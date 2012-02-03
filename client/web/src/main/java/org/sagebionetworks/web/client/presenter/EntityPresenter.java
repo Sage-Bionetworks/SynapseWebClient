@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.registry.EntityTypeMetadata;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
@@ -89,7 +89,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					if(!DisplayUtils.handleServiceException(ex, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
 						onFailure(null);					
 					} 
-					return;
+					placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
 				}				
 			}
 			

@@ -20,6 +20,12 @@ public interface HeaderView extends IsWidget {
 	public void refresh();
 	
 	/**
+	 * Sets the search box to visible or not
+	 * @param searchVisible
+	 */
+	public void setSearchVisible(boolean searchVisible);
+
+	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
@@ -27,5 +33,6 @@ public interface HeaderView extends IsWidget {
 
 		void lookupId(String synapseId);
 	}
+
 
 }

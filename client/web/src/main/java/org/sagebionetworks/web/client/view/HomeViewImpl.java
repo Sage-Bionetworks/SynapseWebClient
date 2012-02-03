@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -30,18 +31,22 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Anchor demoCharlesLink;
 	@UiField
 	Anchor seeAllContributors;
+	@UiField
+	SimplePanel bigSearchBox;
 	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
 	private GlobalApplicationState globalApplicationState;
+	private HomeSearchBox homeSearchBox;
 	
 	@Inject
-	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget, Footer footerWidget, IconsImageBundle icons, QueryFilter filter, SageImageBundle imageBundle, GlobalApplicationState globalApplicationState) {		
+	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget, Footer footerWidget, IconsImageBundle icons, QueryFilter filter, SageImageBundle imageBundle, GlobalApplicationState globalApplicationState, HomeSearchBox homeSearchBox) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.globalApplicationState = globalApplicationState;
+		this.homeSearchBox = homeSearchBox;
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -54,7 +59,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 			demoCharlesLink.setHref("#" + globalApplicationState.getAppPlaceHistoryMapper().getToken(new ComingSoon(DisplayUtils.DEFAULT_PLACE_TOKEN)));
 			seeAllContributors.setHref("#" + globalApplicationState.getAppPlaceHistoryMapper().getToken(new ComingSoon(DisplayUtils.DEFAULT_PLACE_TOKEN)));
 		}
-		
+
+		bigSearchBox.clear();
+		bigSearchBox.add(homeSearchBox.asWidget());
+
 	}
 
 
@@ -66,6 +74,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void refresh() {
 		headerWidget.refresh();
+		headerWidget.setSearchVisible(false);
 	}
 
 	@Override

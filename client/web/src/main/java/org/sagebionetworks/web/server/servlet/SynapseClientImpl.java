@@ -3,6 +3,7 @@ package org.sagebionetworks.web.server.servlet;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.logging.Logger;
 
 import org.sagebionetworks.client.Synapse;
@@ -10,6 +11,8 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -122,6 +125,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		return entityWrapper;
 	}
 	
+	@Override
+	public EntityWrapper search(String searchQueryJson) {
+		Synapse synapseClient = createSynapseClient();
+		EntityWrapper entityWrapper = new EntityWrapper();
+		
+		try {
+			JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
+			SearchResults searchResults = synapseClient.search(new SearchQuery(adapter.createNew(searchQueryJson)));
+			searchResults.writeToJSONObject(adapter);
+			entityWrapper.setEntityJson(adapter.toJSONString());
+		} catch (SynapseException e) {
+			entityWrapper.setRestServiceException(ExceptionUtil.convertSynapseException(e));
+		} catch (JSONObjectAdapterException e) {
+			entityWrapper.setRestServiceException(new UnknownErrorException(e.getMessage()));
+		} catch (UnsupportedEncodingException e) {
+			entityWrapper.setRestServiceException(new UnknownErrorException(e.getMessage()));
+		}		
+
+		return entityWrapper;
+	}
+
+	
 	
 	/*
 	 * Private Methods
@@ -178,4 +203,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		}
 		return jsonString;
 	}
+
 }

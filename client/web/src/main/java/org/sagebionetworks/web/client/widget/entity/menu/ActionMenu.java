@@ -2,25 +2,25 @@ package org.sagebionetworks.web.client.widget.entity.menu;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.place.Lookup;
+import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityType;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -32,17 +32,19 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
+	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
 	private Entity entity;
 	private EntityTypeProvider entityTypeProvider;
 	
 	@Inject
-	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider) {
+	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.nodeService = nodeService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
+		this.globalApplicationState = globalApplicationState;
 		
 		view.setPresenter(this);
 	}	
@@ -96,21 +98,21 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	@Override
 	public void deleteEntity() {
 		final String parentId = entity.getParentId();
+		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entity);
 		final String entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(entity);
-		nodeService.deleteAcl(DisplayUtils.getNodeTypeForEntity(entity), entity.getId(), new AsyncCallback<String>() {			
+		nodeService.deleteNode(DisplayUtils.getNodeTypeForEntity(entity), entity.getId(), new AsyncCallback<Void>() {			
 			@Override
-			public void onSuccess(String result) {
-				try {
-					nodeModelCreator.validate(result);
-					view.showInfo(entityTypeDisplay + " Deleted", "The " + entityTypeDisplay + " was successfully deleted."); 
-					// Go to entity's parent
-					placeChanger.goTo(new Lookup(parentId));
-				} catch (RestServiceException ex) {					
-					if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {					
-						onFailure(null);					
-					} 
-					return;
+			public void onSuccess(Void result) {				
+				view.showInfo(entityTypeDisplay + " Deleted", "The " + entityTypeDisplay + " was successfully deleted."); 
+				// Go to entity's parent
+				Place gotoPlace = null;
+				if(parentId != null && !"/project".equals(entityType.getUrlPrefix())) {
+					gotoPlace = new Synapse(parentId);
+				} else {
+					gotoPlace = new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
 				}
+					
+				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
 			}
 			
 			@Override

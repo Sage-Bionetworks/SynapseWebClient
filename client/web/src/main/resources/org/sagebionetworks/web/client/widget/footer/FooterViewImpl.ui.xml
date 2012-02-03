@@ -5,44 +5,72 @@
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
 	
 	<g:HTMLPanel>
-<!-- This is the static footer -->
-		<div class="footer">
-			<hr />
-			<div class="footer_nav clearfix left">
-				<table>
-					<tr>
-						<td><a href="#ComingSoon:0">Privacy Policy</a></td>
-						<td><a href="#ComingSoon:0">Platform support</a></td>
-						<td><a href="#ComingSoon:0">Creative Commons License</a></td>
-					</tr>
-					<tr>
-						<td><a href="#ComingSoon:0">FAQ</a></td>
-						<td><a href="#ComingSoon:0">Submit feedback</a></td>
-						<td><a href="http://www.sagebase.org">Visit the Sage website</a></td>
-					</tr>
-				</table>
-			</div>
-			<div class="footer_logos">
-				<ul>
-					<li><a href="http://www.lsdfa.org/" target="_new"><img src="images/LSDF_logo.jpg"/></a></li>
-					<li><a href="http://www.cancer.gov/" target="_new"><img src="images/NCI_logo.jpg"/></a></li>
-				</ul>
-			</div>
-			<div class="contact right">
-				<div class="vcard right">
-					<p class="fn"><span class="organization-name">Sage Bionetworks</span></p>
-					<p class="adr">
-						<span class="street-address">1100 Fairview Ave N</span><br/>
-						<span class="locality">Seattle</span>
 
-						<span class="region">WA</span>
-						<span class="postal-code">98109</span><br/>
-						<a href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a>
-					</p>
-				</div> 
-				<img src="static/images/sage_logo.png" class="logo" alt="sage logo" />
-			</div>
+		<!-- FOOTER -->
+		<div class="footer-line-top-wrapper">
+            <div class="footer-container">
+                <div class="span-24 notopmargin footer-top-line">
+            	</div>
+        	</div>
+            <div class="clear"></div>
+    	</div>
+        <div class="clear"></div>
+        <div class="footer-wrapper">
+            <div class="footer-container">
+                <div class="span-24 notopmargin">
+                    <div class="span-24 footer notopmargin">
+                        <div class="span-5 notopmargin">
+                            <h6>With Support From</h6>                            				                          
+                            <div class="flickr item left"><a href="http://www.lsdfa.org/" target="_new"><img src="images/LSDF_logo.jpg" style="padding: 5px;"/></a></div>                            
+                        </div>
+                        <div class="span-12 notopmargin">
+                            <h6>&nbsp;</h6>
+                            <div class="flickr item left"><a href="http://www.cancer.gov/" target="_new"><img src="images/NCI_logo.jpg" style="padding: 5px;" /></a></div>                                                       
+                        </div>
+                        <div class="span-3 notopmargin">
+                        	<h6>Follow Us On</h6>                            
+                            <div class="tweet-icon">
+                                <a href="https://twitter.com/sagebio" class='social' title='Twitter'><img src="images/1px.png" alt="" width="26px" height="26px" /></a>
+                            </div>
+                            <div class="facebook-icon">
+                                <a href="http://www.facebook.com/pages/Sage-Bionetworks/246302308981" class='social' title='Facebook'><img src="images/1px.png" alt="" width="26px" height="26px" /></a>
+                            </div>
+                        </div>
+                        <div class="span-4 notopmargin last">
+                            <h6>Contact info</h6>
+                            <p class="small">
+                            	Sage Bionetworks<br/>
+                            	1100 Fairview Ave N<br/>
+                            	Seattle, WA 98109<br/>
+                            	<a href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a>                             	
+                           	</p>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+            <div class="clear"></div>
 		</div>
+        <div class="footer-line-wrapper">
+            <div class="footer-container">
+                <div class="span-24 notopmargin footer-line">
+                    <div class="span-10 notopmargin">
+                        <p>Copyright 2011 <a class="link" href="http://www.sagebase.org">Sage Bionetworks</a></p>
+                    </div>
+                    <div class="span-14 notopmargin last">
+                    	<p class="right">
+	                    	<a class="link" href="#Home:0">Home</a> / 
+							<a class="link" href="#ComingSoon:0">Privacy Policy</a> /
+							<a class="link" href="#ComingSoon:0">Platform support</a> /
+							<a class="link" href="#ComingSoon:0">Creative Commons License</a> /
+							<a class="link" href="#ComingSoon:0">FAQ</a> /
+							<a class="link" href="#ComingSoon:0">Submit feedback</a>
+                    	</p>           
+                	</div>
+            	</div>
+                <div class="clear"></div>
+        	</div>
+    	</div>
+
 		<script ui:field="searchScript"/>
 	</g:HTMLPanel>
 </ui:UiBinder>

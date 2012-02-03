@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.registry.EntityTypeMetadata;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
 public class EntityType {
 
 	private String name;
@@ -23,7 +21,7 @@ public class EntityType {
 		this.urlPrefix = urlPrefix;
 		this.className = className;
 		this.defaultParentPath = defaultParentPath;
-		this.metadata = metadata;
+		this.metadata = metadata;		
 	}
 
 	public List<EntityType> getValidParentTypes() {

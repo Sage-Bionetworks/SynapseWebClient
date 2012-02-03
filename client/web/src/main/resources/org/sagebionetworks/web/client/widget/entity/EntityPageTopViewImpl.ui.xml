@@ -6,32 +6,28 @@
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 
 	<g:HTMLPanel>
-		<div id="content" class="clearfix">
-			<div id="main" role="main">
-				<ul class="breadcrumbs">
-					<li class="breadcrumb">
-						<g:SimplePanel ui:field="breadcrumbsPanel"/>
-					</li>
-				</ul>			
-				
- 				<div id="privacy_setting" class="right">
-					<table>
-						<tr valign="bottom">
-							<td style="padding-right: 10px">
-								<g:SimplePanel ui:field="actionMenuPanel" />
-							</td>
-						</tr>
-					</table>
+
+				<div class="span-24 notopmargin">
+					<g:SimplePanel ui:field="breadcrumbsPanel"/>
 				</div>
 				
-  				<div class="portal">		
-					<!-- <g:SimplePanel ui:field="portalPanel" styleName="portal rounded dropshaddow"/>  -->							
-					<g:SimplePanel ui:field="portalPanel"/>	
-					<g:SimplePanel ui:field="portalPanelSingleCol"/>							
-					<g:SimplePanel ui:field="portalPanelThreeCol"/>
-				</div>						
-			</div>
-		</div>
+				<div class="span-24 notopmargin">
+					<div class="span-17 notopmargin">
+					&nbsp;
+					</div>
+					<div class="span-6 notopmargin" style="text-align: right;">
+						<g:SimplePanel ui:field="actionMenuPanel" />
+					</div>
+				</div>
+				
+				<div class="span-24 notopmargin">
+	  				<div class="portal">		
+						<!-- <g:SimplePanel ui:field="portalPanel" styleName="portal rounded dropshaddow"/>  -->							
+						<g:SimplePanel ui:field="portalPanel"/>	
+						<g:SimplePanel ui:field="portalPanelSingleCol"/>							
+						<g:SimplePanel ui:field="portalPanelThreeCol"/>
+					</div>						
+				</div>
 	</g:HTMLPanel>
 </ui:UiBinder>
 

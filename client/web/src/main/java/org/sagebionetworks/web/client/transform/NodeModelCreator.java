@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.Eula;
 import org.sagebionetworks.repo.model.Layer;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Step;
+import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.shared.Annotations;
 import org.sagebionetworks.web.shared.DownloadLocation;
@@ -26,6 +27,9 @@ public interface NodeModelCreator {
 	Entity createEntity(EntityWrapper entityWrapper) throws RestServiceException;
 	
 	EntityPath createEntityPath(EntityWrapper entityWrapper) throws RestServiceException;
+	
+	SearchResults createSearchResults(EntityWrapper entityWrapper) throws RestServiceException;
+	
 	
 	// Specific Types:
 	

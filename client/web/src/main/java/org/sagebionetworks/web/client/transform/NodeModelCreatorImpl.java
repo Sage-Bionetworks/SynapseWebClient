@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.transform;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.Agreement;
 import org.sagebionetworks.repo.model.Analysis;
+import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Dataset;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -10,6 +11,7 @@ import org.sagebionetworks.repo.model.Eula;
 import org.sagebionetworks.repo.model.Layer;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Step;
+import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -22,6 +24,7 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.LayerPreview;
 import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
@@ -74,6 +77,10 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 						entity = new Analysis(obj);
 					} else if("/step".equals(entityType.getUrlPrefix())) {
 						entity = new Step(obj);
+					} else if("/code".equals(entityType.getUrlPrefix())) {
+						entity = new Code(obj);
+					} else {
+						throw new UnknownErrorException("Unknown entity type");
 					} 
 				}			
 			} catch (JSONObjectAdapterException e) {
@@ -104,7 +111,34 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		return entityPath;
 	}
 
+	// TODO : template this kind of method
+	@Override
+	public SearchResults createSearchResults(EntityWrapper entityWrapper)
+			throws RestServiceException {
+		SearchResults searchResults = null;
+		
+		if(entityWrapper.getRestServiceException() != null) {
+			throw entityWrapper.getRestServiceException();
+		}
+ 
+		String json = entityWrapper.getEntityJson();
+		if(json != null) {			
+			try {
+				JSONObjectAdapter obj = jsonObjectAdapter.createNew(json);			
+				searchResults = new SearchResults(obj);
+			} catch (JSONObjectAdapterException e) {
+				throw new RestServiceException(e.getMessage());
+			}
+		}		
+		
+		return searchResults;
+	}
+
 	
+	
+	/*
+	 * Specific types
+	 */
 	@Override
 	public Dataset createDataset(String json) throws RestServiceException {
 		JSONObject obj = JSONParser.parseStrict(json).isObject();

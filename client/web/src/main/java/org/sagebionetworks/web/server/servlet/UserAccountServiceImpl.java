@@ -95,7 +95,10 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		} catch (NullPointerException nex) {
 			// TODO : change this to properly deal with a 204!!!
 			return; // this is expected
-		}
+		} catch (RestClientException ex) {
+			// Not ideal. DELETE returns no content type
+			return;
+		}		
 		
 		throw new RestClientException("An error occured. Please try again.");
 		
@@ -139,7 +142,11 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		} catch (NullPointerException nex) {
 			// TODO : change this to properly deal with a 204!!!
 			return; // this is expected
-		}
+		} catch (RestClientException ex) {
+			// Not ideal. DELETE returns no content type
+			return;
+		}		
+	
 		
 		throw new RestClientException("An error occured. Please try again.");		
 	}

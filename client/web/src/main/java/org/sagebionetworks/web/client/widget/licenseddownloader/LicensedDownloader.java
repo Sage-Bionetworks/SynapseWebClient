@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Eula;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
@@ -12,15 +14,20 @@ import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.shared.DownloadLocation;
+import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.FileDownload;
 import org.sagebionetworks.web.shared.LicenseAgreement;
@@ -55,6 +62,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private AsyncCallback<Void> licenseAcceptedCallback;	
 	private boolean hasAcceptedLicenseAgreement;
 	private LicenseAgreement licenseAgreement;
+	private EntityTypeProvider entityTypeProvider;
 	
 	@Inject
 	public LicensedDownloader(LicensedDownloaderView view,
@@ -63,7 +71,8 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient, 
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			EntityTypeProvider entityTypeProvider) {
 		this.view = view;
 		this.nodeService = nodeService;
 		this.licenseService = licenseService;
@@ -73,6 +82,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.placeChanger = globalApplicationState.getPlaceChanger();
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapterProvider = jsonObjectAdapter;
+		this.entityTypeProvider = entityTypeProvider;
 		
 		view.setPresenter(this);		
 	}
@@ -243,62 +253,120 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	}
 
 	/**
-	 * Recursively look up the entity hierarchy until we find a eula id
-	 * @param root
+	 * Recursively look up the entity hierarchy until we find a eula id. This should probably be generalized and moved to 
+	 * a DisplayUtils. Not going to now as I don't want to heavily refactor this branch.
+	 * @param start
 	 * @param callback
 	 */
-	private void findEulaId(Entity root, final AsyncCallback<String> callback) {
-		if(root == null) {
+	public void findEulaId(final Entity start, final AsyncCallback<String> callback) {
+		if(start == null) {
 			callback.onFailure(null);
 			return;			
 		}
+		
+		// test if this entity has a eula
 		try {
-			if(root.getJSONSchema() == null) {
-				callback.onFailure(null);
+			String startEulaId = getEulaId(start);
+			if(startEulaId != null) {
+				callback.onSuccess(startEulaId);
 				return;
-			}				
-			ObjectSchema schema = new ObjectSchema(jsonObjectAdapterProvider.createNew(root.getJSONSchema()));
+			}
+		} catch (JSONObjectAdapterException e1) {
+		}
+		
+		// get path and iterate through parents to find eula id
+		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(start);
+		synapseClient.getEntityPath(start.getId(), entityType.getUrlPrefix(), new AsyncCallback<EntityWrapper>() {			
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				EntityPath entityPath = null;
+				try {					
+					// get and add paths
+					entityPath = nodeModelCreator.createEntityPath(result);
+					if(entityPath != null) {
+						List<EntityHeader> path = entityPath.getPath();
+						//start with start entity's parent and stop short of the root
+						List<EntityHeader> trimmedPath = path.subList(1, path.size()-1); 
+						findEulaIdInPath(trimmedPath, trimmedPath.size()-1, callback);
+					} else {
+						onFailure(null);
+					}
+				} catch (ForbiddenException ex) {
+					// if a parent forbids it's viewing, disable download and don't bother alerting user
+					onFailure(null);					
+					return;								
+				} catch (RestServiceException ex) {					
+					DisplayUtils.handleServiceException(ex, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());					
+					onFailure(null);					
+					return;			
+				}				
+
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(null);
+			}
+		});					
+	}
+	
+	private void findEulaIdInPath(final List<EntityHeader> path, final int currentIndex, final AsyncCallback<String> callback) {
+		// check for end of recursion state
+		if(currentIndex < 0) {
+			// if at end we have successfully traversed the path and found no eula, so return success with null
+			callback.onSuccess(null);			
+		} else {
+			// load entity at this point in the path and check for a eula id
+			EntityHeader element = path.get(currentIndex);							
+			String currentEntityId = element.getId();			
+			synapseClient.getEntity(currentEntityId, new AsyncCallback<EntityWrapper>() {						
+				@Override
+				public void onSuccess(EntityWrapper result) {							
+					try {								
+						Entity currentEntity = nodeModelCreator.createEntity(result);
+						if(currentEntity != null) {
+							String eulaId = getEulaId(currentEntity);
+							if(eulaId != null) {
+								callback.onSuccess(eulaId);			
+							} else {							
+								// Recurse with parent in path 
+								findEulaIdInPath(path, currentIndex-1, callback);
+							}
+						} else {
+							onFailure(null);
+						}
+					} catch (RestServiceException ex) {					
+						DisplayUtils.handleServiceException(ex, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());					
+						onFailure(null);													 							
+					} catch (JSONObjectAdapterException e) {
+						onFailure(null);
+					}											
+				}
+
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+			});				
+		}		
+	}
+	
+	private String getEulaId(Entity entity) throws JSONObjectAdapterException {
+		String eulaId = null;
+		if(entity.getJSONSchema() != null) {
+			ObjectSchema schema = new ObjectSchema(jsonObjectAdapterProvider.createNew(entity.getJSONSchema()));
 			Map<String, ObjectSchema> properties = schema.getProperties();
 			if(properties.containsKey(DisplayUtils.ENTITY_EULA_ID_KEY)) {
 				// this Entity contains a eula field
 				JSONObjectAdapter rootObj = jsonObjectAdapterProvider.createNew();
-				root.writeToJSONObject(rootObj);
+				entity.writeToJSONObject(rootObj);
 				// We have found a parent entity with a eula, and regardless of what it holds we have a success condition
-				String eulaId = null;
 				if(rootObj.has(DisplayUtils.ENTITY_EULA_ID_KEY)) {
 					eulaId = rootObj.getString(DisplayUtils.ENTITY_EULA_ID_KEY);
-				} 
-				callback.onSuccess(eulaId);			
-			} else {
-				// look up parent
-				String parentId = root.getParentId();
-				if(parentId != null) {
-					synapseClient.getEntity(parentId, new AsyncCallback<EntityWrapper>() {						
-						@Override
-						public void onSuccess(EntityWrapper result) {							
-							Entity parentEntity = null;
-							try {
-								// Recurse with parent 
-								parentEntity = nodeModelCreator.createEntity(result);
-								findEulaId(parentEntity, callback);
-							} catch (RestServiceException ex) {					
-								DisplayUtils.handleServiceException(ex, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());					
-								onFailure(null);													 							
-							}											
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
-						}
-					});
-				} else {
-					// hit root and didn't find a eula
-					callback.onFailure(null);
 				}
-			}			
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(null);
-		}
+			}
+		}				
+		return eulaId;
 	}
 		
 	public void showWindow() {

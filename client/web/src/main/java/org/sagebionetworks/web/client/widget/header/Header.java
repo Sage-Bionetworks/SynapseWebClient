@@ -48,8 +48,13 @@ public class Header implements HeaderView.Presenter {
 		return view.asWidget();
 	}
 	
+	public void setSearchVisible(boolean searchVisible) {
+		view.setSearchVisible(searchVisible);
+	}
+	
 	public void refresh() {
 		view.refresh();
+		view.setSearchVisible(true);
 	}
 
 	@Override

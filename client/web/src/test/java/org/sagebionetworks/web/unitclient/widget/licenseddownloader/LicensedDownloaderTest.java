@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.licenseddownloader;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -17,12 +17,15 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Dataset;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Eula;
 import org.sagebionetworks.repo.model.Layer;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -33,6 +36,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicenceServiceAsync;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
+import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 import org.sagebionetworks.web.shared.NodeType;
@@ -54,15 +58,22 @@ public class LicensedDownloaderTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
 	PlaceChanger mockPlaceChanger;
+	AsyncCallback<String> mockStringCallback;
 	
 	JSONObjectAdapter jsonObjectAdapterProvider;
+	EntityTypeProvider entityTypeProvider;
 	Locationable entity;
 	Entity parentEntity;
 	Eula eula1;
 	UserData user1;
 	LicenseAgreement licenseAgreement;
-	List<LocationData> locations;
+	List<LocationData> locations;	
+	EntityPath entityPath;
+	EntityWrapper datasetEntityWrapper;
+	EntityWrapper layerEntityWrapper;
+	EntityWrapper pathEntityWrapper;
 	
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setup(){		
 		mockView = Mockito.mock(LicensedDownloaderView.class);		
@@ -74,11 +85,19 @@ public class LicensedDownloaderTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		jsonObjectAdapterProvider = new JSONObjectAdapterImpl();
+		mockStringCallback = mock(AsyncCallback.class);
+
+
+		// create entity type provider
+		String registryJson = SynapseClientImpl.getEntityTypeRegistryJson();
+		AsyncMockStubber.callSuccessWith(registryJson).when(mockSynapseClient).getEntityTypeRegistryJSON(any(AsyncCallback.class));
+		entityTypeProvider = new EntityTypeProvider(mockSynapseClient, new JSONObjectAdapterImpl());		
+
 		
 		licensedDownloader = new LicensedDownloader(mockView, mockNodeService,
 				mockLicenseService, mockNodeModelCreator,
 				mockAuthenticationController, mockGlobalApplicationState,
-				mockSynapseClient, jsonObjectAdapterProvider);
+				mockSynapseClient, jsonObjectAdapterProvider, entityTypeProvider);
 		
 		
 		licensedDownloader.setPlaceChanger(mockPlaceChanger);
@@ -93,18 +112,40 @@ public class LicensedDownloaderTest {
 		// Parent Entity
 		parentEntity = new Dataset();
 		parentEntity.setId("datasetId");
+		parentEntity.setUri("blahblah/dataset/datasetId");
 		((Dataset)parentEntity).setEulaId(eula1.getId());
 
 		// Entity
 		String md5sum = "4759818803f93967eb250f784cf8576d";
 		String contentType = "application/jpg";		
 		entity = new Layer();
+		entity.setUri("blahblah/layer/layerId");
 		entity.setId("layerId");
 		entity.setName("layer");
 		entity.setParentId(parentEntity.getId());
 		entity.setMd5(md5sum);
 		entity.setContentType(contentType);
 
+		// path for entity
+		entityPath = new EntityPath();
+		List<EntityHeader> path = new ArrayList<EntityHeader>();
+		EntityHeader entityHeader = new EntityHeader();
+		entityHeader.setId("root");
+		entityHeader.setName("root");
+		entityHeader.setType("/folder");
+		path.add(entityHeader);
+		entityHeader = new EntityHeader();
+		entityHeader.setId("datasetId");
+		entityHeader.setName("dataset");
+		entityHeader.setType("/dataset");
+		path.add(entityHeader);
+		entityHeader = new EntityHeader();
+		entityHeader.setId("layerId");
+		entityHeader.setName("layer");
+		entityHeader.setType("/layer");
+		path.add(entityHeader);
+		entityPath.setPath(path);
+		
 		// User
 		user1 = new UserData("email@email.com", "Username", "token", false);
 		
@@ -112,19 +153,59 @@ public class LicensedDownloaderTest {
 		licenseAgreement.setLicenseHtml(eula1.getAgreement());
 
 		// create a DownloadLocation model for this test
-		LocationData downloadLocation = new LocationData();
-		String name = "name";
-		String path = "path";
-		downloadLocation.setPath(path);
+		LocationData downloadLocation = new LocationData();				
+		downloadLocation.setPath("path");
 		locations = new ArrayList<LocationData>();
 		locations.add(downloadLocation);
 
+		datasetEntityWrapper = new EntityWrapper();
+		datasetEntityWrapper.setEntityJson("datasetEntityWrapper");
+		layerEntityWrapper = new EntityWrapper();
+		layerEntityWrapper.setEntityJson("layerEntityWrapper");
+		pathEntityWrapper = new EntityWrapper();
+		pathEntityWrapper.setEntityJson("pathEntityWrapper");
+		
 	}
 	
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testFindEulaId() throws Exception {
+		// test for no eula in parent path
+		resetMocks();
+		configureTestFindEulaIdMocks();
+		((Dataset)parentEntity).setEulaId(null);		
+		licensedDownloader.findEulaId(entity, mockStringCallback);
+		verify(mockStringCallback).onSuccess(null);
+
+		// test failure for 1st parent (dataset) service retrieval
+		resetMocks();
+		configureTestFindEulaIdMocks();
+		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 				
+		licensedDownloader.findEulaId(entity, mockStringCallback);
+		verify(mockStringCallback).onFailure(any(Throwable.class));
+		
+		// test failure for 1st parent (dataset) model creation
+		resetMocks();
+		configureTestFindEulaIdMocks();
+		when(mockNodeModelCreator.createEntity(datasetEntityWrapper)).thenReturn(null); 				
+		licensedDownloader.findEulaId(entity, mockStringCallback);
+		verify(mockStringCallback).onFailure(any(Throwable.class));
+
+		// test finding eula Id in 1st parent (dataset)
+		resetMocks();
+		configureTestFindEulaIdMocks();
+		String eulaId = "eulaId";
+		((Dataset)parentEntity).setEulaId(eulaId);		
+		licensedDownloader.findEulaId(entity, mockStringCallback);
+		verify(mockStringCallback).onSuccess(eulaId);
+		
+	}
+
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testLoadLicenseAgreement() throws RestServiceException {
+	public void testLoadLicenseAgreement() throws Exception {
 		LicenseAgreement licenseAgreement = new LicenseAgreement(eula1.getAgreement(), null, eula1.getId());
 		
 		// null model
@@ -133,81 +214,49 @@ public class LicensedDownloaderTest {
 		
 		// Failure to get parent via synapse client		
 		resetMocks();
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(parentEntity);
-		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(eula1);
-		AsyncMockStubber.callFailureWith(new Throwable("error message")).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); // fail for get parent 
-		AsyncMockStubber.callSuccessWith("eula json").when(mockNodeService).getNodeJSON(eq(NodeType.EULA), eq(eula1.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockLicenseService).hasAccepted(eq(user1.getEmail()), eq(eula1.getId()), eq(parentEntity.getId()), any(AsyncCallback.class));
+		configureTestLoadMocks();
+		AsyncMockStubber.callFailureWith(new Throwable("error message")).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); // fail for get parent
 		licensedDownloader.loadLicenseAgreement(entity);
 		verify(mockView).showDownloadFailure();
 
 		// Success of parental get but failure in Entity creation 
 		resetMocks();
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
+		configureTestLoadMocks();
 		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(null); // failed entity creation
-		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(eula1);
-		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 		
-		AsyncMockStubber.callSuccessWith("eula json").when(mockNodeService).getNodeJSON(eq(NodeType.EULA), eq(eula1.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockLicenseService).hasAccepted(eq(user1.getEmail()), eq(eula1.getId()), eq(parentEntity.getId()), any(AsyncCallback.class));
 		licensedDownloader.loadLicenseAgreement(entity);
 		verify(mockView).showDownloadFailure();
 
 		// Dataset with null EULA 
 		resetMocks();
+		configureTestLoadMocks();
 		((Dataset)parentEntity).setEulaId(null); // null EULA
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(parentEntity);
-		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(eula1);
-		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class));		
-		AsyncMockStubber.callSuccessWith("eula json").when(mockNodeService).getNodeJSON(eq(NodeType.EULA), eq(eula1.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockLicenseService).hasAccepted(eq(user1.getEmail()), eq(eula1.getId()), eq(parentEntity.getId()), any(AsyncCallback.class));
 		licensedDownloader.loadLicenseAgreement(entity);
 		verify(mockView).setLicenceAcceptanceRequired(false);		
 		
 		// model creation of EULA fails
 		resetMocks();
-		((Dataset)parentEntity).setEulaId(eula1.getId()); 
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(parentEntity);
+		configureTestLoadMocks(); 
 		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(null); // null EULA object
-		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class));		
-		AsyncMockStubber.callSuccessWith("eula json").when(mockNodeService).getNodeJSON(eq(NodeType.EULA), eq(eula1.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockLicenseService).hasAccepted(eq(user1.getEmail()), eq(eula1.getId()), eq(parentEntity.getId()), any(AsyncCallback.class));
 		licensedDownloader.loadLicenseAgreement(entity);
 		verify(mockView).showDownloadFailure();
-		
-
+	
 		// License Acceptance failure
 		resetMocks();
-		((Dataset)parentEntity).setEulaId(eula1.getId());
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(parentEntity);
-		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(eula1);
-		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class));		
-		AsyncMockStubber.callSuccessWith("eula json").when(mockNodeService).getNodeJSON(eq(NodeType.EULA), eq(eula1.getId()), any(AsyncCallback.class));
+		configureTestLoadMocks();
 		AsyncMockStubber.callFailureWith(new Throwable("error message")).when(mockLicenseService).hasAccepted(eq(user1.getEmail()), eq(eula1.getId()), eq(parentEntity.getId()), any(AsyncCallback.class)); // has not accepted
 		licensedDownloader.loadLicenseAgreement(entity);
 		verify(mockView).showDownloadFailure();
 
 		// Check all okay but with user not logged in and trying to show download
 		resetMocks();
+		configureTestLoadMocks();
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(null); // null user
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(parentEntity);
-		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(eula1);
-		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class));		
-		AsyncMockStubber.callSuccessWith("eula json").when(mockNodeService).getNodeJSON(eq(NodeType.EULA), eq(eula1.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockLicenseService).hasAccepted(eq(user1.getEmail()), eq(eula1.getId()), eq(parentEntity.getId()), any(AsyncCallback.class));
 		licensedDownloader.loadLicenseAgreement(entity);
 		verify(mockView).setUnauthorizedDownloads();		
 		
 		// License Accepted == False
 		resetMocks();
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(parentEntity);
-		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(eula1);
-		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class));		
-		AsyncMockStubber.callSuccessWith("eula json").when(mockNodeService).getNodeJSON(eq(NodeType.EULA), eq(eula1.getId()), any(AsyncCallback.class));
+		configureTestLoadMocks();
 		AsyncMockStubber.callSuccessWith(false).when(mockLicenseService).hasAccepted(eq(user1.getEmail()), eq(eula1.getId()), eq(parentEntity.getId()), any(AsyncCallback.class)); // accepted == false
 		licensedDownloader.loadLicenseAgreement(entity);
 		verify(mockView).setLicenceAcceptanceRequired(true);
@@ -216,11 +265,7 @@ public class LicensedDownloaderTest {
 		
 		// License Accepted == True
 		resetMocks();
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(parentEntity);
-		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(eula1);
-		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class));		
-		AsyncMockStubber.callSuccessWith("eula json").when(mockNodeService).getNodeJSON(eq(NodeType.EULA), eq(eula1.getId()), any(AsyncCallback.class));
+		configureTestLoadMocks();
 		AsyncMockStubber.callSuccessWith(true).when(mockLicenseService).hasAccepted(eq(user1.getEmail()), eq(eula1.getId()), eq(parentEntity.getId()), any(AsyncCallback.class)); // accepted == true
 		licensedDownloader.loadLicenseAgreement(entity);
 		verify(mockView).setLicenceAcceptanceRequired(false);
@@ -273,19 +318,13 @@ public class LicensedDownloaderTest {
 	}
 
 	@Test
-	public void testAsWidgetParameterized() throws RestServiceException {
+	public void testAsWidgetParameterized() throws Exception {
 
 		// License Accepted == True
 		resetMocks();
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(parentEntity);
-		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(eula1);
-		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class));		
-		AsyncMockStubber.callSuccessWith("eula json").when(mockNodeService).getNodeJSON(eq(NodeType.EULA), eq(eula1.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockLicenseService).hasAccepted(eq(user1.getEmail()), eq(eula1.getId()), eq(parentEntity.getId()), any(AsyncCallback.class)); // accepted == true		
+		configureTestLoadMocks();
 
 		// Success Test: No download
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
 		entity.setLocations(locations);		
 		
 		licensedDownloader.asWidget(entity, false);		
@@ -296,6 +335,7 @@ public class LicensedDownloaderTest {
 		verify(mockView).setLicenseHtml(licenseAgreement.getLicenseHtml());
 
 	}
+	
 	
 	@Test
 	public void testAsWidget(){
@@ -339,7 +379,6 @@ public class LicensedDownloaderTest {
 		verify(callback).onSuccess(null);
 		verify(mockView).setLicenceAcceptanceRequired(false);
 	}
-
 	
 	/*
 	 * Private methods
@@ -353,8 +392,35 @@ public class LicensedDownloaderTest {
 		reset(mockGlobalApplicationState);
 		reset(mockSynapseClient);
 		reset(mockPlaceChanger);
+		reset(mockStringCallback);
 		jsonObjectAdapterProvider = new JSONObjectAdapterImpl();
 	}	
 
+	private void configureTestLoadMocks() throws Exception {
+		((Dataset)parentEntity).setEulaId(eula1.getId());
+		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
+		when(mockNodeModelCreator.createEntity(datasetEntityWrapper)).thenReturn(parentEntity);
+		when(mockNodeModelCreator.createEntity(layerEntityWrapper)).thenReturn(entity);
+		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(eula1);
+		when(mockNodeModelCreator.createEntityPath(pathEntityWrapper)).thenReturn(entityPath);
+		AsyncMockStubber.callSuccessWith(datasetEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
+		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), anyString(), any(AsyncCallback.class)); 		
+		AsyncMockStubber.callSuccessWith("eula json").when(mockNodeService).getNodeJSON(eq(NodeType.EULA), eq(eula1.getId()), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(true).when(mockLicenseService).hasAccepted(eq(user1.getEmail()), eq(eula1.getId()), eq(parentEntity.getId()), any(AsyncCallback.class));
+	}
+
+	private void configureTestFindEulaIdMocks() throws Exception {
+		((Dataset)parentEntity).setEulaId(eula1.getId());
+		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
+		when(mockNodeModelCreator.createEntity(datasetEntityWrapper)).thenReturn(parentEntity);
+		when(mockNodeModelCreator.createEntity(layerEntityWrapper)).thenReturn(entity);
+		when(mockNodeModelCreator.createEntityPath(pathEntityWrapper)).thenReturn(entityPath);
+		AsyncMockStubber.callSuccessWith(datasetEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
+		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), anyString(), any(AsyncCallback.class)); 				
+	}
+	
+	
 	
 }

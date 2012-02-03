@@ -44,7 +44,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 
 	public void setPlace(Home place) {
 		this.place = place;		
-		view.setPresenter(this);
+		view.setPresenter(this);		
 		if(place != null && place.toToken() != null) {
 			if(place.toToken().equals(DisplayConstants.TURN_DEMO_ON_TOKEN)) {
 				DisplayConstants.showDemoHtml = true;

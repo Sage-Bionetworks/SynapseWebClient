@@ -41,6 +41,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpMessageConverterExtractor;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -460,6 +461,9 @@ public class NodeServiceImpl extends RemoteServiceServlet implements
 			return "";	
 		} catch (HttpClientErrorException ex) {
 			return ServiceUtils.handleHttpClientErrorException(ex);
+		} catch (RestClientException ex) {
+			// Not ideal. DELETE returns no content type
+			return "";
 		}		
 	}
 		

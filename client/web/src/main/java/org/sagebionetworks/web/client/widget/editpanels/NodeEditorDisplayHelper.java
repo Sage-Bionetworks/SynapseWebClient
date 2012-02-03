@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.editpanels;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,14 +26,15 @@ public class NodeEditorDisplayHelper {
 		typeToDevaition.put(NodeType.LAYER, createLayerDeviation());
 		typeToDevaition.put(NodeType.PROJECT, createProjectDeviation());		
 		typeToDevaition.put(NodeType.ANALYSIS, createAnalysisDeviation());		
-		typeToDevaition.put(NodeType.STEP, createStepDeviation());		
+		typeToDevaition.put(NodeType.STEP, createStepDeviation());
+		typeToDevaition.put(NodeType.CODE, createCodeDeviation());
 	}
 
 	public SpecificNodeTypeDeviation getNodeTypeDeviation(NodeType type) {
 		if(typeToDevaition.containsKey(type)) {
 			return typeToDevaition.get(type);
-		}
-		return null;
+		} 
+		return new SpecificNodeTypeDeviation(type, type.name(), "", "", new ArrayList<String>(), new ArrayList<String>());
 	}
 			
 	/*
@@ -99,6 +101,19 @@ public class NodeEditorDisplayHelper {
 				NodeType.STEP, "Step",
 				DisplayConstants.CREATE_STEP_TEXT,
 				DisplayConstants.EDIT_STEP_TEXT, 
+				Arrays.asList(new String[] {"name"}),
+				Arrays.asList(new String[] {"name", "description"}));		
+		deviation.setKeyToOntology(new StaticEnumerations().getAnnotationToEnum());
+			
+		return deviation;
+	}
+	
+	// CODE
+	private SpecificNodeTypeDeviation createCodeDeviation() {
+		SpecificNodeTypeDeviation deviation = new SpecificNodeTypeDeviation(
+				NodeType.CODE, "Code",
+				DisplayConstants.CREATE_CODE_TEXT,
+				DisplayConstants.EDIT_CODE_TEXT, 
 				Arrays.asList(new String[] {"name"}),
 				Arrays.asList(new String[] {"name", "description"}));		
 		deviation.setKeyToOntology(new StaticEnumerations().getAnnotationToEnum());

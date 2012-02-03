@@ -1,21 +1,16 @@
 package org.sagebionetworks.web.client;
 
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
-import org.sagebionetworks.repo.model.Agreement;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Eula;
-import org.sagebionetworks.schema.ObjectSchema;
-import org.sagebionetworks.web.client.place.Analysis;
-import org.sagebionetworks.web.client.place.Dataset;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.Layer;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Project;
-import org.sagebionetworks.web.client.place.Step;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -34,7 +29,6 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
@@ -61,7 +55,6 @@ public class DisplayUtils {
 	private static final String ERROR_OBJ_REASON_KEY = "reason";
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
-	
 	
 	/*
 	 * Style names
@@ -280,6 +273,8 @@ public class DisplayUtils {
 			return NodeType.ANALYSIS;
 		} else if(entity instanceof org.sagebionetworks.repo.model.Step) {
 			return NodeType.STEP;
+		} else if(entity instanceof org.sagebionetworks.repo.model.Code) {
+			return NodeType.CODE;
 		}
 		return null;	
 	}
@@ -306,7 +301,9 @@ public class DisplayUtils {
 			return NodeType.ANALYSIS;
 		} else if("/step".equals(entityType.getUrlPrefix())) {
 			return NodeType.STEP;
-		} 
+		} else if("/code".equals(entityType.getUrlPrefix())) {
+			return NodeType.CODE;
+		}
 		return null;	
 	}
 	
@@ -349,6 +346,21 @@ public class DisplayUtils {
 		return dt.toDate();
 	}
 	
+	public static String getSynapseHistoryToken(String value) {
+		return "#" + getPlaceString(Synapse.class) + ":" + value;
+	}
+	
+	public static String stubStr(String str, int length) {
+		if(str == null) {
+			return "";
+		}
+		if(str.length() > length) {
+			String sub = str.substring(0, length);
+			str = sub.replaceFirst(" \\w+$", "") + ".."; // clean off partial last word
+		} 
+		return str; 
+	}
+
 	
 	/*
 	 * Private methods

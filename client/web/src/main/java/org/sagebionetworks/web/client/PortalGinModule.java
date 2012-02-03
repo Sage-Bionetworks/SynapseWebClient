@@ -44,6 +44,8 @@ import org.sagebionetworks.web.client.view.ProjectsHomeView;
 import org.sagebionetworks.web.client.view.ProjectsHomeViewImpl;
 import org.sagebionetworks.web.client.view.PublicProfileView;
 import org.sagebionetworks.web.client.view.PublicProfileViewImpl;
+import org.sagebionetworks.web.client.view.SearchView;
+import org.sagebionetworks.web.client.view.SearchViewImpl;
 import org.sagebionetworks.web.client.view.StepView;
 import org.sagebionetworks.web.client.view.StepViewImpl;
 import org.sagebionetworks.web.client.view.StepsHomeView;
@@ -90,6 +92,10 @@ import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowView;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowViewImpl;
+import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
+import org.sagebionetworks.web.client.widget.search.HomeSearchBoxViewImpl;
+import org.sagebionetworks.web.client.widget.search.SearchBoxView;
+import org.sagebionetworks.web.client.widget.search.SearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButtonView;
@@ -218,6 +224,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(PublicProfileViewImpl.class).in(Singleton.class);
 		bind(PublicProfileView.class).to(PublicProfileViewImpl.class);
 		
+		// SearchView
+		bind(SearchViewImpl.class).in(Singleton.class);
+		bind(SearchView.class).to(SearchViewImpl.class);
+		
 		/*
 		 * Widgets
 		 */
@@ -312,7 +322,15 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// EntityChildBrowser (not singleton as you may want multiple)
 		bind(LocationableDownloaderView.class).to(LocationableDownloaderViewImpl.class);
-		
+
+		// Search Box
+		bind(SearchBoxViewImpl.class).in(Singleton.class);
+		bind(SearchBoxView.class).to(SearchBoxViewImpl.class);
+
+		// Home Search Box
+		bind(HomeSearchBoxViewImpl.class).in(Singleton.class);
+		bind(HomeSearchBoxView.class).to(HomeSearchBoxViewImpl.class);
+
 	}
 
 }
