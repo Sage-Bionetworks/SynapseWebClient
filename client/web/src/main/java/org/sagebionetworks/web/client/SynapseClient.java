@@ -17,6 +17,8 @@ public interface SynapseClient extends RemoteService {
 	
 	public EntityWrapper getEntityPath(String entityId, String urlPrefix);
 	
-	public SerializableWhitelist junk(SerializableWhitelist l); 
+	public EntityWrapper search(String searchQueryJson); 
+	
+	public SerializableWhitelist junk(SerializableWhitelist l);
 	
 }

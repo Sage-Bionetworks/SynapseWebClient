@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Project;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.PublicProfile;
+import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Step;
 import org.sagebionetworks.web.client.place.StepsHome;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -43,6 +44,7 @@ import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectPresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.PublicProfilePresenter;
+import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.StepPresenter;
 import org.sagebionetworks.web.client.presenter.StepsHomePresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
@@ -89,6 +91,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Analysis.class);
 		openAccessPlaces.add(AnalysesHome.class);
 		openAccessPlaces.add(PublicProfile.class);
+		openAccessPlaces.add(Search.class);
 	}
 
 	@Override
@@ -216,6 +219,11 @@ public class AppActivityMapper implements ActivityMapper {
 			PublicProfilePresenter presenter = ginjector.getPublicProfilePresenter();
 			presenter.setPlace((PublicProfile)place);
 			return presenter;
+		} else if (place instanceof Search) {
+			// search results page
+			SearchPresenter presenter = ginjector.getSearchPresenter();
+			presenter.setPlace((Search)place);
+			return presenter;
 		} else {
 			// Log that we have an unknown place but send the user to the default
 			log.log(Level.WARNING, "Unknown Place: "+place.getClass().getName());
@@ -229,7 +237,7 @@ public class AppActivityMapper implements ActivityMapper {
 	 * @return
 	 */
 	public Place getDefaultPlace() {
-		return new Home(null);
+		return new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
 	}
 
 }

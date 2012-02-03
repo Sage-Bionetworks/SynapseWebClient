@@ -8,6 +8,7 @@ public interface SynapseWidgetPresenter {
 
 	public Widget asWidget();
 	
+	@Deprecated
     public void setPlaceChanger(PlaceChanger placeChanger);
 
 }

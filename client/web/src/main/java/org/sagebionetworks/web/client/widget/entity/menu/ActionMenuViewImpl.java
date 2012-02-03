@@ -219,29 +219,31 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 	
 	private void configureAddMenu(final Entity entity, final EntityType entityType) {		
 		// create add menu button from children
-		List<EntityType> children = entityType.getValidChildTypes();
 		Menu menu = new Menu();		
 		MenuItem item;
-		
-		// TODO : sort children?
 		int numAdded = 0;
-		List<EntityType> skipTypes = presenter.getAddSkipTypes();		
-		for(final EntityType childType : children) {
-			if(skipTypes.contains(childType)) continue; // skip some types
-			
-			String displayName = DisplayUtils.uppercaseFirstLetter(childType.getName());			
-			item = new MenuItem(displayName);
-			// TODO : replace icon with entity type icon
-			item.setIcon(AbstractImagePrototype.create(iconsImageBundle.documentAdd16()));
-			item.addSelectionListener(new SelectionListener<MenuEvent>() {
-				public void componentSelected(MenuEvent menuEvent) {													
-					showAddWindow(childType, entity.getId());
-				}
-			});
-			menu.add(item);
-			numAdded++;
-		}
 		
+		List<EntityType> children = entityType.getValidChildTypes();
+		if(children != null) {
+			// TODO : sort children?
+			List<EntityType> skipTypes = presenter.getAddSkipTypes();
+			for(final EntityType childType : children) {
+				if(skipTypes.contains(childType)) continue; // skip some types
+				
+				String displayName = DisplayUtils.uppercaseFirstLetter(childType.getName());			
+				item = new MenuItem(displayName);
+				// TODO : replace icon with entity type icon
+				item.setIcon(AbstractImagePrototype.create(iconsImageBundle.documentAdd16()));
+				item.addSelectionListener(new SelectionListener<MenuEvent>() {
+					public void componentSelected(MenuEvent menuEvent) {													
+						showAddWindow(childType, entity.getId());
+					}
+				});
+				menu.add(item);
+				numAdded++;
+			}
+		}
+			
 		if(numAdded==0) {
 			addButton.disable();
 		}

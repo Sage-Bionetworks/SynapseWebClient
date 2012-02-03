@@ -18,13 +18,14 @@
 		
 	<g:HTMLPanel>
 
-	<!-- start header -->
-		<div id="container" class="clearfix">		
+	<!-- MAIN CONTAINER -->
+		<!-- HEADER -->
+        <div class="color-line"></div>
+        <div class="clear"></div>
+    	<div class="container"> 		
 			<g:SimplePanel ui:field="header" />
-			<div id="main" role="main">
-	<!-- end header -->
-				<div id="content" class="clearfix">
-
+	        	<div class="span-24 notopmargin">
+	        	
 					<ul class="breadcrumbs">
 						<li class="breadcrumb"><a href="#">Home</a> > <a href="#AnalysisHome:0">All Analysis</a> > <span ui:field="breadcrumbTitleSpan" /></li>
 					</ul>				
@@ -119,11 +120,9 @@
  				
 			</div>
 					
-<!-- start footer -->
-				<g:SimplePanel ui:field="footer" />
-			</div> <!-- id: main -->				
-		</div> <!-- id: container -->
-<!-- end footer -->
+            <div class="clear"></div>
+        </div> <!-- close class="container" -->
+		<g:SimplePanel ui:field="footer" />
 
 	</g:HTMLPanel>
 </ui:UiBinder> 

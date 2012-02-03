@@ -1,12 +1,12 @@
 /** Add css rules here for your application. */
 /** Example rules used by the template application (remove for your app) */
-h1 {
+/* h1 {
 	font-size: 2em;
 	font-weight: bold;
 	color: #777777;
 	margin: 40px 0px 70px;
 	text-align: center;
-}
+} */
 
 .sendButton {
 	display: block;
@@ -42,12 +42,6 @@ h1 {
 .datasetLayerColumn {
 	text-align: left;
 	width: 0px;
-}
-
-.mainBody {
-/*	margin: 15px 30px 6px;
-	width: 1060px;
-	height: 800px;*/ 
 }
 
 .mainPageHeader {
@@ -212,3 +206,70 @@ h1 {
 	margin-right: 0px;
 	
 }
+
+/* Search boxes */
+.homesearchbox {
+	width: 650px;
+	margin: 4px 0 0 0;
+
+	height: 25px;
+	font-size: 1.6em;
+
+	-moz-box-shadow: black 0 0 0 0;
+	-webkit-box-shadow: black 0 0 0 0;
+	-o-box-shadow: black 0 0 0 0;
+	box-shadow: black 0 0 0 0;
+	font-family: "Ubuntu", sans-serif;
+
+	-webkit-border-radius: 4px;
+	-o-border-radius: 4px;
+	-khtml-border-radius: 4px;
+	border-radius: 4px;
+	display: inline-block;
+	-moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 0 rgba(255, 255, 255, 0.9);
+	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 0 rgba(255, 255, 255, 0.9);
+	-o-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 0 rgba(255, 255, 255, 0.9);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 0 rgba(255, 255, 255, 0.9);
+	border: medium none;
+	padding: 5px;
+	margin-bottom: 5px;
+	margin-left: 2px;
+	border: 1px solid #AAA;
+	border-image: initial;
+	
+	vertical-align: middle;
+	background: white;	
+}
+
+.smallsearchbox {	
+	width: 140px;
+	margin: 0;
+	height: 26px;
+	background-color:  #fff;
+	font-size: 1.2em;
+}
+
+.resultssearchbox {
+	width: 500px;
+	margin: 0px 0 0 0;
+	height: 20px;
+	font-size: 1.2em;
+}
+
+
+
+/* Clear out GWT's link color */
+a, a:visited, a:hover {
+  color: inherit;
+}
+
+a.shortBtn {		
+	display: inline-block; 
+	margin: 6px 5px 7px 0px;
+	padding:5px;
+	color: #ffffff;
+	background-color: #666;	
+}
+
+
+

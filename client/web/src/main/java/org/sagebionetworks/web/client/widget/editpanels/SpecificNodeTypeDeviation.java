@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.editpanels;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ public class SpecificNodeTypeDeviation {
 		this.editText = editText;
 		this.creationRequiredFields = creationRequiredFields;
 		this.updateShowFields = updateShowFields;
+		this.keyToOntology = new HashMap<String, Enumeration>();
 	}
 
 	public NodeType getNodeType() {

@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class BreadcrumbViewImpl extends LayoutContainer implements BreadcrumbView {
+	private static final int MAX_BREADCRUMB_LENGTH = 25;
 	private static final String BREADCRUMB_SEP = "&nbsp;&raquo;&nbsp;";
 
 	public interface BreadcrumbViewImplUiBinder extends
@@ -52,8 +53,10 @@ public class BreadcrumbViewImpl extends LayoutContainer implements BreadcrumbVie
 		panel.removeAll();
 		panel.layout();
 		for (int i = 0; i < breadcrumbs.size(); i++) {
-			final LinkData data = breadcrumbs.get(i);			
-			Anchor anchor = new Anchor(data.getText());
+			final LinkData data = breadcrumbs.get(i);
+			String text = data.getText();
+			text = stubString(text);
+			Anchor anchor = new Anchor(text);
 			anchor.addClickHandler(new ClickHandler() {				
 				@Override
 				public void onClick(ClickEvent event) {
@@ -66,6 +69,7 @@ public class BreadcrumbViewImpl extends LayoutContainer implements BreadcrumbVie
 			panel.add(anchor);
 		}
 		if (current != null) {
+			current = stubString(current);
 			panel.add(new Html(BREADCRUMB_SEP + current));
 		}
 		panel.layout(true);
@@ -93,4 +97,16 @@ public class BreadcrumbViewImpl extends LayoutContainer implements BreadcrumbVie
 		DisplayUtils.showErrorMessage(message); 
 	}
 
+	/*
+	 * Private Methods
+	 */
+	private String stubString(String text) {
+		if(text.length() > MAX_BREADCRUMB_LENGTH) {
+			text = text.substring(0, MAX_BREADCRUMB_LENGTH-1) + "...";
+		}
+		return text;
+	}
+
+
+	
 }

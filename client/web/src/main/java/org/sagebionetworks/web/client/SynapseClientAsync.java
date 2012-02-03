@@ -13,7 +13,10 @@ public interface SynapseClientAsync {
 
 	void getEntityPath(String entityId, String urlPrefix, AsyncCallback<EntityWrapper> callback);
 
+	void search(String searchQueryJson, AsyncCallback<EntityWrapper> callback);
+
 	void junk(SerializableWhitelist l,
 			AsyncCallback<SerializableWhitelist> callback);
+
 	
 }

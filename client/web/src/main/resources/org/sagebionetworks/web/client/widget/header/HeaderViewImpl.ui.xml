@@ -1,55 +1,40 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:d="urn:import:com.google.gwt.dom.client">
-	
-	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
-	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle'/>
-	<g:HTMLPanel>	
-		<div class="header">
-			<div id="header_top" class="clearfix">				
-				<div id="logo" class="left">
-						<a href="#"><g:Image resource="{sageImages.sageLogoAndTitle}"/></a>
-				</div>
-				<div id="user_tools" class="right">
-					<span class="hello" ui:field="userName" /><br />
-					<span class="tools right">
-					<table>
-						<tr>
-							<!-- 
-							<td><a href="edit_profile.html">My profile</a><g:Hyperlink ui:field="editProfileLink" /></td>
-							<td>&nbsp;|&nbsp;</td>
-							 -->
-							<td align="right"><g:Anchor ui:field="topRightLink1" /></td>
-							<td>&nbsp;|&nbsp;</td>
-							<td align="right"><g:Hyperlink ui:field="topRightLink2" /></td>
-						</tr>
-					</table>					
-					</span>
-					<span>
-						<br/>
-						<br/>
-										
-						<g:SimplePanel ui:field="jumpToPanel"/>
-					</span>		
-					
-				</div>													
-			</div>	
-			<div class="global_nav">
-				<ul id="navbar_ul">
-					<li class="first" ui:field="navbarDatasets"><g:Hyperlink ui:field="datasetsLink">Datasets</g:Hyperlink></li> 
-					<li ui:field="navbarTools"><g:Hyperlink ui:field="toolsLink">Tools</g:Hyperlink></li>
-					<li ui:field="navbarNetworks"><g:Hyperlink ui:field="networksLink">Networks</g:Hyperlink></li>
-					<li ui:field="navbarPeople"><g:Anchor ui:field="peopleLink">People</g:Anchor></li>
-					<li class="last" ui:field="navbarProjects"><g:Anchor ui:field="projectsLink">Projects</g:Anchor></li>
+
+	<ui:with field='icons'
+		type='org.sagebionetworks.web.client.IconsImageBundle' />
+	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
+	<g:HTMLPanel>
+
+		<div class="span-24 notopmargin">
+			<div class="span-16 logo">
+				<a href="#">
+					<g:Image resource="{sageImages.sageLogoAndTitle}" />
+				</a>
+			</div>
+			<div class="span-8 last">
+				<h5 style="text-align: right;">
+					<span ui:field="userName" />
+				</h5>
+				<div class="menu-right"></div>
+				<ul class="sf-menu">
+					<li>
+						<g:Anchor ui:field="topRightLink1" />
+					</li>
+					<li>
+						<g:Hyperlink ui:field="topRightLink2" />
+					</li>
 				</ul>
-				
-				<div id="search" class="right">
-					<!-- <form action="" method="get">  -->
-						<input id="query" type="input" class="search_box" name="q" value="" />						
-						<span class="advanced"><a href="#ComingSoon:0">Advanced<br />Search</a></span>
-					<!-- </form>  -->
+				<div class="menu-left"></div>
+			</div>
+			<div class="span-24 notopmargin">
+				<div class="span-16 notopmargin">&nbsp;</div>
+				<div class="span-8 last notopmargin" style="text-align: right;">
+					<g:SimplePanel ui:field="searchBoxPanel" />
 				</div>
 			</div>
-		</div>		
-			</g:HTMLPanel>	
+		</div>
+
+	</g:HTMLPanel>
 </ui:UiBinder>

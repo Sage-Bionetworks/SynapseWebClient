@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
+import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.shared.users.UserData;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -45,35 +46,15 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
-	
-	@UiField
-	LIElement navbarDatasets;
-	@UiField
-	LIElement navbarTools;
-	@UiField
-	LIElement navbarNetworks;
-	@UiField
-	LIElement navbarPeople;
-	@UiField
-	LIElement navbarProjects;
+
 	@UiField
 	SpanElement userName;
 	@UiField
 	Anchor topRightLink1;
 	@UiField
 	Hyperlink topRightLink2;
-	@UiField 
-	Hyperlink datasetsLink;
-	@UiField 
-	Hyperlink toolsLink;
-	@UiField 
-	Hyperlink networksLink;
 	@UiField
-	Anchor peopleLink;	// TODO : change to Hyperlink post demo era
-	@UiField 
-	Anchor projectsLink; // TODO : change to Hyperlink post demo era
-	@UiField
-	SimplePanel jumpToPanel;
+	SimplePanel searchBoxPanel;
 		
 	private Presenter presenter;
 	private Map<MenuItems, Element> itemToElement;
@@ -83,78 +64,21 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private LayoutContainer jumpTo;
 	private TextField<String> jumpToField;
 	private Button goButton;
-	
+	private SearchBox searchBox;	
 	
 	@Inject
-	public HeaderViewImpl(Binder binder, AuthenticationControllerImpl authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState) {
+	public HeaderViewImpl(Binder binder, AuthenticationControllerImpl authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState, SearchBox searchBox) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.iconsImageBundle = iconsImageBundle;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		
-		itemToElement = new HashMap<Header.MenuItems, Element>();		
-		itemToElement.put(MenuItems.DATASETS, navbarDatasets);
-		itemToElement.put(MenuItems.TOOLS, navbarTools);
-		itemToElement.put(MenuItems.NETWORKS, navbarNetworks);
-		itemToElement.put(MenuItems.PEOPLE, navbarPeople);
-		itemToElement.put(MenuItems.PROJECTS, navbarProjects);		
-	
-		// setup header links
-		datasetsLink.getElement().setId("navbar_datasets_a"); // for special first element style
-		datasetsLink.setTargetHistoryToken(globalApplicationState.getAppPlaceHistoryMapper().getToken(new DatasetsHome(DisplayUtils.DEFAULT_PLACE_TOKEN)));
-		toolsLink.setTargetHistoryToken(globalApplicationState.getAppPlaceHistoryMapper().getToken(new ComingSoon(DisplayUtils.DEFAULT_PLACE_TOKEN))); 
-		networksLink.setTargetHistoryToken(globalApplicationState.getAppPlaceHistoryMapper().getToken(new ComingSoon(DisplayUtils.DEFAULT_PLACE_TOKEN)));
-		if(DisplayConstants.showDemoHtml) {
-			peopleLink.setHref("people.html");
-			projectsLink.setHref("projects.html");
-		} else {
-			peopleLink.setHref("#" + globalApplicationState.getAppPlaceHistoryMapper().getToken(new ComingSoon(DisplayUtils.DEFAULT_PLACE_TOKEN)));			
-			projectsLink.setHref("#" + globalApplicationState.getAppPlaceHistoryMapper().getToken(new ProjectsHome(DisplayUtils.DEFAULT_PLACE_TOKEN)));
-		}
-		
-		// add jump to panel
-		createJumpToPanel();
-		jumpToPanel.clear();
-		jumpToPanel.add(jumpTo);
-		
-		
-	}
-
-	private void createJumpToPanel() {
-		if(jumpTo == null) {
-			HBoxLayout layout = new HBoxLayout();	
-			jumpTo = new LayoutContainer(layout);
-			
-			jumpTo.setWidth(152);
-			
-			jumpToField = new TextField<String>();
-			jumpToField.setEmptyText(DisplayConstants.LABEL_GOTO_SYNAPSE_ID);
-			jumpToField.setWidth(125);
-			jumpTo.add(jumpToField);
-			
-			goButton = new Button();
-			goButton.setText("Go");
-			goButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		this.searchBox = searchBox;
 				
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					presenter.lookupId(jumpToField.getValue());
-					jumpToField.clear();
-					jumpToField.setEmptyText(DisplayConstants.LABEL_GOTO_SYNAPSE_ID);
-					jumpToField.repaint();
-				}
-			});
-			jumpTo.add(goButton);
-			
-			// Enter key clicks go
-			new KeyNav<ComponentEvent>(jumpToField) {
-				@Override
-				public void onEnter(ComponentEvent ce) {
-					super.onEnter(ce);
-					goButton.fireEvent(Events.Select);					
-				}
-			};
-		}						
+		// add search panel
+		searchBoxPanel.clear();		
+		searchBoxPanel.add(searchBox.asWidget());
+		searchBoxPanel.setVisible(false);
+		
 	}
 	
 	@Override
@@ -165,62 +89,52 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void setMenuItemActive(MenuItems menuItem) {
-		if(itemToElement == null) loadMap();
-		Element el = itemToElement.get(menuItem);
-		if(el != null) {
-			el.addClassName("active");
-		}
 	}
 
 	@Override
 	public void removeMenuItemActive(MenuItems menuItem) {
-		if(itemToElement == null) loadMap();
-		Element el = itemToElement.get(menuItem);
-		if(el != null) {
-			el.removeClassName("active");
-		}
 	}
 
 	@Override
 	public void refresh() {
-		setUser(presenter.getUser());
-		
-		jumpToField.clear();
-		jumpToField.setEmptyText(DisplayConstants.LABEL_GOTO_SYNAPSE_ID);
+		setUser(presenter.getUser());		
 	}
 
+	@Override
+	public void setSearchVisible(boolean searchVisible) {
+		searchBoxPanel.setVisible(searchVisible);
+	}
+	
 	
 	/*
 	 * Private Methods
 	 */
-	// load elements after page has rendered
-	private void loadMap() {
-	}
 	
 	private void setUser(UserData userData) {
 		if(userData != null) {
-			topRightLink1.setHTML("My Profile");
+			topRightLink1.setHTML(DisplayConstants.BUTTON_MY_PROFILE);
 			//topRightLink1.setTargetHistoryToken(DisplayUtils.getDefaultHistoryTokenForPlace(Profile.class));
 			topRightLink1.setHref("#" + globalApplicationState.getAppPlaceHistoryMapper().getToken(new Profile(DisplayUtils.DEFAULT_PLACE_TOKEN))); //demo
 			if(DisplayConstants.showDemoHtml) {
 				topRightLink1.setHref("edit_profile.html");
 			}	
 
-			userName.setInnerHTML("Welcome " + userData.getUserName());			
-			topRightLink2.setHTML("Logout");		
+			userName.setInnerHTML(DisplayConstants.LABEL_WELCOME + " " + userData.getUserName());			
+			topRightLink2.setHTML(DisplayConstants.BUTTON_LOGOUT);		
 			topRightLink2.setTargetHistoryToken(globalApplicationState.getAppPlaceHistoryMapper().getToken(new LoginPlace(LoginPlace.LOGOUT_TOKEN)));			
 		} else {
-			topRightLink1.setHTML("Register");
+			topRightLink1.setHTML(DisplayConstants.BUTTON_REGISTER);
 			//topRightLink1.setTargetHistoryToken(DisplayUtils.getDefaultHistoryTokenForPlace(RegisterAccount.class));			
 			topRightLink1.setHref("#" + globalApplicationState.getAppPlaceHistoryMapper().getToken(new RegisterAccount(DisplayUtils.DEFAULT_PLACE_TOKEN))); // demo
 
 			userName.setInnerHTML("");			
-			topRightLink2.setHTML("Login to Synapse");		
+			topRightLink2.setHTML(DisplayConstants.BUTTON_LOGIN);		
 			topRightLink2.setTargetHistoryToken(globalApplicationState.getAppPlaceHistoryMapper().getToken(new LoginPlace(LoginPlace.LOGIN_TOKEN)));
 			
 		}
 
 	}
+
 }
 
 

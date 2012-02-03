@@ -94,39 +94,53 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		}
 		tabPanel.setHeight(tabPanelHeight);
 				
-		List<EntityType> skipTypes = presenter.getContentsSkipTypes();		
-		for(final EntityType child : entityType.getValidChildTypes()) {
-			if(skipTypes.contains(child)) continue; // skip some types
-				
-			final String childDisplay = DisplayUtils.uppercaseFirstLetter(child.getName());
-			final TabItem tab = new TabItem(childDisplay);			
-			tab.addStyleName("pad-text");			
-			final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);
-			loading.setHeight(tabPanelHeight);		
-			tab.add(loading);
-			tab.addListener(Events.Render, new Listener<BaseEvent>() {
-				@Override
-				public void handleEvent(BaseEvent be) {
-					if("preview".equals(child.getName())) {									
-						// let presenter create preview info when data is loaded
-						previewTab = tab;
-						previewLoading = loading;
-						
-						// Synchronous previews						
-						if(location != null && location.getPath() != null) {
-							setMediaPreview(location);
+		int numAdded=0;
+		
+		List<EntityType> skipTypes = presenter.getContentsSkipTypes();
+		List<EntityType> children = entityType.getValidChildTypes();
+		if(children != null && children.size() > 0) {
+			for(final EntityType child : children) {
+				if(skipTypes.contains(child)) continue; // skip some types
+					
+				final String childDisplay = DisplayUtils.uppercaseFirstLetter(child.getName());
+				final TabItem tab = new TabItem(childDisplay);			
+				tab.addStyleName("pad-text");			
+				final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);
+				loading.setHeight(tabPanelHeight);		
+				tab.add(loading);
+				tab.addListener(Events.Render, new Listener<BaseEvent>() {
+					@Override
+					public void handleEvent(BaseEvent be) {
+						if("preview".equals(child.getName())) {									
+							// let presenter create preview info when data is loaded
+							previewTab = tab;
+							previewLoading = loading;
+							
+							// Synchronous previews						
+							if(location != null && location.getPath() != null) {
+								setMediaPreview(location);
+							}
+							
+						} else {
+							// loading is embedded into the query table widget
+							addQueryTable(child, tab, loading);							
 						}
-						
-					} else {
-						// loading is embedded into the query table widget
-						addQueryTable(child, tab, loading);
 					}
-				}
-			});
-			tabPanel.add(tab);			
+				});
+				tabPanel.add(tab);	
+				numAdded++;
+			}
+		} 
+		
+		if(numAdded == 0) {
+			final TabItem tab = new TabItem("None");			
+			tab.addStyleName("pad-text");											
+			Html noChildren = new Html(DisplayConstants.LABEL_CONTAINS_NO_CHILDREN);
+			tab.add(noChildren, new MarginData(10));
+			tabPanel.add(tab);  
 		}
-
-		add(tabPanel);
+		
+		add(tabPanel);		
 	}
 
 	@Override
