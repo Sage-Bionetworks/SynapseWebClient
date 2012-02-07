@@ -200,6 +200,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private void createShownFacets(SearchResults searchResults) {
 		LayoutContainer currentFacets = new LayoutContainer();
+		timeFacets = new HashMap<String, String>();
 
 		// add size
 		Html totalFound = new Html(searchResults.getFound() + " results found");
@@ -372,97 +373,63 @@ public class SearchViewImpl extends Composite implements SearchView {
 		if(facet == null) {
 			return null;
 		}		
+		
 		return null;
 		
 //		LayoutContainer lc = new LayoutContainer();
 //		lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
 //		FlexTable table = new FlexTable();
 //		
+//		long min = facet.getMin();
+//		long max = facet.getMax();
+//		
 //		timeFacets = new HashMap<String, String>();
 //		// determine time diffs
-//		final int now = new Long(new Date().getTime()).intValue();
+//		//final int now = new Long(new Date().getTime()).intValue();
+//		final int now = (int) max;
 //		final int beginingOfTime = 0;
-//		final int anHourAgo = now - (NUM_SECONDS_PER_DAY/24)*1000;
-//		final int aDayAgo = now - NUM_SECONDS_PER_DAY*1000;
-//		final int aWeekAgo = now - (NUM_SECONDS_PER_DAY*7)*1000;
-//		final int aMonthAgo = now - (NUM_SECONDS_PER_DAY*30)*1000;
-//		final int aYearAgo = now - (NUM_SECONDS_PER_DAY*365)*1000;
+//		final int anHourAgo = now - (NUM_SECONDS_PER_DAY/24)*100;
+//		final int aDayAgo = now - NUM_SECONDS_PER_DAY*100;
+//		final int aWeekAgo = now - (NUM_SECONDS_PER_DAY*7)*100;
+//		final int aMonthAgo = now - (NUM_SECONDS_PER_DAY*30)*100;
+//		final int aYearAgo = now - (NUM_SECONDS_PER_DAY*365)*100;
 //		
-//		timeFacets.put(beginingOfTime + ".." + now, "Any Time");
-//		timeFacets.put(anHourAgo + ".." + now, "Past Hour");
-//		timeFacets.put(aDayAgo + ".." + now, "Past 24 Hours");
-//		timeFacets.put(aWeekAgo + ".." + now, "Past Week");
-//		timeFacets.put(aMonthAgo + ".." + now, "Past Month");
-//		timeFacets.put(aYearAgo + ".." + now, "Past Year");
-//
 //		
-//		timeFacets.put(beginingOfTime + ".." + now, "Any Time");
-//		int row = 0;
+//		int row = -1;								
+//		if(min <= beginingOfTime && max >= now)
+//			table.setWidget(++row, 0, createtimeFacet(facet, now, beginingOfTime, "Any Time"));
+//		if(min <= anHourAgo && max >= now)
+//			table.setWidget(++row, 0, createtimeFacet(facet, now, anHourAgo, "Past Hour"));
+//		if(min <= aDayAgo && max >= now)
+//			table.setWidget(++row, 0, createtimeFacet(facet, now, aDayAgo, "Past 24 Hours"));
+//		if(min <= aWeekAgo && max >= now)
+//			table.setWidget(++row, 0, createtimeFacet(facet, now, aWeekAgo, "Past Week"));
+//		if(min <= aMonthAgo && max >= now)
+//			table.setWidget(++row, 0, createtimeFacet(facet, now, aMonthAgo, "Past Month"));
+//		if(min <= aYearAgo && max >= now)
+//			table.setWidget(++row, 0, createtimeFacet(facet, now, aYearAgo, "Past Year"));
 //		
-//		Anchor a;
-//		
-//		a = new Anchor("Any Time");
-//		a.addClickHandler(new ClickHandler() {			
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				presenter.addFacet(facet.getName(), beginingOfTime + ".." + now);
-//			}
-//		});
-//		table.setWidget(row, 0, a);
-//		row++;
-//		
-//		a = new Anchor("Past Hour");
-//		a.addClickHandler(new ClickHandler() {			
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				presenter.addFacet(facet.getName(), anHourAgo + ".." + now);
-//			}
-//		});
-//		table.setWidget(row, 0, a);
-//		row++;
-//		
-//		a = new Anchor("Past 24 Hours");
-//		a.addClickHandler(new ClickHandler() {			
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				presenter.addFacet(facet.getName(), aDayAgo + ".." + now);
-//			}
-//		});
-//		table.setWidget(row, 0, a);
-//		row++;
-//		
-//		a = new Anchor("Past Week");
-//		a.addClickHandler(new ClickHandler() {			
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				presenter.addFacet(facet.getName(), aWeekAgo + ".." + now);
-//			}
-//		});
-//		table.setWidget(row, 0, a);
-//		row++;
-//		
-//		a = new Anchor("Past Month");
-//		a.addClickHandler(new ClickHandler() {			
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				presenter.addFacet(facet.getName(), aMonthAgo + ".." + now);
-//			}
-//		});
-//		table.setWidget(row, 0, a);
-//		row++;
-//		
-//		a = new Anchor("Past Year");
-//		a.addClickHandler(new ClickHandler() {			
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				presenter.addFacet(facet.getName(), aYearAgo + ".." + now);
-//			}
-//		});
-//		table.setWidget(row, 0, a);
-//		row++;
+//		if(row == -1) {
+//			// no time facets were defined for the range
+//			return null;
+//		}
 //		
 //		lc.add(table);	  	     	 
 //		return lc;
+	}
+
+	private Anchor createtimeFacet(final Facet facet, final int endTime,
+			final int startTime, String title) {
+		Anchor a;
+		a = new Anchor(title);
+		a.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.addFacet(facet.getName(), startTime + ".." + endTime);
+			}
+		});
+		timeFacets.put(startTime + ".." + endTime, title);
+		return a;
 	}
 
 	private LayoutContainer createContinuousFacet(final Facet facet) {		
