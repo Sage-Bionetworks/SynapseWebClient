@@ -247,7 +247,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	 * Protected Methods
 	 */	
 	protected void createEulaWindow() {
-		int windowHeight = showCitation ? 460 : 360;
+		int windowHeight = showCitation ? 510 : 410;		
 		eulaWindow = new Window();
 		eulaWindow.setSize(500, windowHeight);
 		eulaWindow.setPlain(true);
