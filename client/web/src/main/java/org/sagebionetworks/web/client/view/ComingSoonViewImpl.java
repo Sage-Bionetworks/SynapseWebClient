@@ -51,7 +51,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
-		headerWidget.refresh();								
+		headerWidget.refresh();					
 	}
 
 
