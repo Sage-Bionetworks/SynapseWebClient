@@ -2,8 +2,12 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.gwttime.time.DateTime;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -30,7 +34,7 @@ import com.google.inject.Inject;
 public class SearchPresenter extends AbstractActivity implements SearchView.Presenter {
 	
 	//private final List<String> FACETS_DEFAULT = Arrays.asList(new String[] {"node_type","disease","species","tissue","platform","num_samples","created_by","modified_by","created_on","modified_on","acl","reference"});
-	private final List<String> FACETS_DISPLAY_ORDER = Arrays.asList(new String[] {"node_type","species","disease","modified_on","tissue","num_samples","created_by"});
+	private final List<String> FACETS_DISPLAY_ORDER = Arrays.asList(new String[] {"node_type","species","disease","modified_on", "created_on","tissue","num_samples","created_by"});
 	
 	private Search place;
 	private SearchView view;
@@ -42,6 +46,9 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	
 	private SearchQuery currentSearch;
 	private boolean newQuery = false;
+	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
+	private DateTime searchStartTime;
+	
 	
 	@Inject
 	public SearchPresenter(SearchView view,
@@ -70,6 +77,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public void setPlace(Search place) {
 		this.place = place;
 		view.setPresenter(this);
+			
 
 		// create initial search query
 		String queryString = place.toToken();
@@ -107,21 +115,46 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
 	public void addFacet(String facetName, String facetValue) {
 		List<KeyValue> bq = currentSearch.getBooleanQuery();
-				
 		if(bq == null) {
 			bq = new ArrayList<KeyValue>();			
 			currentSearch.setBooleanQuery(bq);
 		}
+
+		// check if exists
+		boolean exists = false;
+		for(KeyValue kv : bq) {
+			if(kv.getKey().equals(facetName) && kv.getValue().equals(facetValue)) {
+				exists = true;
+				break;
+			}
+		}
 		
-		// add facet to query list
-		KeyValue kv = new KeyValue();		
-		kv.setKey(facetName);
-		kv.setValue(facetValue);		
-		bq.add(kv);
+		// only add if not exists already. but do run the search
+		if(!exists) {	
+					
+			// add facet to query list
+			KeyValue kv = new KeyValue();		
+			kv.setKey(facetName);
+			kv.setValue(facetValue);		
+			bq.add(kv);
+			
+		}
 		
 		executeSearch();
 	}
 
+	@Override
+	public void addTimeFacet(String facetName, String facetValue, String displayValue) {
+		timeValueToDisplay.put(createTimeValueKey(facetName, facetValue), displayValue);
+		addFacet(facetName, facetValue);
+	}
+	
+	@Override
+	public String getDisplayForTimeFacet(String facetName, String facetValue) {
+		return timeValueToDisplay.get(createTimeValueKey(facetName, facetValue));
+	}
+	
+	
 	@Override
 	public void removeFacet(String facetName, String facetValue) {
 		List<KeyValue> bq = currentSearch.getBooleanQuery();
@@ -163,6 +196,12 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		executeSearch();
 	}
 
+	@Override
+	public DateTime getSearchStartTime() {
+		if(searchStartTime == null) searchStartTime = new DateTime();
+		return searchStartTime;		
+	}
+
 	
 	/*
 	 * Private Methods
@@ -173,6 +212,9 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		query.setQueryTerm(Arrays.asList(new String[] {""}));		
 		query.setReturnFields(Arrays.asList(new String[] {"name","description","id"}));		
 		query.setFacet(FACETS_DISPLAY_ORDER);
+		
+		timeValueToDisplay.clear();
+		searchStartTime = new DateTime();
 		
 		newQuery = true;
 		return query;
@@ -220,6 +262,10 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			str = str.substring(0, str.length()-1);
 		}
 		return str;
+	}
+
+	private String createTimeValueKey(String facetName, String facetValue) {
+		return facetName + facetValue;
 	}
 
 }

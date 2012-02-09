@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.gwttime.time.DateTime;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -29,6 +30,9 @@ public interface SearchView extends IsWidget, SynapseView {
 		
 		void addFacet(String facetName, String facetValue);
 		
+		void addTimeFacet(String facetName, String facetValue,
+				String displayValue);
+
 		void removeFacet(String facetName, String facetValue);
 		
 		void clearSearch();
@@ -40,6 +44,11 @@ public interface SearchView extends IsWidget, SynapseView {
 		PlaceChanger getPlaceChanger();
 
 		void setStart(int newStart);
+
+		String getDisplayForTimeFacet(String facetName, String facetValue);
+		
+		DateTime getSearchStartTime();
+		
 	}
 
 }

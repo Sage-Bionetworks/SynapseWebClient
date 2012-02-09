@@ -21,7 +21,7 @@
     	<div class="container"> 		
 			<g:SimplePanel ui:field="header" />
 	        	<div class="span-24 notopmargin">
-
+	        	<div class="span-24 separator"></div>
 					<g:SimplePanel ui:field="entityPageTopPanel" />
 				</div>
 
