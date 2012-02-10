@@ -22,6 +22,8 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SearchView;
+import org.sagebionetworks.web.client.widget.search.PaginationEntry;
+import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -45,6 +47,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private JSONObjectAdapter jsonObjectAdapter;
 	
 	private SearchQuery currentSearch;
+	private SearchResults currentResult;
 	private boolean newQuery = false;
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
 	private DateTime searchStartTime;
@@ -202,6 +205,15 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		return searchStartTime;		
 	}
 
+	@Override
+	public List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow) {
+		Long nResults = currentResult.getFound();
+		Long start = currentResult.getStart();
+		if(nResults == null || start == null)
+			return null;
+		return PaginationUtil.getPagination(nResults.intValue(), start.intValue(), nPerPage, nPagesToShow);
+	}
+
 	
 	/*
 	 * Private Methods
@@ -228,15 +240,15 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			synapseClient.search(adapter.toJSONString(), new AsyncCallback<EntityWrapper>() {			
 				@Override
 				public void onSuccess(EntityWrapper result) {
-					SearchResults results = new SearchResults();		
+					currentResult = new SearchResults();		
 					try {
-						results = nodeModelCreator.createSearchResults(result);
+						currentResult = nodeModelCreator.createSearchResults(result);
 					} catch (RestServiceException e) {
 						if(!DisplayUtils.handleServiceException(e, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
 							onFailure(null);					
 						} 						
-					}					
-					view.setSearchResults(results, join(currentSearch.getQueryTerm(), " "), newQuery);
+					}									
+					view.setSearchResults(currentResult, join(currentSearch.getQueryTerm(), " "), newQuery);
 					newQuery = false;
 				}
 				

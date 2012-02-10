@@ -17,8 +17,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
 import com.extjs.gxt.ui.client.Style.IconAlign;
 import com.extjs.gxt.ui.client.core.El;
@@ -58,7 +60,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private final int HIT_DESCRIPTION_LENGTH_CHAR = 270;
 	private final int FACET_NAME_LENGTH_CHAR = 21;
-	private final int MAX_PAGES_IN_PAGINATION = 9;	
+	private final int MAX_PAGES_IN_PAGINATION = 10;
+	private final int MAX_RESULTS_PER_PAGE = 10;
 	private final int NUM_MILLI_SECONDS_PER_DAY = 86400 * 100;
 	
 	public interface SearchViewImplUiBinder extends
@@ -155,42 +158,20 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private void createPagination(SearchResults searchResults) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setStyleName("span-16 last clear");
-		FlexTable table = new FlexTable();
-		int start = searchResults.getStart().intValue();
-		int calcMax = new Double(Math.ceil(searchResults.getFound()/10)).intValue();
-		int maxPage = calcMax < MAX_PAGES_IN_PAGINATION ? calcMax : MAX_PAGES_IN_PAGINATION;		
-		int firstPage = new Double(Math.floor(start / 10)).intValue() + 1;			
-		int lastPage = maxPage;
-		if(firstPage > 1) {
-			lastPage = firstPage + maxPage - 1;
+		UnorderedListPanel ul = new UnorderedListPanel();
+		ul.setStyleName("pagination");
+				
+		List<PaginationEntry> entries = presenter.getPaginationEntries(MAX_RESULTS_PER_PAGE, MAX_PAGES_IN_PAGINATION);
+		if(entries != null) {
+			for(PaginationEntry pe : entries) {
+				if(pe.isCurrent())
+					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()), "current");
+				else
+					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()));
+			}
 		}
-			
-		int tableCol = 0;
-		if(firstPage != 1) {
-			int newStart = (firstPage-2) * 10;			
-			table.setWidget(0, tableCol, createPaginationAnchor("Prev", newStart, "btn tab02c grey"));
-			tableCol++;
-			table.setHTML(0, tableCol, "");
-			tableCol++;
-		} 			
-		for(int i=firstPage; i<=lastPage; i++) {
-			int newStart = (i-1) * 10;
-			String style = "btn tab01a grey";
-			if(i==firstPage) 
-				style = "btn tab01a black";
-			table.setWidget(0, tableCol, createPaginationAnchor("&nbsp;" + i +"&nbsp;", newStart, style));
-			tableCol++;
-			table.setHTML(0, tableCol, "");
-			tableCol++;
-		}
-		if(firstPage + 1 < lastPage) {
-			int newStart = firstPage * 10;			
-			table.setWidget(0, tableCol, createPaginationAnchor("Next", newStart, "btn tab02d grey"));
-			tableCol++;
-			table.setHTML(0, tableCol, "");
-			tableCol++;
-		} 			
-		lc.add(table);
+		
+		lc.add(ul);
 		paginationPanel.clear();
 		paginationPanel.add(lc);
 	}
@@ -227,6 +208,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 					for(Button btn : facetButtons) {
 						btn.disable();
 					}
+					Window.scrollTo(0, 0);
 					presenter.removeFacet(facet.getKey(), facet.getValue());						
 				}
 			});
@@ -421,6 +403,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
+				Window.scrollTo(0, 0);
 				presenter.addTimeFacet(facet.getName(), facetValue, title);
 			}
 		});
@@ -468,6 +451,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				// TODO : add an addContinuousFacet method to presenter
+				Window.scrollTo(0, 0);
 				presenter.addFacet(facet.getName(), slider.getValue() + "..");
 			}
 		});
@@ -515,6 +499,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				a.addClickHandler(new ClickHandler() {				
 					@Override
 					public void onClick(ClickEvent event) {
+						Window.scrollTo(0, 0);
 						presenter.addFacet(facet.getName(), constraint.getValue());				
 					}
 				});			
@@ -530,14 +515,14 @@ public class SearchViewImpl extends Composite implements SearchView {
 		return DisplayUtils.uppercaseFirstLetter(name.replace("_", " "));
 	}
 
-	private Anchor createPaginationAnchor(String anchorName, final int newStart, String styleName) {
+	private Anchor createPaginationAnchor(String anchorName, final int newStart) {
 		Anchor a = new Anchor();
-		a.setHTML(anchorName);
-		a.setStyleName(styleName);
+		a.setHTML(anchorName);	
 		a.addClickHandler(new ClickHandler() {					
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.setStart(newStart);
+				Window.scrollTo(0, 0);
+				presenter.setStart(newStart);				
 			}
 		});
 		return a;
