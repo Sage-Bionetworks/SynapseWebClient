@@ -103,13 +103,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
 	public void setSearchTerm(String queryTerm) {		
 		if(queryTerm == null) queryTerm = "";
-		String oldQueryTerm = join(currentSearch.getQueryTerm(), " ");
-		
-		// reset search if queryTerm is not prefixed by existing term
-		if(currentSearch.getQueryTerm() == null || queryTerm.length() < oldQueryTerm.length()  || !oldQueryTerm.startsWith(queryTerm)) {
-			currentSearch = getBaseSearchQuery();					
-		}
-		
+		currentSearch = getBaseSearchQuery();					
+				
 		// set new search term & run search. split each word into its own value
 		currentSearch.setQueryTerm(Arrays.asList(queryTerm.split(" ")));					
 		executeSearch();
@@ -141,6 +136,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			kv.setValue(facetValue);		
 			bq.add(kv);
 			
+			// set start back to zero so we go to first page with the new facet
+			currentSearch.setStart(new Long(0));			
 		}
 		
 		executeSearch();
@@ -169,6 +166,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			}
 		}
 		
+		// set to first page
+		currentResult.setStart(new Long(0));
 		executeSearch();
 	}
 
