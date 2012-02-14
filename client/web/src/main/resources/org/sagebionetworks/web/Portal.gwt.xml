@@ -36,6 +36,6 @@
 	<inherits name="com.extjs.gxt.ui.GXT" />
 	<inherits name="org.sagebionetworks.repo.synpaseDTOs"/>
 	<inherits name="org.sagebionetworks.gwt.JSONAdapter"/>
-
+	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
 
 </module>
