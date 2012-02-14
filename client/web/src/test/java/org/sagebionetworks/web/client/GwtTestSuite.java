@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.junit.Test;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.Agreement;
 import org.sagebionetworks.repo.model.Analysis;
@@ -211,8 +212,15 @@ public class GwtTestSuite extends GWTTestCase {
 		toPopulate.initializeFromJSONObject(adapterToPopulate);
 	}
 	
+	@Test
 	public void testCreateAdapter(){
 		JSONObjectGwt adapter = new JSONObjectGwt();
+	}
+	
+	@Test
+	public void testCreateException(){
+		// This will fail if the project is not configured correctly.
+		SynapseException e = new SynapseException();
 	}
 
 	@Override
