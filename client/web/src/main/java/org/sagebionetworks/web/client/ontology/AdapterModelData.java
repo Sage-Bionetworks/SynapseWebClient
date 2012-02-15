@@ -39,10 +39,6 @@ public class AdapterModelData implements ModelData, JSONEntity {
 		map = AdapterCollectionUtils.readMapFromObject(adapter);
 	}
 	
-	public void writeToAdapter(){
-		
-	}
-
 	@Override
 	public <X> X get(String property) {
 		return (X) map.get(property);

@@ -3,12 +3,15 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.ontology.AdapterModelData;
+import org.sagebionetworks.web.client.widget.editpanels.ConceptAutoCompleteEditor;
 import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableResourceProvider;
 
+import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -44,13 +47,17 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
+		
+		ComboBox<AdapterModelData> box = ConceptAutoCompleteEditor.createNcboSuggestField();
+//		box.setSelectionRange(0, 1);
+		entityView.add(box.asWidget());
 				
 	}
 
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;		
+		this.presenter = presenter;
 		headerWidget.refresh();					
 	}
 
