@@ -21,22 +21,36 @@ import org.sagebionetworks.web.shared.NodeType;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MenuEvent;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
+import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.SplitButton;
 import com.extjs.gxt.ui.client.widget.custom.Portal;
 import com.extjs.gxt.ui.client.widget.custom.Portlet;
+import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.FormData;
+import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.cell.client.widget.PreviewDisclosurePanel;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,6 +71,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel portalPanelSingleCol;
 	@UiField 
 	SimplePanel portalPanelThreeCol;
+	@UiField
+	SimplePanel portalPanelRstudio;
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -70,7 +86,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Breadcrumb breadcrumb;
 	private boolean isAdministrator = false; 
 	private boolean canEdit = false;
-		
+			
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
@@ -156,6 +172,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    portalThreeCol.add(createReferencesPortlet(entity), 1);
 	    // Create References portlet
 	    portalThreeCol.add(createActivityFeedPortlet(entity), 2);
+	    
+	    Portal portalRstudio = new Portal(1);
+	    portalRstudio.setBorders(false);
+	    portalRstudio.setStyleAttribute("backgroundColor", "white");  
+	    portalRstudio.setColumnWidth(0, 1.0);
+	    portalPanelRstudio.clear();
+	    portalPanelRstudio.add(portalRstudio);
+	    portalRstudio.add(createRstudioPortlet(entity), 0);
 	}
 	
 	@Override
@@ -322,5 +346,63 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return portlet;
 	}
 	
+	private Portlet createRstudioPortlet(Entity entity) {
+	    final SynapsePortlet portlet = new SynapsePortlet("RStudio");  
+	    portlet.setLayout(new FitLayout());    
+	    portlet.setAutoHeight(true);	    	    
+	    
+	    final SplitButton showRstudio = new SplitButton("&nbsp;&nbsp;Load in RStudio Server");
+	    showRstudio.setIcon(AbstractImagePrototype.create(iconsImageBundle.rstudio24()));
+	    Menu menu = new Menu();  
+	    MenuItem item = new MenuItem("Set RStudio Server URL");
+		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				final MessageBox box = MessageBox.prompt("Set RStudio Server URL", "RStudio Server URL:");
+				box.getTextBox().setValue(presenter.getRstudioUrlBase());
+				box.addCallback(new Listener<MessageBoxEvent>() {
+					public void handleEvent(MessageBoxEvent be) {
+						if (be.getButtonClicked().getText().equals("Cancel")) // .isCanceled() does not give correct result
+							return;
+						if (be.getValue() != null && !be.getValue().equals("")) {
+							presenter.saveRStudioUrlBase(be.getValue());
+							showRstudio.fireEvent(Events.Select);
+						}
+					}
+				});
+			}
+		});
+	    menu.add(item);  
+	    showRstudio.setMenu(menu);  
+	  
+	    showRstudio.setHeight(36);
+	    if(!presenter.isLoggedIn()) {
+	    	showRstudio.disable();
+	    	showRstudio.setText("&nbsp;&nbsp;Please Login to Load in RStudio");
+	    }
+	    
+	    final Html label = new Html("<div class=\"span-12 notopmargin\">" +
+	    		"<a href=\"http://rstudio.org/\" class=\"link\">RStudio&trade;</a> is a free and open source integrated development environment (IDE) for R. " +
+	    		"You can run it on your desktop (Windows, Mac, or Linux) or even over the web using RStudio Server.<br/></br>" +
+	    		"If you do not have a copy of RStudio Server setup, you can create one by <a href=\"http://rstudio.org/download/server\" class=\"link\">following these directions</a>." +
+	    "</div>");
+	    	    
+	    showRstudio.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+			    Frame iframe = new Frame(presenter.getRstudioUrl());
+			    iframe.setHeight("500px");
+			    iframe.setWidth("100%");
+			    portlet.remove(showRstudio);
+			    portlet.remove(label);
+			    portlet.add(iframe);
+				portlet.layout(true);
+			}
+		});	    
+	    portlet.add(showRstudio);
+	    portlet.add(label, new MarginData(5, 0, 0, 0));
+		
+	    return portlet;  		
+	}
 	
 }

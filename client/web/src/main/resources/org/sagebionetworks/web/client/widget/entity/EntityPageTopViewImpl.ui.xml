@@ -26,6 +26,7 @@
 						<g:SimplePanel ui:field="portalPanel"/>	
 						<g:SimplePanel ui:field="portalPanelSingleCol"/>							
 						<g:SimplePanel ui:field="portalPanelThreeCol"/>
+						<g:SimplePanel ui:field="portalPanelRstudio"/>
 					</div>						
 				</div>
 	</g:HTMLPanel>

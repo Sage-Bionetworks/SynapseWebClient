@@ -136,7 +136,16 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/arrow-circle-315-16.png")
 	ImageResource reload16();
-	
+
+	@Source("images/icons/rstudio-16.png")
+	ImageResource rstudio16();
+
+	@Source("images/icons/rstudio-24.png")
+	ImageResource rstudio24();
+
+	@Source("images/icons/rstudio-36.png")
+	ImageResource rstudio36();
+
 	@Source("images/icons/table-insert-column-16.png")
 	ImageResource tableInsertColumn16();
 	
@@ -156,7 +165,6 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/details-16.png") 
 	ImageResource details16();	
-
 	
 	@Source("images/icons/visualize-16.png")
 	ImageResource visualize16();	
