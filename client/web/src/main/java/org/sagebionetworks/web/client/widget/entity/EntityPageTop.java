@@ -35,6 +35,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private boolean isAdmin = false;
 	private boolean canEdit = false;
 	
+	// TODO : delete this variable
+	private String rStudioUrl = "http://localhost:8787";
+	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState) {
 		this.view = view;
@@ -133,6 +136,33 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getRstudioUrl() {
+		// TODO : get this from user's profile, or prompt
+		String urlBase = rStudioUrl; 
+		UserData userData = authenticationController.getLoggedInUser();
+		if(userData != null) {
+			urlBase += "#Synapse:" + userData.getToken() + ":" + entity.getId();			
+		} 
+		return urlBase;
+	}
+	
+	@Override
+	public void saveRStudioUrlBase(String value) {
+		// TODO : save RStudio Url to profile
+		rStudioUrl = value;		
+	}
+	
+	@Override
+	public String getRstudioUrlBase() {
+		return rStudioUrl;
+	}
+	
+	@Override 
+	public boolean isLoggedIn() {
+		return authenticationController.getLoggedInUser() != null;
 	}
 
 	
