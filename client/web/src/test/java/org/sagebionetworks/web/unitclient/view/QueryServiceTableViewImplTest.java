@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.ImagePrototypeSingleton;
@@ -83,6 +84,7 @@ public class QueryServiceTableViewImplTest {
 		GWTMockUtilities.restore();
 	}
 	
+	@Ignore
 	@Test
 	public void testViewSetColumns(){
 		assertNotNull(view);
@@ -96,6 +98,7 @@ public class QueryServiceTableViewImplTest {
 		assertEquals(list.size(), view.getColumnCount());
 	}
 	
+	@Ignore
 	@Test
 	public void testSorting(){
 		// Create a few Sorting rows

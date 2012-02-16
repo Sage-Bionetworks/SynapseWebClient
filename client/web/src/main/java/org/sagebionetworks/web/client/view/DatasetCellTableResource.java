@@ -6,7 +6,7 @@ public interface DatasetCellTableResource extends CellTable.Resources {
 	
 	public interface CellTableStyle extends CellTable.Style {};
 
-	 @Source({"DatasetCellTable.css"})
-	 CellTableStyle cellTableStyle(); 
+//	 @Source({"DatasetCellTable.css"})
+//	 CellTableStyle cellTableStyle(); 
 	
 }
