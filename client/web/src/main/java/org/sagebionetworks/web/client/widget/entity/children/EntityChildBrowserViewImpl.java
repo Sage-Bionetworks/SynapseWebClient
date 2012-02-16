@@ -50,6 +50,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	private static final int BASE_PANEL_HEIGHT_PX = 270;
 	private static final int TALL_PANEL_HEIGHT_PX = 500;
 	private static final int SLIDER_HEIGHT_PX = 25;
+	private static final int MAX_NUMBER_PREVIEWTABLE_COLS = 35;
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
@@ -194,7 +195,9 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 			staticTable.setShowTitleBar(false);
 
 			List<StaticTableColumn> stColumns = new ArrayList<StaticTableColumn>();
+			int ncol = 0;
 			for (String key : previewData.getColumnDisplayOrder()) {
+				if(ncol >= MAX_NUMBER_PREVIEWTABLE_COLS) break;
 				StaticTableColumn stCol = new StaticTableColumn();
 				stCol.setId(key);
 				stCol.setName(key);
@@ -210,11 +213,12 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 				}
 
 				stColumns.add(stCol);
-
-				staticTable.setDataAndColumnsInOrder(previewData.getRows(),
-						stColumns);
-				previewTab.add(staticTable.asWidget());
+				ncol++;
 			}
+			
+			staticTable.setDataAndColumnsInOrder(previewData.getRows(),
+					stColumns);
+			previewTab.add(staticTable.asWidget());
 		} else {			
 			setNoPreview();
 		}
