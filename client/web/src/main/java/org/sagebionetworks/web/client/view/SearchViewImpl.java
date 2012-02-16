@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwttime.time.DateTime;
 import org.sagebionetworks.repo.model.search.Facet;
 import org.sagebionetworks.repo.model.search.FacetConstraint;
 import org.sagebionetworks.repo.model.search.FacetTypeNames;
@@ -15,8 +17,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
 import com.extjs.gxt.ui.client.Style.IconAlign;
 import com.extjs.gxt.ui.client.core.El;
@@ -56,8 +60,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private final int HIT_DESCRIPTION_LENGTH_CHAR = 270;
 	private final int FACET_NAME_LENGTH_CHAR = 21;
-	private final int MAX_PAGES_IN_PAGINATION = 9;	
-	private final int NUM_SECONDS_PER_DAY = 86400;
+	private final int MAX_PAGES_IN_PAGINATION = 10;
+	private final int MAX_RESULTS_PER_PAGE = 10;
+	private final int NUM_MILLI_SECONDS_PER_DAY = 86400 * 100;
 	
 	public interface SearchViewImplUiBinder extends
 			UiBinder<Widget, SearchViewImpl> {
@@ -87,8 +92,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private Button searchButton;
 	private ContentPanel loadingPanel;
 	private boolean loadShowing;
-	private Map<String,FacetTypeNames> tempFacetToType;
-	private Map<String, String> timeFacets;
+	private List<Button> facetButtons;
 
 	@Inject
 	public SearchViewImpl(SearchViewImplUiBinder binder, Header headerWidget,
@@ -106,15 +110,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 //		loadingPanel = DisplayUtils.getLoadingWidget(sageImageBundle);
 //		loadingPanel.setSize(700, 100);
 		
-		tempFacetToType = new HashMap<String, FacetTypeNames>();
-		tempFacetToType.put("node_type", FacetTypeNames.LITERAL);
-		tempFacetToType.put("species", FacetTypeNames.LITERAL);
-		tempFacetToType.put("disease", FacetTypeNames.LITERAL);
-		tempFacetToType.put("modified_on", FacetTypeNames.DATE);
-		tempFacetToType.put("tissue", FacetTypeNames.LITERAL);
-		tempFacetToType.put("num_samples", FacetTypeNames.CONTINUOUS);
-		tempFacetToType.put("created_by", FacetTypeNames.LITERAL);
-
 	}
 
 	@Override
@@ -130,6 +125,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	public void setSearchResults(SearchResults searchResults, String searchTerm, boolean newQuery) {		
 		// TODO : set searchTerm into search box
 		searchField.setText(searchTerm);
+		facetButtons = new ArrayList<Button>();
 		
 		// create search result list
 		List<Hit> hits = searchResults.getHits();
@@ -140,55 +136,17 @@ public class SearchViewImpl extends Composite implements SearchView {
 			// create facet widgets
 			createFacetWidgets(searchResults);			
 											
-			// show existing facets			
-			createShownFacets(searchResults);
-			
 			// create pagination
-			LayoutContainer lc = new LayoutContainer();
-			lc.setStyleName("span-16 last clear");
-			FlexTable table = new FlexTable();
-			int start = searchResults.getStart().intValue();
-			int calcMax = new Double(Math.ceil(searchResults.getFound()/10)).intValue();
-			int maxPage = calcMax < MAX_PAGES_IN_PAGINATION ? calcMax : MAX_PAGES_IN_PAGINATION;		
-			int firstPage = new Double(Math.floor(start / 10)).intValue() + 1;			
-			int lastPage = maxPage;
-			if(firstPage > 1) {
-				lastPage = firstPage + maxPage - 1;
-			}
-				
-			int tableCol = 0;
-			if(firstPage != 1) {
-				int newStart = (firstPage-2) * 10;			
-				table.setWidget(0, tableCol, createPaginationAnchor("Prev", newStart, "btn tab02c grey"));
-				tableCol++;
-				table.setHTML(0, tableCol, "");
-				tableCol++;
-			} 			
-			for(int i=firstPage; i<=lastPage; i++) {
-				int newStart = (i-1) * 10;
-				String style = "btn tab01a grey";
-				if(i==firstPage) 
-					style = "btn tab01a black";
-				table.setWidget(0, tableCol, createPaginationAnchor("&nbsp;" + i +"&nbsp;", newStart, style));
-				tableCol++;
-				table.setHTML(0, tableCol, "");
-				tableCol++;
-			}
-			if(firstPage + 1 < lastPage) {
-				int newStart = firstPage * 10;			
-				table.setWidget(0, tableCol, createPaginationAnchor("Next", newStart, "btn tab02d grey"));
-				tableCol++;
-				table.setHTML(0, tableCol, "");
-				tableCol++;
-			} 			
-			lc.add(table);
-			paginationPanel.clear();
-			paginationPanel.add(lc);
+			createPagination(searchResults);
 			
 		} else {
 			resultsHtml = "<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1 + searchTerm + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART2 + "</h4>";
 		}
+
+		// show existing facets			
+		createShownFacets(searchResults);
 		
+
 		resultsPanel.clear();
 		resultsPanel.add(new Html(resultsHtml));
 		loadShowing = false;
@@ -197,10 +155,30 @@ public class SearchViewImpl extends Composite implements SearchView {
 		Window.scrollTo(0, 0);
 	}
 
+	private void createPagination(SearchResults searchResults) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.setStyleName("span-16 last clear");
+		UnorderedListPanel ul = new UnorderedListPanel();
+		ul.setStyleName("pagination");
+				
+		List<PaginationEntry> entries = presenter.getPaginationEntries(MAX_RESULTS_PER_PAGE, MAX_PAGES_IN_PAGINATION);
+		if(entries != null) {
+			for(PaginationEntry pe : entries) {
+				if(pe.isCurrent())
+					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()), "current");
+				else
+					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()));
+			}
+		}
+		
+		lc.add(ul);
+		paginationPanel.clear();
+		paginationPanel.add(lc);
+	}
+
 
 	private void createShownFacets(SearchResults searchResults) {
 		LayoutContainer currentFacets = new LayoutContainer();
-		timeFacets = new HashMap<String, String>();
 
 		// add size
 		Html totalFound = new Html(searchResults.getFound() + " results found");
@@ -212,9 +190,10 @@ public class SearchViewImpl extends Composite implements SearchView {
 		currentFacets.setAutoHeight(true);
 		for(final KeyValue facet : presenter.getAppliedFacets()) {
 			String text = facet.getValue();
-			if(text.contains("..")) {
-				if(timeFacets.containsKey(facet.getValue())) {
-					text = timeFacets.get(facet.getValue());
+			if(text.contains("..")) {				
+				text = presenter.getDisplayForTimeFacet(facet.getKey(), facet.getValue());
+				if (text != null) {
+					text = formatFacetName(facet.getKey()) + ": " + text;
 				} else {
 					// continuous variable
 					text = formatFacetName(facet.getKey()) + " >= " + facet.getValue().replaceAll("\\.\\.", "");
@@ -224,11 +203,17 @@ public class SearchViewImpl extends Composite implements SearchView {
 			btn.setIconAlign(IconAlign.RIGHT);
 			btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
-				public void componentSelected(ButtonEvent ce) {
+				public void componentSelected(ButtonEvent ce) {				
+					// disable all buttons to allow only one click
+					for(Button btn : facetButtons) {
+						btn.disable();
+					}
+					Window.scrollTo(0, 0);
 					presenter.removeFacet(facet.getKey(), facet.getValue());						
 				}
 			});
 			currentFacets.add(btn, new MarginData(6, 5, 0, 0));
+			facetButtons.add(btn);
 		}
 		currentFacets.layout(true);
 		currentFacetsPanel.clear();
@@ -240,8 +225,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		for (String facetName : presenter.getFacetDisplayOrder()) {
 			for (final Facet facet : searchResults.getFacets()) {
 				if (facet.getName().equals(facetName)) {
-					FacetTypeNames type = facet.getType();
-					type = tempFacetToType.get(facet.getName());
+					FacetTypeNames type = facet.getType();					
 					if (type != null) {
 						Widget widget = null;
 						switch (type) {
@@ -370,72 +354,65 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 
 	private LayoutContainer createDateFacet(final Facet facet) {
-		if(facet == null) {
+		if(facet == null) return null;
+		if(facet.getMin() == null || facet.getMax() == null || facet.getMin() >= facet.getMax()) return null;		
+		
+		LayoutContainer lc = new LayoutContainer();
+		lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
+		FlexTable table = new FlexTable();
+		
+		// convert to miliseconds
+		long min = facet.getMin() * 1000;
+		long max = facet.getMax() * 1000;
+		
+		// determine time diffs
+		DateTime now = presenter.getSearchStartTime();
+		long beginingOfTime = 0;
+		long anHourAgo = now.minusHours(1).getMillis();
+		long aDayAgo = now.minusDays(1).getMillis();
+		long aWeekAgo = now.minusWeeks(1).getMillis();
+		long aMonthAgo = now.minusMonths(1).getMillis();
+		long aYearAgo = now.minusYears(1).getMillis();
+		
+		int row = -1;
+		table.setWidget(++row, 0, createTimeFacet(facet, beginingOfTime, "Any Time"));
+		if(anHourAgo <= max)
+			table.setWidget(++row, 0, createTimeFacet(facet, anHourAgo, "Past Hour"));
+		if(aDayAgo <= max)
+			table.setWidget(++row, 0, createTimeFacet(facet, aDayAgo, "Past 24 Hours"));
+		if(aWeekAgo <= max)
+			table.setWidget(++row, 0, createTimeFacet(facet, aWeekAgo, "Past Week"));
+		if(aMonthAgo <= max)
+			table.setWidget(++row, 0, createTimeFacet(facet, aMonthAgo, "Past Month"));
+		if(aYearAgo <= max)
+			table.setWidget(++row, 0, createTimeFacet(facet, aYearAgo, "Past Year"));
+		
+		if(row == -1) {
+			// no time facets were defined for the range
 			return null;
-		}		
+		}
 		
-		return null;
-		
-//		LayoutContainer lc = new LayoutContainer();
-//		lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
-//		FlexTable table = new FlexTable();
-//		
-//		long min = facet.getMin();
-//		long max = facet.getMax();
-//		
-//		timeFacets = new HashMap<String, String>();
-//		// determine time diffs
-//		//final int now = new Long(new Date().getTime()).intValue();
-//		final int now = (int) max;
-//		final int beginingOfTime = 0;
-//		final int anHourAgo = now - (NUM_SECONDS_PER_DAY/24)*100;
-//		final int aDayAgo = now - NUM_SECONDS_PER_DAY*100;
-//		final int aWeekAgo = now - (NUM_SECONDS_PER_DAY*7)*100;
-//		final int aMonthAgo = now - (NUM_SECONDS_PER_DAY*30)*100;
-//		final int aYearAgo = now - (NUM_SECONDS_PER_DAY*365)*100;
-//		
-//		
-//		int row = -1;								
-//		if(min <= beginingOfTime && max >= now)
-//			table.setWidget(++row, 0, createtimeFacet(facet, now, beginingOfTime, "Any Time"));
-//		if(min <= anHourAgo && max >= now)
-//			table.setWidget(++row, 0, createtimeFacet(facet, now, anHourAgo, "Past Hour"));
-//		if(min <= aDayAgo && max >= now)
-//			table.setWidget(++row, 0, createtimeFacet(facet, now, aDayAgo, "Past 24 Hours"));
-//		if(min <= aWeekAgo && max >= now)
-//			table.setWidget(++row, 0, createtimeFacet(facet, now, aWeekAgo, "Past Week"));
-//		if(min <= aMonthAgo && max >= now)
-//			table.setWidget(++row, 0, createtimeFacet(facet, now, aMonthAgo, "Past Month"));
-//		if(min <= aYearAgo && max >= now)
-//			table.setWidget(++row, 0, createtimeFacet(facet, now, aYearAgo, "Past Year"));
-//		
-//		if(row == -1) {
-//			// no time facets were defined for the range
-//			return null;
-//		}
-//		
-//		lc.add(table);	  	     	 
-//		return lc;
+		lc.add(table);	  	     	 
+		return lc;
 	}
 
-	private Anchor createtimeFacet(final Facet facet, final int endTime,
-			final int startTime, String title) {
+	private Anchor createTimeFacet(final Facet facet, final long startTime, final String title) {
 		Anchor a;
 		a = new Anchor(title);
+		final String facetValue = startTime + "..";
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.addFacet(facet.getName(), startTime + ".." + endTime);
+				Window.scrollTo(0, 0);
+				presenter.addTimeFacet(facet.getName(), facetValue, title);
 			}
 		});
-		timeFacets.put(startTime + ".." + endTime, title);
 		return a;
 	}
 
-	private LayoutContainer createContinuousFacet(final Facet facet) {		
-		if(facet == null || facet.getMin() >= facet.getMax()) {
-			return null;
-		}
+	private LayoutContainer createContinuousFacet(final Facet facet) {
+		if(facet == null) return null;
+		if(facet.getMin() == null || facet.getMax() == null || facet.getMin() >= facet.getMax()) return null;
 		
 		LayoutContainer lc = new LayoutContainer();
 		lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
@@ -474,6 +451,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				// TODO : add an addContinuousFacet method to presenter
+				Window.scrollTo(0, 0);
 				presenter.addFacet(facet.getName(), slider.getValue() + "..");
 			}
 		});
@@ -498,8 +476,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 
 	private LayoutContainer createLiteralFacet(final Facet facet) {
-		LayoutContainer lc = new LayoutContainer();
-		if(facet != null && facet.getConstraints() != null) {
+		LayoutContainer lc = null; 
+		if(facet != null && facet.getConstraints() != null && facet.getConstraints().size() > 0) {
+			lc = new LayoutContainer();
 			lc.setWidth(188);
 			lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));
 			FlexTable flexTable = new FlexTable();
@@ -520,6 +499,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				a.addClickHandler(new ClickHandler() {				
 					@Override
 					public void onClick(ClickEvent event) {
+						Window.scrollTo(0, 0);
 						presenter.addFacet(facet.getName(), constraint.getValue());				
 					}
 				});			
@@ -535,14 +515,14 @@ public class SearchViewImpl extends Composite implements SearchView {
 		return DisplayUtils.uppercaseFirstLetter(name.replace("_", " "));
 	}
 
-	private Anchor createPaginationAnchor(String anchorName, final int newStart, String styleName) {
+	private Anchor createPaginationAnchor(String anchorName, final int newStart) {
 		Anchor a = new Anchor();
-		a.setHTML(anchorName);
-		a.setStyleName(styleName);
+		a.setHTML(anchorName);	
 		a.addClickHandler(new ClickHandler() {					
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.setStart(newStart);
+				Window.scrollTo(0, 0);
+				presenter.setStart(newStart);				
 			}
 		});
 		return a;

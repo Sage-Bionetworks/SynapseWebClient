@@ -3419,7 +3419,7 @@ background:#000 url(../images/cross.png) no-repeat center center;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 }
-.mega-button a{ display:block; padding-top:18px;}
+.mega-button a{ display:block; padding-top:18px; padding-bottom:18px;}
 .ca-content .live {
 	margin-top:0px;
 	padding:5px 10px;
