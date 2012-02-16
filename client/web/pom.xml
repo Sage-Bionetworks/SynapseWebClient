@@ -13,11 +13,12 @@
 	<groupId>org.sagebionetworks</groupId>
 	<artifactId>portal</artifactId>
 	<packaging>war</packaging>
-	<name>GWT Maven Archetype</name>
+	<name>Synapse Portal</name>
 
 	<properties>
 		<!-- Convenience property to set the GWT version -->
-		<gwtVersion>2.1.1</gwtVersion>
+		<gwtVersion>2.4.0</gwtVersion>
+		<guiceVersion>3.0-rc2</guiceVersion>
 		<!-- GWT needs at least java 1.5 -->
 		<maven.compiler.source>1.6</maven.compiler.source>
 		<maven.compiler.target>1.6</maven.compiler.target>
@@ -34,7 +35,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
-				<version>2.1.0-1</version>
+				<version>2.4.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -153,17 +154,18 @@
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
-			<version>2.0</version>
+			<version>${guiceVersion}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.googlecode.gwt.inject</groupId>
+			<groupId>com.google.gwt.inject</groupId>
 			<artifactId>gin</artifactId>
-			<version>1.0</version>
+			<version>1.5.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-servlet</artifactId>
-			<version>2.0</version>
+			<version>${guiceVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
@@ -176,11 +178,11 @@
 			<artifactId>jersey-json</artifactId>
 			<version>1.5-ea09</version>
 		</dependency>
-
+		<!-- This provides the GWT MVP framework -->
 		<dependency>
 			<groupId>com.gwtplatform</groupId>
 			<artifactId>gwtp-all</artifactId>
-			<version>0.5</version>
+			<version>0.7</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -238,7 +240,8 @@
 		<dependency>
 			<groupId>com.extjs</groupId>
 			<artifactId>gxt</artifactId>
-			<version>2.2.1.SPECIAL</version>
+			<version>2.2.5</version>
+			<classifier>gwt22</classifier>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -253,8 +256,6 @@
 			<artifactId>scribe</artifactId>
 			<version>1.2.3</version>
 		</dependency>
-
-
 	</dependencies>
 
 
