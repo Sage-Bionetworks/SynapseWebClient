@@ -102,7 +102,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 				@Override
 				public void onKeyPress(KeyPressEvent event) {
 					char charCode = event.getCharCode();
-					if (charCode == '\n' || charCode == '\r') {
+					if (charCode == 13 || charCode == '\n' || charCode == '\r') {
 						presenter.search(searchField.getValue());
 		            }					
 				}
