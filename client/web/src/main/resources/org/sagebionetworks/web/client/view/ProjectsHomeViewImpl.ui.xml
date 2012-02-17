@@ -25,41 +25,71 @@
 			<g:SimplePanel ui:field="header" />
 	        	<div class="span-24 notopmargin">
 	<!-- end header -->
+		            <div class="span-24 separator"></div>
 
 					<ul class="breadcrumbs">
-						<li class="breadcrumb"><a href="#">Home</a> > All Projects</li>
+						<li class="breadcrumb"><a href="#Home:0">Home</a> > All Projects</li>
 					</ul>
-					<h2>All Projects</h2>
+					
+					<div class="span-24 separator-inner"></div>
+		            
+		            <div class="span-24 slider-area-inner">
+		            	<g:SimplePanel ui:field="createProjectPanel" />
+					</div>
+		            <div class="span-24 separator-inner"></div>
+					
+					<h2>What is a Synapse Project?</h2>
 					<div class="info">
-						Groups use projects in Synapse to organize their efforts and track their analyses. You can browse existing projects in the table below. 											
-					</div>					
+						Projects are a great place to organize your work. Here are a few things you can do with a Synapse Project: 											
+					</div>			
+					<div class="">
+						<div class="span-12 inner-12 view">
+		                	<div class="span-6 notopmargin">
+		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    </div>
+		                    <h4 class="colored">Feature</h4>
+		                    <p>Description</p>
+		                </div>
+						<div class="span-12 inner-12 view last">
+		                	<div class="span-6 notopmargin">
+		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    </div>
+		                    <h4 class="colored">Feature</h4>
+		                    <p>Description</p>
+		                </div>
+					
+						<div class="span-12 inner-12 view">
+		                	<div class="span-6 notopmargin">
+		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    </div>
+		                    <h4 class="colored">Feature</h4>
+		                    <p>Description</p>
+		                </div>
+						<div class="span-12 inner-12 view last">
+		                	<div class="span-6 notopmargin">
+		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    </div>
+		                    <h4 class="colored">Feature</h4>
+		                    <p>Description</p>
+		                </div>
+					
+						<div class="span-12 inner-12 view">
+		                	<div class="span-6 notopmargin">
+		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    </div>
+		                    <h4 class="colored">Feature</h4>
+		                    <p>Description</p>
+		                </div>
+						<div class="span-12 inner-12 view last">
+		                	<div class="span-6 notopmargin">
+		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    </div>
+		                    <h4 class="colored">Feature</h4>
+		                    <p>Description</p>
+		                </div>
+					
+					</div>		
 				</div>		
-
-				<div id="sidebar">
-					<div id="participate" class="clearfix">
-							<h5>Invitation to Participate</h5>
-							<br />
-							Would you like to create a project to make use of the available datasets and analytical capabilities of Synapse?  
-							<br /><br />
-				
-							<g:SimplePanel ui:field="createProjectButtonPanel" />							
-							<!-- 
-							<a href="#">
-							<span class="large_button left">
-								<span class="large_button_left">&nbsp;</span>
-								<span class="large_button_center">Start a Project</span>
-								<span class="large_button_right">&nbsp;</span>
-							</span>
-							</a>
-							 -->
-					</div>
-				</div>
-
-				<div id="data">
-					<div>
-						<g:SimplePanel ui:field="tablePanel" />
-					</div>
-				</div>				
 					
 <!-- start footer -->
             <div class="clear"></div>

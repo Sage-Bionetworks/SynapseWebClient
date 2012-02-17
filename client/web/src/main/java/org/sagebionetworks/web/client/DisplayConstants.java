@@ -178,6 +178,8 @@ public class DisplayConstants {
 	public static final String LABEL_NO_SEARCH_RESULTS_PART1 = "Your search for '";
 	public static final String LABEL_NO_SEARCH_RESULTS_PART2 = "' did not match any results.";
 	public static final String LABEL_SEARCH = "Search";
+	public static final String LABEL_PROJECT_NAME = "Project Name";
+	public static final String LABEL_PROJECT_CREATED = "Project Created";
 	
 }
 
