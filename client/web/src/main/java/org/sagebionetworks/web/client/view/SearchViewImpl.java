@@ -42,6 +42,9 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -313,11 +316,10 @@ public class SearchViewImpl extends Composite implements SearchView {
 			// setup field
 			searchField = new TextBox();
 			searchField.setStyleName("homesearchbox resultssearchbox");
-			searchField.addKeyPressHandler(new KeyPressHandler() {				
+			searchField.addKeyDownHandler(new KeyDownHandler() {				
 				@Override
-				public void onKeyPress(KeyPressEvent event) {
-					char charCode = event.getCharCode();
-					if (charCode == '\n' || charCode == '\r') {
+				public void onKeyDown(KeyDownEvent event) {
+					if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 		                searchButton.fireEvent(Events.Select);
 		            }					
 				}
