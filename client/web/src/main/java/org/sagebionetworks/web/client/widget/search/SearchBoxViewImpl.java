@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 
+import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -18,6 +19,9 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.ui.Anchor;
@@ -35,7 +39,7 @@ public class SearchBoxViewImpl extends LayoutContainer implements SearchBoxView 
 	private FlexTable horizontalTable;
 	private Button typeDropdown;
 	private TextBox searchField;
-	private Anchor anchor;
+	private Button searchBtn;
 	private Boolean currentIsLarge;
 		
 	private static final String SEARCH_BOX_STYLE_NAME = "smallsearchbox";
@@ -101,31 +105,31 @@ public class SearchBoxViewImpl extends LayoutContainer implements SearchBoxView 
 		    searchField = new TextBox();
 		    searchField.setStyleName(SEARCH_BOX_STYLE_NAME);    	
 		    horizontalTable.setWidget(0, 1, searchField);
-			searchField.addKeyPressHandler(new KeyPressHandler() {				
+			searchField.addKeyDownHandler(new KeyDownHandler() {				
 				@Override
-				public void onKeyPress(KeyPressEvent event) {
-					char charCode = event.getCharCode();
-					if (charCode == '\n' || charCode == '\r') {
+				public void onKeyDown(KeyDownEvent event) {
+					if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 						presenter.search(searchField.getValue());
 		            }					
 				}
-			});						    
+			});				
 		}
 	    
-		if(anchor != null) {
+		if(searchBtn != null) {
 			horizontalTable.clearCell(0, 2);
 		} else {
-			anchor = new Anchor("Search");
-			anchor.setStyleName("shortBtn tab02d");
-			anchor.addClickHandler(new ClickHandler() {			
+			searchBtn = new Button("Search");
+			searchBtn.setHeight(26);
+			searchBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
-				public void onClick(ClickEvent event) {
+				public void componentSelected(ButtonEvent ce) {
 					presenter.search(searchField.getValue());
 				}
 			});
+					
 			
 		}
-	    horizontalTable.setWidget(0, 2, anchor);
+	    horizontalTable.setWidget(0, 2, searchBtn);
 	}
 	
 	@Override

@@ -97,29 +97,25 @@
 	        <div class="span-24 separator"></div>
 	        <div class="span-24 from_portfolio">
 	            <div class="span-24 notopmargin">
-	                <div class="span-6 notopmargin">
-	                	<h3>Projects in the Spotlight</h3>
-	                    <p>Project spotlight description...</p>
-						<p>
-							<div class="mega-button">
-								<a href="#ProjectsHome:0">Start a Project</a>
-							</div>
-						</p>								
+	               	<h3>Projects in the Spotlight</h3>
+				</div>
+	            <div class="span-24 notopmargin">
+	                <div class="span-6 inner-6 view notopmargin">
+	                    <h5><a class="link" href="#Synapse:102610">Synapse Commons Repository</a></h5>
+	                    <p>The Synapse Commons Repository is the place to access publicly available data sets. To build this project we have developed a system to crawl repositories, like GEO, ArrayExpress, and TCGA, and to manage contributions from users.</p>
+	                	<a class="button_readmore"  href="#Synapse:102610"></a>
 	                </div>
-	                <div class="span-6 inner-6 view">                    
+	                <div class="span-6 inner-6 view notopmargin">                    
 	                    <h5><a class="link" href="#Synapse:4492">Federation Aging Project</a></h5>
 	                    <p>The Federation Aging project is exploring the large effect of age on human gene expression by exploring a set of genes whose expression levels are tightly associated with age.</p>
 	                	<a class="button_readmore"  href="#Synapse:4492"></a>
 	                </div>
-	                <div class="span-6 inner-6 view">
-	                    <h5><a class="link" href="#Synapse:4492">SageBioCuration</a></h5>
-	                    <p>The Sage Bio Curation project is an umbrella for all Sage Bionetworks-curated projects.</p>
-	                	<a class="button_readmore"  href="#Synapse:4492"></a>
-	                </div>
-	                <div class="span-6 inner-6 view last">
+	                <div class="span-6 inner-6 view last notopmargin">
 	                    <h5><a class="link" href="portfolio-details.html">Start Your Own Project!</a></h5>
 	                    <p>Get started using Synapse today by creating your own Project.</p>
-	                	<a class="button_readmore"  href="#ProjectsHome:0"></a>
+						<div class="mega-button">
+							<a href="#ProjectsHome:0">Start a Project</a>
+						</div>	                	
 	                </div>
 	            </div>
 	        </div>
