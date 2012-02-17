@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearchBoxView {
-
+	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;	
@@ -39,7 +39,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 	private LayoutContainer searchButtonContainer;
 	private Boolean currentIsLarge;
 		
-	private static final String HOMESEARCH_BOX_STYLE_NAME = "homesearchbox";
+	
 	
 	@Inject
 	public HomeSearchBoxViewImpl(SageImageBundle sageImageBundle,
@@ -99,7 +99,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 
 		if(searchField == null) {
 		    searchField = new TextBox();
-		    searchField.setStyleName(HOMESEARCH_BOX_STYLE_NAME);
+		    searchField.setStyleName(DisplayUtils.HOMESEARCH_BOX_STYLE_NAME);
 		    horizontalTable.setWidget(0, 1, searchField);
 			searchField.addKeyDownHandler(new KeyDownHandler() {				
 				@Override

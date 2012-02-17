@@ -256,6 +256,11 @@
 	font-size: 1.2em;
 }
 
+.addProjectBox {
+	width: 570px;
+	margin: 4px 10px 0 0; 
+}
+
 
 
 /* Clear out GWT's link color */

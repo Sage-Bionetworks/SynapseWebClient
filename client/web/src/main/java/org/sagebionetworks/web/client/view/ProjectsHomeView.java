@@ -15,6 +15,8 @@ public interface ProjectsHomeView extends IsWidget, SynapseView {
 		
 	public interface Presenter {
 
+		void createProject(String name);
+		
 		PlaceChanger getPlaceChanger();
 	}
 
