@@ -17,6 +17,9 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.ui.Anchor;
@@ -26,7 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearchBoxView {
-
+	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;	
@@ -36,7 +39,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 	private LayoutContainer searchButtonContainer;
 	private Boolean currentIsLarge;
 		
-	private static final String HOMESEARCH_BOX_STYLE_NAME = "homesearchbox";
+	
 	
 	@Inject
 	public HomeSearchBoxViewImpl(SageImageBundle sageImageBundle,
@@ -96,17 +99,16 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 
 		if(searchField == null) {
 		    searchField = new TextBox();
-		    searchField.setStyleName(HOMESEARCH_BOX_STYLE_NAME);
+		    searchField.setStyleName(DisplayUtils.HOMESEARCH_BOX_STYLE_NAME);
 		    horizontalTable.setWidget(0, 1, searchField);
-			searchField.addKeyPressHandler(new KeyPressHandler() {				
+			searchField.addKeyDownHandler(new KeyDownHandler() {				
 				@Override
-				public void onKeyPress(KeyPressEvent event) {
-					char charCode = event.getCharCode();
-					if (charCode == 13 || charCode == '\n' || charCode == '\r') {
+				public void onKeyDown(KeyDownEvent event) {
+					if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 						presenter.search(searchField.getValue());
 		            }					
 				}
-			});						    		    
+			});				
 		}
 	    
 		if(searchButtonContainer != null) {
