@@ -121,7 +121,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		     formPanel = new FormPanel();  
 		     formPanel.setFrame(true);  
 		     formPanel.setHeaderVisible(false);
-		     formPanel.setWidth(350);  
+		     formPanel.setWidth(380);  
 		     formPanel.setLayout(new FlowLayout());		     
 		   
 		     FieldSet fieldSet = new FieldSet();  
