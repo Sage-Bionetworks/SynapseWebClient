@@ -7,6 +7,8 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.users.UserData;
@@ -31,6 +33,10 @@ import com.google.inject.Inject;
 public class LoginViewImpl extends Composite implements LoginView {
 	
 	@UiField
+	SimplePanel header;
+	@UiField
+	SimplePanel footer;
+	@UiField
 	SimplePanel loginWidgetPanel;
 	@UiField
 	SimplePanel passwordResetButtonPanel;
@@ -44,15 +50,23 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
 	private Window logginInWindow;
+	private Header headerWidget;
 
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
 	
 	@Inject
-	public LoginViewImpl(Binder uiBinder, IconsImageBundle icons, SageImageBundle sageImageBundle, LoginWidget loginWidget){
+	public LoginViewImpl(Binder uiBinder, IconsImageBundle icons,
+			Header headerWidget, Footer footerWidget,
+			SageImageBundle sageImageBundle, LoginWidget loginWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
 		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
+		this.headerWidget = headerWidget;
+			
+		header.add(headerWidget.asWidget());
+		footer.add(footerWidget.asWidget());
+
 	}
 
 	@Override

@@ -62,6 +62,7 @@ public class DisplayUtils {
 	public static final String STYLE_NAME_GXT_GREY_BACKGROUND = "gxtGreyBackground";
 	public static final String STYLE_CODE_CONTENT = "codeContent";
 	public static final String STYLE_SMALL_GREY_TEXT = "smallGreyText";
+	public static final String HOMESEARCH_BOX_STYLE_NAME = "homesearchbox";	
 
 	
 	/**
