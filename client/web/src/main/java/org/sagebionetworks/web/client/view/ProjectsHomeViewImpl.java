@@ -59,7 +59,6 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 	}
 
 

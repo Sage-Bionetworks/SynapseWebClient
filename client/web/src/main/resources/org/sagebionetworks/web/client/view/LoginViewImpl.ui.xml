@@ -18,31 +18,28 @@
     	<div class="container"> 		
 			<g:SimplePanel ui:field="header" />
 	        	<div class="span-24 notopmargin">
+			        <div class="span-24 separator"></div>
 
 	<!-- end header -->
-				<div id="logo" style="clear: right">					
-						<span class="large">Synapse</span>
-						<span class="tagline">CONTRIBUTE TO<br /> THE CURE</span>					
-				</div>
-				
-				<p>&nbsp;</p>
-				<p>&nbsp;</p> 
-				<p>&nbsp;</p>
-				<p>&nbsp;</p>
-
 				<!-- LoginView -->				
+					<div class="span-7"></div>				
+					<div class="span-10 inner-6 view">
+						<h2>Login to Synapse </h2>
+						<g:SimplePanel ui:field="loginWidgetPanel" />
+				        <div class="span-24 separator-inner"></div>	
+						<table style="width: 380px">
+							<tr>
+								<td><g:SimplePanel ui:field="passwordResetButtonPanel" /></td>
+								<td class="right" style="text-align: right"><g:SimplePanel ui:field="registerButtonPanel" /></td>
+							</tr>
+						</table>		
+						<!-- Logout View -->
+						<g:SimplePanel ui:field="logoutPanel" />
+					</div>
+					<div class="span-7"></div>
 				
-				<g:SimplePanel ui:field="loginWidgetPanel" />
 				<br/>
-				<table style="width: 350px;">
-					<tr>
-						<td><g:SimplePanel ui:field="passwordResetButtonPanel" /></td>
-						<td class="right" style="text-align: right"><g:SimplePanel ui:field="registerButtonPanel" /></td>
-					</tr>
-				</table>		
 
-				<!-- Logout View -->
-				<g:SimplePanel ui:field="logoutPanel" />
 				
 		</div>
 <!-- start footer -->

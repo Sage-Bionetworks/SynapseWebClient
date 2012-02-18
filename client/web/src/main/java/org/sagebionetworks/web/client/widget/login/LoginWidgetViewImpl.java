@@ -71,32 +71,8 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		final FormPanel formPanel = new FormPanel();
 		formPanel.setHeaderVisible(false);
 		formPanel.setFrame(true);
-		formPanel.setWidth(350);
+		formPanel.setWidth(380);
 		formPanel.setLabelWidth(85);
-
-		
-//		FieldSet fieldSetFederated = new FieldSet();  
-//		fieldSetFederated.setHeading("Login with an External Account");  
-//		fieldSetFederated.setCheckboxToggle(false);
-//		fieldSetFederated.setCollapsible(false);
-//		fieldSetFederated.setLayout(layout);  
-//		formPanel.setAction(DisplayConstants.OPEN_ID_ACTION_ENDPOINT);
-//		formPanel.setMethod(Method.POST);
-//		
-//		HiddenField<String> openIdProvider = new HiddenField<String>();
-//		openIdProvider.setFieldLabel(OPEN_ID_PROVIDER_FIELD_NAME);
-//		openIdProvider.setValue(OPEN_ID_PROVIDER_SAGE_VALUE);
-//		
-//		Button sagebaseLoginButton = new Button("Login with a Sagebase.org Account");
-//		sagebaseLoginButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.google16()));
-//		sagebaseLoginButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-//			@Override
-//			public void componentSelected(ButtonEvent ce) {
-//				formPanel.submit();
-//			}
-//		});
-//		formPanel.add(sagebaseLoginButton, new MarginData(0, 0, 13, 0));
-
 		
 		// synapse login
 		FieldSet fieldSet = new FieldSet();  
@@ -105,8 +81,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		FormLayout layout = new FormLayout();  
 		layout.setLabelWidth(85);  		
 		fieldSet.setLayout(layout);  
-		fieldSet.setCollapsible(true);
-		fieldSet.collapse();
+		fieldSet.setCollapsible(false);
 		
 		firstName.setFieldLabel("Email Address");
 		firstName.setAllowBlank(false);
@@ -120,8 +95,6 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 
 		fieldSet.add(messageLabel);
 		
-		//formPanel.add(fieldSet);
-		
 		final Button loginButton = new Button("Login", new SelectionListener<ButtonEvent>(){			
 			@Override
 			public void componentSelected(ButtonEvent ce) {
@@ -131,11 +104,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		});
 
 		fieldSet.add(loginButton);
-		formPanel.add(fieldSet);
-		//formPanel.addButton(loginButton);
-		//formPanel.setButtonAlign(HorizontalAlignment.CENTER);
-		
-		formPanel.add(fieldSet);
+		formPanel.add(fieldSet);		
 		
 		FormButtonBinding binding = new FormButtonBinding(formPanel);
 		binding.addButton(loginButton);
