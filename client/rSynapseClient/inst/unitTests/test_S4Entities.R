@@ -228,6 +228,34 @@ unitTestMultipleValueSetters <-
   ##	checkEquals(propertyValue(entity, "POSIXdateKey"), POSIXVal)
 }
 
+unitTestReplaceAnnotations <-
+  function()
+{
+  entity <- new(Class="SynapseEntity")
+  dateVal <- Sys.time()
+  POSIXVal <- as.POSIXct(Sys.time(), origin=ISOdatetime(1970,1,1,0,0,0))
+  
+  valueList <- list(
+    stringKey = "aStringValue",
+    longKey = 1L,
+    doubleKey = 1.1,
+    booleanKeyTrue1 = T,
+    booleanKeyTrue2 = TRUE,
+    booleanKeyFalse1 = F,
+    booleanKeyFalse2 = FALSE
+  ## TODO: fix these once dates are handled properly (SYNR-43)
+  ## dateKey = dateVal,
+  ## POSIXdateKey =POSIXVal
+  )
+  
+  annotationValues(entity) <- valueList
+  
+  annotations(entity) <- list(annot1="foo", annot2="bar")
+  checkEquals(length(annotationNames(entity)), 2L)
+  checkTrue(all(c("annot1", "annot2") %in% annotationNames(entity)))
+  
+}
+
 unitTestPropertySetters <-
   function()
 {

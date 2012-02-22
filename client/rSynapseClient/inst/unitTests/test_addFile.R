@@ -14,14 +14,14 @@ unitTestOverwriteFile <-
   
   layer <- new(Class="Layer")
   layer <- addFile(layer, file, path)
-  checkTrue(length(layer$files) == 1L)
+  checkEquals(length(layer$files), 1L)
   checkEquals(checksum, as.character(tools::md5sum(file.path(layer$cacheDir, layer$files[1]))))
   
   d <- diag(x = 2, nrow=10, ncol=10)
   save(d, file=file)
   checksum2 <- as.character(tools::md5sum(file))
   layer <- addFile(layer, file, path)
-  checkTrue(length(layer$files) == 1L)
+  checkEquals(length(layer$files), 1L)
   checkEquals(checksum2, as.character(tools::md5sum(file.path(layer$cacheDir, layer$files[1]))))
   checkTrue(checksum2 != checksum)
   
@@ -30,7 +30,7 @@ unitTestOverwriteFile <-
   save(d, file=file2)
   checksum3 <- as.character(tools::md5sum(file2))
   layer <- addFile(layer, file2, path)
-  checkTrue(length(layer$files) == 2L)
+  checkEquals(length(layer$files), 2L)
   checkEquals(checksum3, as.character(tools::md5sum(file.path(layer$cacheDir, layer$files[2]))))
   
   ## overwrite again
@@ -38,7 +38,7 @@ unitTestOverwriteFile <-
   save(d, file=file)
   
   layer <- addFile(layer, file, path)
-  checkTrue(length(layer$files) == 2L)
+  checkEquals(length(layer$files), 2L)
   checkEquals(checksum, as.character(tools::md5sum(file.path(layer$cacheDir, layer$files[1]))))
   checkEquals(checksum3, as.character(tools::md5sum(file.path(layer$cacheDir, layer$files[2]))))
 }
@@ -54,7 +54,7 @@ unitTestAddFileToRoot <-
   
   layer <- new(Class="Layer")
   layer <- addFile(layer, file, path)
-  checkTrue(length(layer$files) == 1L)
+  checkEquals(length(layer$files), 1L)
   checkEquals(checksum, as.character(tools::md5sum(file.path(layer$cacheDir, layer$files[1]))))
   
   file <- tempfile()
@@ -65,7 +65,7 @@ unitTestAddFileToRoot <-
   
   layer <- new(Class="Layer")
   layer <- addFile(layer, file, path)
-  checkTrue(length(layer$files) == 1L)
+  checkEquals(length(layer$files), 1L)
   checkEquals(checksum, as.character(tools::md5sum(file.path(layer$cacheDir, layer$files[1]))))
   
   file <- tempfile()
@@ -75,7 +75,7 @@ unitTestAddFileToRoot <-
   
   layer <- new(Class="Layer")
   layer <- addFile(layer, file)
-  checkTrue(length(layer$files) == 1L)
+  checkEquals(length(layer$files), 1L)
   checkEquals(checksum, as.character(tools::md5sum(file.path(layer$cacheDir, layer$files[1]))))
 }
 
@@ -204,3 +204,19 @@ unitTestOneFileOneDirTwoPaths <-
   checkException(addFile(layer, c(tempdir(), file2), c(path1, path2)))
 }
 
+unitTestAddToSubDirKeepName <-
+    function()
+{
+  file <- tempfile()
+  d <- diag(nrow=10, ncol=10)
+  save(d, file=file)
+  path <- "/foo/"
+  checksum <- as.character(tools::md5sum(file))
+  
+  layer <- new(Class="Layer")
+  layer <- addFile(layer, file, path)
+  checkEquals(length(layer$files), 1L)
+  checkEquals(layer$files, gsub("^/", "", gsub("/+","/", gsub(tempdir(), "", file.path(path, file)))))
+  checkEquals(checksum, as.character(tools::md5sum(file.path(layer$cacheDir, layer$files[1]))))
+  
+}

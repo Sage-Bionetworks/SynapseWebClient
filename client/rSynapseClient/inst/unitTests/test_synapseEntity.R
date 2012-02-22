@@ -63,7 +63,7 @@ uniTestProperties <-
   propertyValue(entity,"long") <- 1L
   propertyValue(entity,"double") <- 2.0
   
-  ## TODO: remove the type coersion one getters return properly typed values
+  ## TODO: remove the type coersion once getters return properly typed values
   ##checkEquals(propertyValue(entity,"date"), as.Date(dd))
   checkEquals(propertyValue(entity,"string"), "string")
   checkEquals(as.integer(propertyValue(entity,"long")), 1L)
@@ -84,7 +84,7 @@ uniTestAnnotations <-
   annotValue(entity,"long") <- 1L
   annotValue(entity,"double") <- 2.0
   
-  ## TODO: remove the type coersion one getters return properly typed values
+  ## TODO: remove the type coersion once getters return properly typed values
   ##checkEquals(as.Date(as.numeric(annotValue(entity,"date"))), dd)
   checkEquals(annotValue(entity,"string"), "string")
   checkEquals(as.integer(annotValue(entity,"long")), 1L)
@@ -104,7 +104,7 @@ unitTestListSetters <-
     double = 2.0
   )
   
-  ## TODO: remove the type coersion one getters return properly typed values (SYNR-43)
+  ## TODO: remove the type coersion once getters return properly typed values (SYNR-43)
   ##checkEquals(annotValue(entity,"date"), as.character(as.numeric(as.POSIXct(dd))))
   checkEquals(annotValue(entity,"string"), "string")
   checkEquals(as.integer(annotValue(entity,"long")), 1L)
@@ -120,7 +120,7 @@ unitTestListSetters <-
     double = 2.0
   )
   
-  ## TODO: remove the type coersion one getters return properly typed values (SYNR-43)
+  ## TODO: remove the type coersion once getters return properly typed values (SYNR-43)
   ##checkEquals(propertyValue(entity,"date"), dd)
   checkEquals(propertyValue(entity,"string"), "string")
   checkEquals(as.integer(propertyValue(entity,"long")), 1L)

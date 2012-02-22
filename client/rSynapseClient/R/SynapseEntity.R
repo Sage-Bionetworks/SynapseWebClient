@@ -157,7 +157,7 @@ setMethod(
   f = "annotations",
   signature = "SynapseEntity",
   definition = function(object){
-    return(object@annotations)
+    object@annotations
   }
 )
 
@@ -169,7 +169,20 @@ setMethod(
   signature = signature("SynapseEntity","SynapseAnnotation"),
   definition = function(object, value){
     object@annotations <- value
-    return(object)
+    object
+  }
+)
+
+#####
+## replace annotations with the values
+#####
+setMethod(
+  f = "annotations<-",
+  signature = signature("SynapseEntity", "list"),
+  definition = function(object, value){
+    object@annotations <- new("SynapseAnnotation")
+    annotationValues(object) <- value
+    object
   }
 )
 

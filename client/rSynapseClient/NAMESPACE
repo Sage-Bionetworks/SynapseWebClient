@@ -78,8 +78,10 @@ exportMethods(
   "annotValue<-",
   annotValue, 
   annotations, 
+  "annotations<-",
   "annotationValues<-", 
-  annotationValues
+  annotationValues,
+  annotationNames
  )
  	
 exportMethods(

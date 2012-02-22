@@ -23,14 +23,6 @@ setMethod(
 
 setMethod(
   f = "addFile",
-  signature = signature("LocationOwner", "missing", "missing"),
-  definition = function(entity){
-    addFile(entity, path="")	
-  }
-)
-
-setMethod(
-  f = "addFile",
   signature = signature("CachedLocation", "character", "character"),
   definition = function(entity, file, path){
     if(length(path) > 1 && (length(path) != length(file)))
