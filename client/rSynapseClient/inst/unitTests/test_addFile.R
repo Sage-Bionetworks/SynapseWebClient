@@ -216,7 +216,7 @@ unitTestAddToSubDirKeepName <-
   layer <- new(Class="Layer")
   layer <- addFile(layer, file, path)
   checkEquals(length(layer$files), 1L)
-  checkEquals(layer$files, gsub("^/", "", gsub("/+","/", gsub(tempdir(), "", file.path(path, file)))))
+  checkEquals(layer$files, gsub("^/", "", gsub("/+","/", gsub(tempdir(), "", file.path(path, file)), fixed = TRUE)))
   checkEquals(checksum, as.character(tools::md5sum(file.path(layer$cacheDir, layer$files[1]))))
   
 }
