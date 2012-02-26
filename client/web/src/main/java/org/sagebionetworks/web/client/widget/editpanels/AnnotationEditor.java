@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -16,7 +17,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.editpanels.FormField.ColumnType;
-import org.sagebionetworks.web.shared.Annotations;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclAccessType;
@@ -85,7 +85,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 				// TODO : convert this class to working with the Annotations object and not the JSONObject
 				originalAnnotationObject = JSONParser.parseStrict(annotationJsonString).isObject();
 				try {
-					Annotations annotations = nodeModelCreator.createAnnotations(annotationJsonString);
+					Annotations annotations = nodeModelCreator.initializeEntity(annotationJsonString, new Annotations());
 				} catch (RestServiceException ex) {
 					if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
 						onFailure(null);
@@ -193,7 +193,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 			@Override
 			public void onSuccess(String result) {
 				try {
-					Annotations annotations = nodeModelCreator.createAnnotations(result);
+					Annotations annotations = nodeModelCreator.initializeEntity(result, new Annotations());
 					originalAnnotationObject = JSONParser.parseStrict(result).isObject();
 					view.updateAnnotations(formFields);										
 					if(operation == PersistOperation.CREATE) {
@@ -232,7 +232,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 				// TODO : convert this class to working with the Annotations object and not the JSONObject
 				originalAnnotationObject = JSONParser.parseStrict(annotationJsonString).isObject();
 				try {
-					Annotations annotations = nodeModelCreator.createAnnotations(annotationJsonString);
+					Annotations annotations = nodeModelCreator.initializeEntity(annotationJsonString, new Annotations());
 				} catch (RestServiceException ex) {
 					if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
 						onFailure(null);

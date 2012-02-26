@@ -69,7 +69,7 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 					String current = null;
 					
 					// get and add paths
-					entityPath = nodeModelCreator.createEntityPath(result);
+					entityPath = nodeModelCreator.createEntity(result, EntityPath.class);
 					if(entityPath != null) {
 						List<EntityHeader> path = entityPath.getPath();
 						if(path != null) {

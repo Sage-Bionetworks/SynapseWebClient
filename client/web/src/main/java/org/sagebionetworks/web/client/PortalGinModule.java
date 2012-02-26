@@ -1,41 +1,33 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONArrayGwt;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
+import org.sagebionetworks.web.client.transform.JSONEntityFactory;
+import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.view.AnalysesHomeView;
-import org.sagebionetworks.web.client.view.AnalysesHomeViewImpl;
-import org.sagebionetworks.web.client.view.AnalysisView;
-import org.sagebionetworks.web.client.view.AnalysisViewImpl;
 import org.sagebionetworks.web.client.view.CellTableProvider;
 import org.sagebionetworks.web.client.view.CellTableProviderImpl;
 import org.sagebionetworks.web.client.view.ColumnsPopupView;
 import org.sagebionetworks.web.client.view.ColumnsPopupViewImpl;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
-import org.sagebionetworks.web.client.view.DatasetView;
-import org.sagebionetworks.web.client.view.DatasetViewImpl;
-import org.sagebionetworks.web.client.view.DatasetsHomeView;
-import org.sagebionetworks.web.client.view.DatasetsHomeViewImpl;
-import org.sagebionetworks.web.client.view.EntityView;
-import org.sagebionetworks.web.client.view.EntityViewImpl;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.view.HomeViewImpl;
-import org.sagebionetworks.web.client.view.LayerView;
-import org.sagebionetworks.web.client.view.LayerViewImpl;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
 import org.sagebionetworks.web.client.view.LookupView;
 import org.sagebionetworks.web.client.view.LookupViewImpl;
-import org.sagebionetworks.web.client.view.PhenoEditView;
-import org.sagebionetworks.web.client.view.PhenoEditViewImpl;
+import org.sagebionetworks.web.client.view.EntityView;
+import org.sagebionetworks.web.client.view.EntityViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
 import org.sagebionetworks.web.client.view.ProjectView;
@@ -46,10 +38,6 @@ import org.sagebionetworks.web.client.view.PublicProfileView;
 import org.sagebionetworks.web.client.view.PublicProfileViewImpl;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.view.SearchViewImpl;
-import org.sagebionetworks.web.client.view.StepView;
-import org.sagebionetworks.web.client.view.StepViewImpl;
-import org.sagebionetworks.web.client.view.StepsHomeView;
-import org.sagebionetworks.web.client.view.StepsHomeViewImpl;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
 import org.sagebionetworks.web.client.view.table.ColumnFactoryImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
@@ -133,6 +121,14 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(JSONObjectAdapter.class).to(JSONObjectGwt.class);
 		bind(JSONArrayAdapter.class).to(JSONArrayGwt.class);
 		
+		// JSONEntityFactory
+		bind(JSONEntityFactoryImpl.class).in(Singleton.class);
+		bind(JSONEntityFactory.class).to(JSONEntityFactoryImpl.class);
+		
+		
+		// Adapter factoyr
+		bind(AdapterFactory.class).to(GwtAdapterFactory.class);
+		
 		/*
 		 * Vanilla Implementation binding
 		 */
@@ -147,46 +143,18 @@ public class PortalGinModule extends AbstractGinModule {
 		// The home page
 		bind(HomeViewImpl.class).in(Singleton.class);
 		bind(HomeView.class).to(HomeViewImpl.class);
-		
-		// The home page for all datasets
-		bind(DatasetsHomeViewImpl.class).in(Singleton.class);
-		bind(DatasetsHomeView.class).to(DatasetsHomeViewImpl.class);
-		
-		// DatasetView
+
+		// EntityView
 		bind(EntityViewImpl.class).in(Singleton.class);
 		bind(EntityView.class).to(EntityViewImpl.class);
-
-		// DatasetView
-		bind(DatasetViewImpl.class).in(Singleton.class);
-		bind(DatasetView.class).to(DatasetViewImpl.class);
-
-		// LayerView
-		bind(LayerViewImpl.class).in(Singleton.class);
-		bind(LayerView.class).to(LayerViewImpl.class);
-
+		
 		// ProjectsHomeView
 		bind(ProjectsHomeViewImpl.class).in(Singleton.class);
 		bind(ProjectsHomeView.class).to(ProjectsHomeViewImpl.class);		
 		
 		// ProjectView
 		bind(ProjectViewImpl.class).in(Singleton.class);
-		bind(ProjectView.class).to(ProjectViewImpl.class);		
-		
-		// AnalysesHomeView
-		bind(AnalysesHomeViewImpl.class).in(Singleton.class);
-		bind(AnalysesHomeView.class).to(AnalysesHomeViewImpl.class);		
-		
-		// AnalysisView
-		bind(AnalysisViewImpl.class).in(Singleton.class);
-		bind(AnalysisView.class).to(AnalysisViewImpl.class);	
-		
-		// StepsHomeView
-		bind(StepsHomeViewImpl.class).in(Singleton.class);
-		bind(StepsHomeView.class).to(StepsHomeViewImpl.class);		
-		
-		// StepView
-		bind(StepViewImpl.class).in(Singleton.class);
-		bind(StepView.class).to(StepViewImpl.class);	
+		bind(ProjectView.class).to(ProjectViewImpl.class);
 		
 		// QueryService View
 		//bind(QueryServiceTableView.class).to(QueryServiceTableViewImpl.class);
@@ -210,11 +178,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// CominSoonView
 		bind(ComingSoonViewImpl.class).in(Singleton.class);
-		bind(ComingSoonView.class).to(ComingSoonViewImpl.class);					
-		
-		// PhenoEditView
-		bind(PhenoEditViewImpl.class).in(Singleton.class);
-		bind(PhenoEditView.class).to(PhenoEditViewImpl.class);					
+		bind(ComingSoonView.class).to(ComingSoonViewImpl.class);									
 		
 		// LookupView
 		bind(LookupViewImpl.class).in(Singleton.class);

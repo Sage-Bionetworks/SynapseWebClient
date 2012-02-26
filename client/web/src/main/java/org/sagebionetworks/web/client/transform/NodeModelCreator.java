@@ -3,16 +3,13 @@ package org.sagebionetworks.web.client.transform;
 
 import org.sagebionetworks.repo.model.Agreement;
 import org.sagebionetworks.repo.model.Analysis;
-import org.sagebionetworks.repo.model.Dataset;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Eula;
-import org.sagebionetworks.repo.model.Layer;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Step;
-import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.shared.Annotations;
 import org.sagebionetworks.web.shared.DownloadLocation;
 import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -26,25 +23,13 @@ public interface NodeModelCreator {
 
 	Entity createEntity(EntityWrapper entityWrapper) throws RestServiceException;
 	
-	EntityPath createEntityPath(EntityWrapper entityWrapper) throws RestServiceException;
+	<T extends JSONEntity> T createEntity(String jsonString, Class<? extends T> clazz) throws RestServiceException;
 	
-	SearchResults createSearchResults(EntityWrapper entityWrapper) throws RestServiceException;
+	<T extends JSONEntity> T createEntity(EntityWrapper entityWrapper, Class<? extends T> clazz) throws RestServiceException;
 	
-	
-	// Specific Types:
-	
-	Dataset createDataset(String json) throws RestServiceException;
-	
-	Layer createLayer(String json) throws RestServiceException;
-	
-	Annotations createAnnotations(String json) throws RestServiceException;
-	
-	Project createProject(String json) throws RestServiceException;
-	
-	Eula createEULA(String json) throws RestServiceException;
-	
-	Agreement createAgreement(String json) throws RestServiceException;
-	
+	<T extends JSONEntity> T initializeEntity(String json, T newEntity) throws RestServiceException;
+			
+
 	String createAgreementJSON(Agreement agreement) throws JSONObjectAdapterException;
 	
 	PagedResults createPagedResults(String json) throws RestServiceException;
@@ -55,10 +40,6 @@ public interface NodeModelCreator {
 	
 	EntityTypeResponse createEntityTypeResponse(String json) throws RestServiceException;
 	
-	Analysis createAnalysis(String json) throws RestServiceException;
-
-	Step createStep(String json) throws RestServiceException;
-
 	/**
 	 * Validates that the json parses and does not throw any RestService exceptions
 	 * this is useful for json that doesn't have a model object (like schemas)

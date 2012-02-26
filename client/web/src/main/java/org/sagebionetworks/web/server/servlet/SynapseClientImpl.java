@@ -86,20 +86,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	 */
 	@Override
 	public EntityWrapper getEntity(String entityId) {
-		Synapse synapseClient = createSynapseClient();		
-		EntityWrapper entityWrapper = new EntityWrapper();
-		
+		Synapse synapseClient = createSynapseClient();
 		try {
 			Entity entity = synapseClient.getEntityById(entityId);
 			JSONObjectAdapter entityJson = entity.writeToJSONObject(jsonObjectAdapter.createNew());
-			entityWrapper.setEntityJson(entityJson.toJSONString());			
+			return new EntityWrapper(entityJson.toJSONString(), entity.getClass().getName(), null);		
 		} catch (SynapseException e) {
-			entityWrapper.setRestServiceException(ExceptionUtil.convertSynapseException(e));
+			return new EntityWrapper(null, null, ExceptionUtil.convertSynapseException(e));
 		} catch (JSONObjectAdapterException e) {
-			entityWrapper.setRestServiceException(new UnknownErrorException(e.getMessage()));
+			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
 		}		
-		
-		return entityWrapper;
 	}
 	
 	@Override
@@ -110,40 +106,32 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	@Override	
 	public EntityWrapper getEntityPath(String entityId, String urlPrefix) { 
 		Synapse synapseClient = createSynapseClient();
-		EntityWrapper entityWrapper = new EntityWrapper();
-		
 		try {
 			EntityPath entityPath = synapseClient.getEntityPath(entityId, urlPrefix); 
 			JSONObjectAdapter entityPathJson = entityPath.writeToJSONObject(jsonObjectAdapter.createNew());
-			entityWrapper.setEntityJson(entityPathJson.toJSONString());			
-		} catch (SynapseException e) {
-			entityWrapper.setRestServiceException(ExceptionUtil.convertSynapseException(e));
+			return new EntityWrapper(entityPathJson.toJSONString(), entityPath.getClass().getName(), null);			
+		}catch (SynapseException e) {
+			return new EntityWrapper(null, null, ExceptionUtil.convertSynapseException(e));
 		} catch (JSONObjectAdapterException e) {
-			entityWrapper.setRestServiceException(new UnknownErrorException(e.getMessage()));
-		}		
-		
-		return entityWrapper;
+			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
+		}
 	}
 	
 	@Override
 	public EntityWrapper search(String searchQueryJson) {
 		Synapse synapseClient = createSynapseClient();
-		EntityWrapper entityWrapper = new EntityWrapper();
-		
 		try {
 			JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 			SearchResults searchResults = synapseClient.search(new SearchQuery(adapter.createNew(searchQueryJson)));
 			searchResults.writeToJSONObject(adapter);
-			entityWrapper.setEntityJson(adapter.toJSONString());
-		} catch (SynapseException e) {
-			entityWrapper.setRestServiceException(ExceptionUtil.convertSynapseException(e));
+			return new EntityWrapper(adapter.toJSONString(), SearchResults.class.getName(), null);		
+		}catch (SynapseException e) {
+			return new EntityWrapper(null, null, ExceptionUtil.convertSynapseException(e));
 		} catch (JSONObjectAdapterException e) {
-			entityWrapper.setRestServiceException(new UnknownErrorException(e.getMessage()));
+			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
 		} catch (UnsupportedEncodingException e) {
-			entityWrapper.setRestServiceException(new UnknownErrorException(e.getMessage()));
+			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
 		}		
-
-		return entityWrapper;
 	}
 
 	

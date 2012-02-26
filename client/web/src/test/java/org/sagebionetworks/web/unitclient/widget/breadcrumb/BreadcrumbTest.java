@@ -93,27 +93,26 @@ public class BreadcrumbTest {
 		JSONObjectAdapter pathAdapter = new JSONObjectAdapterImpl();
 		entityPath.writeToJSONObject(pathAdapter);
 				
-		EntityWrapper entityWrapper = new EntityWrapper();
-		entityWrapper.setEntityJson(pathAdapter.toJSONString());		
+		EntityWrapper entityWrapper = new EntityWrapper(pathAdapter.toJSONString(), EntityPath.class.getName(), null);	
 		
 		// Fail path service call
 		reset(mockView);		
 		AsyncMockStubber.callFailureWith(new Throwable("error message")).when(mockSynapseClient).getEntityPath(eq(entity.getId()), anyString(), any(AsyncCallback.class)); // fail for get Path
-		when(mockNodeModelCreator.createEntityPath(any(EntityWrapper.class))).thenReturn(entityPath);
+		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class), eq(EntityPath.class))).thenReturn(entityPath);
 		breadcrumb.asWidget(entity);
 		verify(mockView).showErrorMessage(anyString());
 		
 		// fail model creation
 		reset(mockView);			
 		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), anyString(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntityPath(any(EntityWrapper.class))).thenReturn(null); // null model return
+		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class), eq(EntityPath.class))).thenReturn(null); // null model return
 		breadcrumb.asWidget(entity);
 		verify(mockView).setLinksList(any(List.class), (String)isNull());
 		
 		// success test
 		reset(mockView);			
 		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), anyString(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntityPath(entityWrapper)).thenReturn(entityPath);
+		when(mockNodeModelCreator.createEntity(entityWrapper, EntityPath.class)).thenReturn(entityPath);
 		breadcrumb.asWidget(entity);
 		verify(mockView).setLinksList(any(List.class), (String)isNotNull());				
 	}

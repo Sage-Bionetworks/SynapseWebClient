@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Layer;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Lookup;
-import org.sagebionetworks.web.client.place.PhenoEdit;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Project;
 import org.sagebionetworks.web.client.place.ProjectsHome;
@@ -29,24 +28,14 @@ import org.sagebionetworks.web.client.place.StepsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.client.presenter.AnalysesHomePresenter;
-import org.sagebionetworks.web.client.presenter.AnalysisPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
-import org.sagebionetworks.web.client.presenter.DatasetPresenter;
-import org.sagebionetworks.web.client.presenter.DatasetsHomePresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
-import org.sagebionetworks.web.client.presenter.LayerPresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.LookupPresenter;
-import org.sagebionetworks.web.client.presenter.PhenoEditPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
-import org.sagebionetworks.web.client.presenter.ProjectPresenter;
-import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.PublicProfilePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
-import org.sagebionetworks.web.client.presenter.StepPresenter;
-import org.sagebionetworks.web.client.presenter.StepsHomePresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -128,56 +117,9 @@ public class AppActivityMapper implements ActivityMapper {
 			HomePresenter presenter = ginjector.getHomePresenter();
 			presenter.setPlace((Home)place);
 			return presenter;
-		} else if(place instanceof DatasetsHome){
-			// The home page for all datasets
-			DatasetsHomePresenter presenter = ginjector.getDatasetsHomePresenter();
-			// set this presenter's place
-			presenter.setPlace((DatasetsHome)place);
-			return presenter;
 		} else if(place instanceof Synapse){
 			EntityPresenter presenter = ginjector.getEntityPresenter();
 			presenter.setPlace((Synapse)place);
-			return presenter;
-		}else if(place instanceof Dataset){
-			DatasetPresenter presenter = ginjector.getDatasetPresenter();
-			// set this presenter's place
-			presenter.setPlace((Dataset)place);
-			return presenter;
-		}else if (place instanceof Layer) {
-			// The layer detail view
-			LayerPresenter presenter = ginjector.getLayerPresenter();
-			presenter.setPlace((Layer)place);
-			return presenter;
-		}else if (place instanceof ProjectsHome) {
-			// Projects Home 
-			ProjectsHomePresenter presenter = ginjector.getProjectsHomePresenter();
-			presenter.setPlace((ProjectsHome)place);
-			return presenter;
-		}else if (place instanceof Project) {
-			// Projects Home 
-			ProjectPresenter presenter = ginjector.getProjectPresenter();
-			presenter.setPlace((Project)place);
-			return presenter;
-		}else if (place instanceof AnalysesHome) {
-			// Analyses Home 
-			AnalysesHomePresenter presenter = ginjector.getAnalysesHomePresenter();
-			presenter.setPlace((AnalysesHome)place);
-			return presenter;
-		}else if (place instanceof Analysis) {
-			// Analysis Home 
-			AnalysisPresenter presenter = ginjector.getAnalysisPresenter();
-			presenter.setPlace((Analysis)place);
-			return presenter;
-		}else if (place instanceof StepsHome) {
-			// Steps Home 
-			StepsHomePresenter presenter = ginjector.getStepsHomePresenter();
-			presenter.setPlace((StepsHome)place);
-			return presenter;
-		}else if (place instanceof Step) {
-			// Steps Home 
-			StepPresenter presenter = ginjector.getStepPresenter();
-			presenter.setPlace((Step)place);
-			presenter.setLookupPresenter(ginjector.getLookupPresenter());
 			return presenter;
 		}else if (place instanceof LoginPlace) {
 			// login view
@@ -204,12 +146,7 @@ public class AppActivityMapper implements ActivityMapper {
 			ComingSoonPresenter presenter = ginjector.getComingSoonPresenter();
 			presenter.setPlace((ComingSoon)place);
 			return presenter;
-		} else if (place instanceof PhenoEdit) {
-			// user's profile page
-			PhenoEditPresenter presenter = ginjector.getPhenoEditPresenter();
-			presenter.setPlace((PhenoEdit)place);
-			return presenter;
-		} else if (place instanceof Lookup) {
+		}else if (place instanceof Lookup) {
 			// user's profile page
 			LookupPresenter presenter = ginjector.getLookupPresenter();
 			presenter.setPlace((Lookup)place);
