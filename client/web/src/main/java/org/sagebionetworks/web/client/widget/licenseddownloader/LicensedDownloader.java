@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.licenseddownloader;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,21 +17,16 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
-import org.sagebionetworks.web.shared.DownloadLocation;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.FileDownload;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 import org.sagebionetworks.web.shared.NodeType;
-import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.UserData;
@@ -158,7 +152,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 									public void onSuccess(String eulaJson) {
 										Eula eula = null;
 										try {
-											eula = nodeModelCreator.createEULA(eulaJson);
+											eula = nodeModelCreator.createEntity(eulaJson, Eula.class);
 										} catch (RestServiceException ex) {
 											DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser());
 											onFailure(null);											
@@ -282,7 +276,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 				EntityPath entityPath = null;
 				try {					
 					// get and add paths
-					entityPath = nodeModelCreator.createEntityPath(result);
+					entityPath = nodeModelCreator.createEntity(result, EntityPath.class);
 					if(entityPath != null) {
 						List<EntityHeader> path = entityPath.getPath();
 						//start with start entity's parent and stop short of the root

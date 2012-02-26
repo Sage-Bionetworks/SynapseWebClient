@@ -158,12 +158,9 @@ public class LicensedDownloaderTest {
 		locations = new ArrayList<LocationData>();
 		locations.add(downloadLocation);
 
-		datasetEntityWrapper = new EntityWrapper();
-		datasetEntityWrapper.setEntityJson("datasetEntityWrapper");
-		layerEntityWrapper = new EntityWrapper();
-		layerEntityWrapper.setEntityJson("layerEntityWrapper");
-		pathEntityWrapper = new EntityWrapper();
-		pathEntityWrapper.setEntityJson("pathEntityWrapper");
+		datasetEntityWrapper = new EntityWrapper("datasetEntityWrapper", Dataset.class.getName(), null);
+		layerEntityWrapper = new EntityWrapper("layerEntityWrapper", Layer.class.getName(), null);
+		pathEntityWrapper = new EntityWrapper("pathEntityWrapper", EntityPath.class.getName(), null);
 		
 	}
 	
@@ -236,7 +233,7 @@ public class LicensedDownloaderTest {
 		// model creation of EULA fails
 		resetMocks();
 		configureTestLoadMocks(); 
-		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(null); // null EULA object
+		when(mockNodeModelCreator.createEntity(anyString(), eq(Eula.class))).thenReturn(null); // null EULA object
 		licensedDownloader.loadLicenseAgreement(entity);
 		verify(mockView).showDownloadFailure();
 	
@@ -401,8 +398,8 @@ public class LicensedDownloaderTest {
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
 		when(mockNodeModelCreator.createEntity(datasetEntityWrapper)).thenReturn(parentEntity);
 		when(mockNodeModelCreator.createEntity(layerEntityWrapper)).thenReturn(entity);
-		when(mockNodeModelCreator.createEULA(anyString())).thenReturn(eula1);
-		when(mockNodeModelCreator.createEntityPath(pathEntityWrapper)).thenReturn(entityPath);
+		when(mockNodeModelCreator.createEntity(anyString(), eq(Eula.class))).thenReturn(eula1);
+		when(mockNodeModelCreator.createEntity(pathEntityWrapper, EntityPath.class)).thenReturn(entityPath);
 		AsyncMockStubber.callSuccessWith(datasetEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
 		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), anyString(), any(AsyncCallback.class)); 		
@@ -415,7 +412,7 @@ public class LicensedDownloaderTest {
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
 		when(mockNodeModelCreator.createEntity(datasetEntityWrapper)).thenReturn(parentEntity);
 		when(mockNodeModelCreator.createEntity(layerEntityWrapper)).thenReturn(entity);
-		when(mockNodeModelCreator.createEntityPath(pathEntityWrapper)).thenReturn(entityPath);
+		when(mockNodeModelCreator.createEntity(pathEntityWrapper, EntityPath.class)).thenReturn(entityPath);
 		AsyncMockStubber.callSuccessWith(datasetEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
 		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), anyString(), any(AsyncCallback.class)); 				

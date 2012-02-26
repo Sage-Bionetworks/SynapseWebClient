@@ -241,7 +241,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 				public void onSuccess(EntityWrapper result) {
 					currentResult = new SearchResults();		
 					try {
-						currentResult = nodeModelCreator.createSearchResults(result);
+						currentResult = nodeModelCreator.createEntity(result, SearchResults.class);
 					} catch (RestServiceException e) {
 						if(!DisplayUtils.handleServiceException(e, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
 							onFailure(null);					

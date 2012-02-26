@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.HasPreviews;
 import org.sagebionetworks.repo.model.Layer;
@@ -19,7 +20,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.Annotations;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.LayerPreview;
 import org.sagebionetworks.web.shared.PagedResults;
@@ -203,7 +203,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 
 							// get columns descriptions from service
 							try {
-								Annotations annotations = nodeModelCreator.createAnnotations(annotationJsonString);
+								Annotations annotations = nodeModelCreator.initializeEntity(annotationJsonString, new Annotations());
 								Map<String, List<String>> strAnnotations = annotations.getStringAnnotations();
 								for(String annotKey : strAnnotations.keySet()) {
 									// process descriptions									

@@ -1,14 +1,18 @@
 package org.sagebionetworks.web.client;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.junit.Test;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.Agreement;
 import org.sagebionetworks.repo.model.Analysis;
+import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Dataset;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Eula;
 import org.sagebionetworks.repo.model.Layer;
 import org.sagebionetworks.repo.model.Project;
@@ -19,6 +23,7 @@ import org.sagebionetworks.schema.TYPE;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -54,8 +59,8 @@ public class GwtTestSuite extends GWTTestCase {
 		String json = adapter.toJSONString();
 		assertNotNull(json);
 		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(null,null); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Dataset clone = modelCreator.createDataset(json);
+		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory())); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
+		Dataset clone = modelCreator.createEntity(json, Dataset.class);
 		assertNotNull(clone);
 		assertEquals(populatedDataset, clone);
 	}
@@ -70,8 +75,8 @@ public class GwtTestSuite extends GWTTestCase {
 		String json = adapter.toJSONString();
 		assertNotNull(json);
 		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(null,null); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Layer clone = modelCreator.createLayer(json);
+		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory())); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
+		Layer clone = modelCreator.createEntity(json, Layer.class);
 		assertNotNull(clone);
 		assertEquals(populatedLayer, clone);
 	}
@@ -86,8 +91,8 @@ public class GwtTestSuite extends GWTTestCase {
 		String json = adapter.toJSONString();
 		assertNotNull(json);
 		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(null,null); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Project clone = modelCreator.createProject(json);
+		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory())); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
+		Project clone = modelCreator.createEntity(json, Project.class);
 		assertNotNull(clone);
 		assertEquals(populatedProject, clone);
 	}
@@ -102,8 +107,8 @@ public class GwtTestSuite extends GWTTestCase {
 		String json = adapter.toJSONString();
 		assertNotNull(json);
 		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(null,null); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Eula clone = modelCreator.createEULA(json);
+		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory())); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
+		Eula clone = modelCreator.createEntity(json, Eula.class);
 		assertNotNull(clone);
 		assertEquals(populatedEula, clone);
 	}
@@ -118,8 +123,8 @@ public class GwtTestSuite extends GWTTestCase {
 		String json = adapter.toJSONString();
 		assertNotNull(json);
 		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(null,null); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Agreement clone = modelCreator.createAgreement(json);
+		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory())); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
+		Agreement clone = modelCreator.createEntity(json, Agreement.class);
 		assertNotNull(clone);
 		assertEquals(populatedAgreement, clone);
 		// Make sure we can go back to json
@@ -137,8 +142,8 @@ public class GwtTestSuite extends GWTTestCase {
 		String json = adapter.toJSONString();
 		assertNotNull(json);
 		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(null,null); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Analysis clone = modelCreator.createAnalysis(json);
+		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory())); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
+		Analysis clone = modelCreator.createEntity(json, Analysis.class);
 		assertNotNull(clone);
 		assertEquals(populatedAnalysis, clone);
 	}
@@ -153,8 +158,8 @@ public class GwtTestSuite extends GWTTestCase {
 		String json = adapter.toJSONString();
 		assertNotNull(json);
 		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(null,null); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Step clone = modelCreator.createStep(json);
+		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory())); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
+		Step clone = modelCreator.createEntity(json, Step.class);
 		assertNotNull(clone);
 		assertEquals(populatedStep, clone);
 	}
@@ -221,6 +226,69 @@ public class GwtTestSuite extends GWTTestCase {
 	public void testCreateException(){
 		// This will fail if the project is not configured correctly.
 		SynapseException e = new SynapseException();
+	}
+	
+	@Test
+	public void testGwtJSONEntityFactory() throws JSONObjectAdapterException{
+		// Make sure the GWT version of the factory works with the client
+		JSONEntityFactoryImpl factory = new JSONEntityFactoryImpl(new GwtAdapterFactory());
+		ObjectSchema projectSchema = factory.initializeEntity(Project.EFFECTIVE_SCHEMA, new ObjectSchema());
+		assertNotNull(projectSchema);
+		assertEquals("Project", projectSchema.getName());
+	}
+	
+	/**
+	 * Make sure we can use the GwtJSONEntityFactory to create each entity type registered.
+	 * 
+	 * @throws JSONObjectAdapterException
+	 */
+	@Test
+	public void testGwtJSONEntityFactoryAllTypesRoundTrip() throws JSONObjectAdapterException{
+		// Make sure the GWT version of the factory works with the client
+		JSONEntityFactoryImpl factory = new JSONEntityFactoryImpl(new GwtAdapterFactory());
+		AutoGenFactory autoGenFactory = new AutoGenFactory();
+		Iterator<String> keyIt = autoGenFactory.getKeySetIterator();
+		int index = 0;
+		while(keyIt.hasNext()){
+			String className = keyIt.next();
+			JSONEntity jsonEntity = autoGenFactory.newInstance(className);
+			assertNotNull(jsonEntity);
+			if(jsonEntity instanceof Entity){
+				Entity entity = (Entity) jsonEntity;
+				entity.setName("Name:"+className);
+				entity.setId(""+index);
+				entity.setEtag("345");
+				entity.setCreatedBy("someTest@sagebase.org");
+				entity.setCreatedOn(new Date(System.currentTimeMillis()));
+				entity.setModifiedBy("others@world.org");
+				entity.setModifiedOn(new Date(entity.getCreatedOn().getTime()+10001));
+				// Now create the json for this entity
+				String json= factory.createJsonStringForEntity(entity);
+				assertNotNull(json);
+				// Now use the JSON and factory to create a clone
+				JSONEntity clone = factory.createEntity(json, className);
+				assertEquals(entity, clone);
+				// Make sure we can do the same using the class
+				clone = factory.createEntity(json, entity.getClass());
+				assertEquals(entity, clone);
+			}
+			index++;
+		}
+	}
+	
+	@Test
+	public void testEntitySchemaCache() throws JSONObjectAdapterException{
+		// Use the GWT factory
+		JSONEntityFactoryImpl factory = new JSONEntityFactoryImpl(new GwtAdapterFactory());
+		EntitySchemaCache cache = new EntitySchemaCache(factory);
+		Project project = new Project();
+		ObjectSchema projectSchema = cache.getSchemaEntity(project);
+		assertNotNull(projectSchema);
+		assertEquals("Project", projectSchema.getName());
+		// The next time we get it from the cache it should be a cache hit.
+		ObjectSchema projectSchemaSecond = cache.getSchemaEntity(project);
+		assertTrue("The second fetch from the cache should have returned the same instance as the first call",projectSchema == projectSchemaSecond);
+		
 	}
 
 	@Override
