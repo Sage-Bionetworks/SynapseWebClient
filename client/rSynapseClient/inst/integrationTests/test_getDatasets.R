@@ -1,5 +1,5 @@
 ## Test getEntity method for Datasets
-## 
+##
 ## Author: Nicole Deflaux <nicole.deflaux@sagebase.org>
 ###############################################################################
 
@@ -9,7 +9,7 @@ integrationTestGetDatasets <- function() {
   ## there are a few we should always expect to receive
   checkTrue("id" %in% names(datasets))
   checkTrue("name" %in% names(datasets))
-  checkTrue("version" %in% names(datasets))
+  checkTrue("versionLabel" %in% names(datasets))
   checkTrue("status" %in% names(datasets))
   checkTrue("Species" %in% names(datasets))
 }
@@ -33,4 +33,3 @@ integrationTestQueryForDataset <- function() {
   ## And its name should match the one we searched for
   checkEquals(datasets$name, "MSKCC Prostate Cancer")
 }
-

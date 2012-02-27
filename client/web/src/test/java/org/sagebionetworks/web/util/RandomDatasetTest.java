@@ -29,7 +29,7 @@ public class RandomDatasetTest {
 		assertNotNull(random.getId());
 //		assertNotNull(random.getLayerPreviews());
 		assertNotNull(random.getStatus());
-		assertNotNull(random.getVersion());
+		assertNotNull(random.getVersionLabel());
 //		assertNotNull(random.getHasClinicalData());
 //		assertNotNull(random.getHasExpressionData());
 		assertNotNull(random.getHasGeneticData());

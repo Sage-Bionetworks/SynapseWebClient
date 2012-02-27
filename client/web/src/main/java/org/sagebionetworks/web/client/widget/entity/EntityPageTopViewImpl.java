@@ -238,7 +238,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		+ DisplayUtils.convertDateToString(entity.getCreatedOn());
 		
 		if(entity instanceof Versionable) {
-			propString += "<br/>" + "Version " + entity.getVersion();
+			Versionable e = (Versionable)entity;
+			propString += "<br/>" + "Version " + e.getVersionLabel();
 		}
 		
 		Html propHtml = new Html(propString);
