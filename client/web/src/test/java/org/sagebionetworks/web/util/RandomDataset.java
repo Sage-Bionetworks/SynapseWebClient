@@ -57,7 +57,7 @@ public class RandomDataset {
 		}
 //		c.setLayerPreviews(layers);
 		c.setStatus(RandomStrings.generateRandomString(1, 10));
-		c.setVersion("1.0."+rand.nextInt(9));
+		c.setVersionLabel("1.0."+rand.nextInt(9));
 		
 		return c;
 	}
