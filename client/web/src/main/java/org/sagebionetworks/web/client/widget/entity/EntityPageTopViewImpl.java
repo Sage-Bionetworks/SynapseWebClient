@@ -111,7 +111,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public void setEntityDetails(Entity entity, String entityTypeDisplay, boolean isAdministrator,
 			boolean canEdit) {
 		
-		NodeType entityType = DisplayUtils.getNodeTypeForEntity(entity);
 		
 		// check authorization
 		this.isAdministrator = isAdministrator;
