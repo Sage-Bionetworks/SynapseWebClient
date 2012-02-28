@@ -22,7 +22,8 @@ export(
   synapseQuery, 
   synapseCacheDir,
   hmacSecretKey,
-  .Last.lib
+  .Last.lib,
+  signEula
 )
 
 ## S3 convenience methods

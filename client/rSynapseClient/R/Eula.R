@@ -32,6 +32,12 @@ setMethod(
   }
 )
 
+signEula <-
+  function(entity)
+{
+  .signEula(entity)
+}
+
 setMethod(
   f = ".signEula",
   signature = "Dataset",
