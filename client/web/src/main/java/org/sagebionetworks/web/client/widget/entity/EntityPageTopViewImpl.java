@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.adminmenu.AdminMenu;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.editpanels.AnnotationEditor;
@@ -108,8 +109,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	@Override
-	public void setEntityDetails(Entity entity, String entityTypeDisplay, boolean isAdministrator,
-			boolean canEdit) {
+	public void setEntityBundle(EntityBundle bundle, String entityTypeDisplay, boolean isAdministrator, boolean canEdit) {
 		
 		
 		// check authorization
@@ -117,7 +117,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.canEdit = canEdit;
 		// add breadcrumbs
 		breadcrumbsPanel.clear();
-		breadcrumbsPanel.add(breadcrumb.asWidget(entity));
+		breadcrumbsPanel.add(breadcrumb.asWidget(bundle.getPath()));
 
 		//setup action menu
 		actionMenuPanel.clear();		
@@ -127,7 +127,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
-		actionMenuPanel.add(actionMenu.asWidget(entity, isAdministrator, canEdit));
+		actionMenuPanel.add(actionMenu.asWidget(bundle.getEntity(), isAdministrator, canEdit));
 		
 		// Portal #1 - 2 columns
 		Portal portalTwoCol = new Portal(2);  
@@ -138,11 +138,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    portalPanel.clear();
 	    portalPanel.add(portalTwoCol);	    
 	    // Title
-	    portalTwoCol.add(createTitlePortlet(entity, entityTypeDisplay), 0);	    
+	    portalTwoCol.add(createTitlePortlet(bundle.getEntity(), entityTypeDisplay), 0);	    
 	    // Description	    
-		portalTwoCol.add(createDescriptionPortlet(entity), 0);	    
+		portalTwoCol.add(createDescriptionPortlet(bundle.getEntity()), 0);	    
 	    // Annotation Editor Portlet
-		portalTwoCol.add(createAnnotationEditorPortlet(entity), 1);	    
+		portalTwoCol.add(createAnnotationEditorPortlet(bundle.getEntity()), 1);	    
 	    
 	    
 		// Portal #2 - full width
@@ -153,7 +153,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    portalPanelSingleCol.clear();
 	    portalPanelSingleCol.add(portalSingleCol);	    
 	    // Child Browser
-	    portalSingleCol.add(createEntityChildBrowser(entity, canEdit), 0);
+	    portalSingleCol.add(createEntityChildBrowser(bundle.getEntity(), canEdit), 0);
 	    
 	    
 		// Portal #3 - 3 columns
@@ -166,11 +166,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		portalPanelThreeCol.clear();
 		portalPanelThreeCol.add(portalThreeCol);
 	    // Create R Client portlet
-	    portalThreeCol.add(createRClientPortlet(entity), 0);
+	    portalThreeCol.add(createRClientPortlet(bundle.getEntity()), 0);
 	    // Create References portlet
-	    portalThreeCol.add(createReferencesPortlet(entity), 1);
+	    portalThreeCol.add(createReferencesPortlet(bundle.getEntity()), 1);
 	    // Create References portlet
-	    portalThreeCol.add(createActivityFeedPortlet(entity), 2);
+	    portalThreeCol.add(createActivityFeedPortlet(bundle.getEntity()), 2);
 	    
 	    Portal portalRstudio = new Portal(1);
 	    portalRstudio.setBorders(false);
@@ -178,7 +178,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    portalRstudio.setColumnWidth(0, 1.0);
 	    portalPanelRstudio.clear();
 	    portalPanelRstudio.add(portalRstudio);
-	    portalRstudio.add(createRstudioPortlet(entity), 0);
+	    portalRstudio.add(createRstudioPortlet(bundle.getEntity()), 0);
 	}
 	
 	@Override

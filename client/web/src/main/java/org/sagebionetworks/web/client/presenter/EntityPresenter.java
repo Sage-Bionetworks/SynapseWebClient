@@ -1,18 +1,22 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.Entity;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
+
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
-import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -78,13 +82,16 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	@Override
 	public void refresh() {
-		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+		// We want the entity, permissions and path.
+		int mask = ENTITY | PERMISSIONS | ENTITY_PATH;
+		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundleTransport>() {
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				Entity entity = null;
+			public void onSuccess(EntityBundleTransport transport) {
+				
+				EntityBundle bundle = null;
 				try {
-					entity = nodeModelCreator.createEntity(result);
-					view.setEntity(entity);
+					bundle = nodeModelCreator.createEntityBundle(transport);
+					view.setEntityBundle(bundle);
 				} catch (RestServiceException ex) {					
 					if(!DisplayUtils.handleServiceException(ex, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
 						onFailure(null);					
@@ -96,6 +103,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
+				placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			}			
 		});
 

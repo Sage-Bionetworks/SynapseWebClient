@@ -92,6 +92,9 @@ import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
+import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
+import org.sagebionetworks.web.server.servlet.SynapseProvider;
+import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 
 import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -125,7 +128,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(JSONEntityFactoryImpl.class).in(Singleton.class);
 		bind(JSONEntityFactory.class).to(JSONEntityFactoryImpl.class);
 		
+		// EntitySchemaCacheImpl
+		bind(EntitySchemaCacheImpl.class).in(Singleton.class);
+		bind(EntitySchemaCache.class).to(EntitySchemaCacheImpl.class);
 		
+	
 		// Adapter factoyr
 		bind(AdapterFactory.class).to(GwtAdapterFactory.class);
 		

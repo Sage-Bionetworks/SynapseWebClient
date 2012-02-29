@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.registry.EntityTypeMetadata;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.model.EntityBundle;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -30,7 +29,7 @@ public interface EntityView extends IsWidget, SynapseView {
 	 * @param entity
 	 * @param entityMetadata 
 	 */
-	public void setEntity(Entity entity);
+	public void setEntityBundle(EntityBundle bundle);
 
 	
 }

@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.transform;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 
 /**
@@ -47,5 +49,13 @@ public interface JSONEntityFactory {
 	 * @throws JSONObjectAdapterException
 	 */
 	public String createJsonStringForEntity(JSONEntity entity) throws JSONObjectAdapterException;
+	
+	/**
+	 * Create an entity from the json string.
+	 * @param json
+	 * @return
+	 * @throws JSONObjectAdapterException
+	 */
+	public Entity createEntity(String json) throws JSONObjectAdapterException;
 
 }

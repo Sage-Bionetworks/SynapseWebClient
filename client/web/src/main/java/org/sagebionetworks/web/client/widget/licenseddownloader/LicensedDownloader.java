@@ -269,8 +269,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		}
 		
 		// get path and iterate through parents to find eula id
-		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(start);
-		synapseClient.getEntityPath(start.getId(), entityType.getUrlPrefix(), new AsyncCallback<EntityWrapper>() {			
+		synapseClient.getEntityPath(start.getId(), new AsyncCallback<EntityWrapper>() {			
 			@Override
 			public void onSuccess(EntityWrapper result) {
 				EntityPath entityPath = null;

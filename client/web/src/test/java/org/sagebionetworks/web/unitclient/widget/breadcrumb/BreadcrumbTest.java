@@ -96,24 +96,24 @@ public class BreadcrumbTest {
 		EntityWrapper entityWrapper = new EntityWrapper(pathAdapter.toJSONString(), EntityPath.class.getName(), null);	
 		
 		// Fail path service call
-		reset(mockView);		
-		AsyncMockStubber.callFailureWith(new Throwable("error message")).when(mockSynapseClient).getEntityPath(eq(entity.getId()), anyString(), any(AsyncCallback.class)); // fail for get Path
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class), eq(EntityPath.class))).thenReturn(entityPath);
-		breadcrumb.asWidget(entity);
-		verify(mockView).showErrorMessage(anyString());
+//		reset(mockView);		
+//		AsyncMockStubber.callFailureWith(new Throwable("error message")).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class)); // fail for get Path
+//		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class), eq(EntityPath.class))).thenReturn(entityPath);
+//		breadcrumb.asWidget(entityPath);
+//		verify(mockView).showErrorMessage(anyString());
 		
 		// fail model creation
 		reset(mockView);			
-		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class), eq(EntityPath.class))).thenReturn(null); // null model return
-		breadcrumb.asWidget(entity);
+		breadcrumb.asWidget(null);
 		verify(mockView).setLinksList(any(List.class), (String)isNull());
 		
 		// success test
 		reset(mockView);			
-		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(entityWrapper, EntityPath.class)).thenReturn(entityPath);
-		breadcrumb.asWidget(entity);
+		breadcrumb.asWidget(entityPath);
 		verify(mockView).setLinksList(any(List.class), (String)isNotNull());				
 	}
 	

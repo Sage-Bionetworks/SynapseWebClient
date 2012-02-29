@@ -2,22 +2,22 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.users.AclUtils;
-import org.sagebionetworks.web.shared.users.PermissionLevel;
 import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -29,22 +29,22 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private Entity entity;
+	private EntityBundle bundle;
 	private String entityTypeDisplay; 
 	private HandlerManager handlerManager = new HandlerManager(this);
-	private boolean isAdmin = false;
-	private boolean canEdit = false;
+	private EntitySchemaCache schemaCache;
 	
 	// TODO : delete this variable
 	private String rStudioUrl = "http://localhost:8787";
 	
 	@Inject
-	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState) {
+	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, EntitySchemaCache schemaCache) {
 		this.view = view;
 		this.nodeService = service;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.schemaCache = schemaCache;
 		view.setPresenter(this);
 	}	
 
@@ -52,40 +52,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.placeChanger = placeChanger;
     }
 
-    public void setEntity(Entity entity) {
-    	this.entity = entity;		
-		if(entity != null) {			
-			UserData currentUser = authenticationController.getLoggedInUser();
-			if(currentUser != null) {
-				AclUtils.getHighestPermissionLevel(DisplayUtils.getNodeTypeForEntity(entity), entity.getId(), nodeService, new AsyncCallback<PermissionLevel>() {
-					@Override
-					public void onSuccess(PermissionLevel result) {
-						isAdmin = false;
-						canEdit = false;
-						if(result == PermissionLevel.CAN_EDIT) {
-							canEdit = true;
-						} else if(result == PermissionLevel.CAN_ADMINISTER) {
-							canEdit = true;
-							isAdmin = true;
-						}
-						sendDetailsToView(isAdmin, canEdit);
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {				
-						view.showErrorMessage(DisplayConstants.ERROR_GETTING_PERMISSIONS_TEXT);
-						isAdmin = false;
-						canEdit = false;
-						sendDetailsToView(isAdmin, canEdit);
-					}			
-				});
-			} else {
-				// because this is a public page, they can view
-				isAdmin = false;
-				canEdit = false;
-				sendDetailsToView(isAdmin, canEdit);
-			}
-		}		
+    public void setBundle(EntityBundle bundle) {
+    	this.bundle = bundle;
+    	if(bundle != null){
+    		// Let the view know
+    		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit());
+    	}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -93,18 +65,18 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		view.clear();
 		// remove handlers
 		handlerManager = new HandlerManager(this);		
-		this.entity = null;		
+		this.bundle = null;		
 	}
     
 	@Override
 	public Widget asWidget() {
-		if(entity != null) {
-			return asWidget(entity);
+		if(bundle != null) {
+			return asWidget(bundle);
 		} 
 		return null;
 	}	
 	
-	public Widget asWidget(Entity entity) {
+	public Widget asWidget(EntityBundle bundle) {
 		view.setPresenter(this);				
 		return view.asWidget();
 	}
@@ -117,7 +89,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	@Override
 	public void refresh() {
 		// TODO : tell consumer to refresh?
-		sendDetailsToView(isAdmin, canEdit);
+		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit());
 	}	
 
 	@Override
@@ -132,7 +104,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public boolean isLocationable() {
-		if(entity instanceof Locationable) {
+		if(bundle.getEntity() instanceof Locationable) {
 			return true;
 		}
 		return false;
@@ -144,7 +116,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		String urlBase = rStudioUrl; 
 		UserData userData = authenticationController.getLoggedInUser();
 		if(userData != null) {
-			urlBase += "#Synapse:" + userData.getToken() + ":" + entity.getId();			
+			urlBase += "#Synapse:" + userData.getToken() + ":" + bundle.getEntity().getId();			
 		} 
 		return urlBase;
 	}
@@ -170,8 +142,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	 * Private Methods
 	 */
 	private void sendDetailsToView(boolean isAdmin, boolean canEdit) {
-		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(entity);
-		view.setEntityDetails(entity, entityTypeDisplay, isAdmin, canEdit);
+		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
+		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
+		view.setEntityBundle(bundle, entityTypeDisplay, isAdmin, canEdit);
 	}
 
 }
