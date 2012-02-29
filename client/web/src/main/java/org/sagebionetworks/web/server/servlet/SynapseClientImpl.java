@@ -8,18 +8,23 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseClient;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -32,7 +37,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	private static Logger logger = Logger.getLogger(SynapseClientImpl.class.getName());
 	private TokenProvider tokenProvider = this;
 	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
-				
+	
 	/**
 	 * Injected with Gin
 	 */
@@ -46,6 +51,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	@Inject
 	public void setServiceUrlProvider(ServiceUrlProvider provider){
 		this.urlProvider = provider;
+	}
+				
+	/**
+	 * Injected with Gin
+	 */
+	@SuppressWarnings("unused")
+	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+		
+	/**
+	 * This allows tests provide mock Synapse ojbects
+	 * @param provider
+	 */
+	public void setSynapseProvider(SynapseProvider provider){
+		this.synapseProvider = provider;
 	}
 
 	/**
@@ -61,9 +80,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	 * missing then it cannot run. Public for tests.
 	 */
 	public void validateService() {
-		if (urlProvider == null)
+		if (synapseProvider == null)
 			throw new IllegalStateException(
-					"The org.sagebionetworks.rest.api.root.url was not set");
+					"The SynapseProvider was not set");
 		if(tokenProvider == null){
 			throw new IllegalStateException(
 			"The token provider was not set");
@@ -104,10 +123,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	}	
 
 	@Override	
-	public EntityWrapper getEntityPath(String entityId, String urlPrefix) { 
+	public EntityWrapper getEntityPath(String entityId) { 
 		Synapse synapseClient = createSynapseClient();
 		try {
-			EntityPath entityPath = synapseClient.getEntityPath(entityId, urlPrefix); 
+			EntityPath entityPath = synapseClient.getEntityPath(entityId); 
 			JSONObjectAdapter entityPathJson = entityPath.writeToJSONObject(jsonObjectAdapter.createNew());
 			return new EntityWrapper(entityPathJson.toJSONString(), entityPath.getClass().getName(), null);			
 		}catch (SynapseException e) {
@@ -144,7 +163,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	 * The synapse client is stateful so we must create a new one for each request
 	 */
 	private Synapse createSynapseClient() {
-		Synapse synapseClient = new Synapse();
+		// Create a new syanpse
+		Synapse synapseClient = synapseProvider.createNewClient();
 		synapseClient.setSessionToken(tokenProvider.getSessionToken());
 		synapseClient.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
@@ -190,6 +210,93 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 			// error reading file
 		}
 		return jsonString;
+	}
+
+	@Override
+	public EntityBundleTransport getEntityBundle(String entityId, int partsMask) throws RestServiceException {
+		try{
+			// Get all of the requested parts
+			EntityBundleTransport transport = new EntityBundleTransport();
+			Synapse synapseClient = createSynapseClient();
+			// Add the entity?
+			handleEntity(entityId, partsMask, transport, synapseClient);
+			// Add the annotations?
+			handleAnnotaions(entityId, partsMask, transport, synapseClient);
+			// Add the permissions?
+			handlePermissions(entityId, partsMask, transport, synapseClient);
+			// Add the path?
+			handleEntityPath(entityId, partsMask, transport, synapseClient);
+			return transport;
+		}catch(SynapseException e){
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	
+	/**
+	 * Set the entity path if requested
+	 * @param entityId
+	 * @param partsMask
+	 * @param transport
+	 * @param synapseClient
+	 * @throws SynapseException
+	 * @throws JSONObjectAdapterException
+	 */
+	public void handleEntityPath(String entityId, int partsMask, EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
+		if((EntityBundleTransport.ENTITY_PATH & partsMask) > 0){
+			EntityPath path = synapseClient.getEntityPath(entityId);
+			transport.setEntityPathJson(EntityFactory.createJSONStringForEntity(path));
+		}
+	}
+
+	/**
+	 * Add the permissions to the bundle if requested.
+	 * @param entityId
+	 * @param partsMask
+	 * @param transport
+	 * @param synapseClient
+	 * @throws SynapseException
+	 * @throws JSONObjectAdapterException
+	 */
+	public void handlePermissions(String entityId, int partsMask,	EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
+		if((EntityBundleTransport.PERMISSIONS & partsMask) > 0){
+			UserEntityPermissions permissions = synapseClient.getUsersEntityPermissions(entityId);
+			transport.setPermissionsJson(EntityFactory.createJSONStringForEntity(permissions));
+		}
+	}
+
+	/**
+	 * Add the annotations to the bundle if requested.
+	 * @param entityId
+	 * @param partsMask
+	 * @param transport
+	 * @param synapseClient
+	 * @throws SynapseException
+	 * @throws JSONObjectAdapterException
+	 */
+	public void handleAnnotaions(String entityId, int partsMask,	EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
+		if((EntityBundleTransport.ANNOTATIONS & partsMask) > 0){
+			Annotations annos = synapseClient.getAnnotations(entityId);
+			transport.setAnnotaionsJson(EntityFactory.createJSONStringForEntity(annos));
+		}
+	}
+
+	/**
+	 * Add an entity to the bundle if requested
+	 * @param entityId
+	 * @param partsMask
+	 * @param transport
+	 * @param synapseClient
+	 * @throws SynapseException
+	 * @throws JSONObjectAdapterException
+	 */
+	public void handleEntity(String entityId, int partsMask, EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
+		if((EntityBundleTransport.ENTITY & partsMask) > 0){
+			Entity e = synapseClient.getEntityById(entityId);
+			transport.setEntityJson(EntityFactory.createJSONStringForEntity(e));
+		}
 	}
 
 }

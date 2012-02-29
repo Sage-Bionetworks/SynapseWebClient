@@ -2,17 +2,23 @@ package org.sagebionetworks.web.client.transform;
 
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.Agreement;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.shared.DownloadLocation;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.LayerPreview;
 import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
@@ -121,6 +127,37 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 			JSONObject obj = JSONParser.parseStrict(json).isObject();
 			DisplayUtils.checkForErrors(obj);
 		}
+	}
+
+	@Override
+	public EntityBundle createEntityBundle(EntityBundleTransport transport) throws RestServiceException {
+		try{
+			Entity entity = null;
+			Annotations annotations = null;
+			UserEntityPermissions permissions = null;
+			EntityPath path = null;
+			// entity?
+			if(transport.getEntityJson() != null){
+				entity = factory.createEntity(transport.getEntityJson());
+			}
+			// annotaions?
+			if(transport.getAnnotaionsJson() != null){
+				annotations = factory.initializeEntity(transport.getAnnotaionsJson(), new Annotations());
+			}
+			// permissions?
+			if(transport.getPermissionsJson() != null){
+				permissions = factory.createEntity(transport.getPermissionsJson(), UserEntityPermissions.class);
+			}
+			// path?
+			if(transport.getEntityPathJson() != null){
+				path =  factory.createEntity(transport.getEntityPathJson() , EntityPath.class);
+			}
+			// put it all together.
+			return new EntityBundle(entity, annotations, permissions, path);
+		}catch (JSONObjectAdapterException e){
+			throw new UnknownErrorException(e.getMessage());
+		}
+
 	}
 
 

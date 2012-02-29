@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -10,21 +11,28 @@ import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.Agreement;
 import org.sagebionetworks.repo.model.Analysis;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Dataset;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Eula;
+import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Layer;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Step;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.junit.client.GWTTestCase;
@@ -218,8 +226,18 @@ public class GwtTestSuite extends GWTTestCase {
 	}
 	
 	@Test
-	public void testCreateAdapter(){
+	public void testCreateEntity() throws JSONObjectAdapterException{
 		JSONObjectGwt adapter = new JSONObjectGwt();
+		Analysis populatedAnalysis = new Analysis();
+		initilaizedJSONEntityFromSchema(populatedAnalysis);
+		// the entity type must be set correctly for this to work
+		populatedAnalysis.setEntityType(Analysis.class.getName());
+		populatedAnalysis.writeToJSONObject(adapter);
+		String jsonString = adapter.toJSONString();
+		
+		JSONEntityFactoryImpl factory = new JSONEntityFactoryImpl(new GwtAdapterFactory());
+		Analysis clone = (Analysis) factory.createEntity(jsonString);
+		assertEquals(populatedAnalysis, clone);
 	}
 	
 	@Test
@@ -280,7 +298,7 @@ public class GwtTestSuite extends GWTTestCase {
 	public void testEntitySchemaCache() throws JSONObjectAdapterException{
 		// Use the GWT factory
 		JSONEntityFactoryImpl factory = new JSONEntityFactoryImpl(new GwtAdapterFactory());
-		EntitySchemaCache cache = new EntitySchemaCache(factory);
+		EntitySchemaCacheImpl cache = new EntitySchemaCacheImpl(factory);
 		Project project = new Project();
 		ObjectSchema projectSchema = cache.getSchemaEntity(project);
 		assertNotNull(projectSchema);
@@ -290,6 +308,50 @@ public class GwtTestSuite extends GWTTestCase {
 		assertTrue("The second fetch from the cache should have returned the same instance as the first call",projectSchema == projectSchemaSecond);
 		
 	}
+	
+	@Test
+	public void testEntityBundleTranslation() throws JSONObjectAdapterException, RestServiceException{
+		// The entity
+		ExampleEntity entity = new ExampleEntity();
+		initilaizedJSONEntityFromSchema(entity);
+		entity.setEntityType(ExampleEntity.class.getName());
+		// annotaions
+		Annotations annos = new Annotations();
+		annos.setId(entity.getId());
+		annos.setEtag(entity.getEtag());
+		annos.addAnnotation("doubleKey", new Double(123.677));
+		// The permission
+		UserEntityPermissions uep = new UserEntityPermissions();
+		uep.setCanAddChild(false);
+		uep.setCanChangePermissions(true);
+		uep.setCanView(false);
+		// The path
+		EntityPath path = new EntityPath();
+		path.setPath(new ArrayList<EntityHeader>());
+		EntityHeader header = new EntityHeader();
+		header.setId(entity.getId());
+		header.setName("RomperRuuuu");
+		path.getPath().add(header);
+		
+		JSONEntityFactoryImpl factory = new JSONEntityFactoryImpl(new GwtAdapterFactory());
+		// the is our transport object
+		EntityBundleTransport transport = new EntityBundleTransport();
+		transport.setEntityJson(factory.createJsonStringForEntity(entity));
+		transport.setAnnotaionsJson(factory.createJsonStringForEntity(annos));
+		transport.setPermissionsJson(factory.createJsonStringForEntity(uep));
+		transport.setEntityPathJson(factory.createJsonStringForEntity(path));
+		
+		// Now make sure we can translate it
+		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(factory);
+		EntityBundle results = modelCreator.createEntityBundle(transport);
+		assertNotNull(results);
+		assertEquals(entity, results.getEntity());
+		assertEquals(annos, results.getAnnotations());
+		assertEquals(path, results.getPath());
+		assertEquals(uep, results.getPermissions());
+	}
+	
+
 
 	@Override
 	public String toString() {

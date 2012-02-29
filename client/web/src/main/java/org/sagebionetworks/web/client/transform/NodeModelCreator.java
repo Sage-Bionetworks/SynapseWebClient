@@ -10,7 +10,9 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.shared.DownloadLocation;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.LayerPreview;
@@ -28,6 +30,14 @@ public interface NodeModelCreator {
 	<T extends JSONEntity> T createEntity(EntityWrapper entityWrapper, Class<? extends T> clazz) throws RestServiceException;
 	
 	<T extends JSONEntity> T initializeEntity(String json, T newEntity) throws RestServiceException;
+	
+	/**
+	 * Convert the transport object to the bundle
+	 * @param transport
+	 * @return
+	 * @throws RestServiceException 
+	 */
+	EntityBundle createEntityBundle(EntityBundleTransport transport) throws RestServiceException;
 			
 
 	String createAgreementJSON(Agreement agreement) throws JSONObjectAdapterException;

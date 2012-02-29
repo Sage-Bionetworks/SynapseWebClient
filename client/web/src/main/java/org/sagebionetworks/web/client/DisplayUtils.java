@@ -8,6 +8,7 @@ import java.util.List;
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -314,6 +315,14 @@ public class DisplayUtils {
 		NodeType type = getNodeTypeForEntity(entity);
 		String display = type.toString().toLowerCase();
 		return uppercaseFirstLetter(display);
+	}
+	
+	public static String getEntityTypeDisplay(ObjectSchema schema) {
+		String title = schema.getTitle();
+		if(title == null){
+			title = "<Title missing for Entity: "+schema.getId()+">";
+		}
+		return title;
 	}
 	
 	public static String uppercaseFirstLetter(String display) {
