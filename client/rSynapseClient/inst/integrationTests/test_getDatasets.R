@@ -11,7 +11,7 @@ integrationTestGetDatasets <- function() {
   checkTrue("name" %in% names(datasets))
   checkTrue("versionLabel" %in% names(datasets))
   checkTrue("status" %in% names(datasets))
-  checkTrue("Species" %in% names(datasets))
+  checkTrue("species" %in% names(datasets))
 }
 
 integrationTestPaging <- function() {

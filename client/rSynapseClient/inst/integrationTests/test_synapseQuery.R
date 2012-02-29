@@ -17,7 +17,7 @@ integrationTestQuery <-
   checkTrue("dataset.name" %in% names(datasets))
   checkTrue("dataset.versionLabel" %in% names(datasets))
   checkTrue("dataset.status" %in% names(datasets))
-  checkTrue("dataset.Species" %in% names(datasets))
+  checkTrue("dataset.species" %in% names(datasets))
 }
 
 integrationTestPaging <-
@@ -54,7 +54,7 @@ integrationTestLotsOQueries <-
   datasetsOrderBy <- synapseQuery(query='select * from dataset order by Number_of_Samples DESC limit 3')
   checkTrue(3 == nrow(datasetsOrderBy))
 
-  datasetsMultiWhere <- synapseQuery(query='select * from dataset where dataset.Species == "Human" and dataset.Number_of_Samples > 100 limit 3 offset 1')
+  datasetsMultiWhere <- synapseQuery(query='select * from dataset where dataset.species == "Human" and dataset.Number_of_Samples > 100 limit 3 offset 1')
   checkTrue(3 == nrow(datasetsMultiWhere))
 
   datasetsSingleWhere <- synapseQuery(query='select * from dataset where name == "MSKCC Prostate Cancer"')
