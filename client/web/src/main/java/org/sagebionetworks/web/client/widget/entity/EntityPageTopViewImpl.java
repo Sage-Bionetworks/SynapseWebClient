@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.editpanels.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
+import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.portlet.SynapsePortlet;

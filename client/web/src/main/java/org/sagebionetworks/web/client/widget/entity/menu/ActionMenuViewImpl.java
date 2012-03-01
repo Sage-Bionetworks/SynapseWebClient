@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.menu;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -12,6 +13,7 @@ import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
+import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
@@ -31,6 +33,7 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -45,6 +48,8 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 	private NodeEditor nodeEditor;
 	private AccessMenuButton accessMenuButton;
 	private AccessControlListEditor accessControlListEditor;
+	private LocationableUploader locationableUploader;
+	
 	private Button editButton;
 	private Button shareButton;
 	private Button addButton;
@@ -56,20 +61,21 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, NodeEditor nodeEditor,
 			AccessMenuButton accessMenuButton,
-			AccessControlListEditor accessControlListEditor) {
+			AccessControlListEditor accessControlListEditor,
+			LocationableUploader locationableUploader) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.nodeEditor = nodeEditor;
 		this.accessMenuButton = accessMenuButton;	
 		this.accessControlListEditor = accessControlListEditor;
+		this.locationableUploader = locationableUploader;
 		this.setLayout(new FitLayout());
 	}
 
 	@Override
 	public void createMenu(Entity entity, EntityType entityType, boolean isAdministrator,
 			boolean canEdit) {			
-		
-		
+				
 		// add items in order. spacing is done with Html widgets as we don't want to add top/bottom padding
 		boolean addHpanel = hp == null ? true : false;
 		if(hp == null) {			
@@ -304,8 +310,45 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 	 * @param entityType 
 	 */
 	private int addCanEditToolMenuItems(Menu menu, final Entity entity, EntityType entityType) {		
-		// add Can Edit permission tools here (other than add and edit)
-		return 0;
+		int count = 0;
+
+		// add uploader
+		if(entity instanceof Locationable) {
+			MenuItem item = new MenuItem(DisplayConstants.TEXT_UPLOAD_FILE);
+			item.setIcon(AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
+			final Window window = new Window();  
+			locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
+				@Override
+				public void onPersistSuccess(EntityUpdatedEvent event) {
+					window.hide();
+					presenter.fireEntityUpdatedEvent();
+				}
+			});
+			locationableUploader.addCancelHandler(new CancelHandler() {				
+				@Override
+				public void onCancel(CancelEvent event) {
+					window.hide();
+				}
+			});
+			item.addSelectionListener(new SelectionListener<MenuEvent>() {
+				@Override
+				public void componentSelected(MenuEvent ce) {
+					window.removeAll();
+					window.setSize(400, 170);
+					window.setPlain(true);
+					window.setModal(true);		
+					window.setBlinkModal(true);
+					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
+					window.setLayout(new FitLayout());			
+					window.add(locationableUploader.asWidget(entity, true), new MarginData(5));
+					window.show();
+				}
+			});			
+			menu.add(item);
+			count++;
+		}
+		
+		return count;
 	}
 
 	private void showAddWindow(EntityType childType, String parentId) {
