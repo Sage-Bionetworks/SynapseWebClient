@@ -20,14 +20,14 @@ import org.sagebionetworks.web.client.view.ColumnsPopupView;
 import org.sagebionetworks.web.client.view.ColumnsPopupViewImpl;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
+import org.sagebionetworks.web.client.view.EntityView;
+import org.sagebionetworks.web.client.view.EntityViewImpl;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.view.HomeViewImpl;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
 import org.sagebionetworks.web.client.view.LookupView;
 import org.sagebionetworks.web.client.view.LookupViewImpl;
-import org.sagebionetworks.web.client.view.EntityView;
-import org.sagebionetworks.web.client.view.EntityViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
 import org.sagebionetworks.web.client.view.ProjectView;
@@ -66,6 +66,8 @@ import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserV
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderView;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderView;
+import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
@@ -92,9 +94,6 @@ import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
-import org.sagebionetworks.web.server.servlet.SynapseProvider;
-import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 
 import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -301,6 +300,10 @@ public class PortalGinModule extends AbstractGinModule {
 		// Home Search Box
 		bind(HomeSearchBoxViewImpl.class).in(Singleton.class);
 		bind(HomeSearchBoxView.class).to(HomeSearchBoxViewImpl.class);
+
+		// LocationableUploader
+		bind(LocationableUploaderViewImpl.class).in(Singleton.class);
+		bind(LocationableUploaderView.class).to(LocationableUploaderViewImpl.class);
 
 	}
 

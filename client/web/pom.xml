@@ -79,7 +79,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- We use this assembly to package the GWT RPC dependencies so they
+			<!-- We use this assembly to package the GWT RPC dependencies so they 
 				are aviablible fore integration testing. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -114,7 +114,7 @@
 	</build>
 
 	<dependencies>
-
+ 
 		<!-- Sage Bionetworks Dependencies -->
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
@@ -199,7 +199,7 @@
 			<version>0.2</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- We are using this to serialize column metadata. We can drop it when
+		<!-- We are using this to serialize column metadata. We can drop it when 
 			the API provides this functionality -->
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
@@ -261,6 +261,14 @@
 			<artifactId>scribe</artifactId>
 			<version>1.2.3</version>
 		</dependency>
+
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+
 	</dependencies>
 
 

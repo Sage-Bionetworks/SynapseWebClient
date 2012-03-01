@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.web.shared.NodeType;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -12,7 +13,7 @@ public class ServiceUtils {
 	private static final String ERROR_REASON = "reason";
 
 	private static Logger logger = Logger.getLogger(ServiceUtils.class.getName());
-
+	
 	public static final String REPOSVC_PATH_DATASET = "dataset";
 	public static final String REPOSVC_PATH_LAYER = "layer";
 	public static final String REPOSVC_PATH_PROJECT = "project";
@@ -125,4 +126,16 @@ public class ServiceUtils {
 		}
 		return obj.toString();
 	}
+	
+	/**
+	 * The synapse client is stateful so we must create a new one for each request
+	 */
+	public static Synapse createSynapseClient(TokenProvider tokenProvider, ServiceUrlProvider urlProvider) {
+		Synapse synapseClient = new Synapse();
+		synapseClient.setSessionToken(tokenProvider.getSessionToken());
+		synapseClient.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
+		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
+		return synapseClient;
+	}	
+
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -19,8 +18,8 @@ import org.sagebionetworks.web.client.ontology.EnumerationTerm;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.editpanels.FormField.ColumnType;
-import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -33,7 +32,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class NodeEditor implements NodeEditorView.Presenter {
+public class NodeEditor implements NodeEditorView.Presenter, SynapsePersistable {
 	
 	private static final String PROPERTY_TYPE_KEY = "type";
 	private static final String SCHEMA_PROPERTIES_KEY = "properties";
@@ -174,11 +173,13 @@ public class NodeEditor implements NodeEditorView.Presenter {
 		handlerManager.fireEvent(new CancelEvent());
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public void addCancelHandler(CancelHandler handler) {
 		handlerManager.addHandler(CancelEvent.getType(), handler);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public void addPersistSuccessHandler(EntityUpdatedHandler handler) {
 		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);

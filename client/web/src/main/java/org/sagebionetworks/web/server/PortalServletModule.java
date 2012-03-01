@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sagebionetworks.web.server.servlet.FileUpload;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
@@ -73,6 +74,10 @@ public class PortalServletModule extends ServletModule {
 		// setup the NCBO servlet
 		bind(NcboSearchService.class).in(Singleton.class);
 		serve("/Portal/ncbo/search").with(NcboSearchService.class);
+		
+		// setup GWTupload
+		bind(FileUpload.class).in(Singleton.class);
+		serve("/Portal/upload").with(FileUpload.class);
 		
 		// Setup the LinkedIn service mapping
 		bind(LinkedInServiceImpl.class).in(Singleton.class);

@@ -34,6 +34,11 @@
 					<h2>Coming Soon</h2>
 					<g:SimplePanel ui:field="entityView" />
 					<div class="info">
+						<div class="span-10">
+							<g:FlexTable ui:field="flextTable1"></g:FlexTable>
+						</div>
+						<div class="span-14">
+						</div>
 						This page is coming soon.
 					</div>
 				</div>

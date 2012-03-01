@@ -56,6 +56,8 @@ public class DisplayUtils {
 	private static final String ERROR_OBJ_REASON_KEY = "reason";
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
+	public static final String ENTITY_PARAM_KEY = "entityId";
+	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";	
 	
 	/*
 	 * Style names

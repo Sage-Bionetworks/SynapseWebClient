@@ -180,6 +180,12 @@ public class DisplayConstants {
 	public static final String LABEL_SEARCH = "Search";
 	public static final String LABEL_PROJECT_NAME = "Project Name";
 	public static final String LABEL_PROJECT_CREATED = "Project Created";
+	public static final String TEXT_UPLOAD_FILE = "Upload File";
+	public static final String LABEL_UPLOAD_TO_SYNAPSE = "To Synapse";
+	public static final String LABEL_TO_EXTERNAL = "Link External Location";
+	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
+	public static final String ERROR_UPLOAD = "An error occured during upload. Please try again.";
+	public static final String LABEL_UPLOADING = "Uploading...";
 	
 }
 
