@@ -20,7 +20,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.google.gwt.thirdparty.guava.common.io.Files;
+import com.google.common.io.Files;
 import com.google.inject.Inject;
 
 public class FileUpload extends HttpServlet {

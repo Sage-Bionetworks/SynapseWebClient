@@ -186,6 +186,12 @@ public class DisplayConstants {
 	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
 	public static final String ERROR_UPLOAD = "An error occured during upload. Please try again.";
 	public static final String LABEL_UPLOADING = "Uploading...";
+	public static final String LABEL_CREATE_SHORTCUT = "Save Shortcut";
+	public static final String ERROR_NOT_FOUND = "Entity not found";
+	public static final String ERROR_ENTITY_CANT_SHORTCUTS = "Sorry, the requested entity can not contain shortcuts.";
+	public static final String LABEL_SUCCESS = "Success";
+	public static final String TEXT_SHORTCUT_ADDED = "Shortcut added to id";
+	public static final String ERROR_UPDATE_FAILED = "Update failed. Please try again.";
 	
 }
 

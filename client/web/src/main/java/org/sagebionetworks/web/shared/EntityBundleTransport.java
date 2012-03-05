@@ -13,15 +13,17 @@ public class EntityBundleTransport implements IsSerializable {
 	/**
 	 * Masks for requesting what should be included in the bundle.s
 	 */
-	public static int ENTITY 		= 0x1;
-	public static int ANNOTATIONS	= 0x2;
-	public static int PERMISSIONS	= 0x4;
-	public static int ENTITY_PATH	= 0x8;
+	public static int ENTITY 		      = 0x1;
+	public static int ANNOTATIONS	      = 0x2;
+	public static int PERMISSIONS	      = 0x4;
+	public static int ENTITY_PATH	      = 0x8;
+	public static int ENTITY_REFERENCEDBY = 0x10;
 
 	private String entityJson;
 	private String annotaionsJson;
 	private String permissionsJson;
 	private String entityPathJson;
+	private String entityReferencedByJson;
 	
 	public String getEntityJson() {
 		return entityJson;
@@ -47,8 +49,9 @@ public class EntityBundleTransport implements IsSerializable {
 	public void setEntityPathJson(String entityPathJson) {
 		this.entityPathJson = entityPathJson;
 	}
-	
-	
+	public void setEntityReferencedByJson(String entityReferencedByJson) {
+		this.entityReferencedByJson = entityReferencedByJson;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -59,6 +62,10 @@ public class EntityBundleTransport implements IsSerializable {
 				+ ((entityJson == null) ? 0 : entityJson.hashCode());
 		result = prime * result
 				+ ((entityPathJson == null) ? 0 : entityPathJson.hashCode());
+		result = prime
+				* result
+				+ ((entityReferencedByJson == null) ? 0
+						: entityReferencedByJson.hashCode());
 		result = prime * result
 				+ ((permissionsJson == null) ? 0 : permissionsJson.hashCode());
 		return result;
@@ -87,6 +94,11 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!entityPathJson.equals(other.entityPathJson))
 			return false;
+		if (entityReferencedByJson == null) {
+			if (other.entityReferencedByJson != null)
+				return false;
+		} else if (!entityReferencedByJson.equals(other.entityReferencedByJson))
+			return false;
 		if (permissionsJson == null) {
 			if (other.permissionsJson != null)
 				return false;
@@ -98,7 +110,8 @@ public class EntityBundleTransport implements IsSerializable {
 	public String toString() {
 		return "EntityBundleTransport [entityJson=" + entityJson
 				+ ", annotaionsJson=" + annotaionsJson + ", permissionsJson="
-				+ permissionsJson + ", entityPathJson=" + entityPathJson + "]";
+				+ permissionsJson + ", entityPathJson=" + entityPathJson
+				+ ", entityReferencedByJson=" + entityReferencedByJson + "]";
 	}
 	
 	

@@ -56,6 +56,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.bundle = bundle;
     	if(bundle != null){
     		// Let the view know
+    		// TODO : add referencedBy
     		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit());
     	}
 	}

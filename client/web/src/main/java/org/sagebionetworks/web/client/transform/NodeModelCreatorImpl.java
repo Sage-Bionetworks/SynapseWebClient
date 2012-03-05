@@ -152,6 +152,11 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 			if(transport.getEntityPathJson() != null){
 				path =  factory.createEntity(transport.getEntityPathJson() , EntityPath.class);
 			}
+			// referencedBy?
+			// TODO : add referenced By
+			//if(transport.)
+			
+			
 			// put it all together.
 			return new EntityBundle(entity, annotations, permissions, path);
 		}catch (JSONObjectAdapterException e){

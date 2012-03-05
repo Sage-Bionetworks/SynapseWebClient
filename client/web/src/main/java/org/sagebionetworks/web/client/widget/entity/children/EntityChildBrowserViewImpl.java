@@ -1,42 +1,55 @@
 package org.sagebionetworks.web.client.widget.entity.children;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.view.table.ColumnFactory;
+import org.sagebionetworks.web.client.view.table.DateColumn;
 import org.sagebionetworks.web.client.widget.statictable.StaticTable;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableColumn;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryTableFactory;
 import org.sagebionetworks.web.shared.EntityType;
-import org.sagebionetworks.web.shared.FileDownload;
 import org.sagebionetworks.web.shared.WhereCondition;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;
+import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
+import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.Grid;
+import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Image;
@@ -46,6 +59,9 @@ import com.google.inject.Inject;
 public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		EntityChildBrowserView {
 	
+	private static final String KEY_TARGET_VERSION_NUMBER = "targetVersionNumber";
+	private static final String KEY_TARGET_ID = "targetId";
+	private static final String KEY_REFERENCE_URI = "referenceUri";
 	private final static int MAX_IMAGE_PREVIEW_WIDTH_PX = 800;
 	private static final int BASE_PANEL_HEIGHT_PX = 270;
 	private static final int TALL_PANEL_HEIGHT_PX = 500;
@@ -55,7 +71,9 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private TabPanel tabPanel;
-	private QueryTableFactory queryTableFactory;	
+	private QueryTableFactory queryTableFactory;
+	private ColumnFactory columnFactory;
+	
 	private TabItem previewTab;
 	private ContentPanel previewLoading;
 	private int tabPanelHeight;
@@ -66,17 +84,18 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 
 	@Inject
 	public EntityChildBrowserViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, QueryTableFactory queryTableFactory, StaticTable staticTable) {
+			IconsImageBundle iconsImageBundle, QueryTableFactory queryTableFactory, ColumnFactory columnFactory) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
-		this.queryTableFactory = queryTableFactory;		
+		this.queryTableFactory = queryTableFactory;
+		this.columnFactory = columnFactory;
 		
 		this.setLayout(new FitLayout());
 	}
 
 	@Override
 	public void createBrowser(final Entity entity, EntityType entityType,
-			boolean canEdit) {
+			boolean canEdit, Set<Reference> shortcuts) {
 		if(tabPanel != null) {
 			// out with the old
 			this.remove(tabPanel);
@@ -94,9 +113,79 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 			tabPanelHeight = BASE_PANEL_HEIGHT_PX;
 		}
 		tabPanel.setHeight(tabPanelHeight);
-				
-		int numAdded=0;
 		
+		int numAdded = 0;
+		
+		// add tabs
+		numAdded += addChildTabs(entityType, location); 		
+		numAdded += addShortcutsTab(shortcuts);
+		
+		if(numAdded == 0) {
+			final TabItem tab = new TabItem("None");			
+			tab.addStyleName("pad-text");											
+			Html noChildren = new Html(DisplayConstants.LABEL_CONTAINS_NO_CHILDREN);
+			tab.add(noChildren, new MarginData(10));
+			tabPanel.add(tab);  
+		}
+		
+		add(tabPanel);		
+	}
+
+	private int addShortcutsTab(final Set<Reference> shortcuts) {
+		int numAdded = 0;
+		if(shortcuts != null) {
+			final TabItem tab = new TabItem("Shortcuts");
+			tab.addStyleName("pad-text");			
+			final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);
+			loading.setHeight(tabPanelHeight);		
+			tab.add(loading);
+			// Render only if selected
+			tab.addListener(Events.Render, new Listener<BaseEvent>() {
+				@Override
+				public void handleEvent(BaseEvent be) {
+					// add table of shortcuts
+					ListStore<BaseModelData> store = new ListStore<BaseModelData>();
+					for(Reference reference : shortcuts.toArray(new Reference[shortcuts.size()])) {
+						BaseModelData model = new BaseModelData();
+						model.set(KEY_TARGET_ID, reference.getTargetId());
+						model.set(KEY_TARGET_VERSION_NUMBER, reference.getTargetVersionNumber());
+						model.set(KEY_REFERENCE_URI, presenter.getReferenceUri(reference));
+						store.add(model);
+					}					
+					
+					List<ColumnConfig> configs = new ArrayList<ColumnConfig>();  
+					  
+				    ColumnConfig column = new ColumnConfig();  
+				    column.setId(KEY_TARGET_ID);  
+				    column.setHeader("Shortcut To");  				     
+				    column.setRowHeader(true);				    
+				    GridCellRenderer<BaseModelData> cellRenderer = configureShortcutGridCellRenderer();
+					column.setRenderer(cellRenderer);				
+
+				    configs.add(column);  
+				  				  
+				    ColumnModel cm = new ColumnModel(configs);  				  
+					
+					Grid<BaseModelData> grid = new Grid<BaseModelData>(store, cm);
+					grid.setAutoWidth(true);
+					grid.setHeight(tabPanelHeight - 25);
+					grid.setAutoExpandColumn(KEY_TARGET_ID);
+					tab.remove(loading);
+					tab.add(grid);
+					tab.layout(true);
+				}
+			});
+			tabPanel.add(tab);	
+			
+			
+			numAdded++;
+		}
+		return numAdded;
+	}
+
+	private int addChildTabs(EntityType entityType,
+			final LocationData location) {
+		int numAdded=0;
 		List<EntityType> skipTypes = presenter.getContentsSkipTypes();
 		List<EntityType> children = entityType.getValidChildTypes();
 		if(children != null && children.size() > 0) {
@@ -131,17 +220,8 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 				tabPanel.add(tab);	
 				numAdded++;
 			}
-		} 
-		
-		if(numAdded == 0) {
-			final TabItem tab = new TabItem("None");			
-			tab.addStyleName("pad-text");											
-			Html noChildren = new Html(DisplayConstants.LABEL_CONTAINS_NO_CHILDREN);
-			tab.add(noChildren, new MarginData(10));
-			tabPanel.add(tab);  
 		}
-		
-		add(tabPanel);		
+		return numAdded;
 	}
 
 	@Override
@@ -333,5 +413,20 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		previewTab.layout(true);
 	}
 
+	private GridCellRenderer<BaseModelData> configureShortcutGridCellRenderer() {
+		// configure cell renderer
+		GridCellRenderer<BaseModelData> cellRenderer = new GridCellRenderer<BaseModelData>() {
+			public String render(BaseModelData model, String property, ColumnData config, int rowIndex, int colIndex, ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
+				String id = model.get(KEY_TARGET_ID);
+				if(model.get(KEY_TARGET_VERSION_NUMBER) != null)
+					id += "." + model.get(KEY_TARGET_VERSION_NUMBER);
+
+				return "<a href=\"" + model.get(KEY_REFERENCE_URI) + "\">" + DisplayUtils.getIconHtml(iconsImageBundle.documentArrow16()) + "Jump to Synapse Id: "+ id + "</a>";
+			}
+		};
+		return cellRenderer;
+	}			
+	
+	
 }
 
