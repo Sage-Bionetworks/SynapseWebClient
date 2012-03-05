@@ -2,20 +2,25 @@ package org.sagebionetworks.web.client.widget.entity.children;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.HasPreviews;
+import org.sagebionetworks.repo.model.HasShortcuts;
 import org.sagebionetworks.repo.model.Layer;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -64,13 +69,20 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 		
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entity);
-		view.createBrowser(entity, entityType, canEdit);
+		Set<Reference> shortcuts = null;
+		if(entity instanceof HasShortcuts) {
+			
+			shortcuts = ((HasShortcuts)entity).getShortcuts();
+			if(shortcuts == null) 
+				shortcuts = new HashSet<Reference>();
+		}
+		view.createBrowser(entity, entityType, canEdit, shortcuts);
 		 
 		// load preview if has previews
 		if(entity instanceof HasPreviews) {
 			loadPreview();
 		}
-		
+				
 		return view.asWidget();
 	}
 
@@ -255,6 +267,15 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 				view.setPreviewTable(null);
 			}
 		});		
+
+	}
+
+	@Override
+	public String getReferenceUri(Reference reference) {
+		String token = reference.getTargetId();
+		if(reference.getTargetVersionNumber() != null)
+			token += "." + reference.getTargetVersionNumber();		
+		return DisplayUtils.getSynapseHistoryToken(token);
 
 	}
 		

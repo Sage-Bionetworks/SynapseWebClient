@@ -53,6 +53,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/document--plus-16.png")
 	ImageResource documentAdd16();
 	
+	@Source("images/icons/document--arrow-16.png")
+	ImageResource documentArrow16();
+	
 	@Source("images/icons/document--pencil-16.png")
 	ImageResource documentEdit16();
 

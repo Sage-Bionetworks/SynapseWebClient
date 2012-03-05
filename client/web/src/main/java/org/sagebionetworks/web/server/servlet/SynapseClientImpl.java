@@ -10,8 +10,10 @@ import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -226,6 +228,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 			handlePermissions(entityId, partsMask, transport, synapseClient);
 			// Add the path?
 			handleEntityPath(entityId, partsMask, transport, synapseClient);
+			// Add Referenced By?
+			handleEntityReferencedBy(entityId, partsMask, transport, synapseClient);
 			return transport;
 		}catch(SynapseException e){
 			throw ExceptionUtil.convertSynapseException(e);
@@ -296,6 +300,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		if((EntityBundleTransport.ENTITY & partsMask) > 0){
 			Entity e = synapseClient.getEntityById(entityId);
 			transport.setEntityJson(EntityFactory.createJSONStringForEntity(e));
+		}
+	}
+
+	/**
+	 * Set the entity path if requested
+	 * @param entityId
+	 * @param partsMask
+	 * @param transport
+	 * @param synapseClient
+	 * @throws SynapseException
+	 * @throws JSONObjectAdapterException
+	 */
+	public void handleEntityReferencedBy(String entityId, int partsMask, EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
+		if((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0){
+			PaginatedResults<EntityHeader> results = synapseClient.getEntityReferencedBy(entityId, null);
+			transport.setEntityReferencedByJson(EntityFactory.createJSONStringForEntity(results));
 		}
 	}
 

@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.children;
 
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.EntityType;
@@ -24,8 +26,9 @@ public interface EntityChildBrowserView extends IsWidget, SynapseWidgetView {
 	 * @param entity
 	 * @param entityType
 	 * @param canEdit
+	 * @param shortcuts 
 	 */
-	public void createBrowser(Entity entity, EntityType entityType, boolean canEdit);
+	public void createBrowser(Entity entity, EntityType entityType, boolean canEdit, Set<Reference> shortcuts);
 	
 	/**
 	 * Sets the Preview Table's details. Preview table only if Entity has "preview" EntityType child
@@ -47,6 +50,8 @@ public interface EntityChildBrowserView extends IsWidget, SynapseWidgetView {
 		List<EntityType> getContentsSkipTypes();
 
 		LocationData getMediaLocationData();
+
+		String getReferenceUri(Reference reference);
 	}
 
 

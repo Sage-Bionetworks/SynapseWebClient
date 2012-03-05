@@ -316,14 +316,18 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}	
 	
 	private Portlet createReferencesPortlet(Entity entity) {			  
-	    SynapsePortlet portlet = new SynapsePortlet("References");  
+	    SynapsePortlet portlet = new SynapsePortlet("Entities Using this " + DisplayUtils.getEntityTypeDisplay(entity));  
 	    portlet.setLayout(new FitLayout());    
 	    portlet.setAutoHeight(true);  	  
 	    
+	    // TODO : remove this block
 	    if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {					
 			portlet.add(new HTML(DisplayConstants.DEMO_ANALYSIS));
+			return portlet;
 		}
 
+	    // add table of references
+	    
 	    
 	    return portlet;  
 	}	

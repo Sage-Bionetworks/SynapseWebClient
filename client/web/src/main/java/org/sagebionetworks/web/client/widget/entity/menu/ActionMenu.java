@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseClientUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
@@ -17,6 +20,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -36,15 +40,19 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private HandlerManager handlerManager = new HandlerManager(this);
 	private Entity entity;
 	private EntityTypeProvider entityTypeProvider;
+	private SynapseClientAsync synapseClient;
+	private JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
-	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState) {
+	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.nodeService = nodeService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
 		this.globalApplicationState = globalApplicationState;
+		this.synapseClient = synapseClient;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 		
 		view.setPresenter(this);
 	}	
@@ -142,6 +150,16 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		}
 		
 		return ignore;
+	}
+
+	@Override
+	public boolean isUserLoggedIn() {
+		return authenticationController.getLoggedInUser() != null;
+	}
+
+	@Override
+	public void createShortcut(final String addToEntityId) {
+		SynapseClientUtils.createShortcut(entity, addToEntityId, view, synapseClient, nodeService, nodeModelCreator, jsonObjectAdapter);
 	}
 
 	

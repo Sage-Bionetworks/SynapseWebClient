@@ -267,11 +267,41 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 		if(isAdministrator) {
 			numAdded += addIsAdministratorToolMenuItems(menu, entity, entityType);
 		}
+		// add tools for logged in users		
+		if(presenter.isUserLoggedIn()) {
+			numAdded += addAuthenticatedToolMenuItems(menu, entity, entityType);
+		}
 
 		toolsButton.setMenu(menu);
 		if(numAdded == 0) {
 			toolsButton.disable();
 		}
+	}
+
+	private int addAuthenticatedToolMenuItems(Menu menu, Entity entity,EntityType entityType) {
+		int numAdded = 0;
+		
+		// Create shortcut
+		MenuItem item = new MenuItem(DisplayConstants.LABEL_CREATE_SHORTCUT);
+		item.setIcon(AbstractImagePrototype.create(iconsImageBundle.documentArrow16()));
+		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				// TODO : make this better. have it show you projects
+				final MessageBox box = MessageBox.prompt(DisplayConstants.LABEL_CREATE_SHORTCUT,"Where would you like to save a shortcut to this page? Enter Synapse ID: ");
+				box.addCallback(new Listener<MessageBoxEvent>() {
+					public void handleEvent(MessageBoxEvent be) {
+						if(be.getValue() != null && !"".equals(be.getValue())) {
+							presenter.createShortcut(be.getValue());
+						}				
+					}
+				});
+			}
+		});
+		menu.add(item);
+		numAdded++;		
+		
+		return numAdded;
 	}
 
 	/**
