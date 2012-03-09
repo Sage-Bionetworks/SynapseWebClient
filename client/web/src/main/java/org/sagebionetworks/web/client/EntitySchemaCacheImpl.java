@@ -38,15 +38,24 @@ public class EntitySchemaCacheImpl implements EntitySchemaCache {
 	@Override
 	public ObjectSchema getSchemaEntity(Entity entity){
 		if(entity == null) throw new IllegalArgumentException("Entity cannot be null");
-		ObjectSchema schema = cache.get(entity.getClass());
+		return getEntitySchema(entity.getJSONSchema(), entity.getClass());
+	}
+
+	/**
+	 * Get schema entity for a class and json.
+	 */
+	@Override
+	public ObjectSchema getEntitySchema(String json, Class<? extends Entity> clazz) {
+		if(json == null) throw new IllegalArgumentException("JSON cannot be null");
+		ObjectSchema schema = cache.get(clazz);
 		if(schema == null){
 			ObjectSchema newSchema = new ObjectSchema();
 			try {
-				schema = factory.initializeEntity(entity.getJSONSchema(), newSchema);
+				schema = factory.initializeEntity(json, newSchema);
 			} catch (JSONObjectAdapterException e) {
 				throw new RuntimeException(e);
 			}
-			cache.put(entity.getClass(), schema);
+			cache.put(clazz, schema);
 		}
 		return schema;		
 	}

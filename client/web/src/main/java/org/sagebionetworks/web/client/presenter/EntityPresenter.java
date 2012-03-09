@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.presenter;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
