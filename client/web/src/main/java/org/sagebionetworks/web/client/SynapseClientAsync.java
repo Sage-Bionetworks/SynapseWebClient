@@ -21,5 +21,7 @@ public interface SynapseClientAsync {
 	void junk(SerializableWhitelist l,
 			AsyncCallback<SerializableWhitelist> callback);
 
+	void getEntityReferencedBy(String entityId, AsyncCallback<String> callback);
+
 	
 }

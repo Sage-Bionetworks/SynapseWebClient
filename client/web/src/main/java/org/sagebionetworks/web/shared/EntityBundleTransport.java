@@ -18,6 +18,8 @@ public class EntityBundleTransport implements IsSerializable {
 	public static int PERMISSIONS	      = 0x4;
 	public static int ENTITY_PATH	      = 0x8;
 	public static int ENTITY_REFERENCEDBY = 0x10;
+	
+	public static String HELLO = ":)";
 
 	private String entityJson;
 	private String annotaionsJson;
@@ -48,6 +50,9 @@ public class EntityBundleTransport implements IsSerializable {
 	}
 	public void setEntityPathJson(String entityPathJson) {
 		this.entityPathJson = entityPathJson;
+	}	
+	public String getEntityReferencedByJson() {
+		return entityReferencedByJson;
 	}
 	public void setEntityReferencedByJson(String entityReferencedByJson) {
 		this.entityReferencedByJson = entityReferencedByJson;

@@ -192,6 +192,7 @@ public class DisplayConstants {
 	public static final String LABEL_SUCCESS = "Success";
 	public static final String TEXT_SHORTCUT_ADDED = "Shortcut added to id";
 	public static final String ERROR_UPDATE_FAILED = "Update failed. Please try again.";
+	public static final String TEXT_NO_REFERENCES = "No shortcuts point to this";
 	
 }
 

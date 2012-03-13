@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.extjs.gxt.ui.client.data.BaseModelData;
+import com.extjs.gxt.ui.client.data.PagingLoadResult;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
@@ -36,6 +41,10 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		void saveRStudioUrlBase(String value);
 
 		String getRstudioUrlBase();
+
+		String createEntityLink(String id, String version, String display);
+
+		void loadShortcuts(int offset, int limit, AsyncCallback<PaginatedResults<EntityHeader>> asyncCallback);
 
 	}
 }

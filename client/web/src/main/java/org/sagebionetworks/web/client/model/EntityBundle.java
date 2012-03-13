@@ -2,8 +2,10 @@ package org.sagebionetworks.web.client.model;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
 /**
  * A bundle of various parts of an entity.  This allows the client to get all the required parts in 
@@ -18,14 +20,16 @@ public class EntityBundle {
 	private Annotations annotations;
 	private UserEntityPermissions permissions;
 	private EntityPath path;
+	private PaginatedResults<EntityHeader> referencedBy;
 	
 	public EntityBundle(Entity entity, Annotations annotations,
-			UserEntityPermissions permissions, EntityPath path) {
+			UserEntityPermissions permissions, EntityPath path, PaginatedResults<EntityHeader> referencedBy) {
 		super();
 		this.entity = entity;
 		this.annotations = annotations;
 		this.permissions = permissions;
 		this.path = path;
+		this.referencedBy = referencedBy;
 	}
 	public Entity getEntity() {
 		return entity;
@@ -38,6 +42,9 @@ public class EntityBundle {
 	}
 	public EntityPath getPath() {
 		return path;
+	}	
+	public PaginatedResults<EntityHeader> getReferencedBy() {
+		return referencedBy;
 	}
 	@Override
 	public int hashCode() {

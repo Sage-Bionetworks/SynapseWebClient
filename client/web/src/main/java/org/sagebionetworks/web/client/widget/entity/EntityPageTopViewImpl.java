@@ -1,6 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -14,14 +19,22 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.editpanels.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.portlet.SynapsePortlet;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
-import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.client.widget.table.QueryTableFactory;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.Direction;
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.data.BaseModelData;
+import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
+import com.extjs.gxt.ui.client.data.BasePagingLoader;
+import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.PagingLoadConfig;
+import com.extjs.gxt.ui.client.data.PagingLoadResult;
+import com.extjs.gxt.ui.client.data.RpcProxy;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -29,27 +42,31 @@ import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.util.Params;
+import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.SplitButton;
 import com.extjs.gxt.ui.client.widget.custom.Portal;
 import com.extjs.gxt.ui.client.widget.custom.Portlet;
-import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
+import com.extjs.gxt.ui.client.widget.grid.ColumnData;
+import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.Grid;
+import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.FormData;
-import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
+import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.google.gwt.cell.client.widget.PreviewDisclosurePanel;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Frame;
@@ -85,6 +102,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private ActionMenu actionMenu;
 	private EntityChildBrowser entityChildBrowser;
 	private LicensedDownloader licensedDownloader;
+	private QueryTableFactory queryTableFactory;
 	private Breadcrumb breadcrumb;
 	private boolean isAdministrator = false; 
 	private boolean canEdit = false;
@@ -95,7 +113,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			AccessMenuButton accessMenuButton, NodeEditor nodeEditor,
 			PreviewDisclosurePanel previewDisclosurePanel,
 			AnnotationEditor annotationEditor, AdminMenu adminMenu, ActionMenu actionMenu,
-			EntityChildBrowser entityChildBrowser, LicensedDownloader licensedDownloader, Breadcrumb breadcrumb) {
+			EntityChildBrowser entityChildBrowser, LicensedDownloader licensedDownloader, Breadcrumb breadcrumb, 
+			QueryTableFactory queryTableFactory) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.previewDisclosurePanel = previewDisclosurePanel;
@@ -105,6 +124,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.entityChildBrowser = entityChildBrowser;
 		this.licensedDownloader = licensedDownloader;
 		this.breadcrumb = breadcrumb;
+		this.queryTableFactory = queryTableFactory;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 	}
@@ -169,7 +189,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    // Create R Client portlet
 	    portalThreeCol.add(createRClientPortlet(bundle.getEntity()), 0);
 	    // Create References portlet
-	    portalThreeCol.add(createReferencesPortlet(bundle.getEntity()), 1);
+	    portalThreeCol.add(createReferencesPortlet(bundle.getEntity(), bundle.getReferencedBy()), 1);
 	    // Create References portlet
 	    portalThreeCol.add(createActivityFeedPortlet(bundle.getEntity()), 2);
 	    
@@ -315,22 +335,130 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    return portlet;  
 	}	
 	
-	private Portlet createReferencesPortlet(Entity entity) {			  
-	    SynapsePortlet portlet = new SynapsePortlet("Entities Using this " + DisplayUtils.getEntityTypeDisplay(entity));  
+	private Portlet createReferencesPortlet(Entity entity, PaginatedResults<EntityHeader> referencedBy) {			  
+	    SynapsePortlet portlet = new SynapsePortlet("Others Using this " + DisplayUtils.getEntityTypeDisplay(entity));	    
 	    portlet.setLayout(new FitLayout());    
 	    portlet.setAutoHeight(true);  	  
 	    
-	    // TODO : remove this block
-	    if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {					
-			portlet.add(new HTML(DisplayConstants.DEMO_ANALYSIS));
-			return portlet;
-		}
+	    if(referencedBy.getTotalNumberOfResults() > 0) {	    
+		    List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
+		    			
+		    // ref by column
+			ColumnConfig colConfig = new ColumnConfig("id", "Referenced By", 200);			
+			columns.add(colConfig);		
+			GridCellRenderer<BaseModelData> cellRenderer = configureReferencedByGridCellRenderer();
+			colConfig.setRenderer(cellRenderer);
+			colConfig.setSortable(false);
+			
+			// type column
+			ColumnConfig colConfigType = new ColumnConfig("type", "Type", 80);
+			colConfigType.setSortable(false);
+			columns.add(colConfigType);						
+			
+		    ColumnModel cm = new ColumnModel(columns);
+		    
+		    // TODO : eventually remove this block
+		    if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {					
+				portlet.add(new HTML(DisplayConstants.DEMO_ANALYSIS));
+				return portlet;
+			}
+	
+		    // CREATE TABLE
+		    // add table of references
+	        RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
+	            @Override
+	            public void load(Object loadConfig, final AsyncCallback<PagingLoadResult<BaseModelData>> callback) {
+	            	int offset = ((PagingLoadConfig) loadConfig).getOffset();
+	            	int limit =  ((PagingLoadConfig) loadConfig).getLimit();
+	            	presenter.loadShortcuts(offset, limit, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+						@Override
+						public void onSuccess(PaginatedResults<EntityHeader> result) {
+							List<BaseModelData> dataList = new ArrayList<BaseModelData>();
+							for(EntityHeader header : result.getResults()) {			
+								BaseModelData model = new BaseModelData();
+								model.set("id", header.getId());
+								model.set("name", header.getName());
+								model.set("type", header.getType());
+								dataList.add(model);
+							}
+							PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(dataList);
+							loadResultData.setTotalLength((int) result.getTotalNumberOfResults());
+							//loadResultData.setOffset(result.get);
+							
+							callback.onSuccess(loadResultData);
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							callback.onFailure(caught);
+						}
+					});
+	            }
+	        };
+			
+	        // create a paging loader from the proxy
+	        BasePagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(proxy);
+	        loader.setRemoteSort(false);
+	        loader.setReuseLoadConfig(true);
+	        loader.setLimit(10);
+	        loader.setOffset(0);            
+	                
+	        // add initial data to the store
+			ListStore<BaseModelData> store = new ListStore<BaseModelData>(loader);
+				
+			Grid<BaseModelData> grid = new Grid<BaseModelData>(store, cm);
+			grid.setLayoutData(new FitLayout());
+			grid.setStateful(false);		
+			grid.setLoadMask(true);
+			grid.getView().setForceFit(true);		
+			grid.setAutoWidth(false);
+			grid.setStyleAttribute("borderTop", "none");
+			grid.setBorders(false);
+			grid.setStripeRows(true);
+			grid.setHeight(200);
+			
+			ContentPanel cp = new ContentPanel();
+			cp.setLayout(new FitLayout());
+			cp.setBodyBorder(true);
+			cp.setButtonAlign(HorizontalAlignment.CENTER);
+			cp.setHeaderVisible(false);
+			cp.setHeight(200);
+	
+			// create bottom paging toolbar				
+		    PagingToolBar toolBar = new PagingToolBar(10);        
+	        toolBar.bind(loader);
+	        toolBar.setSpacing(2);
+	        toolBar.insert(new SeparatorToolItem(), toolBar.getItemCount() - 2);
+	        
+	    	cp.setBottomComponent(toolBar);
+	    	
+			cp.add(grid);
+			
+			portlet.add(cp);
+			
+			// load initial data
+			loader.load();
 
-	    // add table of references
-	    
-	    
+	    } else {
+	    	portlet.add(new Html(DisplayConstants.TEXT_NO_REFERENCES + " " + DisplayUtils.getEntityTypeDisplay(entity) + "."));
+	    }
 	    return portlet;  
 	}	
+	
+	private GridCellRenderer<BaseModelData> configureReferencedByGridCellRenderer() {
+		// configure cell renderer
+		GridCellRenderer<BaseModelData> cellRenderer = new GridCellRenderer<BaseModelData>() {
+			public String render(BaseModelData model, String property, ColumnData config, int rowIndex, int colIndex, ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
+				// catch all for types that don't need specific rendering beyond string
+				if("id".equals(property) && model.get("id") != null) {
+					return presenter.createEntityLink(model.get("id").toString(), null, model.get("name").toString());
+				} else {
+					return null;
+				}
+			}
+		};
+		return cellRenderer;
+	}			
+
 	
 	private Portlet createActivityFeedPortlet(Entity entity) {			  
 	    SynapsePortlet portlet = new SynapsePortlet("Activity Feed");  

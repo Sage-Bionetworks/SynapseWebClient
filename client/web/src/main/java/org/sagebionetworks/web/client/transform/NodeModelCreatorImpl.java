@@ -4,6 +4,7 @@ import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.Agreement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.LayerPreview;
 import org.sagebionetworks.web.shared.PagedResults;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -33,11 +35,13 @@ import com.google.inject.Inject;
  */
 public class NodeModelCreatorImpl implements NodeModelCreator {		
 	
-	JSONEntityFactory factory;	
+	JSONEntityFactory factory;
+	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
-	public NodeModelCreatorImpl(JSONEntityFactory factory) {
+	public NodeModelCreatorImpl(JSONEntityFactory factory, JSONObjectAdapter jsonObjectAdapter) {
 		this.factory = factory;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 	}
 	
 	@Override
@@ -136,6 +140,7 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 			Annotations annotations = null;
 			UserEntityPermissions permissions = null;
 			EntityPath path = null;
+			PaginatedResults<EntityHeader> referencedBy = null;
 			// entity?
 			if(transport.getEntityJson() != null){
 				entity = factory.createEntity(transport.getEntityJson());
@@ -153,18 +158,31 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 				path =  factory.createEntity(transport.getEntityPathJson() , EntityPath.class);
 			}
 			// referencedBy?
-			// TODO : add referenced By
-			//if(transport.)
+			if(transport.getEntityReferencedByJson() != null){
+				referencedBy =  new PaginatedResults<EntityHeader>(EntityHeader.class, factory);
+				referencedBy.initializeFromJSONObject(jsonObjectAdapter.createNew(transport.getEntityReferencedByJson()));
+			}
 			
 			
 			// put it all together.
-			return new EntityBundle(entity, annotations, permissions, path);
+			return new EntityBundle(entity, annotations, permissions, path, referencedBy);
 		}catch (JSONObjectAdapterException e){
 			throw new UnknownErrorException(e.getMessage());
 		}
 
 	}
 
+	@Override
+	public <T extends JSONEntity> PaginatedResults<T> createPaginatedResults(String jsonString, Class<? extends JSONEntity> clazz) {
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		PaginatedResults<T> paginatedResults = new PaginatedResults(clazz, factory);
+		try {
+			paginatedResults.initializeFromJSONObject(jsonObjectAdapter.createNew(jsonString));
+		} catch (JSONObjectAdapterException e) {
+			e.printStackTrace();
+		}
+		return paginatedResults;
+	}
 
 
 }
