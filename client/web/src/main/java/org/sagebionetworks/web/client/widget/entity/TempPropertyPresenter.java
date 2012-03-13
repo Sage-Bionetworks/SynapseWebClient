@@ -122,7 +122,7 @@ public class TempPropertyPresenter extends LayoutContainer {
 						try {
 							newEntity = entityFactory.newInstance(bundle.getEntity().getClass().getName());
 							newEntity.initializeFromJSONObject(newAdapter);
-							EntityBundle newBundel = new EntityBundle((Entity) newEntity, null, null, null);
+							EntityBundle newBundel = new EntityBundle((Entity) newEntity, null, null, null, null);
 							setEntity(newBundel);
 						} catch (JSONObjectAdapterException e) {
 							DisplayUtils.showErrorMessage("Failed to apply the changes. Error: "+e.getMessage());
@@ -188,7 +188,7 @@ public class TempPropertyPresenter extends LayoutContainer {
 	public void initializeWithTestData() {
 		// Create an example entity
 		ExampleEntity example = createSample();
-		EntityBundle bundle = new EntityBundle(example, null, null, null);
+		EntityBundle bundle = new EntityBundle(example, null, null, null, null);
 		this.setEntity(bundle);
 	}
 	

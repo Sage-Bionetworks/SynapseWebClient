@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -15,9 +15,11 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -25,6 +27,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		
 	private EntityPageTopView view;
 	private NodeServiceAsync nodeService;
+	private SynapseClientAsync synapseClient;
 	private PlaceChanger placeChanger;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -32,15 +35,16 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityBundle bundle;
 	private String entityTypeDisplay; 
 	private HandlerManager handlerManager = new HandlerManager(this);
-	private EntitySchemaCache schemaCache;
+	private EntitySchemaCache schemaCache;	
 	
 	// TODO : delete this variable
 	private String rStudioUrl = "http://localhost:8787";
 	
 	@Inject
-	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, EntitySchemaCache schemaCache) {
+	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, EntitySchemaCache schemaCache) {
 		this.view = view;
 		this.nodeService = service;
+		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -136,6 +140,31 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	@Override 
 	public boolean isLoggedIn() {
 		return authenticationController.getLoggedInUser() != null;
+	}
+	
+	@Override
+	public String createEntityLink(String id, String version, String display) {
+		return DisplayUtils.createEntityLink(id, version, display);
+	}
+
+	@Override
+	public void loadShortcuts(int offset, int limit, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
+		PaginatedResults<EntityHeader> references = null;
+		if(offset == 0) {
+			 callback.onSuccess(bundle.getReferencedBy());			 
+		} else {
+			synapseClient.getEntityReferencedBy(bundle.getEntity().getId(), new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					PaginatedResults<EntityHeader> paginatedResults = nodeModelCreator.createPaginatedResults(result, EntityHeader.class);
+					callback.onSuccess(paginatedResults);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+			});
+		}		
 	}
 
 	

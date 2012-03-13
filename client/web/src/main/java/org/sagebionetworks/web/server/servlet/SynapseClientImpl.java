@@ -314,8 +314,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	 */
 	public void handleEntityReferencedBy(String entityId, int partsMask, EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
 		if((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0){
+			// TODO : support entity version
 			PaginatedResults<EntityHeader> results = synapseClient.getEntityReferencedBy(entityId, null);
 			transport.setEntityReferencedByJson(EntityFactory.createJSONStringForEntity(results));
+		}
+	}
+
+	@Override
+	public String getEntityReferencedBy(String entityId) throws RestServiceException {
+		try {
+			Synapse synapseClient = createSynapseClient();
+			PaginatedResults<EntityHeader> results = synapseClient.getEntityReferencedBy(entityId, null);
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 

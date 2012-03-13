@@ -32,5 +32,7 @@ public interface SynapseClient extends RemoteService {
 	 * @throws SynapseException 
 	 */
 	public EntityBundleTransport getEntityBundle(String entityId, int partsMask) throws RestServiceException;
+
+	public String getEntityReferencedBy(String entityId) throws RestServiceException;
 	
 }

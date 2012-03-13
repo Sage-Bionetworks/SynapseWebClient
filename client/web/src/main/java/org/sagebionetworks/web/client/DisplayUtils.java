@@ -396,5 +396,10 @@ public class DisplayUtils {
 		}
 		return null;		
 	}
+
+	public static String createEntityLink(String id, String version,
+			String display) {
+		return "<a href=\"" + DisplayUtils.getSynapseHistoryToken(id) + "\" class=\"link\">" + display + "</a>";
+	}
 	
 }
