@@ -84,23 +84,6 @@ public class EntityRowFactoryTest {
 		assertEquals("test", stringRow.getValue());
 	}
 	
-	@Ignore // This is too fragile
-	@Test
-	public void testDateAsString() throws JSONObjectAdapterException{
-		JSONObjectAdapter adapter = adapterFactory.createNew();
-		ObjectSchema schema = new ObjectSchema(TYPE.STRING);
-		schema.setFormat(FORMAT.DATE_TIME);
-		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
-		assertTrue(row instanceof EntityRowDateAsString);
-		EntityRowDateAsString dateRow = (EntityRowDateAsString) row;
-		// check the wiring
-		long now = 1331069728612l;
-		System.out.println(now);
-		dateRow.setValue(new Date(now));
-		assertEquals("2012-03-06T13:35:28.612-08:00", adapter.getString("key"));
-		assertEquals(new Date(now), dateRow.getValue());
-	}
-	
 	@Test
 	public void testDateAsLong() throws JSONObjectAdapterException{
 		JSONObjectAdapter adapter = adapterFactory.createNew();
