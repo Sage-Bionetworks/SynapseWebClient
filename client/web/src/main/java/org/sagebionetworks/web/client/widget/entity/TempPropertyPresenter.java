@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -51,15 +52,17 @@ public class TempPropertyPresenter extends LayoutContainer {
 	List<EntityRow<?>> rows;
 	AutoGenFactory entityFactory;
 	VerticalPanel vp;
+	FormFieldFactory formFactory;
 	
 	@Inject
 	public TempPropertyPresenter(EntitySchemaCache cache,
-			AdapterFactory factory, EntityPropertyGrid view) {
+			AdapterFactory factory, EntityPropertyGrid view, FormFieldFactory formFactory) {
 		super();
 		this.cache = cache;
 		this.factory = factory;
 		this.view = view;
 		this.entityFactory = new AutoGenFactory();
+		this.formFactory = formFactory;
 	}
 	
 	@Override
@@ -89,13 +92,17 @@ public class TempPropertyPresenter extends LayoutContainer {
 	    	    
 	    	    // Create a new Adapter to capture the editor's changes
 	    	    final JSONObjectAdapter newAdapter = factory.createNew();
-	    	    EntityPropertyForm editor = new EntityPropertyForm();
+	    	    EntityPropertyForm editor = new EntityPropertyForm(formFactory);
 	    	    Entity entity = bundle.getEntity();
 	    	    try {
 	    	    	entity.writeToJSONObject(newAdapter);
 	    	    	// We want to filter out all transient properties.
 	    	    	ObjectSchema schema = cache.getSchemaEntity(entity);
-	    	    	Set<String> filter = EntityRowFactory.createTransientFilter(schema);
+	    	    	Set<String> filter = new HashSet<String>();
+	    	    	// Filter transient fields
+	    	    	EntityRowFactory.addTransientToFilter(schema, filter);
+	    	    	// Filter objects
+	    	    	EntityRowFactory.addObjectTypeToFilter(schema, filter);
 	    	    	List<EntityRow<?>> rows = EntityRowFactory.createEntityRowList(newAdapter, schema, null, filter);
 	    	    	editor.setList(rows);
 				} catch (JSONObjectAdapterException e) {
@@ -159,7 +166,14 @@ public class TempPropertyPresenter extends LayoutContainer {
 			// Get the list of rows
 			// Filter out all versionable properties
 			ObjectSchema enityScheam = cache.getEntitySchema(Versionable.EFFECTIVE_SCHEMA, Versionable.class);
-			rows = EntityRowFactory.createEntityRowList(adapter, schema, null, enityScheam.getProperties().keySet());
+			Set<String> filter = new HashSet<String>();
+			// filter out all properties from versionable
+			filter.addAll(enityScheam.getProperties().keySet());
+			// Filter all transient properties
+			EntityRowFactory.addTransientToFilter(schema, filter);
+			// Add all objects to the filter
+			EntityRowFactory.addObjectTypeToFilter(schema, filter);
+			rows = EntityRowFactory.createEntityRowList(adapter, schema, null, filter);
 			// Pass the rows to the two views
 			view.setRows(rows);
 			this.layout(true);
@@ -182,6 +196,13 @@ public class TempPropertyPresenter extends LayoutContainer {
 		example.setEntityType(example.getClass().getName());
 		example.setDescription("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque risus sapien, elementum a elementum adipiscing, laoreet condimentum odio. Vivamus pretium purus ac tellus tempor lobortis. Suspendisse nec nibh sit amet ligula consectetur tincidunt in vitae mi. Donec in pretium odio. Quisque lacus nunc, condimentum tincidunt placerat at, convallis in leo. Aliquam erat volutpat. Suspendisse sodales nisl sit amet quam eleifend fermentum. Vivamus interdum, arcu at tempor gravida, dolor neque tempus mi, ac viverra risus quam sit amet lacus. Fusce eget purus magna, nec lacinia neque. Pellentesque pretium metus ac velit mattis sed tempus sem adipiscing. Vivamus molestie lorem in dui viverra interdum. Sed nec elementum diam. ");
 		example.setSingleString("This could be a very long string that wraps way off the screen. When that happens we want a portion of it to be shown on the screen, but the rest on tool tips.");
+		example.setSingleDouble(123.45);
+		example.setSingleInteger(42l);
+		example.setStringList(new ArrayList<String>());
+		example.getStringList().add("one");
+		example.getStringList().add("two");
+		example.getStringList().add("three");
+		
 		return example;
 	}
 

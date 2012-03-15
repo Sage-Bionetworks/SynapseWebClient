@@ -23,5 +23,7 @@ public interface SynapseClientAsync {
 
 	void getEntityReferencedBy(String entityId, AsyncCallback<String> callback);
 
+	void logDebug(String message, AsyncCallback<Void> callback);
+
 	
 }

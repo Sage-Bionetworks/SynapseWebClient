@@ -10,6 +10,7 @@ import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.user.client.Element;
+import com.google.inject.Inject;
 
 /**
  * This is a form for editing entity properties.
@@ -21,8 +22,11 @@ public class EntityPropertyForm extends LayoutContainer {
 	private VerticalPanel vp;
 	private FormData formData;
 	List<Field<?>> formFields;
+	FormFieldFactory formFactory;
 
-	public EntityPropertyForm() {
+	@Inject
+	public EntityPropertyForm(FormFieldFactory formFactory) {
+		this.formFactory = formFactory;
 	}
 
 	@Override
@@ -61,7 +65,7 @@ public class EntityPropertyForm extends LayoutContainer {
 	 */
 	public void setList(List<EntityRow<?>> rows) {
 		// Create the list of fields
-		formFields = FormFieldFactory.createFormFields(rows);
+		formFields = formFactory.createFormFields(rows);
 		rebuild();
 	}
 

@@ -11,6 +11,9 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("synapse")	
 public interface SynapseClient extends RemoteService {
+	
+	
+	
 
 	public EntityWrapper getEntity(String entityId);
 
@@ -34,5 +37,7 @@ public interface SynapseClient extends RemoteService {
 	public EntityBundleTransport getEntityBundle(String entityId, int partsMask) throws RestServiceException;
 
 	public String getEntityReferencedBy(String entityId) throws RestServiceException;
+	
+	public void logDebug(String message);
 	
 }

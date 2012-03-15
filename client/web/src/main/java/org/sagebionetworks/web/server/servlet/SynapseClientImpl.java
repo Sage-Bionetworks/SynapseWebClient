@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Logger;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Annotations;
@@ -34,6 +36,9 @@ import com.google.inject.Inject;
 
 @SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements SynapseClient, TokenProvider  {
+	
+	
+	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 
 	@SuppressWarnings("unused")	
 	private static Logger logger = Logger.getLogger(SynapseClientImpl.class.getName());
@@ -331,6 +336,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
+	}
+
+	@Override
+	public void logDebug(String message) {
+		log.debug(message);
+		System.out.println(message);
 	}
 
 }

@@ -21,6 +21,7 @@ public class EntityRowDouble extends AbstractEntityRow<Double>{
 	@Override
 	public Double getValue() {
 		if(adapter.has(key)){
+			if(adapter.isNull(key)) return null;
 			try {
 				// stored as a long
 				return adapter.getDouble(key);
@@ -34,7 +35,11 @@ public class EntityRowDouble extends AbstractEntityRow<Double>{
 	@Override
 	public void setValue(Double newValue) {
 		try {
-			adapter.put(key, newValue);
+			if(newValue == null){
+				adapter.putNull(key);
+			}else{
+				adapter.put(key, newValue);
+			}
 		} catch (JSONObjectAdapterException e) {
 			throw new RuntimeException(e);
 		}

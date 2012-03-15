@@ -418,7 +418,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private GridCellRenderer<PermissionsTableEntry> createRemoveRenderer() {
 		GridCellRenderer<PermissionsTableEntry> removeButton = new GridCellRenderer<PermissionsTableEntry>() {  			   
 			@Override  
-			public Object render(final PermissionsTableEntry model, String property, ColumnData config, final int rowIndex,  
+			public Object render(final PermissionsTableEntry model, String property, ColumnData config, int rowIndex,  
 			      final int colIndex, ListStore<PermissionsTableEntry> store, Grid<PermissionsTableEntry> grid) {				 
 				  final PermissionsTableEntry entry = store.getAt(rowIndex);
 			    if(entry.getAclEntry().isOwner()) {

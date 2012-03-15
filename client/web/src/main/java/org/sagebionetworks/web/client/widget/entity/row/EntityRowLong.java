@@ -19,6 +19,7 @@ public class EntityRowLong extends AbstractEntityRow<Long> {
 	@Override
 	public Long getValue() {
 		if(adapter.has(key)){
+			if(adapter.isNull(key)) return null;
 			try {
 				return adapter.getLong(key);
 			} catch (JSONObjectAdapterException e) {
@@ -31,7 +32,11 @@ public class EntityRowLong extends AbstractEntityRow<Long> {
 	@Override
 	public void setValue(Long newValue) {
 		try {
-			adapter.put(key, newValue);
+			if(newValue == null){
+				adapter.putNull(key);
+			}else{
+				adapter.put(key, newValue);
+			}
 		} catch (JSONObjectAdapterException e) {
 			throw new RuntimeException(e);
 		}

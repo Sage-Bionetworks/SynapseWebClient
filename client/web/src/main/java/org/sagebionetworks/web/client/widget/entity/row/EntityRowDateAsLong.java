@@ -22,6 +22,7 @@ public class EntityRowDateAsLong extends AbstractEntityRowDate{
 	public Date getValue() {
 		if(adapter.has(key)){
 			try {
+				if(adapter.isNull(key))return null;
 				// the date is stored as a long in the adapter
 				return new Date(adapter.getLong(key));
 			} catch (JSONObjectAdapterException e) {
@@ -35,7 +36,11 @@ public class EntityRowDateAsLong extends AbstractEntityRowDate{
 	public void setValue(Date newValue) {
 		// store the value as a long in the adapter
 		try {
-			adapter.put(key, newValue.getTime());
+			if(newValue == null){
+				adapter.putNull(key);
+			}else{
+				adapter.put(key, newValue.getTime());
+			}
 		} catch (JSONObjectAdapterException e) {
 			throw new RuntimeException(e);
 		}
