@@ -118,8 +118,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 			JSONObjectAdapter entityJson = entity.writeToJSONObject(jsonObjectAdapter.createNew());
 			return new EntityWrapper(entityJson.toJSONString(), entity.getClass().getName(), null);		
 		} catch (SynapseException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
 			return new EntityWrapper(null, null, ExceptionUtil.convertSynapseException(e));
 		} catch (JSONObjectAdapterException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
 			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
 		}		
 	}
@@ -137,8 +141,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 			JSONObjectAdapter entityPathJson = entityPath.writeToJSONObject(jsonObjectAdapter.createNew());
 			return new EntityWrapper(entityPathJson.toJSONString(), entityPath.getClass().getName(), null);			
 		}catch (SynapseException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
 			return new EntityWrapper(null, null, ExceptionUtil.convertSynapseException(e));
 		} catch (JSONObjectAdapterException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
 			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
 		}
 	}
@@ -152,10 +160,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 			searchResults.writeToJSONObject(adapter);
 			return new EntityWrapper(adapter.toJSONString(), SearchResults.class.getName(), null);		
 		}catch (SynapseException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
 			return new EntityWrapper(null, null, ExceptionUtil.convertSynapseException(e));
 		} catch (JSONObjectAdapterException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
 			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
 		} catch (UnsupportedEncodingException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
 			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
 		}		
 	}
@@ -214,6 +228,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		try {
 			jsonString = readToString(in);
 		} catch (IOException e) {
+			log.error(e);
 			// error reading file
 		}
 		return jsonString;
@@ -341,7 +356,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	@Override
 	public void logDebug(String message) {
 		log.debug(message);
-		System.out.println(message);
+	}
+
+	@Override
+	public void logError(String message) {
+		log.error(message);
+	}
+
+	@Override
+	public void logInfo(String message) {
+		log.info(message);
 	}
 
 }
