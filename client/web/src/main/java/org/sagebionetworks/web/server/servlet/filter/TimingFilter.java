@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -11,9 +10,18 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+
+/**
+ * Logs timing and error messages 
+ * @author John
+ *
+ */
 public class TimingFilter implements Filter {
 	
-	private static Logger logger = Logger.getLogger(TimingFilter.class.getName());
+	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 
 	@Override
 	public void destroy() {
@@ -24,10 +32,23 @@ public class TimingFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		// Log the time
 		long start = System.currentTimeMillis();
-		chain.doFilter(request, response);
-		long end = System.currentTimeMillis();
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		logger.info(httpRequest.getServletPath()+" elapse: "+(end-start)+" ms");
+		try{
+			// Pass it along.
+			chain.doFilter(request, response);
+		}catch (IOException e){
+			// Log any exceptions.
+			log.error(e);
+			throw e;
+		}catch (ServletException e){
+			// Log any exceptions.
+			log.error(e);
+			throw e;
+		}finally{
+			// Log the timing.
+			long end = System.currentTimeMillis();
+			HttpServletRequest httpRequest = (HttpServletRequest) request;
+			log.trace(httpRequest.getServletPath()+" elapse: "+(end-start)+" ms");
+		}
 	}
 
 	@Override

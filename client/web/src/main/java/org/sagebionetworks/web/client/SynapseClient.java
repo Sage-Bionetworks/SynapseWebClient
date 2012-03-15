@@ -38,6 +38,22 @@ public interface SynapseClient extends RemoteService {
 
 	public String getEntityReferencedBy(String entityId) throws RestServiceException;
 	
+	/**
+	 * Log a debug message in the server-side log.
+	 * @param message
+	 */
 	public void logDebug(String message);
 	
+	/**
+	 * Log an error message in the server-side log.
+	 * @param message
+	 */
+	public void logError(String message);
+	
+
+	/**
+	 * Log an info message in the server-side log.
+	 * @param message
+	 */
+	public void logInfo(String message);
 }

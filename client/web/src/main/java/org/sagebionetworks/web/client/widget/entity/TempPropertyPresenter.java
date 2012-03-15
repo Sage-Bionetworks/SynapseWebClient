@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -16,10 +15,10 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 
@@ -27,12 +26,10 @@ import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
@@ -53,16 +50,24 @@ public class TempPropertyPresenter extends LayoutContainer {
 	AutoGenFactory entityFactory;
 	VerticalPanel vp;
 	FormFieldFactory formFactory;
+	ClientLogger log;
 	
 	@Inject
 	public TempPropertyPresenter(EntitySchemaCache cache,
-			AdapterFactory factory, EntityPropertyGrid view, FormFieldFactory formFactory) {
+			AdapterFactory factory, EntityPropertyGrid view, FormFieldFactory formFactory, ClientLogger log) {
 		super();
 		this.cache = cache;
 		this.factory = factory;
 		this.view = view;
 		this.entityFactory = new AutoGenFactory();
 		this.formFactory = formFactory;
+		this.log = log;
+		// test the log
+		log.debug("Testing a debug message");
+		log.info("Testing an info message");
+		log.error("Testing an error message");
+		log.error("Testing an error with a basic stack info", IllegalArgumentException.class.getName(), TempPropertyPresenter.class.getName(), "<init>", 69);
+		
 	}
 	
 	@Override
