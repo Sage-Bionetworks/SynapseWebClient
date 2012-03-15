@@ -121,7 +121,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		String urlBase = rStudioUrl; 
 		UserData userData = authenticationController.getLoggedInUser();
 		if(userData != null) {
-			urlBase += "#Synapse:" + userData.getToken() + ":" + bundle.getEntity().getId();			
+			urlBase += "#synapse:" + userData.getToken() + ";get:" + bundle.getEntity().getId();			
 		} 
 		return urlBase;
 	}
