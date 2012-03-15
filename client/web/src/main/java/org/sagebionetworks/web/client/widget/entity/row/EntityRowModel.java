@@ -7,7 +7,8 @@ import java.util.Map;
 import com.extjs.gxt.ui.client.data.ModelData;
 
 /**
- * EntityRow as 
+ * Models a single row of the property table.
+ * 
  * @author John
  *
  */
@@ -22,7 +23,7 @@ public class EntityRowModel implements ModelData {
 	
 	public EntityRowModel(String label, String value, String toolTipTitle, String toolTipBody){
 		// Map this row
-		map = new HashMap<String, Object>();
+		map = new HashMap<String, Object>(2);
 		map.put(LABEL, label);
 		map.put(VALUE, value);
 		this.toolTipTitle = toolTipTitle;

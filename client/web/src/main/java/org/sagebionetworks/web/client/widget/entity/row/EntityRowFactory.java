@@ -51,9 +51,23 @@ public class EntityRowFactory {
 			}
 		}else if(TYPE.NUMBER == schema.getType()){
 			return new EntityRowDouble(adapter, key, schema);
+		}else if(TYPE.ARRAY == schema.getType()){
+			// We must have an items
+			if(schema.getItems() == null) throw new IllegalArgumentException("Items cannot be null for type: ARRAY");
+			if(TYPE.STRING == schema.getItems().getType()){
+				return new EntityRowList<String>(adapter, key, schema, String.class);
+			} else if(TYPE.NUMBER == schema.getItems().getType()){
+				return new EntityRowList<Double>(adapter, key, schema, Double.class);
+			} else if(TYPE.INTEGER == schema.getItems().getType()){
+				return new EntityRowList<Long>(adapter, key, schema, Long.class);
+			}else{
+				throw new IllegalArgumentException("Unknown ARRAY type: "+schema.getItems().getType()+" for "+schema.getId());
+			}
+		}else{
+			// Unknown type.
+			throw new IllegalArgumentException("Unknown type: "+schema.getType());
 		}
-		return null;
-//		throw new IllegalArgumentException("Unknown type: "+schema.getType());
+
 	}
 	
 	/**
@@ -84,20 +98,40 @@ public class EntityRowFactory {
 	}
 	
 	/**
-	 * Create a filter for all transient properties of an entity..
+	 * Add all transient properties of an entity to the passed filter.
 	 * @param schema
 	 * @return
 	 */
-	public static Set<String> createTransientFilter(ObjectSchema schema){
+	public static void addTransientToFilter(ObjectSchema schema, Set<String> filter){
 		if(schema == null) throw new IllegalArgumentException("Schema cannot be null");
-		HashSet<String> filter = new HashSet<String>();
+		if(filter == null) throw new IllegalArgumentException("Filter set cannot be null");
 		for(String key: schema.getProperties().keySet()){
 			ObjectSchema propSchema = schema.getProperties().get(key);
 			if(propSchema.isTransient()){
 				filter.add(key);
 			}
 		}
-		return filter;
+	}
+	
+	/**
+	 * Add all TYPE.OBJECT to the passed filter.
+	 * @param schema
+	 * @return
+	 */
+	public static void addObjectTypeToFilter(ObjectSchema schema, Set<String> filter){
+		if(schema == null) throw new IllegalArgumentException("Schema cannot be null");
+		if(filter == null) throw new IllegalArgumentException("Filter set cannot be null");
+		for(String key: schema.getProperties().keySet()){
+			ObjectSchema propSchema = schema.getProperties().get(key);
+			if(TYPE.OBJECT == propSchema.getType()){
+				filter.add(key);
+			}else if(TYPE.ARRAY == propSchema.getType()){
+				if(propSchema.getItems() == null) throw new IllegalArgumentException("Items cannot be null for an array");
+				if(TYPE.OBJECT == propSchema.getItems().getType()){
+					filter.add(key);
+				}
+			}
+		}
 	}
 
 }

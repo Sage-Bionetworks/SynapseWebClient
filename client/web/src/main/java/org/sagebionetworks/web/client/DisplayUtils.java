@@ -351,12 +351,24 @@ public class DisplayUtils {
 		DateTime dt = new DateTime(toFormat.getTime());
 		return ISODateTimeFormat.dateTime().print(dt);		
 	}
+	
+	/**
+	 * Converts a date to just a date.
+     * @return  yyyy-MM-dd
+	 * @return
+	 */
+	public static String converDateaToSimpleString(Date toFormat) {
+		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
+		DateTime dt = new DateTime(toFormat.getTime());
+		return ISODateTimeFormat.date().print(dt);		
+	}
  
 	public static Date convertStringToDate(String toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
 		DateTime dt = ISODateTimeFormat.dateTime().parseDateTime(toFormat);
 		return dt.toDate();
 	}
+	
 	
 	public static String getSynapseHistoryToken(String value) {
 		return "#" + getPlaceString(Synapse.class) + ":" + value;

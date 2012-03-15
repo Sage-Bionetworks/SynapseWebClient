@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.row.EntityRowDouble;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowLong;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowString;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
 
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.editor.client.Editor.Ignore;
@@ -98,6 +100,10 @@ public class EntityRowFactoryTest {
 		dateRow.setValue(new Date(now));
 		assertEquals(1331069728612l, adapter.getLong("key"));
 		assertEquals(new Date(now), dateRow.getValue());
+		
+		// Test null
+		dateRow.setValue(null);
+		assertEquals(null, dateRow.getValue());
 	}
 	
 	@Test
@@ -112,6 +118,10 @@ public class EntityRowFactoryTest {
 		longRow.setValue(value);
 		assertEquals(1331069728612l, adapter.getLong("key"));
 		assertEquals(new Long(value), longRow.getValue());
+		
+		// Test null
+		longRow.setValue(null);
+		assertEquals(null, longRow.getValue());
 	}
 	
 	@Test
@@ -126,23 +136,76 @@ public class EntityRowFactoryTest {
 		longRow.setValue(value);
 		assertEquals(new Double(value), new Double(adapter.getDouble("key")));
 		assertEquals(new Double(value), longRow.getValue());
+		
+		// Test null
+		longRow.setValue(null);
+		assertEquals(null, longRow.getValue());
 	}
 	
 	@Test
-	public void testCreateRowListFiltered() throws JSONObjectAdapterException{
-		// Get the adapter for this entity
-		JSONObjectAdapter entityAdapter = entity.writeToJSONObject(adapterFactory.createNew());
-		// Use the entity keys for a filter
-		filter = entityInterfaceSchema.getProperties().keySet();
-		// We want to use the entity schema as a filter
-		List<EntityRow<?>> results = EntityRowFactory.createEntityRowList(entityAdapter, schema, annos, filter);
-		// Make sure none of the filtered properties are there
-		for(EntityRow<?> row: results){
-			assertNotNull(row.getLabel());
-//			assertFalse(filter.contains(data.getKey()));
-		}
-
+	public void testStringList() throws JSONObjectAdapterException{
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		ObjectSchema schema = new ObjectSchema(TYPE.ARRAY);
+		schema.setItems(new ObjectSchema(TYPE.STRING));
+		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
+		assertTrue(row instanceof EntityRowList);
+		EntityRowList<String> rowImpl = (EntityRowList<String>) row;
+		// check the wiring
+		List<String> value = new ArrayList<String>();
+		value.add("one");
+		value.add("two");
+		rowImpl.setValue(value);
+		assertNotNull(adapter.getJSONArray("key"));
+		assertEquals(value, rowImpl.getValue());
+		
+		// Test null
+		rowImpl.setValue(null);
+		assertEquals(null, rowImpl.getValue());
 	}
+	
+	@Test
+	public void testDoubleList() throws JSONObjectAdapterException{
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		ObjectSchema schema = new ObjectSchema(TYPE.ARRAY);
+		schema.setItems(new ObjectSchema(TYPE.NUMBER));
+		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
+		assertTrue(row instanceof EntityRowList);
+		EntityRowList<Double> rowImpl = (EntityRowList<Double>) row;
+		// check the wiring
+		List<Double> value = new ArrayList<Double>();
+		value.add(1.1);
+		value.add(1.2);
+		rowImpl.setValue(value);
+		assertNotNull(adapter.getJSONArray("key"));
+		assertEquals(value, rowImpl.getValue());
+		
+		// Test null
+		rowImpl.setValue(null);
+		assertEquals(null, rowImpl.getValue());
+	}
+	
+	@Test
+	public void testLongList() throws JSONObjectAdapterException{
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		ObjectSchema schema = new ObjectSchema(TYPE.ARRAY);
+		schema.setItems(new ObjectSchema(TYPE.INTEGER));
+		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
+		assertTrue(row instanceof EntityRowList);
+		EntityRowList<Long> rowImpl = (EntityRowList<Long>) row;
+		// check the wiring
+		List<Long> value = new ArrayList<Long>();
+		value.add(100l);
+		value.add(200l);
+		rowImpl.setValue(value);
+		assertNotNull(adapter.getJSONArray("key"));
+		assertEquals(value, rowImpl.getValue());
+		
+		// Test null
+		rowImpl.setValue(null);
+		assertEquals(null, rowImpl.getValue());
+	}
+	
+
 	
 	@Test
 	public void testCreateTransientFilter(){
@@ -156,10 +219,57 @@ public class EntityRowFactoryTest {
 		ObjectSchema nonTransientSchema = new ObjectSchema(TYPE.STRING);
 		nonTransientSchema.setTransient(false);
 		schema.getProperties().put("non-transient", nonTransientSchema);
-		Set<String> filter = EntityRowFactory.createTransientFilter(schema);
+		Set<String> filter = new HashSet<String>();
+		EntityRowFactory.addTransientToFilter(schema, filter);
 		assertNotNull(filter);
 		assertTrue(filter.contains("transient"));
 		assertFalse(filter.contains("non-transient"));
 	}
+	
+	@Test
+	public void testCreateObjectTypeFilter(){
+		ObjectSchema schema = new ObjectSchema(TYPE.OBJECT);
+		schema.setProperties(new LinkedHashMap<String, ObjectSchema>());
+		// Add a non-object property
+		ObjectSchema nonObject = new ObjectSchema(TYPE.STRING);
+		schema.getProperties().put("nonObject", nonObject);
+		// Add an object property
+		ObjectSchema object = new ObjectSchema(TYPE.OBJECT);
+		schema.getProperties().put("object", object);
+		// Add an array of objects
+		ObjectSchema arrayObjects = new ObjectSchema(TYPE.ARRAY);
+		arrayObjects.setItems(new ObjectSchema(TYPE.OBJECT));
+		schema.getProperties().put("arrayOfObjects", arrayObjects);
+		// an array of strings
+		ObjectSchema arrayString = new ObjectSchema(TYPE.ARRAY);
+		arrayString.setItems(new ObjectSchema(TYPE.STRING));
+		schema.getProperties().put("arrayOfStrings", arrayString);
+		Set<String> filter = new HashSet<String>();
+		EntityRowFactory.addObjectTypeToFilter(schema, filter);
+		assertNotNull(filter);
+		assertTrue(filter.contains("object"));
+		assertTrue(filter.contains("arrayOfObjects"));
+		assertFalse(filter.contains("nonObject"));
+		assertFalse(filter.contains("arrayOfStrings"));
+	}
+	
+	@Test
+	public void testCreateRowListFiltered() throws JSONObjectAdapterException{
+		// Get the adapter for this entity
+		JSONObjectAdapter entityAdapter = entity.writeToJSONObject(adapterFactory.createNew());
+		// Use the entity keys for a filter
+		Set<String> filter = new HashSet<String>();
+		EntityRowFactory.addTransientToFilter(schema, filter);
+		EntityRowFactory.addObjectTypeToFilter(schema, filter);
+		// We want to use the entity schema as a filter
+		List<EntityRow<?>> results = EntityRowFactory.createEntityRowList(entityAdapter, schema, annos, filter);
+		// Make sure none of the filtered properties are there
+		for(EntityRow<?> row: results){
+			assertNotNull(row.getLabel());
+//			assertFalse(filter.contains(data.getKey()));
+		}
+
+	}
+
 
 }

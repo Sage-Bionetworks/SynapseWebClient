@@ -52,58 +52,14 @@ public class EntityPropertyGrid extends LayoutContainer {
 		// Create the grid
 		vp = new VerticalPanel();
 		vp.setSpacing(10);
-
-		// Renderer for the label column
-		GridCellRenderer<EntityRowModel> labelRenderer = new GridCellRenderer<EntityRowModel>() {
-
-			@Override
-			public Object render(EntityRowModel model, String property,
-					ColumnData config, int rowIndex, int colIndex,
-					ListStore<EntityRowModel> store, Grid<EntityRowModel> grid) {
-				String value = model.get(property);
-
-				StringBuilder builder = new StringBuilder();
-				builder.append("<div style='font-weight:bold; color:grey; white-space:normal; overflow:hidden; text-overflow:ellipsis;'>");
-				builder.append(value);
-				builder.append(":</div>");
-				Html html = new Html(builder.toString());
-				return html;
-			}
-
-		};
+		
+		// the label renderer
+		GridCellRenderer<EntityRowModel> labelRenderer = createLabelRenderer();
 
 		// Renderer for the value column
-		GridCellRenderer<EntityRowModel> valueRenderer = new GridCellRenderer<EntityRowModel>() {
-
-			@Override
-			public Object render(EntityRowModel model, String property,
-					ColumnData config, int rowIndex, int colIndex,
-					ListStore<EntityRowModel> store, Grid<EntityRowModel> grid) {
-				String value = model.get(property);
-				if (value == null) {
-					value = "";
-				}
-				StringBuilder builder = new StringBuilder();
-				builder.append("<div style='font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;'>");
-				builder.append(value);
-				builder.append("</div>");
-				Html html = new Html(builder.toString());
-//				html.setWidth(50);
-			    ToolTipConfig tipsConfig = new ToolTipConfig();  
-			    tipsConfig.setTitle(model.getToolTipTitle());  
-			    tipsConfig.setText(model.getToolTipBody());
-			    tipsConfig.setMouseOffset(new int[] {0, 0});  
-			    tipsConfig.setAnchor("left");  
-			    tipsConfig.setDismissDelay(0);
-			    ToolTip tip = new ToolTip(html, tipsConfig);
-				return html;
-			}
-
-		};
+		GridCellRenderer<EntityRowModel> valueRenderer = createValueRenderer();
 		// Create a grid
 		List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
-		int col0Width = 150;
-		int col1Width = 200;
 
 		// Label
 		ColumnConfig column = new ColumnConfig();
@@ -141,14 +97,75 @@ public class EntityPropertyGrid extends LayoutContainer {
 		grid.setColumnLines(false);
 		grid.setColumnReordering(false);
 		grid.setHideHeaders(true);
-		grid.setTrackMouseOver(true);
-		grid.setSelectionModel(null);
+		grid.setTrackMouseOver(false);
 		grid.setShadow(false);
 		grid.getAriaSupport().setLabelledBy(cp.getHeader().getId() + "-label");
 		cp.add(grid);
 		vp.add(cp);
 		this.add(vp);
 
+	}
+
+	/**
+	 * The value renderer
+	 * @return
+	 */
+	public GridCellRenderer<EntityRowModel> createValueRenderer() {
+		GridCellRenderer<EntityRowModel> valueRenderer = new GridCellRenderer<EntityRowModel>() {
+
+			@Override
+			public Object render(EntityRowModel model, String property,
+					ColumnData config, int rowIndex, int colIndex,
+					ListStore<EntityRowModel> store, Grid<EntityRowModel> grid) {
+				String value = model.get(property);
+				if (value == null) {
+					value = "";
+				}
+				StringBuilder builder = new StringBuilder();
+				builder.append("<div style='font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;'>");
+				builder.append(value);
+				builder.append("</div>");
+				Html html = new Html(builder.toString());
+//				html.setWidth(50);
+			    ToolTipConfig tipsConfig = new ToolTipConfig();  
+			    tipsConfig.setTitle(model.getToolTipTitle());  
+			    tipsConfig.setText(model.getToolTipBody());
+			    tipsConfig.setMouseOffset(new int[] {0, 0});  
+			    tipsConfig.setAnchor("left");  
+			    tipsConfig.setDismissDelay(0);
+			    tipsConfig.setShowDelay(100);
+			    ToolTip tip = new ToolTip(html, tipsConfig);
+				return html;
+			}
+
+		};
+		return valueRenderer;
+	}
+
+	/**
+	 * The label renderer
+	 * @return
+	 */
+	public GridCellRenderer<EntityRowModel> createLabelRenderer() {
+		// Renderer for the label column
+		GridCellRenderer<EntityRowModel> labelRenderer = new GridCellRenderer<EntityRowModel>() {
+
+			@Override
+			public Object render(EntityRowModel model, String property,
+					ColumnData config, int rowIndex, int colIndex,
+					ListStore<EntityRowModel> store, Grid<EntityRowModel> grid) {
+				String value = model.get(property);
+
+				StringBuilder builder = new StringBuilder();
+				builder.append("<div style='font-weight:bold; color:grey; white-space:normal; overflow:hidden; text-overflow:ellipsis;'>");
+				builder.append(value);
+				builder.append(":</div>");
+				Html html = new Html(builder.toString());
+				return html;
+			}
+
+		};
+		return labelRenderer;
 	}
 
 	/**

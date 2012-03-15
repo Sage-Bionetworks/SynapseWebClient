@@ -25,6 +25,7 @@ public class EntityRowString extends AbstractEntityRow<String>{
 	@Override
 	public String getValue() {
 		if(adapter.has(key)){
+			if(adapter.isNull(key)) return null;
 			try {
 				return adapter.getString(key);
 			} catch (JSONObjectAdapterException e) {
@@ -40,7 +41,11 @@ public class EntityRowString extends AbstractEntityRow<String>{
 	public void setValue(String newValue) {
 		// Set the value in the adapter
 		try {
-			adapter.put(key, newValue);
+			if(newValue == null){
+				adapter.putNull(key);
+			}else{
+				adapter.put(key, newValue);
+			}
 		} catch (JSONObjectAdapterException e) {
 			// Convert these to runtime
 			throw new RuntimeException(e);
