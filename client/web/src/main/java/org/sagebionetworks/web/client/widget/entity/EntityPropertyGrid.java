@@ -30,28 +30,15 @@ import com.google.gwt.user.client.Element;
  */
 public class EntityPropertyGrid extends LayoutContainer {
 
-	private VerticalPanel vp;
+//	private VerticalPanel vp;
 
 	ListStore<EntityRowModel> gridStore;
+	Grid<EntityRowModel> grid;
+	ColumnModel columnModel;
 
 	@Override
 	protected void onRender(Element parent, int index) {
 		super.onRender(parent, index);
-		rebuild();
-
-	}
-
-	/**
-	 * Rebuild this component.
-	 */
-	public void rebuild() {
-		// there is nothing to do if we have not been rendered.
-		if(!this.isRendered()) return;
-		this.clearState();
-		this.removeAll();
-		// Create the grid
-		vp = new VerticalPanel();
-		vp.setSpacing(10);
 		
 		// the label renderer
 		GridCellRenderer<EntityRowModel> labelRenderer = createLabelRenderer();
@@ -79,7 +66,7 @@ public class EntityPropertyGrid extends LayoutContainer {
 		column.setRenderer(valueRenderer);
 		configs.add(column);
 
-		ColumnModel cm = new ColumnModel(configs);
+		columnModel = new ColumnModel(configs);
 
 		ContentPanel cp = new ContentPanel();
 		cp.setBodyBorder(false);
@@ -90,8 +77,10 @@ public class EntityPropertyGrid extends LayoutContainer {
 		cp.setHeaderVisible(false);
 		cp.setSize(350, 700);
 
-		final Grid<EntityRowModel> grid = new Grid<EntityRowModel>(gridStore,cm);
+		grid = new Grid<EntityRowModel>(gridStore,columnModel);
 		grid.setAutoExpandColumn(EntityRowModel.VALUE);
+		grid.setAutoExpandMin(100);
+		grid.setAutoExpandMax(300);
 		grid.setBorders(true);
 		grid.setStripeRows(false);
 		grid.setColumnLines(false);
@@ -101,9 +90,18 @@ public class EntityPropertyGrid extends LayoutContainer {
 		grid.setShadow(false);
 		grid.getAriaSupport().setLabelledBy(cp.getHeader().getId() + "-label");
 		cp.add(grid);
-		vp.add(cp);
-		this.add(vp);
+		this.add(cp);
+		rebuild();
 
+	}
+
+	/**
+	 * Rebuild this component.
+	 */
+	public void rebuild() {
+		// there is nothing to do if we have not been rendered.
+		if(!this.isRendered()) return;
+		grid.reconfigure(gridStore,columnModel);
 	}
 
 	/**

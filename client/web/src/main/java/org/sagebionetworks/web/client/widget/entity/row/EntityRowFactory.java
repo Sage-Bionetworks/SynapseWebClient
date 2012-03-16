@@ -79,7 +79,39 @@ public class EntityRowFactory {
 	 * @param filter - Properties that should be filter out.
 	 * @return
 	 */
-	public static List<EntityRow<?>> createEntityRowList(JSONObjectAdapter adapter, ObjectSchema schema, Annotations annos, Set<String> filter){
+	public static EntityFormModel createEntityRowList(JSONObjectAdapter adapter, ObjectSchema schema, Annotations annos, Set<String> filter){
+		// Create the entity row list for the properties.
+		List<EntityRow<?>> properties = createEntityRowListForProperties(adapter, schema, filter);
+		// Get the name
+		EntityRowString name = (EntityRowString) EntityRowFactory.createEntityRowByKey(adapter, schema, "name");
+		// get the description.
+		EntityRowString description = (EntityRowString) EntityRowFactory.createEntityRowByKey(adapter, schema, "description");
+		return new EntityFormModel(name, description, properties, null);
+	}
+	
+	/**
+	 * Get a single row given a key.
+	 * @param adapter
+	 * @param schema
+	 * @param key
+	 * @return
+	 */
+	public static EntityRow<?> createEntityRowByKey(JSONObjectAdapter adapter, ObjectSchema schema, String key){
+		ObjectSchema propertySchema = schema.getProperties().get(key);
+		if(propertySchema == null) throw new IllegalArgumentException("Failed to find the schema for "+key+" property");
+		return EntityRowFactory.createRow(adapter, propertySchema, key);
+	}
+	
+	/**
+	 * Create a new list of property data from an entity.
+	 * 
+	 * @param entity
+	 * @param schema
+	 * @param annos
+	 * @param filter - Properties that should be filter out.
+	 * @return
+	 */
+	public static List<EntityRow<?>> createEntityRowListForProperties(JSONObjectAdapter adapter, ObjectSchema schema, Set<String> filter){
 		List<EntityRow<?>> results = new ArrayList<EntityRow<?>>();
 		// Fill in the list from the entity
 		for(String key: schema.getProperties().keySet()){
