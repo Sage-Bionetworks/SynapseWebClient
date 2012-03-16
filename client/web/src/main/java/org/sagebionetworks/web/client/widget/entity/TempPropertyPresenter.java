@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 
@@ -31,6 +32,7 @@ import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
 import com.google.inject.Inject;
@@ -82,13 +84,14 @@ public class TempPropertyPresenter extends LayoutContainer {
 		editButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
 	    	@Override
 	    	public void componentSelected(ButtonEvent ce) {
+	    	    Entity entity = bundle.getEntity();
 	    		final Dialog window = new Dialog();
 	    		window.setMaximizable(false);
-	    	    window.setSize(350, 600);  
+	    	    window.setSize(600, 700);
 	    	    window.setPlain(true);  
 	    	    window.setModal(true);  
 	    	    window.setBlinkModal(true);  
-	    	    window.setHeading("Hello Window");  
+	    	    window.setHeading("Edit: "+entity.getId());  
 	    	    window.setLayout(new FitLayout());
 	    	    // We want okay to say save
 	    	    window.okText = "Save";
@@ -98,32 +101,23 @@ public class TempPropertyPresenter extends LayoutContainer {
 	    	    // Create a new Adapter to capture the editor's changes
 	    	    final JSONObjectAdapter newAdapter = factory.createNew();
 	    	    EntityPropertyForm editor = new EntityPropertyForm(formFactory);
-	    	    Entity entity = bundle.getEntity();
 	    	    try {
 	    	    	entity.writeToJSONObject(newAdapter);
 	    	    	// We want to filter out all transient properties.
 	    	    	ObjectSchema schema = cache.getSchemaEntity(entity);
 	    	    	Set<String> filter = new HashSet<String>();
+	    			ObjectSchema versionableScheam = cache.getEntitySchema(Versionable.EFFECTIVE_SCHEMA, Versionable.class);
+	    			filter.addAll(versionableScheam.getProperties().keySet());
 	    	    	// Filter transient fields
 	    	    	EntityRowFactory.addTransientToFilter(schema, filter);
 	    	    	// Filter objects
 	    	    	EntityRowFactory.addObjectTypeToFilter(schema, filter);
-	    	    	List<EntityRow<?>> rows = EntityRowFactory.createEntityRowList(newAdapter, schema, null, filter);
-	    	    	editor.setList(rows);
+	    	    	EntityFormModel model = EntityRowFactory.createEntityRowList(newAdapter, schema, null, filter);
+	    	    	editor.setList(model);
 				} catch (JSONObjectAdapterException e) {
 					throw new RuntimeException(e);
 				}
-	    		ContentPanel cp = new ContentPanel();
-	    		cp.setBodyBorder(false);
-	    		// cp.setIcon(Resources.ICONS.table());
-	    		// cp.setHeading("Basic Grid");
-	    		cp.setButtonAlign(HorizontalAlignment.CENTER);
-	    		cp.setLayout(new FitLayout());
-	    		cp.setHideCollapseTool(true);
-	    		cp.setHeaderVisible(false);
-	    		cp.setScrollMode(Scroll.AUTOY);
-	    		cp.add(editor);
-	    	    window.add(cp);
+	    	    window.add(editor, new FitData(0));
 	    	    // List for the button selection
 	    	    Button saveButton = window.getButtonById(Dialog.OK);
 	    	    saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
@@ -170,15 +164,15 @@ public class TempPropertyPresenter extends LayoutContainer {
 			ObjectSchema schema = cache.getSchemaEntity(entity);
 			// Get the list of rows
 			// Filter out all versionable properties
-			ObjectSchema enityScheam = cache.getEntitySchema(Versionable.EFFECTIVE_SCHEMA, Versionable.class);
+			ObjectSchema versionableScheam = cache.getEntitySchema(Versionable.EFFECTIVE_SCHEMA, Versionable.class);
 			Set<String> filter = new HashSet<String>();
 			// filter out all properties from versionable
-			filter.addAll(enityScheam.getProperties().keySet());
+			filter.addAll(versionableScheam.getProperties().keySet());
 			// Filter all transient properties
 			EntityRowFactory.addTransientToFilter(schema, filter);
 			// Add all objects to the filter
 			EntityRowFactory.addObjectTypeToFilter(schema, filter);
-			rows = EntityRowFactory.createEntityRowList(adapter, schema, null, filter);
+			rows = EntityRowFactory.createEntityRowListForProperties(adapter, schema, filter);
 			// Pass the rows to the two views
 			view.setRows(rows);
 			this.layout(true);
@@ -195,6 +189,7 @@ public class TempPropertyPresenter extends LayoutContainer {
 	 */
 	public static ExampleEntity createSample() {
 		ExampleEntity example = new ExampleEntity();
+		example.setId("12345");
 		example.setName("My name is coolness");
 		example.setConcept("Concept value");
 		example.setSingleDate(new Date(System.currentTimeMillis()));

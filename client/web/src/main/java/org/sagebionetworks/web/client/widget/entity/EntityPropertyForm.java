@@ -2,12 +2,16 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
-import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
+import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowString;
 
+import com.extjs.gxt.ui.client.Style.Scroll;
+import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
+import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
+import com.extjs.gxt.ui.client.widget.layout.AnchorLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.user.client.Element;
 import com.google.inject.Inject;
@@ -19,10 +23,12 @@ import com.google.inject.Inject;
  */
 public class EntityPropertyForm extends LayoutContainer {
 
-	private VerticalPanel vp;
-	private FormData formData;
-	List<Field<?>> formFields;
+	Field<?> nameField;
+	Field<?> descriptionField;
+	List<Field<?>> propertyFields;
+	List<Field<?>> annotationFields;
 	FormFieldFactory formFactory;
+	FormPanel formPanel;
 
 	@Inject
 	public EntityPropertyForm(FormFieldFactory formFactory) {
@@ -32,40 +38,58 @@ public class EntityPropertyForm extends LayoutContainer {
 	@Override
 	protected void onRender(Element parent, int index) {
 		super.onRender(parent, index);
+		this.setLayout(new AnchorLayout());
+		this.setScrollMode(Scroll.AUTO);
+		// Build up the form
+		formPanel = new FormPanel();
+		add(formPanel);
 		rebuild();
 	}
 
 	public void rebuild() {
 		// Nothing to do if this is not being rendered.
 		if(!this.isRendered()) return;
-		this.clearState();
-		this.removeAll();
-		formData = new FormData("-20");
-		vp = new VerticalPanel();
-		vp.setSpacing(10);
-		if (formFields != null) {
-
-			// Build up the form
-			FormPanel simple = new FormPanel();
-			simple.setHeading("Simple Form");
-			simple.setFrame(true);
-			simple.setWidth(350);
-			// Add them to the form
-			for (Field<?> formField : formFields) {
-				simple.add(formField, formData);
-			}
-			vp.add(simple);
+		this.remove(formPanel);
+		// Build up a new form
+		formPanel = new FormPanel();
+		formPanel.setHeading("Simple Form");
+		formPanel.setHeaderVisible(false);
+		formPanel.setFrame(true);
+		formPanel.setBorders(false);
+		formPanel.setLabelAlign(LabelAlign.RIGHT);
+//		formPanel.setSize("100%", "100%");
+		// Basic form data
+		Margins margins = new Margins(10, 10, 0, 10);
+		FormData basicFormData = new FormData("-100");
+		basicFormData.setMargins(margins);
+		
+		// Name is the first
+		FormData formData = new FormData(200, 20);
+		formPanel.add(nameField, basicFormData);
+		// followed by description.
+		FormData descriptionData = new FormData("-20 50%");
+		descriptionData.setMargins(margins);
+		formPanel.add(descriptionField, descriptionData);
+		
+		// Add them to the form
+		for (Field<?> formField : propertyFields) {
+//			FormData thisData = new FormData("-100");
+			formPanel.add(formField, basicFormData);
 		}
-		add(vp);
+		this.add(formPanel);
 	}
 
 	/**
 	 * 
 	 * @param entity
 	 */
-	public void setList(List<EntityRow<?>> rows) {
+	public void setList(EntityFormModel model) {
+		// The name field is just a text field that cannot be null
+		nameField = formFactory.createField(model.getName());
+		descriptionField = formFactory.createTextAreaField((EntityRowString) model.getDescription());
+		
 		// Create the list of fields
-		formFields = formFactory.createFormFields(rows);
+		propertyFields = formFactory.createFormFields(model.getProperties());
 		rebuild();
 	}
 

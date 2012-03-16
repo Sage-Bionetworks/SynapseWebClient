@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.entity.row.EntityRowModel;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -62,8 +63,10 @@ public class ListEditorGrid<String> extends LayoutContainer {
 		cp.setHeaderVisible(false);
 		cp.setScrollMode(Scroll.AUTOY);
 		int oneWidth = 120;
-		int twoWidth = 25;
-		cp.setSize(oneWidth+ twoWidth+ 25, 200);
+		int twoWidth = 45;
+		int scrollWidth = 0;
+		int totalWidth = oneWidth+ twoWidth+ scrollWidth;
+		cp.setSize(totalWidth, 200);
 
 		List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
 		// Label
@@ -87,12 +90,14 @@ public class ListEditorGrid<String> extends LayoutContainer {
 
 		grid = new EditorGrid<ListItem<String>>(
 				new ListStore<ListItem<String>>(), columnModel);
-		grid.setAutoExpandColumn(EntityRowModel.VALUE);
-		grid.setAutoExpandMax(oneWidth);
-		grid.setAutoExpandMin(oneWidth);
+		// the delete button column absorbs width changes due to the scroll
+		// bars being shown or hidden.
+		grid.setAutoExpandColumn(ListItem.REMOVE_COLUMN_ID);
+		grid.setAutoExpandMax(100);
+		grid.setAutoExpandMin(25);
 		grid.setBorders(false);
 		grid.setStripeRows(false);
-		grid.setColumnLines(false);
+		grid.setColumnLines(true);
 		grid.setColumnReordering(false);
 		grid.setHideHeaders(true);
 		grid.setTrackMouseOver(true);
@@ -112,15 +117,26 @@ public class ListEditorGrid<String> extends LayoutContainer {
 						store.add(model);
 					}
 				}
-				// We want the focus to be in the next cell
-//				grid.getView().focusCell(0, store.getCount()-1, true);
-//				grid.getSelectionModel().selectNext(false);
+			}
+		});
+		// when this component gets the focus forward it to the grid.
+		this.addListener(Events.Focus, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				// this does not seem to work as expected :(
+				grid.getView().focusCell(0, 0, true);
+				
 			}
 		});
 		
 		cp.add(grid);
 		this.add(cp);
 		rebuild();
+	}
+	
+	public void stopEditing(){
+		// This should apply any changes the user was making.
+		grid.stopEditing(false);
 	}
 	
 	/**
@@ -144,7 +160,7 @@ public class ListEditorGrid<String> extends LayoutContainer {
 				Anchor removeAnchor = new Anchor();
 				StringBuilder builder = new StringBuilder();
 				builder.append("<div>");
-				builder.append(AbstractImagePrototype.create(iconBundle.delete16()).getHTML());
+				builder.append(AbstractImagePrototype.create(iconBundle.delete16Grey()).getHTML());
 				builder.append("</div>");
 				removeAnchor.setHTML(builder.toString());
 				removeAnchor.addClickHandler(new ClickHandler() {

@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.form.TriggerField;
+import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
@@ -27,9 +28,11 @@ import com.google.gwt.user.client.Element;
  * 
  * @param <T>
  */
-public class ListFieldEditor extends TriggerField<List<String>> {
+public class ListFieldEditor extends TriggerField<String> {
 
-	private ListMenu menu;
+//	private ListMenu menu;
+	Menu menu;
+	ListEditorGrid<String> editorGrid;
 	EntityRowList<String> rowList;
 	IconsImageBundle iconBundle;
 	ClientLogger log;
@@ -39,46 +42,27 @@ public class ListFieldEditor extends TriggerField<List<String>> {
 		this.rowList = rowList;
 		this.iconBundle = iconBundle;
 		this.log = log;
+		this.setEditable(false);
 	}
 
-	/**
-	 * Returns the field's date picker.
-	 * 
-	 * @return the date picker
-	 */
-	public ListEditorGrid<String> getListPicker() {
-		if (menu == null) {
-			menu = new ListMenu(this.iconBundle, log);
-			// When we hide the menu, apply the change.
-			menu.addListener(Events.Hide, new Listener<ComponentEvent>() {
-				public void handleEvent(ComponentEvent be) {
-					applyListFromPicker();
-					focus();
-				}
-			});
-		}
-		return menu.getListPicker();
-	}
 	
 	// Apply the list from the picker
 	public void applyListFromPicker() {
-		List<String> value = menu.getList();
-		setValue(value);
+		// stop editing if currently editing.
+		editorGrid.stopEditing();
+		List<String> value = editorGrid.getList();
+		setValue(value.toString());
 		rowList.setValue(value);
 	}
 
-	
 	protected void expand() {
-		ListEditorGrid<String> picker = getListPicker();
-
 		List<String> value = getList();
-		picker.setList(value, new TextField<String>());
+		editorGrid.setList(value, new TextField<String>());
 
 		// handle case when down arrow is opening menu
 		DeferredCommand.addCommand(new Command() {
 			public void execute() {
 				menu.show(el().dom, "tl-bl?");
-				menu.getListPicker().focus();
 			}
 		});
 	}
@@ -97,6 +81,27 @@ public class ListFieldEditor extends TriggerField<List<String>> {
 	@Override
 	protected void onRender(Element target, int index) {
 		super.onRender(target, index);
+		// the menu shows the ListPicker
+		menu = new Menu();
+		// the editor will handle the scrolling
+		menu.setEnableScrolling(false);
+		menu.setFocusOnShow(true);
+		menu.setAutoHeight(true);
+
+		
+		// The picker is added to the menu
+		editorGrid = new ListEditorGrid<String>(iconBundle, log);
+		menu.add(editorGrid);
+		
+		// On hide, we apply
+		menu.addListener(Events.Hide, new Listener<ComponentEvent>() {
+			public void handleEvent(ComponentEvent be) {
+
+				applyListFromPicker();
+				focus();
+			}
+		});
+
 
 		new KeyNav<FieldEvent>(this) {
 
@@ -126,6 +131,12 @@ public class ListFieldEditor extends TriggerField<List<String>> {
 	
 	public void setList(List<String> list){
 		this.rowList.setValue(list);
+		if(list == null){
+			setValue(null);
+		}else{
+			// the display for this list is the list string
+			setValue(list.toString());
+		}
 	}
 	
 	public List<String> getList(){

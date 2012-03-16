@@ -262,7 +262,7 @@ public class EntityRowFactoryTest {
 		EntityRowFactory.addTransientToFilter(schema, filter);
 		EntityRowFactory.addObjectTypeToFilter(schema, filter);
 		// We want to use the entity schema as a filter
-		List<EntityRow<?>> results = EntityRowFactory.createEntityRowList(entityAdapter, schema, annos, filter);
+		List<EntityRow<?>> results = EntityRowFactory.createEntityRowListForProperties(entityAdapter, schema, filter);
 		// Make sure none of the filtered properties are there
 		for(EntityRow<?> row: results){
 			assertNotNull(row.getLabel());
