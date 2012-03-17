@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowString;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.util.Margins;
@@ -86,7 +85,7 @@ public class EntityPropertyForm extends LayoutContainer {
 	public void setList(EntityFormModel model) {
 		// The name field is just a text field that cannot be null
 		nameField = formFactory.createField(model.getName());
-		descriptionField = formFactory.createTextAreaField((EntityRowString) model.getDescription());
+		descriptionField = formFactory.createTextAreaField(model.getDescription());
 		
 		// Create the list of fields
 		propertyFields = formFactory.createFormFields(model.getProperties());

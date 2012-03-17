@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.row;
 
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.widget.entity.AdapterUtils;
+import org.sagebionetworks.web.client.widget.entity.StringValueUtils;
 
 /**
  * Provides shared support for entity row implementaions
@@ -14,6 +16,8 @@ public abstract class AbstractEntityRow<T> implements EntityRow<T> {
 	JSONObjectAdapter adapter;
 	String key;
 	ObjectSchema propertySchema;
+	String toolTipsBody;
+	String dislplayValue;
 	
 
 	public AbstractEntityRow(JSONObjectAdapter adapter, String key,
@@ -37,5 +41,32 @@ public abstract class AbstractEntityRow<T> implements EntityRow<T> {
 	public String getDescription() {
 		return propertySchema.getDescription();
 	}
+
+	public String getToolTipsBody() {
+		return toolTipsBody;
+	}
+
+	public String getDislplayValue() {
+		return dislplayValue;
+	}
+	
+	/**
+	 * Update the display value
+	 * @param newValue
+	 */
+	public final void updateDisplayValue(Object newValue){
+		this.toolTipsBody = StringValueUtils.valueToToolTips(newValue);
+		this.dislplayValue = StringValueUtils.valueToString(newValue);
+	}
+
+
+	@Override
+	public final void setValue(T newValue) {
+		// Set the new value
+		setValueInternal(newValue);
+		updateDisplayValue(newValue);
+	}
+	
+	public abstract void setValueInternal(T newValue);
 
 }

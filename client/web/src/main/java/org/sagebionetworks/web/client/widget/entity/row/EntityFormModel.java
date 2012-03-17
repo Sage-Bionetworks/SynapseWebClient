@@ -10,9 +10,9 @@ import java.util.List;
 public class EntityFormModel {
 	
 	// The name of this entity.
-	EntityRowString name;
+	EntityRowScalar<String> name;
 	// The description of this entity.
-	EntityRowString description;
+	EntityRowScalar<String> description;
 	// The first class properties of an entity.
 	List<EntityRow<?>> properties;
 	// the annotations of an entity
@@ -26,7 +26,7 @@ public class EntityFormModel {
 	 * @param properties
 	 * @param annotations
 	 */
-	public EntityFormModel(EntityRowString name, EntityRowString description,
+	public EntityFormModel(EntityRowScalar<String> name, EntityRowScalar<String> description,
 			List<EntityRow<?>> properties, List<EntityRow<?>> annotations) {
 		super();
 		this.name = name;
@@ -34,16 +34,16 @@ public class EntityFormModel {
 		this.properties = properties;
 		this.annotations = annotations;
 	}
-	public EntityRowString getName() {
+	public EntityRowScalar<String> getName() {
 		return name;
 	}
-	public void setName(EntityRowString name) {
+	public void setName(EntityRowScalar<String> name) {
 		this.name = name;
 	}
-	public EntityRowString getDescription() {
+	public EntityRowScalar<String> getDescription() {
 		return description;
 	}
-	public void setDescription(EntityRowString description) {
+	public void setDescription(EntityRowScalar<String> description) {
 		this.description = description;
 	}
 	public List<EntityRow<?>> getProperties() {

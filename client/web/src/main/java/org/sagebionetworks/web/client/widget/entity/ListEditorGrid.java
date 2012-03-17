@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowModel;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -18,7 +17,6 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.grid.CellEditor;
-import com.extjs.gxt.ui.client.widget.grid.CellSelectionModel;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -38,12 +36,12 @@ import com.google.gwt.user.client.ui.Anchor;
  * @author John
  * 
  */
-public class ListEditorGrid<String> extends LayoutContainer {
+public class ListEditorGrid<T> extends LayoutContainer {
 
 	ContentPanel cp;
-	ListStore<ListItem<String>> store;
-	Field<String> field;
-	EditorGrid<ListItem<String>> grid;
+	ListStore<ListItem<T>> store;
+	Field<T> field;
+	EditorGrid<ListItem<T>> grid;
 	ColumnModel columnModel;
 	IconsImageBundle iconBundle;
 	ClientLogger log;
@@ -62,7 +60,7 @@ public class ListEditorGrid<String> extends LayoutContainer {
 		cp.setLayout(new FitLayout());
 		cp.setHeaderVisible(false);
 		cp.setScrollMode(Scroll.AUTOY);
-		int oneWidth = 120;
+		int oneWidth = 180;
 		int twoWidth = 45;
 		int scrollWidth = 0;
 		int totalWidth = oneWidth+ twoWidth+ scrollWidth;
@@ -88,8 +86,8 @@ public class ListEditorGrid<String> extends LayoutContainer {
 
 		columnModel = new ColumnModel(configs);
 
-		grid = new EditorGrid<ListItem<String>>(
-				new ListStore<ListItem<String>>(), columnModel);
+		grid = new EditorGrid<ListItem<T>>(
+				new ListStore<ListItem<T>>(), columnModel);
 		// the delete button column absorbs width changes due to the scroll
 		// bars being shown or hidden.
 		grid.setAutoExpandColumn(ListItem.REMOVE_COLUMN_ID);
@@ -103,17 +101,17 @@ public class ListEditorGrid<String> extends LayoutContainer {
 		grid.setTrackMouseOver(true);
 		grid.setShadow(false);
 		grid.getAriaSupport().setLabelledBy(cp.getHeader().getId() + "-label");
-		grid.setSelectionModel(new CellSelectionModel<ListItem<String>>());
+
 		
-		grid.addListener(Events.ValidateEdit, new Listener<GridEvent<ListItem<String>>>() {
+		grid.addListener(Events.ValidateEdit, new Listener<GridEvent<ListItem<T>>>() {
 			@Override
-			public void handleEvent(GridEvent<ListItem<String>> be) {
+			public void handleEvent(GridEvent<ListItem<T>> be) {
 				// If this is an edit of the last cell then add another cell to the model
 				if(isLastIndex(be.getRowIndex())){
 					Object value = be.getValue();
 					if(value != null && !"".equals(value) ){
 						// Add a new empty value at the end.
-						ListItem<String> model = new ListItem<String>((String)"");
+						ListItem<T> model = new ListItem<T>(null);
 						store.add(model);
 					}
 				}
@@ -200,16 +198,16 @@ public class ListEditorGrid<String> extends LayoutContainer {
 	 * @param list
 	 * @param field
 	 */
-	public void setList(List<String> list, Field<String> field) {
+	public void setList(List<T> list, Field<T> field) {
 		this.field = field;
 		// Build up our list model from the passed list
-		store = new ListStore<ListItem<String>>();
-		for (String it : list) {
-			ListItem<String> model = new ListItem<String>(it);
+		store = new ListStore<ListItem<T>>();
+		for (T it : list) {
+			ListItem<T> model = new ListItem<T>(it);
 			store.add(model);
 		}
 		// Add an empty cell to the end
-		ListItem<String> model = new ListItem<String>((String)"");
+		ListItem<T> model = new ListItem<T>(null);
 		store.add(model);
 		rebuild();
 
@@ -220,12 +218,12 @@ public class ListEditorGrid<String> extends LayoutContainer {
 	 * 
 	 * @return
 	 */
-	public List<String> getList() {
-		List<String> results = new ArrayList<String>();
+	public List<T> getList() {
+		List<T> results = new ArrayList<T>();
 		// Read from the store
 		// Note the last cell is always empty hence the store.getCount()-1
 		for (int i = 0; i < store.getCount()-1; i++) {
-			ListItem<String> model = store.getAt(i);
+			ListItem<T> model = store.getAt(i);
 			results.add(model.getItem());
 		}
 		return results;

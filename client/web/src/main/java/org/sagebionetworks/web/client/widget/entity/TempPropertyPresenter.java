@@ -202,6 +202,11 @@ public class TempPropertyPresenter extends LayoutContainer {
 		example.getStringList().add("one");
 		example.getStringList().add("two");
 		example.getStringList().add("three");
+//		example.setDateList(new ArrayList<Date>());
+//		long now = System.currentTimeMillis();
+//		example.getDateList().add(new Date(now));
+//		example.getDateList().add(new Date(now-10000));
+//		example.getDateList().add(new Date(now-100000));
 		
 		return example;
 	}

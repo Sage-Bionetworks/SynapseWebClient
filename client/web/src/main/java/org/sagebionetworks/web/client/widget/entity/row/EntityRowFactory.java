@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.row;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -35,27 +35,37 @@ public class EntityRowFactory {
 		// The schema determines which row type we use.
 		if(TYPE.STRING == schema.getType()){
 			if(schema.getFormat() == null){
-				return new EntityRowString(adapter, key, schema);
+				return new EntityRowScalar<String>(adapter, key, schema, String.class);
 			}else if(FORMAT.DATE_TIME == schema.getFormat()){
-				return new EntityRowDateAsString(adapter, key, schema);
+				return new EntityRowScalar<Date>(adapter, key, schema, Date.class);
 			}else{
 				throw new IllegalArgumentException("Unknown FORMAT: "+schema.getFormat()+" for TYPE: "+schema.getType());
 			}
 		}else if(TYPE.INTEGER == schema.getType()){
 			if(schema.getFormat() == null){
-				return new EntityRowLong(adapter, key, schema);
+				return new EntityRowScalar<Long>(adapter, key, schema, Long.class);
 			}else if(FORMAT.UTC_MILLISEC == schema.getFormat()){
-				return new EntityRowDateAsLong(adapter, key, schema);
+				return new EntityRowScalar<Date>(adapter, key, schema, Date.class);
 			}else{
 				throw new IllegalArgumentException("Unknown FORMAT: "+schema.getFormat()+" for TYPE: "+schema.getType());
 			}
 		}else if(TYPE.NUMBER == schema.getType()){
-			return new EntityRowDouble(adapter, key, schema);
+			return new EntityRowScalar<Double>(adapter, key, schema, Double.class);
 		}else if(TYPE.ARRAY == schema.getType()){
 			// We must have an items
 			if(schema.getItems() == null) throw new IllegalArgumentException("Items cannot be null for type: ARRAY");
 			if(TYPE.STRING == schema.getItems().getType()){
-				return new EntityRowList<String>(adapter, key, schema, String.class);
+				// Check the format
+				if(schema.getFormat() == schema.getItems().getFormat()){
+					// this is just a string
+					return new EntityRowList<String>(adapter, key, schema, String.class);
+				}else if(FORMAT.DATE_TIME == schema.getItems().getFormat()){
+					// This is a date
+					return new EntityRowList<Date>(adapter, key, schema, Date.class);
+				}else{
+					throw new IllegalArgumentException("Unknown FORMAT: "+schema.getFormat()+" for type "+schema.getType()+" for id: "+schema.getId());
+				}
+
 			} else if(TYPE.NUMBER == schema.getItems().getType()){
 				return new EntityRowList<Double>(adapter, key, schema, Double.class);
 			} else if(TYPE.INTEGER == schema.getItems().getType()){
@@ -83,9 +93,9 @@ public class EntityRowFactory {
 		// Create the entity row list for the properties.
 		List<EntityRow<?>> properties = createEntityRowListForProperties(adapter, schema, filter);
 		// Get the name
-		EntityRowString name = (EntityRowString) EntityRowFactory.createEntityRowByKey(adapter, schema, "name");
+		EntityRowScalar<String> name = (EntityRowScalar<String>) EntityRowFactory.createEntityRowByKey(adapter, schema, "name");
 		// get the description.
-		EntityRowString description = (EntityRowString) EntityRowFactory.createEntityRowByKey(adapter, schema, "description");
+		EntityRowScalar<String> description = (EntityRowScalar<String>) EntityRowFactory.createEntityRowByKey(adapter, schema, "description");
 		return new EntityFormModel(name, description, properties, null);
 	}
 	

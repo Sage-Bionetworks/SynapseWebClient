@@ -13,6 +13,7 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.form.TriggerField;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
@@ -28,20 +29,22 @@ import com.google.gwt.user.client.Element;
  * 
  * @param <T>
  */
-public class ListFieldEditor extends TriggerField<String> {
+public class ListFieldEditor<T> extends TriggerField<List<T>> {
 
 //	private ListMenu menu;
 	Menu menu;
-	ListEditorGrid<String> editorGrid;
-	EntityRowList<String> rowList;
+	ListEditorGrid<T> editorGrid;
+	EntityRowList<T> rowList;
+	Field<T> editor;
 	IconsImageBundle iconBundle;
 	ClientLogger log;
 
-	public ListFieldEditor(EntityRowList<String> rowList, IconsImageBundle iconBundle, ClientLogger log) {
+	public ListFieldEditor(EntityRowList<T> rowList, Field<T> editor, IconsImageBundle iconBundle, ClientLogger log) {
 		setTriggerStyle("x-form-date-trigger");
 		this.rowList = rowList;
 		this.iconBundle = iconBundle;
 		this.log = log;
+		this.editor = editor;
 		this.setEditable(false);
 	}
 
@@ -50,14 +53,14 @@ public class ListFieldEditor extends TriggerField<String> {
 	public void applyListFromPicker() {
 		// stop editing if currently editing.
 		editorGrid.stopEditing();
-		List<String> value = editorGrid.getList();
-		setValue(value.toString());
+		List<T> value = editorGrid.getList();
+		setValue(value);
 		rowList.setValue(value);
 	}
 
 	protected void expand() {
-		List<String> value = getList();
-		editorGrid.setList(value, new TextField<String>());
+		List<T> value = getList();
+		editorGrid.setList(value, editor);
 
 		// handle case when down arrow is opening menu
 		DeferredCommand.addCommand(new Command() {
@@ -90,7 +93,7 @@ public class ListFieldEditor extends TriggerField<String> {
 
 		
 		// The picker is added to the menu
-		editorGrid = new ListEditorGrid<String>(iconBundle, log);
+		editorGrid = new ListEditorGrid<T>(iconBundle, log);
 		menu.add(editorGrid);
 		
 		// On hide, we apply
@@ -129,17 +132,17 @@ public class ListFieldEditor extends TriggerField<String> {
 		return menu == null || (menu != null && !menu.isVisible());
 	}
 	
-	public void setList(List<String> list){
+	public void setList(List<T> list){
 		this.rowList.setValue(list);
 		if(list == null){
 			setValue(null);
 		}else{
 			// the display for this list is the list string
-			setValue(list.toString());
+			setValue(list);
 		}
 	}
 	
-	public List<String> getList(){
+	public List<T> getList(){
 		return this.rowList.getValue();
 	}
 

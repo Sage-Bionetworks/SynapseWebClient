@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Set;
 
 import org.junit.Before;
@@ -12,25 +9,11 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.schema.ObjectSchema;
-import org.sagebionetworks.schema.TYPE;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
-import org.sagebionetworks.web.client.widget.entity.FormFieldFactory;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowString;
-
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.FieldEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.widget.form.DateField;
-import com.extjs.gxt.ui.client.widget.form.Field;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.form.Validator;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
