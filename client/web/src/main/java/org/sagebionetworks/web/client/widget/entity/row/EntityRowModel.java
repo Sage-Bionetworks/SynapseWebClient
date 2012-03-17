@@ -18,16 +18,14 @@ public class EntityRowModel implements ModelData {
 	public static final String VALUE = "Value";
 	
 	Map<String, Object> map;
-	String toolTipTitle;
-	String toolTipBody;
+	EntityRow<?> row;
 	
-	public EntityRowModel(String label, String value, String toolTipTitle, String toolTipBody){
+	public EntityRowModel(EntityRow<?> row){
 		// Map this row
 		map = new HashMap<String, Object>(2);
-		map.put(LABEL, label);
-		map.put(VALUE, value);
-		this.toolTipTitle = toolTipTitle;
-		this.toolTipBody = toolTipBody;
+		map.put(LABEL, row.getLabel());
+		map.put(VALUE, row.getDislplayValue());
+		this.row = row;
 	}
 
 	@Override
@@ -56,17 +54,11 @@ public class EntityRowModel implements ModelData {
 	}
 
 	public String getToolTipTitle() {
-		return toolTipTitle;
+		return row.getDescription();
 	}
 
 	public String getToolTipBody() {
-		return toolTipBody;
-	}
-
-	@Override
-	public String toString() {
-		return "EntityRowModel [map=" + map + ", toolTipTitle=" + toolTipTitle
-				+ ", toolTipBody=" + toolTipBody + "]";
+		return row.getToolTipsBody();
 	}
 
 }

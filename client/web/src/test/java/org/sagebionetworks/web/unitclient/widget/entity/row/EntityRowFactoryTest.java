@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.row;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -26,16 +26,11 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowDateAsLong;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowDateAsString;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowDouble;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowLong;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowString;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowScalar;
 
 import com.google.gwt.dev.util.collect.HashSet;
-import com.google.gwt.editor.client.Editor.Ignore;
 
 public class EntityRowFactoryTest {
 	
@@ -78,8 +73,8 @@ public class EntityRowFactoryTest {
 	public void testString() throws JSONObjectAdapterException{
 		JSONObjectAdapter adapter = adapterFactory.createNew();
 		EntityRow<?> row = EntityRowFactory.createRow(adapter, new ObjectSchema(TYPE.STRING), "key");
-		assertTrue(row instanceof EntityRowString);
-		EntityRowString stringRow = (EntityRowString) row;
+		assertTrue(row instanceof EntityRowScalar);
+		EntityRowScalar<String> stringRow = (EntityRowScalar<String>) row;
 		// check the wiring
 		stringRow.setValue("test");
 		assertEquals("test", adapter.getString("key"));
@@ -92,8 +87,8 @@ public class EntityRowFactoryTest {
 		ObjectSchema schema = new ObjectSchema(TYPE.INTEGER);
 		schema.setFormat(FORMAT.UTC_MILLISEC);
 		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
-		assertTrue(row instanceof EntityRowDateAsLong);
-		EntityRowDateAsLong dateRow = (EntityRowDateAsLong) row;
+		assertTrue(row instanceof EntityRowScalar);
+		EntityRowScalar<Date> dateRow = (EntityRowScalar<Date>) row;
 		// check the wiring
 		long now = 1331069728612l;
 		System.out.println(now);
@@ -111,8 +106,8 @@ public class EntityRowFactoryTest {
 		JSONObjectAdapter adapter = adapterFactory.createNew();
 		ObjectSchema schema = new ObjectSchema(TYPE.INTEGER);
 		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
-		assertTrue(row instanceof EntityRowLong);
-		EntityRowLong longRow = (EntityRowLong) row;
+		assertTrue(row instanceof EntityRowScalar);
+		EntityRowScalar<Long> longRow = (EntityRowScalar<Long>) row;
 		// check the wiring
 		long value = 1331069728612l;
 		longRow.setValue(value);
@@ -129,8 +124,8 @@ public class EntityRowFactoryTest {
 		JSONObjectAdapter adapter = adapterFactory.createNew();
 		ObjectSchema schema = new ObjectSchema(TYPE.NUMBER);
 		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
-		assertTrue(row instanceof EntityRowDouble);
-		EntityRowDouble longRow = (EntityRowDouble) row;
+		assertTrue(row instanceof EntityRowScalar);
+		EntityRowScalar<Double> longRow = (EntityRowScalar<Double>) row;
 		// check the wiring
 		double value = 1.233;
 		longRow.setValue(value);
@@ -154,6 +149,29 @@ public class EntityRowFactoryTest {
 		List<String> value = new ArrayList<String>();
 		value.add("one");
 		value.add("two");
+		rowImpl.setValue(value);
+		assertNotNull(adapter.getJSONArray("key"));
+		assertEquals(value, rowImpl.getValue());
+		
+		// Test null
+		rowImpl.setValue(null);
+		assertEquals(null, rowImpl.getValue());
+	}
+	
+	@Test
+	public void testDateList() throws JSONObjectAdapterException{
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		ObjectSchema schema = new ObjectSchema(TYPE.ARRAY);
+		schema.setItems(new ObjectSchema(TYPE.STRING));
+		schema.getItems().setFormat(FORMAT.DATE_TIME);
+		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
+		assertTrue(row instanceof EntityRowList);
+		EntityRowList<Date> rowImpl = (EntityRowList<Date>) row;
+		// check the wiring
+		List<Date> value = new ArrayList<Date>();
+		long now = System.currentTimeMillis();
+		value.add(new Date(now));
+		value.add(new Date(now+1));
 		rowImpl.setValue(value);
 		assertNotNull(adapter.getJSONArray("key"));
 		assertEquals(value, rowImpl.getValue());
