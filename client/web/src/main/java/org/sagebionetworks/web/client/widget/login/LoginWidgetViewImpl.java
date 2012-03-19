@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.login;
 
+import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
@@ -17,13 +17,11 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FieldSet;
 import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
-import com.extjs.gxt.ui.client.widget.form.HiddenField;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,11 +36,13 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 	private IconsImageBundle iconsImageBundle;
 	private TextField<String> firstName = new TextField<String>();
 	private TextField<String> password = new TextField<String>();
+	private ClientLogger log;
 	
 	@Inject
-	public LoginWidgetViewImpl(IconsImageBundle iconsImageBundle) {
+	public LoginWidgetViewImpl(IconsImageBundle iconsImageBundle, ClientLogger log) {
 		this.iconsImageBundle = iconsImageBundle;
 		messageLabel = new Label();
+		this.log = log;
 	}
 
 	@Override
@@ -52,11 +52,16 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		vp = new VerticalPanel();
 		vp.setSpacing(10);
 		
+		// We want to redirect back to where we currently are.
+		// The Window.Location method tells us what our current URL is.
+		String redirectURL = Window.Location.getHref();
+		log.debug("Redirect to: "+redirectURL);
+		
 		// federated login button
 		StringBuilder sb = new StringBuilder();		
 		sb.append("<form accept-charset=\"UTF-8\" action=\""+ presenter.getOpenIdActionUrl() +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">");
 		sb.append("    <input name=\"OPEN_ID_PROVIDER\" type=\"hidden\" value=\""+ DisplayConstants.OPEN_ID_PROVIDER_SAGE_VALUE +"\"/>");
-		sb.append("    <input name=\"RETURN_TO_URL\" type=\"hidden\" value=\""+ presenter.getOpenIdReturnUrl() +"\"/>");
+		sb.append("    <input name=\"RETURN_TO_URL\" type=\"hidden\" value=\""+ redirectURL +"\"/>");
 		sb.append("    <button id=\"login-via-gapp-google\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"\" src=\"http://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>");
 		sb.append("</form>");		
 		sb.append("<p>&nbsp;</p>");

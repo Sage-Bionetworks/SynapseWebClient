@@ -73,11 +73,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 		return openIdActionUrl;
 	}
 
-	@Override
-	public String getOpenIdReturnUrl() {
-		return openIdReturnUrl;
-	}
-	
+
 	
 	
 	

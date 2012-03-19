@@ -20,7 +20,6 @@ public interface LoginWidgetView extends IsWidget {
 		
 		public String getOpenIdActionUrl();
 		
-		public String getOpenIdReturnUrl();
 	}
 
 	public void showAuthenticationFailed();
