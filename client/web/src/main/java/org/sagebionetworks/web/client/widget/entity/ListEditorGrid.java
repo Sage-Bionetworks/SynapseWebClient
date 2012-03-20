@@ -202,9 +202,11 @@ public class ListEditorGrid<T> extends LayoutContainer {
 		this.field = field;
 		// Build up our list model from the passed list
 		store = new ListStore<ListItem<T>>();
-		for (T it : list) {
-			ListItem<T> model = new ListItem<T>(it);
-			store.add(model);
+		if(list != null){
+			for (T it : list) {
+				ListItem<T> model = new ListItem<T>(it);
+				store.add(model);
+			}
 		}
 		// Add an empty cell to the end
 		ListItem<T> model = new ListItem<T>(null);
