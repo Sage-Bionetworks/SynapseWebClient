@@ -7,12 +7,16 @@ import java.util.List;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowEnum;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowScalar;
 
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.widget.form.ComboBox;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.DateField;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
@@ -61,8 +65,41 @@ public class FormFieldFactory {
 	 */
 	public Field<?> createField(EntityRow<?> row) {
 		Field<?> field = null;
-		// There are two types
-		if(row instanceof EntityRowScalar){
+		// There are three types
+		if(row instanceof EntityRowEnum){
+			final EntityRowEnum rowEnum = (EntityRowEnum) row;
+			// build the list store from the enum
+			ListStore<ComboValue> store = new ListStore<ComboValue>();
+			ComboValue current = null;
+			for(String value: rowEnum.getEnumValues()){
+				ComboValue comboValue = new ComboValue(value);
+				store.add(comboValue);
+				if(value.equals(rowEnum.getValue())){
+					current = comboValue;
+				}
+			}
+			final ComboBox<ComboValue> combo = new ComboBox<ComboValue>();
+			combo.setEmptyText("Select a value...");
+			combo.setDisplayField(ComboValue.VALUE_KEY);
+			combo.setStore(store);
+			// setting this to false prevents the user from typing anything they want in the box.
+			combo.setEditable(false);
+			if(current != null){
+				combo.setValue(current);
+			}
+		    combo.setTriggerAction(TriggerAction.ALL);
+
+			field = combo;
+			field.addListener(Events.Change, new Listener<FieldEvent>() {
+				@Override
+				public void handleEvent(FieldEvent be) {
+					if(combo.getValue() != null){
+						rowEnum.setValue(combo.getValue().getValue());
+					}
+				}
+			});
+			
+		}else if(row instanceof EntityRowScalar){
 			final EntityRowScalar scalar = (EntityRowScalar) row;
 			Class clazz = scalar.getTypeClass();
 			if(String.class == clazz){
