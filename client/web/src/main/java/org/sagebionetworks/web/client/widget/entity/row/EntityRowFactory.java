@@ -35,7 +35,12 @@ public class EntityRowFactory {
 		// The schema determines which row type we use.
 		if(TYPE.STRING == schema.getType()){
 			if(schema.getFormat() == null){
-				return new EntityRowScalar<String>(adapter, key, schema, String.class);
+				// Is this an enumeration?
+				if(schema.getEnum() != null){
+					return new EntityRowEnum(adapter, key, schema);
+				}else{
+					return new EntityRowScalar<String>(adapter, key, schema, String.class);
+				}
 			}else if(FORMAT.DATE_TIME == schema.getFormat()){
 				return new EntityRowScalar<Date>(adapter, key, schema, Date.class);
 			}else{

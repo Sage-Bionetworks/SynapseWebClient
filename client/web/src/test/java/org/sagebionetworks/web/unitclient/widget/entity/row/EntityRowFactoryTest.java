@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowEnum;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowScalar;
@@ -218,6 +220,26 @@ public class EntityRowFactoryTest {
 		assertNotNull(adapter.getJSONArray("key"));
 		assertEquals(value, rowImpl.getValue());
 		
+		// Test null
+		rowImpl.setValue(null);
+		assertEquals(null, rowImpl.getValue());
+	}
+	
+	
+	@Test
+	public void testEnumeration() throws JSONObjectAdapterException{
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		ObjectSchema schema = new ObjectSchema(TYPE.STRING);
+		schema.setEnum(new String[]{"a","b","c"});
+		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
+		assertTrue(row instanceof EntityRowEnum);
+		EntityRowEnum rowImpl = (EntityRowEnum) row;
+		// check the wiring
+		String value = "a";
+		rowImpl.setValue(value);
+		assertNotNull(adapter.getString("key"));
+		assertEquals(value, rowImpl.getValue());
+		assertTrue(Arrays.equals(schema.getEnum(), rowImpl.getEnumValues()));
 		// Test null
 		rowImpl.setValue(null);
 		assertEquals(null, rowImpl.getValue());
