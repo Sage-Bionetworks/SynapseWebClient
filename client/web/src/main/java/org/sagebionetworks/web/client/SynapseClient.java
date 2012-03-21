@@ -56,4 +56,10 @@ public interface SynapseClient extends RemoteService {
 	 * @param message
 	 */
 	public void logInfo(String message);
+	
+	/**
+	 * Get the repository service URL
+	 * @return
+	 */
+	public String getRepositoryServiceUrl();
 }

@@ -29,6 +29,8 @@ public interface SynapseClientAsync {
 
 	void logInfo(String message, AsyncCallback<Void> callback);
 
+	void getRepositoryServiceUrl(AsyncCallback<String> callback);
+
 
 	
 }

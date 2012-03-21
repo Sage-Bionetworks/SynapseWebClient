@@ -6,11 +6,16 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.UrlCache;
+import org.sagebionetworks.web.client.ontology.AdapterModelData;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowConcept;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowEnum;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowScalar;
 
+import com.extjs.gxt.ui.client.data.BaseModelData;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -33,13 +38,17 @@ import com.google.inject.Inject;
  */
 public class FormFieldFactory {
 
+	private static final String KEY_CHILDREN_TRANSITIVE = "/childrenTransitive/";
+	private static final String KEY_CONCEPT = "/concept/";
 	IconsImageBundle iconBundle;
 	ClientLogger log;
+	UrlCache urlCache;
 
 	@Inject
-	public FormFieldFactory(IconsImageBundle iconBundle, ClientLogger log) {
+	public FormFieldFactory(IconsImageBundle iconBundle, ClientLogger log, UrlCache urlCache) {
 		this.iconBundle = iconBundle;
 		this.log = log;
+		this.urlCache = urlCache;
 	}
 
 	/**
@@ -70,6 +79,9 @@ public class FormFieldFactory {
 		if(row instanceof EntityRowEnum){
 			// An enumeration editor.
 			field = createEnumEditor((EntityRowEnum) row);
+		}if(row instanceof EntityRowConcept){
+			// An enumeration editor.
+			field = createConceptEditor((EntityRowConcept) row);
 		}else if(row instanceof EntityRowScalar){
 			final EntityRowScalar scalar = (EntityRowScalar) row;
 			Class clazz = scalar.getTypeClass();
@@ -323,6 +335,42 @@ public class FormFieldFactory {
 			}
 		});
 		return combo;
+	}
+	
+	/**
+	 * Create an enumeration editor.
+	 * @param row
+	 * @return
+	 */
+	public Field<?> createConceptEditor(final EntityRowConcept row) {
+		// build the list store from the enum
+		// We will need the rep url for this one
+		if(this.urlCache.getRepositoryServiceUrl() == null){
+			IllegalArgumentException e = new IllegalArgumentException("Failed to get the URL for the repository service.");
+			log.error(e.getMessage(), IllegalArgumentException.class.getName(), FormFieldFactory.class.getName(), "createConceptEditor", 354);
+			throw e;
+		}
+		// Build up the URL for this concept
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.urlCache.getRepositoryServiceUrl());
+		builder.append(KEY_CONCEPT);
+		builder.append(row.getConceptId());
+		builder.append(KEY_CHILDREN_TRANSITIVE);
+		log.info("Using concept URL: "+builder.toString());
+		final ComboBox<AdapterModelData> field = ConceptAutoCompleteEditorFactory.createConceptAutoCompleteEditor(builder.toString());
+		AdapterModelData model = new AdapterModelData();
+		model.set(ConceptAutoCompleteEditorFactory.KEY_PREFERRED_LABEL, row.getValue());
+		field.setValue(model);
+		field.addListener(Events.Change, new Listener<FieldEvent>() {
+			@Override
+			public void handleEvent(FieldEvent be) {
+				if(field.getValue() != null){
+					ModelData model = field.getValue();
+					row.setValue((String)model.get(ConceptAutoCompleteEditorFactory.KEY_PREFERRED_LABEL));
+				}
+			}
+		});
+		return field;
 	}
 	
 	/**
