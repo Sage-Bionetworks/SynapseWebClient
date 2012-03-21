@@ -220,7 +220,7 @@ integrationTestGetEntity <-
   synapseClient:::.setCache("testProject", createdProject)
   checkEquals(propertyValue(createdProject,"name"), synapseClient:::.getCache("testProjectName"))
   
-  fetchedProject <- getEntity(as.numeric(propertyValue(createdProject, "id")))
+  fetchedProject <- getEntity(propertyValue(createdProject, "id"))
   checkEquals(propertyValue(fetchedProject, "id"), propertyValue(createdProject, "id"))
   checkEquals(propertyValue(fetchedProject,"name"), synapseClient:::.getCache("testProjectName"))
   
