@@ -368,4 +368,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		log.info(message);
 	}
 
+	@Override
+	public String getRepositoryServiceUrl() {
+		return urlProvider.getRepositoryServiceUrl();
+	}
+
 }

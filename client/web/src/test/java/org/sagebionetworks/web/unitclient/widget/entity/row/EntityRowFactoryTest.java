@@ -18,6 +18,8 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.schema.FORMAT;
+import org.sagebionetworks.schema.LinkDescription;
+import org.sagebionetworks.schema.LinkDescription.LinkRel;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -27,6 +29,7 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowConcept;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowEnum;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
@@ -309,6 +312,31 @@ public class EntityRowFactoryTest {
 //			assertFalse(filter.contains(data.getKey()));
 		}
 
+	}
+	
+	@Test
+	public void testConceptRow() throws JSONObjectAdapterException{
+		String conceptUrl = "http://synapse.sagebase.org/ontology#4578";
+		LinkDescription desc = new LinkDescription();
+		desc.setRel(LinkRel.DESCRIBED_BY);
+		desc.setHref(conceptUrl);
+		
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		ObjectSchema schema = new ObjectSchema(TYPE.STRING);
+		// Setting this link tells the system this is a concept.
+		schema.setLinks(new LinkDescription[]{desc});
+		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
+		assertTrue(row instanceof EntityRowConcept);
+		EntityRowConcept rowImpl = (EntityRowConcept) row;
+		assertEquals("4578", rowImpl.getConceptId());
+		// check the wiring
+		String value = "a";
+		rowImpl.setValue(value);
+		assertNotNull(adapter.getString("key"));
+		assertEquals(value, rowImpl.getValue());
+		// Test null
+		rowImpl.setValue(null);
+		assertEquals(null, rowImpl.getValue());
 	}
 
 

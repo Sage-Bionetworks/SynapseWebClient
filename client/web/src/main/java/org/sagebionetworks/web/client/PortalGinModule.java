@@ -131,6 +131,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntitySchemaCacheImpl.class).in(Singleton.class);
 		bind(EntitySchemaCache.class).to(EntitySchemaCacheImpl.class);
 		
+		// The URL cache
+		bind(UrlCacheImpl.class).in(Singleton.class);
+		bind(UrlCache.class).to(UrlCacheImpl.class);
+		
 	
 		// Adapter factoyr
 		bind(AdapterFactory.class).to(GwtAdapterFactory.class);

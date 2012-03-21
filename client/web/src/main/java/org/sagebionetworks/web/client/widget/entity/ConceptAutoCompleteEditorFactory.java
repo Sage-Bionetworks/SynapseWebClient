@@ -1,11 +1,6 @@
-package org.sagebionetworks.web.client.widget.editpanels;
-
-
-
-import java.util.List;
+package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.web.client.ontology.AdapterModelData;
-import org.sagebionetworks.web.client.ontology.NcboOntologyTerm;
 
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
 import com.extjs.gxt.ui.client.data.JsonPagingLoadResultReader;
@@ -16,48 +11,65 @@ import com.extjs.gxt.ui.client.data.ModelType;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.extjs.gxt.ui.client.data.PagingLoader;
 import com.extjs.gxt.ui.client.data.ScriptTagProxy;
-import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.EventType;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class ConceptAutoCompleteEditor {
+/**
+ * Creates an auto-complete editor for the concept services.
+ * @author jmhill
+ *
+ */
+public class ConceptAutoCompleteEditorFactory {
 	
-	public static ComboBox<AdapterModelData> createNcboSuggestField() {
-		String url = "http://localhost:8080/services-repository-0.11-SNAPSHOT/repo/v1/concept/11291/childrenTransitive/";
+	public static final String KEY_QUERY = "query";
+	public static final String KEY_PREFIX = "prefix";
+	public static final String KEY_OFFSET = "offset";
+	public static final String KEY_START = "start";
+	public static final String KEY_DEFINITION = "definition";
+	// This is the value to get and set.
+	public static final String KEY_PREFERRED_LABEL = "preferredLabel";
+	public static final String KEY_TOTAL_NUMBER_OF_RESULTS = "totalNumberOfResults";
+	public static final String KEY_CHILDREN = "children";
+
+	/**
+	 * Create a new editor for a given concept URL.
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public static ComboBox<AdapterModelData> createConceptAutoCompleteEditor(String url) {
+//		String url = "http://localhost:8080/services-repository-0.11-SNAPSHOT/repo/v1/concept/11291/childrenTransitive/";
 		ScriptTagProxy<PagingLoadResult<AdapterModelData>> proxy = new ScriptTagProxy<PagingLoadResult<AdapterModelData>>(url);
 		
-
+		// Maps the model to our Concepts JSON format.
 		ModelType type = new ModelType();
-		type.setRoot("children");
-		type.setTotalName("totalNumberOfResults");
-		type.addField("preferredLabel", "preferredLabel");
-		type.addField("definition", "definition");
+		type.setRoot(KEY_CHILDREN);
+		type.setTotalName(KEY_TOTAL_NUMBER_OF_RESULTS);
+		type.addField(KEY_PREFERRED_LABEL, KEY_PREFERRED_LABEL);
+		type.addField(KEY_DEFINITION, KEY_DEFINITION);
 
+		// The paginated reader
 		JsonPagingLoadResultReader<PagingLoadResult<AdapterModelData>> reader = new JsonPagingLoadResultReader<PagingLoadResult<AdapterModelData>>(
 				type);
 		
-		
+		// the paging loader.
 		PagingLoader<PagingLoadResult<AdapterModelData>> loader = new BasePagingLoader<PagingLoadResult<AdapterModelData>>(
 				proxy, reader);
 
+		// Map the offset and query to the prefix
 		loader.addListener(Loader.BeforeLoad, new Listener<LoadEvent>() {
 			public void handleEvent(LoadEvent be) {
-				be.<ModelData> getConfig().set("start",	be.<ModelData> getConfig().get("offset"));
-				be.<ModelData> getConfig().set("prefix",	be.<ModelData> getConfig().get("query"));
+				be.<ModelData> getConfig().set(KEY_START,	be.<ModelData> getConfig().get(KEY_OFFSET));
+				be.<ModelData> getConfig().set(KEY_PREFIX,	be.<ModelData> getConfig().get(KEY_QUERY));
 			}
 		});
 		
-
 		ListStore<AdapterModelData> store = new ListStore<AdapterModelData>(loader);
 
 		ComboBox<AdapterModelData> combo = new ComboBox<AdapterModelData>();
 		combo.setWidth(580);
-		combo.setDisplayField("preferredLabel");
+		combo.setDisplayField(KEY_PREFERRED_LABEL);
 		combo.setItemSelector("div.search-item");
 		combo.setTemplate(getTemplate());
 		combo.setStore(store);

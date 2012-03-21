@@ -18,7 +18,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
  *
  */
 public class EntityRowFactory {
-	
 
 	/**
 	 * Create a new entity row for a given property schema.
@@ -38,6 +37,8 @@ public class EntityRowFactory {
 				// Is this an enumeration?
 				if(schema.getEnum() != null){
 					return new EntityRowEnum(adapter, key, schema);
+				}else if (EntityRowConcept.isConceptSchema(schema)){
+					return new EntityRowConcept(adapter, key, schema);
 				}else{
 					return new EntityRowScalar<String>(adapter, key, schema, String.class);
 				}
