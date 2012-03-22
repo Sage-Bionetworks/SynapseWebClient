@@ -83,12 +83,7 @@ public class LookupPresenterTest {
 		verify(mockView).showUnknownType(unknownType, entityId);
 		
 		// success: entities that have places
-		for(NodeType nodeType : NodeType.values()) {
-			if (nodeType == NodeType.EULA || nodeType == NodeType.AGREEMENT
-					|| nodeType == NodeType.ENTITY) {
-				// skip entities that do not have pages
-				continue;
-			}			
+		for(NodeType nodeType : NodeType.values()) {		
 			etr.setType("/" + nodeType.toString().toLowerCase());
 			resetMocks();
 			when(mockNodeModelCreator.createEntityTypeResponse(Mockito.anyString())).thenReturn(etr);

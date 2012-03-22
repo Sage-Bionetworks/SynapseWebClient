@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.sagebionetworks.repo.model.Dataset;
+import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.web.shared.LayerLink;
 
 public class RandomDataset {
@@ -22,8 +22,8 @@ public class RandomDataset {
 	 * Create a randomly generated dataset.
 	 * @return
 	 */
-	public static Dataset createRandomDataset(){
-		Dataset c = new Dataset();
+	public static Study createRandomDataset(){
+		Study c = new Study();
 		long now = System.currentTimeMillis();
 		c.setId(""+idSequence++);
 		// Created sometime within the last year.
@@ -43,17 +43,6 @@ public class RandomDataset {
 		for(int i=0; i<numLayers; i++){
 			int typeIndex = rand.nextInt(types.length);
 			layers.add(new LayerLink(""+idSequence++, types[typeIndex], RandomStrings.generateRandomUrl(4, 8)));
-			switch(types[typeIndex]) {
-			case G:
-				c.setHasGeneticData(true);
-				break;
-			case C:
-				c.setHasClinicalData(true);
-				break;
-			case E:
-				c.setHasExpressionData(true);
-				break;
-			}
 		}
 //		c.setLayerPreviews(layers);
 		c.setStatus(RandomStrings.generateRandomString(1, 10));

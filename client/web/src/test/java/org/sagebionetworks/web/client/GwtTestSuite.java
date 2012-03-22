@@ -9,19 +9,17 @@ import org.junit.Test;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
-import org.sagebionetworks.repo.model.Agreement;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Dataset;
+import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.Eula;
 import org.sagebionetworks.repo.model.ExampleEntity;
-import org.sagebionetworks.repo.model.Layer;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Step;
+import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -59,7 +57,7 @@ public class GwtTestSuite extends GWTTestCase {
 	
 	@Test
 	public void testNodeModelCreatorImpl_createDataset() throws JSONObjectAdapterException, RestServiceException{
-		Dataset populatedDataset = new Dataset();
+		Study populatedDataset = new Study();
 		initilaizedJSONEntityFromSchema(populatedDataset);
 		assertNotNull(populatedDataset);
 		// Get the JSON for the populate dataset
@@ -68,14 +66,14 @@ public class GwtTestSuite extends GWTTestCase {
 		assertNotNull(json);
 		// Use the factor to create a clone
 		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory()), new JSONObjectGwt()); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Dataset clone = modelCreator.createEntity(json, Dataset.class);
+		Study clone = modelCreator.createEntity(json, Study.class);
 		assertNotNull(clone);
 		assertEquals(populatedDataset, clone);
 	}
 	
 	@Test
 	public void testNodeModelCreatorImpl_createLayer() throws JSONObjectAdapterException, RestServiceException{
-		Layer populatedLayer = new Layer();
+		Data populatedLayer = new Data();
 		initilaizedJSONEntityFromSchema(populatedLayer);
 		assertNotNull(populatedLayer);
 		// Get the JSON for the populate dataset
@@ -84,7 +82,7 @@ public class GwtTestSuite extends GWTTestCase {
 		assertNotNull(json);
 		// Use the factor to create a clone
 		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory()), new JSONObjectGwt()); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Layer clone = modelCreator.createEntity(json, Layer.class);
+		Data clone = modelCreator.createEntity(json, Data.class);
 		assertNotNull(clone);
 		assertEquals(populatedLayer, clone);
 	}
@@ -105,40 +103,6 @@ public class GwtTestSuite extends GWTTestCase {
 		assertEquals(populatedProject, clone);
 	}
 	
-	@Test
-	public void testNodeModelCreatorImpl_createEULA() throws JSONObjectAdapterException, RestServiceException{
-		Eula populatedEula = new Eula();
-		initilaizedJSONEntityFromSchema(populatedEula);
-		assertNotNull(populatedEula);
-		// Get the JSON for the populate dataset
-		JSONObjectAdapter adapter = populatedEula.writeToJSONObject(JSONObjectGwt.createNewAdapter());
-		String json = adapter.toJSONString();
-		assertNotNull(json);
-		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory()), new JSONObjectGwt()); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Eula clone = modelCreator.createEntity(json, Eula.class);
-		assertNotNull(clone);
-		assertEquals(populatedEula, clone);
-	}
-	
-	@Test
-	public void testNodeModelCreatorImpl_Agreement() throws JSONObjectAdapterException, RestServiceException{
-		Agreement populatedAgreement = new Agreement();
-		initilaizedJSONEntityFromSchema(populatedAgreement);
-		assertNotNull(populatedAgreement);
-		// Get the JSON for the populate dataset
-		JSONObjectAdapter adapter = populatedAgreement.writeToJSONObject(JSONObjectGwt.createNewAdapter());
-		String json = adapter.toJSONString();
-		assertNotNull(json);
-		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory()), new JSONObjectGwt()); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Agreement clone = modelCreator.createEntity(json, Agreement.class);
-		assertNotNull(clone);
-		assertEquals(populatedAgreement, clone);
-		// Make sure we can go back to json
-		String jsonClone = modelCreator.createAgreementJSON(clone);
-		assertEquals(json, jsonClone);
-	}
 	
 	@Test
 	public void testNodeModelCreatorImpl_createAnalysis() throws JSONObjectAdapterException, RestServiceException{

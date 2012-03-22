@@ -1,15 +1,8 @@
 package org.sagebionetworks.web.client.transform;
 
 
-import org.sagebionetworks.repo.model.Agreement;
-import org.sagebionetworks.repo.model.Analysis;
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Eula;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.shared.DownloadLocation;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -39,9 +32,6 @@ public interface NodeModelCreator {
 	 * @throws RestServiceException 
 	 */
 	EntityBundle createEntityBundle(EntityBundleTransport transport) throws RestServiceException;
-			
-
-	String createAgreementJSON(Agreement agreement) throws JSONObjectAdapterException;
 	
 	PagedResults createPagedResults(String json) throws RestServiceException;
 

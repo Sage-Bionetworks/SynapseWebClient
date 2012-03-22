@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.repo.model.Dataset;
+import org.sagebionetworks.repo.model.Study;
 
 /**
  * 
@@ -20,27 +20,27 @@ import org.sagebionetworks.repo.model.Dataset;
 public class ListUtilsTest {
 	
 	@Test
-	public void testDatasetSort(){
+	public void testStudySort(){
 		
 		// Create a few datset
-		Dataset one = new Dataset();
+		Study one = new Study();
 		one.setId(DisplayUtils.DEFAULT_PLACE_TOKEN);
 		one.setName("beta");
 		one.setCreatedOn(new Date(99));
-		Dataset two = new Dataset();
+		Study two = new Study();
 		two.setId("1");
 		two.setName("alpha");
 		two.setCreatedOn(new Date(98));
-		Dataset allNull = new Dataset();
+		Study allNull = new Study();
 		// Add them to the list
 		
-		List<Dataset> list = new ArrayList<Dataset>();
+		List<Study> list = new ArrayList<Study>();
 		list.add(allNull);
 		list.add(one);
 		list.add(two);
 		
 		// Now sort the list on name
-		List<Dataset> sorted = ListUtils.getSortedCopy("name", false, list, Dataset.class);
+		List<Study> sorted = ListUtils.getSortedCopy("name", false, list, Study.class);
 		assertNotNull(sorted);
 		System.out.println(sorted);
 		

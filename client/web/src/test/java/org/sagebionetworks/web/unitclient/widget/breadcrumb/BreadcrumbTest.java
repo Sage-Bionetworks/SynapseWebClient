@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.breadcrumb;
 
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Matchers.isNull;
@@ -17,10 +16,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.Dataset;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -68,7 +67,7 @@ public class BreadcrumbTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testAsWidgetEntity() throws Exception {
-		Entity entity = new Dataset();
+		Entity entity = new Study();
 		entity.setId("3");
 		entity.setUri("path/dataset/3");
 		List<EntityHeader> pathHeaders = new ArrayList<EntityHeader>();
