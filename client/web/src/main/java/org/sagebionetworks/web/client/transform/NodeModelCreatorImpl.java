@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.transform;
 
-import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
-import org.sagebionetworks.repo.model.Agreement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -88,13 +86,6 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		} catch (JSONObjectAdapterException e) {
 			throw new RestServiceException(e.getMessage());
 		}
-	}
-	
-	@Override
-	public String createAgreementJSON(Agreement agreement)	throws JSONObjectAdapterException {
-		// Write it to an adapter
-		JSONObjectAdapter adapter = agreement.writeToJSONObject(JSONObjectGwt.createNewAdapter());
-		return adapter.toJSONString();
 	}
 
 	@Override

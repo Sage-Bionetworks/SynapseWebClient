@@ -11,7 +11,7 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.HasPreviews;
 import org.sagebionetworks.repo.model.HasShortcuts;
-import org.sagebionetworks.repo.model.Layer;
+import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Reference;
@@ -152,8 +152,8 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	@Override
 	public LocationData getMediaLocationData() {
 		LocationData location = new LocationData();
-		if(entity instanceof Layer && ((Layer)entity).getType() == LayerTypeNames.M) {			
-			List<LocationData> locations = ((Layer)entity).getLocations();
+		if(entity instanceof Data && ((Data)entity).getType() == LayerTypeNames.M) {			
+			List<LocationData> locations = ((Data)entity).getLocations();
 			if(locations != null && locations.size() > 0) {
 				location = locations.get(0); // send the first location
 			}			 				
@@ -166,7 +166,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	 */
 	public void loadPreview() {			
 		// Treat preview of Layers of Media type specially
-		if(entity instanceof Layer && ((Layer)entity).getType() == LayerTypeNames.M) {			
+		if(entity instanceof Data && ((Data)entity).getType() == LayerTypeNames.M) {			
 			return;
 		}
 		

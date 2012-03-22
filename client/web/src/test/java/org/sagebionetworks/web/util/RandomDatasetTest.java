@@ -4,7 +4,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.Dataset;
+import org.sagebionetworks.repo.model.Study;
 
 /**
  * 
@@ -17,7 +17,7 @@ public class RandomDatasetTest {
 	@Test
 	public void testCreateRandom(){
 		// Create a random dataset
-		Dataset random = RandomDataset.createRandomDataset();
+		Study random = RandomDataset.createRandomDataset();
 		assertNotNull(random);
 		System.out.println(random);
 		// Check all fields of the dataset
@@ -32,7 +32,6 @@ public class RandomDatasetTest {
 		assertNotNull(random.getVersionLabel());
 //		assertNotNull(random.getHasClinicalData());
 //		assertNotNull(random.getHasExpressionData());
-		assertNotNull(random.getHasGeneticData());
 	}
 
 }

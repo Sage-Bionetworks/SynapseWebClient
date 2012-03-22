@@ -263,16 +263,12 @@ public class DisplayUtils {
 	 */
 	public static NodeType getNodeTypeForEntity(Entity entity) {
 		// 	DATASET, LAYER, PROJECT, EULA, AGREEMENT, ENTITY, ANALYSIS, STEP
-		if(entity instanceof org.sagebionetworks.repo.model.Dataset) {
+		if(entity instanceof org.sagebionetworks.repo.model.Study) {
 			return NodeType.DATASET;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Layer) {
+		} else if(entity instanceof org.sagebionetworks.repo.model.Data) {
 			return NodeType.LAYER;
 		} else if(entity instanceof org.sagebionetworks.repo.model.Project) {
 			return NodeType.PROJECT;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Eula) {
-			return NodeType.EULA;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Agreement) {
-			return NodeType.AGREEMENT;
 		} else if(entity instanceof org.sagebionetworks.repo.model.Analysis) {
 			return NodeType.ANALYSIS;
 		} else if(entity instanceof org.sagebionetworks.repo.model.Step) {
@@ -297,10 +293,6 @@ public class DisplayUtils {
 			return NodeType.LAYER;
 		} else if("/project".equals(entityType.getUrlPrefix())) {
 			return NodeType.PROJECT;			
-		} else if("/eula".equals(entityType.getUrlPrefix())) {
-			return NodeType.EULA;
-		} else if("/agreement".equals(entityType.getUrlPrefix())) {
-			return NodeType.AGREEMENT;
 		} else if("/analysis".equals(entityType.getUrlPrefix())) {
 			return NodeType.ANALYSIS;
 		} else if("/step".equals(entityType.getUrlPrefix())) {

@@ -66,12 +66,6 @@ public class ServiceUtils {
 		case LAYER:
 			builder.append(REPOSVC_PATH_LAYER);
 			break;
-		case EULA:
-			builder.append(REPOSVC_PATH_EULA);
-			break;
-		case AGREEMENT:
-			builder.append(REPOSVC_PATH_AGREEMENT);
-			break;
 		case ANALYSIS:
 			builder.append(REPOSVC_PATH_ANALYSIS);
 			break;
