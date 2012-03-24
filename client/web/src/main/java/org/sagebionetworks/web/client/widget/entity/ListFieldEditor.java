@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowListImpl;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.ComponentEvent;

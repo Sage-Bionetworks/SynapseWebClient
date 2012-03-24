@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client;
 
+import static org.junit.Assert.assertNotNull;
+
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -18,6 +21,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.RegisterConstants;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -31,8 +35,10 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
+import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.junit.client.GWTTestCase;
 
 /**
@@ -313,6 +319,16 @@ public class GwtTestSuite extends GWTTestCase {
 		assertEquals(annos, results.getAnnotations());
 		assertEquals(path, results.getPath());
 		assertEquals(uep, results.getPermissions());
+	}
+	
+	@Test
+	public void testRegister() throws UnsupportedEncodingException, JSONObjectAdapterException{
+		RegisterConstants constants = GWT.create(RegisterConstants.class);
+		GwtAdapterFactory factory = new GwtAdapterFactory();
+		EntityTypeProvider entityTypeProvider = new EntityTypeProvider(constants, factory);
+		String uri = "http://HOST/PATH/project/ID";
+		EntityType projectType = entityTypeProvider.getEntityTypeForUri(uri);
+		assertNotNull(projectType);
 	}
 	
 
