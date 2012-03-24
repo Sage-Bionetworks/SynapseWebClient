@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.widget.entity.row.EntityRowEnum;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowScalar;
 
-import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
@@ -79,7 +78,7 @@ public class FormFieldFactory {
 		if(row instanceof EntityRowEnum){
 			// An enumeration editor.
 			field = createEnumEditor((EntityRowEnum) row);
-		}if(row instanceof EntityRowConcept){
+		}else if(row instanceof EntityRowConcept){
 			// An enumeration editor.
 			field = createConceptEditor((EntityRowConcept) row);
 		}else if(row instanceof EntityRowScalar){
@@ -112,6 +111,8 @@ public class FormFieldFactory {
 			}else{
 				throw new IllegalArgumentException("Unknown list type: "+clazz.getName());
 			}
+		}else{
+			throw new IllegalArgumentException("Unknown EntityRow: "+row.getClass().getName());
 		}
 		// Add all of the basic stuff
 		field.setBorders(false);

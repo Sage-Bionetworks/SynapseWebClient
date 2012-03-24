@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,9 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.codec.binary.Base64;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.RegisterConstants;
 import org.sagebionetworks.repo.model.registry.EntityRegistry;
 import org.sagebionetworks.repo.model.registry.EntityTypeMetadata;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.shared.EntityType;
@@ -23,25 +27,15 @@ public class EntityTypeProvider {
 	private List<EntityType> values;
 	
 	@Inject
-	public EntityTypeProvider(SynapseClientAsync synapseClient, final JSONObjectAdapter jsonObjectAdapter) {		
-		synapseClient.getEntityTypeRegistryJSON(new AsyncCallback<String>() {			
-			@Override
-			public void onSuccess(String registryJson) {
-				try {
-					JSONObjectAdapter registryAdaptor = jsonObjectAdapter.createNew(registryJson);
-					EntityRegistry registry = new EntityRegistry(registryAdaptor);
-					typeMetadatas = registry.getEntityTypes();
-					createEntityTypes();					
-				} catch (JSONObjectAdapterException e) {
-					int i=0;
-				}
-				
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {				
-			}
-		});
+	public EntityTypeProvider(RegisterConstants constants, final AdapterFactory factory) throws UnsupportedEncodingException, JSONObjectAdapterException {
+		// Read this from the constants.
+		String base64String = constants.getRegisterJson();
+		String decoded =  new String(Base64.decodeBase64(base64String.getBytes("UTF-8")), "UTF-8");		// Decode it
+		JSONObjectAdapter adapter = factory.createNew(decoded);
+		EntityRegistry registry = new EntityRegistry();
+		registry.initializeFromJSONObject(adapter);
+		typeMetadatas = registry.getEntityTypes();
+		createEntityTypes();
 	}
 	
 		

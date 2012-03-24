@@ -16,9 +16,6 @@
 	<name>Synapse Portal</name>
 
 	<properties>
-		<!-- Convenience property to set the GWT version -->
-		<gwtVersion>2.4.0</gwtVersion>
-		<guiceVersion>3.0-rc2</guiceVersion>
 		<!-- GWT needs at least java 1.5 -->
 		<maven.compiler.source>1.6</maven.compiler.source>
 		<maven.compiler.target>1.6</maven.compiler.target>
@@ -143,12 +140,10 @@
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
-			<version>${gwtVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
-			<version>${gwtVersion}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -188,7 +183,6 @@
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-dev</artifactId>
-			<version>${gwtVersion}</version>
 			<scope>provided</scope>
 		</dependency>
 

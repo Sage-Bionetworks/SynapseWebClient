@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.row;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.Annotations;
@@ -64,18 +65,18 @@ public class EntityRowFactory {
 				// Check the format
 				if(schema.getFormat() == schema.getItems().getFormat()){
 					// this is just a string
-					return new EntityRowList<String>(adapter, key, schema, String.class);
+					return new EntityRowListImpl<String>(adapter, key, schema, String.class);
 				}else if(FORMAT.DATE_TIME == schema.getItems().getFormat()){
 					// This is a date
-					return new EntityRowList<Date>(adapter, key, schema, Date.class);
+					return new EntityRowListImpl<Date>(adapter, key, schema, Date.class);
 				}else{
 					throw new IllegalArgumentException("Unknown FORMAT: "+schema.getFormat()+" for type "+schema.getType()+" for id: "+schema.getId());
 				}
 
 			} else if(TYPE.NUMBER == schema.getItems().getType()){
-				return new EntityRowList<Double>(adapter, key, schema, Double.class);
+				return new EntityRowListImpl<Double>(adapter, key, schema, Double.class);
 			} else if(TYPE.INTEGER == schema.getItems().getType()){
-				return new EntityRowList<Long>(adapter, key, schema, Long.class);
+				return new EntityRowListImpl<Long>(adapter, key, schema, Long.class);
 			}else{
 				throw new IllegalArgumentException("Unknown ARRAY type: "+schema.getItems().getType()+" for "+schema.getId());
 			}
@@ -98,11 +99,12 @@ public class EntityRowFactory {
 	public static EntityFormModel createEntityRowList(JSONObjectAdapter adapter, ObjectSchema schema, Annotations annos, Set<String> filter){
 		// Create the entity row list for the properties.
 		List<EntityRow<?>> properties = createEntityRowListForProperties(adapter, schema, filter);
+		List<EntityRow<?>> annoList = createEntityRowListForAnnotations(annos);
 		// Get the name
 		EntityRowScalar<String> name = (EntityRowScalar<String>) EntityRowFactory.createEntityRowByKey(adapter, schema, "name");
 		// get the description.
 		EntityRowScalar<String> description = (EntityRowScalar<String>) EntityRowFactory.createEntityRowByKey(adapter, schema, "description");
-		return new EntityFormModel(name, description, properties, null);
+		return new EntityFormModel(name, description, properties, annoList);
 	}
 	
 	/**
@@ -140,6 +142,55 @@ public class EntityRowFactory {
 			EntityRow<?> row = EntityRowFactory.createRow(adapter, propertySchema, key);
 			if(row != null){
 				results.add(row);
+			}
+		}
+		return results;
+	}
+	
+	/**
+	 * Create a list of rows for annotations.
+	 * @param annos
+	 * @return
+	 */
+	public static List<EntityRow<?>> createEntityRowListForAnnotations(Annotations annos){
+		List<EntityRow<?>> results = new ArrayList<EntityRow<?>>();
+		// Add all strings.
+		if(annos != null){
+			// Strings
+			if(annos.getStringAnnotations() != null){
+				for(String key: annos.getStringAnnotations().keySet()){
+					// Create a new annotation row
+					Map<String, List<String>> map =  annos.getStringAnnotations();
+					EntityRowAnnotation<String> row = new EntityRowAnnotation<String>(map, key, String.class);
+					results.add(row);
+				}
+			}
+			// Longs
+			if(annos.getLongAnnotations() != null){
+				for(String key: annos.getLongAnnotations().keySet()){
+					// Create a new annotation row
+					Map<String, List<Long>> map =  annos.getLongAnnotations();
+					EntityRowAnnotation<Long> row = new EntityRowAnnotation<Long>(map, key, Long.class);
+					results.add(row);
+				}
+			}
+			// Doubles
+			if(annos.getDoubleAnnotations() != null){
+				for(String key: annos.getDoubleAnnotations().keySet()){
+					// Create a new annotation row
+					Map<String, List<Double>> map =  annos.getDoubleAnnotations();
+					EntityRowAnnotation<Double> row = new EntityRowAnnotation<Double>(map, key, Double.class);
+					results.add(row);
+				}
+			}
+			// Dates
+			if(annos.getDateAnnotations() != null){
+				for(String key: annos.getDateAnnotations().keySet()){
+					// Create a new annotation row
+					Map<String, List<Date>> map =  annos.getDateAnnotations();
+					EntityRowAnnotation<Date> row = new EntityRowAnnotation<Date>(map, key, Date.class);
+					results.add(row);
+				}
 			}
 		}
 		return results;

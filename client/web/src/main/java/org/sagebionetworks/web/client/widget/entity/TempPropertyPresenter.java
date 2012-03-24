@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ExampleEntity;
@@ -18,13 +19,12 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -53,10 +53,11 @@ public class TempPropertyPresenter extends LayoutContainer {
 	VerticalPanel vp;
 	FormFieldFactory formFactory;
 	ClientLogger log;
+	IconsImageBundle icons;
 	
 	@Inject
 	public TempPropertyPresenter(EntitySchemaCache cache,
-			AdapterFactory factory, EntityPropertyGrid view, FormFieldFactory formFactory, ClientLogger log) {
+			AdapterFactory factory, EntityPropertyGrid view, FormFieldFactory formFactory, ClientLogger log, IconsImageBundle icons) {
 		super();
 		this.cache = cache;
 		this.factory = factory;
@@ -64,6 +65,7 @@ public class TempPropertyPresenter extends LayoutContainer {
 		this.entityFactory = new AutoGenFactory();
 		this.formFactory = formFactory;
 		this.log = log;
+		this.icons = icons;
 		// test the log
 		log.debug("Testing a debug message");
 		log.info("Testing an info message");
@@ -85,9 +87,10 @@ public class TempPropertyPresenter extends LayoutContainer {
 	    	@Override
 	    	public void componentSelected(ButtonEvent ce) {
 	    	    Entity entity = bundle.getEntity();
+	    	    Annotations annos = bundle.getAnnotations();
 	    		final Dialog window = new Dialog();
 	    		window.setMaximizable(false);
-	    	    window.setSize(600, 700);
+	    	    window.setSize(750, 700);
 	    	    window.setPlain(true);  
 	    	    window.setModal(true);  
 	    	    window.setBlinkModal(true);  
@@ -100,9 +103,14 @@ public class TempPropertyPresenter extends LayoutContainer {
 	    	    
 	    	    // Create a new Adapter to capture the editor's changes
 	    	    final JSONObjectAdapter newAdapter = factory.createNew();
-	    	    EntityPropertyForm editor = new EntityPropertyForm(formFactory);
+	    	    final Annotations newAnnos = new Annotations();
+	    	    if(annos != null){
+	    	    	newAnnos.addAll(annos);
+	    	    }
+	    	    EntityPropertyForm editor = new EntityPropertyForm(formFactory, icons);
 	    	    try {
 	    	    	entity.writeToJSONObject(newAdapter);
+	    	    	
 	    	    	// We want to filter out all transient properties.
 	    	    	ObjectSchema schema = cache.getSchemaEntity(entity);
 	    	    	Set<String> filter = new HashSet<String>();
@@ -112,7 +120,7 @@ public class TempPropertyPresenter extends LayoutContainer {
 	    	    	EntityRowFactory.addTransientToFilter(schema, filter);
 	    	    	// Filter objects
 	    	    	EntityRowFactory.addObjectTypeToFilter(schema, filter);
-	    	    	EntityFormModel model = EntityRowFactory.createEntityRowList(newAdapter, schema, null, filter);
+	    	    	EntityFormModel model = EntityRowFactory.createEntityRowList(newAdapter, schema, newAnnos, filter);
 	    	    	editor.setList(model);
 				} catch (JSONObjectAdapterException e) {
 					throw new RuntimeException(e);
@@ -128,7 +136,7 @@ public class TempPropertyPresenter extends LayoutContainer {
 						try {
 							newEntity = entityFactory.newInstance(bundle.getEntity().getClass().getName());
 							newEntity.initializeFromJSONObject(newAdapter);
-							EntityBundle newBundel = new EntityBundle((Entity) newEntity, null, null, null, null);
+							EntityBundle newBundel = new EntityBundle((Entity) newEntity, newAnnos, null, null, null);
 							setEntity(newBundel);
 						} catch (JSONObjectAdapterException e) {
 							DisplayUtils.showErrorMessage("Failed to apply the changes. Error: "+e.getMessage());
@@ -173,6 +181,8 @@ public class TempPropertyPresenter extends LayoutContainer {
 			// Add all objects to the filter
 			EntityRowFactory.addObjectTypeToFilter(schema, filter);
 			rows = EntityRowFactory.createEntityRowListForProperties(adapter, schema, filter);
+			// Add the annotations to this list.
+			rows.addAll(EntityRowFactory.createEntityRowListForAnnotations(bundle.getAnnotations()));
 			// Pass the rows to the two views
 			view.setRows(rows);
 			this.layout(true);
@@ -214,7 +224,14 @@ public class TempPropertyPresenter extends LayoutContainer {
 	public void initializeWithTestData() {
 		// Create an example entity
 		ExampleEntity example = createSample();
-		EntityBundle bundle = new EntityBundle(example, null, null, null, null);
+		Annotations annos = new Annotations();
+		annos.addAnnotation("stringAnno", "one");
+		annos.addAnnotation("stringAnno", "two");
+		annos.addAnnotation("longAnno", 123445667788l);
+		annos.addAnnotation("doubleAnno", Double.MAX_VALUE);
+		annos.addAnnotation("dataAnno", new Date());
+		
+		EntityBundle bundle = new EntityBundle(example, annos, null, null, null);
 		this.setEntity(bundle);
 	}
 	
