@@ -29,10 +29,11 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowAnnotation;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowConcept;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowEnum;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowListImpl;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowScalar;
 
 import com.google.gwt.dev.util.collect.HashSet;
@@ -148,8 +149,8 @@ public class EntityRowFactoryTest {
 		ObjectSchema schema = new ObjectSchema(TYPE.ARRAY);
 		schema.setItems(new ObjectSchema(TYPE.STRING));
 		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
-		assertTrue(row instanceof EntityRowList);
-		EntityRowList<String> rowImpl = (EntityRowList<String>) row;
+		assertTrue(row instanceof EntityRowListImpl);
+		EntityRowListImpl<String> rowImpl = (EntityRowListImpl<String>) row;
 		// check the wiring
 		List<String> value = new ArrayList<String>();
 		value.add("one");
@@ -170,8 +171,8 @@ public class EntityRowFactoryTest {
 		schema.setItems(new ObjectSchema(TYPE.STRING));
 		schema.getItems().setFormat(FORMAT.DATE_TIME);
 		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
-		assertTrue(row instanceof EntityRowList);
-		EntityRowList<Date> rowImpl = (EntityRowList<Date>) row;
+		assertTrue(row instanceof EntityRowListImpl);
+		EntityRowListImpl<Date> rowImpl = (EntityRowListImpl<Date>) row;
 		// check the wiring
 		List<Date> value = new ArrayList<Date>();
 		long now = System.currentTimeMillis();
@@ -192,8 +193,8 @@ public class EntityRowFactoryTest {
 		ObjectSchema schema = new ObjectSchema(TYPE.ARRAY);
 		schema.setItems(new ObjectSchema(TYPE.NUMBER));
 		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
-		assertTrue(row instanceof EntityRowList);
-		EntityRowList<Double> rowImpl = (EntityRowList<Double>) row;
+		assertTrue(row instanceof EntityRowListImpl);
+		EntityRowListImpl<Double> rowImpl = (EntityRowListImpl<Double>) row;
 		// check the wiring
 		List<Double> value = new ArrayList<Double>();
 		value.add(1.1);
@@ -213,8 +214,8 @@ public class EntityRowFactoryTest {
 		ObjectSchema schema = new ObjectSchema(TYPE.ARRAY);
 		schema.setItems(new ObjectSchema(TYPE.INTEGER));
 		EntityRow<?> row = EntityRowFactory.createRow(adapter, schema, "key");
-		assertTrue(row instanceof EntityRowList);
-		EntityRowList<Long> rowImpl = (EntityRowList<Long>) row;
+		assertTrue(row instanceof EntityRowListImpl);
+		EntityRowListImpl<Long> rowImpl = (EntityRowListImpl<Long>) row;
 		// check the wiring
 		List<Long> value = new ArrayList<Long>();
 		value.add(100l);
@@ -334,6 +335,100 @@ public class EntityRowFactoryTest {
 		rowImpl.setValue(value);
 		assertNotNull(adapter.getString("key"));
 		assertEquals(value, rowImpl.getValue());
+		// Test null
+		rowImpl.setValue(null);
+		assertEquals(null, rowImpl.getValue());
+	}
+	
+	@Test
+	public void testCreateEntityRowListForAnnotationsString(){
+		Annotations annos = new Annotations();
+		String key = "someKey";
+		annos.addAnnotation(key, "string one");
+		annos.addAnnotation(key, "string two");
+		List<EntityRow<?>> rows = EntityRowFactory.createEntityRowListForAnnotations(annos);
+		assertNotNull(rows);
+		assertEquals(1, rows.size());
+		EntityRow<?> row = rows.get(0);
+		assertTrue(row instanceof EntityRowAnnotation);
+		EntityRowAnnotation<String> rowImpl = (EntityRowAnnotation<String>) row;
+		assertEquals(String.class, rowImpl.getListClass());
+		assertNotNull(rowImpl.getValue());
+		assertEquals(2, rowImpl.getValue().size());
+		assertEquals("string one", rowImpl.getValue().get(0));
+		assertNotNull(rowImpl.getToolTipsBody());
+		assertEquals("string one, string two", rowImpl.getDislplayValue());
+
+		// Test null
+		rowImpl.setValue(null);
+		assertEquals(null, rowImpl.getValue());
+	}
+	
+	@Test
+	public void testCreateEntityRowListForAnnotationsLong(){
+		Annotations annos = new Annotations();
+		String key = "someKey";
+		annos.addAnnotation(key, 123l);
+		annos.addAnnotation(key, 456l);
+		List<EntityRow<?>> rows = EntityRowFactory.createEntityRowListForAnnotations(annos);
+		assertNotNull(rows);
+		assertEquals(1, rows.size());
+		EntityRow<?> row = rows.get(0);
+		assertTrue(row instanceof EntityRowAnnotation);
+		EntityRowAnnotation<Long> rowImpl = (EntityRowAnnotation<Long>) row;
+		assertEquals(Long.class, rowImpl.getListClass());
+		assertNotNull(rowImpl.getValue());
+		assertEquals(2, rowImpl.getValue().size());
+		assertEquals(new Long(123), rowImpl.getValue().get(0));
+		assertNotNull(rowImpl.getToolTipsBody());
+		assertEquals("123, 456", rowImpl.getDislplayValue());
+		// Test null
+		rowImpl.setValue(null);
+		assertEquals(null, rowImpl.getValue());
+	}
+	
+	@Test
+	public void testCreateEntityRowListForAnnotationsDouble(){
+		Annotations annos = new Annotations();
+		String key = "someKey";
+		annos.addAnnotation(key, 123.4);
+		annos.addAnnotation(key, 456.7);
+		List<EntityRow<?>> rows = EntityRowFactory.createEntityRowListForAnnotations(annos);
+		assertNotNull(rows);
+		assertEquals(1, rows.size());
+		EntityRow<?> row = rows.get(0);
+		assertTrue(row instanceof EntityRowAnnotation);
+		EntityRowAnnotation<Double> rowImpl = (EntityRowAnnotation<Double>) row;
+		assertEquals(Double.class, rowImpl.getListClass());
+		assertNotNull(rowImpl.getValue());
+		assertEquals(2, rowImpl.getValue().size());
+		assertEquals(new Double(123.4), rowImpl.getValue().get(0));
+		assertNotNull(rowImpl.getToolTipsBody());
+		assertEquals("123.4, 456.7", rowImpl.getDislplayValue());
+		// Test null
+		rowImpl.setValue(null);
+		assertEquals(null, rowImpl.getValue());
+	}
+	
+	@Test
+	public void testCreateEntityRowListForAnnotationsDate(){
+		Annotations annos = new Annotations();
+		String key = "someKey";
+		long now = System.currentTimeMillis();
+		annos.addAnnotation(key, new Date(now));
+		annos.addAnnotation(key, new Date(now+10000));
+		List<EntityRow<?>> rows = EntityRowFactory.createEntityRowListForAnnotations(annos);
+		assertNotNull(rows);
+		assertEquals(1, rows.size());
+		EntityRow<?> row = rows.get(0);
+		assertTrue(row instanceof EntityRowAnnotation);
+		EntityRowAnnotation<Date> rowImpl = (EntityRowAnnotation<Date>) row;
+		assertEquals(Date.class, rowImpl.getListClass());
+		assertNotNull(rowImpl.getValue());
+		assertEquals(2, rowImpl.getValue().size());
+		assertEquals(new Date(now), rowImpl.getValue().get(0));
+		assertNotNull(rowImpl.getToolTipsBody());
+		assertNotNull(rowImpl.getDislplayValue());
 		// Test null
 		rowImpl.setValue(null);
 		assertEquals(null, rowImpl.getValue());

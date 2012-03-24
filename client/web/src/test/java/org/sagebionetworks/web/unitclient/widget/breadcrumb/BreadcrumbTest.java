@@ -10,17 +10,28 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.management.RuntimeErrorException;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.ResourceEncoder;
+import org.sagebionetworks.ResourceUtils;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.RegisterConstants;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -32,6 +43,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -47,7 +59,7 @@ public class BreadcrumbTest {
 	
 	@SuppressWarnings("unchecked")
 	@Before
-	public void setup(){		
+	public void setup() throws UnsupportedEncodingException, JSONObjectAdapterException{		
 		mockView = Mockito.mock(BreadcrumbView.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
@@ -56,7 +68,9 @@ public class BreadcrumbTest {
 		
 		String registryJson = SynapseClientImpl.getEntityTypeRegistryJson();
 		AsyncMockStubber.callSuccessWith(registryJson).when(mockSynapseClient).getEntityTypeRegistryJSON(any(AsyncCallback.class));
-		entityTypeProvider = new EntityTypeProvider(mockSynapseClient, new JSONObjectAdapterImpl());		
+		// Load the register from the classpath.
+		
+		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl());		
 		
 		breadcrumb = new Breadcrumb(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, entityTypeProvider);
 		
