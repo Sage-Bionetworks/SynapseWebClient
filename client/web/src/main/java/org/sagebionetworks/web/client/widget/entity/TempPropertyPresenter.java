@@ -13,26 +13,20 @@ import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.ClientLogger;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
+import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
 import com.google.inject.Inject;
@@ -46,32 +40,22 @@ public class TempPropertyPresenter extends LayoutContainer {
 
 	EntitySchemaCache cache;
 	AdapterFactory factory;
+	AutoGenFactory entityFactory;
 	EntityPropertyGrid view;
 	EntityBundle bundle;
 	List<EntityRow<?>> rows;
-	AutoGenFactory entityFactory;
 	VerticalPanel vp;
-	FormFieldFactory formFactory;
-	ClientLogger log;
-	IconsImageBundle icons;
+	EntityEditorDialog editorDialog;
 	
 	@Inject
 	public TempPropertyPresenter(EntitySchemaCache cache,
-			AdapterFactory factory, EntityPropertyGrid view, FormFieldFactory formFactory, ClientLogger log, IconsImageBundle icons) {
+			AdapterFactory factory, EntityPropertyGrid view, EntityEditorDialog editorDialog) {
 		super();
 		this.cache = cache;
 		this.factory = factory;
 		this.view = view;
+		this.editorDialog = editorDialog;
 		this.entityFactory = new AutoGenFactory();
-		this.formFactory = formFactory;
-		this.log = log;
-		this.icons = icons;
-		// test the log
-		log.debug("Testing a debug message");
-		log.info("Testing an info message");
-		log.error("Testing an error message");
-		log.error("Testing an error with a basic stack info", IllegalArgumentException.class.getName(), TempPropertyPresenter.class.getName(), "<init>", 69);
-		
 	}
 	
 	@Override
@@ -83,69 +67,50 @@ public class TempPropertyPresenter extends LayoutContainer {
 		vp.setSpacing(10);
 		Button editButton = new Button();
 		editButton.setText("Edit");
+		// On edit we will show the edit dialog.
 		editButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
 	    	@Override
 	    	public void componentSelected(ButtonEvent ce) {
 	    	    Entity entity = bundle.getEntity();
 	    	    Annotations annos = bundle.getAnnotations();
-	    		final Dialog window = new Dialog();
-	    		window.setMaximizable(false);
-	    	    window.setSize(750, 700);
-	    	    window.setPlain(true);  
-	    	    window.setModal(true);  
-	    	    window.setBlinkModal(true);  
-	    	    window.setHeading("Edit: "+entity.getId());  
-	    	    window.setLayout(new FitLayout());
-	    	    // We want okay to say save
-	    	    window.okText = "Save";
-	    	    window.setButtons(Dialog.OKCANCEL);
-	    	    window.setHideOnButtonClick(true);
-	    	    
+    	    	// We want to filter out all transient properties.
+    	    	ObjectSchema schema = cache.getSchemaEntity(entity);
+    	    	Set<String> filter = new HashSet<String>();
+    			ObjectSchema versionableScheam = cache.getEntitySchema(Versionable.EFFECTIVE_SCHEMA, Versionable.class);
+    			filter.addAll(versionableScheam.getProperties().keySet());
+    	    	// Filter transient fields
+    	    	EntityRowFactory.addTransientToFilter(schema, filter);
+    	    	// Filter objects
+    	    	EntityRowFactory.addObjectTypeToFilter(schema, filter);
 	    	    // Create a new Adapter to capture the editor's changes
 	    	    final JSONObjectAdapter newAdapter = factory.createNew();
 	    	    final Annotations newAnnos = new Annotations();
 	    	    if(annos != null){
 	    	    	newAnnos.addAll(annos);
 	    	    }
-	    	    EntityPropertyForm editor = new EntityPropertyForm(formFactory, icons);
 	    	    try {
+	    	    	// Write the current entity to an adapter
 	    	    	entity.writeToJSONObject(newAdapter);
-	    	    	
-	    	    	// We want to filter out all transient properties.
-	    	    	ObjectSchema schema = cache.getSchemaEntity(entity);
-	    	    	Set<String> filter = new HashSet<String>();
-	    			ObjectSchema versionableScheam = cache.getEntitySchema(Versionable.EFFECTIVE_SCHEMA, Versionable.class);
-	    			filter.addAll(versionableScheam.getProperties().keySet());
-	    	    	// Filter transient fields
-	    	    	EntityRowFactory.addTransientToFilter(schema, filter);
-	    	    	// Filter objects
-	    	    	EntityRowFactory.addObjectTypeToFilter(schema, filter);
-	    	    	EntityFormModel model = EntityRowFactory.createEntityRowList(newAdapter, schema, newAnnos, filter);
-	    	    	editor.setList(model);
-				} catch (JSONObjectAdapterException e) {
-					throw new RuntimeException(e);
-				}
-	    	    window.add(editor, new FitData(0));
-	    	    // List for the button selection
-	    	    Button saveButton = window.getButtonById(Dialog.OK);
-	    	    saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+	    		} catch (JSONObjectAdapterException e) {
+	    			throw new RuntimeException(e);
+	    		}
+	    	    
+	    	    // Show the edit dialog.
+	    	    editorDialog.showEditEntityDialog(newAdapter, schema, newAnnos, filter, new EntityEditorDialog.Callback(){
+
 					@Override
-					public void componentSelected(ButtonEvent ce) {
-						// first create a new entity
-						JSONEntity newEntity;
+					public void saveEntity(JSONObjectAdapter newAdapter, Annotations newAnnos) {
+						Entity newEntity;
 						try {
-							newEntity = entityFactory.newInstance(bundle.getEntity().getClass().getName());
+							newEntity = (Entity) entityFactory.newInstance(bundle.getEntity().getEntityType());
 							newEntity.initializeFromJSONObject(newAdapter);
-							EntityBundle newBundel = new EntityBundle((Entity) newEntity, newAnnos, null, null, null);
+							// Let the caller know about the save
+							EntityBundle newBundel = new EntityBundle(newEntity, newAnnos, null, null, null);
 							setEntity(newBundel);
 						} catch (JSONObjectAdapterException e) {
-							DisplayUtils.showErrorMessage("Failed to apply the changes. Error: "+e.getMessage());
+							throw new RuntimeException(e);
 						}
-					}
-	    	    });
-	    	    // show the window
-	    	    window.show();
-	    	 
+					}});
 	    	}
 	    });
 		vp.add(editButton);
@@ -186,7 +151,6 @@ public class TempPropertyPresenter extends LayoutContainer {
 			// Pass the rows to the two views
 			view.setRows(rows);
 			this.layout(true);
-//			view.repaint();
 			// Create the list of fields
 		} catch (JSONObjectAdapterException e) {
 			throw new RuntimeException(e);
@@ -212,11 +176,6 @@ public class TempPropertyPresenter extends LayoutContainer {
 		example.getStringList().add("one");
 		example.getStringList().add("two");
 		example.getStringList().add("three");
-//		example.setDateList(new ArrayList<Date>());
-//		long now = System.currentTimeMillis();
-//		example.getDateList().add(new Date(now));
-//		example.getDateList().add(new Date(now-10000));
-//		example.getDateList().add(new Date(now-100000));
 		
 		return example;
 	}

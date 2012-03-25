@@ -276,5 +276,8 @@ a.shortBtn {
 	background-color: #666;	
 }
 
+.x-form-field-wrap .x-form-list-trigger {
+  background-image: url(/images/icons/list-trigger.gif);
+}
 
 
