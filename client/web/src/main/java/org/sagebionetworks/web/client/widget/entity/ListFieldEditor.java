@@ -41,7 +41,7 @@ public class ListFieldEditor<T> extends TriggerField<List<T>> {
 	ClientLogger log;
 
 	public ListFieldEditor(EntityRowList<T> rowList, Field<T> editor, IconsImageBundle iconBundle, ClientLogger log) {
-		setTriggerStyle("x-form-date-trigger");
+		setTriggerStyle("x-form-list-trigger");
 		this.rowList = rowList;
 		this.iconBundle = iconBundle;
 		this.log = log;
