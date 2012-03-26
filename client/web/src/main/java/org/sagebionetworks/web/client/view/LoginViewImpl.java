@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.users.UserData;
@@ -16,10 +17,11 @@ import org.sagebionetworks.web.shared.users.UserData;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -50,7 +52,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
 	private Window logginInWindow;
-	private Header headerWidget;
 
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
 	
@@ -62,7 +63,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		this.loginWidget = loginWidget;
 		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
-		this.headerWidget = headerWidget;
 			
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -192,4 +192,16 @@ public class LoginViewImpl extends Composite implements LoginView {
 		registerButtonPanel.clear();
 		logoutPanel.clear();
 	}
+	
+	@Override
+	public void showTermsOfUse(String content, final AcceptTermsOfUseCallback callback) {
+        TermsOfUseHelper.showTermsOfUse(content, callback);
+     }
+
+	@Override
+	public void acceptTermsOfUse() {
+		loginWidget.acceptTermsOfUse();
+	}
+
+
 }

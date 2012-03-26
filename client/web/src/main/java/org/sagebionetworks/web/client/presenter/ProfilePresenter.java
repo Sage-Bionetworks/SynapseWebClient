@@ -80,7 +80,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		// 1. Authenticate user with existing password
 		final UserData currentUser = authenticationController.getLoggedInUser();
 		if(currentUser != null) {
-			authenticationController.loginUser(currentUser.getEmail(), existingPassword, new AsyncCallback<UserData>() {				
+			authenticationController.loginUser(currentUser.getEmail(), existingPassword, false, new AsyncCallback<UserData>() {				
 				@Override
 				public void onSuccess(UserData result) {
 					// 2. set password

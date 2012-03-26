@@ -37,9 +37,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	@Override
-	public void loginUser(final String username, String password, final AsyncCallback<UserData> callback) {
+	public void loginUser(final String username, String password, boolean explicitlyAcceptsTermsOfUse, final AsyncCallback<UserData> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));		
-		userAccountService.initiateSession(username, password, new AsyncCallback<UserData>() {		
+		userAccountService.initiateSession(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<UserData>() {		
 			@Override
 			public void onSuccess(UserData userData) {				
 				String cookie = userData.getCookieString();
@@ -52,7 +52,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+				callback.onFailure(caught);
 			}
 		});
 	}
@@ -123,6 +123,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			}
 		});		
+	}
+
+	@Override
+	public void getTermsOfUse(AsyncCallback<String> callback) {
+		userAccountService.getTermsOfUse(callback);
 	}
 
 }

@@ -13,6 +13,7 @@ public class GetUser implements IsSerializable {
 	private String firstName;
 	private String lastName;
 	private String password;
+	private boolean acceptsTermsOfUse;
 	
 	public GetUser() {		
 	}
@@ -67,10 +68,20 @@ public class GetUser implements IsSerializable {
 		this.password = password;
 	}
 
+	public boolean isAcceptsTermsOfUse() {
+		return acceptsTermsOfUse;
+	}
+
+	public void setAcceptsTermsOfUse(boolean acceptsTermsOfUse) {
+		this.acceptsTermsOfUse = acceptsTermsOfUse;
+	}
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (acceptsTermsOfUse ? 1231 : 1237);
 		result = prime * result
 				+ ((displayName == null) ? 0 : displayName.hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
@@ -92,6 +103,8 @@ public class GetUser implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		GetUser other = (GetUser) obj;
+		if (acceptsTermsOfUse != other.acceptsTermsOfUse)
+			return false;
 		if (displayName == null) {
 			if (other.displayName != null)
 				return false;

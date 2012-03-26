@@ -20,6 +20,7 @@ import org.sagebionetworks.web.server.RestTemplateProviderImpl;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.users.AclPrincipal;
 import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.shared.users.UserRegistration;
@@ -149,7 +150,7 @@ public class UserAccountServiceImplTest {
 	}
 	
 	@Test
-	public void testCreateUser() {
+	public void testCreateUser() throws Exception {
 		try {
 			service.createUser(user1);
 		} catch (RestServiceException e) {
@@ -157,13 +158,8 @@ public class UserAccountServiceImplTest {
 		}
 		
 		// assure user was actually created		
-		try {
-			UserData userData = service.initiateSession(user1.getEmail(), user1password);
-			assertEquals(userData.getEmail(), user1.getEmail());
-		} catch (AuthenticationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		UserData userData = service.initiateSession(user1.getEmail(), user1password, false);
+		assertEquals(userData.getEmail(), user1.getEmail());
 	}
 	
 	@Test
@@ -175,7 +171,7 @@ public class UserAccountServiceImplTest {
 		user1acl.setName(user1.getDisplayName());
 		
 		try {
-			UserData userData = service.initiateSession(user1.getEmail(), user1password);
+			UserData userData = service.initiateSession(user1.getEmail(), user1password, false);
 			service.updateUser(user1.getFirstName(), user1.getLastName(), user1.getDisplayName());
 			assertEquals(user1.getDisplayName(), userData.getUserName());
 		} catch (Exception e) {
@@ -183,23 +179,18 @@ public class UserAccountServiceImplTest {
 		}
 	}
 	
-	@Test
-	public void testAuthenticateUser() {
+	@Test(expected=UnauthorizedException.class)
+	public void testUnAuthenticateUser() throws Exception {
 		// try fake user
-		try {
-			service.initiateSession("junk", "junk");
-			fail("unknown user was authenticated!");
-		} catch (AuthenticationException e1) {
-			// expected
-		}
+		service.initiateSession("junk", "junk", false);
+	}
 		
+	@Test
+	public void testAuthenticateUser() throws Exception {
 		// auth real user
-		try {
-			UserData userdata = service.initiateSession(user1.getEmail(), user1password);
-			assertEquals(user1.getEmail(), userdata.getEmail());
-		} catch (AuthenticationException e) {
-			fail("user not created properly");
-		}		
+		UserData userdata = service.initiateSession(user1.getEmail(), user1password, false);
+		assertEquals(user1.getEmail(), userdata.getEmail());
+		
 	}
 		
 	@Test
@@ -221,29 +212,18 @@ public class UserAccountServiceImplTest {
 	}
 		
 	@Test
-	public void testTerminateSession() {
+	public void testTerminateSession() throws Exception {
 		UserData userdata = null;
-		try {
-			userdata = service.initiateSession(user1.getEmail(), user1password);
-		} catch (AuthenticationException e) {
-			fail(e.getMessage());
-		}
+		userdata = service.initiateSession(user1.getEmail(), user1password, false);
 		
 		if(userdata == null) fail("test setup error: user doesn't exist");
 		
 		// terminate unknown session
-		try {
-			service.terminateSession("junk");
-		} catch (Exception e) {
-			fail("termination of an unknown session should not throw an exception");			
-		}
+		service.terminateSession("junk");
+
 		
 		// terminate real session
-		try {
-			service.terminateSession(userdata.getToken());			
-		} catch (RestServiceException e) {
-			fail(e.getMessage());
-		}
+		service.terminateSession(userdata.getToken());			
 	}
 		
 	@Test

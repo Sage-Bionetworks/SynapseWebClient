@@ -4,10 +4,13 @@ import java.util.logging.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.sagebionetworks.repo.ServiceConstants;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.users.GetUser;
 import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.shared.users.UserRegistration;
@@ -26,6 +29,8 @@ import com.google.gwt.user.server.rpc.UnexpectedException;
 import com.google.inject.Inject;
 
 public class UserAccountServiceImpl extends RemoteServiceServlet implements UserAccountService {
+	
+	public static final long serialVersionUID = 498269726L;
 
 	private static Logger logger = Logger.getLogger(UserAccountServiceImpl.class.getName());
 			
@@ -197,7 +202,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 
 	
 	@Override
-	public UserData initiateSession(String username, String password) throws AuthenticationException {
+	public UserData initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws TermsOfUseException, UnauthorizedException {
 		// First make sure the service is ready to go.
 		validateService();
 		
@@ -205,6 +210,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		try {
 			obj.put("email", username);
 			obj.put("password", password);
+			if (explicitlyAcceptsTermsOfUse) obj.put("acceptsTermsOfUse", "true");
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -225,7 +231,21 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		try {
 			response = templateProvider.getTemplate().exchange(url, method, entity, UserSession.class);
 		} catch (HttpClientErrorException ex) {
-			throw new AuthenticationException("Unable to authenticate.");
+			HttpStatus status = ex.getStatusCode();
+			switch (status.value()) {
+			case 403:
+				String termsOfUseContent = "";
+				try {
+					String responseBody = ex.getResponseBodyAsString();
+					JSONObject json = new JSONObject(responseBody);
+					termsOfUseContent = json.getString("reason");
+				} catch (JSONException e) {
+					throw new RuntimeException(e);
+				}
+				throw new TermsOfUseException(termsOfUseContent);
+			default:
+				throw new UnauthorizedException(ex.getMessage());
+			}
 		}
 		
 		UserData userData = null;		
@@ -235,7 +255,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			String sessionToken = initSession.getSessionToken();
 			userData = new UserData(username, displayName, sessionToken, false);
 		} else {			
-			throw new AuthenticationException("Unable to authenticate.");
+			throw new UnauthorizedException("Unable to authenticate.");
 		}
 		return userData;		
 	}
@@ -408,9 +428,20 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		} catch (NullPointerException nex) {
 			// TODO : change this to properly deal with a 204!!!
 			return true; // this is expected
+		} catch (HttpClientErrorException ex) {
+			HttpStatus status = ex.getStatusCode();
+			switch (status.value()) {
+			case 403:
+				throw new TermsOfUseException("Please log and sign the Terms of Use.");
+			default:
+				throw new UnauthorizedException(ex.getMessage());
+			}
 		}
 		return false;
 	}
+	
+
+
 
 	@Override
 	public String getPrivateAuthServiceUrl() {
@@ -471,5 +502,13 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 					+ response.getStatusCode().value());
 		}
 		
+	}
+	
+	@Override
+	public String getTermsOfUse() {
+		// Make the actual call.
+		String url = getPrivateAuthServiceUrl() + "/termsOfUse.html"; // TODO replace string with constant 
+		ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, HttpMethod.GET, null, String.class);
+		return response.getBody();
 	}
 }

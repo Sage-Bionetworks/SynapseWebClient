@@ -13,7 +13,7 @@ public interface UserAccountServiceAsync {
 
 	void setPassword(String email, String newPassword, AsyncCallback<Void> callback);
 
-	void initiateSession(String username, String password, AsyncCallback<UserData> callback);
+	void initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse, AsyncCallback<UserData> callback);
 
 	void getUser(String sessionToken, AsyncCallback<UserData> callback);	
 
@@ -30,5 +30,7 @@ public interface UserAccountServiceAsync {
 	void getPublicAuthServiceUrl(AsyncCallback<String> callback);
 	
 	void getSynapseWebUrl(AsyncCallback<String> callback);
+	
+	void getTermsOfUse(AsyncCallback<String> callback);
 
 }

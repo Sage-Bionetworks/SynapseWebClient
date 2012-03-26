@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -33,10 +34,10 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	public void addUserListener(UserListener listener){
 		listeners.add(listener);
 	}
-
+	
 	@Override
-	public void setUsernameAndPassword(String username, String password) {		
-		authenticationController.loginUser(username, password, new AsyncCallback<UserData>() {
+	public void setUsernameAndPassword(final String username, final String password, final boolean explicitlyAcceptsTermsOfUse) {		
+		authenticationController.loginUser(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<UserData>() {
 			@Override
 			public void onSuccess(UserData result) {
 				fireUserChage(result);
@@ -44,7 +45,22 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showAuthenticationFailed();
+				if (caught instanceof TermsOfUseException) {
+					authenticationController.getTermsOfUse(new AsyncCallback<String>() {
+						public void onSuccess(String termsOfUseContent) {	
+							view.showTermsOfUse(termsOfUseContent, 
+									new AcceptTermsOfUseCallback() {
+										public void accepted() {setUsernameAndPassword(username, password, true);}
+									});							
+						}
+						public void onFailure(Throwable t) {
+							view.showTermsOfUseDownloadFailed();							
+						}
+					});
+
+				} else {
+					view.showAuthenticationFailed();
+				}
 			}
 		});
 	}
@@ -73,8 +89,15 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 		return openIdActionUrl;
 	}
 
+	@Override
+	public String getOpenIdReturnUrl() {
+		return openIdReturnUrl;
+	}
 
-	
+	@Override
+	public void acceptTermsOfUse() {
+		view.acceptTermsOfUse();
+	}
 	
 	
 }

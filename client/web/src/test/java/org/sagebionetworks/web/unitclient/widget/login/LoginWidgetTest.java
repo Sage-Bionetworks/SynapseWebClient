@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.anyBoolean;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,9 +39,9 @@ public class LoginWidgetTest {
 	public void testSetUsernameAndPassword() {
 		String u = "user";
 		String p = "pass";
-		loginWidget.setUsernameAndPassword(u, p);
+		loginWidget.setUsernameAndPassword(u, p, true);
 		
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserData>) any());
+		verify(mockAuthController).loginUser(anyString(), anyString(), anyBoolean(), (AsyncCallback<UserData>) any());
 	}
 
 }
