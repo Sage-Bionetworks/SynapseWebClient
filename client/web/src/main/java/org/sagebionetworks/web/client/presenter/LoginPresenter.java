@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.ServiceConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -8,6 +9,8 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.LoginView;
+import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
+import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -48,12 +51,14 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.bus = eventBus;
 		
 	}
+	
+	public static final String LOGIN_PLACE  = "LoginPlace";
 
 	public void setPlace(final LoginPlace place) {
 		this.loginPlace = place;
 		view.setPresenter(this);
 		view.clear();
-		if(openIdActionUrl != null && openIdReturnUrl != null) {		
+		if(openIdActionUrl != null && openIdReturnUrl != null) {
 			showView(place);
 		} else {
 			// load Open ID urls
@@ -67,7 +72,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						@Override
 						public void onSuccess(String result) {
 							// this should be a string as the Auth service completes the URL with ":<sessionId>"
-							openIdReturnUrl = result + "/#LoginPlace";
+							openIdReturnUrl = result + "/#"+LOGIN_PLACE;
 							
 							// now show the view
 							showView(place);
@@ -79,13 +84,13 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage("An Error occured. Please try reloading the page");
+					view.showErrorMessage("An Error occured. Please try reloading the page.");
 				}
 			});
 		}
 	}
 
-	private void showView(LoginPlace place) {
+	private void showView(final LoginPlace place) {
 		String token = place.toToken();
 		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {
 			UserData currentUser = authenticationController.getLoggedInUser();
@@ -94,6 +99,22 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				isSso = currentUser.isSSO();
 			authenticationController.logoutUser();
 			view.showLogout(isSso);
+		} else if (token!=null && ServiceConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN.equals(token)) {
+			userService.getTermsOfUse(new AsyncCallback<String>() {
+				public void onSuccess(String content) {
+					view.showTermsOfUse(content, 
+						new AcceptTermsOfUseCallback() {
+							public void accepted() {
+								view.acceptTermsOfUse();
+								placeChanger.goTo(new LoginPlace("0"));
+							} 
+						});			
+				}
+				public void onFailure(Throwable throwable) {
+					view.showErrorMessage("An error occured. Please try logging in again.");
+					view.showLogin(openIdActionUrl, openIdReturnUrl);
+				}
+			});
 		} else if (!DisplayUtils.DEFAULT_PLACE_TOKEN.equals(token)				
 				&& !"".equals(token) && token != null) {			
 			// Single Sign on token. try refreshing the token to see if it is valid. if so, log user in
@@ -110,8 +131,24 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					}
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showErrorMessage("An error occured. Please try logging in again.");
-						view.showLogin(openIdActionUrl, openIdReturnUrl);
+
+						if (caught instanceof TermsOfUseException) {
+							authenticationController.getTermsOfUse(new AsyncCallback<String>() {
+								public void onSuccess(String termsOfUseContents) {
+									view.showTermsOfUse(termsOfUseContents, 
+											new AcceptTermsOfUseCallback() {
+												public void accepted() {showView(place);}
+											});		
+								}
+								public void onFailure(Throwable t) {
+									view.showErrorMessage("An error occured. Please try logging in again.");
+									view.showLogin(openIdActionUrl, openIdReturnUrl);									
+								}
+							});
+						} else {
+							view.showErrorMessage("An error occured. Please try logging in again.");
+							view.showLogin(openIdActionUrl, openIdReturnUrl);
+						}
 					}
 				});
 			} 
@@ -120,7 +157,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			view.showLogin(openIdActionUrl, openIdReturnUrl);
 		}
 	}
-
 	
 	@Override
 	public void setNewUser(UserData newUser) {	
