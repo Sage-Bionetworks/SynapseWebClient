@@ -506,8 +506,8 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	
 	@Override
 	public String getTermsOfUse() {
-		// Make the actual call.
-		String url = getPrivateAuthServiceUrl() + "/termsOfUse.html"; // TODO replace string with constant 
+		// call Synapse client instead of making its own call
+		String url = getPrivateAuthServiceUrl() + "/termsOfUse.html";
 		ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, HttpMethod.GET, null, String.class);
 		return response.getBody();
 	}
