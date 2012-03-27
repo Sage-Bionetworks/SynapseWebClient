@@ -28,6 +28,7 @@ import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.layout.AnchorLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Element;
@@ -70,14 +71,15 @@ public class EntityPropertyForm extends LayoutContainer {
 		this.setLayout(new AnchorLayout());
 		this.setScrollMode(Scroll.AUTO);
 		this.vp = new VerticalPanel();
-		vp.setSize(-1, -1);
 		this.add(vp);
+		int width = 700;
 		// This is the property panel
 		propPanel = new ContentPanel();
 		propPanel.setCollapsible(true);
 		propPanel.setFrame(false);
 		propPanel.setHeading("Properties");
 		propPanel.setLayout(new AnchorLayout());
+		propPanel.setWidth(width);
 		// Add a place holder form panel
 		formPanel = new FormPanel();
 		propPanel.add(formPanel);
@@ -144,6 +146,7 @@ public class EntityPropertyForm extends LayoutContainer {
 		annoPanel.setFrame(false);
 		annoPanel.setHeading("Annotations");
 		annoPanel.setLayout(new AnchorLayout());
+		annoPanel.setWidth(width);
 		annoPanel.setBottomComponent(toolBar);
 		// Add a place holder form panel
 		annotationFormPanel = new FormPanel();

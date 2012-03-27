@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
-import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.ClientLoggerImpl;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowListImpl;
@@ -38,9 +38,9 @@ public class ListFieldEditor<T> extends TriggerField<List<T>> {
 	EntityRowList<T> rowList;
 	Field<T> editor;
 	IconsImageBundle iconBundle;
-	ClientLogger log;
+	ClientLoggerImpl log;
 
-	public ListFieldEditor(EntityRowList<T> rowList, Field<T> editor, IconsImageBundle iconBundle, ClientLogger log) {
+	public ListFieldEditor(EntityRowList<T> rowList, Field<T> editor, IconsImageBundle iconBundle, ClientLoggerImpl log) {
 		setTriggerStyle("x-form-list-trigger");
 		this.rowList = rowList;
 		this.iconBundle = iconBundle;

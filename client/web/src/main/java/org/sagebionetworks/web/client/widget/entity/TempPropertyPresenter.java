@@ -18,6 +18,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialogImpl;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 
@@ -45,11 +46,11 @@ public class TempPropertyPresenter extends LayoutContainer {
 	EntityBundle bundle;
 	List<EntityRow<?>> rows;
 	VerticalPanel vp;
-	EntityEditorDialog editorDialog;
+	EntityEditorDialogImpl editorDialog;
 	
 	@Inject
 	public TempPropertyPresenter(EntitySchemaCache cache,
-			AdapterFactory factory, EntityPropertyGrid view, EntityEditorDialog editorDialog) {
+			AdapterFactory factory, EntityPropertyGrid view, EntityEditorDialogImpl editorDialog) {
 		super();
 		this.cache = cache;
 		this.factory = factory;

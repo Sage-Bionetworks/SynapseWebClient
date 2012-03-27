@@ -66,8 +66,14 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
+
+import org.sagebionetworks.web.client.widget.entity.EntityPropertyGrid;
+import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
+import org.sagebionetworks.web.client.widget.entity.PropertyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserView;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialogImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderView;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderView;
@@ -134,6 +140,17 @@ public class PortalGinModule extends AbstractGinModule {
 		// EntitySchemaCacheImpl
 		bind(EntitySchemaCacheImpl.class).in(Singleton.class);
 		bind(EntitySchemaCache.class).to(EntitySchemaCacheImpl.class);
+		
+		bind(PropertyWidget.class).in(Singleton.class);
+		bind(EntityPropertyGrid.class).in(Singleton.class);
+		bind(PropertyWidgetView.class).to(EntityPropertyGrid.class);
+		
+		// the logger
+		bind(ClientLoggerImpl.class).in(Singleton.class);
+		bind(ClientLogger.class).to(ClientLoggerImpl.class);
+		// the edit dialog
+		bind(EntityEditorDialogImpl.class).in(Singleton.class);
+		bind(EntityEditorDialog.class).to(EntityEditorDialogImpl.class);
 		
 		// The URL cache
 		bind(UrlCacheImpl.class).in(Singleton.class);

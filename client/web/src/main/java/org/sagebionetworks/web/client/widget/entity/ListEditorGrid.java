@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.ClientLoggerImpl;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -44,9 +44,9 @@ public class ListEditorGrid<T> extends LayoutContainer {
 	EditorGrid<ListItem<T>> grid;
 	ColumnModel columnModel;
 	IconsImageBundle iconBundle;
-	ClientLogger log;
+	ClientLoggerImpl log;
 
-	public ListEditorGrid(IconsImageBundle iconBundle, ClientLogger log) {
+	public ListEditorGrid(IconsImageBundle iconBundle, ClientLoggerImpl log) {
 		this.iconBundle = iconBundle;
 		this.log = log;
 	}

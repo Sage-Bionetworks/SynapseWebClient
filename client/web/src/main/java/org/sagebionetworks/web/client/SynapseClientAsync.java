@@ -31,6 +31,11 @@ public interface SynapseClientAsync {
 
 	void getRepositoryServiceUrl(AsyncCallback<String> callback);
 
+	void createOrUpdateEntity(String entityJson, String annoJson,
+			boolean isNew, AsyncCallback<String> callback);
+	
+	
+
 
 	
 }

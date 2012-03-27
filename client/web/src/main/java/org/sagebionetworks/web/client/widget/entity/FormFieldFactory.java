@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.ClientLoggerImpl;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.ontology.AdapterModelData;
@@ -40,11 +40,11 @@ public class FormFieldFactory {
 	private static final String KEY_CHILDREN_TRANSITIVE = "/childrenTransitive/";
 	private static final String KEY_CONCEPT = "/concept/";
 	IconsImageBundle iconBundle;
-	ClientLogger log;
+	ClientLoggerImpl log;
 	UrlCache urlCache;
 
 	@Inject
-	public FormFieldFactory(IconsImageBundle iconBundle, ClientLogger log, UrlCache urlCache) {
+	public FormFieldFactory(IconsImageBundle iconBundle, ClientLoggerImpl log, UrlCache urlCache) {
 		this.iconBundle = iconBundle;
 		this.log = log;
 		this.urlCache = urlCache;

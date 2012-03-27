@@ -1,14 +1,21 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.schema.ObjectSchema;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -20,6 +27,8 @@ import org.sagebionetworks.web.client.widget.editpanels.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
+import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.portlet.SynapsePortlet;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
@@ -84,10 +93,22 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel breadcrumbsPanel;
 	@UiField
 	SimplePanel actionMenuPanel;
-	@UiField 
-	SimplePanel portalPanel;
-	@UiField 
-	SimplePanel portalPanelSingleCol;
+	@UiField
+	SimplePanel titlePanel;
+	@UiField
+	SimplePanel metadataPanel;
+	@UiField
+	SimplePanel descriptionHeader;
+	@UiField
+	SimplePanel propertiesHeader;
+	@UiField
+	SimplePanel descriptionBody;
+	@UiField
+	SimplePanel propertiesBody;
+	@UiField
+	SimplePanel contentsTitle;
+	@UiField
+	SimplePanel contentBody;
 	@UiField 
 	SimplePanel portalPanelThreeCol;
 	@UiField
@@ -106,6 +127,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Breadcrumb breadcrumb;
 	private boolean isAdministrator = false; 
 	private boolean canEdit = false;
+	PropertyWidget propertyWidget;
 			
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -114,7 +136,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PreviewDisclosurePanel previewDisclosurePanel,
 			AnnotationEditor annotationEditor, AdminMenu adminMenu, ActionMenu actionMenu,
 			EntityChildBrowser entityChildBrowser, LicensedDownloader licensedDownloader, Breadcrumb breadcrumb, 
-			QueryTableFactory queryTableFactory) {
+			QueryTableFactory queryTableFactory, PropertyWidget propertyWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.previewDisclosurePanel = previewDisclosurePanel;
@@ -125,6 +147,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.licensedDownloader = licensedDownloader;
 		this.breadcrumb = breadcrumb;
 		this.queryTableFactory = queryTableFactory;
+		this.propertyWidget = propertyWidget;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 	}
@@ -148,7 +171,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
-		actionMenuPanel.add(actionMenu.asWidget(bundle.getEntity(), isAdministrator, canEdit));
+		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator, canEdit));
 		
 		// Portal #1 - 2 columns
 		Portal portalTwoCol = new Portal(2);  
@@ -156,14 +179,34 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    portalTwoCol.setStyleAttribute("backgroundColor", "white");  
 	    portalTwoCol.setColumnWidth(0, .57);  
 	    portalTwoCol.setColumnWidth(1, .43);	 	    
-	    portalPanel.clear();
-	    portalPanel.add(portalTwoCol);	    
+	    Html title = new Html();
+	    
 	    // Title
-	    portalTwoCol.add(createTitlePortlet(bundle.getEntity(), entityTypeDisplay), 0);	    
-	    // Description	    
-		portalTwoCol.add(createDescriptionPortlet(bundle.getEntity()), 0);	    
-	    // Annotation Editor Portlet
-		portalTwoCol.add(createAnnotationEditorPortlet(bundle.getEntity()), 1);	    
+	    titlePanel.clear();
+	    titlePanel.add(createTitleHtml(bundle.getEntity(), entityTypeDisplay));
+	    // Metadata
+	    metadataPanel.clear();
+	    metadataPanel.add(createMetadata(bundle.getEntity()));
+
+	    // the headers for description and property
+	    descriptionHeader.clear();
+	    descriptionHeader.add(new Html("<h4>Description</h4>"));
+
+	    // the headers for properties.
+	    propertiesHeader.clear();
+	    propertiesHeader.add(new Html("<h4>Properties &amp; Annotations</h4>"));
+	    // Add the description body
+	    descriptionBody.clear();
+	    descriptionBody.add(new Html(bundle.getEntity().getDescription()));
+	    // Create the property body
+	    propertyWidget.setEntityBundle(bundle);
+	    propertiesBody.clear();
+	    propertiesBody.add(propertyWidget.asWidget());
+	    // the cotnents panel
+	    contentsTitle.clear();
+	    contentsTitle.add(new Html("<h4>"+entityTypeDisplay+" Contents</h4>"));
+	    contentBody.clear();
+	    contentBody.add(createEntityChildBrowser(bundle.getEntity(), canEdit));
 	    
 	    
 		// Portal #2 - full width
@@ -171,11 +214,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    portalSingleCol.setBorders(false);  
 	    portalSingleCol.setStyleAttribute("backgroundColor", "white");  
 	    portalSingleCol.setColumnWidth(0, 1.0);  	 	    
-	    portalPanelSingleCol.clear();
-	    portalPanelSingleCol.add(portalSingleCol);	    
-	    // Child Browser
-	    portalSingleCol.add(createEntityChildBrowser(bundle.getEntity(), canEdit), 0);
-	    
 	    
 		// Portal #3 - 3 columns
 		Portal portalThreeCol = new Portal(3);  
@@ -268,18 +306,50 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		return portlet;
 	}
+	
+	
 
-	private SynapsePortlet createTitlePortlet(Entity entity, String entityTypeDisplay) {
-	    String title = "<span style=\"font-weight:lighter;\">["
-				+ entityTypeDisplay.substring(0, 1)
-				+ "]</span> "
-				+ entity.getName()
-				+ "<br/><span style=\"font-size: 60%\">"
-				+ DisplayConstants.SYNAPSE_ID_PREFIX + entity.getId()
-				+ "</span>";
-	    SynapsePortlet titlePortlet = new SynapsePortlet(title, true, true);
-	    titlePortlet.setAutoHeight(true);
-		return titlePortlet;
+	private Html createTitleHtml(Entity entity, String entityTypeDisplay) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<h3>");
+		builder.append("<span style=\"font-weight:lighter;\">[");
+		builder.append(entityTypeDisplay.substring(0, 1));
+		builder.append("]</span> ");
+		builder.append(entity.getName());
+		builder.append(" (");
+		builder.append(entity.getId());
+		builder.append(")");
+		builder.append("</h3>");
+	    return new Html(builder.toString());
+	}
+	
+	/**
+	 * Basic meata data about this entity
+	 * @param entity
+	 * @return
+	 */
+	private Html createMetadata(Entity entity) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<div style=\"font-size: 80%\">");
+		builder.append("Added by: ");
+		builder.append(entity.getCreatedBy());
+		builder.append(" on: ");
+		builder.append(entity.getCreatedOn());
+		builder.append("<br/>Last updated by: ");
+		builder.append(entity.getModifiedBy());
+		builder.append(" on: ");
+		builder.append(entity.getModifiedOn());
+		builder.append("<br/>");
+		if(entity instanceof Versionable){
+			Versionable vb = (Versionable) entity;
+			builder.append("Current version: ");
+			builder.append(vb.getVersionLabel());
+			builder.append(" (#");
+			builder.append(vb.getVersionNumber());
+			builder.append(")");
+		}
+		builder.append("<div/>");
+	    return new Html(builder.toString());
 	}
 
 	private Portlet createAnnotationEditorPortlet(Entity entity) {
@@ -472,11 +542,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    return portlet;  
 	}	
 	
-	private Portlet createEntityChildBrowser(Entity entity, boolean canEdit) {
-		String typeDisplay = DisplayUtils.getEntityTypeDisplay(entity);
-		SynapsePortlet portlet = new SynapsePortlet(typeDisplay + " " + "Contents");
-		portlet.add(entityChildBrowser.asWidget(entity, canEdit));
-		return portlet;
+	private Widget createEntityChildBrowser(Entity entity, boolean canEdit) {
+		return entityChildBrowser.asWidget(entity, canEdit);
 	}
 	
 	private Portlet createRstudioPortlet(Entity entity) {
