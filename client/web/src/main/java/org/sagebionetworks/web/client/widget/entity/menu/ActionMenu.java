@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseClientUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -21,6 +22,7 @@ import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -38,13 +40,14 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
-	private Entity entity;
+	private EntityBundle entityBundle;
 	private EntityTypeProvider entityTypeProvider;
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private EntityEditor entityEditor;
 	
 	@Inject
-	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter) {
+	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor) {
 		this.view = view;
 		this.nodeService = nodeService;
 		this.nodeModelCreator = nodeModelCreator;
@@ -53,18 +56,19 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.entityEditor = entityEditor;
 		
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(Entity entity, boolean isAdministrator, boolean canEdit) {		
+	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit) {		
 		view.setPresenter(this);
-		this.entity = entity; 		
+		this.entityBundle = bundle; 		
 		
 		// Get EntityType
-		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entity);
+		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
-		view.createMenu(entity, entityType, isAdministrator, canEdit);
+		view.createMenu(bundle.getEntity(), entityType, isAdministrator, canEdit);
 		return view.asWidget();
 	}
 
@@ -73,7 +77,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		view.clear();
 		// remove handlers
 		handlerManager = new HandlerManager(this);		
-		this.entity = null;		
+		this.entityBundle = null;		
 	}
 
 	/**
@@ -105,10 +109,10 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 
 	@Override
 	public void deleteEntity() {
-		final String parentId = entity.getParentId();
-		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entity);
-		final String entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(entity);
-		nodeService.deleteNode(DisplayUtils.getNodeTypeForEntity(entity), entity.getId(), new AsyncCallback<Void>() {			
+		final String parentId = entityBundle.getEntity().getParentId();
+		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
+		final String entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(entityBundle.getEntity());
+		nodeService.deleteNode(DisplayUtils.getNodeTypeForEntity(entityBundle.getEntity()), entityBundle.getEntity().getId(), new AsyncCallback<Void>() {			
 			@Override
 			public void onSuccess(Void result) {				
 				view.showInfo(entityTypeDisplay + " Deleted", "The " + entityTypeDisplay + " was successfully deleted."); 
@@ -133,7 +137,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	@Override
 	public List<EntityType> getAddSkipTypes() {
 		// Get EntityType
-		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entity);
+		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		
 		List<EntityType> ignore = new ArrayList<EntityType>();
 		// ignore self type children 
@@ -159,7 +163,13 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 
 	@Override
 	public void createShortcut(final String addToEntityId) {
-		SynapseClientUtils.createShortcut(entity, addToEntityId, view, synapseClient, nodeService, nodeModelCreator, jsonObjectAdapter);
+		SynapseClientUtils.createShortcut(entityBundle.getEntity(), addToEntityId, view, synapseClient, nodeService, nodeModelCreator, jsonObjectAdapter);
+	}
+
+	@Override
+	public void onEdit() {
+		// Edit this entity.
+		entityEditor.editEntity(entityBundle, false);
 	}
 
 	

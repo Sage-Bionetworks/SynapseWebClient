@@ -35,6 +35,11 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 		void fireEntityUpdatedEvent();
 
 		PlaceChanger getPlaceChanger();
+		
+		/**
+		 * Called when the edit button is pushed.
+		 */
+		void onEdit();
 
 		void deleteEntity();
 

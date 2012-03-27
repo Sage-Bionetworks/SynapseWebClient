@@ -86,7 +86,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public void refresh() {
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
-		int mask = ENTITY | PERMISSIONS | ENTITY_PATH | ENTITY_REFERENCEDBY;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ENTITY_REFERENCEDBY;
 		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundleTransport>() {
 			@Override
 			public void onSuccess(EntityBundleTransport transport) {

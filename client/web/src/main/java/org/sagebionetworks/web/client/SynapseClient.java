@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
@@ -62,4 +64,16 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 */
 	public String getRepositoryServiceUrl();
+	
+
+	/**
+	 * Create or update an entity
+	 * @param entityJson
+	 * @param annoJson
+	 * @param isNew
+	 * @return
+	 * @throws RestServiceException 
+	 */
+	public String createOrUpdateEntity(String entityJson, String annoJson, boolean isNew) throws RestServiceException;
+	
 }

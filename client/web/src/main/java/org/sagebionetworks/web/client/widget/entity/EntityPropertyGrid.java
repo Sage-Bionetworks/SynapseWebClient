@@ -17,10 +17,12 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
+import com.extjs.gxt.ui.client.widget.layout.AnchorLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.tips.ToolTip;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * A widget that renders entity properties.
@@ -28,9 +30,7 @@ import com.google.gwt.user.client.Element;
  * @author jmhill
  *
  */
-public class EntityPropertyGrid extends LayoutContainer {
-
-//	private VerticalPanel vp;
+public class EntityPropertyGrid extends LayoutContainer implements PropertyWidgetView, IsWidget {
 
 	ListStore<EntityRowModel> gridStore;
 	Grid<EntityRowModel> grid;
@@ -39,6 +39,7 @@ public class EntityPropertyGrid extends LayoutContainer {
 	@Override
 	protected void onRender(Element parent, int index) {
 		super.onRender(parent, index);
+		this.setLayout(new AnchorLayout());
 		
 		// the label renderer
 		GridCellRenderer<EntityRowModel> labelRenderer = createLabelRenderer();
@@ -61,21 +62,12 @@ public class EntityPropertyGrid extends LayoutContainer {
 		column = new ColumnConfig();
 		column.setId(EntityRowModel.VALUE);
 		column.setHeader("Value");
-//		column.setWidth(col1Width);
+		column.setWidth(500);
 		column.setRowHeader(false);
 		column.setRenderer(valueRenderer);
 		configs.add(column);
 
 		columnModel = new ColumnModel(configs);
-
-		ContentPanel cp = new ContentPanel();
-		cp.setBodyBorder(false);
-		// cp.setIcon(Resources.ICONS.table());
-		// cp.setHeading("Basic Grid");
-		cp.setButtonAlign(HorizontalAlignment.CENTER);
-		cp.setLayout(new FitLayout());
-		cp.setHeaderVisible(false);
-		cp.setSize(350, 700);
 
 		grid = new Grid<EntityRowModel>(gridStore,columnModel);
 		grid.setAutoExpandColumn(EntityRowModel.VALUE);
@@ -88,11 +80,8 @@ public class EntityPropertyGrid extends LayoutContainer {
 		grid.setHideHeaders(true);
 		grid.setTrackMouseOver(false);
 		grid.setShadow(false);
-		grid.getAriaSupport().setLabelledBy(cp.getHeader().getId() + "-label");
-		cp.add(grid);
-		this.add(cp);
+		this.add(grid);
 		rebuild();
-
 	}
 
 	/**
@@ -102,6 +91,7 @@ public class EntityPropertyGrid extends LayoutContainer {
 		// there is nothing to do if we have not been rendered.
 		if(!this.isRendered()) return;
 		grid.reconfigure(gridStore,columnModel);
+		this.layout();
 	}
 
 	/**

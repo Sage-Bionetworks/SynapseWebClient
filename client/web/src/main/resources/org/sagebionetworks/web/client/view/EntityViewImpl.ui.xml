@@ -18,13 +18,10 @@
 		<!-- HEADER -->
         <div class="color-line"></div>
         <div class="clear"></div>
-    	<div class="container"> 		
-			<g:SimplePanel ui:field="header" />
-	        	<div class="span-24 notopmargin">
-	        	<div class="span-24 separator"></div>
-					<g:SimplePanel ui:field="entityPageTopPanel" />
-				</div>
-
+    	<div class="container"> 
+    		<div class="span-24 notopmargin"><g:SimplePanel ui:field="header" /></div>		
+			<div class="span-24 separator"></div>
+			<div class="span-24 notopmargin"><g:SimplePanel ui:field="entityPageTopPanel" /></div>
             <div class="clear"></div>
         </div> <!-- close class="container" -->
 		<g:SimplePanel ui:field="footer" />

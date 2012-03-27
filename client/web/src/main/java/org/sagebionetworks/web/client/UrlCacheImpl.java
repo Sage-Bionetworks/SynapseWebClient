@@ -8,7 +8,7 @@ public class UrlCacheImpl implements UrlCache {
 	String repoUrl;
 	
 	@Inject
-	public UrlCacheImpl(SynapseClientAsync client, final ClientLogger log){
+	public UrlCacheImpl(SynapseClientAsync client, final ClientLoggerImpl log){
 		client.getRepositoryServiceUrl(new AsyncCallback<String>() {
 			
 			@Override

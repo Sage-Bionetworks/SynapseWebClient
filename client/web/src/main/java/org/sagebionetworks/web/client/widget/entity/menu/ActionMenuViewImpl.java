@@ -40,7 +40,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuView {
+public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuView {
 
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -54,7 +54,6 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 	private Button shareButton;
 	private Button addButton;
 	private Button toolsButton;
-	private HorizontalPanel hp;
 	
 		
 	@Inject
@@ -69,25 +68,21 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 		this.accessMenuButton = accessMenuButton;	
 		this.accessControlListEditor = accessControlListEditor;
 		this.locationableUploader = locationableUploader;
-		this.setLayout(new FitLayout());
+//		this.setLayout(new FitLayout());
+		this.setHorizontalAlign(HorizontalAlignment.RIGHT);
+		this.setTableWidth("100%");
 	}
 
 	@Override
 	public void createMenu(Entity entity, EntityType entityType, boolean isAdministrator,
 			boolean canEdit) {			
-				
-		// add items in order. spacing is done with Html widgets as we don't want to add top/bottom padding
-		boolean addHpanel = hp == null ? true : false;
-		if(hp == null) {			
-			hp = new HorizontalPanel();
-		} 
 
 		// edit button
 		if(editButton == null) {			
 			editButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
 			editButton.setHeight(25);
-			hp.add(editButton);
-			hp.add(new Html("&nbsp;"));			
+			this.add(editButton);
+			this.add(new Html("&nbsp;"));			
 		}				
 		if (canEdit) editButton.enable();
 		else editButton.disable();
@@ -97,8 +92,8 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 		if(shareButton == null) { 
 			shareButton = new Button(DisplayConstants.BUTTON_SHARE, AbstractImagePrototype.create(iconsImageBundle.mailGrey16()));
 			shareButton.setHeight(25);
-			hp.add(shareButton);
-			hp.add(new Html("&nbsp;"));
+			this.add(shareButton);
+			this.add(new Html("&nbsp;"));
 		}
 		configureShareButton(entity);		
 		if (isAdministrator) shareButton.enable();
@@ -108,8 +103,8 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 		if(addButton == null) {
 			addButton = new Button(DisplayConstants.BUTTON_ADD, AbstractImagePrototype.create(iconsImageBundle.addGrey16()));
 			addButton.setHeight(25);
-			hp.add(addButton);
-			hp.add(new Html("&nbsp;"));
+			this.add(addButton);
+			this.add(new Html("&nbsp;"));
 		}
 		configureAddMenu(entity, entityType);
 		if (canEdit) addButton.enable();
@@ -118,13 +113,9 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 		if(toolsButton == null) {
 			toolsButton = new Button(DisplayConstants.BUTTON_TOOLS_MENU, AbstractImagePrototype.create(iconsImageBundle.adminToolsGrey16()));
 			toolsButton.setHeight(25);
-			hp.add(toolsButton);	
+			this.add(toolsButton);	
 		}							
 		configureToolsMenu(entity, entityType, isAdministrator, canEdit);
-
-		if(addHpanel) add(hp);
-//		hp.layout(true);
-//		this.layout(true);
 	}
 	
 	@Override
@@ -167,29 +158,8 @@ public class ActionMenuViewImpl extends LayoutContainer implements ActionMenuVie
 
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				final Window window = new Window();  
-				window.setSize(600, 345);
-				window.setPlain(true);
-				window.setModal(true);
-				window.setBlinkModal(true);
-				window.setHeading(DisplayConstants.BUTTON_EDIT + " " + typeDisplay);
-				window.setLayout(new FitLayout());								
-				nodeEditor.addCancelHandler(new CancelHandler() {					
-					@Override
-					public void onCancel(CancelEvent event) {
-						window.hide();
-					}
-				});
-				nodeEditor.addPersistSuccessHandler(new EntityUpdatedHandler() {					
-					@Override
-					public void onPersistSuccess(EntityUpdatedEvent event) {
-						window.hide();
-						presenter.fireEntityUpdatedEvent();
-					}
-				});
-				nodeEditor.setPlaceChanger(presenter.getPlaceChanger());
-				window.add(nodeEditor.asWidget(DisplayUtils.getNodeTypeForEntity(entity), entity.getId()), new FitData(4));				
-				window.show();
+				// the presenter should handle this
+				presenter.onEdit();
 			}
 		});		
 	}

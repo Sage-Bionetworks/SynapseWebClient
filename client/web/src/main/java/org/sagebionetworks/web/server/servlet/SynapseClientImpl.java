@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -19,14 +20,18 @@ import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
+import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -43,7 +48,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	@SuppressWarnings("unused")	
 	private static Logger logger = Logger.getLogger(SynapseClientImpl.class.getName());
 	private TokenProvider tokenProvider = this;
-	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+	AutoGenFactory entityFactory = new AutoGenFactory();
 	
 	/**
 	 * Injected with Gin
@@ -115,7 +121,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		Synapse synapseClient = createSynapseClient();
 		try {
 			Entity entity = synapseClient.getEntityById(entityId);
-			JSONObjectAdapter entityJson = entity.writeToJSONObject(jsonObjectAdapter.createNew());
+			JSONObjectAdapter entityJson = entity.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(entityJson.toJSONString(), entity.getClass().getName(), null);		
 		} catch (SynapseException e) {
 			// Since we are not throwing errors, log them
@@ -138,7 +144,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		Synapse synapseClient = createSynapseClient();
 		try {
 			EntityPath entityPath = synapseClient.getEntityPath(entityId); 
-			JSONObjectAdapter entityPathJson = entityPath.writeToJSONObject(jsonObjectAdapter.createNew());
+			JSONObjectAdapter entityPathJson = entityPath.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(entityPathJson.toJSONString(), entityPath.getClass().getName(), null);			
 		}catch (SynapseException e) {
 			// Since we are not throwing errors, log them
@@ -371,6 +377,74 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	@Override
 	public String getRepositoryServiceUrl() {
 		return urlProvider.getRepositoryServiceUrl();
+	}
+
+	@Override
+	public String createOrUpdateEntity(String entityJson, String annoJson,	boolean isNew) throws RestServiceException {
+		// First read the entity
+		try {
+			Entity entity = parseEntityFromJson(entityJson);
+			Annotations annos = null;
+			if(annoJson != null){
+				annos = EntityFactory.createEntityFromJSONString(annoJson, Annotations.class);
+			}
+			return createOrUpdateEntity(entity, annos, isNew);
+		} catch (JSONObjectAdapterException e) {
+			throw new BadRequestException(e.getMessage());
+		} 
+
+	}
+	
+	/**
+	 * Create or update an entity
+	 * @param entity
+	 * @param annos
+	 * @param isNew
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public String createOrUpdateEntity(Entity entity, Annotations annos, boolean isNew) throws RestServiceException {
+		// First read the entity
+		try {
+			Synapse synapseClient = createSynapseClient();
+			if(isNew){
+				// This is a create
+				entity = synapseClient.createEntity(entity);
+			}else{
+				// This is an update
+				entity = synapseClient.putEntity(entity);
+			}
+			// Update the annotations
+			if(annos != null){
+				annos.setEtag(entity.getEtag());
+				annos.setId(entity.getId());
+				synapseClient.updateAnnotations(entity.getId(), annos);
+			}
+			return entity.getId();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+
+	}
+	
+	/**
+	 * Parse an entity from its json.
+	 * @param json
+	 * @return
+	 * @throws JSONObjectAdapterException
+	 */
+	public Entity parseEntityFromJson(String json) throws JSONObjectAdapterException{
+		if(json == null) throw new IllegalArgumentException("Entity cannot be null");
+		// Create an adapter
+		JSONObjectAdapter adapter = adapterFactory.createNew(json);
+		// Extrat the entity type.
+		if(!adapter.has(EntityConstants.ENTITY_TYPE) || adapter.isNull(EntityConstants.ENTITY_TYPE)){
+			throw new IllegalArgumentException("JSON does not contain: "+EntityConstants.ENTITY_TYPE);
+		}
+		String entityType = adapter.getString(EntityConstants.ENTITY_TYPE);
+		Entity entity = (Entity) entityFactory.newInstance(entityType);
+		entity.initializeFromJSONObject(adapter);
+		return entity;
 	}
 
 }

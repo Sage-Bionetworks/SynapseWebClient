@@ -3,7 +3,7 @@ package org.sagebionetworks.web.unitserver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
@@ -21,7 +21,10 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -29,6 +32,8 @@ import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+
+import com.google.appengine.api.datastore.Entity;
 
 /**
  * Test for the SynapseClientImpl
@@ -163,6 +168,99 @@ public class SynapseClientImplTest {
 		assertNull(bundle.getAnnotaionsJson());
 		assertNull(bundle.getEntityPathJson());
 		assertNull(bundle.getPermissionsJson());
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testParseEntityFromJsonNoType() throws JSONObjectAdapterException{
+		ExampleEntity example = new ExampleEntity();
+		example.setName("some name");
+		example.setDescription("some description");
+		// do not set the type
+		String json = EntityFactory.createJSONStringForEntity(example);
+		// This will fail as the type is required
+		synapseClient.parseEntityFromJson(json);
+	}
+	
+	@Test
+	public void testParseEntityFromJson() throws JSONObjectAdapterException{
+		ExampleEntity example = new ExampleEntity();
+		example.setName("some name");
+		example.setDescription("some description");
+		example.setEntityType(ExampleEntity.class.getName());
+		String json = EntityFactory.createJSONStringForEntity(example);
+		System.out.println(json);
+		// Now make sure this can be read back
+		ExampleEntity clone = (ExampleEntity) synapseClient.parseEntityFromJson(json);
+		assertEquals(example, clone);
+	}
+	
+	@Test
+	public void testCreateOrUpdateEntityFalse() throws JSONObjectAdapterException, RestServiceException, SynapseException{
+		ExampleEntity in = new ExampleEntity();
+		in.setName("some name");
+		in.setDescription("some description");
+		in.setEntityType(ExampleEntity.class.getName());
+		
+		ExampleEntity out = new ExampleEntity();
+		out.setName("some name");
+		out.setDescription("some description");
+		out.setEntityType(ExampleEntity.class.getName());
+		out.setId("syn123");
+		out.setEtag("45");
+		
+		// when in comes in then return out.
+		when(mockSynapse.putEntity(in)).thenReturn(out);
+		String result = synapseClient.createOrUpdateEntity(in, null, false);
+		assertEquals(out.getId(), result);
+		verify(mockSynapse).putEntity(in);	
+	}
+	
+	@Test
+	public void testCreateOrUpdateEntityTrue() throws JSONObjectAdapterException, RestServiceException, SynapseException{
+		ExampleEntity in = new ExampleEntity();
+		in.setName("some name");
+		in.setDescription("some description");
+		in.setEntityType(ExampleEntity.class.getName());
+		
+		ExampleEntity out = new ExampleEntity();
+		out.setName("some name");
+		out.setDescription("some description");
+		out.setEntityType(ExampleEntity.class.getName());
+		out.setId("syn123");
+		out.setEtag("45");
+		
+		// when in comes in then return out.
+		when(mockSynapse.createEntity(in)).thenReturn(out);
+		String result = synapseClient.createOrUpdateEntity(in, null, true);
+		assertEquals(out.getId(), result);
+		verify(mockSynapse).createEntity(in);	
+	}
+	
+	@Test
+	public void testCreateOrUpdateEntityTrueWithAnnos() throws JSONObjectAdapterException, RestServiceException, SynapseException{
+		ExampleEntity in = new ExampleEntity();
+		in.setName("some name");
+		in.setDescription("some description");
+		in.setEntityType(ExampleEntity.class.getName());
+		
+		Annotations annos = new Annotations();
+		annos.addAnnotation("someString", "one");
+		
+		ExampleEntity out = new ExampleEntity();
+		out.setName("some name");
+		out.setDescription("some description");
+		out.setEntityType(ExampleEntity.class.getName());
+		out.setId("syn123");
+		out.setEtag("45");
+		
+		// when in comes in then return out.
+		when(mockSynapse.createEntity(in)).thenReturn(out);
+		String result = synapseClient.createOrUpdateEntity(in, annos, true);
+		assertEquals(out.getId(), result);
+		verify(mockSynapse).createEntity(in);
+		annos.setEtag(out.getEtag());
+		annos.setId(out.getId());
+		verify(mockSynapse).updateAnnotations(out.getId(), annos);
 	}
 
 }
