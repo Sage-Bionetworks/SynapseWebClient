@@ -84,7 +84,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage("An Error occured. Please try reloading the page.");
+					view.showErrorMessage("An Error occurred. Please try reloading the page.");
 				}
 			});
 		}
