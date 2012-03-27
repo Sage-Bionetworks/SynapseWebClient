@@ -41,6 +41,7 @@ public class QueryStringUtils {
 	public static final String BY = "by";
 	public static final String STAR = "*";
 	public static final String WHITE_SPACE = "+";
+	public static final String COMMA = ",";
 	
 	public static final String PATH_QUERY = "query?query=";
 
@@ -58,8 +59,16 @@ public class QueryStringUtils {
 		// Build up the template
 		builder.append(SELECT);
 		builder.append(WHITE_SPACE);
-		// For now all queries are select *
-		builder.append(STAR);
+		if(params.getSelectColumns() != null) {
+			for(int i=0; i<params.getSelectColumns().size(); i++) {
+				builder.append(params.getSelectColumns().get(i));
+				if(i != params.getSelectColumns().size()-1) 
+					builder.append(COMMA);
+			}		
+		} else {
+			// default to star
+			builder.append(STAR);
+		}
 		builder.append(WHITE_SPACE);
 		if(params.fetchType() == null) throw new IllegalArgumentException("From type cannot be null");
 		builder.append(FROM);

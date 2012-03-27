@@ -62,6 +62,10 @@ import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatri
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatrixViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
+import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserView;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderView;
@@ -308,6 +312,14 @@ public class PortalGinModule extends AbstractGinModule {
 		// LocationableUploader
 		bind(LocationableUploaderViewImpl.class).in(Singleton.class);
 		bind(LocationableUploaderView.class).to(LocationableUploaderViewImpl.class);
+
+		// EntityTreeBrowser
+		bind(EntityTreeBrowserViewImpl.class).in(Singleton.class);
+		bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);
+
+		// MyEntitiesBrowser
+		bind(MyEntitiesBrowserViewImpl.class).in(Singleton.class);
+		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);
 
 	}
 

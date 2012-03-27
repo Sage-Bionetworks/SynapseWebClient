@@ -37,7 +37,6 @@ public class SearchParameters implements IsSerializable{
 		setMembers(selectColumns, where, offset, limit, sort, ascending);
 	}
 
-
 	public SearchParameters(List<String> selectColumns, String fromType, List<WhereCondition>  where, int offset, int limit,
 			String sort, boolean ascending) {
 		super();
