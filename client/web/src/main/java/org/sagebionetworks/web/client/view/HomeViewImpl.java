@@ -6,11 +6,15 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.ComingSoon;
+import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 
+import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
@@ -33,20 +37,29 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Anchor seeAllContributors;
 	@UiField
 	SimplePanel bigSearchBox;
+	@UiField
+	SimplePanel myEntityOrRegister;
 	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
 	private GlobalApplicationState globalApplicationState;
 	private HomeSearchBox homeSearchBox;
+	private Html registerHtml;
+	private MyEntitiesBrowser myEntitiesBrowser;
 	
 	@Inject
-	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget, Footer footerWidget, IconsImageBundle icons, QueryFilter filter, SageImageBundle imageBundle, GlobalApplicationState globalApplicationState, HomeSearchBox homeSearchBox) {		
+	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget,
+			Footer footerWidget, IconsImageBundle icons, QueryFilter filter,
+			SageImageBundle imageBundle,
+			GlobalApplicationState globalApplicationState,
+			HomeSearchBox homeSearchBox, MyEntitiesBrowser myEntitiesBrowser) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.globalApplicationState = globalApplicationState;
 		this.homeSearchBox = homeSearchBox;
+		this.myEntitiesBrowser = myEntitiesBrowser;
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -63,6 +76,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 		bigSearchBox.clear();
 		bigSearchBox.add(homeSearchBox.asWidget());
 
+		registerHtml = new Html("<h3>Call for ALPHA USERS</h3>" 
+		+ "<p>Are you interested in working with Sage to start a pilot project on Synapse?  Please let us know at <a class=\"link\" href=\"mailto:synapseInfo@sagebase.org\">synapseInfo@sagebase.org</a></p>"
+		+ "<div class=\"mega-button\">"
+		+ "	<a href=\"#RegisterAccount:0\">Create an Account</a>"
+		+ "</div>");		
+		
 	}
 
 
@@ -75,6 +94,16 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void refresh() {
 		headerWidget.refresh();
 		headerWidget.setSearchVisible(false);
+		myEntityOrRegister.clear();		
+		if(presenter.showMyProjects()) {
+			VerticalPanel vp = new VerticalPanel();
+			vp.add(new Html("<h3>My Projects</h3>"));
+			vp.add(myEntitiesBrowser.asWidget());
+			myEntityOrRegister.add(vp);
+		} else {
+			myEntityOrRegister.add(registerHtml);
+		}
+		
 	}
 
 	@Override

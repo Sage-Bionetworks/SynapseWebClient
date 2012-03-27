@@ -68,4 +68,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		return placeChanger;
 	}
 
+	@Override
+	public boolean showMyProjects() {
+		return authenticationController.isLoggedIn();
+	}
+
 }

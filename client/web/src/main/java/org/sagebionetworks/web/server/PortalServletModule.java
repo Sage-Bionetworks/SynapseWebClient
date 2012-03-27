@@ -7,7 +7,10 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.FileUpload;
+import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
 import org.sagebionetworks.web.server.servlet.NodeServiceImpl;
@@ -60,6 +63,11 @@ public class PortalServletModule extends ServletModule {
 		// setup the node service
 		bind(NodeServiceImpl.class).in(Singleton.class);
 		serve("/Portal/node").with(NodeServiceImpl.class);
+			
+		
+		// Setup the License service mapping
+		bind(LicenseServiceImpl.class).in(Singleton.class);
+		serve("/Portal/license").with(LicenseServiceImpl.class);
 		
 		// Setup the User Account service mapping
 		bind(UserAccountServiceImpl.class).in(Singleton.class);
@@ -85,6 +93,9 @@ public class PortalServletModule extends ServletModule {
 		
 		// Bind the ConlumnConfig to singleton
 		bind(ColumnConfigProvider.class).in(Singleton.class);
+		
+		// JSONObjectAdapter
+		bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
 	}
 	
 	

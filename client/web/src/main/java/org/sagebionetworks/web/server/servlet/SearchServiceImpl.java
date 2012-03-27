@@ -2,14 +2,17 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SearchService;
 import org.sagebionetworks.web.server.ColumnConfigProvider;
 import org.sagebionetworks.web.server.RestTemplateProvider;
@@ -21,12 +24,12 @@ import org.sagebionetworks.web.shared.SearchParameters;
 import org.sagebionetworks.web.shared.TableResults;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -43,6 +46,8 @@ public class SearchServiceImpl extends RemoteServiceServlet implements
 	 * The template is injected with Gin
 	 */
 	private RestTemplateProvider templateProvider;
+	
+	private JSONObjectAdapter jsonObjectAdapter;
 
 	/**
 	 * Injected with Gin
@@ -74,6 +79,11 @@ public class SearchServiceImpl extends RemoteServiceServlet implements
 	@Inject
 	public void setColunConfigProvider(ColumnConfigProvider columnConfig) {
 		this.columnConfig = columnConfig;
+	}
+	
+	@Inject
+	public void setJSONObjectAdapter(JSONObjectAdapter jsonObjectAdapter) {
+		this.jsonObjectAdapter = jsonObjectAdapter;
 	}
 	
 	/**
@@ -262,6 +272,71 @@ public class SearchServiceImpl extends RemoteServiceServlet implements
 	@Override
 	protected void checkPermutationStrongName() throws SecurityException {
 		// No-opp here allows us to make RPC calls for integration testing.
+	}
+
+	@Override
+	public List<String> searchEntities(String fromType,
+			List<WhereCondition> where, int offset, int limit, String sort,
+			boolean ascending) throws RestServiceException {
+		if(fromType == null) throw new IllegalArgumentException("fromType cannot be null");		
+		
+		final String COL_ID = "id";
+		final String COL_NAME = "name";
+		final String COL_NODETYPE = "nodeType";
+		SearchParameters params = new SearchParameters(
+				Arrays.asList(new String[] { COL_ID, COL_NAME, COL_NODETYPE }),
+				fromType, where, offset, limit, sort, ascending);		
+		
+		// Build the uri from the parameters
+		URI uri = QueryStringUtils.writeQueryUri(urlProvider.getRepositoryServiceUrl() + "/", params);
+
+		HttpHeaders headers = new HttpHeaders();
+		// If the user data is stored in a cookie, then fetch it and the session token to the header.
+		UserDataProvider.addUserDataToHeader(this.getThreadLocalRequest(), headers);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> entity = new HttpEntity<String>("", headers);
+
+		// Make the actual call.
+		try {
+			ResponseEntity<Object> response = templateProvider.getTemplate().exchange(uri, HttpMethod.GET, entity, Object.class);
+			LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) response.getBody();
+			List<Map<String, Object>> rows = (List<Map<String, Object>>) body.get(KEY_RESULTS);
+			long end = System.currentTimeMillis();
+			logger.info("Url GET: " + uri.toString());
+			
+			final String KEY_ID = fromType + "." + COL_ID;
+			final String KEY_NAME = fromType + "." + COL_NAME;
+			final String KEY_NODETYPE = fromType + "." + COL_NODETYPE;
+			List<String> eheaders = new ArrayList<String>();
+			for(Map<String,Object> row : rows) {
+				if(row.containsKey(KEY_ID) && row.containsKey(KEY_NAME) && row.containsKey(KEY_NODETYPE)) {
+					EntityHeader eh = new EntityHeader();
+					eh.setId((String)row.get(KEY_ID));
+					eh.setName((String)row.get(KEY_NAME));
+					short typeid = Short.parseShort(row.get(KEY_NODETYPE).toString());
+					EntityType type = EntityType.getTypeForId(typeid);
+					eh.setType(type.getMetadata().getName());
+					JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+					try {
+						eh.writeToJSONObject(adapter);
+					} catch (JSONObjectAdapterException e) {
+						e.printStackTrace();
+					}
+					eheaders.add(adapter.toJSONString());
+				}
+			}
+			return eheaders;
+		} catch (HttpClientErrorException ex) {
+			// temporary solution to not being able to throw caught exceptions (due to Gin 1.0)
+			Integer code = ex.getStatusCode().value();
+			if(code == 401) { // UNAUTHORIZED
+				throw new UnauthorizedException();
+			} else if(code == 403) { // FORBIDDEN
+				throw new ForbiddenException();
+			} else {
+				throw new UnknownErrorException(ex.getMessage());
+			}
+		}				
 	}
 
 }

@@ -80,6 +80,21 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/external-16.png")
 	ImageResource external16();
 
+	@Source("images/icons/funnel-16.png")
+	ImageResource filter16();
+
+	@Source("images/icons/folder-open-document-16.png")
+	ImageResource folderDocument16();
+
+	@Source("images/icons/folder-open-document-text-16.png")
+	ImageResource folderDocumentText16();
+
+	@Source("images/icons/folder-open-image-16.png")
+	ImageResource folderImage16();
+
+	@Source("images/icons/folder-open-table-16.png")
+	ImageResource folderTable16();
+
 	@Source("images/icons/flag-16.png")
 	ImageResource flag16();
 

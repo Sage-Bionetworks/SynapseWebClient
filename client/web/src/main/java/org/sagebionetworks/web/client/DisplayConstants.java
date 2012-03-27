@@ -193,6 +193,11 @@ public class DisplayConstants {
 	public static final String TEXT_SHORTCUT_ADDED = "Shortcut added to id";
 	public static final String ERROR_UPDATE_FAILED = "Update failed. Please try again.";
 	public static final String TEXT_NO_REFERENCES = "No shortcuts point to this";
+	public static final String BUTTON_FILTER_ONLY_MY_CREATION = "Show Projects I Created";
+	public static final String BUTTON_FILTER_USER_UPDATABLE = "Show Projects I Can Edit";
+	public static final String STATUS_CAN_EDIT = "Can Edit";
+	public static final String STATUS_CREATED_BY = "Owner";
+	public static final String LABEL_NONE_FOUND = "None Found";
 	
 }
 

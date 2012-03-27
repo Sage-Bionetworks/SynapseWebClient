@@ -57,6 +57,8 @@ public class DisplayUtils {
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
+	public static final String ENTITY_CREATEDBY_KEY = "createdBy";
+	public static final String ENTITY_UPDATEDBY_KEY = "updatedBy";
 	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";	
 	
 	/*
@@ -145,7 +147,7 @@ public class DisplayUtils {
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
-	public static boolean handleServiceException(RestServiceException ex, PlaceChanger placeChanger, UserData currentUser) {
+	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, UserData currentUser) {
 		if(ex instanceof UnauthorizedException) {
 			// send user to login page						
 			Info.display("Session Timeout", "Your session has timed out. Please login again.");

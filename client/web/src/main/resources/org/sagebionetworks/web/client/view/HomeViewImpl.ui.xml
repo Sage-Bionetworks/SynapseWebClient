@@ -84,12 +84,7 @@
 	                    <p>Synapse is currently in Alpha development.  This prototype has been developed to demonstrate our vision for the technology and solicit feedback from the community.  The ability to create accounts and download Sage-hosted data is operational now.  Some of the other functionality of the site is still under development.</p>
 	                </div>        
 	                <div class="span-12 notopmargin last">
-	                	<h3>Call for ALPHA USERS</h3>
-	                    <p>Are you interested in working with Sage to start a pilot project on Synapse?  Please let us know at <a class="link" href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a></p>
-						<div class="mega-button">
-							<a href="#RegisterAccount:0">Create an Account</a>
-						</div>
-	                    						
+						<g:SimplePanel ui:field="myEntityOrRegister"/>	                    						
 	                </div>
 	        	</div>
 			</div>			
