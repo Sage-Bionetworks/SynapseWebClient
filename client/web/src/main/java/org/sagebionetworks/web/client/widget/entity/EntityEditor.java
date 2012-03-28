@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.shared.EntityConstants;
+import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -151,6 +152,22 @@ public class EntityEditor {
 			log.error(e.getMessage());
 			editorDialog.showErrorMessage(e.getMessage());
 		}
+	}
+
+	/**
+	 * Add a new entity to the given parent.
+	 * @param type
+	 * @param parentId
+	 */
+	public void addNewEntity(EntityType type, String parentId) {
+		// Create a new entity.
+		Entity entity = (Entity) entityFactory.newInstance(type.getClassName());
+		entity.setParentId(parentId);
+		entity.setEntityType(type.getClassName());
+		EntityBundle newBundle = new EntityBundle(entity, null, null, null, null);
+		// edit the entity
+		editEntity(newBundle, true);
+		
 	}
 
 }

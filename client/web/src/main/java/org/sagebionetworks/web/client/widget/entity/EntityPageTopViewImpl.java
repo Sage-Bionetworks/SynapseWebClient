@@ -1,38 +1,25 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.schema.ObjectSchema;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.adminmenu.AdminMenu;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.editpanels.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.portlet.SynapsePortlet;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
-import org.sagebionetworks.web.client.widget.table.QueryTableFactory;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.Direction;
@@ -118,15 +105,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private PreviewDisclosurePanel previewDisclosurePanel;	
-	private AnnotationEditor annotationEditor;
-	private AdminMenu adminMenu;
 	private ActionMenu actionMenu;
 	private EntityChildBrowser entityChildBrowser;
 	private LicensedDownloader licensedDownloader;
-	private QueryTableFactory queryTableFactory;
 	private Breadcrumb breadcrumb;
-	private boolean isAdministrator = false; 
-	private boolean canEdit = false;
 	PropertyWidget propertyWidget;
 			
 	@Inject
@@ -134,19 +116,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
 			AccessMenuButton accessMenuButton, NodeEditor nodeEditor,
 			PreviewDisclosurePanel previewDisclosurePanel,
-			AnnotationEditor annotationEditor, AdminMenu adminMenu, ActionMenu actionMenu,
+			ActionMenu actionMenu,
 			EntityChildBrowser entityChildBrowser, LicensedDownloader licensedDownloader, Breadcrumb breadcrumb, 
-			QueryTableFactory queryTableFactory, PropertyWidget propertyWidget) {
+			PropertyWidget propertyWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.previewDisclosurePanel = previewDisclosurePanel;
-		this.annotationEditor = annotationEditor;
-		this.adminMenu = adminMenu;
 		this.actionMenu = actionMenu;
 		this.entityChildBrowser = entityChildBrowser;
 		this.licensedDownloader = licensedDownloader;
 		this.breadcrumb = breadcrumb;
-		this.queryTableFactory = queryTableFactory;
 		this.propertyWidget = propertyWidget;
 		
 		initWidget(uiBinder.createAndBindUi(this));
@@ -155,10 +134,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void setEntityBundle(EntityBundle bundle, String entityTypeDisplay, boolean isAdministrator, boolean canEdit) {
 		
-		
-		// check authorization
-		this.isAdministrator = isAdministrator;
-		this.canEdit = canEdit;
 		// add breadcrumbs
 		breadcrumbsPanel.clear();
 		breadcrumbsPanel.add(breadcrumb.asWidget(bundle.getPath()));
@@ -350,19 +325,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		}
 		builder.append("<div/>");
 	    return new Html(builder.toString());
-	}
-
-	private Portlet createAnnotationEditorPortlet(Entity entity) {
-	    SynapsePortlet portlet = new SynapsePortlet("Properties &amp; Annotations", true, false);  
-	    portlet.setLayout(new FitLayout());    
-	    portlet.setAutoHeight(true);  	  
-		annotationEditor.setPlaceChanger(presenter.getPlaceChanger());
-		annotationEditor.setResource(DisplayUtils.getNodeTypeForEntity(entity), entity.getId());				
-		portlet.add(annotationEditor.asWidget());
-		return portlet;
 	}	
-	
-	
 	
 	private Portlet createRClientPortlet(Entity entity) {			  
 	    SynapsePortlet portlet = new SynapsePortlet("Synapse R Client");  

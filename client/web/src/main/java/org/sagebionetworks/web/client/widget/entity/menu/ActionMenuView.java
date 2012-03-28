@@ -48,6 +48,8 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 		boolean isUserLoggedIn();
 
 		void createShortcut(String entityId);
+		
+		public void addNewChild(EntityType type, String parentId);
 
 	}
 }

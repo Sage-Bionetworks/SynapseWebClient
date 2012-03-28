@@ -172,6 +172,12 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		entityEditor.editEntity(entityBundle, false);
 	}
 
+	@Override
+	public void addNewChild(EntityType type, String parentId) {
+		entityEditor.addNewEntity(type, parentId);
+		
+	}
+
 	
 	/*
 	 * Private Methods
