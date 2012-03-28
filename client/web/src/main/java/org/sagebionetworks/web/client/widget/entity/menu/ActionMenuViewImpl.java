@@ -211,8 +211,8 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				// TODO : replace icon with entity type icon
 				item.setIcon(AbstractImagePrototype.create(iconsImageBundle.documentAdd16()));
 				item.addSelectionListener(new SelectionListener<MenuEvent>() {
-					public void componentSelected(MenuEvent menuEvent) {													
-						showAddWindow(childType, entity.getId());
+					public void componentSelected(MenuEvent menuEvent) {
+						presenter.addNewChild(childType, entity.getId());
 					}
 				});
 				menu.add(item);
@@ -349,33 +349,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		}
 		
 		return count;
-	}
-
-	private void showAddWindow(EntityType childType, String parentId) {
-		final String typeDisplay = DisplayUtils.uppercaseFirstLetter(childType.getName());
-		final Window window = new Window();  
-		window.setSize(600, 275);
-		window.setPlain(true);
-		window.setModal(true);
-		window.setBlinkModal(true);
-		window.setHeading(DisplayConstants.LABEL_CREATE + " " + typeDisplay);
-		window.setLayout(new FitLayout());				
-		nodeEditor.addCancelHandler(new CancelHandler() {					
-			@Override
-			public void onCancel(CancelEvent event) {
-				window.hide();
-			}
-		});
-		nodeEditor.addPersistSuccessHandler(new EntityUpdatedHandler() {					
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				window.hide();
-				presenter.fireEntityUpdatedEvent();
-			}
-		});
-		nodeEditor.setPlaceChanger(presenter.getPlaceChanger());
-		window.add(nodeEditor.asWidget(DisplayUtils.getNodeTypeForEntityType(childType), null, parentId), new FitData(4));
-		window.show();
 	}
 
 }
