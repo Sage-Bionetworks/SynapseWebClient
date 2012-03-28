@@ -256,7 +256,11 @@
 	font-size: 1.2em;
 }
 
-.searchresult {
+.hitdescription {
+	color: black;
+}
+
+.hitattribution {
 	color: green;
 }
 
