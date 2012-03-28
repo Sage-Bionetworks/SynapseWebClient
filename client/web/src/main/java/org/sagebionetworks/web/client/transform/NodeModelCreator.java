@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.transform;
 
 
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -51,5 +52,7 @@ public interface NodeModelCreator {
 	void validate(String json) throws RestServiceException;
 
 	<T extends JSONEntity> PaginatedResults<T> createPaginatedResults(String jsonString, Class<? extends JSONEntity> clazz);
+
+	<T extends JSONEntity> BatchResults<T> createBatchResults(String jsonString, Class<? extends JSONEntity> clazz);
 
 }

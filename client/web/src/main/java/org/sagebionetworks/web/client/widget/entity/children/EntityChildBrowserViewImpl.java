@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.children;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -14,7 +13,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
-import org.sagebionetworks.web.client.view.table.DateColumn;
 import org.sagebionetworks.web.client.widget.statictable.StaticTable;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableColumn;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
@@ -23,7 +21,6 @@ import org.sagebionetworks.web.client.widget.table.QueryTableFactory;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.WhereCondition;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -48,8 +45,6 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Image;
@@ -61,6 +56,8 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	
 	private static final String KEY_TARGET_VERSION_NUMBER = "targetVersionNumber";
 	private static final String KEY_TARGET_ID = "targetId";
+	private static final String KEY_TYPE = "type";
+	private static final String KEY_NAME= "name";
 	private static final String KEY_REFERENCE_URI = "referenceUri";
 	private final static int MAX_IMAGE_PREVIEW_WIDTH_PX = 800;
 	private static final int BASE_PANEL_HEIGHT_PX = 270;
@@ -95,7 +92,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 
 	@Override
 	public void createBrowser(final Entity entity, EntityType entityType,
-			boolean canEdit, Set<Reference> shortcuts) {
+			boolean canEdit) {
 		if(tabPanel != null) {
 			// out with the old
 			this.remove(tabPanel);
@@ -118,7 +115,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		
 		// add tabs
 		numAdded += addChildTabs(entityType, location); 		
-		numAdded += addShortcutsTab(shortcuts);
+		numAdded += addShortcutsTab();
 		
 		if(numAdded == 0) {
 			final TabItem tab = new TabItem("None");			
@@ -131,58 +128,84 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		add(tabPanel);		
 	}
 
-	private int addShortcutsTab(final Set<Reference> shortcuts) {
-		int numAdded = 0;
-		if(shortcuts != null) {
-			final TabItem tab = new TabItem("Shortcuts");
-			tab.addStyleName("pad-text");			
-			final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);
-			loading.setHeight(tabPanelHeight);		
-			tab.add(loading);
-			// Render only if selected
-			tab.addListener(Events.Render, new Listener<BaseEvent>() {
-				@Override
-				public void handleEvent(BaseEvent be) {
-					// add table of shortcuts
-					ListStore<BaseModelData> store = new ListStore<BaseModelData>();
-					for(Reference reference : shortcuts.toArray(new Reference[shortcuts.size()])) {
-						BaseModelData model = new BaseModelData();
-						model.set(KEY_TARGET_ID, reference.getTargetId());
-						model.set(KEY_TARGET_VERSION_NUMBER, reference.getTargetVersionNumber());
-						model.set(KEY_REFERENCE_URI, presenter.getReferenceUri(reference));
-						store.add(model);
-					}					
-					
-					List<ColumnConfig> configs = new ArrayList<ColumnConfig>();  
-					  
-				    ColumnConfig column = new ColumnConfig();  
-				    column.setId(KEY_TARGET_ID);  
-				    column.setHeader("Shortcut To");  				     
-				    column.setRowHeader(true);				    
-				    GridCellRenderer<BaseModelData> cellRenderer = configureShortcutGridCellRenderer();
-					column.setRenderer(cellRenderer);				
+	private int addShortcutsTab() {
+		int numAdded = 0;		
+		final TabItem tab = new TabItem("Shortcuts");
+		tab.addStyleName("pad-text");			
+		final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);
+		loading.setHeight(tabPanelHeight);		
+		tab.add(loading);
+		// Render only if selected
+		tab.addListener(Events.Render, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {				
+				presenter.getShortcuts(new AsyncCallback<List<EntityHeader>>() {
+					@Override
+					public void onSuccess(List<EntityHeader> result) {
+						createShortcutGrid(tab, loading, result);
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						tab.remove(loading);
+						tab.add(new Html(DisplayConstants.ERROR_GENERIC_RELOAD), new MarginData(10));
+						tab.layout(true);
+					}
+				});				
+			}
 
-				    configs.add(column);  
-				  				  
-				    ColumnModel cm = new ColumnModel(configs);  				  
-					
-					Grid<BaseModelData> grid = new Grid<BaseModelData>(store, cm);
-					grid.setAutoWidth(true);
-					grid.setHeight(tabPanelHeight - 25);
-					grid.setAutoExpandColumn(KEY_TARGET_ID);
-					tab.remove(loading);
-					tab.add(grid);
-					tab.layout(true);
-				}
-			});
-			tabPanel.add(tab);	
-			
-			
-			numAdded++;
-		}
+		});
+		tabPanel.add(tab);	
+		numAdded++;
+		
 		return numAdded;
 	}
 
+	private void createShortcutGrid(final TabItem tab,
+			final ContentPanel loading, List<EntityHeader> shortcuts) {
+		// add table of shortcuts
+		ListStore<BaseModelData> store = new ListStore<BaseModelData>();
+		if(shortcuts != null) {
+			for(EntityHeader header : shortcuts.toArray(new EntityHeader[shortcuts.size()])) {
+				BaseModelData model = new BaseModelData();
+				model.set(KEY_TARGET_ID, header.getId());
+				model.set(KEY_TYPE, header.getType().replaceAll("/", ""));
+				model.set(KEY_NAME, header.getName());
+				// TODO : change from EntityHeader to something that contains target version number
+				//model.set(KEY_TARGET_VERSION_NUMBER, reference.getTargetVersionNumber());
+				model.set(KEY_REFERENCE_URI, presenter.getReferenceUri(header));
+				store.add(model);
+			}					
+		}
+		List<ColumnConfig> configs = new ArrayList<ColumnConfig>();  
+		  
+	    ColumnConfig column;
+
+	    column = new ColumnConfig();  
+	    column.setId(KEY_TARGET_ID);  
+	    column.setHeader("Shortcut To");  				     
+	    column.setRowHeader(true);				    
+	    GridCellRenderer<BaseModelData> cellRenderer = configureShortcutGridCellRenderer();
+		column.setRenderer(cellRenderer);				
+	    configs.add(column);  
+	  				  			  				  
+	    column = new ColumnConfig();  
+	    column.setId(KEY_TYPE);  
+	    column.setHeader("Type"); 
+	    column.setWidth(70);
+	    configs.add(column);  
+	  				  			  				  
+	    ColumnModel cm = new ColumnModel(configs);  				  
+		
+		Grid<BaseModelData> grid = new Grid<BaseModelData>(store, cm);
+		grid.setAutoWidth(true);
+		grid.setHeight(tabPanelHeight - 25);
+		grid.setAutoExpandColumn(KEY_TARGET_ID);
+		tab.remove(loading);
+		tab.add(grid);
+		tab.layout(true);
+	}
+
+	
 	private int addChildTabs(EntityType entityType,
 			final LocationData location) {
 		int numAdded=0;
@@ -384,7 +407,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 			@Override
 			public void onSuccess(ColumnModel cm) {					   		        
 				// limit view to just this entity's children
-				final List<WhereCondition> where = presenter.getProjectContentsWhereContidions();
+ 				final List<WhereCondition> where = presenter.getProjectContentsWhereContidions();
 				ContentPanel cp = queryTableFactory.createGridPanel(child, cm, where, presenter.getPlaceChanger(), null);
 		        if(cp != null && cp.getElement() != null) {
 		        	cp.setHeight(tabPanelHeight-25);
@@ -421,7 +444,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 				if(model.get(KEY_TARGET_VERSION_NUMBER) != null)
 					id += "." + model.get(KEY_TARGET_VERSION_NUMBER);
 
-				return "<a href=\"" + model.get(KEY_REFERENCE_URI) + "\">" + DisplayUtils.getIconHtml(iconsImageBundle.documentArrow16()) + "Jump to Synapse Id: "+ id + "</a>";
+				return "<a href=\"" + model.get(KEY_REFERENCE_URI) + "\">" + DisplayUtils.getIconHtml(iconsImageBundle.documentArrow16()) + model.get(KEY_NAME) +" (" + id + ")</a>";
 			}
 		};
 		return cellRenderer;

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.transform;
 
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -173,6 +174,19 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 			e.printStackTrace();
 		}
 		return paginatedResults;
+	}
+
+	@Override
+	public <T extends JSONEntity> BatchResults<T> createBatchResults(
+			String jsonString, Class<? extends JSONEntity> clazz) {
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		BatchResults<T> batchResults = new BatchResults(clazz);
+		try {
+			batchResults.initializeFromJSONObject(jsonObjectAdapter.createNew(jsonString));
+		} catch (JSONObjectAdapterException e) {
+			e.printStackTrace();
+		}
+		return batchResults;
 	}
 
 

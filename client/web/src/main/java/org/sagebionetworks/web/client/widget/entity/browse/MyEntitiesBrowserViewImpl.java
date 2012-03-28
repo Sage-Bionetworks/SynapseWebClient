@@ -25,6 +25,9 @@ import com.google.inject.Inject;
 
 public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEntitiesBrowserView {
 
+	private static final int HEIGHT_PX = 250;
+	private static final int WIDTH_PX = 459;
+	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
@@ -49,8 +52,8 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 
 		cp = new ContentPanel();
 		cp.setHeaderVisible(false);
-		cp.setHeight(250);
-		cp.setWidth(459);
+		cp.setHeight(HEIGHT_PX);
+		cp.setWidth(WIDTH_PX);
 		cp.setScrollMode(Scroll.AUTO);				
 		
 		final Status status = new Status();

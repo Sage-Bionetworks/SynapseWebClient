@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import java.util.List;
+
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
@@ -34,7 +36,8 @@ public interface SynapseClientAsync {
 	void createOrUpdateEntity(String entityJson, String annoJson,
 			boolean isNew, AsyncCallback<String> callback);
 	
-	
+	void getEntityTypeBatch(List<String> entityIds,
+			AsyncCallback<String> callback);
 
 
 	
