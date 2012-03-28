@@ -2,25 +2,26 @@ package org.sagebionetworks.web.client.widget.entity.children;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.BatchResults;
+import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.HasPreviews;
 import org.sagebionetworks.repo.model.HasShortcuts;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -42,6 +43,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	private EntityChildBrowserView view;
 	private PlaceChanger placeChanger;
 	private NodeServiceAsync nodeService;
+	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager = new HandlerManager(this);
@@ -52,9 +54,14 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	PreviewData previewData;
 	
 	@Inject
-	public EntityChildBrowser(EntityChildBrowserView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider) {
+	public EntityChildBrowser(EntityChildBrowserView view,
+			NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator,
+			AuthenticationController authenticationController,
+			EntityTypeProvider entityTypeProvider, 
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.nodeService = nodeService;
+		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
@@ -69,14 +76,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 		
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entity);
-		Set<Reference> shortcuts = null;
-		if(entity instanceof HasShortcuts) {
-			
-			shortcuts = ((HasShortcuts)entity).getShortcuts();
-			if(shortcuts == null) 
-				shortcuts = new HashSet<Reference>();
-		}
-		view.createBrowser(entity, entityType, canEdit, shortcuts);
+		view.createBrowser(entity, entityType, canEdit);
 		 
 		// load preview if has previews
 		if(entity instanceof HasPreviews) {
@@ -271,12 +271,43 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	}
 
 	@Override
-	public String getReferenceUri(Reference reference) {
-		String token = reference.getTargetId();
-		if(reference.getTargetVersionNumber() != null)
-			token += "." + reference.getTargetVersionNumber();		
+	public String getReferenceUri(EntityHeader header) {
+		String token = header.getId();
+//		if(header.getTargetVersionNumber() != null)
+//			token += "." + header.getTargetVersionNumber();		
 		return DisplayUtils.getSynapseHistoryToken(token);
 
+	}
+
+	@Override
+	public void getShortcuts(final AsyncCallback<List<EntityHeader>> callback) {
+		// TODO : deal with versions, not just current entity ids
+		if(entity instanceof HasShortcuts) {			
+			Set<Reference> shortcuts = ((HasShortcuts)entity).getShortcuts();
+			if(shortcuts != null && shortcuts.size() > 0) {
+				List<String> entityIds = new ArrayList<String>();
+				for(Reference reference : shortcuts) {
+					entityIds.add(reference.getTargetId());
+				}
+				synapseClient.getEntityTypeBatch(entityIds, new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String result) {
+						BatchResults<EntityHeader> batchResults = nodeModelCreator.createBatchResults(result, EntityHeader.class);
+						callback.onSuccess(batchResults.getResults());
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
+						callback.onFailure(caught);
+					}
+				});				
+ 			} else {
+ 				callback.onSuccess(new ArrayList<EntityHeader>());
+ 			}
+		} else {
+			callback.onFailure(null);
+		}		
 	}
 		
 	/*

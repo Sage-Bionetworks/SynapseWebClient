@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class QueryTableFactoryPresenter {
 	// can go into presenter class
 	public void getTableColumns(EntityType entityType, final PlaceChanger placeChanger, final AsyncCallback<List<HeaderData>> callback) {
 		// super simple params just to get columns
-		SearchParameters searchParams = new SearchParameters(new ArrayList<String>(), entityType, null, 1, 1, null, false);
+		SearchParameters searchParams = new SearchParameters(null, entityType, null, 1, 1, null, false);
 		searchService.executeSearch(searchParams, new AsyncCallback<TableResults>() {			
 			@Override
 			public void onSuccess(TableResults result) {

@@ -13,6 +13,8 @@ import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
+import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
+import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
@@ -50,8 +52,10 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private AccessMenuButton accessMenuButton;
 	private AccessControlListEditor accessControlListEditor;
 	private LocationableUploader locationableUploader;
+	private MyEntitiesBrowser myEntitiesBrowser;
 	private LicensedDownloader licensedDownloader;
 	private Widget downloadButton = null;
+
 	
 	private Button editButton;
 	private Button shareButton;
@@ -64,14 +68,16 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			IconsImageBundle iconsImageBundle, NodeEditor nodeEditor,
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
-			LocationableUploader locationableUploader, LicensedDownloader licensedDownloader) {
+			LocationableUploader locationableUploader, MyEntitiesBrowser myEntitiesBrowser, LicensedDownloader licensedDownloader) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.nodeEditor = nodeEditor;
 		this.accessMenuButton = accessMenuButton;	
 		this.accessControlListEditor = accessControlListEditor;
 		this.locationableUploader = locationableUploader;
+		this.myEntitiesBrowser = myEntitiesBrowser;
 		this.licensedDownloader = licensedDownloader;
+
 //		this.setLayout(new FitLayout());
 		this.setHorizontalAlign(HorizontalAlignment.RIGHT);
 		this.setTableWidth("100%");
@@ -269,16 +275,33 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		item.setIcon(AbstractImagePrototype.create(iconsImageBundle.documentArrow16()));
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
-			public void componentSelected(MenuEvent ce) {
-				// TODO : make this better. have it show you projects
-				final MessageBox box = MessageBox.prompt(DisplayConstants.LABEL_CREATE_SHORTCUT,"Where would you like to save a shortcut to this page? Enter Synapse ID: ");
-				box.addCallback(new Listener<MessageBoxEvent>() {
-					public void handleEvent(MessageBoxEvent be) {
-						if(be.getValue() != null && !"".equals(be.getValue())) {
-							presenter.createShortcut(be.getValue());
-						}				
+			public void componentSelected(MenuEvent ce) {				
+				final Window window = new Window();  
+
+				myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
+					@Override
+					public void onSelection(String selectedEntityId) {
+						presenter.createShortcut(selectedEntityId);
+						window.hide();
 					}
 				});
+				
+				window.setSize(483, 329);
+				window.setPlain(true);
+				window.setModal(true);
+				window.setBlinkModal(true);
+				window.setHeading(DisplayConstants.LABEL_WHERE_SAVE_SHORTCUT);
+				window.setLayout(new FitLayout());
+				window.add(myEntitiesBrowser.asWidget(), new FitData(4)); 				
+				window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						window.hide();
+					}
+				}));
+				window.setButtonAlign(HorizontalAlignment.CENTER);
+				window.show();
+
 			}
 		});
 		menu.add(item);
@@ -362,6 +385,33 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		}
 		
 		return count;
+	}
+
+	private void showAddWindow(EntityType childType, String parentId) {
+		final String typeDisplay = DisplayUtils.uppercaseFirstLetter(childType.getName());
+		final Window window = new Window();  
+		window.setSize(600, 275);
+		window.setPlain(true);
+		window.setModal(true);
+		window.setBlinkModal(true);
+		window.setHeading(DisplayConstants.LABEL_CREATE + " " + typeDisplay);
+		window.setLayout(new FitLayout());				
+		nodeEditor.addCancelHandler(new CancelHandler() {					
+			@Override
+			public void onCancel(CancelEvent event) {
+				window.hide();
+			}
+		});
+		nodeEditor.addPersistSuccessHandler(new EntityUpdatedHandler() {					
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				window.hide();
+				presenter.fireEntityUpdatedEvent();
+			}
+		});
+		nodeEditor.setPlaceChanger(presenter.getPlaceChanger());
+		window.add(nodeEditor.asWidget(DisplayUtils.getNodeTypeForEntityType(childType), null, parentId), new FitData(4));
+		window.show();
 	}
 
 }

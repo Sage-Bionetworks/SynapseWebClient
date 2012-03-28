@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
@@ -11,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -445,6 +447,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		Entity entity = (Entity) entityFactory.newInstance(entityType);
 		entity.initializeFromJSONObject(adapter);
 		return entity;
+	}
+
+
+	@Override
+	public String getEntityTypeBatch(List<String> entityIds) throws RestServiceException {		
+		try {
+		Synapse synapseClient = createSynapseClient();
+			BatchResults<EntityHeader> results = synapseClient.getEntityTypeBatch(entityIds);
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+
 	}
 
 }

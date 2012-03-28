@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import java.util.List;
+
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -27,8 +29,11 @@ public interface SynapseClient extends RemoteService {
 	
 	public EntityWrapper search(String searchQueryJson); 
 	
+	public String getEntityTypeBatch(List<String> entityIds) throws RestServiceException;
+	
 	public SerializableWhitelist junk(SerializableWhitelist l);
-
+	
+	
 	/**
 	 * Get a bundle of information about an entity in a single call
 	 * @param entityId

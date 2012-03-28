@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
@@ -47,13 +48,18 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	private EntityTypeProvider entityTypeProvider;
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private SelectedHandler selectedHandler;
+	
+	public interface SelectedHandler {
+		void onSelection(String selectedEntityId);
+	}
 	
 	@Inject
 	public MyEntitiesBrowser(MyEntitiesBrowserView view,
 			NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
-			GlobalApplicationState globalApplicationState,
+			final GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter, 
 			SearchServiceAsync searchService) {
@@ -66,6 +72,14 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		
+		// default selection behavior is to goto entity page
+		this.selectedHandler = new SelectedHandler() {			
+			@Override
+			public void onSelection(String selectedEntityId) {				
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(selectedEntityId));
+			}
+		};
 		
 		view.setPresenter(this);
 	}	
@@ -175,10 +189,18 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	public PlaceChanger getPlaceChanger() {
 		return placeChanger;
 	}
+	
+	/**
+	 * Define custom handling for when an entity is clicked
+	 * @param handler
+	 */
+	public void setEntitySelectedHandler(SelectedHandler handler) {
+		selectedHandler = handler;
+	}
 
 	@Override
 	public void entitySelected(String selectedEntityId) {
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(selectedEntityId));		
+		selectedHandler.onSelection(selectedEntityId);
 	}
 
 	@Override
