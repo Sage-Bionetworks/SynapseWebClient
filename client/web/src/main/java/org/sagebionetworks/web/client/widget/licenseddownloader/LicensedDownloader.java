@@ -31,15 +31,9 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private LicensedDownloaderView view;
 	private AuthenticationController authenticationController;
 	private PlaceChanger placeChanger;
-//	private GlobalApplicationState globalApplicationState;
-//	private SynapseClientAsync synapseClient;
-//	private JSONObjectAdapter jsonObjectAdapterProvider;
 
 	private boolean requireLicenseAcceptance;
 	private AsyncCallback<Void> licenseAcceptedCallback;	
-//	private boolean hasAcceptedLicenseAgreement;
-//	private LicenseAgreement licenseAgreement;
-//	private EntityTypeProvider entityTypeProvider;
 	
 	@Inject
 	public LicensedDownloader(LicensedDownloaderView view,

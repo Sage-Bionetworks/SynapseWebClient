@@ -25,7 +25,7 @@
 	<g:HTMLPanel>
 
 		<div class="span-12 left "><g:SimplePanel ui:field="breadcrumbsPanel" /></div>
-		<div class="span-7 last {style.right-important}"><g:SimplePanel ui:field="actionMenuPanel" /></div>
+		<div class="span-9 last {style.right-important}"><g:SimplePanel ui:field="actionMenuPanel" /></div>
 				
 		<div class="span-18 left "><g:SimplePanel ui:field="titlePanel" /></div>
 		<div class="span-6 right last"><g:SimplePanel ui:field="propertiesHeader" /></div>
