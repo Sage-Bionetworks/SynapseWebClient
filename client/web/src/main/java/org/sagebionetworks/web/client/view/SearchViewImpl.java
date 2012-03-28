@@ -345,14 +345,25 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 
 	private String getResultHtml(int i, Hit hit) {
-		String a =
-				"<div class=\"span-18 last serv notopmargin\">\n" +					
-				"	   <h4>"+ i +". \n" +
-				"         <a class=\"link\" href=\""+ DisplayUtils.getSynapseHistoryToken(hit.getId()) +"\">" + hit.getName() + "</a>" +
-				"      </h4>\n" +							 
-				"	<p class=\"notopmargin small-italic\">" + DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR) + "</p>\n" +					
-				"</div>\n";
-		return a;
+		StringBuilder attribution = new StringBuilder();
+		attribution.append("Created by ").append(hit.getCreated_by()).append(" on ").append(DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000))).append(", ");
+		if(null != hit.getVersion_label()) {
+			attribution.append("Version ").append(hit.getVersion_label()).append(" ");
+		}
+		attribution.append("Updated by ").append(hit.getModified_by()).append(" on ").append(DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)));
+		
+		StringBuilder resultHtml = new StringBuilder();
+		resultHtml.append("<div class=\"span-18 last serv notopmargin\">\n");
+		resultHtml.append("	   <h4>").append(i).append(". \n").append(hit.getNode_type());
+		resultHtml.append("         <a class=\"link\" href=\"").append(DisplayUtils.getSynapseHistoryToken(hit.getId())).append("\">").append(hit.getName()).append("</a>");
+		resultHtml.append("    </h4>\n");
+		if(null != hit.getDescription()) {
+			resultHtml.append("<p class=\"notopmargin small-italic\">").append(DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR)).append("</p>\n");
+		}
+		resultHtml.append("    <p class=\"notopmargin small-italic\">").append(attribution.toString()).append("</p>\n");					
+		resultHtml.append("</div>\n");
+
+		return resultHtml.toString();
 	}
 
 	private LayoutContainer createDateFacet(final Facet facet) {
