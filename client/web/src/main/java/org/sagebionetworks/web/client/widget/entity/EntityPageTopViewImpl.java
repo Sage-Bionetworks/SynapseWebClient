@@ -107,7 +107,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private PreviewDisclosurePanel previewDisclosurePanel;	
 	private ActionMenu actionMenu;
 	private EntityChildBrowser entityChildBrowser;
-	private LicensedDownloader licensedDownloader;
 	private Breadcrumb breadcrumb;
 	PropertyWidget propertyWidget;
 			
@@ -117,14 +116,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			AccessMenuButton accessMenuButton, NodeEditor nodeEditor,
 			PreviewDisclosurePanel previewDisclosurePanel,
 			ActionMenu actionMenu,
-			EntityChildBrowser entityChildBrowser, LicensedDownloader licensedDownloader, Breadcrumb breadcrumb, 
+			EntityChildBrowser entityChildBrowser, Breadcrumb breadcrumb, 
 			PropertyWidget propertyWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.previewDisclosurePanel = previewDisclosurePanel;
 		this.actionMenu = actionMenu;
 		this.entityChildBrowser = entityChildBrowser;
-		this.licensedDownloader = licensedDownloader;
 		this.breadcrumb = breadcrumb;
 		this.propertyWidget = propertyWidget;
 		
@@ -245,43 +243,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu.clearState();
 		// TODO : add other widgets here
 	}
-	
-	/*
-	 * Private Methods
-	 */
-	private SynapsePortlet createDescriptionPortlet(Entity entity) {		
-		SynapsePortlet portlet = new SynapsePortlet("Description");
-		String overviewText = entity.getDescription();
-		if(overviewText == null) overviewText = "";
-		int summaryLength = overviewText.length() >= DisplayConstants.DESCRIPTION_SUMMARY_LENGTH ? DisplayConstants.DESCRIPTION_SUMMARY_LENGTH : overviewText.length();
-		previewDisclosurePanel.init("Expand", overviewText.substring(0, summaryLength), overviewText);
-		portlet.add(previewDisclosurePanel);
-		
-		// download button		
-		if(presenter.isLocationable()) {
-			portlet.add(licensedDownloader.asWidget(entity, false), new MarginData(10, 0, 0, 0));
-		}
-		
-		// add some properties		
-		String propString = "Modified By " + entity.getModifiedBy() + " on "
-		+ DisplayUtils.convertDateToString(entity.getModifiedOn())
-		+ "<br/>" 
-		+ "Created By " + entity.getCreatedBy()
-		+ " on "
-		+ DisplayUtils.convertDateToString(entity.getCreatedOn());
-		
-		if(entity instanceof Versionable) {
-			Versionable e = (Versionable)entity;
-			propString += "<br/>" + "Version " + e.getVersionLabel();
-		}
-		
-		Html propHtml = new Html(propString);
-		propHtml.setStyleName(DisplayUtils.STYLE_SMALL_GREY_TEXT);		
-		portlet.add(propHtml, new MarginData(10,0,0,0));
-		
-		return portlet;
-	}
-	
 	
 
 	private Html createTitleHtml(Entity entity, String entityTypeDisplay) {

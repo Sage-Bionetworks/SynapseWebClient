@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
+import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
@@ -49,6 +50,8 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private AccessMenuButton accessMenuButton;
 	private AccessControlListEditor accessControlListEditor;
 	private LocationableUploader locationableUploader;
+	private LicensedDownloader licensedDownloader;
+	private Widget downloadButton = null;
 	
 	private Button editButton;
 	private Button shareButton;
@@ -61,13 +64,14 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			IconsImageBundle iconsImageBundle, NodeEditor nodeEditor,
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
-			LocationableUploader locationableUploader) {
+			LocationableUploader locationableUploader, LicensedDownloader licensedDownloader) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.nodeEditor = nodeEditor;
 		this.accessMenuButton = accessMenuButton;	
 		this.accessControlListEditor = accessControlListEditor;
 		this.locationableUploader = locationableUploader;
+		this.licensedDownloader = licensedDownloader;
 //		this.setLayout(new FitLayout());
 		this.setHorizontalAlign(HorizontalAlignment.RIGHT);
 		this.setTableWidth("100%");
@@ -76,6 +80,15 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	@Override
 	public void createMenu(Entity entity, EntityType entityType, boolean isAdministrator,
 			boolean canEdit) {			
+		int height = 25;
+		if(downloadButton == null){
+			downloadButton = licensedDownloader.asWidget(entity, false);
+			downloadButton.setHeight("25px");
+			add(downloadButton);
+			this.add(new Html("&nbsp;"));	
+		}
+		// Configure the button
+		licensedDownloader.configureHeadless(entity, false);
 
 		// edit button
 		if(editButton == null) {			
