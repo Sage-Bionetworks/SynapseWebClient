@@ -221,7 +221,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		SearchQuery query = new SearchQuery();
 		// start with a blank, valid query
 		query.setQueryTerm(Arrays.asList(new String[] {""}));		
-		query.setReturnFields(Arrays.asList(new String[] {"name","description","id"}));		
+		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "version_label"}));		
 		query.setFacet(FACETS_DISPLAY_ORDER);
 		
 		timeValueToDisplay.clear();
