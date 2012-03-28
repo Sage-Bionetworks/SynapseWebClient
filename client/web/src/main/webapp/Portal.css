@@ -256,6 +256,10 @@
 	font-size: 1.2em;
 }
 
+.searchresult {
+	color: green;
+}
+
 .addProjectBox {
 	width: 570px;
 	margin: 4px 10px 0 0; 
