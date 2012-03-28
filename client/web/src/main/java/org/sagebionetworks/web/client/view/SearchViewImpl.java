@@ -353,14 +353,15 @@ public class SearchViewImpl extends Composite implements SearchView {
 		attribution.append("Updated by ").append(hit.getModified_by()).append(" on ").append(DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)));
 		
 		StringBuilder resultHtml = new StringBuilder();
-		resultHtml.append("<div class=\"span-18 last serv notopmargin\">\n");
+		resultHtml.append("<div class=\"span-18 last serv notopmargin searchresult\">\n");
 		resultHtml.append("	   <h4>").append(i).append(". \n").append(hit.getNode_type());
 		resultHtml.append("         <a class=\"link\" href=\"").append(DisplayUtils.getSynapseHistoryToken(hit.getId())).append("\">").append(hit.getName()).append("</a>");
 		resultHtml.append("    </h4>\n");
+		resultHtml.append("<p class=\"notopmargin\">");
 		if(null != hit.getDescription()) {
-			resultHtml.append("<p class=\"notopmargin small-italic\">").append(DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR)).append("</p>\n");
+			resultHtml.append(DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR)).append("<br>\n");
 		}
-		resultHtml.append("    <p class=\"notopmargin small-italic\">").append(attribution.toString()).append("</p>\n");					
+		resultHtml.append(attribution.toString()).append("</p>\n");					
 		resultHtml.append("</div>\n");
 
 		return resultHtml.toString();
