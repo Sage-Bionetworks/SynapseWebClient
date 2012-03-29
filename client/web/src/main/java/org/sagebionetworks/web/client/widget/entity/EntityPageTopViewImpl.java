@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
-import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.portlet.SynapsePortlet;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -80,22 +79,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel breadcrumbsPanel;
 	@UiField
 	SimplePanel actionMenuPanel;
-	@UiField
-	SimplePanel titlePanel;
-	@UiField
-	SimplePanel metadataPanel;
-	@UiField
-	SimplePanel descriptionHeader;
-	@UiField
-	SimplePanel propertiesHeader;
-	@UiField
-	SimplePanel descriptionBody;
-	@UiField
-	SimplePanel propertiesBody;
-	@UiField
-	SimplePanel contentsTitle;
-	@UiField
-	SimplePanel contentBody;
+	@UiField 
+	SimplePanel portalPanel;
 	@UiField 
 	SimplePanel portalPanelThreeCol;
 	@UiField
@@ -109,6 +94,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private EntityChildBrowser entityChildBrowser;
 	private Breadcrumb breadcrumb;
 	PropertyWidget propertyWidget;
+	Widget propWidget;
 			
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -145,50 +131,24 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		});
 		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator, canEdit));
-		
+			    
 		// Portal #1 - 2 columns
 		Portal portalTwoCol = new Portal(2);  
 	    portalTwoCol.setBorders(false);  
 	    portalTwoCol.setStyleAttribute("backgroundColor", "white");  
-	    portalTwoCol.setColumnWidth(0, .57);  
-	    portalTwoCol.setColumnWidth(1, .43);	 	    
-	    Html title = new Html();
-	    
+	    portalTwoCol.setColumnWidth(0, .66);  
+	    portalTwoCol.setColumnWidth(1, .33);	 	    
+	    portalPanel.clear();
+	    portalPanel.add(portalTwoCol);	    
 	    // Title
-	    titlePanel.clear();
-	    titlePanel.add(createTitleHtml(bundle.getEntity(), entityTypeDisplay));
-	    // Metadata
-	    metadataPanel.clear();
-	    metadataPanel.add(createMetadata(bundle.getEntity()));
-
-	    // the headers for description and property
-	    descriptionHeader.clear();
-	    descriptionHeader.add(new Html("<h4>Description</h4>"));
-
-	    // the headers for properties.
-	    propertiesHeader.clear();
-	    propertiesHeader.add(new Html("<h4>Properties &amp; Annotations</h4>"));
-	    // Add the description body
-	    descriptionBody.clear();
-	    descriptionBody.add(new Html(bundle.getEntity().getDescription()));
-	    // Create the property body
-	    propertyWidget.setEntityBundle(bundle);
-	    propertiesBody.clear();
-	    propertiesBody.add(propertyWidget.asWidget());
-	    // the cotnents panel
-	    contentsTitle.clear();
-	    contentsTitle.add(new Html("<h4>"+entityTypeDisplay+" Contents</h4>"));
-	    contentBody.clear();
-	    contentBody.add(createEntityChildBrowser(bundle.getEntity(), canEdit));
+	    portalTwoCol.add(createTitlePortlet(bundle, entityTypeDisplay), 0);	    
+	    // Annotation Editor Portlet
+		portalTwoCol.add(createPropertyWidgetPortlet(bundle), 1);	    
+	    // Child Browser
+	    portalTwoCol.add(createEntityChildBrowser(bundle.getEntity(), canEdit), 0);
 	    
 	    
-		// Portal #2 - full width
-		Portal portalSingleCol = new Portal(1);  
-	    portalSingleCol.setBorders(false);  
-	    portalSingleCol.setStyleAttribute("backgroundColor", "white");  
-	    portalSingleCol.setColumnWidth(0, 1.0);  	 	    
-	    
-		// Portal #3 - 3 columns
+		// Portal #2 - 3 columns
 		Portal portalThreeCol = new Portal(3);  
 		portalThreeCol.setBorders(false);  
 		portalThreeCol.setStyleAttribute("backgroundColor", "white");  
@@ -243,22 +203,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu.clearState();
 		// TODO : add other widgets here
 	}
-	
-
-	private Html createTitleHtml(Entity entity, String entityTypeDisplay) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("<h3>");
-		builder.append("<span style=\"font-weight:lighter;\">[");
-		builder.append(entityTypeDisplay.substring(0, 1));
-		builder.append("]</span> ");
-		builder.append(entity.getName());
-		builder.append(" (");
-		builder.append(entity.getId());
-		builder.append(")");
-		builder.append("</h3>");
-	    return new Html(builder.toString());
-	}
-	
+		
 	/**
 	 * Basic meata data about this entity
 	 * @param entity
@@ -466,9 +411,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    return portlet;  
 	}	
 	
-	private Widget createEntityChildBrowser(Entity entity, boolean canEdit) {
-		return entityChildBrowser.asWidget(entity, canEdit);
+	private Portlet createEntityChildBrowser(Entity entity, boolean canEdit) {
+		String typeDisplay = DisplayUtils.getEntityTypeDisplay(entity);
+		SynapsePortlet portlet = new SynapsePortlet(typeDisplay + " " + "Contents");
+		portlet.add(entityChildBrowser.asWidget(entity, canEdit));
+		return portlet;
 	}
+	
 	
 	private Portlet createRstudioPortlet(Entity entity) {
 	    final SynapsePortlet portlet = new SynapsePortlet("RStudio");  
@@ -528,5 +477,46 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 	    return portlet;  		
 	}
+	
+	private SynapsePortlet createTitlePortlet(EntityBundle bundle, String entityTypeDisplay) {
+	    String title = "<span style=\"font-weight:lighter;\">["
+				+ entityTypeDisplay.substring(0, 1)
+				+ "]</span> "
+				+ bundle.getEntity().getName()
+				+ "&nbsp;(" + bundle.getEntity().getId() + ")";
+
+	    SynapsePortlet titlePortlet = new SynapsePortlet(title, true, true);
+	    titlePortlet.setAutoHeight(true);
+	    
+	    // Metadata
+	    titlePortlet.add(createMetadata(bundle.getEntity()));
+	    // the headers for description and property
+	    titlePortlet.add(new Html("<h3>Description</h3>"));
+	    // Add the description body
+	    String description = bundle.getEntity().getDescription();
+	    if(description == null || "".equals(description)) {
+	    	description = "<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>";
+	    }
+	    titlePortlet.add(new Html(description));
+	   	  
+		return titlePortlet;
+	}
+
+	private Portlet createPropertyWidgetPortlet(EntityBundle bundle) {
+	    SynapsePortlet portlet = new SynapsePortlet("Properties &amp; Annotations", true, false);  
+	    
+	    // Create the property body
+	    // the headers for properties.
+	    //propertiesHeader.add(new Html("<h4>Properties &amp; Annotations</h4>"));
+	    propertyWidget.setEntityBundle(bundle);
+	    portlet.add(propertyWidget.asWidget());
+
+	    portlet.setLayout(new FitLayout());    
+	    portlet.setAutoHeight(true);  	  
+		portlet.add(propertyWidget.asWidget());
+		return portlet;
+	}	
+	
+
 	
 }

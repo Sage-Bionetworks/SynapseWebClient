@@ -199,6 +199,7 @@ public class DisplayConstants {
 	public static final String STATUS_CAN_EDIT = "Can Edit";
 	public static final String STATUS_CREATED_BY = "Owner";
 	public static final String LABEL_NONE_FOUND = "None Found";
+	public static final String LABEL_NO_DESCRIPTION = "Add a description by clicking the \"Edit\" button.";
 	
 }
 

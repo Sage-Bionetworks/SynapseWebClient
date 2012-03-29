@@ -5,46 +5,25 @@
 	<ui:with field='icons'
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 
-	<ui:style>
-		.entity-table {
-			margin-top: 40px;
-		}
-		
-		.entity-table-notop {
-			margin-left: 15px;
-			margin-right: 15px;
-		}
-		
-		.right-important {
-			float:right !important;
-<!-- 			position:absolute; -->
-<!-- 			right:0px; -->
-		}
-	</ui:style>
-
 	<g:HTMLPanel>
 
-		<div class="span-12 left "><g:SimplePanel ui:field="breadcrumbsPanel" /></div>
-		<div class="span-9 last {style.right-important}"><g:SimplePanel ui:field="actionMenuPanel" /></div>
+				<div class="span-24 notopmargin" style="margin-top: 5px !important">
+					<div class="span-15 notopmargin" style="white-space: normal;">
+						<g:SimplePanel ui:field="breadcrumbsPanel"/>
+					</div>
+					<div class="span-9 last right notopmargin">
+						<g:SimplePanel ui:field="actionMenuPanel" />
+					</div>
+				</div>
 				
-		<div class="span-18 left "><g:SimplePanel ui:field="titlePanel" /></div>
-		<div class="span-6 right last"><g:SimplePanel ui:field="propertiesHeader" /></div>
-		<div class="span-18 left notopmargin">
-			<div class="span-18 left notopmargin"><g:SimplePanel ui:field="metadataPanel" /></div>
-			<div class="span-18 left"><g:SimplePanel ui:field="descriptionHeader" /></div>
-			<div class="span-18 notopmargin"><g:SimplePanel ui:field="descriptionBody" /></div>
-			<div class="span-18"><g:SimplePanel ui:field="contentsTitle" /></div>
-			<div class="span-18 notopmargin"><g:SimplePanel ui:field="contentBody" /></div>
-		</div>
-		<div class="span-6 right last notopmargin"><g:SimplePanel ui:field="propertiesBody" /></div>
-
-
-		<div class="span-24 notopmargin">
-			<div class="portal">
-				<g:SimplePanel ui:field="portalPanelThreeCol" />
-				<g:SimplePanel ui:field="portalPanelRstudio" />
-			</div>
-		</div>
+				<div class="span-24 notopmargin">
+	  				<div class="portal">		
+						<!-- <g:SimplePanel ui:field="portalPanel" styleName="portal rounded dropshaddow"/>  -->							
+						<g:SimplePanel ui:field="portalPanel"/>	
+						<g:SimplePanel ui:field="portalPanelThreeCol"/>
+						<g:SimplePanel ui:field="portalPanelRstudio"/>
+					</div>						
+				</div>
 	</g:HTMLPanel>
 </ui:UiBinder>
 

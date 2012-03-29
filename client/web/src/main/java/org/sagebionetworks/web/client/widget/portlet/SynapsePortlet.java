@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.portlet;
 
-import java.util.List;
-
 import org.sagebionetworks.web.client.widget.entity.DOMUtil;
 
 import com.extjs.gxt.ui.client.widget.Html;
@@ -14,13 +12,13 @@ public class SynapsePortlet extends Portlet {
 		String headTag = "";
 		String headTagClose = "";
 		if(isTitle) {
-			headTag = isTop ? "<h4 class=\"top\">" : "<h4>";
-			headTagClose = "</h4>";			
+			headTag = isTop ? "<h2 class=\"top\">" : "<h2>";
+			headTagClose = "</h2>";			
 		} else {
 			headTag = isTop ? "<h3 class=\"top\">" : "<h3>";
 			headTagClose = "</h3>";
 		}
-		Html header = new Html(headTag + title + "</h3>");
+		Html header = new Html(headTag + title + headTagClose);
 		header.setAutoHeight(true);
 	    add(header);
 	    
