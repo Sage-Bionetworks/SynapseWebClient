@@ -80,6 +80,7 @@ public class EntityPropertyGrid extends LayoutContainer implements PropertyWidge
 		grid.setHideHeaders(true);
 		grid.setTrackMouseOver(false);
 		grid.setShadow(false);
+		grid.setHeight(446);		
 		this.add(grid);
 		rebuild();
 	}
