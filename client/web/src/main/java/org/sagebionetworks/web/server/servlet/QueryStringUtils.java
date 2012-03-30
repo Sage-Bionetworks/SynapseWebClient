@@ -59,7 +59,7 @@ public class QueryStringUtils {
 		// Build up the template
 		builder.append(SELECT);
 		builder.append(WHITE_SPACE);
-		if(params.getSelectColumns() != null) {
+		if(params.getSelectColumns() != null && params.getSelectColumns().size() > 0) {
 			for(int i=0; i<params.getSelectColumns().size(); i++) {
 				builder.append(params.getSelectColumns().get(i));
 				if(i != params.getSelectColumns().size()-1) 

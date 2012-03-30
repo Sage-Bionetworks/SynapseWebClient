@@ -130,7 +130,7 @@ public class QueryTableFactoryPresenter {
 		
 		// If the sortKey is based on creator/createdBy or creationDate/createdOn, we want to be able to find AND sort the columns correctly
 		// Else, just leave the sortKey alone.
-		List<String> visibleColumnIds = context.visibleColumnIds == null ? new LinkedList<String>() : context.visibleColumnIds;
+		List<String> visibleColumnIds = context.visibleColumnIds == null ? null : context.visibleColumnIds;
 		return new SearchParameters(visibleColumnIds, entityType, where, oneBasedOffset, context.paginationLimit, context.sortKey, context.ascending);
 	}
 	
