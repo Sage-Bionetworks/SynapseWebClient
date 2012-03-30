@@ -290,7 +290,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
-		lc.add(new Html("<h3>Others Using this " + entityTypeProvider.getEntityDispalyName(entity) + "/<h3>"));	    
+		lc.add(new Html("<h3>Others Using this " + entityTypeProvider.getEntityDispalyName(entity) + "</h3>"));	    
 
 	    
 	    if(referencedBy.getTotalNumberOfResults() > 0) {	    
