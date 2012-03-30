@@ -39,7 +39,7 @@ public class PropertyWidgetViewImpl extends LayoutContainer implements PropertyW
 	@Override
 	protected void onRender(Element parent, int index) {
 		super.onRender(parent, index);
-		this.setLayout(new AnchorLayout());
+//		this.setLayout(new AnchorLayout());
 		
 		// the label renderer
 		GridCellRenderer<EntityRowModel> labelRenderer = createLabelRenderer();
