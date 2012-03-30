@@ -56,6 +56,11 @@ public interface EntityChildBrowserView extends IsWidget, SynapseWidgetView {
 		String getReferenceUri(EntityHeader reference);
 		
 		void getShortcuts(AsyncCallback<List<EntityHeader>> callback);
+
+		void getChildrenHeaders(AsyncCallback<List<EntityHeader>> callback);
+
+		void goToEntity(String selectedId);
+		
 	}
 
 
