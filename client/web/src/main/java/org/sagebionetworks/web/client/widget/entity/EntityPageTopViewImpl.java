@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
-import org.sagebionetworks.web.client.widget.portlet.SynapsePortlet;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -45,8 +44,6 @@ import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.SplitButton;
-import com.extjs.gxt.ui.client.widget.custom.Portal;
-import com.extjs.gxt.ui.client.widget.custom.Portlet;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -76,15 +73,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	@UiField
+	SimplePanel colLeftPanel;
+	@UiField
+	SimplePanel colRightPanel;
+	@UiField
 	SimplePanel breadcrumbsPanel;
 	@UiField
 	SimplePanel actionMenuPanel;
-	@UiField 
-	SimplePanel portalPanel;
-	@UiField 
-	SimplePanel portalPanelThreeCol;
-	@UiField
-	SimplePanel portalPanelRstudio;
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -92,9 +87,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private PreviewDisclosurePanel previewDisclosurePanel;	
 	private ActionMenu actionMenu;
 	private EntityChildBrowser entityChildBrowser;
-	private Breadcrumb breadcrumb;
-	PropertyWidget propertyWidget;
-	Widget propWidget;
+	private Breadcrumb breadcrumb;	
+	private PropertyWidget propertyWidget;
+	private LayoutContainer colLeftContainer;
+	private LayoutContainer colRightContainer;
 			
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -115,8 +111,27 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 	
+	
 	@Override
 	public void setEntityBundle(EntityBundle bundle, String entityTypeDisplay, boolean isAdministrator, boolean canEdit) {
+		
+		if(colLeftContainer == null) {
+			colLeftContainer = new LayoutContainer();
+			colLeftContainer.setAutoHeight(true);
+			colLeftContainer.setAutoWidth(true);
+			colLeftPanel.clear();
+			colLeftPanel.add(colLeftContainer);
+		}
+		if(colRightContainer == null) {
+			colRightContainer = new LayoutContainer();
+			colRightContainer.setAutoHeight(true);
+			colRightContainer.setAutoWidth(true);
+			colRightPanel.clear();
+			colRightPanel.add(colRightContainer);
+		}
+		
+		colLeftContainer.removeAll();
+		colRightContainer.removeAll();
 		
 		// add breadcrumbs
 		breadcrumbsPanel.clear();
@@ -130,49 +145,40 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
-		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator, canEdit));
-			    
-		// Portal #1 - 2 columns
-		Portal portalTwoCol = new Portal(2);  
-	    portalTwoCol.setBorders(false);  
-	    portalTwoCol.setStyleAttribute("backgroundColor", "white");  
-	    portalTwoCol.setColumnWidth(0, .66);  
-	    portalTwoCol.setColumnWidth(1, .33);	 	    
-	    portalPanel.clear();
-	    portalPanel.add(portalTwoCol);	    
+		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator, canEdit));	
+		
+		MarginData widgetMargin = new MarginData(0, 0, 20, 0);
+		
+		/* 
+		 * Left Column
+		 */
 	    // Title
-	    portalTwoCol.add(createTitlePortlet(bundle, entityTypeDisplay), 0);	    
-	    // Annotation Editor Portlet
-		portalTwoCol.add(createPropertyWidgetPortlet(bundle), 1);	    
+	    colLeftContainer.add(createTitleWidget(bundle, entityTypeDisplay), widgetMargin);
+	    // Description
+	    colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);	    
 	    // Child Browser
-	    portalTwoCol.add(createEntityChildBrowser(bundle.getEntity(), canEdit), 0);
+		colLeftContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), canEdit), widgetMargin);
+	    // RStudio Button
+		colLeftContainer.add(createRstudioWidget(bundle.getEntity()), widgetMargin);
+		// Create Activity Feed widget
+		colLeftContainer.add(createActivityFeedWidget(bundle.getEntity()), widgetMargin);
 	    
+		/*
+		 * Right Column
+		 */
+		// Annotation Editor widget
+		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
+		// Attachments
+		colRightContainer.add(createAttachmentsWidget(bundle), widgetMargin);
+	    // Create References widget
+		colRightContainer.add(createReferencesWidget(bundle.getEntity(), bundle.getReferencedBy()), widgetMargin);
+		// Create R Client widget
+		colRightContainer.add(createRClientWidget(bundle.getEntity()), widgetMargin);
 	    
-		// Portal #2 - 3 columns
-		Portal portalThreeCol = new Portal(3);  
-		portalThreeCol.setBorders(false);  
-		portalThreeCol.setStyleAttribute("backgroundColor", "white");  
-		portalThreeCol.setColumnWidth(0, .33);  	 	    
-		portalThreeCol.setColumnWidth(1, .33);  	 	    
-		portalThreeCol.setColumnWidth(2, .33);  	 	    
-		portalPanelThreeCol.clear();
-		portalPanelThreeCol.add(portalThreeCol);
-	    // Create R Client portlet
-	    portalThreeCol.add(createRClientPortlet(bundle.getEntity()), 0);
-	    // Create References portlet
-	    portalThreeCol.add(createReferencesPortlet(bundle.getEntity(), bundle.getReferencedBy()), 1);
-	    // Create References portlet
-	    portalThreeCol.add(createActivityFeedPortlet(bundle.getEntity()), 2);
-	    
-	    Portal portalRstudio = new Portal(1);
-	    portalRstudio.setBorders(false);
-	    portalRstudio.setStyleAttribute("backgroundColor", "white");  
-	    portalRstudio.setColumnWidth(0, 1.0);
-	    portalPanelRstudio.clear();
-	    portalPanelRstudio.add(portalRstudio);
-	    portalRstudio.add(createRstudioPortlet(bundle.getEntity()), 0);
-	}
-	
+		colLeftContainer.layout(true);
+		colRightContainer.layout(true);
+	} 
+
 	@Override
 	public Widget asWidget() {
 		return this;
@@ -233,10 +239,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    return new Html(builder.toString());
 	}	
 	
-	private Portlet createRClientPortlet(Entity entity) {			  
-	    SynapsePortlet portlet = new SynapsePortlet("Synapse R Client");  
-	    portlet.setLayout(new FitLayout());    
-	    portlet.setAutoHeight(true);  	  
+	private Widget createRClientWidget(Entity entity) {			  
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+		lc.add(new Html("<h3>Synapse R Client</h3>"));  
 
 	    // setup install code widgets		
 	    Html loadEntityCode = new Html(DisplayUtils.getRClientEntityLoad(entity.getId()));
@@ -268,16 +275,20 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		vp.add(getRClientButton);
 		vp.add(container);
 		
-		portlet.add(new Html("<p>The Synapse R Client allows you to interact with the Synapse system programmatically.</p>"));
-		portlet.add(loadEntityCode);
-		portlet.add(vp);
-	    return portlet;  
+		lc.add(new Html("<p>The Synapse R Client allows you to interact with the Synapse system programmatically.</p>"));
+		lc.add(loadEntityCode);
+		lc.add(vp);
+		
+		lc.layout();
+	    return lc;  
 	}	
 	
-	private Portlet createReferencesPortlet(Entity entity, PaginatedResults<EntityHeader> referencedBy) {			  
-	    SynapsePortlet portlet = new SynapsePortlet("Others Using this " + DisplayUtils.getEntityTypeDisplay(entity));	    
-	    portlet.setLayout(new FitLayout());    
-	    portlet.setAutoHeight(true);  	  
+	private Widget createReferencesWidget(Entity entity, PaginatedResults<EntityHeader> referencedBy) {			  
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+
+		lc.add(new Html("<h3>Others Using this " + DisplayUtils.getEntityTypeDisplay(entity) + "/<h3>"));	    
 	    
 	    if(referencedBy.getTotalNumberOfResults() > 0) {	    
 		    List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
@@ -298,8 +309,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		    
 		    // TODO : eventually remove this block
 		    if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {					
-				portlet.add(new HTML(DisplayConstants.DEMO_ANALYSIS));
-				return portlet;
+				lc.add(new HTML(DisplayConstants.DEMO_ANALYSIS));
+				return lc;
 			}
 	
 		    // CREATE TABLE
@@ -372,15 +383,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    	
 			cp.add(grid);
 			
-			portlet.add(cp);
+			lc.add(cp);
 			
 			// load initial data
 			loader.load();
 
 	    } else {
-	    	portlet.add(new Html(DisplayConstants.TEXT_NO_REFERENCES + " " + DisplayUtils.getEntityTypeDisplay(entity) + "."));
+	    	lc.add(new Html(DisplayConstants.TEXT_NO_REFERENCES + " " + DisplayUtils.getEntityTypeDisplay(entity) + "."));
 	    }
-	    return portlet;  
+	    lc.layout();
+	    return lc;  
 	}	
 	
 	private GridCellRenderer<BaseModelData> configureReferencedByGridCellRenderer() {
@@ -399,30 +411,42 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}			
 
 	
-	private Portlet createActivityFeedPortlet(Entity entity) {			  
-	    SynapsePortlet portlet = new SynapsePortlet("Activity Feed");  
-	    portlet.setLayout(new FitLayout());    
-	    portlet.setAutoHeight(true);
+	private Widget createActivityFeedWidget(Entity entity) {			  
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+
+		lc.add(new Html("<h3>Activity Feed</h3>"));  
 	    
 		if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {			
-			portlet.add(new HTML(DisplayConstants.DEMO_COMMENTS));
+			lc.add(new HTML(DisplayConstants.DEMO_COMMENTS));
+		} else {
+			lc.add(new Html("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_ACTIVITY + "</div>"));
 		}
-
-	    return portlet;  
+				
+		lc.layout();
+	    return lc;  
 	}	
 	
-	private Portlet createEntityChildBrowser(Entity entity, boolean canEdit) {
+	private Widget createEntityChildBrowserWidget(Entity entity, boolean canEdit) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+
 		String typeDisplay = DisplayUtils.getEntityTypeDisplay(entity);
-		SynapsePortlet portlet = new SynapsePortlet(typeDisplay + " " + "Contents");
-		portlet.add(entityChildBrowser.asWidget(entity, canEdit));
-		return portlet;
+		lc.add(new Html("<h3>" + typeDisplay + " " + "Contents</h3>"));
+		lc.add(entityChildBrowser.asWidget(entity, canEdit));
+		lc.layout();
+		return lc;
 	}
 	
 	
-	private Portlet createRstudioPortlet(Entity entity) {
-	    final SynapsePortlet portlet = new SynapsePortlet("RStudio");  
-	    portlet.setLayout(new FitLayout());    
-	    portlet.setAutoHeight(true);	    	    
+	private Widget createRstudioWidget(Entity entity) {
+		final LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+
+		lc.add(new Html("<h3>RStudio</h3>"));  	        	    	    	 
 	    
 	    final SplitButton showRstudio = new SplitButton("&nbsp;&nbsp;Load in RStudio Server");
 	    showRstudio.setIcon(AbstractImagePrototype.create(iconsImageBundle.rstudio24()));
@@ -454,11 +478,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    	showRstudio.setText("&nbsp;&nbsp;Please Login to Load in RStudio");
 	    }
 	    
-	    final Html label = new Html("<div class=\"span-12 notopmargin\">" +
-	    		"<a href=\"http://rstudio.org/\" class=\"link\">RStudio&trade;</a> is a free and open source integrated development environment (IDE) for R. " +
+	    final Html label = new Html("<a href=\"http://rstudio.org/\" class=\"link\">RStudio&trade;</a> is a free and open source integrated development environment (IDE) for R. " +
 	    		"You can run it on your desktop (Windows, Mac, or Linux) or even over the web using RStudio Server.<br/></br>" +
-	    		"If you do not have a copy of RStudio Server setup, you can create one by <a href=\"http://rstudio.org/download/server\" class=\"link\">following these directions</a>." +
-	    "</div>");
+	    		"If you do not have a copy of RStudio Server setup, you can create one by <a href=\"http://rstudio.org/download/server\" class=\"link\">following these directions</a>.");
 	    	    
 	    showRstudio.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
@@ -466,57 +488,87 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			    Frame iframe = new Frame(presenter.getRstudioUrl());
 			    iframe.setHeight("500px");
 			    iframe.setWidth("100%");
-			    portlet.remove(showRstudio);
-			    portlet.remove(label);
-			    portlet.add(iframe);
-				portlet.layout(true);
+			    lc.remove(showRstudio);
+			    lc.remove(label);
+			    lc.add(iframe);
+				lc.layout(true);
 			}
 		});	    
-	    portlet.add(showRstudio);
-	    portlet.add(label, new MarginData(5, 0, 0, 0));
+	    lc.add(showRstudio);
+	    lc.add(label, new MarginData(5, 0, 0, 0));
 		
-	    return portlet;  		
+	    lc.layout();
+	    return lc;  		
 	}
 	
-	private SynapsePortlet createTitlePortlet(EntityBundle bundle, String entityTypeDisplay) {
-	    String title = "<span style=\"font-weight:lighter;\">["
+	private Widget createTitleWidget(EntityBundle bundle, String entityTypeDisplay) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+
+		String title = "<h2><span style=\"font-weight:lighter;\">["
 				+ entityTypeDisplay.substring(0, 1)
 				+ "]</span> "
 				+ bundle.getEntity().getName()
-				+ "&nbsp;(" + bundle.getEntity().getId() + ")";
-
-	    SynapsePortlet titlePortlet = new SynapsePortlet(title, true, true);
-	    titlePortlet.setAutoHeight(true);
-	    
+				+ "&nbsp;(" + bundle.getEntity().getId() + ")</h2>";
+    	lc.add(new Html(title));  
+		
 	    // Metadata
-	    titlePortlet.add(createMetadata(bundle.getEntity()));
+	    lc.add(createMetadata(bundle.getEntity()));
 	    // the headers for description and property
-	    titlePortlet.add(new Html("<h3>Description</h3>"));
-	    // Add the description body
+	   	  
+	    lc.layout();
+		return lc;
+	}
+		
+	private Widget createDescriptionWidget(EntityBundle bundle, String entityTypeDisplay) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+		lc.add(new Html("<h3>Description</h3>"));	
+
+		// Add the description body
 	    String description = bundle.getEntity().getDescription();
 	    if(description == null || "".equals(description)) {
 	    	description = "<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>";
 	    }
-	    titlePortlet.add(new Html(description));
-	   	  
-		return titlePortlet;
+	    lc.add(new Html(description));
+
+		
+		lc.layout();
+		return lc;
 	}
 
-	private Portlet createPropertyWidgetPortlet(EntityBundle bundle) {
-	    SynapsePortlet portlet = new SynapsePortlet("Properties &amp; Annotations", true, false);  
+	private Widget createPropertyWidget(EntityBundle bundle) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+		lc.add(new Html("<h3>Properties &amp; Annotations</h3>"));  
 	    
 	    // Create the property body
 	    // the headers for properties.
 	    //propertiesHeader.add(new Html("<h4>Properties &amp; Annotations</h4>"));
 	    propertyWidget.setEntityBundle(bundle);
-	    portlet.add(propertyWidget.asWidget());
-
-	    portlet.setLayout(new FitLayout());    
-	    portlet.setAutoHeight(true);  	  
-		portlet.add(propertyWidget.asWidget());
-		return portlet;
+	    lc.add(propertyWidget.asWidget());
+	    lc.layout();
+		return lc;
 	}	
 	
+	private Widget createAttachmentsWidget(EntityBundle bundle) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+		lc.add(new Html("<h3>Attachments</h3>"));	
+
+		ContentPanel cp = new ContentPanel();
+		cp.setHeight(150);
+		cp.setHeaderVisible(false);
+		cp.add(new Html("Coming soon."), new MarginData(5));
+		lc.add(cp);
+		
+		lc.layout();
+		return lc;
+	}
 
 	
 }

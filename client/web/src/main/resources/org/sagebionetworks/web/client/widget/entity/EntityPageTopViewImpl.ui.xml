@@ -15,15 +15,9 @@
 						<g:SimplePanel ui:field="actionMenuPanel" />
 					</div>
 				</div>
-				
-				<div class="span-24 notopmargin">
-	  				<div class="portal">		
-						<!-- <g:SimplePanel ui:field="portalPanel" styleName="portal rounded dropshaddow"/>  -->							
-						<g:SimplePanel ui:field="portalPanel"/>	
-						<g:SimplePanel ui:field="portalPanelThreeCol"/>
-						<g:SimplePanel ui:field="portalPanelRstudio"/>
-					</div>						
-				</div>
+
+				<div class="span-17 left"><g:SimplePanel ui:field="colLeftPanel" /></div>
+				<div class="span-7 right last" style="float:right; !important"><g:SimplePanel ui:field="colRightPanel" /></div>				
 	</g:HTMLPanel>
 </ui:UiBinder>
 
