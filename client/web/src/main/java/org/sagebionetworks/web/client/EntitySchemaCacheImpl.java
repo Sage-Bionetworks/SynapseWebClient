@@ -3,10 +3,12 @@ package org.sagebionetworks.web.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.schema.ObjectSchema;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 
 import com.google.inject.Inject;
 
@@ -21,12 +23,15 @@ public class EntitySchemaCacheImpl implements EntitySchemaCache {
 	 * The actual cache.
 	 */
 	private Map<Class<? extends Entity>, ObjectSchema> cache = new HashMap<Class<? extends Entity>, ObjectSchema>();
-	JSONEntityFactory factory = null;
+	//JSONEntityFactory factory = null;
+	AdapterFactory adapterFactory;
+	AutoGenFactory entityFactory;
 	
 	@Inject
-	public EntitySchemaCacheImpl(JSONEntityFactory factory){
-		if(factory == null) throw new IllegalArgumentException("The JSONEntityFactory cannot be null");
-		this.factory = factory;
+	public EntitySchemaCacheImpl(AdapterFactory adapterFactory){
+		if(adapterFactory == null) throw new IllegalArgumentException("The AdapterFactory cannot be null");
+		this.adapterFactory = adapterFactory;
+		this.entityFactory = new AutoGenFactory();
 	}
 	
 	/**
@@ -51,13 +56,23 @@ public class EntitySchemaCacheImpl implements EntitySchemaCache {
 		if(schema == null){
 			ObjectSchema newSchema = new ObjectSchema();
 			try {
-				schema = factory.initializeEntity(json, newSchema);
+				JSONObjectAdapter adapter = adapterFactory.createNew(json);
+				newSchema.initializeFromJSONObject(adapter);
+				schema = newSchema;
 			} catch (JSONObjectAdapterException e) {
 				throw new RuntimeException(e);
 			}
 			cache.put(clazz, schema);
 		}
 		return schema;		
+	}
+
+	@Override
+	public ObjectSchema getSchemaEntity(String entityClassName) {
+		// First get an instance of the class.
+		Entity instance = (Entity) entityFactory.newInstance(entityClassName);
+		Class clazz = instance.getClass();
+		return getEntitySchema(instance.getJSONSchema(), clazz);
 	}
 
 }

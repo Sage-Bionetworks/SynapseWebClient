@@ -400,7 +400,7 @@ public class ProjectViewImpl extends Composite implements ProjectView {
 			}
 		});
 		nodeEditor.setPlaceChanger(presenter.getPlaceChanger());
-		window.add(nodeEditor.asWidget(NodeType.DATASET, null, projectId), new FitData(4));
+		window.add(nodeEditor.asWidget(NodeType.STUDY, null, projectId), new FitData(4));
 		window.show();
 	}
 

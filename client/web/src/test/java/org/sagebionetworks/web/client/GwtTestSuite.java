@@ -268,7 +268,7 @@ public class GwtTestSuite extends GWTTestCase {
 	public void testEntitySchemaCache() throws JSONObjectAdapterException{
 		// Use the GWT factory
 		JSONEntityFactoryImpl factory = new JSONEntityFactoryImpl(new GwtAdapterFactory());
-		EntitySchemaCacheImpl cache = new EntitySchemaCacheImpl(factory);
+		EntitySchemaCacheImpl cache = new EntitySchemaCacheImpl(new GwtAdapterFactory());
 		Project project = new Project();
 		ObjectSchema projectSchema = cache.getSchemaEntity(project);
 		assertNotNull(projectSchema);
@@ -325,7 +325,7 @@ public class GwtTestSuite extends GWTTestCase {
 	public void testRegister() throws UnsupportedEncodingException, JSONObjectAdapterException{
 		RegisterConstants constants = GWT.create(RegisterConstants.class);
 		GwtAdapterFactory factory = new GwtAdapterFactory();
-		EntityTypeProvider entityTypeProvider = new EntityTypeProvider(constants, factory);
+		EntityTypeProvider entityTypeProvider = new EntityTypeProvider(constants, factory, null);
 		String uri = "http://HOST/PATH/project/ID";
 		EntityType projectType = entityTypeProvider.getEntityTypeForUri(uri);
 		assertNotNull(projectType);

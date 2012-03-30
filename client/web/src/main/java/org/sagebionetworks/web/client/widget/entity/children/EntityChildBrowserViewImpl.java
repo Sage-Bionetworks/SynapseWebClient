@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
@@ -75,6 +76,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	private ColumnFactory columnFactory;
 	private EntityTreeBrowser entityTreeBrowser;
 	private EntitySelectedHandler entitySelectedHandler;
+	private EntityTypeProvider entityTypeProvider;
 	
 	private TabItem previewTab;
 	private ContentPanel previewLoading;
@@ -88,12 +90,13 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	public EntityChildBrowserViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle,
 			QueryTableFactory queryTableFactory, ColumnFactory columnFactory,
-			EntityTreeBrowser entityTreeBrowser) {
+			EntityTreeBrowser entityTreeBrowser, EntityTypeProvider entityTypeProvider) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.queryTableFactory = queryTableFactory;
 		this.columnFactory = columnFactory;
 		this.entityTreeBrowser = entityTreeBrowser;
+		this.entityTypeProvider = entityTypeProvider;
 		
 		this.setLayout(new FitLayout());
 	}
@@ -258,7 +261,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 			for(final EntityType child : children) {
 				if(skipTypes.contains(child)) continue; // skip some types
 					
-				final String childDisplay = DisplayUtils.uppercaseFirstLetter(child.getName());
+				final String childDisplay = entityTypeProvider.getEntityDispalyName(child);
 				final TabItem tab = new TabItem(childDisplay);			
 				tab.addStyleName("pad-text");			
 				final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);

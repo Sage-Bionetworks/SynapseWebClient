@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.RegisterConstants;
 import org.sagebionetworks.repo.model.registry.EntityRegistry;
 import org.sagebionetworks.repo.model.registry.EntityTypeMetadata;
+import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -25,9 +26,10 @@ public class EntityTypeProvider {
 
 	private List<EntityTypeMetadata> typeMetadatas;
 	private List<EntityType> values;
+	private EntitySchemaCache cache;
 	
 	@Inject
-	public EntityTypeProvider(RegisterConstants constants, final AdapterFactory factory) throws UnsupportedEncodingException, JSONObjectAdapterException {
+	public EntityTypeProvider(RegisterConstants constants, final AdapterFactory factory, EntitySchemaCache cache) throws UnsupportedEncodingException, JSONObjectAdapterException {
 		// Read this from the constants.
 		String base64String = constants.getRegisterJson();
 		String decoded =  new String(Base64.decodeBase64(base64String.getBytes("UTF-8")), "UTF-8");		// Decode it
@@ -35,6 +37,7 @@ public class EntityTypeProvider {
 		EntityRegistry registry = new EntityRegistry();
 		registry.initializeFromJSONObject(adapter);
 		typeMetadatas = registry.getEntityTypes();
+		this.cache = cache;
 		createEntityTypes();
 	}
 	
@@ -112,6 +115,26 @@ public class EntityTypeProvider {
 			}
 
 		}
+	}
+	
+	/**
+	 * The display name of an entity comes from the schema.
+	 * @param type
+	 * @return
+	 */
+	public String getEntityDispalyName(EntityType type){
+		ObjectSchema schema = cache.getSchemaEntity(type.getClassName());
+		return schema.getTitle();
+	}
+	
+	/**
+	 * The display name of an entity comes from the schema.
+	 * @param type
+	 * @return
+	 */
+	public String getEntityDispalyName(Entity entity){
+		EntityType type = getEntityTypeForEntity(entity);
+		return getEntityDispalyName(type);
 	}
 
 }
