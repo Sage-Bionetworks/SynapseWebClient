@@ -172,6 +172,10 @@ public class AppActivityMapper implements ActivityMapper {
 			// search results page
 			SearchPresenter presenter = ginjector.getSearchPresenter();
 			presenter.setPlace((Search)place);
+			Place forwardTo = presenter.getRedirect(); 
+			if(forwardTo != null) {
+				return getActivity(forwardTo);
+			}
 			return presenter;
 		} else {
 			// Log that we have an unknown place but send the user to the default

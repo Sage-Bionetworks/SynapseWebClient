@@ -13,6 +13,7 @@ import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,8 +21,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
@@ -55,6 +55,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 		this.add(horizontalTable);
 	}
 		
+	@SuppressWarnings("serial")
 	private void createSearchBox() {
 		if(typeDropdown == null) {
 			typeDropdown = new Button();
@@ -95,6 +96,71 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 		    
 		    typeDropdown.setMenu(menu);		    
 		    horizontalTable.setWidget(0, 0, typeDropdown);
+		    
+		    // add facet links
+		    HorizontalPanel hp = new HorizontalPanel();
+		    Anchor a; 
+		    TableData tableData = new TableData();
+		    tableData.setPadding(5);
+		    		
+		    a = new Anchor(new SafeHtml() {				
+				@Override
+				public String asString() {
+					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Projects";
+				}
+			});
+		    a.addClickHandler(new ClickHandler() {				
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.searchAllProjects();
+				}
+			});
+		    hp.add(a, tableData);
+		    
+		    a = new Anchor(new SafeHtml() {				
+				@Override
+				public String asString() {
+					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Data";
+				}
+			});
+		    a.addClickHandler(new ClickHandler() {				
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.searchAllData();
+				}
+			});
+		    hp.add(a, tableData);
+		    
+		    a = new Anchor(new SafeHtml() {				
+				@Override
+				public String asString() {
+					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Studies";
+				}
+			});
+
+		    a.addClickHandler(new ClickHandler() {				
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.searchAllStudies();
+				}
+			});
+		    hp.add(a, tableData);
+		    
+		    a = new Anchor(new SafeHtml() {				
+				@Override
+				public String asString() {
+					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Code";
+				}
+			});
+		    a.addClickHandler(new ClickHandler() {				
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.searchAllCode();
+				}
+			});
+		    hp.add(a, tableData);
+		    
+		    horizontalTable.setWidget(1, 1, hp); 
 		}
 
 		if(searchField == null) {

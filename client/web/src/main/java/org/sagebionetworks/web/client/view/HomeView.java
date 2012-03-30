@@ -17,7 +17,8 @@ public interface HomeView extends IsWidget, SynapseView {
 	
 	public interface Presenter extends SynapsePresenter {
 
-		boolean showMyProjects();		
+		boolean showMyProjects();	
+				
 	}
 
 }
