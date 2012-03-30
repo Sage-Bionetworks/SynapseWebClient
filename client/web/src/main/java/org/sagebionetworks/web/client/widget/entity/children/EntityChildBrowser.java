@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.children;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +19,13 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -44,10 +48,12 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	private PlaceChanger placeChanger;
 	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
+	private SearchServiceAsync searchService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager = new HandlerManager(this);
-	private Entity entity;
+	private GlobalApplicationState globalApplicationState;
+	private Entity entity;	
 	private EntityTypeProvider entityTypeProvider;
 
 	private LayerPreview layerPreview; 
@@ -57,14 +63,17 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	public EntityChildBrowser(EntityChildBrowserView view,
 			NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
-			EntityTypeProvider entityTypeProvider, 
-			SynapseClientAsync synapseClient) {
+			EntityTypeProvider entityTypeProvider,
+			SynapseClientAsync synapseClient, SearchServiceAsync searchService,
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.nodeService = nodeService;
 		this.synapseClient = synapseClient;
+		this.searchService = searchService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
+		this.globalApplicationState = globalApplicationState;
 				
 		previewData = new PreviewData();
 		view.setPresenter(this);
@@ -309,7 +318,42 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 			callback.onFailure(null);
 		}		
 	}
-		
+
+	@Override
+	public void getChildrenHeaders(final AsyncCallback<List<EntityHeader>> callback) {
+		List<EntityHeader> headers = new ArrayList<EntityHeader>();		
+		final int MAX_LIMIT = 200;
+
+		searchService.searchEntities("entity", Arrays
+				.asList(new WhereCondition[] { new WhereCondition("parentId",
+						WhereOperator.EQUALS, entity.getId()) }), 1, MAX_LIMIT, null,
+				false, new AsyncCallback<List<String>>() {
+				@Override
+				public void onSuccess(List<String> result) {
+					List<EntityHeader> headers = new ArrayList<EntityHeader>();
+					for(String entityHeaderJson : result) {
+						try {
+							headers.add(nodeModelCreator.createEntity(entityHeaderJson, EntityHeader.class));
+						} catch (RestServiceException e) {
+							onFailure(e);
+						}
+					}
+					callback.onSuccess(headers);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());				
+					callback.onFailure(caught);
+				}
+			});					
+
+	}
+
+	@Override
+	public void goToEntity(String selectedId) {
+		globalApplicationState.getPlaceChanger().goTo(new Synapse(selectedId));
+	}
+	
 	/*
 	 * Private Methods
 	 */

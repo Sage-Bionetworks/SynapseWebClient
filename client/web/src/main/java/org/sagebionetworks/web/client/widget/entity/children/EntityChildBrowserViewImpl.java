@@ -12,7 +12,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.events.EntitySelectedEvent;
+import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.statictable.StaticTable;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableColumn;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
@@ -70,6 +73,8 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	private TabPanel tabPanel;
 	private QueryTableFactory queryTableFactory;
 	private ColumnFactory columnFactory;
+	private EntityTreeBrowser entityTreeBrowser;
+	private EntitySelectedHandler entitySelectedHandler;
 	
 	private TabItem previewTab;
 	private ContentPanel previewLoading;
@@ -81,11 +86,14 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 
 	@Inject
 	public EntityChildBrowserViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, QueryTableFactory queryTableFactory, ColumnFactory columnFactory) {
+			IconsImageBundle iconsImageBundle,
+			QueryTableFactory queryTableFactory, ColumnFactory columnFactory,
+			EntityTreeBrowser entityTreeBrowser) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.queryTableFactory = queryTableFactory;
 		this.columnFactory = columnFactory;
+		this.entityTreeBrowser = entityTreeBrowser;
 		
 		this.setLayout(new FitLayout());
 	}
@@ -114,6 +122,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		int numAdded = 0;
 		
 		// add tabs
+		numAdded += addTreeviewTab(entity);
 		numAdded += addChildTabs(entityType, location); 		
 		numAdded += addShortcutsTab();
 		
@@ -126,6 +135,40 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		}
 		
 		add(tabPanel);		
+	}
+
+	private int addTreeviewTab(Entity entity) {
+		int numAdded = 0;		
+		final TabItem tab = new TabItem("All Contents");
+		tab.addStyleName("pad-text");			
+		final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);
+		loading.setHeight(tabPanelHeight);		
+		tab.add(loading);
+		// Render only if selected
+		tab.addListener(Events.Render, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				presenter.getChildrenHeaders(new AsyncCallback<List<EntityHeader>>() {
+					@Override
+					public void onSuccess(List<EntityHeader> result) {
+						tab.remove(loading);
+						entityTreeBrowser.setRootEntities(result);
+						tab.add(entityTreeBrowser.asWidget());
+						tab.layout(true);						
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						tab.remove(loading);
+						tab.add(new Html(DisplayConstants.ERROR_GENERIC_RELOAD), new MarginData(10));
+						tab.layout(true);						
+					}
+				});
+			}
+		});
+		tabPanel.add(tab);	
+		numAdded++;
+		
+		return numAdded;
 	}
 
 	private int addShortcutsTab() {
@@ -255,6 +298,13 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+		
+		// create a new handler for this presenter
+		if(entitySelectedHandler != null) {
+			entityTreeBrowser.removeEntitySelectedHandler(entitySelectedHandler);
+		}
+		createSelectedHandler();
+
 	}
 
 	@Override
@@ -450,6 +500,15 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		return cellRenderer;
 	}			
 	
+	private void createSelectedHandler() {
+		entitySelectedHandler = new EntitySelectedHandler() {			
+			@Override
+			public void onSelection(EntitySelectedEvent event) {
+				presenter.goToEntity(entityTreeBrowser.getSelected());
+			}
+		};
+		entityTreeBrowser.addEntitySelectedHandler(entitySelectedHandler);
+	}
 	
 }
 

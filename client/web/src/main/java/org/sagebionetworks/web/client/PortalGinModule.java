@@ -337,11 +337,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(LocationableUploaderView.class).to(LocationableUploaderViewImpl.class);
 
 		// EntityTreeBrowser
-		bind(EntityTreeBrowserViewImpl.class).in(Singleton.class);
 		bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);
 
 		// MyEntitiesBrowser
-		bind(MyEntitiesBrowserViewImpl.class).in(Singleton.class);
 		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);
 
 	}
