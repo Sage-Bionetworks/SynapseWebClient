@@ -297,9 +297,9 @@ public class DisplayUtils {
 	public static NodeType getNodeTypeForEntity(Entity entity) {
 		// 	DATASET, LAYER, PROJECT, EULA, AGREEMENT, ENTITY, ANALYSIS, STEP
 		if(entity instanceof org.sagebionetworks.repo.model.Study) {
-			return NodeType.DATASET;
+			return NodeType.STUDY;
 		} else if(entity instanceof org.sagebionetworks.repo.model.Data) {
-			return NodeType.LAYER;
+			return NodeType.DATA;
 		} else if(entity instanceof org.sagebionetworks.repo.model.Project) {
 			return NodeType.PROJECT;
 		} else if(entity instanceof org.sagebionetworks.repo.model.Analysis) {
@@ -310,38 +310,6 @@ public class DisplayUtils {
 			return NodeType.CODE;
 		}
 		return null;	
-	}
-	
-	/**
-	 * Returns the NodeType for this entitytype. 
-	 * TODO : This should be removed when we move to using the Synapse Java Client
-	 * @param entityType
-	 * @return
-	 */
-	public static NodeType getNodeTypeForEntityType(EntityType entityType) {
-		// 	DATASET, LAYER, PROJECT, EULA, AGREEMENT, ENTITY, ANALYSIS, STEP
-		if("/dataset".equals(entityType.getUrlPrefix())) {
-			return NodeType.DATASET;
-		} else if("/layer".equals(entityType.getUrlPrefix())) {
-			return NodeType.LAYER;
-		} else if("/project".equals(entityType.getUrlPrefix())) {
-			return NodeType.PROJECT;			
-		} else if("/analysis".equals(entityType.getUrlPrefix())) {
-			return NodeType.ANALYSIS;
-		} else if("/step".equals(entityType.getUrlPrefix())) {
-			return NodeType.STEP;
-		} else if("/code".equals(entityType.getUrlPrefix())) {
-			return NodeType.CODE;
-		}
-		return null;	
-	}
-	
-	
-	
-	public static String getEntityTypeDisplay(Entity entity) {
-		NodeType type = getNodeTypeForEntity(entity);
-		String display = type.toString().toLowerCase();
-		return uppercaseFirstLetter(display);
 	}
 	
 	public static String getEntityTypeDisplay(ObjectSchema schema) {

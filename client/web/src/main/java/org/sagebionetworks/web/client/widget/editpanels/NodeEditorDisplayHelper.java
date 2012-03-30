@@ -22,8 +22,8 @@ public class NodeEditorDisplayHelper {
 	@Inject
 	public NodeEditorDisplayHelper() {		
 		typeToDevaition = new HashMap<NodeType, SpecificNodeTypeDeviation>();		
-		typeToDevaition.put(NodeType.DATASET, createDatasetDeviation());
-		typeToDevaition.put(NodeType.LAYER, createLayerDeviation());
+		typeToDevaition.put(NodeType.STUDY, createDatasetDeviation());
+		typeToDevaition.put(NodeType.DATA, createLayerDeviation());
 		typeToDevaition.put(NodeType.PROJECT, createProjectDeviation());		
 		typeToDevaition.put(NodeType.ANALYSIS, createAnalysisDeviation());		
 		typeToDevaition.put(NodeType.STEP, createStepDeviation());
@@ -43,7 +43,7 @@ public class NodeEditorDisplayHelper {
 	// DATASET
 	private SpecificNodeTypeDeviation createDatasetDeviation() {
 		SpecificNodeTypeDeviation deviation = new SpecificNodeTypeDeviation(
-				NodeType.DATASET, "Dataset",
+				NodeType.STUDY, "Dataset",
 				DisplayConstants.CREATE_DATASET_TEXT,
 				DisplayConstants.EDIT_DATASET_TEXT,
 				Arrays.asList(new String[] { "name" }),
@@ -56,7 +56,7 @@ public class NodeEditorDisplayHelper {
 	// LAYER
 	private SpecificNodeTypeDeviation createLayerDeviation() {
 		SpecificNodeTypeDeviation deviation = new SpecificNodeTypeDeviation(
-				NodeType.LAYER, "Layer", DisplayConstants.CREATE_LAYER_TEXT,
+				NodeType.DATA, "Layer", DisplayConstants.CREATE_LAYER_TEXT,
 				DisplayConstants.EDIT_LAYER_TEXT,
  Arrays.asList(new String[] { "name", "type" }),
 				Arrays.asList(new String[] {

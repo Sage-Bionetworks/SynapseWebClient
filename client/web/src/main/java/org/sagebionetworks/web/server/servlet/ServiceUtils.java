@@ -57,13 +57,13 @@ public class ServiceUtils {
 		builder.append(urlProvider.getRepositoryServiceUrl() + "/");
 		// set path based on type
 		switch(type) {
-		case DATASET:
+		case STUDY:
 			builder.append(REPOSVC_PATH_DATASET);
 			break;
 		case PROJECT:
 			builder.append(REPOSVC_PATH_PROJECT);
 			break;
-		case LAYER:
+		case DATA:
 			builder.append(REPOSVC_PATH_LAYER);
 			break;
 		case ANALYSIS:

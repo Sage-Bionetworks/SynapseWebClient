@@ -69,7 +69,7 @@ public class NodeEditorTest {
 		formFields.add(new FormField(key1, value1, ColumnType.STRING));
 		formFields.add(new FormField(key2, value2, ColumnType.STRING));
 
-		nodeEditor.asWidget(NodeType.DATASET);
+		nodeEditor.asWidget(NodeType.STUDY);
 		
 		reset(mockNodeService);
 		nodeEditor.persist(formFields);		

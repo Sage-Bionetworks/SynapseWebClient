@@ -26,7 +26,7 @@ public class FormFieldFactoryTest {
 	
 	// Use the schema cache
 	static AdapterFactoryImpl adapterFactory = new AdapterFactoryImpl();
-	static EntitySchemaCache schemaCache = new EntitySchemaCacheImpl(new JSONEntityFactoryImpl(adapterFactory));
+	static EntitySchemaCache schemaCache = new EntitySchemaCacheImpl(adapterFactory);
 	ExampleEntity entity;
 	ObjectSchema schema;
 	Annotations annos;

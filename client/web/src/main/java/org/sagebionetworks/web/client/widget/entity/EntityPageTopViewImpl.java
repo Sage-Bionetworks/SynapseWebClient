@@ -8,13 +8,13 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
@@ -91,15 +91,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private PropertyWidget propertyWidget;
 	private LayoutContainer colLeftContainer;
 	private LayoutContainer colRightContainer;
+	private EntityTypeProvider entityTypeProvider;
 			
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
-			AccessMenuButton accessMenuButton, NodeEditor nodeEditor,
+			AccessMenuButton accessMenuButton,
 			PreviewDisclosurePanel previewDisclosurePanel,
 			ActionMenu actionMenu,
 			EntityChildBrowser entityChildBrowser, Breadcrumb breadcrumb, 
-			PropertyWidget propertyWidget) {
+			PropertyWidget propertyWidget,EntityTypeProvider entityTypeProvider) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.previewDisclosurePanel = previewDisclosurePanel;
@@ -107,6 +108,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.entityChildBrowser = entityChildBrowser;
 		this.breadcrumb = breadcrumb;
 		this.propertyWidget = propertyWidget;
+		this.entityTypeProvider = entityTypeProvider;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 	}
@@ -288,7 +290,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
-		lc.add(new Html("<h3>Others Using this " + DisplayUtils.getEntityTypeDisplay(entity) + "/<h3>"));	    
+		lc.add(new Html("<h3>Others Using this " + entityTypeProvider.getEntityDispalyName(entity) + "/<h3>"));	    
+
 	    
 	    if(referencedBy.getTotalNumberOfResults() > 0) {	    
 		    List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
@@ -389,7 +392,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			loader.load();
 
 	    } else {
-	    	lc.add(new Html(DisplayConstants.TEXT_NO_REFERENCES + " " + DisplayUtils.getEntityTypeDisplay(entity) + "."));
+	    	lc.add(new Html(DisplayConstants.TEXT_NO_REFERENCES + " " + entityTypeProvider.getEntityDispalyName(entity) + "."));
 	    }
 	    lc.layout();
 	    return lc;  
@@ -433,7 +436,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
-		String typeDisplay = DisplayUtils.getEntityTypeDisplay(entity);
+		String typeDisplay = entityTypeProvider.getEntityDispalyName(entity);
 		lc.add(new Html("<h3>" + typeDisplay + " " + "Contents</h3>"));
 		lc.add(entityChildBrowser.asWidget(entity, canEdit));
 		lc.layout();

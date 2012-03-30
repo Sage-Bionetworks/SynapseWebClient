@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.CancelEvent;
@@ -55,6 +56,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private MyEntitiesBrowser myEntitiesBrowser;
 	private LicensedDownloader licensedDownloader;
 	private Widget downloadButton = null;
+	private EntityTypeProvider typeProvider;
 
 	
 	private Button editButton;
@@ -68,7 +70,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			IconsImageBundle iconsImageBundle, NodeEditor nodeEditor,
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
-			LocationableUploader locationableUploader, MyEntitiesBrowser myEntitiesBrowser, LicensedDownloader licensedDownloader) {
+			LocationableUploader locationableUploader, MyEntitiesBrowser myEntitiesBrowser, LicensedDownloader licensedDownloader, EntityTypeProvider typeProvider) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.nodeEditor = nodeEditor;
@@ -77,6 +79,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		this.locationableUploader = locationableUploader;
 		this.myEntitiesBrowser = myEntitiesBrowser;
 		this.licensedDownloader = licensedDownloader;
+		this.typeProvider = typeProvider;
 
 //		this.setLayout(new FitLayout());
 		this.setHorizontalAlign(HorizontalAlignment.RIGHT);
@@ -171,7 +174,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	 * Private Methods
 	 */
 	private void configureEditButton(final Entity entity, EntityType entityType) {
-		final String typeDisplay = DisplayUtils.uppercaseFirstLetter(entityType.getName());
 		editButton.removeAllListeners();
 		editButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 
@@ -225,7 +227,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			for(final EntityType childType : children) {
 				if(skipTypes.contains(childType)) continue; // skip some types
 				
-				String displayName = DisplayUtils.uppercaseFirstLetter(childType.getName());			
+				String displayName = typeProvider.getEntityDispalyName(childType);			
 				item = new MenuItem(displayName);
 				// TODO : replace icon with entity type icon
 				item.setIcon(AbstractImagePrototype.create(iconsImageBundle.documentAdd16()));
@@ -317,7 +319,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	 */
 	private int addIsAdministratorToolMenuItems(Menu menu, Entity entity, EntityType entityType) {
 		int numAdded = 0;
-		final String typeDisplay = DisplayUtils.uppercaseFirstLetter(entityType.getName());
+		final String typeDisplay = typeProvider.getEntityDispalyName(entityType);
 		MenuItem item = new MenuItem(DisplayConstants.LABEL_DELETE + " " + typeDisplay);
 		item.setIcon(AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
@@ -385,33 +387,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		}
 		
 		return count;
-	}
-
-	private void showAddWindow(EntityType childType, String parentId) {
-		final String typeDisplay = DisplayUtils.uppercaseFirstLetter(childType.getName());
-		final Window window = new Window();  
-		window.setSize(600, 275);
-		window.setPlain(true);
-		window.setModal(true);
-		window.setBlinkModal(true);
-		window.setHeading(DisplayConstants.LABEL_CREATE + " " + typeDisplay);
-		window.setLayout(new FitLayout());				
-		nodeEditor.addCancelHandler(new CancelHandler() {					
-			@Override
-			public void onCancel(CancelEvent event) {
-				window.hide();
-			}
-		});
-		nodeEditor.addPersistSuccessHandler(new EntityUpdatedHandler() {					
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				window.hide();
-				presenter.fireEntityUpdatedEvent();
-			}
-		});
-		nodeEditor.setPlaceChanger(presenter.getPlaceChanger());
-		window.add(nodeEditor.asWidget(DisplayUtils.getNodeTypeForEntityType(childType), null, parentId), new FitData(4));
-		window.show();
 	}
 
 }
