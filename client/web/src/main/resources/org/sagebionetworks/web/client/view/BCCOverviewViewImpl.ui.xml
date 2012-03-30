@@ -1,0 +1,77 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+
+	<ui:style>
+		.important {
+			font-weight: bold;
+		}
+		
+		.rowTop {
+			vertical-align: top;
+		}
+	</ui:style>
+
+	<g:HTMLPanel>
+
+		<!-- start header -->
+	<!-- MAIN CONTAINER -->
+		<!-- HEADER -->
+        <div class="color-line"></div>
+        <div class="clear"></div>
+    	<div class="container"> 		
+			<g:SimplePanel ui:field="header" />
+	        	<div class="span-24 notopmargin">
+				<!-- end header -->
+
+					<ul class="breadcrumbs">
+						<li class="breadcrumb">
+							<a href="#">Home</a>
+						</li>
+					</ul>
+					<h2>Sage / DREAM Breast Cancer Prognosis Challenge</h2>
+
+						<h3>Clinical Problem</h3>
+Molecular diagnostics for cancer therapeutic decision making are among the most promising applications of genomic technology. Several diagnostic tests have gained regulatory approval in recent years. Molecular profiles have proved particularly powerful in adding molecular information to standard clinical practice in breast cancer, using gene-expression-based diagnostic tests such as Mammaprint and Oncotype Dx. The exciting phase of “Precision Medicine”, as defined by the Institute of Medicine Report last year, proposes a world where medical decisions will be guided by molecular markers that ensure that therapies are tailored to the patients that receive them. The most exciting topics at the FDA and in the scientific community revolve around – “how can we leverage genomic information to determine who should and should not get which therapies?”
+<h3>Data Formats</h3>
+<h4>Survival data</h4>
+Survival data is loaded into R as a Surv object as defined in the R survivalpackage. This object is simply a 2 column matrix with sample names on the rows and columns:
+<ul>
+<li>time – time from diagnosis to last follow up.</li>
+<li>status – weather the patient was alive at last follow up time.</li>
+</ul>
+<h4>Feature data</h4>
+<h5>Gene expression data.</h5>
+<ul>
+<li>Performed on the Illumina HT 12v3 platform and normalized using XXXX.</li>
+<li>Loaded as Bioconductor ExpressionSet object with columns corresponding to samples and rows corresponding to Illumina probes.</li>
+<h5>Copy number data.</h5>
+</ul>
+<ul>
+<li>Performed on the Affymetrix SNP 6.0 platform and normalized using XXX.</li>
+<li>Loaded as Bioconductor ExpressionSet object with columns corresponding to samples and rows corresponding to segmented copy number regions (??).
+Clinical covariates. For a detailed explanation of the clinical data and how it is currently used in breast cancer prognosis and treatment, see Breast Cancer Challenge clinical background.
+</li></ul>
+<br></br>
+<a href="http://support.rstudio.org" target="_blank"><h3>R-Studio Tutorial</h3></a>
+<br></br>
+<a href="https://sagebionetworks.jira.com/browse/BCC#selectedTab=com.atlassian.jira.plugin.system.project%3Asummary-panel" target="_blank"><h3>Discussion Forum</h3></a>
+<br></br>
+<a href="http://www.google.com" target="_blank"><h3>Google Technical Guide</h3></a>
+<br></br>
+<g:SimplePanel ui:field="applyForChallenge" />
+<br></br>
+<br></br>
+<center>Contest Computing Facilities Powered by Google</center>
+
+				</div>
+
+				<!-- start footer -->
+            <div class="clear"></div>
+        </div> <!-- close class="container" -->
+		<g:SimplePanel ui:field="footer" />
+		<!-- end footer -->
+
+	</g:HTMLPanel>
+</ui:UiBinder> 

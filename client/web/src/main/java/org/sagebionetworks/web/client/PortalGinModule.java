@@ -14,6 +14,8 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.client.view.BCCOverviewView;
+import org.sagebionetworks.web.client.view.BCCOverviewViewImpl;
 import org.sagebionetworks.web.client.view.CellTableProvider;
 import org.sagebionetworks.web.client.view.CellTableProviderImpl;
 import org.sagebionetworks.web.client.view.ColumnsPopupView;
@@ -104,6 +106,7 @@ import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
+import org.sagebionetworks.web.server.servlet.BCCSignupImpl;
 
 import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -211,7 +214,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ComingSoonViewImpl.class).in(Singleton.class);
 		bind(ComingSoonView.class).to(ComingSoonViewImpl.class);									
 		
-		// LookupView
+		// BCCOverviewView
+		bind(BCCOverviewViewImpl.class).in(Singleton.class);
+		bind(BCCOverviewView.class).to(BCCOverviewViewImpl.class);									
+				// LookupView
 		bind(LookupViewImpl.class).in(Singleton.class);
 		bind(LookupView.class).to(LookupViewImpl.class);					
 		

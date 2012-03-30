@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sagebionetworks.web.server.servlet.BCCSignupImpl;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.FileUpload;
@@ -72,6 +73,9 @@ public class PortalServletModule extends ServletModule {
 		// Setup the User Account service mapping
 		bind(UserAccountServiceImpl.class).in(Singleton.class);
 		serve("/Portal/users").with(UserAccountServiceImpl.class);
+	
+		bind(BCCSignupImpl.class).in(Singleton.class);
+		serve("/Portal/bcc").with(BCCSignupImpl.class);
 	
 		// setup the NCBO servlet
 		bind(NcboSearchService.class).in(Singleton.class);

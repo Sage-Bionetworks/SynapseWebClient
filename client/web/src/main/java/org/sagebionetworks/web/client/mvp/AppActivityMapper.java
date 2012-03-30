@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AnalysesHome;
 import org.sagebionetworks.web.client.place.Analysis;
+import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Dataset;
 import org.sagebionetworks.web.client.place.DatasetsHome;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.client.place.StepsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
@@ -76,6 +78,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(ProjectsHome.class);
 		openAccessPlaces.add(Project.class);
 		openAccessPlaces.add(ComingSoon.class);
+		openAccessPlaces.add(BCCOverview.class);
 		openAccessPlaces.add(Lookup.class);
 		openAccessPlaces.add(Step.class);
 		openAccessPlaces.add(StepsHome.class);
@@ -157,6 +160,11 @@ public class AppActivityMapper implements ActivityMapper {
 			// user's profile page
 			ComingSoonPresenter presenter = ginjector.getComingSoonPresenter();
 			presenter.setPlace((ComingSoon)place);
+			return presenter;
+		} else if (place instanceof BCCOverview) {
+			// user's profile page
+			BCCOverviewPresenter presenter = ginjector.getBCCOverviewPresenter();
+			presenter.setPlace((BCCOverview)place);
 			return presenter;
 		}else if (place instanceof Lookup) {
 			// user's profile page
