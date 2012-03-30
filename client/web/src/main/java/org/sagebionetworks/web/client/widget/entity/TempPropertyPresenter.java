@@ -42,7 +42,7 @@ public class TempPropertyPresenter extends LayoutContainer {
 	EntitySchemaCache cache;
 	AdapterFactory factory;
 	AutoGenFactory entityFactory;
-	EntityPropertyGrid view;
+	PropertyWidgetViewImpl view;
 	EntityBundle bundle;
 	List<EntityRow<?>> rows;
 	VerticalPanel vp;
@@ -50,7 +50,7 @@ public class TempPropertyPresenter extends LayoutContainer {
 	
 	@Inject
 	public TempPropertyPresenter(EntitySchemaCache cache,
-			AdapterFactory factory, EntityPropertyGrid view, EntityEditorDialogImpl editorDialog) {
+			AdapterFactory factory, PropertyWidgetViewImpl view, EntityEditorDialogImpl editorDialog) {
 		super();
 		this.cache = cache;
 		this.factory = factory;

@@ -30,7 +30,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jmhill
  *
  */
-public class EntityPropertyGrid extends LayoutContainer implements PropertyWidgetView, IsWidget {
+public class PropertyWidgetViewImpl extends LayoutContainer implements PropertyWidgetView, IsWidget {
 
 	ListStore<EntityRowModel> gridStore;
 	Grid<EntityRowModel> grid;
@@ -79,8 +79,7 @@ public class EntityPropertyGrid extends LayoutContainer implements PropertyWidge
 		grid.setColumnReordering(false);
 		grid.setHideHeaders(true);
 		grid.setTrackMouseOver(false);
-		grid.setShadow(false);
-		grid.setHeight(446);		
+		grid.setShadow(false);			
 		this.add(grid);
 		rebuild();
 	}
@@ -91,8 +90,8 @@ public class EntityPropertyGrid extends LayoutContainer implements PropertyWidge
 	public void rebuild() {
 		// there is nothing to do if we have not been rendered.
 		if(!this.isRendered()) return;
-		grid.reconfigure(gridStore,columnModel);
-		this.layout();
+		grid.reconfigure(gridStore,columnModel);		
+		this.layout(true);
 	}
 
 	/**
