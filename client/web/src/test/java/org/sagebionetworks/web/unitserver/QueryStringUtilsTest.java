@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitserver;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -149,4 +150,30 @@ public class QueryStringUtilsTest {
 	}
 
 
+	@Test
+	public void testNullColumnsTrip() throws URISyntaxException{
+		// Create a simple query
+		SearchParameters params = new SearchParameters();
+		params.setFromType(ObjectType.dataset.name());
+		params.setSelectColumns(null);
+		// Now create the query string for this object
+		URI uri = QueryStringUtils.writeQueryUri(ROOT_URL, params);
+		assertNotNull(uri);
+		System.out.println(uri);
+		assertTrue(uri.toString().contains("select+*+"));		
+	}
+	
+	@Test
+	public void testEmptyColumnsTrip() throws URISyntaxException{
+		// Create a simple query
+		SearchParameters params = new SearchParameters();
+		params.setFromType(ObjectType.dataset.name());
+		params.setSelectColumns(new ArrayList<String>());
+		// Now create the query string for this object
+		URI uri = QueryStringUtils.writeQueryUri(ROOT_URL, params);
+		assertNotNull(uri);
+		System.out.println(uri);
+		assertTrue(uri.toString().contains("select+*+"));
+	}
+	
 }
