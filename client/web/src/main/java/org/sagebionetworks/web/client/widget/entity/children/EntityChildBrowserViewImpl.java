@@ -143,6 +143,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	private int addTreeviewTab(Entity entity) {
 		int numAdded = 0;		
 		final TabItem tab = new TabItem("All Contents");
+		tab.setScrollMode(Scroll.AUTO);
 		tab.addStyleName("pad-text");			
 		final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);
 		loading.setHeight(tabPanelHeight);		
