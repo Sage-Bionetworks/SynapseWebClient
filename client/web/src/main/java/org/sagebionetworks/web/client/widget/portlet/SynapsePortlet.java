@@ -25,6 +25,7 @@ public class SynapsePortlet extends Portlet {
 		setStyleName("");
 		setHeaderVisible(false);
 		setBorders(false);
+		setFrame(false);
 		setBodyStyleName(""); // TODO : create a style for SynapsePortlet?
 		setBodyStyle("background-color: #ffffff");
 		

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +18,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SearchView;
@@ -29,6 +29,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -36,7 +37,6 @@ import com.google.inject.Inject;
 public class SearchPresenter extends AbstractActivity implements SearchView.Presenter {
 	
 	//private final List<String> FACETS_DEFAULT = Arrays.asList(new String[] {"node_type","disease","species","tissue","platform","num_samples","created_by","modified_by","created_on","modified_on","acl","reference"});
-	private final List<String> FACETS_DISPLAY_ORDER = Arrays.asList(new String[] {"node_type","species","disease","modified_on", "created_on","tissue","num_samples","created_by"});
 	
 	private Search place;
 	private SearchView view;
@@ -51,6 +51,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private boolean newQuery = false;
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
 	private DateTime searchStartTime;
+	
+	private Place redirect; 
 	
 	
 	@Inject
@@ -80,13 +82,25 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public void setPlace(Search place) {
 		this.place = place;
 		view.setPresenter(this);
+		redirect = null;
 			
-
-		// create initial search query
+		// TODO : perhaps not pass the json query in the token? could run up against URL limits. could possibly pop it off of global app state		
 		String queryString = place.toToken();
+		// if query parses into SearchQuery, use that, otherwise use it as a
+		// search Term
+		if (queryString != null && queryString.startsWith("{")) {
+			try {
+				currentSearch = new SearchQuery(jsonObjectAdapter.createNew(queryString));
+				// passed a searchQuery
+				executeSearch();
+				return;
+			} catch (JSONObjectAdapterException e) {
+				// fall through to a use as search term
+			}
+		}
+		// passed a serachTerm
 		currentSearch = getBaseSearchQuery();
-		setSearchTerm(queryString);		
-		executeSearch();
+		setSearchTerm(queryString);
 	}
 
 	@Override
@@ -103,6 +117,15 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
 	public void setSearchTerm(String queryTerm) {		
 		if(queryTerm == null) queryTerm = "";
+		
+		if(queryTerm.startsWith(DisplayUtils.SYNAPSE_ID_PREFIX)) {
+			String remainder = queryTerm.replaceFirst(DisplayUtils.SYNAPSE_ID_PREFIX, "");
+			if(remainder.matches("^[0-9]+$")) {
+				redirect = new Synapse(queryTerm);
+				return;
+			}
+		}
+		
 		currentSearch = getBaseSearchQuery();					
 				
 		// set new search term & run search. split each word into its own value
@@ -189,7 +212,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 
 	@Override
 	public List<String> getFacetDisplayOrder() {
-		return FACETS_DISPLAY_ORDER;
+		return DisplayUtils.FACETS_DISPLAY_ORDER;
 	}
 
 	@Override
@@ -213,24 +236,23 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		return PaginationUtil.getPagination(nResults.intValue(), start.intValue(), nPerPage, nPagesToShow);
 	}
 
+	public Place getRedirect() {
+		return redirect;
+	}
+	
 	
 	/*
 	 * Private Methods
 	 */
-	private SearchQuery getBaseSearchQuery() {		
-		SearchQuery query = new SearchQuery();
-		// start with a blank, valid query
-		query.setQueryTerm(Arrays.asList(new String[] {""}));		
-		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on"}));		
-		query.setFacet(FACETS_DISPLAY_ORDER);
-		
+	
+	private SearchQuery getBaseSearchQuery() {
+		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
 		timeValueToDisplay.clear();
-		searchStartTime = new DateTime();
-		
-		newQuery = true;
+		searchStartTime = new DateTime();		
+		newQuery = true;		
 		return query;
 	}
-
+	
 	private void executeSearch() {
 		view.showLoading();
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
