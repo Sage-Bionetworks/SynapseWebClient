@@ -96,6 +96,11 @@
 				</div>
 	            <div class="span-24 notopmargin">
 	                <div class="span-6 inner-6 view notopmargin">
+	                    <h5><a class="link" href="#BCCOverview:0">Sage / DREAM Breast Cancer Prognosis Challenge</a></h5>
+	                    <p>The goal of the breast cancer prognosis challenge is to assess the accuracy of computational models designed to predict breast cancer survival based on clinical information about the patient's tumor as well as genome-wide molecular profiling data including gene expression and copy number profiles.</p>
+	                	<a class="button_readmore"  href="#BCCOverview:0"></a>
+	                </div>
+	                <div class="span-6 inner-6 view notopmargin">
 	                    <h5><a class="link" href="#Synapse:102610">Synapse Commons Repository</a></h5>
 	                    <p>The Synapse Commons Repository is the place to access publicly available data sets. To build this project we have developed a system to crawl repositories, like GEO, ArrayExpress, and TCGA, and to manage contributions from users.</p>
 	                	<a class="button_readmore"  href="#Synapse:102610"></a>

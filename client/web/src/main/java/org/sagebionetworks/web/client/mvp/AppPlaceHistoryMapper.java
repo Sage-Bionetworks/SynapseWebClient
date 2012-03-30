@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.mvp;
 
 import org.sagebionetworks.web.client.place.AnalysesHome;
 import org.sagebionetworks.web.client.place.Analysis;
+import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Dataset;
 import org.sagebionetworks.web.client.place.DatasetsHome;
@@ -39,6 +40,7 @@ import com.google.gwt.place.shared.WithTokenizers;
 		Analysis.Tokenizer.class, Step.Tokenizer.class,
 		ComingSoon.Tokenizer.class, PhenoEdit.Tokenizer.class,
 		Lookup.Tokenizer.class, Synapse.Tokenizer.class,
-		PublicProfile.Tokenizer.class, Search.Tokenizer.class })
+		PublicProfile.Tokenizer.class, Search.Tokenizer.class,
+		BCCOverview.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }
