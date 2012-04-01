@@ -15,7 +15,6 @@ integrationTestGet <-
   checkTrue("id" %in% names(dataset))
   checkTrue("name" %in% names(dataset))
   checkTrue("versionLabel" %in% names(dataset))
-  checkTrue("status" %in% names(dataset))
   checkTrue("id" %in% names(dataset))
   checkTrue("uri" %in% names(dataset))
 }

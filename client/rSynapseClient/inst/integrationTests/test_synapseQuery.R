@@ -16,7 +16,6 @@ integrationTestQuery <-
   checkTrue("dataset.id" %in% names(datasets))
   checkTrue("dataset.name" %in% names(datasets))
   checkTrue("dataset.versionLabel" %in% names(datasets))
-  checkTrue("dataset.status" %in% names(datasets))
   checkTrue("dataset.species" %in% names(datasets))
 }
 

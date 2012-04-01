@@ -16,23 +16,20 @@ integrationTestCRUD <-
   ## Create a dataset
   dataset <- RJSONIO::emptyNamedList
   dataset$name = 'R Integration Test Dataset'
-  dataset$status = 'test create'
   dataset$parentId <- propertyValue(createdProject, "id")
+  dataset$species <- "Homo sapiens"
   createdDataset <- synapseClient:::synapsePost(uri='/dataset', entity=dataset)
   checkEquals(dataset$name, createdDataset$name)
-  checkEquals(dataset$status, createdDataset$status)
   
   ## Get a dataset
   storedDataset <- synapseClient:::synapseGet(uri=createdDataset$uri)
   checkEquals(dataset$name, storedDataset$name)
-  checkEquals(dataset$status, storedDataset$status)
   
   ## Modify a dataset
-  storedDataset$status <- 'test update'
+  storedDataset$species <- "Mus musculus"
   modifiedDataset <- synapseClient:::synapsePut(uri=storedDataset$uri, entity=storedDataset)
   checkEquals(dataset$name, modifiedDataset$name)
-  checkTrue(dataset$status != modifiedDataset$status)
-  checkEquals('test update', modifiedDataset$status)
+  checkEquals('Mus musculus', modifiedDataset$species)
   
   ## Get dataset annotations
   annotations <- synapseClient:::getAnnotations(entity=modifiedDataset)
