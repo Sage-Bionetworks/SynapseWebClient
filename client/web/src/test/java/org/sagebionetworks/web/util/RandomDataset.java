@@ -31,7 +31,6 @@ public class RandomDataset {
 		// Released within 5 days of creation.
 		long release = created + rand.nextInt(DAY_MS*5);
 		c.setCreatedOn(new Date(created));
-		c.setReleaseDate(new Date(created));
 		c.setName(RandomStrings.generateRandomString(2, 15));
 		c.setCreatedBy(RandomStrings.generateRandomString(2, 15));
 		int descWordCount = rand.nextInt(25)+5;
@@ -45,7 +44,6 @@ public class RandomDataset {
 			layers.add(new LayerLink(""+idSequence++, types[typeIndex], RandomStrings.generateRandomUrl(4, 8)));
 		}
 //		c.setLayerPreviews(layers);
-		c.setStatus(RandomStrings.generateRandomString(1, 10));
 		c.setVersionLabel("1.0."+rand.nextInt(9));
 		
 		return c;

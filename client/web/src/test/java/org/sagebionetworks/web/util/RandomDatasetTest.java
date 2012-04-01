@@ -23,12 +23,10 @@ public class RandomDatasetTest {
 		// Check all fields of the dataset
 		assertNotNull(random.getName());
 		assertNotNull(random.getCreatedOn());
-		assertNotNull(random.getReleaseDate());
 		assertNotNull(random.getCreatedBy());
 		assertNotNull(random.getDescription());
 		assertNotNull(random.getId());
 //		assertNotNull(random.getLayerPreviews());
-		assertNotNull(random.getStatus());
 		assertNotNull(random.getVersionLabel());
 //		assertNotNull(random.getHasClinicalData());
 //		assertNotNull(random.getHasExpressionData());
