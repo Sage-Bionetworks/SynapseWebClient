@@ -30,35 +30,368 @@
 							<a href="#">Home</a>
 						</li>
 					</ul>
-					<h2>Sage / DREAM Breast Cancer Prognosis Challenge</h2>
+					
+					
+					
+<div>
+    <h1 id="Breastcancerchallengedescription-SageDREAMbreastcancerprognosischallenge">
+        Sage / DREAM breast cancer prognosis challenge
+    </h1>
+    <h2 id="Breastcancerchallengedescription-Synopsis">
+        Synopsis
+    </h2>
+    <p>
+        The goal of the breast cancer prognosis challenge is to assess the accuracy of computational models designed to predict breast cancer survival (median
+        10 year follow up) based on clinical information about the patient's tumor as well as genome-wide molecular profiling data including gene expression
+        and copy number profiles.
+    </p>
+    <h2 id="Breastcancerchallengedescription-Background">
+        Background
+    </h2>
+    <p>
+        Molecular diagnostics for cancer therapeutic decision making are among the most promising applications of genomic technology. Several diagnostic tests
+        have gained regulatory approval in recent years. Molecular profiles have proved particularly powerful in adding molecular information to standard
+        clinical practice in breast cancer, using gene-expression-based diagnostic tests such as Mammaprint and Oncotype Dx. The exciting phase of "Precision
+        Medicine", as defined by the Institute of Medicine Report last year, proposes a world where medical decisions will be guided by molecular markers that
+        ensure that therapies are tailored to the patients that receive them. The most exciting topics at the FDA and in the scientific community revolve
+        around - "how can we leverage genomic information to determine who should and should not get which therapies?"
+        <br/>
+        <br/>
+        Based on initial promising clinical results, computational approaches to infer molecular predictors of cancer clinical phenotypes is one of the most
+        active areas of research in both industrial and academic institutions, leading to a flood of published reports of signatures predictive of cancer
+        phenotypes. Several trends have emerged through such numerous studies: 1) genes defining predictive signatures of the same phenotype often do not
+        overlap across multiple studies; 2) predictive signatures reported by one group may not prove robust in other studies; 3) there is no consensus
+        regarding the most accurate signatures or computational methods for inferring predictive signatures; 4) there is no consensus regarding the added value
+        of incorporating molecular data in addition to or instead of traditionally used clinical covariates.
+    </p>
+    <p>
+        There is a critical need to objectively and systematically assess whether genomic data, at this current time, provides value-added above and beyond
+        classic TNM staging and other clinical covariates. For instance, the UK's NICE (National Institute for Health and Clinical Excellence) has initial
+        guidance that the genomic prognostic signatures currently being marketed do not supplant clinical measures in a cost-effective manner. The emergence of
+        datasets containing clinical measurements combined with genome-wide molecular profiles of large beast cancer patient cohorts now allows prognostic
+        models to be systematically evaluated. Given the complexity of the data and plethora of possible modeling approaches, we believe the most powerful
+        mechanism of elucidating the optimal use of genomic and clinical information in breast cancer prognosis is through a community-based effort to evaluate
+        the accuracy of many different modeling approaches on a common dataset and analytical platform.
+        <br/>
+        <br/>
+        The challenge on molecular predictors of breast cancer survival will create a community-based competition to provide an unbiased assessment of the most
+        accurate models and methodologies for prediction of breast cancer survival. The competition will provide a common training dataset provided to all
+        participants, and a separate validation dataset, used to assess the models, that is not publicly available until the conclusion of the competition.
+    </p>
+    <h2 id="Breastcancerchallengedescription-TheChallenge">
+        The Challenge
+    </h2>
+    <p>
+        The challenge consists of building predictive models of breast cancer survival, specified by <em>survival data</em> containing:
+    </p>
+    <ul>
+        <li>
+            Time from diagnosis until death, or time of last follow-up if the patient is not known to have died.
+            <br/>
+        </li>
+        <li>
+            Whether the patient was alive at last follow up time.
+            <br/>
+        </li>
+    </ul>
+    <p>
+        Predictive models will be built using the following <em>feature data</em>:
+    </p>
+    <ul>
+        <li>
+            Genome-wide gene expression profiles.
+        </li>
+        <li>
+            Genome-wide gene copy number profiles.
+        </li>
+        <li>
+            Detailed clinical information about each tumor (see
+            <a href="https://sagebionetworks.jira.com/wiki/display/COMPBIO/Breast+cancer+challenge+description#Breastcancerchallengedescription-Clinicaldata">
+                Clinical data
+            </a>
+            for details on the provided clinical covariates).
+        </li>
+        <li>
+            Additional information from related data sets, such as other breast cancer studies (some suggested publicly available datasets will be formatted
+            and provided to users as part of the challenge).
+        </li>
+    </ul>
+    <h3 id="Breastcancerchallengedescription-Provideddatasetsandchallengetimelines">
+        <em>Provided datasets and challenge timelines</em>
+    </h3>
+    <p>
+        Data provided to participants will be separated into:
+    </p>
+    <ul>
+        <li>
+            <strong>Training dataset</strong>
+            consisting of both <em>feature data</em> and <em>survival data</em> for set of samples.
+        </li>
+        <li>
+            <strong>Test dataset</strong>
+            consisting of <em>feature data</em> for an additional set of samples for which the <em>survival data</em> is hidden.
+        </li>
+    </ul>
+    <p>
+        Participants will build models using the training dataset, and infer predictions of survival on the test dataset, which will be compared to the hidden
+survival data for the test dataset. The primary dataset used in this challenge will be from the <strong>METABRIC patient cohort of 1,000</strong>        <strong> breast cancer samples</strong>. The complete competition will begin at the April 20, 2012 Sage Commons Congress in San Francisco and conclude
+        on October 1, 2012, and results presented at the DREAM Conference on November 12, 2012, also in San Francisco. Data will be release to participants in
+        multiple phases:
+    </p>
+    <ul>
+        <li>
+            Phase 1 -- Challenge initiation: April 20th Sage Commons Congress.
+            <ul>
+                <li>
+                    Training dataset will consist of 500 samples from the METABRIC cohort.
+                </li>
+                <li>
+                    Validation dataset will consist of remaining 500 samples from the METABRIC cohort.
+                </li>
+            </ul>
+        </li>
+        <li>
+            Phase 2 - Challenge evolution: the challenge will dynamically evolve during the participation phase between April 20 and October 1. As a
+            community-based effort, input, discussions, and suggestions for improvements will be incorporated by the conference organizers to continuously
+            improve the challenge. Moreover, the compute platform provided by Sage Bionetworks will actively add features throughout the duration of the
+            challenge. Current plans for the challenge evolution phase are:
+            <ul>
+                <li>
+                    Each month, survival data for 100 samples will be added to the training dataset. The creator of the best performing model from the previous
+                    month will be asked to provide a written description of their approach for the community to read.
+                </li>
+                <li>
+                    Within 2 months, an additional validation dataset will be used to score models, consisting of around 200 breast cancer samples with
+                    survival information and molecular data collected at a different institution and on different profiling platforms. This validation dataset
+                    will assess the robustness of models when applied to different datasets, simulating a more clinically relevant evaluation. Details will be
+                    provided regarding how to translate models from one platform to the other.
+                </li>
+                <li>
+                    Additional training and validation data, as well as modifications of provided data formats and evaluation metrics will be added based on
+                    user suggestions.
+                </li>
+                <li>
+                    Raw feature data (e.g. microarray CEL files) will also be provided, subject to legal restrictions (e.g. raw genetic data cannot be
+                    released), allowing users to test custom pre-processing methods.
+                </li>
+            </ul>
+        </li>
+        <li>
+            Phase 3 - Challenge completion: October 1, 2012.
+            <ul>
+                <li>
+                    Training dataset will consist of all 1,000 samples from the METABRIC cohort.
+                </li>
+                <li>
+                    Validation dataset will consist of <em>an additional 500 samples with data generated specifically for this challenge</em>. These data are
+                    from an identified patient cohort with detailed clinical followup and fresh frozen tumor samples for which molecular profiles have not yet
+                    been generated. These samples will be sent to the same processing facility that generated the training dataset and gene expression and copy
+                    number profiles will be generated on the same platforms as for the training dataset.
+                </li>
+                <li>
+                    Models will be evaluated based on the newly generated validation dataset and results presented at the November 12-16 DREAM Conference in
+                    San Fransisco.
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <h2 id="Breastcancerchallengedescription-Data">
+        Data
+    </h2>
+    <p>
+        All data is accessible through the Sage Synapse software platform and loaded into R objects via simple function calls through the Synapse R client.
+    </p>
+    <h3 id="Breastcancerchallengedescription-Survivaldata">
+        <em>Survival data</em>
+    </h3>
+    <ul>
+        <li>
+            Survival data is loaded into R as a <code>Surv</code> object as defined in the R <code>survival</code>package. This object is simply a 2 column
+            matrix with sample names on the rows and columns:
+            <ul>
+                <li>
+                    time - time from diagnosis to last follow up.
+                </li>
+                <li>
+                    status - weather the patient was alive at last follow up time.
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <h3 id="Breastcancerchallengedescription-Featuredata">
+        <em>Feature data</em>
+    </h3>
+    <ul>
+        <li>
+            Gene expression data.
+            <ul>
+                <li>
+                    Performed on the Illumina HT 12v3 platform and normalized using XXXX.
+                </li>
+                <li>
+                    Loaded as Bioconductor ExpressionSet object with columns corresponding to samples and rows corresponding to Illumina probes.
+                </li>
+            </ul>
+        </li>
+        <li>
+            Copy number data.
+            <ul>
+                <li>
+                    Performed on the Affymetrix SNP 6.0 platform and normalized using XXX.
+                </li>
+                <li>
+                    Loaded as Bioconductor ExpressionSet object with columns corresponding to samples and rows corresponding to segmented copy number regions
+                    (??).
+                </li>
+            </ul>
+        </li>
+        <li>
+            Clinical covariates. For a detailed explanation of the clinical data and how it is currently used in breast cancer prognosis and treatment, see
+            <a href="https://sagebionetworks.jira.com/wiki/display/COMPBIO/Breast+Cancer+Challenge+clinical+background">
+                Breast Cancer Challenge clinical background
+            </a>
+            .
+            <ul>
+                <li>
+                    Loaded as an AnnotatedDataFrame object with the following features:
+                    <ul>
+                        <li>
+                            <em><strong>Site</strong></em>
+                            - site that patient tumor was collected from (1, 2, 3)
+                        </li>
+                        <li>
+                            <em><strong>ageDiagnosis</strong></em>
+                            - age of patient at diagnosis of disease
+                        </li>
+                        <li>
+                            <em><strong>lymphnodes</strong></em>
+                            - lymph node assessment (neg, pos)
+                        </li>
+                        <li>
+                            <em><strong>grade</strong></em>
+                            - grade of disease (1, 2, 3)
+                        </li>
+                        <li>
+                            <em><strong>histology</strong></em>
+                            - tumor histology (Infiltrating Lobular, Infiltrating Ductal, Medullary, Mixed Histology, Mucinous)
+                        </li>
+                        <li>
+                            <em><strong>tumorSizeCm</strong></em>
+                            - size of tumor in cm (often used dichotomization uses cutoff of 2cm)
+                        </li>
+                        <li>
+                            <em><strong>chemo</strong></em>
+                            - indicator of whether the patient received some sort of chemotherapy (0, 1)
+                        </li>
+                        <li>
+                            <em><strong>hormone</strong></em>
+                            - indicator of whether the patient received some sort of hormonal therapy (0, 1)
+                        </li>
+                        <li>
+                            <em><strong>radiation</strong></em>
+                            - indicator of whether the patient received some sort of radiation (0, 1)
+                        </li>
+                        <li>
+                            <em><strong>HER2</strong></em>
+                            - status (neg, pos)
+                        </li>
+                        <li>
+                            <em><strong>ER</strong></em>
+                            - status (neg, pos)
+                        </li>
+                        <li>
+                            <em><strong>PR</strong></em>
+                            - status (neg, pos)
+                        </li>
+                        <li>
+                            <em><strong>ERPR</strong></em>
+                            - if one of ER or PR is positive (neg, pos)
+                        </li>
+                        <li>
+                            <em><strong>tripleNegative</strong></em>
+                            - indicator of if all HER2 / ER / PR are negative (0, 1)
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <h2 id="Breastcancerchallengedescription-Scoringmetrics">
+        Scoring metrics
+    </h2>
+    <p>
+        The standard statistic used to evaluate the accuracy of survival predictions is the <em>concordance index</em>. Models will therefore be scored by
+        calculating the concordance index between the survival time predicted by the model, and the true survival time in the validation dataset (accounting
+        for the censor variable indicating weather the patient was alive at last follow-up). Users are encouraged to use cross validation in the training data
+        to compute their model concordance index as a good way to evaluate models prior to submission. A script will be provided to assess cross validation
+        model performance. Throughout the competition, the following scores will be provided:
+    </p>
+    <ul>
+        <li>
+            The final assessment of models and declaration of the winner will be based on concordance index of predictions on the newly generated validation
+            dataset.
+        </li>
+        <li>
+            Throughout the competition, participants will be provided concordance index scores on the following (a leaderboard will be developed to track the
+            best performers):
+            <br/>
+            <ul>
+                <li>
+                    The concordance index on the METABRIC validation dataset.
+                </li>
+                <li>
+                    The concordance index on the additional validation data of 200 samples performed on a different platform.
+                </li>
+                <li>
+                    Additional scoring metrics as determined by the community throughout the competition.
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <h2 id="Breastcancerchallengedescription-Submissionsofpredictionsandwriteup">
+        Submissions of predictions and writeup
+    </h2>
+    <p>
+        A primary goal of this challenge is to promote transparent, reusable models that can be assessed and extended by the community. To this end, models
+        built for this competition will be constructed using the R programming language (we may support additional languages in future competitions) and
+uploaded to a common platform provided by Sage Synapse. Models will be uploaded as R objects implementing a function called        <code>customPredict()</code> that returns a vector of survival predictions when given a set of feature data as input. The customPredict() function will
+        be run by a validation script for each submitted model and resulting predictions scored using concordance index against survival data from the
+        validation dataset. As the competition progresses, we plan to support source code submissions allowing the validation script to also reproduce the
+        training of the model. The creator of the best performing model will be expected to write a short description of their approach each month and posted
+on the discussion forum. Details on how to submit models are given in        <a href="https://sagebionetworks.jira.com/wiki/display/COMPBIO/Breast+cancer+challenge+user+guide">Breast cancer challenge user guide</a>.
+    </p>
+    <h2 id="Breastcancerchallengedescription-Computeplatform">
+        Compute platform
+    </h2>
+    <p>
+        A challenge of standardizing computational models developed for this competition is that most sophisticated models require the use of large compute
+        clusters for model optimization. Therefore, individual labs often program customized workflows to run on their own cluster architecture, making it
+        difficult to standardize or re-run analyses. For this reason, prior competition efforts either 1) abandoned the requirement for re-runnable code
+        submission (DREAM6 competition), or 2) limited entries to those that complete in a small amount of time on a single processor (Innocentive
+        competition).
+    </p>
+    <br/>
+    <p>
+    </p>
+    <br/>
+    <p>
+        We believe that supporting reusable, extensible code is critical to facilitating the type of transparency, rigor, and community development that we
+        hope to promote with this competition. We have therefore partnered with a cloud compute vendor to donate to the community the computational cycles
+        allowing participants to develop and test complex models on a common compute architecture in the cloud. In addition to promoting scientific rigor and
+        transparency, this donation of compute time will also enable the "democratization of medicine" in which participants from around the world can develop
+        sophisticated methods from a level playing field, without being in a rich institution with access to high-performance compute clusters. Details for
+        accessing compute resources will follow in the user guide.
+    </p>
+</div>
+					
+					
+					
 
-						<h3>Clinical Problem</h3>
-Molecular diagnostics for cancer therapeutic decision making are among the most promising applications of genomic technology. Several diagnostic tests have gained regulatory approval in recent years. Molecular profiles have proved particularly powerful in adding molecular information to standard clinical practice in breast cancer, using gene-expression-based diagnostic tests such as Mammaprint and Oncotype Dx. The exciting phase of “Precision Medicine”, as defined by the Institute of Medicine Report last year, proposes a world where medical decisions will be guided by molecular markers that ensure that therapies are tailored to the patients that receive them. The most exciting topics at the FDA and in the scientific community revolve around – “how can we leverage genomic information to determine who should and should not get which therapies?”
-<h3>Data Formats</h3>
-<h4>Survival data</h4>
-Survival data is loaded into R as a Surv object as defined in the R survivalpackage. This object is simply a 2 column matrix with sample names on the rows and columns:
-<ul>
-<li>time – time from diagnosis to last follow up.</li>
-<li>status – weather the patient was alive at last follow up time.</li>
-</ul>
-<h4>Feature data</h4>
-<h5>Gene expression data.</h5>
-<ul>
-<li>Performed on the Illumina HT 12v3 platform and normalized using XXXX.</li>
-<li>Loaded as Bioconductor ExpressionSet object with columns corresponding to samples and rows corresponding to Illumina probes.</li>
-<h5>Copy number data.</h5>
-</ul>
-<ul>
-<li>Performed on the Affymetrix SNP 6.0 platform and normalized using XXX.</li>
-<li>Loaded as Bioconductor ExpressionSet object with columns corresponding to samples and rows corresponding to segmented copy number regions (??).
-Clinical covariates. For a detailed explanation of the clinical data and how it is currently used in breast cancer prognosis and treatment, see Breast Cancer Challenge clinical background.
-</li></ul>
 <br></br>
 <a href="http://support.rstudio.org" target="_blank"><h3>R-Studio Tutorial</h3></a>
 <br></br>
 <a href="https://sagebionetworks.jira.com/browse/BCC#selectedTab=com.atlassian.jira.plugin.system.project%3Asummary-panel" target="_blank"><h3>Discussion Forum</h3></a>
 <br></br>
-<a href="http://www.google.com" target="_blank"><h3>Google Technical Guide</h3></a>
 <br></br>
 <g:SimplePanel ui:field="applyForChallenge" />
 <br></br>

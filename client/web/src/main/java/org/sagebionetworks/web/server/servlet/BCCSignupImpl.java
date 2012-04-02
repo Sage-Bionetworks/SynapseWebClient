@@ -23,11 +23,11 @@ public class BCCSignupImpl extends RemoteServiceServlet implements BCCSignup {
 	
 	// per the requirements there must be no space characters
 	public static String signupEmailMessage(BCCSignupProfile profile) {
-		return "{\"FirstName\":"+profile.getFname().trim()+
-				",\n\"LastName\":"+profile.getLname().trim()+
-				",\n\"Organization\":"+profile.getOrganization().trim()+
-				",\n\"ContactEmail\":"+profile.getEmail().trim()+
-				",\n\"ContactPhone\":"+profile.getPhone().trim()+"}";
+		return "{\"FirstName\":\""+profile.getFname().trim()+
+				"\",\n\"LastName\":\""+profile.getLname().trim()+
+				"\",\n\"Organization\":\""+profile.getOrganization().trim()+
+				"\",\n\"ContactEmail\":\""+profile.getEmail().trim()+
+				"\",\n\"ContactPhone\":\""+profile.getPhone().trim()+"\"}";
 	}
 
 	
