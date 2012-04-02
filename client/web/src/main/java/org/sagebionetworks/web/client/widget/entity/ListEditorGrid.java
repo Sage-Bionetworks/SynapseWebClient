@@ -158,7 +158,7 @@ public class ListEditorGrid<T> extends LayoutContainer {
 				Anchor removeAnchor = new Anchor();
 				StringBuilder builder = new StringBuilder();
 				builder.append("<div>");
-				builder.append(AbstractImagePrototype.create(iconBundle.delete16Grey()).getHTML());
+				builder.append(AbstractImagePrototype.create(iconBundle.deleteButtonGrey16()).getHTML());
 				builder.append("</div>");
 				removeAnchor.setHTML(builder.toString());
 				removeAnchor.addClickHandler(new ClickHandler() {
