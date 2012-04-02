@@ -11,6 +11,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/plus-button-16.png")
 	ImageResource addSquare16();	
 
+	@Source("images/icons/plus-button-grey-16.png")
+	ImageResource addSquareGrey16();	
+
 	@Source("images/icons/plus-16.png")
 	ImageResource add16();	
 
@@ -40,15 +43,12 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/cog-16.png")
 	ImageResource cog16();
-
-	@Source("images/icons/cross-16-grey.png")
-	ImageResource delete16Grey();
-	
-	@Source("images/icons/cross-16.png")
-	ImageResource delete16();
-	
+		
 	@Source("images/icons/cross-button-16.png")
 	ImageResource deleteButton16();
+
+	@Source("images/icons/cross-button-grey-16.png")
+	ImageResource deleteButtonGrey16();
 
 	@Source("images/icons/disk-black-16.png")
 	ImageResource disk16();

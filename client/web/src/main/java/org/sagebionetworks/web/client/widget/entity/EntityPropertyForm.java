@@ -90,7 +90,7 @@ public class EntityPropertyForm extends LayoutContainer {
 		addButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.addSquare16()));
 		toolBar.add(addButton);
 		Button removeButton = new Button("Remove Annotation");
-		removeButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.delete16()));
+		removeButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
 		toolBar.add(removeButton);
 		toolBar.setAlignment(HorizontalAlignment.CENTER);
 		// The add button.
