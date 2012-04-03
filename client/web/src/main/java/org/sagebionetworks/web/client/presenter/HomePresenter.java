@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.presenter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -10,6 +11,7 @@ import org.sagebionetworks.web.client.view.HomeView;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
@@ -23,16 +25,21 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private PlaceChanger placeChanger;
 	private CookieProvider cookieProvider;
 	private AuthenticationController authenticationController;
+	private StackConfigServiceAsync stackConfigService;
 	
 	@Inject
-	public HomePresenter(HomeView view, CookieProvider cookieProvider, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState){
+	public HomePresenter(HomeView view, 
+			CookieProvider cookieProvider, 
+			AuthenticationController authenticationController, 
+			GlobalApplicationState globalApplicationState,
+			StackConfigServiceAsync stackConfigService){
 		this.view = view;
 		// Set the presenter on the view
 		this.cookieProvider = cookieProvider;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.placeChanger = globalApplicationState.getPlaceChanger();
-
+		this.stackConfigService = stackConfigService;
 		this.view.setPresenter(this);
 	}
 
@@ -72,5 +79,11 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public boolean showMyProjects() {
 		return authenticationController.isLoggedIn();
 	}
+
+	@Override
+	public void showBCCSignup(AsyncCallback<String> callback) {
+		stackConfigService.getBCCSignupEnabled(callback);
+	}
+	
 
 }
