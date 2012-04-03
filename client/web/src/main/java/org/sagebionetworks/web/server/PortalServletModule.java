@@ -17,6 +17,7 @@ import org.sagebionetworks.web.server.servlet.NcboSearchService;
 import org.sagebionetworks.web.server.servlet.NodeServiceImpl;
 import org.sagebionetworks.web.server.servlet.ProjectServiceImpl;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
+import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
@@ -73,6 +74,10 @@ public class PortalServletModule extends ServletModule {
 		// Setup the User Account service mapping
 		bind(UserAccountServiceImpl.class).in(Singleton.class);
 		serve("/Portal/users").with(UserAccountServiceImpl.class);
+	
+		// Setup the User Account service mapping
+		bind(StackConfigServiceImpl.class).in(Singleton.class);
+		serve("/Portal/stackConfig").with(StackConfigServiceImpl.class);
 	
 		bind(BCCSignupImpl.class).in(Singleton.class);
 		serve("/Portal/bcc").with(BCCSignupImpl.class);

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface HomeView extends IsWidget, SynapseView {
@@ -18,7 +19,9 @@ public interface HomeView extends IsWidget, SynapseView {
 	public interface Presenter extends SynapsePresenter {
 
 		boolean showMyProjects();	
-				
+		
+		void showBCCSignup(AsyncCallback<String> callback);	
+		
 	}
 
 }
