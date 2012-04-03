@@ -39,7 +39,8 @@ setMethod(
     oldAnnotations <- annotations(entity)
     oldClass <- class(entity)
     uri <- paste("/", synapseEntityKind(entity), sep = "")
-    entity <- SynapseEntity(synapsePost(uri=uri, entity=.extractEntityFromSlots(entity)))
+    tmp <- synapsePost(uri=uri, entity=.extractEntityFromSlots(entity))
+    entity <- SynapseEntity(tmp)
     class(entity) <- oldClass
     
     ## update entity annotations
