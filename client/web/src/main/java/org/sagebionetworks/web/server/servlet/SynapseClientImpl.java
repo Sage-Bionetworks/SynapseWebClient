@@ -42,51 +42,55 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
 @SuppressWarnings("serial")
-public class SynapseClientImpl extends RemoteServiceServlet implements SynapseClient, TokenProvider  {
-	
-	
+public class SynapseClientImpl extends RemoteServiceServlet implements
+		SynapseClient, TokenProvider {
+
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 
-	@SuppressWarnings("unused")	
-	private static Logger logger = Logger.getLogger(SynapseClientImpl.class.getName());
+	@SuppressWarnings("unused")
+	private static Logger logger = Logger.getLogger(SynapseClientImpl.class
+			.getName());
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
-	
+
 	/**
 	 * Injected with Gin
 	 */
 	@SuppressWarnings("unused")
 	private ServiceUrlProvider urlProvider;
-		
+
 	/**
 	 * Essentially the constructor. Setup synapse client.
+	 * 
 	 * @param provider
 	 */
 	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider){
+	public void setServiceUrlProvider(ServiceUrlProvider provider) {
 		this.urlProvider = provider;
 	}
-				
+
 	/**
 	 * Injected with Gin
 	 */
 	@SuppressWarnings("unused")
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-		
+
 	/**
 	 * This allows tests provide mock Synapse ojbects
+	 * 
 	 * @param provider
 	 */
-	public void setSynapseProvider(SynapseProvider provider){
+	public void setSynapseProvider(SynapseProvider provider) {
 		this.synapseProvider = provider;
 	}
 
 	/**
 	 * This allows integration tests to override the token provider.
+	 * 
 	 * @param tokenProvider
 	 */
-	public void setTokenProvider(TokenProvider tokenProvider){
+	public void setTokenProvider(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
 	}
 
@@ -96,25 +100,23 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	 */
 	public void validateService() {
 		if (synapseProvider == null)
-			throw new IllegalStateException(
-					"The SynapseProvider was not set");
-		if(tokenProvider == null){
-			throw new IllegalStateException(
-			"The token provider was not set");
+			throw new IllegalStateException("The SynapseProvider was not set");
+		if (tokenProvider == null) {
+			throw new IllegalStateException("The token provider was not set");
 		}
 	}
-	
+
 	@Override
 	public String getSessionToken() {
 		// By default, we get the token from the request cookies.
-		return UserDataProvider.getThreadLocalUserToken(this.getThreadLocalRequest());
+		return UserDataProvider.getThreadLocalUserToken(this
+				.getThreadLocalRequest());
 	}
 
-	
 	/*
 	 * SynapseClient Service Methods
 	 */
-	
+
 	/**
 	 * Get an Entity by its id
 	 */
@@ -123,82 +125,95 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		Synapse synapseClient = createSynapseClient();
 		try {
 			Entity entity = synapseClient.getEntityById(entityId);
-			JSONObjectAdapter entityJson = entity.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(entityJson.toJSONString(), entity.getClass().getName(), null);		
+			JSONObjectAdapter entityJson = entity
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(entityJson.toJSONString(), entity
+					.getClass().getName(), null);
 		} catch (SynapseException e) {
 			// Since we are not throwing errors, log them
 			log.error(e);
-			return new EntityWrapper(null, null, ExceptionUtil.convertSynapseException(e));
+			return new EntityWrapper(null, null,
+					ExceptionUtil.convertSynapseException(e));
 		} catch (JSONObjectAdapterException e) {
 			// Since we are not throwing errors, log them
 			log.error(e);
-			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
-		}		
-	}
-	
-	@Override
-	public String getEntityTypeRegistryJSON() {		
-		return SynapseClientImpl.getEntityTypeRegistryJson();
-	}	
-
-	@Override	
-	public EntityWrapper getEntityPath(String entityId) { 
-		Synapse synapseClient = createSynapseClient();
-		try {
-			EntityPath entityPath = synapseClient.getEntityPath(entityId); 
-			JSONObjectAdapter entityPathJson = entityPath.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(entityPathJson.toJSONString(), entityPath.getClass().getName(), null);			
-		}catch (SynapseException e) {
-			// Since we are not throwing errors, log them
-			log.error(e);
-			return new EntityWrapper(null, null, ExceptionUtil.convertSynapseException(e));
-		} catch (JSONObjectAdapterException e) {
-			// Since we are not throwing errors, log them
-			log.error(e);
-			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
+			return new EntityWrapper(null, null, new UnknownErrorException(
+					e.getMessage()));
 		}
 	}
-	
+
+	@Override
+	public String getEntityTypeRegistryJSON() {
+		return SynapseClientImpl.getEntityTypeRegistryJson();
+	}
+
+	@Override
+	public EntityWrapper getEntityPath(String entityId) {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			EntityPath entityPath = synapseClient.getEntityPath(entityId);
+			JSONObjectAdapter entityPathJson = entityPath
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(entityPathJson.toJSONString(), entityPath
+					.getClass().getName(), null);
+		} catch (SynapseException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
+			return new EntityWrapper(null, null,
+					ExceptionUtil.convertSynapseException(e));
+		} catch (JSONObjectAdapterException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
+			return new EntityWrapper(null, null, new UnknownErrorException(
+					e.getMessage()));
+		}
+	}
+
 	@Override
 	public EntityWrapper search(String searchQueryJson) {
 		Synapse synapseClient = createSynapseClient();
 		try {
 			JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
-			SearchResults searchResults = synapseClient.search(new SearchQuery(adapter.createNew(searchQueryJson)));
+			SearchResults searchResults = synapseClient.search(new SearchQuery(
+					adapter.createNew(searchQueryJson)));
 			searchResults.writeToJSONObject(adapter);
-			return new EntityWrapper(adapter.toJSONString(), SearchResults.class.getName(), null);		
-		}catch (SynapseException e) {
+			return new EntityWrapper(adapter.toJSONString(),
+					SearchResults.class.getName(), null);
+		} catch (SynapseException e) {
 			// Since we are not throwing errors, log them
 			log.error(e);
-			return new EntityWrapper(null, null, ExceptionUtil.convertSynapseException(e));
+			return new EntityWrapper(null, null,
+					ExceptionUtil.convertSynapseException(e));
 		} catch (JSONObjectAdapterException e) {
 			// Since we are not throwing errors, log them
 			log.error(e);
-			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
+			return new EntityWrapper(null, null, new UnknownErrorException(
+					e.getMessage()));
 		} catch (UnsupportedEncodingException e) {
 			// Since we are not throwing errors, log them
 			log.error(e);
-			return new EntityWrapper(null, null, new UnknownErrorException(e.getMessage()));
-		}		
+			return new EntityWrapper(null, null, new UnknownErrorException(
+					e.getMessage()));
+		}
 	}
 
-	
-	
 	/*
 	 * Private Methods
 	 */
 
 	/**
-	 * The synapse client is stateful so we must create a new one for each request
+	 * The synapse client is stateful so we must create a new one for each
+	 * request
 	 */
 	private Synapse createSynapseClient() {
 		// Create a new syanpse
 		Synapse synapseClient = synapseProvider.createNewClient();
 		synapseClient.setSessionToken(tokenProvider.getSessionToken());
-		synapseClient.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
+		synapseClient.setRepositoryEndpoint(urlProvider
+				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
 		return synapseClient;
-	}	
+	}
 
 	/**
 	 * Read an input stream into a string.
@@ -227,11 +242,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		return null;
 	}
 
-	
 	public static String getEntityTypeRegistryJson() {
 		ClassLoader classLoader = EntityType.class.getClassLoader();
-		InputStream in = classLoader.getResourceAsStream(EntityType.REGISTER_JSON_FILE_NAME);
-		if(in == null) throw new IllegalStateException("Cannot find the "+EntityType.REGISTER_JSON_FILE_NAME+" file on the classpath");
+		InputStream in = classLoader
+				.getResourceAsStream(EntityType.REGISTER_JSON_FILE_NAME);
+		if (in == null)
+			throw new IllegalStateException("Cannot find the "
+					+ EntityType.REGISTER_JSON_FILE_NAME
+					+ " file on the classpath");
 		String jsonString = "";
 		try {
 			jsonString = readToString(in);
@@ -243,8 +261,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	}
 
 	@Override
-	public EntityBundleTransport getEntityBundle(String entityId, int partsMask) throws RestServiceException {
-		try{
+	public EntityBundleTransport getEntityBundle(String entityId, int partsMask)
+			throws RestServiceException {
+		try {
 			// Get all of the requested parts
 			EntityBundleTransport transport = new EntityBundleTransport();
 			Synapse synapseClient = createSynapseClient();
@@ -257,18 +276,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 			// Add the path?
 			handleEntityPath(entityId, partsMask, transport, synapseClient);
 			// Add Referenced By?
-			handleEntityReferencedBy(entityId, partsMask, transport, synapseClient);
+			handleEntityReferencedBy(entityId, partsMask, transport,
+					synapseClient);
 			return transport;
-		}catch(SynapseException e){
+		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
-	
 	/**
 	 * Set the entity path if requested
+	 * 
 	 * @param entityId
 	 * @param partsMask
 	 * @param transport
@@ -276,15 +296,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	 * @throws SynapseException
 	 * @throws JSONObjectAdapterException
 	 */
-	public void handleEntityPath(String entityId, int partsMask, EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
-		if((EntityBundleTransport.ENTITY_PATH & partsMask) > 0){
+	public void handleEntityPath(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient)
+			throws SynapseException, JSONObjectAdapterException {
+		if ((EntityBundleTransport.ENTITY_PATH & partsMask) > 0) {
 			EntityPath path = synapseClient.getEntityPath(entityId);
-			transport.setEntityPathJson(EntityFactory.createJSONStringForEntity(path));
+			transport.setEntityPathJson(EntityFactory
+					.createJSONStringForEntity(path));
 		}
 	}
 
 	/**
 	 * Add the permissions to the bundle if requested.
+	 * 
 	 * @param entityId
 	 * @param partsMask
 	 * @param transport
@@ -292,15 +316,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	 * @throws SynapseException
 	 * @throws JSONObjectAdapterException
 	 */
-	public void handlePermissions(String entityId, int partsMask,	EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
-		if((EntityBundleTransport.PERMISSIONS & partsMask) > 0){
-			UserEntityPermissions permissions = synapseClient.getUsersEntityPermissions(entityId);
-			transport.setPermissionsJson(EntityFactory.createJSONStringForEntity(permissions));
+	public void handlePermissions(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient)
+			throws SynapseException, JSONObjectAdapterException {
+		if ((EntityBundleTransport.PERMISSIONS & partsMask) > 0) {
+			UserEntityPermissions permissions = synapseClient
+					.getUsersEntityPermissions(entityId);
+			transport.setPermissionsJson(EntityFactory
+					.createJSONStringForEntity(permissions));
 		}
 	}
 
 	/**
 	 * Add the annotations to the bundle if requested.
+	 * 
 	 * @param entityId
 	 * @param partsMask
 	 * @param transport
@@ -308,15 +337,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	 * @throws SynapseException
 	 * @throws JSONObjectAdapterException
 	 */
-	public void handleAnnotaions(String entityId, int partsMask,	EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
-		if((EntityBundleTransport.ANNOTATIONS & partsMask) > 0){
+	public void handleAnnotaions(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient)
+			throws SynapseException, JSONObjectAdapterException {
+		if ((EntityBundleTransport.ANNOTATIONS & partsMask) > 0) {
 			Annotations annos = synapseClient.getAnnotations(entityId);
-			transport.setAnnotaionsJson(EntityFactory.createJSONStringForEntity(annos));
+			transport.setAnnotaionsJson(EntityFactory
+					.createJSONStringForEntity(annos));
 		}
 	}
 
 	/**
 	 * Add an entity to the bundle if requested
+	 * 
 	 * @param entityId
 	 * @param partsMask
 	 * @param transport
@@ -324,8 +357,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	 * @throws SynapseException
 	 * @throws JSONObjectAdapterException
 	 */
-	public void handleEntity(String entityId, int partsMask, EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
-		if((EntityBundleTransport.ENTITY & partsMask) > 0){
+	public void handleEntity(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient)
+			throws SynapseException, JSONObjectAdapterException {
+		if ((EntityBundleTransport.ENTITY & partsMask) > 0) {
 			Entity e = synapseClient.getEntityById(entityId);
 			transport.setEntityJson(EntityFactory.createJSONStringForEntity(e));
 		}
@@ -333,6 +368,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 
 	/**
 	 * Set the entity path if requested
+	 * 
 	 * @param entityId
 	 * @param partsMask
 	 * @param transport
@@ -340,19 +376,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	 * @throws SynapseException
 	 * @throws JSONObjectAdapterException
 	 */
-	public void handleEntityReferencedBy(String entityId, int partsMask, EntityBundleTransport transport, Synapse synapseClient) throws SynapseException, JSONObjectAdapterException {
-		if((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0){
+	public void handleEntityReferencedBy(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient)
+			throws SynapseException, JSONObjectAdapterException {
+		if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
 			// TODO : support entity version
-			PaginatedResults<EntityHeader> results = synapseClient.getEntityReferencedBy(entityId, null);
-			transport.setEntityReferencedByJson(EntityFactory.createJSONStringForEntity(results));
+			PaginatedResults<EntityHeader> results = synapseClient
+					.getEntityReferencedBy(entityId, null);
+			transport.setEntityReferencedByJson(EntityFactory
+					.createJSONStringForEntity(results));
 		}
 	}
 
 	@Override
-	public String getEntityReferencedBy(String entityId) throws RestServiceException {
+	public String getEntityReferencedBy(String entityId)
+			throws RestServiceException {
 		try {
 			Synapse synapseClient = createSynapseClient();
-			PaginatedResults<EntityHeader> results = synapseClient.getEntityReferencedBy(entityId, null);
+			PaginatedResults<EntityHeader> results = synapseClient
+					.getEntityReferencedBy(entityId, null);
 			return EntityFactory.createJSONStringForEntity(results);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -382,42 +424,46 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 	}
 
 	@Override
-	public String createOrUpdateEntity(String entityJson, String annoJson,	boolean isNew) throws RestServiceException {
+	public String createOrUpdateEntity(String entityJson, String annoJson,
+			boolean isNew) throws RestServiceException {
 		// First read the entity
 		try {
 			Entity entity = parseEntityFromJson(entityJson);
 			Annotations annos = null;
-			if(annoJson != null){
-				annos = EntityFactory.createEntityFromJSONString(annoJson, Annotations.class);
+			if (annoJson != null) {
+				annos = EntityFactory.createEntityFromJSONString(annoJson,
+						Annotations.class);
 			}
 			return createOrUpdateEntity(entity, annos, isNew);
 		} catch (JSONObjectAdapterException e) {
 			throw new BadRequestException(e.getMessage());
-		} 
+		}
 
 	}
-	
+
 	/**
 	 * Create or update an entity
+	 * 
 	 * @param entity
 	 * @param annos
 	 * @param isNew
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String createOrUpdateEntity(Entity entity, Annotations annos, boolean isNew) throws RestServiceException {
+	public String createOrUpdateEntity(Entity entity, Annotations annos,
+			boolean isNew) throws RestServiceException {
 		// First read the entity
 		try {
 			Synapse synapseClient = createSynapseClient();
-			if(isNew){
+			if (isNew) {
 				// This is a create
 				entity = synapseClient.createEntity(entity);
-			}else{
+			} else {
 				// This is an update
 				entity = synapseClient.putEntity(entity);
 			}
 			// Update the annotations
-			if(annos != null){
+			if (annos != null) {
 				annos.setEtag(entity.getEtag());
 				annos.setId(entity.getId());
 				synapseClient.updateAnnotations(entity.getId(), annos);
@@ -428,20 +474,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		}
 
 	}
-	
+
 	/**
 	 * Parse an entity from its json.
+	 * 
 	 * @param json
 	 * @return
 	 * @throws JSONObjectAdapterException
 	 */
-	public Entity parseEntityFromJson(String json) throws JSONObjectAdapterException{
-		if(json == null) throw new IllegalArgumentException("Entity cannot be null");
+	public Entity parseEntityFromJson(String json)
+			throws JSONObjectAdapterException {
+		if (json == null)
+			throw new IllegalArgumentException("Entity cannot be null");
 		// Create an adapter
 		JSONObjectAdapter adapter = adapterFactory.createNew(json);
 		// Extrat the entity type.
-		if(!adapter.has(EntityConstants.ENTITY_TYPE) || adapter.isNull(EntityConstants.ENTITY_TYPE)){
-			throw new IllegalArgumentException("JSON does not contain: "+EntityConstants.ENTITY_TYPE);
+		if (!adapter.has(EntityConstants.ENTITY_TYPE)
+				|| adapter.isNull(EntityConstants.ENTITY_TYPE)) {
+			throw new IllegalArgumentException("JSON does not contain: "
+					+ EntityConstants.ENTITY_TYPE);
 		}
 		String entityType = adapter.getString(EntityConstants.ENTITY_TYPE);
 		Entity entity = (Entity) entityFactory.newInstance(entityType);
@@ -449,12 +500,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements SynapseCl
 		return entity;
 	}
 
-
 	@Override
-	public String getEntityTypeBatch(List<String> entityIds) throws RestServiceException {		
+	public String getEntityTypeBatch(List<String> entityIds)
+			throws RestServiceException {
 		try {
-		Synapse synapseClient = createSynapseClient();
-			BatchResults<EntityHeader> results = synapseClient.getEntityTypeBatch(entityIds);
+			Synapse synapseClient = createSynapseClient();
+			BatchResults<EntityHeader> results = synapseClient
+					.getEntityTypeBatch(entityIds);
 			return EntityFactory.createJSONStringForEntity(results);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

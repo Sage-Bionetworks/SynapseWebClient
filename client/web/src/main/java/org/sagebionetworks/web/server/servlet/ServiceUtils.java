@@ -14,18 +14,9 @@ public class ServiceUtils {
 
 	private static Logger logger = Logger.getLogger(ServiceUtils.class.getName());
 	
-	public static final String REPOSVC_PATH_DATASET = "dataset";
-	public static final String REPOSVC_PATH_LAYER = "layer";
-	public static final String REPOSVC_PATH_PROJECT = "project";
-	public static final String REPOSVC_PATH_EULA = "eula";
-	public static final String REPOSVC_PATH_AGREEMENT = "agreement";
 	public static final String REPOSVC_PATH_ENTITY = "entity";
 	public static final String REPOSVC_PATH_HAS_ACCESS = "access";
 	public static final String REPOSVC_PATH_GET_USERS = "user";
-	public static final String REPOSVC_PATH_ANALYSIS = "analysis";
-	public static final String REPOSVC_PATH_STEP = "step";
-	public static final String REPOSVC_PATH_CODE = "code";
-	public static final String REPOSVC_PATH_LINK = "link";
 	public static final String REPOSVC_PATH_PUBLIC_PROFILE = "publicprofile";
 	public static final String REPOSVC_SUFFIX_PATH_ANNOTATIONS = "annotations";
 	public static final String REPOSVC_SUFFIX_PATH_PREVIEW = "preview";
@@ -56,35 +47,7 @@ public class ServiceUtils {
 	public static StringBuilder getBaseUrlBuilder(ServiceUrlProvider urlProvider, NodeType type) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(urlProvider.getRepositoryServiceUrl() + "/");
-		// set path based on type
-		switch(type) {
-		case STUDY:
-			builder.append(REPOSVC_PATH_DATASET);
-			break;
-		case PROJECT:
-			builder.append(REPOSVC_PATH_PROJECT);
-			break;
-		case DATA:
-			builder.append(REPOSVC_PATH_LAYER);
-			break;
-		case ANALYSIS:
-			builder.append(REPOSVC_PATH_ANALYSIS);
-			break;
-		case STEP:
-			builder.append(REPOSVC_PATH_STEP);
-			break;
-		case CODE:
-			builder.append(REPOSVC_PATH_CODE);
-			break;
-		case LINK: 
-			builder.append(REPOSVC_PATH_LINK);
-			break;
-		case ENTITY:
-			builder.append(REPOSVC_PATH_ENTITY);
-			break;
-		default:
-			throw new IllegalArgumentException("Unsupported type:" + type.toString());
-		}
+		builder.append(REPOSVC_PATH_ENTITY);
 		return builder;
 	}
 
