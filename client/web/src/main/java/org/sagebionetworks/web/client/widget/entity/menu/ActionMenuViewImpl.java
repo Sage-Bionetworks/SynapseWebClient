@@ -273,7 +273,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		int numAdded = 0;
 		
 		// Create shortcut
-		MenuItem item = new MenuItem(DisplayConstants.LABEL_CREATE_SHORTCUT);
+		MenuItem item = new MenuItem(DisplayConstants.LABEL_CREATE_LINK);
 		item.setIcon(AbstractImagePrototype.create(iconsImageBundle.documentArrow16()));
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
@@ -283,7 +283,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
 					@Override
 					public void onSelection(String selectedEntityId) {
-						presenter.createShortcut(selectedEntityId);
+						presenter.createLink(selectedEntityId);
 						window.hide();
 					}
 				});
@@ -292,7 +292,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				window.setPlain(true);
 				window.setModal(true);
 				window.setBlinkModal(true);
-				window.setHeading(DisplayConstants.LABEL_WHERE_SAVE_SHORTCUT);
+				window.setHeading(DisplayConstants.LABEL_WHERE_SAVE_LINK);
 				window.setLayout(new FitLayout());
 				window.add(myEntitiesBrowser.asWidget(), new FitData(4)); 				
 				window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {

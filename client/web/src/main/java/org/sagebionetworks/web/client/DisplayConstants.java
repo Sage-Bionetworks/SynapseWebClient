@@ -186,12 +186,13 @@ public class DisplayConstants {
 	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
 	public static final String ERROR_UPLOAD = "An error occured during upload. Please try again.";
 	public static final String LABEL_UPLOADING = "Uploading...";
-	public static final String LABEL_CREATE_SHORTCUT = "Save Shortcut";
-	public static final String LABEL_WHERE_SAVE_SHORTCUT = "Where would you like to save a shortcut to this page?";
+	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
+	public static final String LABEL_WHERE_SAVE_LINK = "Where would you like to save a Link to this page?";
 	public static final String ERROR_NOT_FOUND = "Entity not found";
 	public static final String ERROR_ENTITY_CANT_SHORTCUTS = "Sorry, the requested entity can not contain shortcuts.";
+	public static final String ERROR_ENTITY_CREATION = "Sorry, creation failed. Please try again.";
 	public static final String LABEL_SUCCESS = "Success";
-	public static final String TEXT_SHORTCUT_ADDED = "Shortcut added to id";
+	public static final String TEXT_LINK_SAVED = "Link saved.";
 	public static final String ERROR_UPDATE_FAILED = "Update failed. Please try again.";
 	public static final String TEXT_NO_REFERENCES = "No shortcuts point to this";
 	public static final String BUTTON_FILTER_ONLY_MY_CREATION = "Show Projects I Created";
@@ -201,6 +202,7 @@ public class DisplayConstants {
 	public static final String LABEL_NONE_FOUND = "None Found";
 	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
+	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	
 }
 

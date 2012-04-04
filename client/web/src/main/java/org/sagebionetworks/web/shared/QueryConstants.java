@@ -7,7 +7,7 @@ public class QueryConstants {
 	 * 
 	 */
 	public enum ObjectType {
-		dataset(), layer(), project(), agreement(), eula(), analysis(), step(), code(), entity();
+		dataset(), layer(), project(), agreement(), eula(), analysis(), step(), code(), link(), entity();
 	}
 
 	/**

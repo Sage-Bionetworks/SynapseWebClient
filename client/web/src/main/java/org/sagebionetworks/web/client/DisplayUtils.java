@@ -7,7 +7,15 @@ import java.util.List;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
+import org.sagebionetworks.repo.model.Analysis;
+import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.Code;
+import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Step;
+import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.web.client.place.Home;
@@ -308,7 +316,9 @@ public class DisplayUtils {
 			return NodeType.STEP;
 		} else if(entity instanceof org.sagebionetworks.repo.model.Code) {
 			return NodeType.CODE;
-		}
+		} else if(entity instanceof org.sagebionetworks.repo.model.Link) {
+			return NodeType.LINK;
+		} 
 		return null;	
 	}
 	
@@ -406,5 +416,59 @@ public class DisplayUtils {
 			String display) {
 		return "<a href=\"" + DisplayUtils.getSynapseHistoryToken(id) + "\" class=\"link\">" + display + "</a>";
 	}
+
+	public static enum IconSize { PX16, PX24 };
 	
+	public static ImageResource getSynapseIconForEntityType(EntityType type, IconSize iconSize, IconsImageBundle iconsImageBundle) {
+		if(type == null) return null;
+		return getSynapseIconForEntityClassName(type.getClassName(), iconSize, iconsImageBundle);
+	}
+
+	public static ImageResource getSynapseIconForEntity(Entity entity, IconSize iconSize, IconsImageBundle iconsImageBundle) {
+		if(entity == null) return null;
+		return getSynapseIconForEntityClassName(entity.getClass().getName(), iconSize, iconsImageBundle);
+	}
+	
+	public static ImageResource getSynapseIconForEntityClassName(String className, IconSize iconSize, IconsImageBundle iconsImageBundle) {
+		//String classname = type.getClassName();
+		ImageResource icon = null;
+		if(Analysis.class.getName().equals(className)) {
+			// Analysis
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseAnalysis16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseAnalysis24();			
+		} else if(Code.class.getName().equals(className)) {
+			// Code
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseCode16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseCode24();			
+		} else if(Data.class.getName().equals(className)) {
+			// Data
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseData24();			
+		} else if(Folder.class.getName().equals(className)) {
+			// Folder
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();			
+//		} else if(Model.class.getName().equals(className)) {
+			// Model
+//			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
+//			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseModel24();			
+		} else if(Project.class.getName().equals(className)) {
+			// Project
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseProject16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseProject24();			
+		} else if(Step.class.getName().equals(className)) {
+			// Step
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStep16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStep24();			
+		} else if(Study.class.getName().equals(className)) {
+			// Study
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStudy16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStudy24();			
+		} else {
+			// default to folder
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();			
+		}
+		return icon;
+	}
 }

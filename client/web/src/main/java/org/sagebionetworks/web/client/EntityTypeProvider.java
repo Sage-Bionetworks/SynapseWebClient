@@ -50,6 +50,36 @@ public class EntityTypeProvider {
 		return getEntityTypeForUri(entity.getUri());
 	}
 	
+	/**
+	 * 
+	 * @param entityType The short name for an entity, such as "project"
+	 * @return
+	 */
+	public EntityType getEntityTypeForString(String entityType) {		
+		if(entityType != null) { 
+			for(EntityType type : values) {
+				if(type.getName().equals(entityType) || (type.getAliases() != null && type.getAliases().contains(entityType))) {
+					return type;
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param className The full class path to an entity. This is called available via getEntityType() in an Entity
+	 * @return
+	 */
+	public EntityType getEntityTypeForClassName(String className) {
+		for(EntityType type : values) {
+			if(type.getClassName().equals(className)) {
+				return type;
+			}
+		}
+		return null;
+	}
+	
 	public EntityType getEntityTypeForUri(String uri) {
 		if(uri == null) throw new IllegalArgumentException("URI cannot be null");
 		int maxIndex = -1;
@@ -124,7 +154,9 @@ public class EntityTypeProvider {
 	 */
 	public String getEntityDispalyName(EntityType type){
 		ObjectSchema schema = cache.getSchemaEntity(type.getClassName());
-		return schema.getTitle();
+		String display = schema.getTitle();
+		if(display == null) display = "";
+		return display;
 	}
 	
 	/**

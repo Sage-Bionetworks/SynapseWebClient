@@ -60,6 +60,10 @@ public class EntityType {
 		return metadata;
 	}
 
+	public List<String> getAliases() {
+		return metadata.getAliases();
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

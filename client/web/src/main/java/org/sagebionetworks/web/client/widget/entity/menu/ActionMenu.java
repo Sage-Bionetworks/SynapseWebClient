@@ -1,17 +1,23 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseClientUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -21,7 +27,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
 
@@ -45,9 +50,10 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityEditor entityEditor;
+	private AutoGenFactory entityFactory;
 	
 	@Inject
-	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor) {
+	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor, AutoGenFactory entityFactory) {
 		this.view = view;
 		this.nodeService = nodeService;
 		this.nodeModelCreator = nodeModelCreator;
@@ -57,7 +63,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.entityEditor = entityEditor;
-		
+		this.entityFactory = entityFactory;
 		view.setPresenter(this);
 	}	
 	
@@ -143,15 +149,9 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		// ignore self type children 
 		ignore.add(entityType); 
 
-		// ignore locations & previews
-		for(EntityType type : entityTypeProvider.getEntityTypes()) {
-			if("location".equals(type.getName())) {
-				ignore.add(type);
-			}
-			if("preview".equals(type.getName())) {
-				ignore.add(type);
-			}
-		}
+		// ignore certain types		
+		ignore.add(entityTypeProvider.getEntityTypeForClassName(Link.class.getName()));
+		ignore.add(entityTypeProvider.getEntityTypeForClassName(Preview.class.getName()));
 		
 		return ignore;
 	}
@@ -159,11 +159,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	@Override
 	public boolean isUserLoggedIn() {
 		return authenticationController.getLoggedInUser() != null;
-	}
-
-	@Override
-	public void createShortcut(final String addToEntityId) {
-		SynapseClientUtils.createShortcut(entityBundle.getEntity(), addToEntityId, view, synapseClient, nodeService, nodeModelCreator, jsonObjectAdapter);
 	}
 
 	@Override
@@ -175,6 +170,37 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	@Override
 	public void addNewChild(EntityType type, String parentId) {
 		entityEditor.addNewEntity(type, parentId);
+		
+	}
+
+	@Override
+	public void createLink(String selectedEntityId) {			
+		Link link = (Link) entityFactory.newInstance(Link.class.getName());
+		link.setParentId(selectedEntityId); // user selects where to save
+		link.setLinksTo(entityBundle.getEntity().getId()); // links to this entity
+		link.setName(entityBundle.getEntity().getName()); // copy name of this entity as default
+		link.setEntityType(Link.class.getName());
+		
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		try {
+			link.writeToJSONObject(adapter);
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
+		}		
+		
+		// create the link
+		synapseClient.createOrUpdateEntity(adapter.toJSONString(), null, true, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+				}
+			}
+		});
 		
 	}
 

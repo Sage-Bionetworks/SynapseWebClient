@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_REFERENCEDBY;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -94,7 +95,15 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				EntityBundle bundle = null;
 				try {
 					bundle = nodeModelCreator.createEntityBundle(transport);
-					view.setEntityBundle(bundle);
+					
+					// Redirect if Entity is a Link
+					if(bundle.getEntity() instanceof Link) {
+						entityId = ((Link)bundle.getEntity()).getLinksTo();
+						refresh();
+						return;
+					} 					
+					
+					view.setEntityBundle(bundle);					
 				} catch (RestServiceException ex) {					
 					if(!DisplayUtils.handleServiceException(ex, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
 						onFailure(null);					

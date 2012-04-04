@@ -46,10 +46,10 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 		List<EntityType> getAddSkipTypes();
 
 		boolean isUserLoggedIn();
-
-		void createShortcut(String entityId);
 		
 		public void addNewChild(EntityType type, String parentId);
+
+		void createLink(String selectedEntityId);
 
 	}
 }

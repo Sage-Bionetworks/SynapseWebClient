@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -30,6 +31,8 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseWidgetView {
 		void setSelection(String id);
 
 		int getMaxLimit();
+
+		ImageResource getIconForType(String type);
 
 	}
 

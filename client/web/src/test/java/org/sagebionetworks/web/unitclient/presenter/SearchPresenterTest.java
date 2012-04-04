@@ -13,7 +13,9 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
@@ -35,6 +37,8 @@ public class SearchPresenterTest {
 	NodeModelCreator mockNodeModelCreator;
 	JSONObjectAdapter jsonObjectAdapter;
 	PlaceChanger mockPlaceChanger;
+	EntityTypeProvider mockEntityTypeProvider;
+	IconsImageBundle mockIconsImageBundle;
 
 	String exampleTerm;
 	String exampleTermSearchQueryJson;
@@ -48,10 +52,16 @@ public class SearchPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		EntityTypeProvider mockEntityTypeProvider = null; 
+		IconsImageBundle mockIconsImageBundle = mock(IconsImageBundle.class);
 
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		
-		searchPresenter = new SearchPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, new JSONObjectAdapterImpl());
+		searchPresenter = new SearchPresenter(mockView,
+				mockGlobalApplicationState, mockAuthenticationController,
+				mockSynapseClient, mockNodeModelCreator,
+				new JSONObjectAdapterImpl(), mockEntityTypeProvider,
+				mockIconsImageBundle);
 		
 		exampleTerm = "searchQueryTerm";
 		SearchQuery query = DisplayUtils.getDefaultSearchQuery();

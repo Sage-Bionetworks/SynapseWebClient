@@ -5,11 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -27,6 +29,7 @@ import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -44,13 +47,24 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private EntityTypeProvider entityTypeProvider;
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private IconsImageBundle iconsImageBundle;
+	private AutoGenFactory entityFactory;
 	
 	private String currentSelection;
 	
 	private final int MAX_LIMIT = 200;
 	
 	@Inject
-	public EntityTreeBrowser(EntityTreeBrowserView view, NodeServiceAsync nodeService, SearchServiceAsync searchService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter) {
+	public EntityTreeBrowser(EntityTreeBrowserView view,
+			NodeServiceAsync nodeService, SearchServiceAsync searchService,
+			NodeModelCreator nodeModelCreator,
+			AuthenticationController authenticationController,
+			EntityTypeProvider entityTypeProvider,
+			GlobalApplicationState globalApplicationState,
+			SynapseClientAsync synapseClient,
+			JSONObjectAdapter jsonObjectAdapter,
+			IconsImageBundle iconsImageBundle,
+			AutoGenFactory entityFactory) {
 		this.view = view;
 		this.nodeService = nodeService;
 		this.searchService = searchService;
@@ -60,6 +74,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.iconsImageBundle = iconsImageBundle;
+		this.entityFactory = entityFactory;
 		
 		view.setPresenter(this);
 	}	
@@ -152,6 +168,14 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 */
 	private void fireEntitySelectedEvent() {
 		handlerManager.fireEvent(new EntitySelectedEvent());
+	}
+
+	@Override
+	public ImageResource getIconForType(String type) {
+		if(type == null) return null;
+		EntityType entityType = entityTypeProvider.getEntityTypeForString(type);
+		if (entityType == null) return null;
+		return DisplayUtils.getSynapseIconForEntityClassName(entityType.getClassName(), DisplayUtils.IconSize.PX16, iconsImageBundle);
 	}
 
 	

@@ -231,6 +231,14 @@ public class ColumnConfigProvider {
 		defaultColumns.put(ObjectType.code.name(), keyList);
 	}
 	
+	@Inject
+	public void setDefaultLinkColumns(@Named(ServerConstants.KEY_DEFAULT_LINK_COLS) String defaults) {
+		// convert from a string to a list
+		List<String> keyList = splitCommaSeparatedString(defaults);
+		// Add this list to the map
+		defaultColumns.put(ObjectType.link.name(), keyList);
+	}
+	
 	/**
 	 * Load the given filter enumeration xml file.
 	 * @param filterResource

@@ -262,6 +262,28 @@
 			<description>The date this code was last changed</description>
 		</column>
 		
+		<!-- Link columns -->
+		<column id="link.id">
+			<type>String</type>
+			<display>Link ID</display>
+			<description>Link ID</description>
+		</column>		
+		<column id="link.name">
+			<type>String</type>
+			<display>Link Name</display>
+			<description>Name of this Link</description>
+		</column>
+		<column id="link.createdBy">
+			<type>String</type>
+			<display>Created By</display>
+			<description>The person that created this link</description>
+		</column>
+		<column id="link.modifiedOn">
+			<type>Long</type>
+			<display>Modified Date </display>
+			<description>The date this link was last changed</description>
+		</column>
+		
 		<!-- The more complex/composite columns -->
 		
 		<!-- A dynamic relative URL will be built for datatsets using the ID column -->
@@ -362,6 +384,18 @@
 			<url reference="code.LocalUrl" />
 		</link-column>
 			
+		<!-- A dynamic relative URL will be built for Link using the ID column -->
+		<url-template id="link.LocalUrl">
+			<type>String</type>
+			<urlTemplate>Synapse:{link.id}</urlTemplate>
+		</url-template>
+		
+		<!-- Acts as the code name column  -->
+		<link-column id="link.NameLink">
+			<display reference="link.name" />
+			<url reference="link.LocalUrl" />
+		</link-column>
+			
 		<!-- The modified on date -->
 		<date-column id="project.modifiedOn">
 			<baseColumn reference="project.modifiedOn"/>
@@ -380,6 +414,11 @@
 		<!-- The created on date -->
 		<date-column id="code.modifiedOn">
 			<baseColumn reference="code.modifiedOn"/>
+		</date-column>
+
+		<!-- The created on date -->
+		<date-column id="link.modifiedOn">
+			<baseColumn reference="link.modifiedOn"/>
 		</date-column>
 		
 	</columns>

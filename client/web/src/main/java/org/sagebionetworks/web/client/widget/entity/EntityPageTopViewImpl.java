@@ -510,9 +510,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
-		String title = "<h2><span style=\"font-weight:lighter;\">["
-				+ entityTypeDisplay.substring(0, 1)
-				+ "]</span> "
+		String title = "<h2>"
+				+ AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(bundle.getEntity(), DisplayUtils.IconSize.PX24, iconsImageBundle)).getHTML() 
+				+ "&nbsp;"
 				+ bundle.getEntity().getName()
 				+ "&nbsp;(" + bundle.getEntity().getId() + ")</h2>";
     	lc.add(new Html(title));  
