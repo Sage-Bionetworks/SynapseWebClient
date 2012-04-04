@@ -48,6 +48,7 @@ public class Portal implements EntryPoint {
 		GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 	    globalApplicationState.setPlaceController(placeController);
 	    globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
+	    globalApplicationState.setActivityMapper(activityMapper);
 
 		
 		// Goes to place represented on URL or default place

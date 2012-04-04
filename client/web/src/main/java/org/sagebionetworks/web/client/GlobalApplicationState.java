@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 
+import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 
@@ -18,7 +19,13 @@ public interface GlobalApplicationState {
 	 * Sets the place controller (should only be used in the onModuleLoad() method of Portal) 
 	 * @param placeController
 	 */
-	public void setPlaceController(PlaceController placeController);	
+	public void setPlaceController(PlaceController placeController);
+	
+	/**
+	 * Set the activity mapper.
+	 * @param mapper
+	 */
+	public void setActivityMapper(ActivityMapper mapper);
 
 	/**
 	 * Holds the last visited place
