@@ -39,7 +39,6 @@ public class PropertyWidgetViewImpl extends LayoutContainer implements PropertyW
 	@Override
 	protected void onRender(Element parent, int index) {
 		super.onRender(parent, index);
-//		this.setLayout(new AnchorLayout());
 		
 		// the label renderer
 		GridCellRenderer<EntityRowModel> labelRenderer = createLabelRenderer();
@@ -62,7 +61,7 @@ public class PropertyWidgetViewImpl extends LayoutContainer implements PropertyW
 		column = new ColumnConfig();
 		column.setId(EntityRowModel.VALUE);
 		column.setHeader("Value");
-		column.setWidth(500);
+		column.setWidth(156);
 		column.setRowHeader(false);
 		column.setRenderer(valueRenderer);
 		configs.add(column);
@@ -73,13 +72,16 @@ public class PropertyWidgetViewImpl extends LayoutContainer implements PropertyW
 		grid.setAutoExpandColumn(EntityRowModel.VALUE);
 		grid.setAutoExpandMin(100);
 		grid.setAutoExpandMax(300);
+		// This is important, the grid must resize to fit its height.
+		grid.setAutoHeight(true);
+		grid.setAutoWidth(false);
 		grid.setBorders(true);
 		grid.setStripeRows(false);
 		grid.setColumnLines(false);
 		grid.setColumnReordering(false);
 		grid.setHideHeaders(true);
 		grid.setTrackMouseOver(false);
-		grid.setShadow(false);			
+		grid.setShadow(false);	
 		this.add(grid);
 		rebuild();
 	}

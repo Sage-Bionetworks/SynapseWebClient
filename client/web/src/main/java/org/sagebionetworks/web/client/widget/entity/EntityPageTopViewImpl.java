@@ -179,6 +179,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    
 		colLeftContainer.layout(true);
 		colRightContainer.layout(true);
+		
 	} 
 
 	@Override

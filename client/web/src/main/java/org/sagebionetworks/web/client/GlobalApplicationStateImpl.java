@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 
+import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.inject.Inject;
@@ -13,6 +14,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
+	private ActivityMapper directMapper;
 	private PlaceChanger placeChanger;
 	
 	@Inject
@@ -26,7 +28,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			placeChanger = new PlaceChanger() {			
 				@Override
 				public void goTo(Place place) {
-					placeController.goTo(place);
+					// If we are not already on this page, go there.
+					if(!placeController.getWhere().equals(place)){
+						placeController.goTo(place);
+					}else{
+						// We are already on this page but we want to force it to reload.
+						directMapper.getActivity(place);
+					}
+
 				}
 			};
 		}
@@ -79,6 +88,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			return place;
 		}
 		return null;
+	}
+
+	@Override
+	public void setActivityMapper(ActivityMapper mapper) {
+		this.directMapper = mapper;
 	}
 	
 }
