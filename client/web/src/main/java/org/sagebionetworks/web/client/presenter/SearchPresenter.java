@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwttime.time.DateTime;
+import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -14,7 +15,9 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
@@ -24,12 +27,14 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
+import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -45,6 +50,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private EntityTypeProvider entityTypeProvider;
+	private IconsImageBundle iconsImageBundle;
 	
 	private SearchQuery currentSearch;
 	private SearchResults currentResult;
@@ -60,13 +67,17 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			EntityTypeProvider entityTypeProvider,
+			IconsImageBundle iconsImageBundle) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.entityTypeProvider = entityTypeProvider;
+		this.iconsImageBundle = iconsImageBundle;
 		
 		currentSearch = getBaseSearchQuery();
 		
@@ -239,7 +250,14 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public Place getRedirect() {
 		return redirect;
 	}
-	
+
+	@Override
+	public ImageResource getIconForHit(Hit hit) {
+		if(hit == null) return null;
+		EntityType type = entityTypeProvider.getEntityTypeForString(hit.getNode_type());
+		return DisplayUtils.getSynapseIconForEntityType(type, DisplayUtils.IconSize.PX24, iconsImageBundle);
+	}
+
 	
 	/*
 	 * Private Methods

@@ -5,18 +5,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.HasPreviews;
-import org.sagebionetworks.repo.model.HasShortcuts;
 import org.sagebionetworks.repo.model.LayerTypeNames;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.LocationData;
-import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -146,14 +144,8 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 		List<EntityType> ignore = new ArrayList<EntityType>();
 		// ignore self type children 
 		ignore.add(entityType); 
-
-		// ignore locations
-		// TODO : locations will be going away. remove this then
-		for(EntityType type : entityTypeProvider.getEntityTypes()) {
-			if("location".equals(type.getName())) {
-				ignore.add(type);
-			}
-		}
+		// ignore certain types		
+		ignore.add(entityTypeProvider.getEntityTypeForClassName(Preview.class.getName()));
 		
 		return ignore;
 	}
@@ -286,37 +278,6 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 //			token += "." + header.getTargetVersionNumber();		
 		return DisplayUtils.getSynapseHistoryToken(token);
 
-	}
-
-	@Override
-	public void getShortcuts(final AsyncCallback<List<EntityHeader>> callback) {
-		// TODO : deal with versions, not just current entity ids
-		if(entity instanceof HasShortcuts) {			
-			Set<Reference> shortcuts = ((HasShortcuts)entity).getShortcuts();
-			if(shortcuts != null && shortcuts.size() > 0) {
-				List<String> entityIds = new ArrayList<String>();
-				for(Reference reference : shortcuts) {
-					entityIds.add(reference.getTargetId());
-				}
-				synapseClient.getEntityTypeBatch(entityIds, new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String result) {
-						BatchResults<EntityHeader> batchResults = nodeModelCreator.createBatchResults(result, EntityHeader.class);
-						callback.onSuccess(batchResults.getResults());
-					}
-
-					@Override
-					public void onFailure(Throwable caught) {
-						DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
-						callback.onFailure(caught);
-					}
-				});				
- 			} else {
- 				callback.onSuccess(new ArrayList<EntityHeader>());
- 			}
-		} else {
-			callback.onFailure(null);
-		}		
 	}
 
 	@Override

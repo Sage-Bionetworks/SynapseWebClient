@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.gwttime.time.DateTime;
 import org.sagebionetworks.repo.model.search.Facet;
@@ -45,8 +43,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -344,14 +341,18 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	}
 
-	private String getResultHtml(int i, Hit hit) {
+	private String getResultHtml(int i, Hit hit) {				
+		
+		ImageResource icon = presenter.getIconForHit(hit);
+		
 		StringBuilder attribution = new StringBuilder();
 		attribution.append("Created by ").append(hit.getCreated_by()).append(" on ").append(DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000))).append(", ");
 		attribution.append("Updated by ").append(hit.getModified_by()).append(" on ").append(DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)));
 		
 		StringBuilder resultHtml = new StringBuilder();
-		resultHtml.append("<div class=\"span-18 last serv notopmargin hit\">\n");
-		resultHtml.append("	   <h4>").append(i).append(". \n").append(hit.getNode_type());
+		resultHtml.append("<div class=\"span-18 last serv notopmargin hit\">\n");		
+		resultHtml.append("	   <h4>").append(i).append(". \n");
+		if(icon != null) resultHtml.append(DisplayUtils.getIconHtml(icon));
 		resultHtml.append("         <a class=\"link\" href=\"").append(DisplayUtils.getSynapseHistoryToken(hit.getId())).append("\">").append(hit.getName()).append("</a>");
 		resultHtml.append("    </h4>\n");
 		resultHtml.append("<p class=\"notopmargin\">");

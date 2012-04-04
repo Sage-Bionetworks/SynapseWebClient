@@ -55,6 +55,11 @@ public class ServerConstants {
 	public static final String KEY_DEFAULT_CODE_COLS =  "org.sagebionetworks.all.code.default.columns";
 
 	/**
+	 * The property key used for the list of default step columns
+	 */
+	public static final String KEY_DEFAULT_LINK_COLS =  "org.sagebionetworks.all.link.default.columns";
+
+	/**
 	 * The property key that tell what column configuration xml file to be used.
 	 */
 	public static final String KEY_COLUMN_CONFIG_XML_FILE = "org.sagebionetworks.column.config.xml.resource";

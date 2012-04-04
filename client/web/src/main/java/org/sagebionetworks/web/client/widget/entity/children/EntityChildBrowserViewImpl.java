@@ -127,7 +127,6 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		// add tabs
 		numAdded += addTreeviewTab(entity);
 		numAdded += addChildTabs(entityType, location); 		
-		numAdded += addShortcutsTab();
 		
 		if(numAdded == 0) {
 			final TabItem tab = new TabItem("None");			
@@ -174,84 +173,6 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		
 		return numAdded;
 	}
-
-	private int addShortcutsTab() {
-		int numAdded = 0;		
-		final TabItem tab = new TabItem("Shortcuts");
-		tab.addStyleName("pad-text");			
-		final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);
-		loading.setHeight(tabPanelHeight);		
-		tab.add(loading);
-		// Render only if selected
-		tab.addListener(Events.Render, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {				
-				presenter.getShortcuts(new AsyncCallback<List<EntityHeader>>() {
-					@Override
-					public void onSuccess(List<EntityHeader> result) {
-						createShortcutGrid(tab, loading, result);
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						tab.remove(loading);
-						tab.add(new Html(DisplayConstants.ERROR_GENERIC_RELOAD), new MarginData(10));
-						tab.layout(true);
-					}
-				});				
-			}
-
-		});
-		tabPanel.add(tab);	
-		numAdded++;
-		
-		return numAdded;
-	}
-
-	private void createShortcutGrid(final TabItem tab,
-			final ContentPanel loading, List<EntityHeader> shortcuts) {
-		// add table of shortcuts
-		ListStore<BaseModelData> store = new ListStore<BaseModelData>();
-		if(shortcuts != null) {
-			for(EntityHeader header : shortcuts.toArray(new EntityHeader[shortcuts.size()])) {
-				BaseModelData model = new BaseModelData();
-				model.set(KEY_TARGET_ID, header.getId());
-				model.set(KEY_TYPE, header.getType().replaceAll("/", ""));
-				model.set(KEY_NAME, header.getName());
-				// TODO : change from EntityHeader to something that contains target version number
-				//model.set(KEY_TARGET_VERSION_NUMBER, reference.getTargetVersionNumber());
-				model.set(KEY_REFERENCE_URI, presenter.getReferenceUri(header));
-				store.add(model);
-			}					
-		}
-		List<ColumnConfig> configs = new ArrayList<ColumnConfig>();  
-		  
-	    ColumnConfig column;
-
-	    column = new ColumnConfig();  
-	    column.setId(KEY_TARGET_ID);  
-	    column.setHeader("Shortcut To");  				     
-	    column.setRowHeader(true);				    
-	    GridCellRenderer<BaseModelData> cellRenderer = configureShortcutGridCellRenderer();
-		column.setRenderer(cellRenderer);				
-	    configs.add(column);  
-	  				  			  				  
-	    column = new ColumnConfig();  
-	    column.setId(KEY_TYPE);  
-	    column.setHeader("Type"); 
-	    column.setWidth(70);
-	    configs.add(column);  
-	  				  			  				  
-	    ColumnModel cm = new ColumnModel(configs);  				  
-		
-		Grid<BaseModelData> grid = new Grid<BaseModelData>(store, cm);
-		grid.setAutoWidth(true);
-		grid.setHeight(tabPanelHeight - 25);
-		grid.setAutoExpandColumn(KEY_TARGET_ID);
-		tab.remove(loading);
-		tab.add(grid);
-		tab.layout(true);
-	}
-
 	
 	private int addChildTabs(EntityType entityType,
 			final LocationData location) {
@@ -262,7 +183,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 			for(final EntityType child : children) {
 				if(skipTypes.contains(child)) continue; // skip some types
 					
-				final String childDisplay = entityTypeProvider.getEntityDispalyName(child);
+				final String childDisplay = entityTypeProvider.getEntityDispalyName(child);				
 				final TabItem tab = new TabItem(childDisplay);			
 				tab.addStyleName("pad-text");			
 				final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);

@@ -25,6 +25,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanelSelectionModel;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Widget;
@@ -60,18 +61,11 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		tree.setIconProvider(new ModelIconProvider<EntityTreeModel>() {
 			public AbstractImagePrototype getIcon(EntityTreeModel model) {
 				String type = model.getType();
-				// select icon
-				if ("dataset".equals(type) || "layer".equals(type)) {
-					return AbstractImagePrototype.create(iconsImageBundle.folderTable16());
-				} else if ("code".equals(type)) {
-					return AbstractImagePrototype.create(iconsImageBundle.folderDocumentText16());
-				} else if ("attachment".equals(type)) {
-					return AbstractImagePrototype.create(iconsImageBundle.folderImage16());
-				} else if(PLACEHOLDER_TYPE.equals(type)) {
+				ImageResource icon = presenter.getIconForType(type);
+				if(icon == null) {
 					return null;
-				} else {
-					return AbstractImagePrototype.create(iconsImageBundle.folderDocument16());
 				}
+				return AbstractImagePrototype.create(icon);
 			}
 		});
 		

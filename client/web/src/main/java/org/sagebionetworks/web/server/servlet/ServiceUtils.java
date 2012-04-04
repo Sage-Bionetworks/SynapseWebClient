@@ -25,6 +25,7 @@ public class ServiceUtils {
 	public static final String REPOSVC_PATH_ANALYSIS = "analysis";
 	public static final String REPOSVC_PATH_STEP = "step";
 	public static final String REPOSVC_PATH_CODE = "code";
+	public static final String REPOSVC_PATH_LINK = "link";
 	public static final String REPOSVC_PATH_PUBLIC_PROFILE = "publicprofile";
 	public static final String REPOSVC_SUFFIX_PATH_ANNOTATIONS = "annotations";
 	public static final String REPOSVC_SUFFIX_PATH_PREVIEW = "preview";
@@ -74,6 +75,9 @@ public class ServiceUtils {
 			break;
 		case CODE:
 			builder.append(REPOSVC_PATH_CODE);
+			break;
+		case LINK: 
+			builder.append(REPOSVC_PATH_LINK);
 			break;
 		case ENTITY:
 			builder.append(REPOSVC_PATH_ENTITY);

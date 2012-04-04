@@ -182,6 +182,58 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/exclamation-16.png")
 	ImageResource warning16();	
 
+	
+	/*
+	 * Synapse Icons
+	 */
+	@Source("images/icons/synapse-analysis-16.png")
+	ImageResource synapseAnalysis16();
+	
+	@Source("images/icons/synapse-analysis-24.png")
+	ImageResource synapseAnalysis24();
+	
+	@Source("images/icons/synapse-code-16.png")
+	ImageResource synapseCode16();
+	
+	@Source("images/icons/synapse-code-24.png")
+	ImageResource synapseCode24();
+	
+	@Source("images/icons/synapse-data-16.png")
+	ImageResource synapseData16();
+	
+	@Source("images/icons/synapse-data-24.png")
+	ImageResource synapseData24();
+	
+	@Source("images/icons/synapse-folder-16.png")
+	ImageResource synapseFolder16();
+	
+	@Source("images/icons/synapse-folder-24.png")
+	ImageResource synapseFolder24();
+	
+	@Source("images/icons/synapse-model-16.png")
+	ImageResource synapseModel16();
+	
+	@Source("images/icons/synapse-model-24.png")
+	ImageResource synapseModel24();
+	
+	@Source("images/icons/synapse-project-16.png")
+	ImageResource synapseProject16();
+	
+	@Source("images/icons/synapse-project-24.png")
+	ImageResource synapseProject24();
+	
+	@Source("images/icons/synapse-step-16.png")
+	ImageResource synapseStep16();
+	
+	@Source("images/icons/synapse-step-24.png")
+	ImageResource synapseStep24();
+	
+	@Source("images/icons/synapse-study-16.png")
+	ImageResource synapseStudy16();
+	
+	@Source("images/icons/synapse-study-24.png")
+	ImageResource synapseStudy24();
+		
 	// demo
 	
 	@Source("images/icons/details-16.png") 
