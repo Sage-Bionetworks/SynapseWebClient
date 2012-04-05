@@ -130,16 +130,16 @@ public class NodeServiceImpl extends RemoteServiceServlet implements
 		return getJsonStringForUrl(url, HttpMethod.GET);
 	}
 	
-	@Override
-	public String createNode(NodeType type, String propertiesJson) {
-		// First make sure the service is ready to go.
-		validateService();
-		
-		// Build up the path
-		StringBuilder builder = ServiceUtils.getBaseUrlBuilder(urlProvider, type);		 		
-		String url = builder.toString();		
-		return getJsonStringForUrl(url, HttpMethod.POST, propertiesJson);
-	}
+//	@Override
+//	public String createNode(NodeType type, String propertiesJson) {
+//		// First make sure the service is ready to go.
+//		validateService();
+//		
+//		// Build up the path
+//		StringBuilder builder = ServiceUtils.getBaseUrlBuilder(urlProvider, type);		 		
+//		String url = builder.toString();		
+//		return getJsonStringForUrl(url, HttpMethod.POST, propertiesJson);
+//	}
 
 	@Override
 	public String updateNode(NodeType type, String id, String propertiesJson, String eTag) {

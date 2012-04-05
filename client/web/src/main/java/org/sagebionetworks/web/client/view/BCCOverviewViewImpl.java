@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.place.users.PasswordReset;
-import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.TempPropertyPresenter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -17,7 +15,6 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,7 +43,7 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
 			SageImageBundle imageBundle,
 			QueryServiceTableResourceProvider queryServiceTableResourceProvider,
-			final NodeEditor nodeEditor, TempPropertyPresenter props) {		
+			TempPropertyPresenter props) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;

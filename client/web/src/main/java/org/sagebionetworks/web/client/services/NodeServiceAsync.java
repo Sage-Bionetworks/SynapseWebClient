@@ -15,7 +15,7 @@ public interface NodeServiceAsync {
 
 	void getNodeJSON(NodeType type, String id, AsyncCallback<String> callback);
 
-	void createNode(NodeType type, String propertiesJson, AsyncCallback<String> callback);
+//	void createNode(NodeType type, String propertiesJson, AsyncCallback<String> callback);
 
 	void updateNode(NodeType type, String id, String propertiesJson, String eTag, AsyncCallback<String> callback);
 

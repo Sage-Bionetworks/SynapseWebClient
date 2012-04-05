@@ -2,26 +2,16 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.ArrayList;
 
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.view.ProfileView.Presenter;
-import org.sagebionetworks.web.client.view.ProfileViewImpl.ProfileViewImplUiBinder;
-import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.Text;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,17 +31,16 @@ public class PublicProfileViewImpl extends Composite implements PublicProfileVie
 	private Presenter presenter;
 	private Header headerWidget;
 	private IconsImageBundle iconsImageBundle;
-	private NodeEditor nodeEditor;
 	private SageImageBundle sageImageBundle;
 
 	@Inject
 	public PublicProfileViewImpl(PublicProfileViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle, final NodeEditor nodeEditor, SageImageBundle sageImageBundle) {		
+			SageImageBundle imageBundle, 
+			SageImageBundle sageImageBundle) {
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = icons;
-		this.nodeEditor = nodeEditor;
 		this.headerWidget = headerWidget;
 		this.sageImageBundle = sageImageBundle;
 		

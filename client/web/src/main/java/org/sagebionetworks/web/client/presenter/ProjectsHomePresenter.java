@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -7,13 +8,13 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
-import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -34,12 +35,15 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 	private JSONObjectAdapter jsonObjectAdapter;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
+	private SynapseClientAsync synapseClient;
+	private AutoGenFactory entityFactory;
 	
 	@Inject
 	public ProjectsHomePresenter(ProjectsHomeView view,
 			GlobalApplicationState globalApplicationState,
 			NodeServiceAsync nodeService, JSONObjectAdapter jsonObjectAdapter,
-			NodeModelCreator nodeModelCreator, AuthenticationController authenticationController) {
+			NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, 
+			SynapseClientAsync synapseClient, AutoGenFactory entityFactory) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.placeChanger = globalApplicationState.getPlaceChanger();
@@ -47,6 +51,8 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
+		this.synapseClient = synapseClient;
+		this.entityFactory = entityFactory;
 		
 		view.setPresenter(this);
 	}
@@ -74,31 +80,25 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
     }
 
 	@Override
-	public void createProject(String name) {
-		org.sagebionetworks.repo.model.Project proj = new org.sagebionetworks.repo.model.Project();
+	public void createProject(String name) {		
+		Project proj = (Project) entityFactory.newInstance(Project.class.getName());
+		proj.setEntityType(Project.class.getName());
 		proj.setName(name);
 		JSONObjectAdapter json = jsonObjectAdapter.createNew();
 		try {
-			proj.writeToJSONObject(json);		
-			nodeService.createNode(NodeType.PROJECT, json.toJSONString(), new AsyncCallback<String>() {			
+			proj.writeToJSONObject(json);
+			synapseClient.createOrUpdateEntity(json.toJSONString(), null, true, new AsyncCallback<String>() {
 				@Override
-				public void onSuccess(String result) {
-					org.sagebionetworks.repo.model.Project resultProject = null;
-					try {
-						resultProject = nodeModelCreator.createEntity(result, Project.class);
-						view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, DisplayConstants.LABEL_PROJECT_CREATED);
-						globalApplicationState.getPlaceChanger().goTo(new Synapse(resultProject.getId()));						
-					} catch (RestServiceException ex) {					
-						if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {					
-							onFailure(null);					
-						} 
-						return;
-					}
+				public void onSuccess(String newProjectId) {
+					view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, DisplayConstants.LABEL_PROJECT_CREATED);
+					globalApplicationState.getPlaceChanger().goTo(new Synapse(newProjectId));						
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {					
+						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					} 
 				}
 			});
 		} catch (JSONObjectAdapterException e) {

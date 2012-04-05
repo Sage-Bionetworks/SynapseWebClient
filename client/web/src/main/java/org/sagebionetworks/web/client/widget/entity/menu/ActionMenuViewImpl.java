@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
@@ -31,7 +30,6 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -49,7 +47,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
-	private NodeEditor nodeEditor;
 	private AccessMenuButton accessMenuButton;
 	private AccessControlListEditor accessControlListEditor;
 	private LocationableUploader locationableUploader;
@@ -67,13 +64,12 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, NodeEditor nodeEditor,
+			IconsImageBundle iconsImageBundle, 
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
 			LocationableUploader locationableUploader, MyEntitiesBrowser myEntitiesBrowser, LicensedDownloader licensedDownloader, EntityTypeProvider typeProvider) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
-		this.nodeEditor = nodeEditor;
 		this.accessMenuButton = accessMenuButton;	
 		this.accessControlListEditor = accessControlListEditor;
 		this.locationableUploader = locationableUploader;
