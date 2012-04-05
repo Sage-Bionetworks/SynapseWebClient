@@ -41,6 +41,7 @@ public class BCCSignupHelper {
         window.setHideOnButtonClick(true);
 
         final ProfilePanel profilePanel = new ProfilePanel(profile);
+        window.setLayout(new FitLayout());
 	    window.add(profilePanel);
 	      Button submitButton = window.getButtonById(Dialog.OK);
 	        submitButton.addSelectionListener(new SelectionListener<ButtonEvent>() {

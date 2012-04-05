@@ -94,6 +94,7 @@
             <br/>
         </li>
     </ul>
+    <br/>
     <p>
         Predictive models will be built using the following <em>feature data</em>:
     </p>
@@ -226,7 +227,7 @@ survival data for the test dataset. The primary dataset used in this challenge w
             Gene expression data.
             <ul>
                 <li>
-                    Performed on the Illumina HT 12v3 platform and normalized using XXXX.
+                    Performed on the Illumina HT 12v3 platform and normalized.
                 </li>
                 <li>
                     Loaded as Bioconductor ExpressionSet object with columns corresponding to samples and rows corresponding to Illumina probes.
@@ -237,11 +238,10 @@ survival data for the test dataset. The primary dataset used in this challenge w
             Copy number data.
             <ul>
                 <li>
-                    Performed on the Affymetrix SNP 6.0 platform and normalized using XXX.
+                    Performed on the Affymetrix SNP 6.0 platform and normalized.
                 </li>
                 <li>
-                    Loaded as Bioconductor ExpressionSet object with columns corresponding to samples and rows corresponding to segmented copy number regions
-                    (??).
+                    Loaded as Bioconductor ExpressionSet object with columns corresponding to samples and rows corresponding to segmented copy number regions.
                 </li>
             </ul>
         </li>
@@ -371,8 +371,6 @@ on the discussion forum. Details on how to submit models are given in        <a 
         competition).
     </p>
     <br/>
-    <p>
-    </p>
     <br/>
     <p>
         We believe that supporting reusable, extensible code is critical to facilitating the type of transparency, rigor, and community development that we
@@ -388,15 +386,16 @@ on the discussion forum. Details on how to submit models are given in        <a 
 					
 
 <br></br>
-<a href="http://support.rstudio.org" target="_blank"><h3>R-Studio Tutorial</h3></a>
+<a href="https://sagebionetworks.jira.com/wiki/display/BCC/" target="_blank"><h3><span style="text-decoration:underline;">Technical Information</span></h3></a>
 <br></br>
-<a href="https://sagebionetworks.jira.com/browse/BCC#selectedTab=com.atlassian.jira.plugin.system.project%3Asummary-panel" target="_blank"><h3>Discussion Forum</h3></a>
+<a href="https://groups.google.com/a/sagebase.org/group/bcc/" target="_blank"><h3><span style="text-decoration:underline;">Discussion Forum</span></h3></a>
 <br></br>
 <br></br>
 <g:SimplePanel ui:field="applyForChallenge" />
 <br></br>
 <br></br>
-<center>Contest Computing Facilities Powered by Google</center>
+<center><img alt="Google" src="http://www.google.com/favicon.ico"/><span style="font-style: italic;">&nbsp;&nbsp;Contest Computing Facilities Powered by Google&nbsp;&nbsp;</span><img alt="Google" src="http://www.google.com/favicon.ico"/></center>
+
 
 				</div>
 
