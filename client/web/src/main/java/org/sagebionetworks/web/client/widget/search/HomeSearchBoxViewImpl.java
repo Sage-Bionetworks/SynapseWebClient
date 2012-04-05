@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.search;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 
@@ -43,7 +42,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 	
 	@Inject
 	public HomeSearchBoxViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, NodeEditor nodeEditor,
+			IconsImageBundle iconsImageBundle, 
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor) {
 		this.sageImageBundle = sageImageBundle;

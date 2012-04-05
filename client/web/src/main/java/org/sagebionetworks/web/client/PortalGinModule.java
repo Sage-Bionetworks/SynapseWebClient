@@ -32,8 +32,6 @@ import org.sagebionetworks.web.client.view.LookupView;
 import org.sagebionetworks.web.client.view.LookupViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
-import org.sagebionetworks.web.client.view.ProjectView;
-import org.sagebionetworks.web.client.view.ProjectViewImpl;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
 import org.sagebionetworks.web.client.view.ProjectsHomeViewImpl;
 import org.sagebionetworks.web.client.view.PublicProfileView;
@@ -50,8 +48,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
 import org.sagebionetworks.web.client.widget.editpanels.AnnotationEditorView;
 import org.sagebionetworks.web.client.widget.editpanels.AnnotationEditorViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.NodeEditorView;
-import org.sagebionetworks.web.client.widget.editpanels.NodeEditorViewImpl;
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnDefinitionEditorView;
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnDefinitionEditorViewImpl;
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnMappingEditorView;
@@ -64,14 +60,13 @@ import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatri
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatrixViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
+import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
+import org.sagebionetworks.web.client.widget.entity.PropertyWidgetView;
+import org.sagebionetworks.web.client.widget.entity.PropertyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
-
-import org.sagebionetworks.web.client.widget.entity.PropertyWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
-import org.sagebionetworks.web.client.widget.entity.PropertyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserView;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
@@ -106,7 +101,6 @@ import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
-import org.sagebionetworks.web.server.servlet.BCCSignupImpl;
 
 import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -185,11 +179,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// ProjectsHomeView
 		bind(ProjectsHomeViewImpl.class).in(Singleton.class);
 		bind(ProjectsHomeView.class).to(ProjectsHomeViewImpl.class);		
-		
-		// ProjectView
-		bind(ProjectViewImpl.class).in(Singleton.class);
-		bind(ProjectView.class).to(ProjectViewImpl.class);
-		
+				
 		// QueryService View
 		//bind(QueryServiceTableView.class).to(QueryServiceTableViewImpl.class);
 		bind(QueryServiceTableView.class).to(QueryServiceTableViewGxtImpl.class);
@@ -276,10 +266,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// Access Menu Button
 		bind(AccessMenuButtonViewImpl.class).in(Singleton.class);
 		bind(AccessMenuButtonView.class).to(AccessMenuButtonViewImpl.class);
-
-		// NodeEditor
-		bind(NodeEditorViewImpl.class).in(Singleton.class);
-		bind(NodeEditorView.class).to(NodeEditorViewImpl.class);
 
 		// AnnotationEditor
 		bind(AnnotationEditorViewImpl.class).in(Singleton.class);

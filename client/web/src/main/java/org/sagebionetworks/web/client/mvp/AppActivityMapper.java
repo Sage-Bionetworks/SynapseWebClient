@@ -36,7 +36,6 @@ import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.LookupPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
-import org.sagebionetworks.web.client.presenter.ProjectPresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.PublicProfilePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
@@ -130,11 +129,6 @@ public class AppActivityMapper implements ActivityMapper {
 			// Projects Home 
 			ProjectsHomePresenter presenter = ginjector.getProjectsHomePresenter();
 			presenter.setPlace((ProjectsHome)place);
-			return presenter;
-		}else if (place instanceof Project) {
-			// Projects Home 
-			ProjectPresenter presenter = ginjector.getProjectPresenter();
-			presenter.setPlace((Project)place);
 			return presenter;
 		}else if (place instanceof LoginPlace) {
 			// login view

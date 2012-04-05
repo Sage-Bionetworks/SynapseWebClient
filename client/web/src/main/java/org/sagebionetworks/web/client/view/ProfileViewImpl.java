@@ -4,7 +4,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.editpanels.NodeEditor;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
@@ -16,9 +15,7 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.MessageBox;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FieldSet;
 import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
@@ -31,7 +28,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -55,7 +51,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
-	private NodeEditor nodeEditor;
 	private Header headerWidget;
 	private FormPanel resetFormPanel;
 	private Button createPasswordButton;
@@ -75,11 +70,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle, final NodeEditor nodeEditor, SageImageBundle sageImageBundle) {		
+			SageImageBundle imageBundle, SageImageBundle sageImageBundle) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = icons;
-		this.nodeEditor = nodeEditor;
 		this.headerWidget = headerWidget;
 		this.sageImageBundle = sageImageBundle;
 		

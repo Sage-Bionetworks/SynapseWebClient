@@ -43,7 +43,6 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
     
 	private AnnotationEditorView view;
 	private NodeServiceAsync service;
-	private NodeEditorDisplayHelper nodeEditorDisplayHelper;
     private NodeType nodetype;
     private String nodeId;
     private JSONObject originalAnnotationObject;
@@ -54,10 +53,9 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
     private AuthenticationController authenticationController;
  
     @Inject
-    public AnnotationEditor(AnnotationEditorView view, NodeServiceAsync service, NodeEditorDisplayHelper nodeEditorDisplayHelper, NodeModelCreator nodeModelCreator, StaticEnumerations staticEnumerations, AuthenticationController authenticationController) {
+    public AnnotationEditor(AnnotationEditorView view, NodeServiceAsync service, NodeModelCreator nodeModelCreator, StaticEnumerations staticEnumerations, AuthenticationController authenticationController) {
         this.view = view;
 		this.service = service;
-		this.nodeEditorDisplayHelper = nodeEditorDisplayHelper;
 		this.nodeModelCreator = nodeModelCreator;
 		this.staticEnumerations = staticEnumerations;
 		this.authenticationController = authenticationController;
@@ -175,7 +173,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 
 	private void setupFormAndGenerate(boolean editable) {
 		formFields = generateFieldsFromAnnotations(originalAnnotationObject, staticEnumerations.getAnnotationToEnum()); 							
-		SpecificNodeTypeDeviation deviation = nodeEditorDisplayHelper.getNodeTypeDeviation(nodetype);										
+		SpecificNodeTypeDeviation deviation = null;										
 		view.generateAnnotationForm(formFields, deviation.getDisplayString(), DisplayConstants.EDIT_ANNOTATIONS_TEXT, editable);						
 		
 		// add enums

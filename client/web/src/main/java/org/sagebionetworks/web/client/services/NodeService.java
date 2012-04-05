@@ -17,7 +17,7 @@ public interface NodeService extends RemoteService {
 	
 	public String getNodeJSON(NodeType type, String id);
 	
-	public String createNode(NodeType type, String propertiesJson);	
+//	public String createNode(NodeType type, String propertiesJson);	
 	
 	public String updateNode(NodeType type, String id, String propertiesJson, String eTag);
 	
