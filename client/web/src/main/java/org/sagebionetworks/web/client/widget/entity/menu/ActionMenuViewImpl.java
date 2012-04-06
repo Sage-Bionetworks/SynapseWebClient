@@ -116,9 +116,9 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			this.add(shareButton);
 			this.add(new Html("&nbsp;"));
 		}
-		configureShareButton(entity);		
 		if (isAdministrator) shareButton.enable();
 		else shareButton.disable();
+		configureShareButton(entity);		
 
 		// add Button
 		if(addButton == null) {
@@ -127,9 +127,9 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			this.add(addButton);
 			this.add(new Html("&nbsp;"));
 		}
-		configureAddMenu(entity, entityType);
 		if (canEdit) addButton.enable();
 		else addButton.disable();
+		configureAddMenu(entity, entityType);
 
 		if(toolsButton == null) {
 			toolsButton = new Button(DisplayConstants.BUTTON_TOOLS_MENU, AbstractImagePrototype.create(iconsImageBundle.adminToolsGrey16()));
