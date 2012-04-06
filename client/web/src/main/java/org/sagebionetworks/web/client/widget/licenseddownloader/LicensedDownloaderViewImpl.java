@@ -110,7 +110,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	@Override
 	public Widget asWidget() {
 		final LicensedDownloaderView view = this;
-		Button downloadButton = new Button(DisplayConstants.BUTTON_DOWNLOAD, AbstractImagePrototype.create(icons.NavigateDown16()));		
+		Button downloadButton = new Button(DisplayConstants.BUTTON_DOWNLOAD, AbstractImagePrototype.create(icons.NavigateDownGrey16()));		
 		downloadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {

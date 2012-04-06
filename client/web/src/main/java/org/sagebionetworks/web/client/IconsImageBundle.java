@@ -152,6 +152,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/navigation-270-button-16.png")
 	ImageResource NavigateDown16();
 
+	@Source("images/icons/navigation-270-button-grey-16.png")
+	ImageResource NavigateDownGrey16();
+
 	@Source("images/icons/sticky-note--plus-16.png")
 	ImageResource notePlus16();
 
