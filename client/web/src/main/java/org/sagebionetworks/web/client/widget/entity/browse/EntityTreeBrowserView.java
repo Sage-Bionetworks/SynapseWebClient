@@ -18,6 +18,23 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseWidgetView {
 	 */
 	public void setPresenter(Presenter presenter);
 
+	/**
+	 * 
+	 * @param rootEntities list of entities to make root level nodes for in the tree
+	 */
+	public void setRootEntities(List<EntityHeader> rootEntities);
+	
+	/**
+	 * Show links if true
+	 * @param makeLinks Make the labels entity links if true 
+	 */
+	public void setMakeLinks(boolean makeLinks);
+
+	/**
+	 * Show the right click menu
+	 * @param showContextMenu
+	 */
+	public void setShowContextMenu(boolean showContextMenu);
 	
 	/**
 	 * Presenter interface
@@ -34,7 +51,10 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseWidgetView {
 
 		ImageResource getIconForType(String type);
 
+		void deleteEntity(String entityId);
+
+		void onEdit(String entityId);
+
 	}
 
-	public void setRootEntities(List<EntityHeader> rootEntities);
 }

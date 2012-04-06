@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -11,18 +12,28 @@ import org.sagebionetworks.web.client.SageImageBundle;
 
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.BaseTreeLoader;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelIconProvider;
 import com.extjs.gxt.ui.client.data.ModelKeyProvider;
 import com.extjs.gxt.ui.client.data.RpcProxy;
 import com.extjs.gxt.ui.client.data.TreeLoader;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MenuEvent;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.Store;
 import com.extjs.gxt.ui.client.store.StoreSorter;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanelSelectionModel;
 import com.google.gwt.resources.client.ImageResource;
@@ -33,6 +44,7 @@ import com.google.inject.Inject;
 
 public class EntityTreeBrowserViewImpl extends LayoutContainer implements EntityTreeBrowserView {
 
+	private static final String KEY_NAME = "name";
 	private static final String PLACEHOLDER_ID = "-1";
 	private static final String PLACEHOLDER_TYPE = "-1";
 	private static final String PLACEHOLDER_NAME_PREFIX = "&#8212";
@@ -44,6 +56,9 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	private TreePanel<EntityTreeModel> tree;  
 	private ContentPanel cp;
 	private TreeStore<EntityTreeModel> store;
+	private HashMap<String, ImageResource> typeToIcon = new HashMap<String, ImageResource>();
+	private boolean makeLinks = true;
+	private boolean showContextMenu = true;
 	
 	@Override
 	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
@@ -53,21 +68,27 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		
 	    tree = new TreePanel<EntityTreeModel>(store);  
 	    tree.setStateful(true);  
-	    tree.setDisplayProperty("name"); 
-	    tree.setBorders(false);
-
+	    tree.setDisplayProperty(KEY_NAME); 
+	    tree.setBorders(false);	    	    
+	    
 	    // statefull components need a defined id  
-	    tree.setId("statefullasyncentitytree");  
+	    tree.setId("statefullasyncentitytree_" + (Math.random()*100));  
 		tree.setIconProvider(new ModelIconProvider<EntityTreeModel>() {
 			public AbstractImagePrototype getIcon(EntityTreeModel model) {
 				String type = model.getType();
-				ImageResource icon = presenter.getIconForType(type);
+				ImageResource icon;
+				if(typeToIcon.containsKey(type)) {
+					icon = typeToIcon.get(type);
+				} else {
+					icon = presenter.getIconForType(type);
+					typeToIcon.put(type, icon);
+				}				
 				if(icon == null) {
 					return null;
 				}
 				return AbstractImagePrototype.create(icon);
 			}
-		});
+		});		
 		
 		TreePanelSelectionModel<EntityTreeModel> sm = tree.getSelectionModel();
 		sm.setSelectionMode(SelectionMode.SINGLE);
@@ -80,6 +101,9 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		tree.setAutoHeight(true);
 		tree.setAutoWidth(true);
 		
+		
+		configureContextMenu();
+		
 		cp = new ContentPanel();  
 	    cp.setHeaderVisible(false);  
 	    cp.setLayout(new FitLayout());  
@@ -90,6 +114,52 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	    add(cp);  		
 	};
 		
+	private void configureContextMenu() {
+		if(tree == null) return;
+		if(showContextMenu) {
+			Menu contextMenu = new Menu();
+			MenuItem insert = new MenuItem();
+			insert.setText("Edit");
+			insert.setIcon(AbstractImagePrototype.create(iconsImageBundle.edit16()));
+			insert.addSelectionListener(new SelectionListener<MenuEvent>() {
+				public void componentSelected(MenuEvent ce) {
+					EntityTreeModel model = tree.getSelectionModel().getSelectedItem();
+					if (model != null) {
+						presenter.onEdit(model.getId());
+					}
+				}
+			});
+			contextMenu.add(insert);
+	
+			MenuItem remove = new MenuItem();
+			remove.setText("Delete");
+			remove.setIcon(AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
+			remove.addSelectionListener(new SelectionListener<MenuEvent>() {
+				public void componentSelected(MenuEvent ce) {
+					final EntityTreeModel model = tree.getSelectionModel().getSelectedItem();
+					if (model != null) {
+						MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + model.get(KEY_NAME), DisplayConstants.PROMPT_SURE_DELETE + " " + model.get(KEY_NAME) +"?", new Listener<MessageBoxEvent>() {					
+							@Override
+							public void handleEvent(MessageBoxEvent be) { 												
+								Button btn = be.getButtonClicked();
+								if(Dialog.YES.equals(btn.getItemId())) {
+									presenter.deleteEntity(model.getId());
+									
+								}
+							}
+						});					
+					}
+				}
+			});
+			contextMenu.add(remove);
+	
+			tree.setContextMenu(contextMenu);
+		} else {
+			
+			tree.setContextMenu(null);
+		}
+	}
+
 	@Inject
 	public EntityTreeBrowserViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
 		this.sageImageBundle = sageImageBundle;
@@ -142,6 +212,18 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		store.add(convertEntityHeaderToModel(rootEntities), false);
 	}
 	
+	@Override
+	public void setMakeLinks(boolean makeLinks) {
+		this.makeLinks = makeLinks;
+	}
+
+	@Override
+	public void setShowContextMenu(boolean showContextMenu) {
+		this.showContextMenu = showContextMenu;
+		configureContextMenu();
+	}
+
+	
 	/*
 	 * Private Methods
 	 */
@@ -153,7 +235,13 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		
 		for(int i=0; i<headers.size() && i<maxlimit; i++) {
 			EntityHeader header = headers.get(i);
-			models.add(new EntityTreeModel(header.getId(), header.getName(), header.getType()));
+			String name;
+			if(makeLinks) {
+				name = "<a href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\">" + header.getName() + "</a>";
+			} else {
+				name = header.getName();
+			}
+			models.add(new EntityTreeModel(header.getId(), name, header.getType()));
 		}
 		if(headers.size() >= maxlimit) {
 			models.add(new EntityTreeModel(PLACEHOLDER_ID, PLACEHOLDER_NAME_PREFIX + " Limited to " + maxlimit + " results" , PLACEHOLDER_TYPE));
@@ -223,6 +311,5 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 			}
 		});
 	}
-
 	
 }

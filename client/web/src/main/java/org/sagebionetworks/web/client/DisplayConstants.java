@@ -188,7 +188,7 @@ public class DisplayConstants {
 	public static final String LABEL_UPLOADING = "Uploading...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
 	public static final String LABEL_WHERE_SAVE_LINK = "Where would you like to save a Link to this page?";
-	public static final String ERROR_NOT_FOUND = "Entity not found";
+	public static final String ERROR_NOT_FOUND = "Sorry, the requested object was not found or no longer exists.";
 	public static final String ERROR_ENTITY_CANT_SHORTCUTS = "Sorry, the requested entity can not contain shortcuts.";
 	public static final String ERROR_ENTITY_CREATION = "Sorry, creation failed. Please try again.";
 	public static final String LABEL_SUCCESS = "Success";
@@ -203,6 +203,8 @@ public class DisplayConstants {
 	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
-	
+	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you can not save a Link to the requested spot.";
+	public static final String TEXT_RIGHT_CLICK_FOR_CONTEXT_MENU = "Right click on an item in the list to Edit or Delete.";
+		
 }
 

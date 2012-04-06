@@ -8,13 +8,12 @@ import java.util.List;
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
 import org.sagebionetworks.repo.model.Analysis;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.Step;
+import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Project;import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -209,7 +208,7 @@ public class DisplayUtils {
 			MessageBox.info("Error", message, null);
 			return true;
 		} else if(ex instanceof NotFoundException) {
-			MessageBox.info("Not Found", "Sorry, the requested object was not found.", null);
+			MessageBox.info("Not Found", DisplayConstants.ERROR_NOT_FOUND, null);
 			placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			return true;
 		} 			
@@ -430,9 +429,10 @@ public class DisplayUtils {
 	}
 	
 	public static ImageResource getSynapseIconForEntityClassName(String className, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		//String classname = type.getClassName();
 		ImageResource icon = null;
-		if(Analysis.class.getName().equals(className)) {
+		if(Link.class.getName().equals(className)) {
+			icon = iconsImageBundle.synapseLink16();
+		} else if(Analysis.class.getName().equals(className)) {
 			// Analysis
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseAnalysis16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseAnalysis24();			

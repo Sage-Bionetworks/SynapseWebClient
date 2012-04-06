@@ -15,6 +15,8 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.statictable.StaticTable;
@@ -75,7 +77,6 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	private QueryTableFactory queryTableFactory;
 	private ColumnFactory columnFactory;
 	private EntityTreeBrowser entityTreeBrowser;
-	private EntitySelectedHandler entitySelectedHandler;
 	private EntityTypeProvider entityTypeProvider;
 	
 	private TabItem previewTab;
@@ -85,6 +86,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	private boolean imagePreviewExpanded;
 	private Integer originalImageWidth;
 	private Integer originalImageHeight;
+	private LayoutContainer lc;
 
 	@Inject
 	public EntityChildBrowserViewImpl(SageImageBundle sageImageBundle,
@@ -104,9 +106,9 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	@Override
 	public void createBrowser(final Entity entity, EntityType entityType,
 			boolean canEdit) {
-		if(tabPanel != null) {
+		if(lc != null && tabPanel != null) {
 			// out with the old
-			this.remove(tabPanel);
+			this.remove(lc);
 			tabPanel.removeAll();
 		}		
 		tabPanel = new TabPanel();
@@ -135,8 +137,17 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 			tab.add(noChildren, new MarginData(10));
 			tabPanel.add(tab);  
 		}
-		
-		add(tabPanel);		
+
+		lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+		lc.add(tabPanel);
+		lc.add(new Html(DisplayUtils.getIconHtml(iconsImageBundle
+				.informationBalloon16())
+				+ " <span style=\"font-size: 80%\">"
+				+ DisplayConstants.TEXT_RIGHT_CLICK_FOR_CONTEXT_MENU + "</span>"));
+		lc.layout();
+		add(lc);
 	}
 
 	private int addTreeviewTab(Entity entity) {
@@ -156,6 +167,12 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 					public void onSuccess(List<EntityHeader> result) {
 						tab.remove(loading);
 						entityTreeBrowser.setRootEntities(result);
+						entityTreeBrowser.addEntityUpdatedHandler(new EntityUpdatedHandler() {							
+							@Override
+							public void onPersistSuccess(EntityUpdatedEvent event) {
+								presenter.reloadEntity();
+							}
+						});
 						tab.add(entityTreeBrowser.asWidget());
 						tab.layout(true);						
 					}
@@ -222,14 +239,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 
 	@Override
 	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-		
-		// create a new handler for this presenter
-		if(entitySelectedHandler != null) {
-			entityTreeBrowser.removeEntitySelectedHandler(entitySelectedHandler);
-		}
-		createSelectedHandler();
-
+		this.presenter = presenter;	
 	}
 
 	@Override
@@ -424,16 +434,6 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		};
 		return cellRenderer;
 	}			
-	
-	private void createSelectedHandler() {
-		entitySelectedHandler = new EntitySelectedHandler() {			
-			@Override
-			public void onSelection(EntitySelectedEvent event) {
-				presenter.goToEntity(entityTreeBrowser.getSelected());
-			}
-		};
-		entityTreeBrowser.addEntitySelectedHandler(entitySelectedHandler);
-	}
-	
+		
 }
 

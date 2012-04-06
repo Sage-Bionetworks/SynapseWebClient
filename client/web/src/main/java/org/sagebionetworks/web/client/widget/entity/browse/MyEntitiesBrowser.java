@@ -73,11 +73,10 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		
-		// default selection behavior is to goto entity page
+		// default selection behavior is to do nothing
 		this.selectedHandler = new SelectedHandler() {			
 			@Override
-			public void onSelection(String selectedEntityId) {				
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(selectedEntityId));
+			public void onSelection(String selectedEntityId) {								
 			}
 		};
 		
@@ -136,9 +135,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 							eheaders.add(eh);
 							
 						}
-
 						
-						view.setMyEntities(eheaders);
+						view.setUpdatableEntities(eheaders);
 					} catch (RestServiceException e) {
 						onFailure(e);
 					}																	
@@ -221,7 +219,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 						}
 					}
 					// send to view
-					view.setMyEntities(headers);
+					view.setCreatedEntities(headers);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -230,6 +228,11 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			});
 		}
 	}
+
+	public EntityTreeBrowser getEntityTreeBrowser() {
+		return view.getEntityTreeBrowser();
+	}
+
 	
 	/*
 	 * Private Methods

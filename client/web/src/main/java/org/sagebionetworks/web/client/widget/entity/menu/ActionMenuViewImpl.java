@@ -3,9 +3,11 @@ package org.sagebionetworks.web.client.widget.entity.menu;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -13,6 +15,7 @@ import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
@@ -224,9 +227,10 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				if(skipTypes.contains(childType)) continue; // skip some types
 				
 				String displayName = typeProvider.getEntityDispalyName(childType);			
-				item = new MenuItem(displayName);
-				// TODO : replace icon with entity type icon
-				item.setIcon(AbstractImagePrototype.create(iconsImageBundle.documentAdd16()));
+				item = new MenuItem(displayName);				
+				item.setIcon(AbstractImagePrototype.create(DisplayUtils
+						.getSynapseIconForEntityType(childType, IconSize.PX16,
+								iconsImageBundle)));				
 				item.addSelectionListener(new SelectionListener<MenuEvent>() {
 					public void componentSelected(MenuEvent menuEvent) {
 						presenter.addNewChild(childType, entity.getId());
@@ -251,12 +255,13 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		if(canEdit) {
 			numAdded += addCanEditToolMenuItems(menu, entity, entityType);
 		}
-		if(isAdministrator) {
-			numAdded += addIsAdministratorToolMenuItems(menu, entity, entityType);
-		}
 		// add tools for logged in users		
 		if(presenter.isUserLoggedIn()) {
 			numAdded += addAuthenticatedToolMenuItems(menu, entity, entityType);
+		}
+
+		if(isAdministrator) {
+			numAdded += addIsAdministratorToolMenuItems(menu, entity, entityType);
 		}
 
 		toolsButton.setMenu(menu);
@@ -270,12 +275,15 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		
 		// Create shortcut
 		MenuItem item = new MenuItem(DisplayConstants.LABEL_CREATE_LINK);
-		item.setIcon(AbstractImagePrototype.create(iconsImageBundle.documentArrow16()));
+		item.setIcon(AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntityClassName(Link.class.getName(), IconSize.PX16, iconsImageBundle)));		
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {				
 				final Window window = new Window();  
 
+				EntityTreeBrowser tree = myEntitiesBrowser.getEntityTreeBrowser();
+				tree.setMakeLinks(false);
+				tree.setShowContextMenu(false);
 				myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
 					@Override
 					public void onSelection(String selectedEntityId) {

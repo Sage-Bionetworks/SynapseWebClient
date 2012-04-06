@@ -20,6 +20,8 @@ public interface SynapseClient extends RemoteService {
 	
 
 	public EntityWrapper getEntity(String entityId);
+	
+	public void deleteEntity(String entityId) throws RestServiceException;
 
 	//public EntityWrapper createEntity(EntityType type, JSONObjectAdaptor properties);
 	

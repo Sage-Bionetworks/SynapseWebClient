@@ -1,13 +1,20 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_REFERENCEDBY;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -17,14 +24,18 @@ import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.EntityEditor;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
-import org.sagebionetworks.web.shared.SearchParameters;
-import org.sagebionetworks.web.shared.TableResults;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -49,6 +60,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private JSONObjectAdapter jsonObjectAdapter;
 	private IconsImageBundle iconsImageBundle;
 	private AutoGenFactory entityFactory;
+	private EntityEditor entityEditor;
 	
 	private String currentSelection;
 	
@@ -64,7 +76,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
 			IconsImageBundle iconsImageBundle,
-			AutoGenFactory entityFactory) {
+			AutoGenFactory entityFactory, EntityEditor entityEditor) {
 		this.view = view;
 		this.nodeService = nodeService;
 		this.searchService = searchService;
@@ -76,6 +88,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.iconsImageBundle = iconsImageBundle;
 		this.entityFactory = entityFactory;
+		this.entityEditor = entityEditor;
 		
 		view.setPresenter(this);
 	}	
@@ -158,11 +171,54 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		handlerManager.removeHandler(EntitySelectedEvent.getType(), handler);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);		
+	}
+
+	@SuppressWarnings("unchecked")
+	public void removeEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		handlerManager.removeHandler(EntityUpdatedEvent.getType(), handler);
+	}
+	
 	@Override
 	public int getMaxLimit() {
 		return MAX_LIMIT;
 	}
 
+	@Override
+	public void deleteEntity(final String entityId) {
+		synapseClient.deleteEntity(entityId, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo("Deleted", "Synapse id " + entityId + " was successfully deleted.");
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Show links if true
+	 * @param makeLinks Make the labels entity links if true 
+	 */
+	public void setMakeLinks(boolean makeLinks) {
+		view.setMakeLinks(makeLinks);
+	}
+
+	/**
+	 * Show the right click menu
+	 * @param showContextMenu
+	 */
+	public void setShowContextMenu(boolean showContextMenu) {
+		view.setShowContextMenu(showContextMenu);
+	}
+
+	
 	/*
 	 * Private Methods
 	 */
@@ -178,6 +234,30 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		return DisplayUtils.getSynapseIconForEntityClassName(entityType.getClassName(), DisplayUtils.IconSize.PX16, iconsImageBundle);
 	}
 
-	
+	@Override
+	public void onEdit(String entityId) {
+		int mask = ENTITY | PERMISSIONS;
+		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundleTransport>() {
+			@Override
+			public void onSuccess(EntityBundleTransport transport) {				
+				EntityBundle bundle = null;
+				try {
+					bundle = nodeModelCreator.createEntityBundle(transport);										
+					entityEditor.editEntity(bundle, false);					
+				} catch (RestServiceException ex) {					
+					if(!DisplayUtils.handleServiceException(ex, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
+						onFailure(null);					
+					} 
+					placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+				}				
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
+				placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			}			
+		});		
+	}
 
 }

@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Preview;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -29,6 +30,8 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.place.shared.Place;
@@ -118,13 +121,13 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		final String parentId = entityBundle.getEntity().getParentId();
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
-		nodeService.deleteNode(DisplayUtils.getNodeTypeForEntity(entityBundle.getEntity()), entityBundle.getEntity().getId(), new AsyncCallback<Void>() {			
+		synapseClient.deleteEntity(entityBundle.getEntity().getId(), new AsyncCallback<Void>() {			
 			@Override
 			public void onSuccess(Void result) {				
 				view.showInfo(entityTypeDisplay + " Deleted", "The " + entityTypeDisplay + " was successfully deleted."); 
 				// Go to entity's parent
 				Place gotoPlace = null;
-				if(parentId != null && !"/project".equals(entityType.getUrlPrefix())) {
+				if(parentId != null && !Project.class.getName().equals(entityBundle.getEntity().getEntityType())) {
 					gotoPlace = new Synapse(parentId);
 				} else {
 					gotoPlace = new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
@@ -178,8 +181,9 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		Link link = (Link) entityFactory.newInstance(Link.class.getName());
 		link.setParentId(selectedEntityId); // user selects where to save
 		link.setLinksTo(entityBundle.getEntity().getId()); // links to this entity
+		link.setLinksToClassName(entityBundle.getEntity().getEntityType());
 		link.setName(entityBundle.getEntity().getName()); // copy name of this entity as default
-		link.setEntityType(Link.class.getName());
+		link.setEntityType(Link.class.getName());		
 		
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		try {
@@ -196,6 +200,14 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				if(caught instanceof BadRequestException) {
+					view.showErrorMessage(DisplayConstants.ERROR_CANT_SAVE_LINK_HERE);
+					return;
+				}
+				if(caught instanceof NotFoundException) {
+					view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
+					return;
+				}
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 				}

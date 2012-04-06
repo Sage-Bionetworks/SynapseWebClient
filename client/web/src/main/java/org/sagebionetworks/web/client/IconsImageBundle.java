@@ -210,6 +210,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/synapse-folder-24.png")
 	ImageResource synapseFolder24();
 	
+	@Source("images/icons/synapse-link-16.png")
+	ImageResource synapseLink16();
+	
 	@Source("images/icons/synapse-model-16.png")
 	ImageResource synapseModel16();
 	
