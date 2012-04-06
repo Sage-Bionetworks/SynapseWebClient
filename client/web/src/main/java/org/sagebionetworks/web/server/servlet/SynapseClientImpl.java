@@ -9,11 +9,13 @@ import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -523,6 +525,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			synapseClient.deleteEntityById(entityId);			
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+
+	@Override
+	public String getUserProfile() throws RestServiceException {
+		try {
+			Synapse synapseClient = createSynapseClient();
+			JSONObject userProfile = synapseClient.getSynapseEntity(urlProvider.getRepositoryServiceUrl(), "/userProfile");
+			return userProfile.toString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+
+	@Override
+	public void updateUserProfile(String userProfileJson)
+			throws RestServiceException {
+		try {
+			Synapse synapseClient = createSynapseClient();
+			synapseClient.putEntity("/userProfile", new JSONObject(userProfileJson));			
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONException e) {
+			throw new UnknownErrorException(e.getMessage());
 		} 
 	}
 

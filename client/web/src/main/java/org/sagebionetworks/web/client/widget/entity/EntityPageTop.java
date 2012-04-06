@@ -1,8 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.ObjectSchema;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -16,6 +21,7 @@ import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -32,16 +38,22 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
+	private EntitySchemaCache schemaCache;	
+	private JSONObjectAdapter jsonObjectAdapter;
+	
 	private EntityBundle bundle;
 	private String entityTypeDisplay; 
 	private HandlerManager handlerManager = new HandlerManager(this);
-	private EntitySchemaCache schemaCache;	
-	
-	// TODO : delete this variable
-	private String rStudioUrl = "http://localhost:8787";
+	private String rStudioUrl;
 	
 	@Inject
-	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, EntitySchemaCache schemaCache) {
+	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service,
+			SynapseClientAsync synapseClient,
+			NodeModelCreator nodeModelCreator,
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState,
+			EntitySchemaCache schemaCache,
+			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.nodeService = service;
 		this.synapseClient = synapseClient;
@@ -49,6 +61,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.schemaCache = schemaCache;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 		view.setPresenter(this);
 	}	
 
@@ -62,6 +75,25 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     		// Let the view know
     		// TODO : add referencedBy
     		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit());
+
+    		// get current user profile
+    		synapseClient.getUserProfile(new AsyncCallback<String>() {
+    			@Override
+    			public void onSuccess(String userProfileJson) {
+    				try {
+    					UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
+   						rStudioUrl = profile.getRStudioUrl();    						    					
+    					view.setRStudioUrlReady();
+    				} catch (RestServiceException e) {
+						onFailure(e);
+					}    				
+    			}
+    			@Override
+    			public void onFailure(Throwable caught) {
+    				view.showErrorMessage(DisplayConstants.ERROR_USER_PROFILE_SAVE);
+    			}
+    		});
+
     	}
 	}
 
@@ -116,25 +148,56 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public String getRstudioUrl() {
-		// TODO : get this from user's profile, or prompt
-		String urlBase = rStudioUrl; 
-		UserData userData = authenticationController.getLoggedInUser();
-		if(userData != null) {
-			urlBase += "#synapse:" + userData.getToken() + ";get:" + bundle.getEntity().getId();			
-		} 
-		return urlBase;
-	}
-	
-	@Override
-	public void saveRStudioUrlBase(String value) {
-		// TODO : save RStudio Url to profile
-		rStudioUrl = value;		
-	}
-	
-	@Override
 	public String getRstudioUrlBase() {
 		return rStudioUrl;
+	}
+	
+	@Override
+	public String getRstudioUrl() {		
+		String url = getRstudioUrlBase(); 
+		UserData userData = authenticationController.getLoggedInUser();
+		if(url != null && userData != null) {
+			url += "#synapse:" + userData.getToken() + ";get:" + bundle.getEntity().getId();			
+		} 
+		return url;
+	}
+	
+	@Override
+	public void saveRStudioUrlBase(final String value) {
+		rStudioUrl = value;
+		
+		// get current user profile		
+		synapseClient.getUserProfile(new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String userProfileJson) {
+				try {
+					UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
+					profile.setRStudioUrl(value);		
+					JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+					profile.writeToJSONObject(adapter);
+					// save update user profile
+					synapseClient.updateUserProfile(adapter.toJSONString(), new AsyncCallback<Void>() {
+						@Override
+						public void onSuccess(Void result) {
+							view.showInfo(DisplayConstants.LABEL_UPDATED, DisplayConstants.TEXT_USER_PROFILE_UPDATED);
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showErrorMessage(DisplayConstants.ERROR_USER_PROFILE_SAVE);
+						}
+					});					
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				} catch (RestServiceException e) {
+					onFailure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.ERROR_USER_PROFILE_SAVE);
+			}
+		});
+		
 	}
 	
 	@Override 

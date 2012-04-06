@@ -40,5 +40,9 @@ public interface SynapseClientAsync {
 			AsyncCallback<String> callback);
 
 	void deleteEntity(String entityId, AsyncCallback<Void> callback);
+
+	void getUserProfile(AsyncCallback<String> callback);
+
+	void updateUserProfile(String userProfileJson, AsyncCallback<Void> callback);
 	
 }

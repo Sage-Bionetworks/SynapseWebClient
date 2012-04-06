@@ -69,6 +69,9 @@ public class DisplayUtils {
 	public static final String ENTITY_UPDATEDBY_KEY = "updatedBy";
 	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
 	public static final String SYNAPSE_ID_PREFIX = "syn";
+	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
+	public static final String ETAG_KEY = "etag";
+		
 	
 	/*
 	 * Style names
@@ -95,7 +98,7 @@ public class DisplayUtils {
 					SEARCH_KEY_DISEASE, SEARCH_KEY_MODIFIED_ON,
 					SEARCH_KEY_CREATED_ON, SEARCH_KEY_TISSUE,
 					SEARCH_KEY_NUM_SAMPLES, SEARCH_KEY_CREATED_BY });
-	public static final String UPLOAD_SUCCESS = "Upload Success";		
+	public static final String UPLOAD_SUCCESS = "Upload Success";	
 	
 	public static SearchQuery getDefaultSearchQuery() {		
 		SearchQuery query = new SearchQuery();

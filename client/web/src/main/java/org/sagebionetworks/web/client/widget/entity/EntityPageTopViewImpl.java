@@ -92,6 +92,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private LayoutContainer colLeftContainer;
 	private LayoutContainer colRightContainer;
 	private EntityTypeProvider entityTypeProvider;
+	
+	private boolean rStudioUrlReady = false;
+	private SplitButton showRstudio;
 			
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -212,7 +215,20 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu.clearState();
 		// TODO : add other widgets here
 	}
-		
+
+	@Override
+	public void setRStudioUrlReady() {
+		// allow button to be used now
+		if(showRstudio != null) {
+			showRstudio.enable();
+		}
+	}
+	
+	
+	/*
+	 * Private Methods
+	 */
+	
 	/**
 	 * Basic meata data about this entity
 	 * @param entity
@@ -452,25 +468,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		lc.add(new Html("<h3>RStudio</h3>"));  	        	    	    	 
 	    
-	    final SplitButton showRstudio = new SplitButton("&nbsp;&nbsp;Load in RStudio Server");
+	    showRstudio = new SplitButton("&nbsp;&nbsp;Load in RStudio Server");
 	    showRstudio.setIcon(AbstractImagePrototype.create(iconsImageBundle.rstudio24()));
 	    Menu menu = new Menu();  
-	    MenuItem item = new MenuItem("Set RStudio Server URL");
+	    MenuItem item = new MenuItem("Edit RStudio Server URL");
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {
-				final MessageBox box = MessageBox.prompt("Set RStudio Server URL", "RStudio Server URL:");
-				box.getTextBox().setValue(presenter.getRstudioUrlBase());
-				box.addCallback(new Listener<MessageBoxEvent>() {
-					public void handleEvent(MessageBoxEvent be) {
-						if (be.getButtonClicked().getText().equals("Cancel")) // .isCanceled() does not give correct result
-							return;
-						if (be.getValue() != null && !be.getValue().equals("")) {
-							presenter.saveRStudioUrlBase(be.getValue());
-							showRstudio.fireEvent(Events.Select);
-						}
-					}
-				});
+				showRStudioUrlEdit();
 			}
 		});
 	    menu.add(item);  
@@ -489,15 +494,25 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    showRstudio.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-			    Frame iframe = new Frame(presenter.getRstudioUrl());
-			    iframe.setHeight("500px");
-			    iframe.setWidth("100%");
-			    lc.remove(showRstudio);
-			    lc.remove(label);
-			    lc.add(iframe);
-				lc.layout(true);
+				String url = presenter.getRstudioUrl();
+				if(url == null) {
+					showRStudioUrlEdit();
+				} else {				
+				    Frame iframe = new Frame();
+				    iframe.setHeight("500px");
+				    iframe.setWidth("100%");
+				    lc.remove(showRstudio);
+				    lc.remove(label);
+				    lc.add(iframe);
+					lc.layout(true);
+				}
 			}
 		});	    
+	    // only enable if we have the URL 
+	    if(!rStudioUrlReady) {
+	    	showRstudio.disable();
+	    }
+	    
 	    lc.add(showRstudio);
 	    lc.add(label, new MarginData(5, 0, 0, 0));
 		
@@ -574,5 +589,23 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 
-	
+	private void showRStudioUrlEdit() {
+		final MessageBox box = MessageBox.prompt("Set RStudio Server URL", "RStudio Server URL:");
+		String existingUrl = presenter.getRstudioUrlBase();
+		if(existingUrl == null) {
+			existingUrl = DisplayUtils.DEFAULT_RSTUDIO_URL;
+		}
+		box.getTextBox().setValue(existingUrl);
+		box.addCallback(new Listener<MessageBoxEvent>() {
+			public void handleEvent(MessageBoxEvent be) {
+				if (be.getButtonClicked().getText().equals("Cancel")) // .isCanceled() does not give correct result
+					return;
+				if (be.getValue() != null && !be.getValue().equals("")) {
+					presenter.saveRStudioUrlBase(be.getValue());
+					showRstudio.fireEvent(Events.Select);
+				}
+			}
+		});
+	}
+
 }

@@ -205,6 +205,9 @@ public class DisplayConstants {
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you can not save a Link to the requested spot.";
 	public static final String TEXT_RIGHT_CLICK_FOR_CONTEXT_MENU = "Right click on an item in the list to Edit or Delete.";
+	public static final String ERROR_USER_PROFILE_SAVE = "An error occurred saving to your user profile.";
+	public static final String LABEL_UPDATED = "Upated";
+	public static final String TEXT_USER_PROFILE_UPDATED = "Change save to your User Profile.";
 		
 }
 
