@@ -94,7 +94,8 @@ public class DisplayUtils {
 			.asList(new String[] { SEARCH_KEY_NODE_TYPE, SEARCH_KEY_SPECIES,
 					SEARCH_KEY_DISEASE, SEARCH_KEY_MODIFIED_ON,
 					SEARCH_KEY_CREATED_ON, SEARCH_KEY_TISSUE,
-					SEARCH_KEY_NUM_SAMPLES, SEARCH_KEY_CREATED_BY });		
+					SEARCH_KEY_NUM_SAMPLES, SEARCH_KEY_CREATED_BY });
+	public static final String UPLOAD_SUCCESS = "Upload Success";		
 	
 	public static SearchQuery getDefaultSearchQuery() {		
 		SearchQuery query = new SearchQuery();

@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -97,6 +99,10 @@ public class FileUpload extends HttpServlet {
 					}						
 					Locationable uploaded = synapseClient.uploadLocationableToSynapse((Locationable)locationable, file);
 					logger.info("Uploaded file " + item.getName() + " ("+ file.getName() +") to Synapse id: " + uploaded.getId());
+					OutputStream os = response.getOutputStream();					
+					PrintStream printStream = new PrintStream(os);
+					printStream.print(DisplayUtils.UPLOAD_SUCCESS);
+					printStream.close();
 				} else {
 					throw new IllegalArgumentException("entityId is a required parameter");
 				}

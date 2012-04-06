@@ -101,12 +101,14 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 
 	@Override
 	public void handleSubmitResult(String resultHtml) {
-		if("".equals(resultHtml)) {
-			view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE, DisplayConstants.TEXT_UPLOAD_SUCCESS);
-			handlerManager.fireEvent(new EntityUpdatedEvent());
-		} else {
+		if(resultHtml == null) resultHtml = "";
+		// response from server 
+		if(resultHtml.contains(DisplayUtils.UPLOAD_SUCCESS)) {
 			view.showErrorMessage(DisplayConstants.ERROR_UPLOAD);
 			handlerManager.fireEvent(new CancelEvent());
+		} else {
+			view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+			handlerManager.fireEvent(new EntityUpdatedEvent());
 		}
 		
 	}
