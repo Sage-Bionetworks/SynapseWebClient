@@ -20,7 +20,13 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	public void setPresenter(Presenter presenter);
 	
 	public void setEntityBundle(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit);
-		
+	
+	/**
+	 * Sets the RStudio URL for the view
+	 * @param rStudioUrl
+	 */
+	public void setRStudioUrlReady();
+	
 	/**
 	 * Presenter interface
 	 */
@@ -47,4 +53,5 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		void loadShortcuts(int offset, int limit, AsyncCallback<PaginatedResults<EntityHeader>> asyncCallback);
 
 	}
+
 }
