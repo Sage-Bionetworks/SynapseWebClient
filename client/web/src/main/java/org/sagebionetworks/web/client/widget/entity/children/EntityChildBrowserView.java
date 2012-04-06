@@ -58,6 +58,8 @@ public interface EntityChildBrowserView extends IsWidget, SynapseWidgetView {
 		void getChildrenHeaders(AsyncCallback<List<EntityHeader>> callback);
 
 		void goToEntity(String selectedId);
+
+		void reloadEntity();
 		
 	}
 

@@ -39,6 +39,6 @@ public interface SynapseClientAsync {
 	void getEntityTypeBatch(List<String> entityIds,
 			AsyncCallback<String> callback);
 
-
+	void deleteEntity(String entityId, AsyncCallback<Void> callback);
 	
 }

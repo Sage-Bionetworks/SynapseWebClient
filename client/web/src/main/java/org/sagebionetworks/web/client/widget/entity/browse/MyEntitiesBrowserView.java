@@ -16,8 +16,12 @@ public interface MyEntitiesBrowserView extends IsWidget, SynapseWidgetView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void setMyEntities(List<EntityHeader> rootEntities);
+	void setCreatedEntities(List<EntityHeader> rootEntities);
+
+	void setUpdatableEntities(List<EntityHeader> rootEntities);
 	
+	public EntityTreeBrowser getEntityTreeBrowser();
+
 	/**
 	 * Presenter interface
 	 */
@@ -32,4 +36,6 @@ public interface MyEntitiesBrowserView extends IsWidget, SynapseWidgetView {
 		void createdOnlyFilter();
 
 	}
+
+
 }

@@ -314,6 +314,11 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	public void goToEntity(String selectedId) {
 		globalApplicationState.getPlaceChanger().goTo(new Synapse(selectedId));
 	}
+
+	@Override
+	public void reloadEntity() {
+		goToEntity(entity.getId());
+	}
 	
 	/*
 	 * Private Methods

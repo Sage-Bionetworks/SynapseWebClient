@@ -80,11 +80,11 @@ public class SearchBoxViewImpl extends LayoutContainer implements SearchBoxView 
 		    menuItem.disable();
 		    menu.add(menuItem);
 		    
-		    menuItem = new MenuItem("Datasets");
+		    menuItem = new MenuItem("Data");
 		    menuItem.addSelectionListener(new SelectionListener<MenuEvent>() {
 				@Override
 				public void componentSelected(MenuEvent ce) {
-					typeDropdown.setText("Datasets");					
+					typeDropdown.setText("Data");					
 				}		    
 			});
 		    menuItem.disable();

@@ -35,6 +35,8 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 	private EntitySelectedHandler entitySelectedHandler;
 	private Button onlyCreatedFilter;
 	private boolean onlyCreatedPressed;
+	private Status status;
+	private Button onlyCreatedButton;
 	
 	private ContentPanel cp;
 			
@@ -56,27 +58,23 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 		cp.setWidth(WIDTH_PX);
 		cp.setScrollMode(Scroll.AUTO);				
 		
-		final Status status = new Status();
+		status = new Status();
 		status.setAutoWidth(true);
 		status.setBox(true);
 		status.setText(DisplayConstants.STATUS_CAN_EDIT);
 		
 		ToolBar toolbar = new ToolBar();
 		onlyCreatedPressed = false;
-		final Button onlyCreatedButton = new Button(DisplayConstants.BUTTON_FILTER_ONLY_MY_CREATION, AbstractImagePrototype.create(iconsImageBundle.filter16()));
+		onlyCreatedButton = new Button(DisplayConstants.BUTTON_FILTER_ONLY_MY_CREATION, AbstractImagePrototype.create(iconsImageBundle.filter16()));
 		onlyCreatedButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				if(onlyCreatedPressed) {
-					presenter.loadUserUpdateable();					
+					presenter.loadUserUpdateable();
 					onlyCreatedPressed = false;
-					onlyCreatedButton.setText(DisplayConstants.BUTTON_FILTER_ONLY_MY_CREATION);
-					status.setText(DisplayConstants.STATUS_CAN_EDIT);					
 				} else {
 					presenter.createdOnlyFilter();
 					onlyCreatedPressed = true;
-					onlyCreatedButton.setText(DisplayConstants.BUTTON_FILTER_USER_UPDATABLE);
-					status.setText(DisplayConstants.STATUS_CREATED_BY);
 				}
 			}
 		});
@@ -95,7 +93,14 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 	}
 
 	@Override
-	public void setMyEntities(List<EntityHeader> rootEntities) {
+	public void setUpdatableEntities(List<EntityHeader> rootEntities) {
+		setToolbarStateUserUpdateable();
+		entityTreeBrowser.setRootEntities(rootEntities);		
+	}
+	
+	@Override
+	public void setCreatedEntities(List<EntityHeader> rootEntities) {
+		setToolbarStateCreatedBy();
 		entityTreeBrowser.setRootEntities(rootEntities);		
 	}
 	
@@ -132,6 +137,11 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 	public void clear() {
 	}
 
+	@Override
+	public EntityTreeBrowser getEntityTreeBrowser() {
+		return entityTreeBrowser;
+	}
+	
 	/*
 	 * Private Methods
 	 */
@@ -144,5 +154,21 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 		};
 		entityTreeBrowser.addEntitySelectedHandler(entitySelectedHandler);
 	}
-	
+
+	private void setToolbarStateCreatedBy() {
+		if(onlyCreatedButton != null && status != null) {
+			onlyCreatedPressed = true;
+			onlyCreatedButton.setText(DisplayConstants.BUTTON_FILTER_USER_UPDATABLE);
+			status.setText(DisplayConstants.STATUS_CREATED_BY);
+		}
+	}
+
+	private void setToolbarStateUserUpdateable() {
+		if(onlyCreatedButton != null && status != null) {
+			onlyCreatedPressed = false;
+			onlyCreatedButton.setText(DisplayConstants.BUTTON_FILTER_ONLY_MY_CREATION);
+			status.setText(DisplayConstants.STATUS_CAN_EDIT);
+		}
+	}
+
 }
