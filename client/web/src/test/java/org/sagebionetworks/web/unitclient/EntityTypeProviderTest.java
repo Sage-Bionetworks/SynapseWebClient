@@ -34,6 +34,10 @@ public class EntityTypeProviderTest {
 //		entityTypeProvider = new EntityTypeProvider(synapseClient, jsonObjectAdapter);
 	}
 
+	@Test
+	public void test(){
+		// junit wants a test so we give it a test!!!!
+	}
 	/*
 	 * Private Methods
 	 */	
