@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -16,6 +17,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -37,6 +39,9 @@ import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.util.Padding;
+import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -50,12 +55,17 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
+import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
+import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.google.gwt.cell.client.widget.PreviewDisclosurePanel;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -577,12 +587,65 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		lc.add(new Html("<h3>Attachments</h3>"));	
+        LayoutContainer c = new LayoutContainer();  
+        HBoxLayout layout = new HBoxLayout();  
+        layout.setPadding(new Padding(5));  
+        layout.setHBoxLayoutAlign(HBoxLayoutAlign.TOP);  
+        c.setLayout(layout);  
+  
+        c.add(new Html("<h3>Attachments</h3>"), new HBoxLayoutData(new Margins(0, 5, 0, 0)));  
+        HBoxLayoutData flex = new HBoxLayoutData(new Margins(0, 5, 0, 0));  
+        flex.setFlex(1);  
+        Button addButton = new Button("Add");
+        c.add(addButton, new HBoxLayoutData(new Margins(0)));
+        lc.add(c);
+        String baseURl = GWT.getModuleBaseURL()+"attachment";
+        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId();
+        addButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, new AddAttachmentDialog.Callback() {
+					@Override
+					public void onSaveAttachment() {
+						presenter.fireEntityUpdatedEvent();
+					}
+				});
+			}
+		});	 
 
 		ContentPanel cp = new ContentPanel();
 		cp.setHeight(150);
 		cp.setHeaderVisible(false);
-		cp.add(new Html("Coming soon."), new MarginData(5));
+		List<AttachmentData> attachments = bundle.getEntity().getAttachments();
+		BoxComponent attachmentBody = null;
+		if(attachments == null){
+			attachmentBody = new Html("No attachments");
+		}else{
+			StringBuilder builder = new StringBuilder();
+			builder.append("<ul>");
+			for(AttachmentData data: attachments){
+				builder.append("<li>");
+				builder.append("<a href=\"");
+				builder.append(baseURl);
+				builder.append("?"+DisplayUtils.ENTITY_PARAM_KEY+"=");
+				builder.append(bundle.getEntity().getId());
+				builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
+				builder.append(data.getTokenId());
+				builder.append("\">");
+				builder.append(data.getName());
+				builder.append("</a>");
+				builder.append("</li>");
+			}
+			builder.append("</ul>");
+			attachmentBody = new Html(builder.toString());
+		}
+		ToolTipConfig config = new ToolTipConfig();  
+	    config.setTitle("Information");  
+	    config.setText("Prints the current document");  
+	    config.setMouseOffset(new int[] {0, 0});  
+	    config.setAnchor("left");  
+	    attachmentBody.setToolTip(config); 
+		cp.add(attachmentBody, new MarginData(5));
 		lc.add(cp);
 		
 		lc.layout();

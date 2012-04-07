@@ -35,7 +35,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		PlaceChanger getPlaceChanger();
 
 		void refresh();
-
+				
 		void fireEntityUpdatedEvent();
 
 		boolean isLocationable();
