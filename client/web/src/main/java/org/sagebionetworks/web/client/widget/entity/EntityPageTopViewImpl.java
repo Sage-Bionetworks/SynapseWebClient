@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
@@ -612,42 +613,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				});
 			}
 		});	 
-
-		ContentPanel cp = new ContentPanel();
-		cp.setHeight(150);
+        // We just create a new one each time.
+        AttachmentPanel cp = new AttachmentPanel(baseURl, bundle.getEntity().getId(), bundle.getEntity().getAttachments());
 		cp.setHeaderVisible(false);
-		List<AttachmentData> attachments = bundle.getEntity().getAttachments();
-		BoxComponent attachmentBody = null;
-		if(attachments == null){
-			attachmentBody = new Html("No attachments");
-		}else{
-			StringBuilder builder = new StringBuilder();
-			builder.append("<ul>");
-			for(AttachmentData data: attachments){
-				builder.append("<li>");
-				builder.append("<a href=\"");
-				builder.append(baseURl);
-				builder.append("?"+DisplayUtils.ENTITY_PARAM_KEY+"=");
-				builder.append(bundle.getEntity().getId());
-				builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
-				builder.append(data.getTokenId());
-				builder.append("\">");
-				builder.append(data.getName());
-				builder.append("</a>");
-				builder.append("</li>");
-			}
-			builder.append("</ul>");
-			attachmentBody = new Html(builder.toString());
-		}
-		ToolTipConfig config = new ToolTipConfig();  
-	    config.setTitle("Information");  
-	    config.setText("Prints the current document");  
-	    config.setMouseOffset(new int[] {0, 0});  
-	    config.setAnchor("left");  
-	    attachmentBody.setToolTip(config); 
-		cp.add(attachmentBody, new MarginData(5));
 		lc.add(cp);
-		
 		lc.layout();
 		return lc;
 	}

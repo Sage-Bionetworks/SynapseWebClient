@@ -3,7 +3,9 @@ package org.sagebionetworks.web.client;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
@@ -50,6 +52,7 @@ public class DisplayUtils {
 	private static final String REGEX_CLEAN_ANNOTATION_KEY = "^[a-z,A-Z,0-9,_,.]+";
 	private static final String REGEX_CLEAN_ENTITY_NAME = "^[a-z,A-Z,0-9,_,., ,\\-,\\+,(,)]+";
 	public static final String REPO_ENTITY_NAME_KEY = "name";
+	public static final String WHITE_SPACE = "&nbsp;";
 		
 	public static final String NODE_DESCRIPTION_KEY = "description";
 	public static final String LAYER_COLUMN_DESCRIPTION_KEY_PREFIX = "colDesc_";
@@ -68,6 +71,7 @@ public class DisplayUtils {
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
+	public static final String FILE_NAME_PARAM_KEY = "fileName";
 	public static final String ENTITY_CREATEDBY_KEY = "createdBy";
 	public static final String ENTITY_UPDATEDBY_KEY = "updatedBy";
 	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
@@ -497,7 +501,91 @@ public class DisplayUtils {
 		return icon;
 	}
 
+	/**
+	 * Maps mime types to icons.
+	 */
+	private static Map<String, String> attachmentMap = new HashMap<String, String>();
+	public static String UNKNOWN_ICON 				= "220";
+	public static String DEFAULT_PDF_ICON 			= "222";
+	public static String DEFAULT_IMAGE_ICON			= "242";
+	public static String DEFAULT_TEXT_ICON 			= "224";
+	public static String DEFAULT_COMPRESSED_ICON	= "226";
+	static{
+		attachmentMap.put("pdf", DEFAULT_PDF_ICON);
+		attachmentMap.put("txt", DEFAULT_TEXT_ICON);
+		attachmentMap.put("doc", DEFAULT_TEXT_ICON);
+		attachmentMap.put("doc", DEFAULT_TEXT_ICON);
+		attachmentMap.put("docx", DEFAULT_TEXT_ICON);
+		attachmentMap.put("docx", DEFAULT_TEXT_ICON);
+		attachmentMap.put("zip", DEFAULT_COMPRESSED_ICON);
+		attachmentMap.put("tar", DEFAULT_COMPRESSED_ICON);
+		attachmentMap.put("gz", DEFAULT_COMPRESSED_ICON);
+		attachmentMap.put("rar", DEFAULT_COMPRESSED_ICON);
+		attachmentMap.put("png", DEFAULT_IMAGE_ICON);
+		attachmentMap.put("gif", DEFAULT_IMAGE_ICON);
+		attachmentMap.put("jpg", DEFAULT_IMAGE_ICON);
+		attachmentMap.put("jpeg", DEFAULT_IMAGE_ICON);
+		attachmentMap.put("bmp", DEFAULT_IMAGE_ICON);
+		attachmentMap.put("wbmp", DEFAULT_IMAGE_ICON);
+	}
 
+	/**
+	 * Get the icon to be used with a given file type.
+	 */
+	public static String getAttachmentIcon(String fileName){
+		if(fileName == null) return UNKNOWN_ICON;
+		String mimeType = getMimeType(fileName);
+		if(mimeType == null) return UNKNOWN_ICON;
+		String icon = attachmentMap.get(mimeType.toLowerCase());
+		if(icon == null) return UNKNOWN_ICON;
+		return icon;
+	}
+	
+	/**
+	 * Get the mime type from a file name.
+	 * @param fileName
+	 * @return
+	 */
+	public static String getMimeType(String fileName){
+		if(fileName == null) return null;
+		int index = fileName.lastIndexOf('.');
+		if(index < 0) return null;
+		if(index+1 >=  fileName.length()) return null;
+		return fileName.substring(index+1, fileName.length());
+	}
+	
+	/**
+	 * Replace all white space
+	 * @param string
+	 * @return
+	 */
+	public static String replaceWhiteSpace(String string){
+		if(string == null) return null;
+		string = string.replaceAll(" ", WHITE_SPACE);
+		return string;
+	}
+	
+	/**
+	 * Create the url to an attachment image.
+	 * @param baseURl
+	 * @param entityId
+	 * @param tokenId
+	 * @param fileName
+	 * @return
+	 */
+	public static String createAttachmentUrl(String baseURl, String entityId, String tokenId, String fileName){
+		StringBuilder builder = new StringBuilder();
+		builder.append(baseURl);
+		builder.append("?"+DisplayUtils.ENTITY_PARAM_KEY+"=");
+		builder.append(entityId);
+		builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
+		builder.append(tokenId);
+		if(fileName != null){
+			builder.append("&"+DisplayUtils.FILE_NAME_PARAM_KEY+"=");
+			builder.append(fileName);
+		}
+		return builder.toString();
+	}
 
 
 }

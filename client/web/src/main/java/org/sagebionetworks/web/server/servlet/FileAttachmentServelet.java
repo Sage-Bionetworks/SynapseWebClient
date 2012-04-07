@@ -90,9 +90,14 @@ public class FileAttachmentServelet extends HttpServlet {
 		Synapse client = createNewClient(token);
 		String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
 		String tokenId = request.getParameter(DisplayUtils.TOKEN_ID_PARAM_KEY);
+		String fileName = request.getParameter(DisplayUtils.FILE_NAME_PARAM_KEY);
 		try {
 			PresignedUrl url = client.getAttachmentPresignedUrl(entityId, tokenId);
 			// Redirect the user to the url
+			if(fileName != null){
+				// Tell the browser the name of the file.
+				response.setHeader("Content-Disposition", "attachment; filename="+fileName);
+			}
 			response.sendRedirect(url.getPresignedUrl());
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
