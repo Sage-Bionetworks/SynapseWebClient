@@ -34,18 +34,6 @@ public class EntityTypeProviderTest {
 //		entityTypeProvider = new EntityTypeProvider(synapseClient, jsonObjectAdapter);
 	}
 
-	@Ignore // This test is now in the GWTTestSuite
-	@Test
-	public void testGetProjectEntity() {
-		String uri = "http://HOST/PATH/project/ID";
-		EntityType projectType = entityTypeProvider.getEntityTypeForUri(uri);
-		assertNotNull(projectType);
-	}	
-
-	
-	
-	
-	
 	/*
 	 * Private Methods
 	 */	

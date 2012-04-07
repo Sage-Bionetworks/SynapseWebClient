@@ -47,7 +47,10 @@ public class EntityTypeProvider {
 	}
 
 	public EntityType getEntityTypeForEntity(Entity entity) {
-		return getEntityTypeForUri(entity.getUri());
+		for(EntityType type: values){
+			if(type.getClassName().equals(entity.getEntityType())) return type;
+		}
+		throw new IllegalArgumentException("Unknown Entity type for entityType: "+entity.getEntityType());
 	}
 	
 	/**
@@ -80,20 +83,20 @@ public class EntityTypeProvider {
 		return null;
 	}
 	
-	public EntityType getEntityTypeForUri(String uri) {
-		if(uri == null) throw new IllegalArgumentException("URI cannot be null");
-		int maxIndex = -1;
-		EntityType maxType = null;
-		for(EntityType type: values) {
-			int index = uri.lastIndexOf(type.getUrlPrefix());
-			if(index > maxIndex){
-				maxIndex = index;
-				maxType = type;
-			}
-		}
-		if(maxType != null) return maxType;
-		throw new IllegalArgumentException("Unknown Entity type for URI: "+uri);
-	}	
+//	public EntityType getEntityTypeForUri(String uri) {
+//		if(uri == null) throw new IllegalArgumentException("URI cannot be null");
+//		int maxIndex = -1;
+//		EntityType maxType = null;
+//		for(EntityType type: values) {
+//			int index = uri.lastIndexOf(type.getUrlPrefix());
+//			if(index > maxIndex){
+//				maxIndex = index;
+//				maxType = type;
+//			}
+//		}
+//		if(maxType != null) return maxType;
+//		throw new IllegalArgumentException("Unknown Entity type for URI: "+uri);
+//	}	
 	
 	/*
 	 * Private Methods
