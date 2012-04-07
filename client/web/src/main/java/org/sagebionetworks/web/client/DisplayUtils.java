@@ -34,8 +34,10 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
+import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.resources.client.ImageResource;
@@ -65,6 +67,7 @@ public class DisplayUtils {
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
+	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
 	public static final String ENTITY_CREATEDBY_KEY = "createdBy";
 	public static final String ENTITY_UPDATEDBY_KEY = "updatedBy";
 	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
@@ -431,6 +434,24 @@ public class DisplayUtils {
 		if(entity == null) return null;
 		return getSynapseIconForEntityClassName(entity.getClass().getName(), iconSize, iconsImageBundle);
 	}
+
+	/**
+	 * Create a loading window.
+	 * 
+	 * @param sageImageBundle
+	 * @param message
+	 * @return
+	 */
+	public static Window createLoadingWindow(SageImageBundle sageImageBundle, String message) {
+		Window window = new Window();
+		window.setModal(true);		
+		window.setHeight(114);
+		window.setWidth(221);		
+		window.setBorders(false);
+		window.add(new Html(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + message), new MarginData(20, 0, 0, 45));		
+		window.setBodyStyleName("whiteBackground");
+		return window;
+	}
 	
 	public static ImageResource getSynapseIconForEntityClassName(String className, IconSize iconSize, IconsImageBundle iconsImageBundle) {
 		ImageResource icon = null;
@@ -475,4 +496,8 @@ public class DisplayUtils {
 		}
 		return icon;
 	}
+
+
+
+
 }

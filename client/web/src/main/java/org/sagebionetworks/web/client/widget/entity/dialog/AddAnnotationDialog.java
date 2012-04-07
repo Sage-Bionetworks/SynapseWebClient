@@ -83,7 +83,7 @@ public class AddAnnotationDialog {
 		dialog.okText = "Add";
 		dialog.setButtons(Dialog.OKCANCEL);
 		dialog.setHideOnButtonClick(true);
-		FormPanel form = createNewFormPanel();
+		FormPanel form = DialogUtils.createNewFormPanel();
 		final TextField<String> nameField = new TextField<String>();
 		nameField.setAllowBlank(false);
 		nameField.setEmptyText("Set the annotation name...");
@@ -124,21 +124,5 @@ public class AddAnnotationDialog {
 	    });
 		
 	}
-	
-	/**
-	 * Build a new empty from panel
-	 * @return
-	 */
-	private static FormPanel createNewFormPanel(){
-		FormPanel form = new FormPanel();
-		form.setHeading("Simple Form");
-		form.setHeaderVisible(false);
-		form.setFrame(false);
-		form.setBorders(false);
-		form.setBodyStyleName("form-background"); 
-		form.setLabelAlign(LabelAlign.RIGHT);
-		return form;
-	}
-
 
 }

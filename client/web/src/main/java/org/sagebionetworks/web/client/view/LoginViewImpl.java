@@ -77,13 +77,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void showLoggingInLoader() {
 		if(logginInWindow == null) {
-			logginInWindow = new Window();
-			logginInWindow.setModal(true);		
-			logginInWindow.setHeight(114);
-			logginInWindow.setWidth(221);		
-			logginInWindow.setBorders(false);
-			logginInWindow.add(new Html(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + DisplayConstants.LABEL_SINGLE_SIGN_ON_LOGGING_IN), new MarginData(20, 0, 0, 45));		
-			logginInWindow.setBodyStyleName("whiteBackground");
+			logginInWindow = DisplayUtils.createLoadingWindow(sageImageBundle, DisplayConstants.LABEL_SINGLE_SIGN_ON_LOGGING_IN);
 		}
 		logginInWindow.show();
 	}
