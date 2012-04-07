@@ -321,17 +321,6 @@ public class GwtTestSuite extends GWTTestCase {
 		assertEquals(uep, results.getPermissions());
 	}
 	
-	@Test
-	public void testRegister() throws UnsupportedEncodingException, JSONObjectAdapterException{
-		RegisterConstants constants = GWT.create(RegisterConstants.class);
-		GwtAdapterFactory factory = new GwtAdapterFactory();
-		EntityTypeProvider entityTypeProvider = new EntityTypeProvider(constants, factory, null);
-		String uri = "http://HOST/PATH/project/ID";
-		EntityType projectType = entityTypeProvider.getEntityTypeForUri(uri);
-		assertNotNull(projectType);
-	}
-	
-
 
 	@Override
 	public String toString() {
