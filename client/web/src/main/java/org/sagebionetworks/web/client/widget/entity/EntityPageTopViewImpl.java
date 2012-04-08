@@ -174,11 +174,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);	    
 	    // Child Browser
 		colLeftContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), canEdit), widgetMargin);
+	    // Attachment preview is only added when there are previews.
+		if(DisplayUtils.hasAttachmentPreviews(bundle.getEntity())){
+			colLeftContainer.add(createAttachmentPreview(bundle.getEntity()), widgetMargin);
+		}
 	    // RStudio Button
 		colLeftContainer.add(createRstudioWidget(bundle.getEntity()), widgetMargin);
 		// Create Activity Feed widget
 		colLeftContainer.add(createActivityFeedWidget(bundle.getEntity()), widgetMargin);
-	    
+
 		/*
 		 * Right Column
 		 */
@@ -195,6 +199,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colRightContainer.layout(true);
 		
 	} 
+
+
 
 	@Override
 	public Widget asWidget() {
@@ -582,7 +588,66 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    lc.add(propertyWidget.asWidget());
 	    lc.layout();
 		return lc;
-	}	
+	}
+	
+	/**
+	 * Create the attachment preview.
+	 * @param entity
+	 * @return
+	 */
+	private Widget createAttachmentPreview(Entity entity) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+		lc.add(new Html("<h3>Visual Attachments</h3>"));
+		String baseURl = GWT.getModuleBaseURL()+"attachment";
+		StringBuilder bodyBuilder = new  StringBuilder();
+		int col = 0;
+		List<AttachmentData> list = entity.getAttachments();
+		bodyBuilder.append("<div class=\"span-17 left notopmargin\">");
+		for(AttachmentData data: list){
+			// Ignore all attachemtns without a preview.
+			if(data.getPreviewId() == null) continue;
+			// Add a new span
+			String style = "span-5 left";
+			if(col == 2 || col == list.size()-1 ){
+				style = style+" last";
+				col = 0;
+			}else{
+				col++;
+			}
+			bodyBuilder.append("<div class=\"");
+			bodyBuilder.append(style);
+			bodyBuilder.append("\">");
+			bodyBuilder.append("<div class=\"preview-image-loading view\" >");
+			// Using a table to center the image because the alternatives were not an option for this case.
+			// The solution is from: http://stackoverflow.com/questions/388180/how-to-make-an-image-center-vertically-horizontally-inside-a-bigger-div
+			// We could not use the background approach because we are using a background sprit to show loading.
+			// We could not use the second approach because we do not know the dimensions of the image (we just know its width<=160 and height<=160).
+			// That left the third option...a table that causes people to go blind!
+			bodyBuilder.append(DisplayUtils.IMAGE_CENTERING_TABLE_START);
+			bodyBuilder.append("<a class=\"item-preview spec-border-ie\" href=\"");
+			bodyBuilder.append(DisplayUtils.createAttachmentUrl(baseURl, entity.getId(), data.getTokenId(), data.getName()));
+			bodyBuilder.append("\" target=\"_blank\" name=\"");
+			bodyBuilder.append(data.getName());
+			bodyBuilder.append("\"");
+			bodyBuilder.append(">");
+			bodyBuilder.append("<img style=\"margin:auto; display:block;\" src=\"");
+			bodyBuilder.append(DisplayUtils.createAttachmentUrl(baseURl, entity.getId(), data.getPreviewId(), null));
+			bodyBuilder.append("\"");
+			bodyBuilder.append(" ");
+			bodyBuilder.append("/>");
+			bodyBuilder.append("</a>");
+			bodyBuilder.append(DisplayUtils.IMAGE_CENTERING_TABLE_END);
+			bodyBuilder.append("</div>");
+			bodyBuilder.append("</div>");
+		}
+		bodyBuilder.append("</div>");
+		Html body = new Html(bodyBuilder.toString());
+		lc.add(body);
+		lc.layout();
+		return lc;
+	}
 	
 	private Widget createAttachmentsWidget(EntityBundle bundle) {
 		LayoutContainer lc = new LayoutContainer();
