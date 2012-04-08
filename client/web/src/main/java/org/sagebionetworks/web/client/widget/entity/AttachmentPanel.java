@@ -57,17 +57,17 @@ public class AttachmentPanel extends ContentPanel {
 				builder.append("</div>");
 				builder.append("</a>");
 				Html listItem = new Html(builder.toString());
-				ToolTipConfig config = new ToolTipConfig();  
-//			    config.setTitle("Information");
+				ToolTipConfig config = new ToolTipConfig();
 			    // If we have a preview then show it as a tooltip.
 			    if(data.getPreviewId() != null){
 			    	StringBuilder imageBuilder = new StringBuilder();
-			    	imageBuilder.append("<div style=\"width:160px; height:160px; float:center;\">");
+			    	imageBuilder.append("<div class=\"preview-image-loading\" >");
+			    	imageBuilder.append(DisplayUtils.IMAGE_CENTERING_TABLE_START);
 			    	imageBuilder.append("<img style=\"margin:auto; display:block;\" src=\"");
 			    	imageBuilder.append(DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getPreviewId(), null));
 			    	imageBuilder.append("\"");
-			    	imageBuilder.append(" alt=\"Downloading image...\"");
 			    	imageBuilder.append("/>");
+			    	imageBuilder.append(DisplayUtils.IMAGE_CENTERING_TABLE_END);
 			    	imageBuilder.append("</div>");
 			    	config.setText(imageBuilder.toString());  
 			    }else{

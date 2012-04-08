@@ -277,4 +277,14 @@ a.shortBtn {
   background-image: url(/images/icons/list-trigger.gif);
 }
 
+.image-loading {
+	 background: white url(/images/ui-anim_basic_16x16.gif) no-repeat center center;
+}
+
+.preview-image-loading {
+	 background: white url(/images/ui-anim_basic_16x16.gif) no-repeat center center;
+	 width: 180px;
+	 height: 180px;
+}
+
 

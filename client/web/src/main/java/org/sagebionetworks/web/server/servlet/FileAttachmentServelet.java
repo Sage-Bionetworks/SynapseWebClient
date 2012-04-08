@@ -25,8 +25,12 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
-import org.sagebionetworks.repo.model.attachment.PreviewState;
+import org.sagebionetworks.repo.model.attachment.S3AttachmentToken;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.utils.MD5ChecksumHelper;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.inject.Inject;
@@ -132,8 +136,7 @@ public class FileAttachmentServelet extends HttpServlet {
 			// Connect to syanpse
 			Synapse client = createNewClient(token);
 			// get Entity and store file in location
-			String entityId = request
-					.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
+			String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
 			FileItemIterator iter = upload.getItemIterator(request);
 			while (iter.hasNext()) {
 				FileItemStream item = iter.next();
@@ -157,14 +160,35 @@ public class FileAttachmentServelet extends HttpServlet {
 			e.getAttachments().addAll(list);
 			// Save the changes.
 			client.putEntity(e);
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getOutputStream().write(("Failed to attach data: "+e.getMessage()).getBytes("UTF-8"));
+			// Wait for the previews to be read
+			for(AttachmentData data: list){
+				if(data.getPreviewId() != null){
+					client.waitForPreviewToBeCreated(entityId, data.getPreviewId(), MAX_TIME_OUT);
+				}
+			}
+			UploadResult result = new UploadResult();
+			result.setMessage("File upload successfully");
+			result.setUploadStatus(UploadStatus.SUCCESS);
+			String out = EntityFactory.createJSONStringForEntity(result);
+			response.setStatus(HttpServletResponse.SC_CREATED);
+			response.getOutputStream().write(out.getBytes("UTF-8"));
 			response.getOutputStream().flush();
+		} catch (Exception e) {
+			UploadResult result = new UploadResult();
+			result.setMessage("Failed to attach data: "+e.getMessage());
+			result.setUploadStatus(UploadStatus.FAILED);
+			String out;
+			try {
+				out = EntityFactory.createJSONStringForEntity(result);
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getOutputStream().write(out.getBytes("UTF-8"));
+				response.getOutputStream().flush();
+			} catch (JSONObjectAdapterException e1) {
+				throw new RuntimeException(e1);
+			}
 			return;
 		}
-
-	}
+	}	
 	
 	/**
 	 * Get the session token

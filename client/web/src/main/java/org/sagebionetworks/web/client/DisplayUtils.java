@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.web.client.place.Home;
@@ -78,7 +79,15 @@ public class DisplayUtils {
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
 	public static final String ETAG_KEY = "etag";
-		
+	
+	/**
+	 * Sometimes we are forced to use a table to center an image in a fixed space. 
+	 * This is the third option from: http://stackoverflow.com/questions/388180/how-to-make-an-image-center-vertically-horizontally-inside-a-bigger-div
+	 * It should only be used when the first two options are not an option.
+	 * Place your image between the start and end.
+	 */
+	public static final String IMAGE_CENTERING_TABLE_START = "<table width=\"100%\" height=\"100%\" align=\"center\" valign=\"center\"><tr><td>";
+	public static final String IMAGE_CENTERING_TABLE_END = "</td></tr></table>";
 	
 	/*
 	 * Style names
@@ -585,6 +594,21 @@ public class DisplayUtils {
 			builder.append(fileName);
 		}
 		return builder.toString();
+	}
+	
+	/**
+	 * Does this entity have attachmet previews?
+	 * @param entity
+	 * @return
+	 */
+	public static boolean hasAttachmentPreviews(Entity entity){
+		if(entity == null) return false;
+		if(entity.getAttachments() == null) return false;
+		if(entity.getAttachments().size() < 1) return false;
+		for(AttachmentData data: entity.getAttachments()){
+			if(data.getPreviewId() != null) return true;
+		}
+		return false;
 	}
 
 

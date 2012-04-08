@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
+import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
@@ -33,7 +34,7 @@ import com.extjs.gxt.ui.client.widget.layout.FormData;
  * 
  */
 public class AddAttachmentDialog {
-
+	
 	public interface Callback {
 		/**
 		 * When the user selects save this will be called.
@@ -116,6 +117,12 @@ public class AddAttachmentDialog {
 			public void handleEvent(FormEvent event) {
 				loading.hide();
 				dialog.hide();
+				if(event != null){
+					if(event.getResultHtml() != null){
+						String results = event.getResultHtml();
+						MessageBox.alert("Upload", results, null);
+					}
+				}
 				// Let the caller know we are done.
 				callback.onSaveAttachment();
 			}
