@@ -5,6 +5,21 @@
 
 
 <web-app>
+	<!-- this filter redirects http to https 
+	
+	<filter>
+		<filter-name>sslFilter</filter-name>
+		<filter-class>org.sagebionetworks.web.server.servlet.filter.SSLFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>sslFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+      -->
+      
+
+
 	<!-- This filter allows us to use Guice for dependency injection in the 
 		server side servlets -->
 
@@ -36,6 +51,9 @@
 		</user-data-constraint>
 	</security-constraint>
  --> 
+ 
+ 
+ 
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>Portal.html</welcome-file>
