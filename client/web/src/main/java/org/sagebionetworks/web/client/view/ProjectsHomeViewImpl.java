@@ -16,6 +16,7 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -60,6 +61,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
 		headerWidget.refresh();
+		Window.scrollTo(0, 0); // scroll user to top of page
 		
 		addCreateProject();		
 	}

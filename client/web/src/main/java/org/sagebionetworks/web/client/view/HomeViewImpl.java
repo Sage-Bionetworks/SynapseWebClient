@@ -18,6 +18,7 @@ import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -93,6 +94,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+		Window.scrollTo(0, 0); // scroll user to top of page		
 	}
 
 	@Override

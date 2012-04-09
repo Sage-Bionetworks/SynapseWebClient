@@ -26,6 +26,7 @@ import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -87,6 +88,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
 		headerWidget.refresh();				
+		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	
 	@Override

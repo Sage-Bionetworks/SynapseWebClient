@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,6 +54,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
 		headerWidget.refresh();
+		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
 	@Override
