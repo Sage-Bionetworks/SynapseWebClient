@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
@@ -42,7 +41,6 @@ import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Padding;
-import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -62,17 +60,16 @@ import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.google.gwt.cell.client.widget.PreviewDisclosurePanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -498,7 +495,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    menu.add(item);  
 	    showRstudio.setMenu(menu);  
 	  
-	    showRstudio.setHeight(36);
+	    showRstudio.setHeight(36);	  
 	    if(!presenter.isLoggedIn()) {
 	    	showRstudio.disable();
 	    	showRstudio.setText("&nbsp;&nbsp;Please Login to Load in RStudio");
@@ -514,14 +511,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				String url = presenter.getRstudioUrl();
 				if(url == null) {
 					showRStudioUrlEdit();
-				} else {				
-				    Frame iframe = new Frame();
-				    iframe.setHeight("500px");
-				    iframe.setWidth("100%");
-				    lc.remove(showRstudio);
-				    lc.remove(label);
-				    lc.add(iframe);
-					lc.layout(true);
+				} else {			
+					Window.open(url, "_blank", "");
 				}
 			}
 		});	    
@@ -703,6 +694,5 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				}
 			}
 		});
-	}
-
+	}	
 }
