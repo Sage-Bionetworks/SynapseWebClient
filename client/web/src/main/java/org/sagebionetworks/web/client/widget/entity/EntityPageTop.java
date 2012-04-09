@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -34,7 +33,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityPageTopView view;
 	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
-	private PlaceChanger placeChanger;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
@@ -64,10 +62,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		view.setPresenter(this);
 	}	
-
-    public void setPlaceChanger(PlaceChanger placeChanger) {
-    	this.placeChanger = placeChanger;
-    }
 
     public void setBundle(EntityBundle bundle) {
     	this.bundle = bundle;
@@ -118,11 +112,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return view.asWidget();
 	}
 	
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return globalApplicationState.getPlaceChanger();
-	}
-
 	@Override
 	public void refresh() {
 		// TODO : tell consumer to refresh?

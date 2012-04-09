@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -19,8 +18,6 @@ public interface LocationableUploaderView extends IsWidget, SynapseWidgetView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
-		PlaceChanger getPlaceChanger();
 
 		String getUploadActionUrl();
 

@@ -20,7 +20,6 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		
 	private BCCOverview place;
 	private BCCOverviewView view;
-	private PlaceChanger placeChanger;
 	private AuthenticationController authenticationController;
 	private BCCSignupAsync bccSignup;
 	
@@ -29,7 +28,6 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		this.bccSignup=bccSignup;
 		this.authenticationController = authenticationController;
 		this.view = view;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
 
 		view.setPresenter(this);
 	}
@@ -44,11 +42,6 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.showOverView();
-	}
-
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
 	}
 
 	@Override

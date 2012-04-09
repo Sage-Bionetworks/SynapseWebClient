@@ -19,7 +19,5 @@ public interface LocationableDownloaderView extends IsWidget, SynapseWidgetView 
 	 */
 	public interface Presenter {
 
-		PlaceChanger getPlaceChanger();
-
 	}
 }

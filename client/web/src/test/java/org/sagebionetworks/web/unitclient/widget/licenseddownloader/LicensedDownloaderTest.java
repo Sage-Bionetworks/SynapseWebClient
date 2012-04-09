@@ -28,7 +28,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -81,6 +80,7 @@ public class LicensedDownloaderTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		jsonObjectAdapterProvider = new JSONObjectAdapterImpl();
 		mockStringCallback = mock(AsyncCallback.class);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 
 
 		// create entity type provider
@@ -92,8 +92,6 @@ public class LicensedDownloaderTest {
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
 				jsonObjectAdapterProvider);
 		
-		
-		licensedDownloader.setPlaceChanger(mockPlaceChanger);
 		verify(mockView).setPresenter(licensedDownloader);
 		
 		
@@ -272,19 +270,25 @@ public class LicensedDownloaderTest {
 		reset(mockPlaceChanger);
 		reset(mockStringCallback);
 		jsonObjectAdapterProvider = new JSONObjectAdapterImpl();
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}	
 
 	private void configureTestLoadMocks() throws Exception {
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
 		AsyncMockStubber.callSuccessWith(StudyEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
 		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class)); 				}
+		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+	}
+	
 
 	private void configureTestFindEulaIdMocks() throws Exception {
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
 		AsyncMockStubber.callSuccessWith(StudyEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
 		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class)); 				
+		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+
 	}
 	
 	

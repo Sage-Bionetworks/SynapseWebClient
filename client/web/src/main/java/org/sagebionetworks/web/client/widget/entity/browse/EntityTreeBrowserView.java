@@ -41,8 +41,6 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseWidgetView {
 	 */
 	public interface Presenter {
 
-		PlaceChanger getPlaceChanger();
-
 		void getFolderChildren(String entityId, AsyncCallback<List<EntityHeader>> asyncCallback);
 
 		void setSelection(String id);

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -50,7 +51,7 @@ public class QueryTableFactoryPresenter {
 	}
 
 	// can go into presenter class
-	public void getTableColumns(EntityType entityType, final PlaceChanger placeChanger, final AsyncCallback<List<HeaderData>> callback) {
+	public void getTableColumns(EntityType entityType, final GlobalApplicationState globalApplicationState, final AsyncCallback<List<HeaderData>> callback) {
 		// super simple params just to get columns
 		SearchParameters searchParams = new SearchParameters(null, entityType, null, 1, 1, null, false);
 		searchService.executeSearch(searchParams, new AsyncCallback<TableResults>() {			
@@ -66,7 +67,7 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 				callback.onFailure(caught);			
 			}
 		});

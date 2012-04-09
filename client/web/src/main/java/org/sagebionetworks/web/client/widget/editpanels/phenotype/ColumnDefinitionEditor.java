@@ -42,13 +42,6 @@ public class ColumnDefinitionEditor implements ColumnDefinitionEditorView.Presen
    		view.setPresenter(this);
         return view.asWidget();
     }
-
-	@Override
-	public void setPlaceChanger(PlaceChanger placeChanger) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	
 	@Override
 	public void removeColumn(String columnName) {

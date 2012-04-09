@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.RowData;
@@ -58,24 +58,27 @@ public class QueryServiceTable implements QueryServiceTableView.Presenter {
 	private ListStore<BaseModelData> store;	
 	private PagingLoadResult<BaseModelData> loadResultData;
 	private AuthenticationController authenticationController;
+	private GlobalApplicationState globalApplicationState;
 	
 	
 	@Inject
-	public QueryServiceTable() {		
+	public QueryServiceTable(GlobalApplicationState globalApplicationState) {
+		this.globalApplicationState = globalApplicationState;
 	}
 		
-	public QueryServiceTable(QueryServiceTableResourceProvider provider, ObjectType type, boolean usePager, PlaceChanger placeChanger) {
-		this(provider, type, null, usePager, DEFAULT_WIDTH, DEFAULT_HEIGHT, placeChanger);
+	public QueryServiceTable(QueryServiceTableResourceProvider provider, ObjectType type, boolean usePager, GlobalApplicationState globalApplicationState) {
+		this(provider, type, null, usePager, DEFAULT_WIDTH, DEFAULT_HEIGHT, globalApplicationState);
 	}
 	
-	public QueryServiceTable(QueryServiceTableResourceProvider provider, ObjectType type, boolean usePager, int width, int height, PlaceChanger placeChanger) {
-		this(provider, type, null, usePager, width, height, placeChanger);
+	public QueryServiceTable(QueryServiceTableResourceProvider provider, ObjectType type, boolean usePager, int width, int height, GlobalApplicationState globalApplicationState) {
+		this(provider, type, null, usePager, width, height, globalApplicationState);
 	}
 	
-	public QueryServiceTable(QueryServiceTableResourceProvider provider, ObjectType type, String tableTitle, boolean usePager, int width, int height, final PlaceChanger placeChanger){
+	public QueryServiceTable(QueryServiceTableResourceProvider provider, ObjectType type, String tableTitle, boolean usePager, int width, int height, final GlobalApplicationState globalApplicationState){
 		this.view = provider.getView();
 		this.searchService = provider.getService();
 		this.authenticationController = provider.getAuthenticationController();
+		this.globalApplicationState = globalApplicationState;
 
 		this.view.setPresenter(this);		
 		this.view.setTitle(tableTitle);
@@ -105,10 +108,8 @@ public class QueryServiceTable implements QueryServiceTableView.Presenter {
         			
         			@Override
         			public void onFailure(Throwable caught) {
-        				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+        				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
         					view.showMessage("An error occured. Please try reloading the page.");
-//        				view.showMessage(caught.getMessage());
-//        				DisplayUtils.logger.log(Level.SEVERE, caught.getMessage());        				
         				}
         				callback.onFailure(caught);
         			}

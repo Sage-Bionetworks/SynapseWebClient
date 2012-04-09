@@ -14,6 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SearchService;
 import org.sagebionetworks.web.client.SearchServiceAsync;
@@ -41,6 +42,7 @@ public class QueryServiceTableTest {
 	QueryServiceTableView mockView;
 	PlaceChanger mockPlaceChanger;
 	AuthenticationController mockAuthenticationController;
+	GlobalApplicationState mockGlobalApplicationState;
 	
 	@Before
 	public void setup(){
@@ -48,8 +50,11 @@ public class QueryServiceTableTest {
 		// Create the mock service
 		mockSearchService = Mockito.mock(SearchService.class);
 		mockView = Mockito.mock(QueryServiceTableView.class);
+		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = Mockito.mock(PlaceChanger.class);
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
+		
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		
 		// Create the asynchronous service recorder
 		recorder = new AsyncServiceRecorder<SearchService, SearchServiceAsync>(mockSearchService, SearchServiceAsync.class);
@@ -58,7 +63,7 @@ public class QueryServiceTableTest {
 		// Using a stub cookie provider
 		// Create the presenter
 		QueryServiceTableResourceProvider queryServiceTableResourceProvider = new QueryServiceTableResourceProvider(mockView, asynchProxy, mockAuthenticationController);		
-		presenter = new QueryServiceTable(queryServiceTableResourceProvider, ObjectType.dataset, true, mockPlaceChanger);		
+		presenter = new QueryServiceTable(queryServiceTableResourceProvider, ObjectType.dataset, true, mockGlobalApplicationState);		
 		
 		// Make sure the view gets the presenter set
 		verify(mockView).setPresenter(presenter);

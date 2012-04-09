@@ -16,8 +16,6 @@ public interface EntityView extends IsWidget, SynapseView {
 		
 	public interface Presenter {
 
-		PlaceChanger getPlaceChanger();
-
 		/**
 		 * refreshes the entity from the service and redraws the view
 		 */

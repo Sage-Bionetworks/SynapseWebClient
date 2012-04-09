@@ -8,7 +8,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.ontology.Enumeration;
 import org.sagebionetworks.web.client.ontology.EnumerationTerm;
 import org.sagebionetworks.web.client.ontology.NcboOntologyTerm;
@@ -46,24 +46,25 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
     private NodeType nodetype;
     private String nodeId;
     private JSONObject originalAnnotationObject;
-    private PlaceChanger placeChanger;
     private NodeModelCreator nodeModelCreator;
     private StaticEnumerations staticEnumerations;
     private List<FormField> formFields;
     private AuthenticationController authenticationController;
+    private GlobalApplicationState globalApplicationState;
  
     @Inject
-    public AnnotationEditor(AnnotationEditorView view, NodeServiceAsync service, NodeModelCreator nodeModelCreator, StaticEnumerations staticEnumerations, AuthenticationController authenticationController) {
+	public AnnotationEditor(AnnotationEditorView view,
+			NodeServiceAsync service, NodeModelCreator nodeModelCreator,
+			StaticEnumerations staticEnumerations,
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState) {
         this.view = view;
 		this.service = service;
 		this.nodeModelCreator = nodeModelCreator;
 		this.staticEnumerations = staticEnumerations;
 		this.authenticationController = authenticationController;
+		this.globalApplicationState = globalApplicationState;
         view.setPresenter(this);
-    }
-
-    public void setPlaceChanger(PlaceChanger placeChanger) {
-    	this.placeChanger = placeChanger;
     }
     
     public void setResource(final NodeType type, final String id) {
@@ -107,7 +108,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage("Unable to load form. Please reload the page and try again.");
 				}
 			}
@@ -209,7 +210,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 				if(operation == PersistOperation.CREATE) {
 					view.showAddAnnotationFail("An error occured creating the new Annotation.");
 				} else if (operation == PersistOperation.DELETE) {
@@ -243,7 +244,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage("Unable to load form. Please reload the page and try again.");
 				}
 			}

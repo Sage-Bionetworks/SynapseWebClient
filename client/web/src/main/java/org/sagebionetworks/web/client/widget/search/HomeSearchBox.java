@@ -29,7 +29,6 @@ import com.google.inject.Inject;
 public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidgetPresenter {
 	
 	private HomeSearchBoxView view;
-	private PlaceChanger placeChanger;
 	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -68,15 +67,6 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 		view.clear();
 	}
     
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return globalApplicationState.getPlaceChanger();
-	}
-
-	@Override
-	public void setPlaceChanger(PlaceChanger placeChanger) {
-	}
-
 	@Override
 	public void search(String value) {		
 		globalApplicationState.getPlaceChanger().goTo(new Search(value));

@@ -390,12 +390,12 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	private void addQueryTable(final EntityType child,
 			final TabItem tab, final ContentPanel loading) {
 		// add query table
-		queryTableFactory.createColumnModel(child, presenter.getPlaceChanger(), new AsyncCallback<ColumnModel>() {
+		queryTableFactory.createColumnModel(child, new AsyncCallback<ColumnModel>() {
 			@Override
 			public void onSuccess(ColumnModel cm) {					   		        
 				// limit view to just this entity's children
  				final List<WhereCondition> where = presenter.getProjectContentsWhereContidions();
-				ContentPanel cp = queryTableFactory.createGridPanel(child, cm, where, presenter.getPlaceChanger(), null);
+				ContentPanel cp = queryTableFactory.createGridPanel(child, cm, where, null);
 		        if(cp != null && cp.getElement() != null) {
 		        	cp.setHeight(tabPanelHeight-25);
 		        	cp.setHeaderVisible(false);

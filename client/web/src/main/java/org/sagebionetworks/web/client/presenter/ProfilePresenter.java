@@ -5,7 +5,6 @@ import java.util.Date;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -16,11 +15,9 @@ import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.users.UserData;
 
-import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -32,8 +29,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		
 	private Profile place;
 	private ProfileView view;
-	private PlaceController placeController;
-	private PlaceChanger placeChanger;
 	private AuthenticationController authenticationController;
 	private UserAccountServiceAsync userService;
 	private LinkedInServiceAsync linkedInService;
@@ -41,13 +36,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private CookieProvider cookieProvider;
 	
 	@Inject
-	public ProfilePresenter(ProfileView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, LinkedInServiceAsync linkedInService, GlobalApplicationState globalApplicationState, CookieProvider cookieProvider) {
+	public ProfilePresenter(ProfileView view,
+			AuthenticationController authenticationController,
+			UserAccountServiceAsync userService,
+			LinkedInServiceAsync linkedInService,
+			GlobalApplicationState globalApplicationState,
+			CookieProvider cookieProvider) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.linkedInService = linkedInService;
 		this.globalApplicationState = globalApplicationState;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
 		this.cookieProvider = cookieProvider;
 		
 		view.setPresenter(this);
@@ -68,11 +67,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.view.setPresenter(this);
 		this.view.clear();
 		showView(place);
-	}
-
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
 	}
 
 	@Override
@@ -107,7 +101,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		} else {
 			view.passwordChangeFailed();
 			view.showInfo("Error","Reset Password failed. Please Login Again.");
-			placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}
 	}
 
@@ -131,7 +125,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		} else {	
 			view.requestPasswordEmailFailed();
 			view.showInfo("Error", "Please Login Again.");
-			placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}		
 	}
 
@@ -199,7 +193,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	@Override
 	public void goTo(Place place) {
-		placeChanger.goTo(place);
+		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
 	/**

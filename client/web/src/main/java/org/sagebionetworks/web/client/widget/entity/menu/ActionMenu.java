@@ -1,13 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.BatchResults;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
@@ -17,7 +13,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -42,7 +37,6 @@ import com.google.inject.Inject;
 public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresenter {
 	
 	private ActionMenuView view;
-	private PlaceChanger placeChanger;
 	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -96,16 +90,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	public Widget asWidget() {
 		return null;
 	}
-
-    public void setPlaceChanger(PlaceChanger placeChanger) {
-    	this.placeChanger = placeChanger;
-    }
     
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
-	}
-	
 	@Override
 	public void fireEntityUpdatedEvent() {
 		handlerManager.fireEvent(new EntityUpdatedEvent());
@@ -138,7 +123,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
 				}
 			}

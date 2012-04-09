@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_REFERENCEDBY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 
 import java.util.ArrayList;
@@ -12,7 +9,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -48,7 +44,6 @@ import com.google.inject.Inject;
 public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private EntityTreeBrowserView view;
-	private PlaceChanger placeChanger;
 	private NodeServiceAsync nodeService;
 	private SearchServiceAsync searchService;
 	private NodeModelCreator nodeModelCreator;
@@ -114,16 +109,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
     
 	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
-	}
-
-	@Override
-	public void setPlaceChanger(PlaceChanger placeChanger) {
-		this.placeChanger = placeChanger;
-	}
-
-	@Override
 	public void getFolderChildren(String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();		
 		
@@ -145,7 +130,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());				
+					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());				
 					asyncCallback.onFailure(caught);
 				}
 			});					
@@ -254,7 +239,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
 				}
-				placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+				globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			}			
 		});		
 	}

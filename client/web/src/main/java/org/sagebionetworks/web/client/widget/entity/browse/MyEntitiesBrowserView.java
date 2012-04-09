@@ -27,8 +27,6 @@ public interface MyEntitiesBrowserView extends IsWidget, SynapseWidgetView {
 	 */
 	public interface Presenter {
 
-		PlaceChanger getPlaceChanger();
-
 		void entitySelected(String selectedEntityId);
 
 		public void loadUserUpdateable();

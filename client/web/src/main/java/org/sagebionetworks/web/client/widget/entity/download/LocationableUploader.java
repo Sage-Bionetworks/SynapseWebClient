@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -23,7 +22,6 @@ import com.google.inject.Inject;
 public class LocationableUploader implements LocationableUploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable {
 	
 	private LocationableUploaderView view;
-	private PlaceChanger placeChanger;
 	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -60,15 +58,6 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	@Override
 	public Widget asWidget() {
 		return null;
-	}
-
-    public void setPlaceChanger(PlaceChanger placeChanger) {
-    	this.placeChanger = placeChanger;
-    }
-    
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
 	}
 
 	@Override

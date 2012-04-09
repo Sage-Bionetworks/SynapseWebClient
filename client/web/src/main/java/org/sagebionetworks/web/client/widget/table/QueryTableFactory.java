@@ -6,14 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
 import org.sagebionetworks.web.client.view.table.DateColumn;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.HeaderData;
-import org.sagebionetworks.web.shared.QueryConstants.ObjectType;
 import org.sagebionetworks.web.shared.WhereCondition;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -44,18 +43,23 @@ public class QueryTableFactory {
 	private SearchServiceAsync searchService;	
 	private AuthenticationController authenticationController;
 	private ColumnFactory columnFactory;
+	private GlobalApplicationState globalApplicationState;
 	
 	@Inject
-	public QueryTableFactory(SearchServiceAsync searchService, AuthenticationController authenticationController, ColumnFactory columnFactory) {
+	public QueryTableFactory(SearchServiceAsync searchService,
+			AuthenticationController authenticationController,
+			ColumnFactory columnFactory,
+			GlobalApplicationState globalApplicationState) {
 		this.searchService = searchService;
 		this.authenticationController = authenticationController;
 		this.columnFactory = columnFactory;
+		this.globalApplicationState = globalApplicationState;
 	}
 				
-	public void createColumnModel(EntityType entityType, final PlaceChanger placeChanger, final AsyncCallback<ColumnModel> callback) {
+	public void createColumnModel(EntityType entityType, final AsyncCallback<ColumnModel> callback) {
 		QueryTableFactoryPresenter presenter = new QueryTableFactoryPresenter(searchService, authenticationController, columnFactory);
 		
-		presenter.getTableColumns(entityType, placeChanger, new AsyncCallback<List<HeaderData>>() {
+		presenter.getTableColumns(entityType, globalApplicationState, new AsyncCallback<List<HeaderData>>() {
 			@Override
 			public void onSuccess(List<HeaderData> list) {				
 				// create columns
@@ -85,7 +89,7 @@ public class QueryTableFactory {
 	
 	public ContentPanel createGridPanel(final EntityType entityType,
 			ColumnModel cm, final List<WhereCondition> where,
-			final PlaceChanger placeChanger, Integer paginationLimit) {
+			Integer paginationLimit) {
 		if (cm == null || cm.getColumns() == null
 				|| cm.getColumns().size() <= 0) {
 			return null;
@@ -96,7 +100,7 @@ public class QueryTableFactory {
         RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
             @Override
             public void load(Object loadConfig, final AsyncCallback<PagingLoadResult<BaseModelData>> callback) {
-            	presenter.loadData(entityType, loadConfig, where, placeChanger, callback);
+            	presenter.loadData(entityType, loadConfig, where, globalApplicationState.getPlaceChanger(), callback);
             }
         };
 		

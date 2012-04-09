@@ -33,8 +33,6 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 	public interface Presenter {
 
 		void fireEntityUpdatedEvent();
-
-		PlaceChanger getPlaceChanger();
 		
 		/**
 		 * Called when the edit button is pushed.

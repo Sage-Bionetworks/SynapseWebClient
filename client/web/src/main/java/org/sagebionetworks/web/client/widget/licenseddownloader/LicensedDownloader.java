@@ -30,10 +30,10 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	private LicensedDownloaderView view;
 	private AuthenticationController authenticationController;
-	private PlaceChanger placeChanger;
 
 	private boolean requireLicenseAcceptance;
-	private AsyncCallback<Void> licenseAcceptedCallback;	
+	private AsyncCallback<Void> licenseAcceptedCallback;
+	private GlobalApplicationState globalApplicationState;
 	
 	@Inject
 	public LicensedDownloader(LicensedDownloaderView view,
@@ -42,7 +42,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);		
 	}
 
@@ -110,13 +110,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			}
 		}
 	}
-			
-	// TODO : this is not needed
-	@Override
-	public void setPlaceChanger(PlaceChanger placeChanger) {
-		this.placeChanger = placeChanger;		
-	}	
-	
+				
 	private void setDownloadUnavailable() {
 		this.view.setDownloadUrls(null);
 		// TODO : more?
@@ -127,9 +121,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			return true;
 		} else {
 			view.showInfo("Login Required", "Please Login to download data.");
-			if(placeChanger != null) {
-				placeChanger.goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
-			}
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
 		}
 		return false;
 	}

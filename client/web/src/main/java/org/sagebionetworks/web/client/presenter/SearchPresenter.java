@@ -115,11 +115,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	}
 
 	@Override
-	public PlaceChanger getPlaceChanger() {
-		return globalApplicationState.getPlaceChanger();
-	}
-
-	@Override
     public String mayStop() {
         view.clear();
         return null;
