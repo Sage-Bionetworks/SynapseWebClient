@@ -59,6 +59,7 @@ public class LookupViewImpl extends Composite implements LookupView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
 		headerWidget.refresh();				
+		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	
 	@Override

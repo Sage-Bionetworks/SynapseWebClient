@@ -72,6 +72,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
+		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	
 	@Override

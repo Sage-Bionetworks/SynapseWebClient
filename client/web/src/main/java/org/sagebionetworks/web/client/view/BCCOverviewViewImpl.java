@@ -63,6 +63,7 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		headerWidget.refresh();	
+		Window.scrollTo(0, 0); // scroll user to top of page
 
 	}
 
