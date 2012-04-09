@@ -114,7 +114,9 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		tabPanel = new TabPanel();
 		tabPanel.setLayoutData(new FitLayout());
 		tabPanel.setPlain(true);
-		tabPanel.setAutoWidth(true);		
+		tabPanel.setAutoWidth(true);
+		tabPanel.setAnimScroll(true);  
+		tabPanel.setTabScroll(true);  
 		// determine tabPanel height
 		final LocationData location = presenter.getMediaLocationData();
 		if(location != null && location.getPath() != null) {
