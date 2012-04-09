@@ -57,7 +57,8 @@ public class QueryServiceTable implements QueryServiceTableView.Presenter {
 	private BasePagingLoader<PagingLoadResult<ModelData>> loader;
 	private ListStore<BaseModelData> store;	
 	private PagingLoadResult<BaseModelData> loadResultData;
-	private AuthenticationController authenticationController; 
+	private AuthenticationController authenticationController;
+	
 	
 	@Inject
 	public QueryServiceTable() {		
@@ -93,13 +94,7 @@ public class QueryServiceTable implements QueryServiceTableView.Presenter {
         			@Override
         			public void onSuccess(TableResults result) {
         				if(result.getException() != null) {
-        					if(!DisplayUtils.handleServiceException(result.getException(), placeChanger, authenticationController.getLoggedInUser())) {
-        						// alert user
-        						onFailure(null);        					
-        					} else {
-        						// if the user has already been alerted, just call the callback
-        						callback.onFailure(null);
-        					}
+    						onFailure(null);        					
         					return;
         				}
         				setTableResults(result, callback);
@@ -110,9 +105,11 @@ public class QueryServiceTable implements QueryServiceTableView.Presenter {
         			
         			@Override
         			public void onFailure(Throwable caught) {
-        				view.showMessage("An error occured. Please try reloading the page.");
+        				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+        					view.showMessage("An error occured. Please try reloading the page.");
 //        				view.showMessage(caught.getMessage());
 //        				DisplayUtils.logger.log(Level.SEVERE, caught.getMessage());        				
+        				}
         				callback.onFailure(caught);
         			}
         		});

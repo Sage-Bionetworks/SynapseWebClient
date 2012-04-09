@@ -283,9 +283,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 					try {
 						currentResult = nodeModelCreator.createEntity(result, SearchResults.class);
 					} catch (RestServiceException e) {
-						if(!DisplayUtils.handleServiceException(e, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
-							onFailure(null);					
-						} 						
+						onFailure(null);					
 					}									
 					view.setSearchResults(currentResult, join(currentSearch.getQueryTerm(), " "), newQuery);
 					newQuery = false;
@@ -293,7 +291,9 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					}
 				}
 			});
 		} catch (JSONObjectAdapterException e) {

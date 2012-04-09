@@ -86,14 +86,14 @@ public class LookupPresenter extends AbstractActivity implements LookupView.Pres
 						view.showUnknownType(typeString, entityId);
 					}
 				} catch (RestServiceException ex) {
-					DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser());
 					onFailure(null);
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showLookupFailed(entityId);
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+				view.showLookupFailed(entityId);				
 			}
 		});
 	}

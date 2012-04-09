@@ -94,9 +94,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 						try {
 							nodeModelCreator.validate(result);
 						} catch (RestServiceException ex) {
-							if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
-								onFailure(null);							
-							}
+							onFailure(ex);
 							return;
 						}					
 						originalAcl = JSONParser.parseStrict(result).isObject();				
@@ -111,14 +109,18 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showErrorMessage("Sharing settings unavailable.");
+						if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {							
+							view.showErrorMessage("Sharing settings unavailable.");
+						}
 					}
 				});				
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("Unable to retrieve Users and Groups. Please try reloading the page.");
+				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {							
+					view.showErrorMessage("Unable to retrieve Users and Groups. Please try reloading the page.");
+				}
 			}					
 		});
 		return view.asWidget();
@@ -135,9 +137,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				try {
 					nodeModelCreator.validate(result);
 				} catch (RestServiceException ex) {
-					if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
-						onFailure(null);
-					}
+					onFailure(null);
 					return;
 				}	
 				view.showLoading();
@@ -145,7 +145,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
+				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+					view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
+				}
 			}
 		});
 	}
@@ -180,9 +182,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 					try {
 						nodeModelCreator.validate(result);
 					} catch (RestServiceException ex) {
-						if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
-							onFailure(null);
-						}
+						onFailure(null);
 						return;
 					}					
 					refresh();					
@@ -190,7 +190,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage("Addition failed. Please try again.");
+					if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+						view.showErrorMessage("Addition failed. Please try again.");
+					}
 				}
 			});
 		}
@@ -224,9 +226,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 						try {
 							nodeModelCreator.validate(result);
 						} catch (RestServiceException ex) {
-							if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
-								onFailure(null);							
-							}
+							onFailure(null);							
 							return;
 						}					
 						refresh();					
@@ -234,8 +234,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showErrorMessage("Change failed. Please try again.");
-						
+						if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+							view.showErrorMessage("Change failed. Please try again.");
+						}						
 					}	
 				});
 			} else {
@@ -273,9 +274,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 						try {
 							nodeModelCreator.validate(result);
 						} catch (RestServiceException ex) {
-							if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
-								onFailure(null);
-							}
+							onFailure(null);
 							return;
 						}					
 						refresh();					
@@ -283,7 +282,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showErrorMessage("Remove failed. Please try again.");						
+						if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {						
+							view.showErrorMessage("Remove failed. Please try again.");						
+						}
 					}	
 				});
 			} else {
@@ -302,9 +303,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				try {
 					nodeModelCreator.validate(result);
 				} catch (RestServiceException ex) {
-					if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
-						onFailure(null);
-					}
+					onFailure(null);
 					return;
 				}	
 				view.showLoading();
@@ -312,7 +311,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
+				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+					view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
+				}
 			}
 		});
 	}
@@ -329,9 +330,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				try {
 					nodeModelCreator.validate(result);
 				} catch (RestServiceException ex) {
-					if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
-						onFailure(null);
-					}
+					onFailure(null);
 					return;
 				}					
 				originalAcl = JSONParser.parseStrict(result).isObject();				
@@ -346,7 +345,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("Sharing settings unavailable.");
+				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+					view.showErrorMessage("Sharing settings unavailable.");
+				}
 			}
 		});				
 	}

@@ -85,9 +85,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 				try {
 					Annotations annotations = nodeModelCreator.initializeEntity(annotationJsonString, new Annotations());
 				} catch (RestServiceException ex) {
-					if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
-						onFailure(null);
-					}
+					onFailure(null);
 					return;
 				}
 								
@@ -109,7 +107,9 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("Unable to load form. Please reload the page and try again.");
+				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+					view.showErrorMessage("Unable to load form. Please reload the page and try again.");
+				}
 			}
 		});
     }
@@ -202,7 +202,6 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 						view.showPersistSuccess();
 					}
 				} catch (RestServiceException ex) {
-					DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser());
 					onFailure(null);					
 					return;
 				}				
@@ -210,6 +209,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
 				if(operation == PersistOperation.CREATE) {
 					view.showAddAnnotationFail("An error occured creating the new Annotation.");
 				} else if (operation == PersistOperation.DELETE) {
@@ -232,9 +232,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 				try {
 					Annotations annotations = nodeModelCreator.initializeEntity(annotationJsonString, new Annotations());
 				} catch (RestServiceException ex) {
-					if(!DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser())) {
-						onFailure(null);
-					}
+					onFailure(null);
 					return;
 				}
 
@@ -245,7 +243,9 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("Unable to load form. Please reload the page and try again.");
+				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+					view.showErrorMessage("Unable to load form. Please reload the page and try again.");
+				}
 			}
 		});
 	}
