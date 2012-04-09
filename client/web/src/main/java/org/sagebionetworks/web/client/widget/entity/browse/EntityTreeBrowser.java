@@ -245,16 +245,15 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 					bundle = nodeModelCreator.createEntityBundle(transport);										
 					entityEditor.editEntity(bundle, false);					
 				} catch (RestServiceException ex) {					
-					if(!DisplayUtils.handleServiceException(ex, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
-						onFailure(null);					
-					} 
-					placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+					onFailure(null);					
 				}				
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
+				}
 				placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			}			
 		});		

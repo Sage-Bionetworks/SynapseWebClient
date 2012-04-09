@@ -138,7 +138,9 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
+				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
+				}
 			}
 		});
 	}	

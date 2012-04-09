@@ -239,7 +239,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 									}
 								}
 							} catch (RestServiceException ex) {
-								DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser());
+								onFailure(ex);
 							}												
 							callSetLayerPreviewTable();
 						}
@@ -263,6 +263,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 
 			@Override
 			public void onFailure(Throwable caught) {
+				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
 				// continue
 				layerPreview = null;
 				view.setPreviewTable(null);

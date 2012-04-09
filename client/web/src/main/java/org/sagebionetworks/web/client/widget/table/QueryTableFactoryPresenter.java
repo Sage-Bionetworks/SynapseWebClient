@@ -57,7 +57,6 @@ public class QueryTableFactoryPresenter {
 			@Override
 			public void onSuccess(TableResults result) {
 				if(result.getException() != null) {
-					DisplayUtils.handleServiceException(result.getException(), placeChanger, authenticationController.getLoggedInUser());				
 					onFailure(null);        										
 					return;
 				}
@@ -67,7 +66,8 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
+				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
+				callback.onFailure(caught);			
 			}
 		});
 	}
@@ -81,13 +81,7 @@ public class QueryTableFactoryPresenter {
 			@Override
 			public void onSuccess(TableResults result) {
 				if(result.getException() != null) {
-					if(!DisplayUtils.handleServiceException(result.getException(), placeChanger, authenticationController.getLoggedInUser())) {
-						// alert user
-						onFailure(null);        					
-					} else {
-						// if the user has already been alerted, just call the callback
-						callback.onFailure(null);
-					}
+					onFailure(null);        					
 					return;
 				}
 				setTableResults(context, result, callback);        				        			        				
@@ -96,6 +90,7 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
 				callback.onFailure(caught);
 			}
 		});
