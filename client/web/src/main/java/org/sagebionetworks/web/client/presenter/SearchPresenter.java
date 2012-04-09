@@ -266,8 +266,17 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		return query;
 	}
 	
-	private void executeSearch() {
+	private void executeSearch() { 						
 		view.showLoading();
+		// Is there a search defined? If not, display empty result.
+		if (isEmptyQuery()) {
+			currentResult = new SearchResults();
+			currentResult.setFound(new Long(0));
+			view.setSearchResults(currentResult, "", newQuery);
+			newQuery = false;
+			return;
+		}
+		
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		try {
 			currentSearch.writeToJSONObject(adapter);
@@ -294,6 +303,12 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 		}
+	}
+
+	private boolean isEmptyQuery() {
+		return (currentSearch.getQueryTerm() == null || currentSearch.getQueryTerm().size() == 0 
+				|| (currentSearch.getQueryTerm().size() == 1 && "".equals(currentSearch.getQueryTerm().get(0))))
+				&& (currentSearch.getBooleanQuery() == null || currentSearch.getBooleanQuery().size() == 0);
 	}
 
 
