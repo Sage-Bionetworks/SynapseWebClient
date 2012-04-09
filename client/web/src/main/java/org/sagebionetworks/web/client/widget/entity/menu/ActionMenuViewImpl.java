@@ -192,7 +192,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				final Window window = new Window();  
-				window.setSize(550, 440);
+				window.setSize(550, 465);
 				window.setPlain(true);
 				window.setModal(true);
 				window.setBlinkModal(true);
