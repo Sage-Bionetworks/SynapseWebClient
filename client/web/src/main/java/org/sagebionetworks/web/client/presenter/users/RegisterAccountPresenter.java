@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.presenter.users;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -22,18 +21,18 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	private RegisterAccount place;
 	private RegisterAccountView view;
 	private CookieProvider cookieProvider;
-	private PlaceChanger placeChanger;
 	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
 	
 	@Inject
-	public RegisterAccountPresenter(RegisterAccountView view, CookieProvider cookieProvider, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState){
+	public RegisterAccountPresenter(RegisterAccountView view,
+			CookieProvider cookieProvider, UserAccountServiceAsync userService,
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		// Set the presenter on the view
 		this.cookieProvider = cookieProvider;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
 
 		view.setPresenter(this);
 	}
@@ -46,7 +45,7 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 
 	@Override
 	public void goTo(Place place) {
-		placeChanger.goTo(place);
+		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
 	public void setPlace(RegisterAccount place) {

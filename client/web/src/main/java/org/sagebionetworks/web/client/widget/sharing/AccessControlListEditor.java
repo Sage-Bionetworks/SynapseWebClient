@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
@@ -19,7 +19,6 @@ import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 import org.sagebionetworks.web.shared.users.UserData;
 
-import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
@@ -45,24 +44,26 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private String nodeId;
 	private JSONObject originalAcl;
 	private List<AclPrincipal> principals;
-	private PlaceChanger placeChanger;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
+	private GlobalApplicationState globalApplicationState;
 	private Entity entity;
 	
 	@Inject
-	public AccessControlListEditor(AccessControlListEditorView view, NodeServiceAsync nodeService, UserAccountServiceAsync userAccountService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController) {
+	public AccessControlListEditor(AccessControlListEditorView view,
+			NodeServiceAsync nodeService,
+			UserAccountServiceAsync userAccountService,
+			NodeModelCreator nodeModelCreator,
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.nodeService = nodeService;
 		this.userAccountService = userAccountService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 	}	
-
-    public void setPlaceChanger(PlaceChanger placeChanger) {
-    	this.placeChanger = placeChanger;
-    }
 	
     /**
      * Use Entity based setResource instead
@@ -109,7 +110,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {							
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {							
 							view.showErrorMessage("Sharing settings unavailable.");
 						}
 					}
@@ -118,7 +119,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {							
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {							
 					view.showErrorMessage("Unable to retrieve Users and Groups. Please try reloading the page.");
 				}
 			}					
@@ -145,7 +146,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
 				}
 			}
@@ -190,7 +191,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 						view.showErrorMessage("Addition failed. Please try again.");
 					}
 				}
@@ -234,7 +235,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 					@Override
 					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 							view.showErrorMessage("Change failed. Please try again.");
 						}						
 					}	
@@ -282,7 +283,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 					@Override
 					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {						
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {						
 							view.showErrorMessage("Remove failed. Please try again.");						
 						}
 					}	
@@ -311,7 +312,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
 				}
 			}
@@ -345,7 +346,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage("Sharing settings unavailable.");
 				}
 			}

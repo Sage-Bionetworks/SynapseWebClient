@@ -185,7 +185,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	}
 	
 	private void configureShareButton(Entity entity) {		
-		accessControlListEditor.setPlaceChanger(presenter.getPlaceChanger());
 		accessControlListEditor.setResource(entity);
 		shareButton.removeAllListeners();		
 		shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {

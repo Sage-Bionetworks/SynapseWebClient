@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -17,7 +16,6 @@ public interface ProjectsHomeView extends IsWidget, SynapseView {
 
 		void createProject(String name);
 		
-		PlaceChanger getPlaceChanger();
 	}
 
 }

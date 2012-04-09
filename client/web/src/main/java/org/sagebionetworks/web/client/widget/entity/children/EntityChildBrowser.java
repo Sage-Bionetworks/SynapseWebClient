@@ -12,13 +12,11 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.HasPreviews;
 import org.sagebionetworks.repo.model.LayerTypeNames;
-import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -43,7 +41,6 @@ import com.google.inject.Inject;
 public class EntityChildBrowser implements EntityChildBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private EntityChildBrowserView view;
-	private PlaceChanger placeChanger;
 	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
 	private SearchServiceAsync searchService;
@@ -107,15 +104,6 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	@Override
 	public Widget asWidget() {
 		return null;
-	}
-
-    public void setPlaceChanger(PlaceChanger placeChanger) {
-    	this.placeChanger = placeChanger;
-    }
-    
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
 	}
 		
 	@SuppressWarnings("unchecked")
@@ -189,7 +177,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 						}					
 					}
 				} catch (RestServiceException ex) {
-					DisplayUtils.handleServiceException(ex, placeChanger, authenticationController.getLoggedInUser());
+					DisplayUtils.handleServiceException(ex, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 					onFailure(null);					
 					return;
 				}				
@@ -263,7 +251,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 				// continue
 				layerPreview = null;
 				view.setPreviewTable(null);
@@ -304,7 +292,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());				
+					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());				
 					callback.onFailure(caught);
 				}
 			});					

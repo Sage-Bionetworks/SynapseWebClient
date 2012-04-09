@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 
@@ -14,7 +13,6 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		
 	private ComingSoon place;
 	private ComingSoonView view;
-	private PlaceChanger placeChanger;
 	private GlobalApplicationState globalApplicationState;
 
 	
@@ -22,7 +20,6 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 	public ComingSoonPresenter(ComingSoonView view, GlobalApplicationState globalApplicationState){
 		this.globalApplicationState = globalApplicationState;
 		this.view = view;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
 
 		view.setPresenter(this);
 	}
@@ -36,11 +33,6 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 	public void setPlace(ComingSoon place) {
 		this.place = place;
 		this.view.setPresenter(this);
-	}
-
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
 	}
 
 	@Override

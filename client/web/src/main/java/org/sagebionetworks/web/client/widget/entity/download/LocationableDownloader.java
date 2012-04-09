@@ -15,7 +15,6 @@ import com.google.inject.Inject;
 public class LocationableDownloader implements LocationableDownloaderView.Presenter, SynapseWidgetPresenter {
 	
 	private LocationableDownloaderView view;
-	private PlaceChanger placeChanger;
 	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -39,33 +38,6 @@ public class LocationableDownloader implements LocationableDownloaderView.Presen
 		return this.view.asWidget();
 	}
 	
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
@@ -79,15 +51,6 @@ public class LocationableDownloader implements LocationableDownloaderView.Presen
 		return null;
 	}
 
-    public void setPlaceChanger(PlaceChanger placeChanger) {
-    	this.placeChanger = placeChanger;
-    }
-    
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
-	}
-		
 	/*
 	 * Private Methods
 	 */

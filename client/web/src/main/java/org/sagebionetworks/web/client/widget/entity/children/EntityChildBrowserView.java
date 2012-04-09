@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.WhereCondition;
 
+import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -44,8 +45,6 @@ public interface EntityChildBrowserView extends IsWidget, SynapseWidgetView {
 	public interface Presenter {
 
 		void refresh();
-
-		PlaceChanger getPlaceChanger();
 
 		List<WhereCondition> getProjectContentsWhereContidions();
 

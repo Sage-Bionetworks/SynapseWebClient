@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
@@ -32,7 +31,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		
 	private Synapse place;
 	private EntityView view;
-	private PlaceChanger placeChanger;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private NodeServiceAsync nodeService;
@@ -51,7 +49,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.nodeService = nodeService;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
 	
 		view.setPresenter(this);
 	}
@@ -70,11 +67,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.entityId = place.toToken();
 		
 		refresh();
-	}
-
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
 	}
 
 	@Override
@@ -106,16 +98,16 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					view.setEntityBundle(bundle);					
 				} catch (RestServiceException ex) {					
 					onFailure(null);					
-					placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+					globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
 				}				
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
 				}
-				placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+				globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			}			
 		});
 

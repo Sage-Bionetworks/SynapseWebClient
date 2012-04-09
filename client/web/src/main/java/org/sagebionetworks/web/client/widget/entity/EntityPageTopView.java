@@ -32,8 +32,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	 */
 	public interface Presenter {
 
-		PlaceChanger getPlaceChanger();
-
 		void refresh();
 				
 		void fireEntityUpdatedEvent();

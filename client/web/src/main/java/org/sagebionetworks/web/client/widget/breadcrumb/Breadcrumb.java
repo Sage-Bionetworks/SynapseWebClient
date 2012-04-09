@@ -87,10 +87,6 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 	}
 
 	@Override
-	public void setPlaceChanger(PlaceChanger placeChanger) {
-	}
-
-	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}

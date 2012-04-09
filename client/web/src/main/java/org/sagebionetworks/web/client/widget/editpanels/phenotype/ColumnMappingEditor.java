@@ -43,12 +43,6 @@ public class ColumnMappingEditor implements ColumnMappingEditorView.Presenter, S
         return view.asWidget();
     }
 
-	@Override
-	public void setPlaceChanger(PlaceChanger placeChanger) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public void setHeight(int height) {
 		view.setHeight(height);
 	}

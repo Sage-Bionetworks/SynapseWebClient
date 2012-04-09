@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.presenter;
 import org.sagebionetworks.repo.ServiceConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -17,7 +16,6 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -27,7 +25,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private LoginPlace loginPlace;
 	private LoginView view;
 	private EventBus bus;
-	private PlaceChanger placeChanger;
 	private AuthenticationController authenticationController;
 	private UserAccountServiceAsync userService;
 	private String openIdActionUrl;
@@ -40,7 +37,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
 
 		view.setPresenter(this);
 	} 
@@ -109,7 +105,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						new AcceptTermsOfUseCallback() {
 							public void accepted() {
 								view.acceptTermsOfUse();
-								placeChanger.goTo(new LoginPlace("0"));
+								globalApplicationState.getPlaceChanger().goTo(new LoginPlace("0"));
 							} 
 						});			
 				}
@@ -168,20 +164,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	}
 
 	@Override
-	public void goTo(Place place) {
-		placeChanger.goTo(place);
-	}
-
-	@Override
     public String mayStop() {
         view.clear();
         return null;
     }
-
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
-	}
 
 	
 	/*
@@ -192,6 +178,11 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			forwardPlace = new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
 		}
 		bus.fireEvent( new PlaceChangeEvent(forwardPlace));
+	}
+
+	@Override
+	public void goTo(Place place) {
+		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
 }

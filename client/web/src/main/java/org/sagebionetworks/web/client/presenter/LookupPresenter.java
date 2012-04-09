@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Lookup;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -16,7 +15,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -24,8 +22,7 @@ import com.google.inject.Inject;
 public class LookupPresenter extends AbstractActivity implements LookupView.Presenter {
 		
 	private Lookup place;
-	private LookupView view;
-	private PlaceChanger placeChanger;
+	private LookupView view;	
 	private GlobalApplicationState globalApplicationState;
 	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
@@ -41,7 +38,6 @@ public class LookupPresenter extends AbstractActivity implements LookupView.Pres
 		this.nodeService = nodeService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
 		
 		view.setPresenter(this);		
 	}
@@ -61,10 +57,6 @@ public class LookupPresenter extends AbstractActivity implements LookupView.Pres
 		doLookupEntity(entityId);
 	}
 
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
-	}
 
 	/**
 	 * looks up the entity via id and forwards the user to it
@@ -107,9 +99,7 @@ public class LookupPresenter extends AbstractActivity implements LookupView.Pres
 		view.showForwarding();
 		Place place = new Synapse(id);
 		view.doneLooking();
-		if(placeChanger != null) {
-			placeChanger.goTo(place);
-		}
+		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
 	@Override

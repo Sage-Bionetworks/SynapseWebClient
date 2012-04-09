@@ -21,7 +21,6 @@ public class PhenotypeEditor implements PhenotypeEditorView.Presenter, SynapseWi
 	private PhenotypeEditorView view;
 	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
-    private PlaceChanger placeChanger;
     private StaticEnumerations staticOntologies;
     private AuthenticationController authenticationController;
     private ColumnDefinitionEditor columnDefinitionEditor;
@@ -46,10 +45,6 @@ public class PhenotypeEditor implements PhenotypeEditorView.Presenter, SynapseWi
         view.setPresenter(this);		
 	}
 	
-    public void setPlaceChanger(PlaceChanger placeChanger) {
-    	this.placeChanger = placeChanger;
-    }
-
     public void setLayerId(String layerId) {
    		view.showLoading();
     	this.layerId = layerId;

@@ -7,7 +7,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -15,11 +14,9 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -28,8 +25,6 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 		
 	private ProjectsHome place;
 	private ProjectsHomeView view;
-	private PlaceController placeController;
-	private PlaceChanger placeChanger;
 	private GlobalApplicationState globalApplicationState;
 	private NodeServiceAsync nodeService;
 	private JSONObjectAdapter jsonObjectAdapter;
@@ -46,7 +41,6 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 			SynapseClientAsync synapseClient, AutoGenFactory entityFactory) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
 		this.nodeService = nodeService;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.nodeModelCreator = nodeModelCreator;
@@ -66,11 +60,6 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 	public void setPlace(ProjectsHome place) {
 		this.place = place;
 		view.setPresenter(this);
-	}
-
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
 	}
 
 	@Override
@@ -96,7 +85,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser())) {					
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
 						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 					} 
 				}

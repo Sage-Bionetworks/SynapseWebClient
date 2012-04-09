@@ -23,8 +23,6 @@ public interface SearchBoxView extends IsWidget, SynapseWidgetView {
 	 */
 	public interface Presenter {
 
-		PlaceChanger getPlaceChanger();
-
 		void search(String value);
 		
 	}

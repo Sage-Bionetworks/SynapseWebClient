@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Lookup;
 import org.sagebionetworks.web.client.presenter.LookupPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -34,6 +35,7 @@ public class LookupPresenterTest {
 	NodeServiceAsync mockNodeService;
 	NodeModelCreator mockNodeModelCreator;
 	AuthenticationController mockAuthenticationController;
+	PlaceChanger mockPlaceChanger;
 	
 	@Before
 	public void setup(){
@@ -42,7 +44,10 @@ public class LookupPresenterTest {
 		mockNodeService = mock(NodeServiceAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
+		mockPlaceChanger = mock(PlaceChanger.class);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 
+		
 		lookupPresenter = new LookupPresenter(mockView, mockGlobalApplicationState, mockNodeService, mockNodeModelCreator, mockAuthenticationController);
 		
 		verify(mockView).setPresenter(lookupPresenter);
@@ -103,5 +108,6 @@ public class LookupPresenterTest {
 		reset(mockNodeService);
 		reset(mockNodeModelCreator);
 		reset(mockAuthenticationController);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
 }

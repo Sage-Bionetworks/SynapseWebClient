@@ -44,8 +44,6 @@ public interface SearchView extends IsWidget, SynapseView {
 		
 		List<String> getFacetDisplayOrder(); 
 		
-		PlaceChanger getPlaceChanger();
-
 		void setStart(int newStart);
 
 		String getDisplayForTimeFacet(String facetName, String facetValue);

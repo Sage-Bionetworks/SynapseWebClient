@@ -15,11 +15,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntitySelectedHandler;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -38,7 +35,6 @@ import com.google.inject.Inject;
 public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private MyEntitiesBrowserView view;
-	private PlaceChanger placeChanger;
 	private NodeServiceAsync nodeService;
 	private SearchServiceAsync searchService;
 	private NodeModelCreator nodeModelCreator;
@@ -178,16 +174,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		
 		return query;
 	}
-	
-    public void setPlaceChanger(PlaceChanger placeChanger) {
-    	this.placeChanger = placeChanger;
-    }
-    
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
-	}
-	
+		
 	/**
 	 * Define custom handling for when an entity is clicked
 	 * @param handler
@@ -223,7 +210,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());				
+					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());				
 				}
 			});
 		}

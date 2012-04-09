@@ -3,21 +3,17 @@ package org.sagebionetworks.web.client.presenter.users;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -26,7 +22,6 @@ import com.google.inject.Inject;
 @SuppressWarnings("unused")
 public class PasswordResetPresenter extends AbstractActivity implements PasswordResetView.Presenter {
 	
-	private PlaceChanger placeChanger;
 	private PasswordReset place;	
 	private PasswordResetView view;
 	private CookieProvider cookieProvider;
@@ -46,7 +41,6 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		// Set the presenter on the view
 		this.cookieProvider = cookieProvider;
 		this.globalApplicationState = globalApplicationState;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
 		
 		view.setPresenter(this);
 	}
@@ -115,7 +109,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 				public void onSuccess(Void result) {				
 					view.showPasswordResetSuccess();
 					view.showInfo("Your password has been reset."); 
-					placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)); // redirect to home page
+					globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)); // redirect to home page
 				}
 				
 				@Override

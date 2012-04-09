@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
@@ -22,7 +21,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private Home place;
 	private HomeView view;
 	private GlobalApplicationState globalApplicationState;
-	private PlaceChanger placeChanger;
 	private CookieProvider cookieProvider;
 	private AuthenticationController authenticationController;
 	private StackConfigServiceAsync stackConfigService;
@@ -38,7 +36,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		this.cookieProvider = cookieProvider;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.placeChanger = globalApplicationState.getPlaceChanger();
 		this.stackConfigService = stackConfigService;
 		this.view.setPresenter(this);
 	}
@@ -69,11 +66,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
         view.clear();
         return null;
     }
-
-	@Override
-	public PlaceChanger getPlaceChanger() {
-		return placeChanger;
-	}
 
 	@Override
 	public boolean showMyProjects() {
