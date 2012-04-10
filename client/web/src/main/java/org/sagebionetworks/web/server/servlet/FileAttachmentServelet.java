@@ -21,16 +21,14 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.sagebionetworks.client.Synapse;
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
-import org.sagebionetworks.repo.model.attachment.S3AttachmentToken;
+import org.sagebionetworks.repo.model.attachment.URLStatus;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.utils.MD5ChecksumHelper;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.inject.Inject;
@@ -44,6 +42,9 @@ import com.google.inject.Inject;
 public class FileAttachmentServelet extends HttpServlet {
 
 	public static final int MAX_TIME_OUT = 10 * 1000;
+	public static final long BYTES_PER_MEGABYTE = 1048576;
+	public static final long MAX_ATTACHMENT_MEGABYTES = 10;
+	public static final long MAX_ATTACHMENT_SIZE_IN_BYTES = MAX_ATTACHMENT_MEGABYTES*BYTES_PER_MEGABYTE; // 10 MB
 	private static Logger logger = Logger.getLogger(FileUpload.class.getName());
 	private static final long serialVersionUID = 1L;
 
@@ -94,14 +95,20 @@ public class FileAttachmentServelet extends HttpServlet {
 		Synapse client = createNewClient(token);
 		String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
 		String tokenId = request.getParameter(DisplayUtils.TOKEN_ID_PARAM_KEY);
-		String fileName = request.getParameter(DisplayUtils.FILE_NAME_PARAM_KEY);
+		String waitString = request.getParameter(DisplayUtils.WAIT_FOR_URL);
+		boolean wait=false;
+		if(waitString != null){
+			wait = Boolean.parseBoolean(waitString);
+		}
 		try {
-			PresignedUrl url = client.getAttachmentPresignedUrl(entityId, tokenId);
-			// Redirect the user to the url
-			if(fileName != null){
-				// Tell the browser the name of the file.
-				response.setHeader("Content-Disposition", "attachment; filename="+fileName);
+			PresignedUrl url = null;
+			// Do we wait?
+			if(wait){
+				url = client.waitForPreviewToBeCreated(entityId, tokenId, MAX_TIME_OUT);
+			}else{
+				url = client.createAttachmentPresignedUrl(entityId, tokenId);
 			}
+			// Redirect the user to the url
 			response.sendRedirect(url.getPresignedUrl());
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -144,12 +151,16 @@ public class FileAttachmentServelet extends HttpServlet {
 				String name = item.getFieldName();
 				InputStream stream = item.openStream();
 				String fileName = item.getName();
-
 				File temp = writeToTempFile(stream);
-				// Now upload the file
-				AttachmentData data = client.uploadAttachmentToSynapse(entityId, temp, fileName);
-				// If this had a preview then wait for it
-				list.add(data);
+				try{
+					// Now upload the file
+					AttachmentData data = client.uploadAttachmentToSynapse(entityId, temp, fileName);
+					// If this had a preview then wait for it
+					list.add(data);
+				}finally{
+					// Unconditionally delete the tmp file
+					temp.delete();
+				}
 			}
 			// Now add all of the attachments to the entity.
 			Entity e = client.getEntityById(entityId);
@@ -160,12 +171,6 @@ public class FileAttachmentServelet extends HttpServlet {
 			e.getAttachments().addAll(list);
 			// Save the changes.
 			client.putEntity(e);
-			// Wait for the previews to be read
-			for(AttachmentData data: list){
-				if(data.getPreviewId() != null){
-					client.waitForPreviewToBeCreated(entityId, data.getPreviewId(), MAX_TIME_OUT);
-				}
-			}
 			UploadResult result = new UploadResult();
 			result.setMessage("File upload successfully");
 			result.setUploadStatus(UploadStatus.SUCCESS);
@@ -242,15 +247,24 @@ public class FileAttachmentServelet extends HttpServlet {
 	 */
 	public File writeToTempFile(InputStream stream) throws IOException {
 		File temp = File.createTempFile("tempUploadedFile", ".tmp");
-		BufferedOutputStream out = new BufferedOutputStream(
-				new FileOutputStream(temp, false));
+		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp, false));
 		try {
+			long size = 0;
 			byte[] buffer = new byte[1024];
 			int length = 0;
 			while ((length = stream.read(buffer)) > 0) {
 				out.write(buffer, 0, length);
+				size += length;
+				if(size > MAX_ATTACHMENT_SIZE_IN_BYTES) throw new IllegalArgumentException("File size exceeds the limit of "+MAX_ATTACHMENT_MEGABYTES+" MB for attachments");
 			}
-		} finally {
+		} catch (Throwable e) {
+			// if is any errors delete the tmp file
+			if (out != null) {
+				out.close();
+			}
+			temp.delete();
+			throw new RuntimeException(e);
+		}finally {
 			if (out != null) {
 				out.close();
 			}

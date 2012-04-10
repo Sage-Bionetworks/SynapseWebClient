@@ -72,7 +72,7 @@ public class DisplayUtils {
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
-	public static final String FILE_NAME_PARAM_KEY = "fileName";
+	public static final String WAIT_FOR_URL = "waitForUrl";
 	public static final String ENTITY_CREATEDBY_KEY = "createdBy";
 	public static final String ENTITY_UPDATEDBY_KEY = "updatedBy";
 	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
@@ -589,10 +589,8 @@ public class DisplayUtils {
 		builder.append(entityId);
 		builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
-		if(fileName != null){
-			builder.append("&"+DisplayUtils.FILE_NAME_PARAM_KEY+"=");
-			builder.append(fileName);
-		}
+		builder.append("&"+DisplayUtils.WAIT_FOR_URL+"=true");
+		builder.append(fileName);
 		return builder.toString();
 	}
 	
