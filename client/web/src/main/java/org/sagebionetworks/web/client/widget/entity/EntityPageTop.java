@@ -84,7 +84,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     			}
     			@Override
     			public void onFailure(Throwable caught) {
-    				view.showErrorMessage(DisplayConstants.ERROR_USER_PROFILE_SAVE);
+    				// error retrieving user profile
+    				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());    					    				
     			}
     		});
 
