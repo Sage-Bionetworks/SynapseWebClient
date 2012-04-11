@@ -60,6 +60,26 @@ public class ServerConstants {
 	public static final String KEY_DEFAULT_LINK_COLS =  "org.sagebionetworks.all.link.default.columns";
 
 	/**
+	 * The property key used for the list of default step columns
+	 */
+	public static final String KEY_DEFAULT_EXPRESSIONDATA_COLS =  "org.sagebionetworks.all.expressiondata.default.columns";
+
+	/**
+	 * The property key used for the list of default step columns
+	 */
+	public static final String KEY_DEFAULT_GENOTYPEDATA_COLS =  "org.sagebionetworks.all.genotypedata.default.columns";
+
+	/**
+	 * The property key used for the list of default step columns
+	 */
+	public static final String KEY_DEFAULT_PHENOTYPEDATA_COLS =  "org.sagebionetworks.all.phenotypedata.default.columns";
+
+	/**
+	 * The property key used for the list of default step columns
+	 */
+	public static final String KEY_DEFAULT_ROBJECT_COLS =  "org.sagebionetworks.all.robject.default.columns";
+
+	/**
 	 * The property key that tell what column configuration xml file to be used.
 	 */
 	public static final String KEY_COLUMN_CONFIG_XML_FILE = "org.sagebionetworks.column.config.xml.resource";

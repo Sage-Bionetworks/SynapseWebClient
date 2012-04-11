@@ -239,6 +239,38 @@ public class ColumnConfigProvider {
 		defaultColumns.put(ObjectType.link.name(), keyList);
 	}
 	
+	@Inject
+	public void setDefaultExpressionDataColumns(@Named(ServerConstants.KEY_DEFAULT_EXPRESSIONDATA_COLS) String defaults) {
+		// convert from a string to a list
+		List<String> keyList = splitCommaSeparatedString(defaults);
+		// Add this list to the map
+		defaultColumns.put(ObjectType.expressiondata.name(), keyList);
+	}
+	
+	@Inject
+	public void setDefaultGenotypeDataColumns(@Named(ServerConstants.KEY_DEFAULT_GENOTYPEDATA_COLS) String defaults) {
+		// convert from a string to a list
+		List<String> keyList = splitCommaSeparatedString(defaults);
+		// Add this list to the map
+		defaultColumns.put(ObjectType.genotypedata.name(), keyList);
+	}
+	
+	@Inject
+	public void setDefaultPhenotypeDataColumns(@Named(ServerConstants.KEY_DEFAULT_PHENOTYPEDATA_COLS) String defaults) {
+		// convert from a string to a list
+		List<String> keyList = splitCommaSeparatedString(defaults);
+		// Add this list to the map
+		defaultColumns.put(ObjectType.phenotypedata.name(), keyList);
+	}
+	
+	@Inject
+	public void setDefaultRObjectColumns(@Named(ServerConstants.KEY_DEFAULT_ROBJECT_COLS) String defaults) {
+		// convert from a string to a list
+		List<String> keyList = splitCommaSeparatedString(defaults);
+		// Add this list to the map
+		defaultColumns.put(ObjectType.robject.name(), keyList);
+	}
+	
 	/**
 	 * Load the given filter enumeration xml file.
 	 * @param filterResource

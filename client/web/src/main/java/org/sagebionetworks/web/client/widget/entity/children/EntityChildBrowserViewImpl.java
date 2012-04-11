@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.children;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -197,43 +198,68 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 			final LocationData location) {
 		int numAdded=0;
 		List<EntityType> skipTypes = presenter.getContentsSkipTypes();
-		List<EntityType> children = entityType.getValidChildTypes();
+		List<EntityType> children = new ArrayList<EntityType>();
+		children.addAll(entityType.getValidChildTypes());
 		if(children != null && children.size() > 0) {
-			for(final EntityType child : children) {
-				if(skipTypes.contains(child)) continue; // skip some types
-					
-				final String childDisplay = entityTypeProvider.getEntityDispalyName(child);				
-				final TabItem tab = new TabItem(childDisplay);			
-				tab.addStyleName("pad-text");			
-				final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);
-				loading.setHeight(tabPanelHeight);		
-				tab.add(loading);
-				tab.addListener(Events.Render, new Listener<BaseEvent>() {
-					@Override
-					public void handleEvent(BaseEvent be) {
-						if("preview".equals(child.getName())) {									
-							// let presenter create preview info when data is loaded
-							previewTab = tab;
-							previewLoading = loading;
-							
-							// Synchronous previews						
-							if(location != null && location.getPath() != null) {
-								setMediaPreview(location);
-							}
-							
-						} else {
-							// loading is embedded into the query table widget
-							addQueryTable(child, tab, loading);							
-						}
-					}
-				});
-				tabPanel.add(tab);	
+			// fill map
+			Map<String,EntityType> classToTypeMap = new HashMap<String, EntityType>();
+			for(int i=0; i<children.size(); i++) {
+				EntityType child = children.get(i);
+				if(skipTypes.contains(child)) {
+					children.remove(child);
+					continue; // skip some types
+				}
+				classToTypeMap.put(child.getClassName(), child);
+			}
+			 
+			// add child tabs in order
+			for(String className : DisplayUtils.ENTITY_TYPE_DISPLAY_ORDER) {
+				if(classToTypeMap.containsKey(className)) {
+					EntityType child = classToTypeMap.get(className);
+					children.remove(child);
+					tabPanel.add(createChildTab(child, location));	
+					numAdded++;					
+				}
+			}
+
+			// add any remaining tabs that weren't covered by the display order
+			for(final EntityType child : children) {				
+				tabPanel.add(createChildTab(child, location));	
 				numAdded++;
 			}
 		}
 		return numAdded;
 	}
 
+	private TabItem createChildTab(final EntityType child, final LocationData location) {
+		final String childDisplay = entityTypeProvider.getEntityDispalyName(child);				
+		final TabItem tab = new TabItem(childDisplay);			
+		tab.addStyleName("pad-text");			
+		final ContentPanel loading = DisplayUtils.getLoadingWidget(sageImageBundle);
+		loading.setHeight(tabPanelHeight);		
+		tab.add(loading);
+		tab.addListener(Events.Render, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				if("preview".equals(child.getName())) {									
+					// let presenter create preview info when data is loaded
+					previewTab = tab;
+					previewLoading = loading;
+					
+					// Synchronous previews						
+					if(location != null && location.getPath() != null) {
+						setMediaPreview(location);
+					}
+					
+				} else {
+					// loading is embedded into the query table widget
+					addQueryTable(child, tab, loading);							
+				}
+			}
+		});
+		return tab;
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return this;

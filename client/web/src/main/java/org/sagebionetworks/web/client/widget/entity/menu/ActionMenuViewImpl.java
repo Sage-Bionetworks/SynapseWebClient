@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Link;
@@ -219,25 +222,31 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		int numAdded = 0;
 		
 		List<EntityType> children = entityType.getValidChildTypes();
+		List<EntityType> skipTypes = presenter.getAddSkipTypes();
 		if(children != null) {
-			// TODO : sort children?
-			List<EntityType> skipTypes = presenter.getAddSkipTypes();
-			for(final EntityType childType : children) {
-				if(skipTypes.contains(childType)) continue; // skip some types
-				
-				String displayName = typeProvider.getEntityDispalyName(childType);			
-				item = new MenuItem(displayName);				
-				item.setIcon(AbstractImagePrototype.create(DisplayUtils
-						.getSynapseIconForEntityType(childType, IconSize.PX16,
-								iconsImageBundle)));				
-				item.addSelectionListener(new SelectionListener<MenuEvent>() {
-					public void componentSelected(MenuEvent menuEvent) {
-						presenter.addNewChild(childType, entity.getId());
-					}
-				});
-				menu.add(item);
-				numAdded++;
+			// fill map
+			Map<String,EntityType> classToTypeMap = new HashMap<String, EntityType>();
+			for(EntityType child : children) {
+				if(skipTypes.contains(child)) continue; // skip some types				
+				classToTypeMap.put(child.getClassName(), child);
 			}
+			 
+			// add child tabs in order
+			for(String className : DisplayUtils.ENTITY_TYPE_DISPLAY_ORDER) {
+				if(classToTypeMap.containsKey(className)) {
+					EntityType child = classToTypeMap.get(className);
+					classToTypeMap.remove(className);
+					menu.add(createAddMenuItem(child, entity));
+					numAdded++;
+				}
+			}
+
+			// add any remaining tabs that weren't covered by the display order
+			for(String className : classToTypeMap.keySet()) {
+				EntityType child = classToTypeMap.get(className);
+				menu.add(createAddMenuItem(child, entity));
+				numAdded++;
+			}							
 		}
 			
 		if(numAdded==0) {
@@ -246,6 +255,20 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		addButton.setMenu(menu);
 	}
 
+	private MenuItem createAddMenuItem(final EntityType childType, final Entity entity) {
+		String displayName = typeProvider.getEntityDispalyName(childType);			
+		MenuItem item = new MenuItem(displayName);				
+		item.setIcon(AbstractImagePrototype.create(DisplayUtils
+				.getSynapseIconForEntityType(childType, IconSize.PX16,
+						iconsImageBundle)));				
+		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+			public void componentSelected(MenuEvent menuEvent) {
+				presenter.addNewChild(childType, entity.getId());
+			}
+		});
+		return item;
+	}
+	
 	private void configureToolsMenu(Entity entity, EntityType entityType, boolean isAdministrator, boolean canEdit) {				
 		// create drop down menu
 		Menu menu = new Menu();

@@ -13,9 +13,14 @@ import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.Project;import org.sagebionetworks.repo.model.Step;
+import org.sagebionetworks.repo.model.PhenotypeData;
+import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.RObject;
+import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -114,7 +119,14 @@ public class DisplayUtils {
 					SEARCH_KEY_DISEASE, SEARCH_KEY_MODIFIED_ON,
 					SEARCH_KEY_CREATED_ON, SEARCH_KEY_TISSUE,
 					SEARCH_KEY_NUM_SAMPLES, SEARCH_KEY_CREATED_BY });
-	public static final String UPLOAD_SUCCESS = "Upload Success";	
+	public static final String UPLOAD_SUCCESS = "Upload Success";
+	
+	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
+			Study.class.getName(), Data.class.getName(), Code.class.getName(), 
+			Link.class.getName(), Analysis.class.getName(),
+			Step.class.getName(), RObject.class.getName(),
+			PhenotypeData.class.getName(), ExpressionData.class.getName(),
+			GenotypeData.class.getName() };
 	
 	public static SearchQuery getDefaultSearchQuery() {		
 		SearchQuery query = new SearchQuery();
@@ -125,8 +137,6 @@ public class DisplayUtils {
 		
 		return query;
 	}
-
-
 	
 	/**
 	 * Returns a properly aligned icon from an ImageResource
@@ -478,7 +488,10 @@ public class DisplayUtils {
 			// Code
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseCode16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseCode24();			
-		} else if(Data.class.getName().equals(className)) {
+		} else if(Data.class.getName().equals(className) ||
+				ExpressionData.class.getName().equals(className) ||
+				GenotypeData.class.getName().equals(className) ||
+				PhenotypeData.class.getName().equals(className)) {
 			// Data
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseData24();			
@@ -494,6 +507,10 @@ public class DisplayUtils {
 			// Project
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseProject16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseProject24();			
+		} else if(RObject.class.getName().equals(className)) {
+			// RObject
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseRObject16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseRObject24();			
 		} else if(Step.class.getName().equals(className)) {
 			// Step
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStep16();
