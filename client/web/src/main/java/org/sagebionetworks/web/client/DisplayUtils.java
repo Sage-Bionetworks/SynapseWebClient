@@ -128,6 +128,7 @@ public class DisplayUtils {
 			PhenotypeData.class.getName(), ExpressionData.class.getName(),
 			GenotypeData.class.getName() };
 	
+	
 	public static SearchQuery getDefaultSearchQuery() {		
 		SearchQuery query = new SearchQuery();
 		// start with a blank, valid query
@@ -520,9 +521,9 @@ public class DisplayUtils {
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStudy16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStudy24();			
 		} else {
-			// default to folder
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();			
+			// default to Model
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseModel24();			
 		}
 		return icon;
 	}

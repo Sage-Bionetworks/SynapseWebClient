@@ -1,182 +1,162 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
-		
-	<ui:style>	
-	</ui:style>	
+ 	
+ 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
+ 
+	<ui:style>		
+	</ui:style>
 	<g:HTMLPanel>
-	<!-- MAIN CONTAINER -->
+		<!-- MAIN CONTAINER -->
 		<!-- HEADER -->
-        <div class="color-line"></div>
-        <div class="clear"></div>
-    	<div class="container">
- 		
-			<g:SimplePanel ui:field="header" />
-	        
-            <!-- MAIN CONTENT -->
-	  		<div class="slogan">
-                <div class="span-24">
-                	<div class="span-18 notopmargin">
-                    	<h1>Welcome to <a class="link" href="#Home:0">SYNAPSE</a></h1>
-                		<p>Synapse is an online community built for a new biology... more open, more collaborative, more data-driven, and more reproducible.</p>
-                    </div>
-                </div>                
-            </div>
-			<div class="span-24 inner-6 view">
-				<g:SimplePanel ui:field="bigSearchBox" />
-			</div>            
-<!-- 
-        <div class="span-24 separator"></div>
-			<div class="span-24">
-                <div id="ca-container" class="ca-container">
-                	<div class="ca-wrapper home">
-                  		<div class="ca-item ca-item-1">
-                            <div class="ca-item-main">
-                                <div class="new-item"></div>
-                                <div class="logo">
-                                    <img src="images/ca-item-1.png" title="Logo" alt="Logo" />
-                                </div>
-                                <div class="title">
-                                    <h3>Premium HTML Template</h3>
-                                    <p>I am happy to announce a new HTML template. Flexible and beautiful template which could be suitable for almost all kinds of business.</p>
-                                </div>
-                                <a href="#" class="ca-more"></a>
-                            </div>
-                        </div>
-                  		<div class="ca-item ca-item-2">
-                            <div class="ca-item-main">
-                                <div class="featured"></div>
-                                <div class="logo">
-                                    <img src="images/ca-item-2.png" title="Logo" alt="Logo" />
-                                </div>
-                                <div class="title">
-                                    <h3>Premium HTML Template</h3>
-                                    <p>Premium xHTML/CSS Template uses a great deal of white space, combined with a light background to create an clean feel to this site.</p>
-                                </div>
-                                <a href="#" class="ca-more"></a>
-                            </div>
-                        </div>
-                  		<div class="ca-item ca-item-3 last">
-                            <div class="ca-item-main">
-                                <div class="featured"></div>
-                                <div class="logo">
-                                    <img src="images/ca-item-3.png" title="Logo" alt="Logo" />
-                                </div>
-                                <div class="title">
-                                    <h3>Premium HTML Template</h3>
-                                    <p>This HTML template with a minimal, clean and elegant design well suited for personal and proffesional use.</p>
-                                </div>
-                                <a href="#" class="ca-more"></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-			</div>	        
- -->	        
-	        
-	        <div class="span-24 separator"></div>
-	        <div class="span-24 main-service">
-	        	<div class="span-24 notopmargin">
-	                <div class="span-12 notopmargin">
-	                	<h3>Development Update</h3>
-	                    <p>Synapse is currently in Alpha development.  This prototype has been developed to demonstrate our vision for the technology and solicit feedback from the community.  The ability to create accounts and download Sage-hosted data is operational now.  Some of the other functionality of the site is still under development.</p>
-	                </div>        
-	                <div class="span-12 notopmargin last">
-						<g:SimplePanel ui:field="myEntityOrRegister"/>	                    						
-	                </div>
-	        	</div>
-			</div>			
-        
-	        <div class="span-24 separator"></div>
-	        <div class="span-24 from_portfolio">
-	            <div class="span-24 notopmargin">
-	               	<h3>Projects in the Spotlight</h3>
-				</div>
-	            <div class="span-24 notopmargin">
+		<div class="color-line"></div>
+		<div class="clear"></div>
+		<div class="container">
 
-					<div>
-				    	<g:SimplePanel ui:field="bccSignup"/>	 
-                  	</div>		
-	                <div class="span-6 inner-6 view notopmargin">
-	                    <h5><a class="link" href="#Synapse:102610">Synapse Commons Repository</a></h5>
-	                    <p>The Synapse Commons Repository is the place to access publicly available data sets. To build this project we have developed a system to crawl repositories, like GEO, ArrayExpress, and TCGA, and to manage contributions from users.</p>
-	                	<a class="button_readmore"  href="#Synapse:102610"></a>
-	                </div>
-	                <div class="span-6 inner-6 view notopmargin">                    
-	                    <h5><a class="link" href="#Synapse:4492">Federation Aging Project</a></h5>
-	                    <p>The Federation Aging project is exploring the large effect of age on human gene expression by exploring a set of genes whose expression levels are tightly associated with age.</p>
-	                	<a class="button_readmore"  href="#Synapse:4492"></a>
-	                </div>
-	                <div class="span-6 inner-6 view last notopmargin">
-	                    <h5><a class="link" href="portfolio-details.html">Start Your Own Project!</a></h5>
-	                    <p>Get started using Synapse today by creating your own Project.</p>
-						<div class="mega-button">
-							<a href="#ProjectsHome:0">Start a Project</a>
-						</div>	                	
-	                </div>
-	            </div>
-	        </div>
-				
-	        <div class="span-24 separator"></div>
-			<div class="span-24 main-service">
-	           	<div class="span-12 notopmargin">
-	                   <h3>Synapse News</h3>                  
-	                   <p>What's happening on Synapse</p>
-	                   <div class="span-6 serv">                   	
-	                       <div class="icon-white-big left icon27-white"></div>
-	                       <h5 class="left"><a href="#ComingSoon:0" class="service-tipsy north link" title='by Brig Mecham'>New Normalization Analysis</a></h5>
-	                       <p class="clear small-italic"><strong>12-Apr-2011</strong>: A new analysis method for normalizing data was published by Brig Mecham.</p>                       
-	                   </div>
-	                   <div class="span-6 serv last">
-	                       <div class="icon-white-big left icon27-white"></div>
-	                       <h5 class="left"><a href="#ComingSoon:0" class="service-tipsy north link" title='Some text'>Schadt's New Diabetes Model </a></h5>
-	                       <p class="clear small-italic"><strong>08-Apr-2011</strong>: Eric Schadt and colleagues have published an article on a new model for diabetes.</p>
-	                   </div>
-	           	</div>
-	           	
-	  			<div class="span-12 notopmargin why last">
-	                   <h3>Top Synapse Contributors</h3>
-	                   <p>Synapse users who are actively contributing data</p>
-	                   <div class="span-12 last serv">
-		                   <g:Anchor ui:field="demoCharlesLink">
-		                       <div class="big-rounded-icon-white left">
-		                       	   <div class="icon-white-big">
-										<img src="static/images/people/charles.jpg"/>
-								   </div>
-		                       </div>
-		                       <h5>Charles Sawyers et al, MSKCC</h5>
-		                       <p class="notopmargin small-italic">DNA copy number, mRNA expression profiles, candidate gene resequencing, and clinical traits from 218 prostate tumors.</p>
-						   </g:Anchor>                       
-	                   </div>
-	                   <div class="span-12 last serv">
-	                       <div class="big-rounded-icon-white left margin15">
-	                           <div class="icon-white-big">
-	                           <img src="static/images/people/amanda.jpg"/>
-	                           </div>
-	                       </div>
-	                       <h5>Amanda Myers, University of Miami</h5>
-	                       <p class="notopmargin small-italic">Genotypes, mRNA expression profiles, and clinical traits from 176 Alzheimer disease and 188 non-diseased brain samples.</p>
-	                   </div>
-					<div class="span-12 last serv">
-	                       <div class="big-rounded-icon-white left margin15">
-	                           <div class="icon-white-big">
-	                           <img src="static/images/people/beatriz.jpg"/>
-	                           </div>
-	                       </div>
-	                       <h5>Beatriz Carvalho &amp; Gerrit Meijer, VUMC</h5>
-	                       <p class="small-italic">DNA copy number, mRNA expression, and tumor traits from 36 colorectal adenocarcinoma and 33 adenoma tumors.</p>
-	                   </div>
-	                   <p>&nbsp;</p>                   
-	                   <p><g:Anchor ui:field="seeAllContributors">See all contributors...</g:Anchor></p>
+			<g:SimplePanel ui:field="header" />
+
+			<!-- MAIN CONTENT -->
+			<div>				
+				<!-- SLOGAN -->
+				<div class="span-24 separator" style="margin-top: 20px"></div>
+				<div class="span-24" style="margin-top: 10px">
+					<div class="span-18 last" style="margin-top: 10px">
+						<h3>
+							Welcome to
+							<a class="link" href="#Home:0">SYNAPSE</a>
+						</h3>
+						<p>Synapse is an online community built for a new biology... more
+							open, more collaborative, more data-driven, and more
+							reproducible.</p>
 					</div>
 				</div>
-		
+				<div class="span-24 separator notopmargin" style="margin-bottom: 18px !important;"></div>
+
+				<!-- TOP COLUMN 1 -->
+				<div class="span-8 notopmargin">
+					<h4>How to Use Synapse</h4>
+					<div class="span-8 notopmargin">
+						<div class="span-8 notopmargin">
+							<div class="item">
+								<iframe width="300" height="169"
+									src="http://www.youtube.com/embed/34mWPKryfXE" frameborder="0"
+									allowfullscreen="true"></iframe>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<!-- TOP COLUMN 2 -->
+				<div class="span-8 notopmargin">
+					<h4>Top Features</h4>
+					<ul class="list check-list">
+						<li>Lorem ipsum dolor sit amet, consec tetur</li>
+						<li>Ut enim ad minim veniam, quis nostrud exercitation ullamco
+							laboris nisi</li>
+						<li>Sed do eiusmod tempor incididunt ut labore et dolore</li>
+						<li><g:Image resource='{icons.users16}'/> Work Publicly or <g:Image resource='{icons.lock16}'/> Work Privately</li>
+					</ul>
+				</div>
+				
+				<!-- TOP COLUMN 3 -->
+				<div class="span-8 notopmargin last">
+					<h4>We&apos;re in Beta</h4>
+					<p>Synapse is currently in Beta development. This site has been
+						developed to demonstrate our vision for the technology and solicit
+						feedback from the community. The ability to create accounts and
+						download Sage-hosted data is operational now.</p>
+					<p class="small-italic">
+						Interested in working with Sage to start a pilot project on
+						Synapse? Please let us know at
+						<a class="link" href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a>
+					</p>
+				</div>
+			</div>
+
+			<!-- SEARCH BOX -->
+			<div class="span-24">
+				<div class="span-24 slider-area-inner">
+					<g:SimplePanel ui:field="bigSearchBox" />
+				</div>
+			</div>
 			
-            <div class="clear"></div>
-        </div> <!-- close class="container" -->
+			<!-- START PROJECT & MY PROJECTS -->
+			<g:SimplePanel ui:field="projectPanel" />
+
+			<div class="span-24 separator"></div>
+			<div class="span-24 from_portfolio">
+				<div class="span-12 notopmargin">
+					<div class="span-12 notopmargin last">
+						<h3>Projects in the Spotlight</h3>
+					</div>
+					<div>
+						<g:SimplePanel ui:field="bccSignup" />
+					</div>
+					<div class="span-6 inner-6 view notopmargin last">
+						<h5>
+							<a class="link" href="#Synapse:102610">Synapse Commons Repository</a>
+						</h5>
+						<p>The Synapse Commons Repository is the place to access publicly
+							available data sets. To build this project we have developed a
+							system to crawl repositories, like GEO, ArrayExpress, and TCGA,
+							and
+							to manage contributions from users.</p>
+						<a class="button_readmore" href="#Synapse:102610"></a>
+					</div>					
+				</div>
+
+				<div class="span-12 notopmargin main-service last">
+					<div class="span-12 notopmargin why last">
+						<h3>Top Synapse Contributors</h3>
+						<p>Synapse users who are actively contributing data</p>
+						<div class="span-12 last serv">
+							<g:Anchor ui:field="demoCharlesLink">
+								<div class="big-rounded-icon-white left">
+									<div class="icon-white-big">
+										<img src="static/images/people/charles.jpg" />
+									</div>
+								</div>
+								<h5>Charles Sawyers et al, MSKCC</h5>
+								<p class="notopmargin small-italic">DNA copy number, mRNA expression profiles, candidate
+									gene resequencing, and clinical traits from 218 prostate
+									tumors.</p>
+							</g:Anchor>
+						</div>
+						<div class="span-12 last serv">
+							<div class="big-rounded-icon-white left margin15">
+								<div class="icon-white-big">
+									<img src="static/images/people/amanda.jpg" />
+								</div>
+							</div>
+							<h5>Amanda Myers, University of Miami</h5>
+							<p class="notopmargin small-italic">Genotypes, mRNA expression profiles, and clinical
+								traits
+								from 176 Alzheimer disease and 188 non-diseased brain
+								samples.</p>
+						</div>
+						<div class="span-12 last serv">
+							<div class="big-rounded-icon-white left margin15">
+								<div class="icon-white-big">
+									<img src="static/images/people/beatriz.jpg" />
+								</div>
+							</div>
+							<h5>Beatriz Carvalho &amp; Gerrit Meijer, VUMC</h5>
+							<p class="small-italic">DNA copy number, mRNA expression, and tumor traits
+								from
+								36 colorectal adenocarcinoma and 33 adenoma tumors.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="span-24 separator"></div>
+
+
+			<div class="clear"></div>
+		</div> <!-- close class="container" -->
 		<g:SimplePanel ui:field="footer" />
-		
+
 	</g:HTMLPanel>
 </ui:UiBinder> 

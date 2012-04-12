@@ -29,8 +29,7 @@
 				<div class="menu-left"></div>
 			</div>
 			<div class="span-24 notopmargin">
-				<div class="span-16 notopmargin">&nbsp;</div>
-				<div class="span-8 last notopmargin" style="text-align: right;">
+				<div class="push-16 span-8 last notopmargin" style="text-align: right;">
 					<g:SimplePanel ui:field="searchBoxPanel" />
 				</div>
 			</div>

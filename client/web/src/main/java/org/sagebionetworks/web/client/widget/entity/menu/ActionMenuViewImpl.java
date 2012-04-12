@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +124,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 
 		// add Button
 		if(addButton == null) {
-			addButton = new Button(DisplayConstants.BUTTON_ADD, AbstractImagePrototype.create(iconsImageBundle.addGrey16()));
+			addButton = new Button(DisplayConstants.BUTTON_ADD, AbstractImagePrototype.create(iconsImageBundle.add16()));
 			addButton.setHeight(25);
 			this.add(addButton);
 			this.add(new Html("&nbsp;"));

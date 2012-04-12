@@ -177,7 +177,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		if(forwardPlace == null) {
 			forwardPlace = new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
 		}
-		bus.fireEvent( new PlaceChangeEvent(forwardPlace));
+		bus.fireEvent(new PlaceChangeEvent(forwardPlace));
 	}
 
 	@Override
