@@ -153,11 +153,12 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 			if(transport.getEntityReferencedByJson() != null){
 				referencedBy =  new PaginatedResults<EntityHeader>(EntityHeader.class, factory);
 				referencedBy.initializeFromJSONObject(jsonObjectAdapter.createNew(transport.getEntityReferencedByJson()));
-			}
-			
-			
+			}			
 			// put it all together.
-			return new EntityBundle(entity, annotations, permissions, path, referencedBy);
+			EntityBundle eb =  new EntityBundle(entity, annotations, permissions, path, referencedBy);
+			// Set the child count when there.
+			eb.setChildCount(transport.getChildCount());
+			return eb;
 		}catch (JSONObjectAdapterException e){
 			throw new UnknownErrorException(e.getMessage());
 		}

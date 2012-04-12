@@ -177,7 +177,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    // Description
 	    colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);	    
 	    // Child Browser
-		colLeftContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), canEdit), widgetMargin);
+	    if(DisplayUtils.hasChildrenOrPreview(bundle)){
+			colLeftContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), canEdit), widgetMargin);
+	    }
 	    // Attachment preview is only added when there are previews.
 		if(DisplayUtils.hasAttachmentPreviews(bundle.getEntity())){
 			colLeftContainer.add(createAttachmentPreview(bundle.getEntity()), widgetMargin);

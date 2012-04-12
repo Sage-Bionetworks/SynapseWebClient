@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.CHILD_COUNT;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_REFERENCEDBY;
@@ -79,7 +80,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public void refresh() {
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ENTITY_REFERENCEDBY;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ENTITY_REFERENCEDBY | CHILD_COUNT;
 		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundleTransport>() {
 			@Override
 			public void onSuccess(EntityBundleTransport transport) {

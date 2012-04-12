@@ -21,6 +21,7 @@ public class EntityBundle {
 	private UserEntityPermissions permissions;
 	private EntityPath path;
 	private PaginatedResults<EntityHeader> referencedBy;
+	private Long childCount;
 	
 	public EntityBundle(Entity entity, Annotations annotations,
 			UserEntityPermissions permissions, EntityPath path, PaginatedResults<EntityHeader> referencedBy) {
@@ -46,16 +47,41 @@ public class EntityBundle {
 	public PaginatedResults<EntityHeader> getReferencedBy() {
 		return referencedBy;
 	}
+	
+	public Long getChildCount() {
+		return childCount;
+	}
+	public void setChildCount(Long childCount) {
+		this.childCount = childCount;
+	}
+	public void setEntity(Entity entity) {
+		this.entity = entity;
+	}
+	public void setAnnotations(Annotations annotations) {
+		this.annotations = annotations;
+	}
+	public void setPermissions(UserEntityPermissions permissions) {
+		this.permissions = permissions;
+	}
+	public void setPath(EntityPath path) {
+		this.path = path;
+	}
+	public void setReferencedBy(PaginatedResults<EntityHeader> referencedBy) {
+		this.referencedBy = referencedBy;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
 				+ ((annotations == null) ? 0 : annotations.hashCode());
+		result = prime * result + (int) (childCount ^ (childCount >>> 32));
 		result = prime * result + ((entity == null) ? 0 : entity.hashCode());
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
 		result = prime * result
 				+ ((permissions == null) ? 0 : permissions.hashCode());
+		result = prime * result
+				+ ((referencedBy == null) ? 0 : referencedBy.hashCode());
 		return result;
 	}
 	@Override
@@ -72,6 +98,8 @@ public class EntityBundle {
 				return false;
 		} else if (!annotations.equals(other.annotations))
 			return false;
+		if (childCount != other.childCount)
+			return false;
 		if (entity == null) {
 			if (other.entity != null)
 				return false;
@@ -87,13 +115,19 @@ public class EntityBundle {
 				return false;
 		} else if (!permissions.equals(other.permissions))
 			return false;
+		if (referencedBy == null) {
+			if (other.referencedBy != null)
+				return false;
+		} else if (!referencedBy.equals(other.referencedBy))
+			return false;
 		return true;
 	}
 	@Override
 	public String toString() {
 		return "EntityBundle [entity=" + entity + ", annotations="
 				+ annotations + ", permissions=" + permissions + ", path="
-				+ path + "]";
+				+ path + ", referencedBy=" + referencedBy + ", childCount="
+				+ childCount + "]";
 	}
 
 }
