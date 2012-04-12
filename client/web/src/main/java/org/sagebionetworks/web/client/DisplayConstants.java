@@ -208,6 +208,9 @@ public class DisplayConstants {
 	public static final String ERROR_USER_PROFILE_SAVE = "An error occurred saving to your user profile.";
 	public static final String LABEL_UPDATED = "Upated";
 	public static final String TEXT_USER_PROFILE_UPDATED = "Change save to your User Profile.";
+	public static final Object TEXT_NO_ATTACHMENTS = "No Attachments.";
+	public static final String ERROR_DELETING_ATTACHMENT = "An error occurred deleting the Attachment. Please try again.";
+	public static final String LABEL_DELETED = "deleted";
 		
 }
 

@@ -18,7 +18,7 @@ public interface HomeView extends IsWidget, SynapseView {
 	
 	public interface Presenter extends SynapsePresenter {
 
-		boolean showMyProjects();	
+		boolean showLoggedInDetails();	
 		
 		void showBCCSignup(AsyncCallback<String> callback);	
 		

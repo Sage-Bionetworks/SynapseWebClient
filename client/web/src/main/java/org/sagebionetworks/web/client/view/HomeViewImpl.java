@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.place.ComingSoon;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -14,8 +11,8 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 
 import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -38,20 +35,17 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField 
 	Anchor demoCharlesLink;
 	@UiField
-	Anchor seeAllContributors;
-	@UiField
 	SimplePanel bigSearchBox;
 	@UiField
-	SimplePanel myEntityOrRegister;
-	@UiField
 	SimplePanel bccSignup;
+	@UiField
+	SimplePanel projectPanel;
 	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
 	private GlobalApplicationState globalApplicationState;
-	private HomeSearchBox homeSearchBox;
-	private Html registerHtml;
+	private HomeSearchBox homeSearchBox;	
 	private MyEntitiesBrowser myEntitiesBrowser;
 	
 	@Inject
@@ -70,24 +64,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
-		seeAllContributors.addStyleName("bulleted");
-		if(DisplayConstants.showDemoHtml) {
-			demoCharlesLink.setHref("people_charles.html");
-			seeAllContributors.setHref("people.html");
-		} else {
-			demoCharlesLink.setHref("#" + globalApplicationState.getAppPlaceHistoryMapper().getToken(new ComingSoon(DisplayUtils.DEFAULT_PLACE_TOKEN)));
-			seeAllContributors.setHref("#" + globalApplicationState.getAppPlaceHistoryMapper().getToken(new ComingSoon(DisplayUtils.DEFAULT_PLACE_TOKEN)));
-		}
-
 		bigSearchBox.clear();
 		bigSearchBox.add(homeSearchBox.asWidget());
 
-		registerHtml = new Html("<h3>Call for ALPHA USERS</h3>" 
-		+ "<p>Are you interested in working with Sage to start a pilot project on Synapse?  Please let us know at <a class=\"link\" href=\"mailto:synapseInfo@sagebase.org\">synapseInfo@sagebase.org</a></p>"
-		+ "<div class=\"mega-button\">"
-		+ "	<a href=\"#RegisterAccount:0\">Create an Account</a>"
-		+ "</div>");		
-		
 	}
 
 
@@ -101,15 +80,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void refresh() {
 		headerWidget.refresh();
 		headerWidget.setSearchVisible(false);
-		myEntityOrRegister.clear();		
-		if(presenter.showMyProjects()) {
-			VerticalPanel vp = new VerticalPanel();
-			vp.add(new Html("<h3>My Projects</h3>"));
-			vp.add(myEntitiesBrowser.asWidget());
-			myEntityOrRegister.add(vp);
-		} else {
-			myEntityOrRegister.add(registerHtml);
-		}
+		
+		injectProjectPanel(); 
+
 		presenter.showBCCSignup(new AsyncCallback<String>() {
 				
 				public void onSuccess(String showBCCSignup) {
@@ -122,7 +95,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 					    "designed to predict breast cancer survival based on clinical information about the patient's tumor as "+
 					    "well as genome-wide molecular profiling data including gene expression and copy number profiles.</p>"+
 	                	"<a class=\"button_readmore\"  href=\"#BCCOverview:0\"></a></div>"));
-					
+					bccSignup.clear();
 					bccSignup.add(sp);
 				}
 				public void onFailure(Throwable t) {
@@ -150,5 +123,48 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void clear() {
 	}
 
+
+	/*
+	 * Private Methods
+	 */
+	private void injectProjectPanel() {
+		projectPanel.clear();
+		if(presenter.showLoggedInDetails()) {
+			// My Projects
+			LayoutContainer projectDiv = new LayoutContainer();
+			
+			LayoutContainer separator = new LayoutContainer();
+			separator.setStyleName("span-24 separator");
+			
+			LayoutContainer mainService = new LayoutContainer();
+			mainService.setStyleName("span-24 main-service");
+			
+			// Create a project
+			mainService.add(new Html(
+					"<div class=\"span-12 notopmargin\">" +
+					"	<h3>Start Your Own Project</h3>" +
+   					"	<p>Get started using Synapse today by creating your own Project. Projects provide an organizational structure for you to interact with your data, code and analyses.</p>" +
+					" 	<div class=\"mega-button\" style=\"margin-top: 10px;\">" +
+					" 		<a href=\"#ProjectsHome:0\">Start a Project</a>" +
+					" 	</div>" +
+					"</div>"));
+
+			
+			// My Projects
+			LayoutContainer myProjectLayout = new LayoutContainer();
+			myProjectLayout.setStyleName("span-12 notopmargin last");
+			VerticalPanel vp = new VerticalPanel();
+			vp.add(new Html("<h3>My Projects</h3>"));
+			vp.add(myEntitiesBrowser.asWidget());
+			myProjectLayout.add(vp);			
+			mainService.add(myProjectLayout);
+			
+			projectDiv.add(separator);
+			projectDiv.add(mainService);
+			projectDiv.layout(true);
+						
+			projectPanel.add(projectDiv);
+		}
+	}
 	
 }

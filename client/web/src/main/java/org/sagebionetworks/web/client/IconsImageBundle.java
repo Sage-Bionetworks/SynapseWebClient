@@ -17,9 +17,6 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/plus-16.png")
 	ImageResource add16();	
 
-	@Source("images/icons/grey_plus-16.png")
-	ImageResource addGrey16();	
-
 	@Source("images/icons/wrench-screwdriver-16.png")
 	ImageResource adminTools16();		
 	
@@ -80,6 +77,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/external-16.png")
 	ImageResource external16();
 
+	@Source("images/icons/film-24.png")
+	ImageResource film24();
+
 	@Source("images/icons/funnel-16.png")
 	ImageResource filter16();
 
@@ -98,6 +98,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/flag-16.png")
 	ImageResource flag16();
 
+	@Source("images/icons/globe-green-16.png")
+	ImageResource globe16();	
+	
 	@Source("images/icons/google-16.png")
 	ImageResource google16();	
 	
@@ -151,9 +154,6 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/navigation-270-button-16.png")
 	ImageResource NavigateDown16();
-
-	@Source("images/icons/navigation-270-button-grey-16.png")
-	ImageResource NavigateDownGrey16();
 
 	@Source("images/icons/sticky-note--plus-16.png")
 	ImageResource notePlus16();

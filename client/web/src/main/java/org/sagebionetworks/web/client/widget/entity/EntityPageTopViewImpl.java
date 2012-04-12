@@ -47,6 +47,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.extjs.gxt.ui.client.widget.button.SplitButton;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
@@ -64,11 +65,14 @@ import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.google.gwt.cell.client.widget.PreviewDisclosurePanel;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -100,6 +104,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private LayoutContainer colLeftContainer;
 	private LayoutContainer colRightContainer;
 	private EntityTypeProvider entityTypeProvider;
+	private Attachments attachmentsPanel;
 	
 	private boolean rStudioUrlReady = false;
 	private SplitButton showRstudio;
@@ -111,7 +116,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PreviewDisclosurePanel previewDisclosurePanel,
 			ActionMenu actionMenu,
 			EntityChildBrowser entityChildBrowser, Breadcrumb breadcrumb, 
-			PropertyWidget propertyWidget,EntityTypeProvider entityTypeProvider) {
+			PropertyWidget propertyWidget,EntityTypeProvider entityTypeProvider,
+			Attachments attachmentsPanel) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.previewDisclosurePanel = previewDisclosurePanel;
@@ -120,6 +126,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.breadcrumb = breadcrumb;
 		this.propertyWidget = propertyWidget;
 		this.entityTypeProvider = entityTypeProvider;
+		this.attachmentsPanel = attachmentsPanel;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 	}
@@ -653,14 +660,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         c.add(new Html("<h3>Attachments</h3>"), new HBoxLayoutData(new Margins(0, 5, 0, 0)));  
         HBoxLayoutData flex = new HBoxLayoutData(new Margins(0, 5, 0, 0));  
         flex.setFlex(1);  
-        Button addButton = new Button("Add");
-        c.add(addButton, new HBoxLayoutData(new Margins(0)));
-        lc.add(c);
+        
         String baseURl = GWT.getModuleBaseURL()+"attachment";
         final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId();
-        addButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+
+        Anchor addBtn = new Anchor();
+        addBtn.setHTML(DisplayUtils.getIconHtml(iconsImageBundle.add16()));
+        addBtn.addClickHandler(new ClickHandler() {			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, new AddAttachmentDialog.Callback() {
 					@Override
 					public void onSaveAttachment() {
@@ -668,11 +676,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					}
 				});
 			}
-		});	 
+		});
+        c.add(addBtn, new HBoxLayoutData(new Margins(0)));
+        lc.add(c);
+
         // We just create a new one each time.
-        AttachmentPanel cp = new AttachmentPanel(baseURl, bundle.getEntity().getId(), bundle.getEntity().getAttachments());
-		cp.setHeaderVisible(false);
-		lc.add(cp);
+        attachmentsPanel.configure(baseURl, bundle.getEntity());
+        lc.add(attachmentsPanel.asWidget());
 		lc.layout();
 		return lc;
 	}

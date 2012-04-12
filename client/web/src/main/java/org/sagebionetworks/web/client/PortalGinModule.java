@@ -58,6 +58,8 @@ import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeEdito
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeEditorViewImpl;
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatrixView;
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatrixViewImpl;
+import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
+import org.sagebionetworks.web.client.widget.entity.AttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
@@ -327,6 +329,9 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// MyEntitiesBrowser
 		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);
+
+		// Attachments		
+		bind(AttachmentsView.class).to(AttachmentsViewImpl.class);
 
 	}
 
