@@ -280,11 +280,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			// Add Referenced By?
 			handleEntityReferencedBy(entityId, partsMask, transport,
 					synapseClient);
+			// Add Referenced By?
+			handleEntityChildCount(entityId, partsMask, transport,	synapseClient);
 			return transport;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	private void handleEntityChildCount(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient) throws SynapseException {
+		if ((EntityBundleTransport.CHILD_COUNT & partsMask) > 0) {
+			Long count = synapseClient.getChildCount(entityId);
+			transport.setChildCount(count);
 		}
 	}
 

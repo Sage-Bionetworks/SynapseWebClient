@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
+import org.sagebionetworks.repo.model.HasPreviews;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
@@ -25,6 +26,7 @@ import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -613,7 +615,7 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Does this entity have attachmet previews?
+	 * Does this entity have attachment previews?
 	 * @param entity
 	 * @return
 	 */
@@ -625,6 +627,19 @@ public class DisplayUtils {
 			if(data.getPreviewId() != null) return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Does this entity have attachmet previews?
+	 * @param entity
+	 * @return
+	 */
+	public static boolean hasChildrenOrPreview(EntityBundle bundle){
+		if(bundle == null) return true;
+		if(bundle.getEntity() == null) return true;
+		Long count = bundle.getChildCount();
+		if(count == null) return true;
+		return count > 0;
 	}
 
 

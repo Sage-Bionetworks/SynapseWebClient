@@ -13,11 +13,12 @@ public class EntityBundleTransport implements IsSerializable {
 	/**
 	 * Masks for requesting what should be included in the bundle.s
 	 */
-	public static int ENTITY 		      = 0x1;
-	public static int ANNOTATIONS	      = 0x2;
-	public static int PERMISSIONS	      = 0x4;
-	public static int ENTITY_PATH	      = 0x8;
-	public static int ENTITY_REFERENCEDBY = 0x10;
+	public static int ENTITY 		      	= 0x1;
+	public static int ANNOTATIONS	      	= 0x2;
+	public static int PERMISSIONS	     	= 0x4;
+	public static int ENTITY_PATH	      	= 0x8;
+	public static int ENTITY_REFERENCEDBY 	= 0x10;
+	public static int CHILD_COUNT			= 0x20;
 	
 	public static String HELLO = ":)";
 
@@ -26,7 +27,14 @@ public class EntityBundleTransport implements IsSerializable {
 	private String permissionsJson;
 	private String entityPathJson;
 	private String entityReferencedByJson;
+	private Long childCount;
 	
+	public Long getChildCount() {
+		return childCount;
+	}
+	public void setChildCount(Long childCount) {
+		this.childCount = childCount;
+	}
 	public String getEntityJson() {
 		return entityJson;
 	}
