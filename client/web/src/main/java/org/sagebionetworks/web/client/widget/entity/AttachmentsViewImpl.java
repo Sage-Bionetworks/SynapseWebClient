@@ -44,6 +44,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	ColumnModel columnModel;
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
+	private boolean isEmpty = true;
 	
 	@Inject
 	public AttachmentsViewImpl(IconsImageBundle iconsImageBundle) {
@@ -107,6 +108,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	}
 
 	private void addNoAttachmentRow() {
+		isEmpty = true;
 		BaseModelData model = new BaseModelData();
 		model.set(LINK_KEY, DisplayConstants.TEXT_NO_ATTACHMENTS);
 		model.set(TOOLTIP_TEXT_KEY, null);
@@ -157,6 +159,10 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 			model.set(ATTACHMENT_DATA_NAME_KEY, data.getName());
 			model.set(TOOLTIP_TEXT_KEY, tooltip);
 			gridStore.add(model);
+		}
+		
+		if(gridStore.getCount() > 0) {
+			isEmpty = false;
 		}
 	}
 
@@ -238,7 +244,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	private void configureContextMenu() {
 		if(grid == null) return;
 		
-		if(gridStore.getCount() > 0) {
+		if(!isEmpty) {
 			Menu contextMenu = new Menu();
 	
 			MenuItem remove = new MenuItem();
