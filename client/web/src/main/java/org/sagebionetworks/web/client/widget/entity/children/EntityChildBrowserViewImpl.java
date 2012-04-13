@@ -197,37 +197,40 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	private int addChildTabs(EntityType entityType,
 			final LocationData location) {
 		int numAdded=0;
-		List<EntityType> skipTypes = presenter.getContentsSkipTypes();
-		List<EntityType> children = new ArrayList<EntityType>();
-		children.addAll(entityType.getValidChildTypes());
-		if(children != null && children.size() > 0) {
-			// fill map
-			Map<String,EntityType> classToTypeMap = new HashMap<String, EntityType>();
-			for(int i=0; i<children.size(); i++) {
-				EntityType child = children.get(i);
-				if(skipTypes.contains(child)) {
-					children.remove(child);
-					continue; // skip some types
+		if(entityType != null && location != null) {
+			List<EntityType> skipTypes = presenter.getContentsSkipTypes();
+			List<EntityType> children = new ArrayList<EntityType>();
+			children.addAll(entityType.getValidChildTypes());
+			if(children != null && children.size() > 0) {
+				// fill map
+				Map<String,EntityType> classToTypeMap = new HashMap<String, EntityType>();
+				for(int i=0; i<children.size(); i++) {
+					EntityType child = children.get(i);
+					if(skipTypes.contains(child)) {
+						children.remove(child);
+						continue; // skip some types
+					}
+					classToTypeMap.put(child.getClassName(), child);
 				}
-				classToTypeMap.put(child.getClassName(), child);
-			}
-			 
-			// add child tabs in order
-			for(String className : DisplayUtils.ENTITY_TYPE_DISPLAY_ORDER) {
-				if(classToTypeMap.containsKey(className)) {
-					EntityType child = classToTypeMap.get(className);
-					children.remove(child);
+				 
+				// add child tabs in order
+				for(String className : DisplayUtils.ENTITY_TYPE_DISPLAY_ORDER) {
+					if(classToTypeMap.containsKey(className)) {
+						EntityType child = classToTypeMap.get(className);
+						children.remove(child);
+						tabPanel.add(createChildTab(child, location));	
+						numAdded++;					
+					}
+				}
+	
+				// add any remaining tabs that weren't covered by the display order
+				for(final EntityType child : children) {				
 					tabPanel.add(createChildTab(child, location));	
-					numAdded++;					
+					numAdded++;
 				}
-			}
-
-			// add any remaining tabs that weren't covered by the display order
-			for(final EntityType child : children) {				
-				tabPanel.add(createChildTab(child, location));	
-				numAdded++;
 			}
 		}
+
 		return numAdded;
 	}
 
