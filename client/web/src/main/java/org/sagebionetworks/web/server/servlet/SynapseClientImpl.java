@@ -159,8 +159,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			return new EntityWrapper(entityPathJson.toJSONString(), entityPath
 					.getClass().getName(), null);
 		} catch (SynapseException e) {
-			// Since we are not throwing errors, log them
-			log.error(e);
 			return new EntityWrapper(null, null,
 					ExceptionUtil.convertSynapseException(e));
 		} catch (JSONObjectAdapterException e) {
@@ -182,8 +180,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			return new EntityWrapper(adapter.toJSONString(),
 					SearchResults.class.getName(), null);
 		} catch (SynapseException e) {
-			// Since we are not throwing errors, log them
-			log.error(e);
 			return new EntityWrapper(null, null,
 					ExceptionUtil.convertSynapseException(e));
 		} catch (JSONObjectAdapterException e) {
