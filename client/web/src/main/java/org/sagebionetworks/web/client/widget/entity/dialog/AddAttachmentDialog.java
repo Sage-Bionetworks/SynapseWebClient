@@ -1,9 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
+import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
+
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -41,7 +47,7 @@ public class AddAttachmentDialog {
 		 * 
 		 * @param attachment
 		 */
-		public void onSaveAttachment();
+		public void onSaveAttachment(UploadResult result);
 	}
 
 	/**
@@ -117,18 +123,34 @@ public class AddAttachmentDialog {
 			public void handleEvent(FormEvent event) {
 				loading.hide();
 				dialog.hide();
-				if(event != null){
-					if(event.getResultHtml() != null){
-						String results = event.getResultHtml();
-						MessageBox.alert("Upload", results, null);
-					}
+				UploadResult result = new UploadResult();
+				result.setUploadStatus(UploadStatus.SUCCESS);
+				if(event != null && event.getResultHtml() != null){
+					result = getUploadResult(event.getResultHtml());
 				}
 				// Let the caller know we are done.
-				callback.onSaveAttachment();
+				callback.onSaveAttachment(result);
 			}
 		});
 		dialog.add(panel);
 		dialog.show();
 
+	}
+	
+	private static UploadResult getUploadResult(String html){
+		UploadResult result = new UploadResult();
+		result.setUploadStatus(UploadStatus.SUCCESS);
+		if(html != null){
+			GwtAdapterFactory factory = new GwtAdapterFactory();
+			String json = html.substring("<pre>".length(), (html.length()-"</pre>".length()));
+			JSONObjectAdapter adapter;
+			try {
+				adapter = factory.createNew(json);
+				result.initializeFromJSONObject(adapter);
+			} catch (JSONObjectAdapterException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return result;
 	}
 }

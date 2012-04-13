@@ -178,9 +178,11 @@ public class FileAttachmentServelet extends HttpServlet {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			response.getOutputStream().write(out.getBytes("UTF-8"));
 			response.getOutputStream().flush();
+			// We wait a few seconds to make sure the preview is ready
+			Thread.sleep(5000);
 		} catch (Exception e) {
 			UploadResult result = new UploadResult();
-			result.setMessage("Failed to attach data: "+e.getMessage());
+			result.setMessage(e.getMessage());
 			result.setUploadStatus(UploadStatus.FAILED);
 			String out;
 			try {
