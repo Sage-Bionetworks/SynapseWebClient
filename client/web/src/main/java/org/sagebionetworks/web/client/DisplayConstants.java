@@ -184,6 +184,7 @@ public class DisplayConstants {
 	public static final String LABEL_UPLOAD_TO_SYNAPSE = "To Synapse";
 	public static final String LABEL_TO_EXTERNAL = "Link External Location";
 	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
+	public static final String TEXT_ATTACHMENT_SUCCESS = "Attachment Uploaded to Synapse";
 	public static final String ERROR_UPLOAD = "An error occured during upload. Please try again.";
 	public static final String LABEL_UPLOADING = "Uploading...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
@@ -211,6 +212,7 @@ public class DisplayConstants {
 	public static final Object TEXT_NO_ATTACHMENTS = "No Attachments.";
 	public static final String ERROR_DELETING_ATTACHMENT = "An error occurred deleting the Attachment. Please try again.";
 	public static final String LABEL_DELETED = "deleted";
+	public static final String ERRROR_ATTACHMENT_FAILED = "Failed to upload attachment: ";
 		
 }
 

@@ -7,6 +7,8 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -673,7 +675,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			public void onClick(ClickEvent event) {
 				AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, new AddAttachmentDialog.Callback() {
 					@Override
-					public void onSaveAttachment() {
+					public void onSaveAttachment(UploadResult result) {
+						if(result != null){
+							if(UploadStatus.SUCCESS == result.getUploadStatus()){
+								showInfo(DisplayConstants.TEXT_ATTACHMENT_SUCCESS, null);
+							}else{
+								showErrorMessage(DisplayConstants.ERRROR_ATTACHMENT_FAILED+result.getMessage());
+							}
+						}
 						presenter.fireEntityUpdatedEvent();
 					}
 				});

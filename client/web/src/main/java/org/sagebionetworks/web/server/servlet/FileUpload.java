@@ -67,44 +67,48 @@ public class FileUpload extends HttpServlet {
 				if(!file.createNewFile()) {
 					throw new IOException("Unable to create server temporary file for upload: " + file.getAbsolutePath());
 				}
-				
-				BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file, false));
-                int len;
-                int BUFFER_SIZE = 8192;
-                byte[] buffer = new byte[BUFFER_SIZE];
-                while ((len = stream.read(buffer, 0, buffer.length)) != -1) {
-                    out.write(buffer, 0, len);
-                }
-// TODO : check file size and restrict to a limit?                
-                
-                TokenProvider tokenProvider = new TokenProvider() {					
-					@Override
-					public String getSessionToken() {
-						return UserDataProvider.getThreadLocalUserToken(request);
-					}
-				};
-                
-				// get Entity and store file in location
-				String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
-				if(entityId != null) {					
-					String makeAttachment = request.getParameter(DisplayUtils.MAKE_ATTACHMENT_PARAM_KEY);
-					Synapse synapseClient = ServiceUtils.createSynapseClient(tokenProvider, urlProvider);
-					Entity locationable = synapseClient.getEntityById(entityId);
-					if("true".equals(makeAttachment)) {
-						// TODO : create Attachment entity, and set locationable
-						// locationable = new attachment entity
-					}
-					if(!(locationable instanceof Locationable)) {
-						throw new RuntimeException("Upload failed. Entity id: " + locationable.getId() + " is not Locationable.");
-					}						
-					Locationable uploaded = synapseClient.uploadLocationableToSynapse((Locationable)locationable, file);
-					logger.info("Uploaded file " + item.getName() + " ("+ file.getName() +") to Synapse id: " + uploaded.getId());
-					OutputStream os = response.getOutputStream();					
-					PrintStream printStream = new PrintStream(os);
-					printStream.print(DisplayUtils.UPLOAD_SUCCESS);
-					printStream.close();
-				} else {
-					throw new IllegalArgumentException("entityId is a required parameter");
+				try{
+					BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file, false));
+	                int len;
+	                int BUFFER_SIZE = 8192;
+	                byte[] buffer = new byte[BUFFER_SIZE];
+	                while ((len = stream.read(buffer, 0, buffer.length)) != -1) {
+	                    out.write(buffer, 0, len);
+	                }
+	// TODO : check file size and restrict to a limit?                
+	                
+	                TokenProvider tokenProvider = new TokenProvider() {					
+						@Override
+						public String getSessionToken() {
+							return UserDataProvider.getThreadLocalUserToken(request);
+						}
+					};
+	                
+					// get Entity and store file in location
+					String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
+					if(entityId != null) {					
+						String makeAttachment = request.getParameter(DisplayUtils.MAKE_ATTACHMENT_PARAM_KEY);
+						Synapse synapseClient = ServiceUtils.createSynapseClient(tokenProvider, urlProvider);
+						Entity locationable = synapseClient.getEntityById(entityId);
+						if("true".equals(makeAttachment)) {
+							// TODO : create Attachment entity, and set locationable
+							// locationable = new attachment entity
+						}
+						if(!(locationable instanceof Locationable)) {
+							throw new RuntimeException("Upload failed. Entity id: " + locationable.getId() + " is not Locationable.");
+						}						
+						Locationable uploaded = synapseClient.uploadLocationableToSynapse((Locationable)locationable, file);
+						logger.info("Uploaded file " + item.getName() + " ("+ file.getName() +") to Synapse id: " + uploaded.getId());
+						OutputStream os = response.getOutputStream();					
+						PrintStream printStream = new PrintStream(os);
+						printStream.print(DisplayUtils.UPLOAD_SUCCESS);
+						printStream.close();
+					} else {
+						throw new IllegalArgumentException("entityId is a required parameter");
+					}					
+				}finally{
+					// Unconditionally delete the temp file.
+					file.delete();
 				}
             }
         }
