@@ -185,7 +185,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			colLeftContainer.add(createAttachmentPreview(bundle.getEntity()), widgetMargin);
 		}
 	    // RStudio Button
-		colLeftContainer.add(createRstudioWidget(bundle.getEntity()), widgetMargin);
+//		colLeftContainer.add(createRstudioWidget(bundle.getEntity()), widgetMargin);
 		// Create Activity Feed widget
 		colLeftContainer.add(createActivityFeedWidget(bundle.getEntity()), widgetMargin);
 
@@ -484,58 +484,58 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	
-	private Widget createRstudioWidget(Entity entity) {
-		final LayoutContainer lc = new LayoutContainer();
-		lc.setAutoWidth(true);
-		lc.setAutoHeight(true);
-
-		lc.add(new Html("<h3>RStudio</h3>"));  	        	    	    	 
-	    
-	    showRstudio = new SplitButton("&nbsp;&nbsp;Load in RStudio Server");
-	    showRstudio.setIcon(AbstractImagePrototype.create(iconsImageBundle.rstudio24()));
-	    Menu menu = new Menu();  
-	    MenuItem item = new MenuItem("Edit RStudio Server URL");
-		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-			@Override
-			public void componentSelected(MenuEvent ce) {
-				showRStudioUrlEdit();
-			}
-		});
-	    menu.add(item);  
-	    showRstudio.setMenu(menu);  
-	  
-	    showRstudio.setHeight(36);	  
-	    if(!presenter.isLoggedIn()) {
-	    	showRstudio.disable();
-	    	showRstudio.setText("&nbsp;&nbsp;Please Login to Load in RStudio");
-	    }
-	    
-	    final Html label = new Html("<a href=\"http://rstudio.org/\" class=\"link\">RStudio&trade;</a> is a free and open source integrated development environment (IDE) for R. " +
-	    		"You can run it on your desktop (Windows, Mac, or Linux) or even over the web using RStudio Server.<br/></br>" +
-	    		"If you do not have a copy of RStudio Server setup, you can create one by <a href=\"http://rstudio.org/download/server\" class=\"link\">following these directions</a>.");
-	    	    
-	    showRstudio.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				String url = presenter.getRstudioUrl();
-				if(url == null) {
-					showRStudioUrlEdit();
-				} else {			
-					Window.open(url, "_blank", "");
-				}
-			}
-		});	    
-	    // only enable if we have the URL 
-	    if(!rStudioUrlReady) {
-	    	showRstudio.disable();
-	    }
-	    
-	    lc.add(showRstudio);
-	    lc.add(label, new MarginData(5, 0, 0, 0));
-		
-	    lc.layout();
-	    return lc;  		
-	}
+//	private Widget createRstudioWidget(Entity entity) {
+//		final LayoutContainer lc = new LayoutContainer();
+//		lc.setAutoWidth(true);
+//		lc.setAutoHeight(true);
+//
+//		lc.add(new Html("<h3>RStudio</h3>"));  	        	    	    	 
+//	    
+//	    showRstudio = new SplitButton("&nbsp;&nbsp;Load in RStudio Server");
+//	    showRstudio.setIcon(AbstractImagePrototype.create(iconsImageBundle.rstudio24()));
+//	    Menu menu = new Menu();  
+//	    MenuItem item = new MenuItem("Edit RStudio Server URL");
+//		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+//			@Override
+//			public void componentSelected(MenuEvent ce) {
+//				showRStudioUrlEdit();
+//			}
+//		});
+//	    menu.add(item);  
+//	    showRstudio.setMenu(menu);  
+//	  
+//	    showRstudio.setHeight(36);	  
+//	    if(!presenter.isLoggedIn()) {
+//	    	showRstudio.disable();
+//	    	showRstudio.setText("&nbsp;&nbsp;Please Login to Load in RStudio");
+//	    }
+//	    
+//	    final Html label = new Html("<a href=\"http://rstudio.org/\" class=\"link\">RStudio&trade;</a> is a free and open source integrated development environment (IDE) for R. " +
+//	    		"You can run it on your desktop (Windows, Mac, or Linux) or even over the web using RStudio Server.<br/></br>" +
+//	    		"If you do not have a copy of RStudio Server setup, you can create one by <a href=\"http://rstudio.org/download/server\" class=\"link\">following these directions</a>.");
+//	    	    
+//	    showRstudio.addSelectionListener(new SelectionListener<ButtonEvent>() {
+//			@Override
+//			public void componentSelected(ButtonEvent ce) {
+//				String url = presenter.getRstudioUrl();
+//				if(url == null) {
+//					showRStudioUrlEdit();
+//				} else {			
+//					Window.open(url, "_blank", "");
+//				}
+//			}
+//		});	    
+//	    // only enable if we have the URL 
+//	    if(!rStudioUrlReady) {
+//	    	showRstudio.disable();
+//	    }
+//	    
+//	    lc.add(showRstudio);
+//	    lc.add(label, new MarginData(5, 0, 0, 0));
+//		
+//	    lc.layout();
+//	    return lc;  		
+//	}
 	
 	private Widget createTitleWidget(EntityBundle bundle, String entityTypeDisplay) {
 		LayoutContainer lc = new LayoutContainer();
@@ -689,22 +689,22 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 
-	private void showRStudioUrlEdit() {
-		final MessageBox box = MessageBox.prompt("Set RStudio Server URL", "RStudio Server URL:");
-		String existingUrl = presenter.getRstudioUrlBase();
-		if(existingUrl == null) {
-			existingUrl = DisplayUtils.DEFAULT_RSTUDIO_URL;
-		}
-		box.getTextBox().setValue(existingUrl);
-		box.addCallback(new Listener<MessageBoxEvent>() {
-			public void handleEvent(MessageBoxEvent be) {
-				if (be.getButtonClicked().getText().equals("Cancel")) // .isCanceled() does not give correct result
-					return;
-				if (be.getValue() != null && !be.getValue().equals("")) {
-					presenter.saveRStudioUrlBase(be.getValue());
-					showRstudio.fireEvent(Events.Select);
-				}
-			}
-		});
-	}	
+//	private void showRStudioUrlEdit() {
+//		final MessageBox box = MessageBox.prompt("Set RStudio Server URL", "RStudio Server URL:");
+//		String existingUrl = presenter.getRstudioUrlBase();
+//		if(existingUrl == null) {
+//			existingUrl = DisplayUtils.DEFAULT_RSTUDIO_URL;
+//		}
+//		box.getTextBox().setValue(existingUrl);
+//		box.addCallback(new Listener<MessageBoxEvent>() {
+//			public void handleEvent(MessageBoxEvent be) {
+//				if (be.getButtonClicked().getText().equals("Cancel")) // .isCanceled() does not give correct result
+//					return;
+//				if (be.getValue() != null && !be.getValue().equals("")) {
+//					presenter.saveRStudioUrlBase(be.getValue());
+//					showRstudio.fireEvent(Events.Select);
+//				}
+//			}
+//		});
+//	}	
 }

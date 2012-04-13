@@ -67,27 +67,26 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.bundle = bundle;
     	if(bundle != null){
     		// Let the view know
-    		// TODO : add referencedBy
     		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit());
 
-    		// get current user profile
-    		synapseClient.getUserProfile(new AsyncCallback<String>() {
-    			@Override
-    			public void onSuccess(String userProfileJson) {
-    				try {
-    					UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
-   						rStudioUrl = profile.getRStudioUrl();    						    					
-    					view.setRStudioUrlReady();
-    				} catch (RestServiceException e) {
-						onFailure(e);
-					}    				
-    			}
-    			@Override
-    			public void onFailure(Throwable caught) {
-    				// error retrieving user profile
-    				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());    					    				
-    			}
-    		});
+//    		// get current user profile
+//    		synapseClient.getUserProfile(new AsyncCallback<String>() {
+//    			@Override
+//    			public void onSuccess(String userProfileJson) {
+//    				try {
+//    					UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
+//   						rStudioUrl = profile.getRStudioUrl();    						    					
+//    					view.setRStudioUrlReady();
+//    				} catch (RestServiceException e) {
+//						onFailure(e);
+//					}    				
+//    			}
+//    			@Override
+//    			public void onFailure(Throwable caught) {
+//    				// error retrieving user profile
+//    				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());    					    				
+//    			}
+//    		});
 
     	}
 	}
@@ -137,58 +136,58 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return false;
 	}
 
-	@Override
-	public String getRstudioUrlBase() {
-		return rStudioUrl;
-	}
-	
-	@Override
-	public String getRstudioUrl() {		
-		String url = getRstudioUrlBase(); 
-		UserData userData = authenticationController.getLoggedInUser();
-		if(url != null && userData != null) {
-			url += "#synapse:" + userData.getToken() + ";get:" + bundle.getEntity().getId();			
-		} 
-		return url;
-	}
-	
-	@Override
-	public void saveRStudioUrlBase(final String value) {
-		rStudioUrl = value;
-		
-		// get current user profile		
-		synapseClient.getUserProfile(new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String userProfileJson) {
-				try {
-					UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
-					profile.setRStudioUrl(value);		
-					JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-					profile.writeToJSONObject(adapter);
-					// save update user profile
-					synapseClient.updateUserProfile(adapter.toJSONString(), new AsyncCallback<Void>() {
-						@Override
-						public void onSuccess(Void result) {
-							view.showInfo(DisplayConstants.LABEL_UPDATED, DisplayConstants.TEXT_USER_PROFILE_UPDATED);
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							view.showErrorMessage(DisplayConstants.ERROR_USER_PROFILE_SAVE);
-						}
-					});					
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				} catch (RestServiceException e) {
-					onFailure(e);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_USER_PROFILE_SAVE);
-			}
-		});
-		
-	}
+//	@Override
+//	public String getRstudioUrlBase() {
+//		return rStudioUrl;
+//	}
+//	
+//	@Override
+//	public String getRstudioUrl() {		
+//		String url = getRstudioUrlBase(); 
+//		UserData userData = authenticationController.getLoggedInUser();
+//		if(url != null && userData != null) {
+//			url += "#synapse:" + userData.getToken() + ";get:" + bundle.getEntity().getId();			
+//		} 
+//		return url;
+//	}
+//	
+//	@Override
+//	public void saveRStudioUrlBase(final String value) {
+//		rStudioUrl = value;
+//		
+//		// get current user profile		
+//		synapseClient.getUserProfile(new AsyncCallback<String>() {
+//			@Override
+//			public void onSuccess(String userProfileJson) {
+//				try {
+//					UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
+//					profile.setRStudioUrl(value);		
+//					JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+//					profile.writeToJSONObject(adapter);
+//					// save update user profile
+//					synapseClient.updateUserProfile(adapter.toJSONString(), new AsyncCallback<Void>() {
+//						@Override
+//						public void onSuccess(Void result) {
+//							view.showInfo(DisplayConstants.LABEL_UPDATED, DisplayConstants.TEXT_USER_PROFILE_UPDATED);
+//						}
+//						@Override
+//						public void onFailure(Throwable caught) {
+//							view.showErrorMessage(DisplayConstants.ERROR_USER_PROFILE_SAVE);
+//						}
+//					});					
+//				} catch (JSONObjectAdapterException e) {
+//					onFailure(e);
+//				} catch (RestServiceException e) {
+//					onFailure(e);
+//				}
+//			}
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				view.showErrorMessage(DisplayConstants.ERROR_USER_PROFILE_SAVE);
+//			}
+//		});
+//		
+//	}
 	
 	@Override 
 	public boolean isLoggedIn() {

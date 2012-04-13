@@ -40,11 +40,11 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 
 		boolean isLoggedIn();
 
-		String getRstudioUrl();
-
-		void saveRStudioUrlBase(String value);
-
-		String getRstudioUrlBase();
+//		String getRstudioUrl();
+//
+//		void saveRStudioUrlBase(String value);
+//
+//		String getRstudioUrlBase();
 
 		String createEntityLink(String id, String version, String display);
 
