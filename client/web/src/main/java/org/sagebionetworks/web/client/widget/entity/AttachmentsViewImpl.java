@@ -182,16 +182,9 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 				builder.append(value);
 				builder.append("</div>");
 				Html html = new Html(builder.toString());
-//				html.setWidth(50);
 				String tooltip = (String)model.get(TOOLTIP_TEXT_KEY);
 				if(tooltip != null) {
-				    ToolTipConfig tipsConfig = new ToolTipConfig();  			     
-				    tipsConfig.setText(tooltip);
-				    tipsConfig.setMouseOffset(new int[] {0, 0});  
-				    tipsConfig.setAnchor("left");  
-				    tipsConfig.setDismissDelay(0);
-				    tipsConfig.setShowDelay(100);
-				    ToolTip tip = new ToolTip(html, tipsConfig);
+				    html.setToolTip(tooltip);
 				}
 				return html;
 			}
