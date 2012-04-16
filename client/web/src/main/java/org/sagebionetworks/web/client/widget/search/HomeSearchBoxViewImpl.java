@@ -50,6 +50,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 		this.setLayout(new FitLayout());
 				
 		horizontalTable = new FlexTable();
+		horizontalTable.setWidth("600px");
 		createSearchBox();
 		this.add(horizontalTable);
 	}

@@ -21,21 +21,19 @@
 				<!-- SLOGAN -->
 				<div class="span-24 separator" style="margin-top: 20px"></div>
 				<div class="span-24" style="margin-top: 10px">
-					<div class="span-18 last" style="margin-top: 10px">
+					<div class="span-24 last" style="margin-top: 10px">
 						<h3>
 							Welcome to
 							<a class="link" href="#Home:0">SYNAPSE</a>
 						</h3>
-						<p>Synapse is an online community built for a new biology... more
-							open, more collaborative, more data-driven, and more
-							reproducible.</p>
+						<p>Synapse is a collaborative compute space that allows scientists to share and analyze data together.</p>
 					</div>
 				</div>
 				<div class="span-24 separator notopmargin" style="margin-bottom: 18px !important;"></div>
 
 				<!-- TOP COLUMN 1 -->
 				<div class="span-8 notopmargin">
-					<h4>How to Use Synapse</h4>
+					<h4>About Synapse</h4>
 					<div class="span-8 notopmargin">
 						<div class="span-8 notopmargin">
 							<div class="item">
@@ -51,11 +49,18 @@
 				<div class="span-8 notopmargin">
 					<h4>Top Features</h4>
 					<ul class="list check-list">
-						<li>Lorem ipsum dolor sit amet, consec tetur</li>
-						<li>Ut enim ad minim veniam, quis nostrud exercitation ullamco
-							laboris nisi</li>
-						<li>Sed do eiusmod tempor incididunt ut labore et dolore</li>
-						<li><g:Image resource='{icons.users16}'/> Work Publicly or <g:Image resource='{icons.lock16}'/> Work Privately</li>
+						<li>Search across public data including curated GEO, TCGA, and Array Express</li>
+						<li>Find raw data or follow an analysis path to processed results</li>
+						<li>Load data directly into analytical tools like R, and record your analysis</li>
+						<li>
+							Create
+							<span style="font-weight: bold;">Public</span>
+							<g:Image resource='{icons.users16}' />
+							or
+							<span style="font-weight: bold;">Private</span>
+							<g:Image resource='{icons.lock16}' />
+							projects to share your work
+						</li>
 					</ul>
 				</div>
 				
@@ -75,10 +80,10 @@
 			</div>
 
 			<!-- SEARCH BOX -->
-			<div class="span-24">
-				<div class="span-24 slider-area-inner">
-					<g:SimplePanel ui:field="bigSearchBox" />
-				</div>
+			<div class="span-24 notopmargin">
+					<div class="span-23 inner-6 view">
+						<g:SimplePanel ui:field="bigSearchBox" />
+					</div>
 			</div>
 			
 			<!-- START PROJECT & MY PROJECTS -->
