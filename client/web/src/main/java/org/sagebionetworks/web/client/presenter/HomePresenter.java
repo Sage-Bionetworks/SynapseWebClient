@@ -74,9 +74,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 
 	@Override
 	public void showBCCSignup(AsyncCallback<String> callback) {
-		// TODO: swap this back to working PLFM-1201
-		callback.onSuccess("true");
-		//stackConfigService.getBCCSignupEnabled(callback);
+		stackConfigService.getBCCSignupEnabled(callback);
 	}
 	
 
