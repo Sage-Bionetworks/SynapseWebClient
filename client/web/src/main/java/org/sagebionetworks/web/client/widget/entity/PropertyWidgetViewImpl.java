@@ -112,15 +112,7 @@ public class PropertyWidgetViewImpl extends LayoutContainer implements PropertyW
 				builder.append(value);
 				builder.append("</div>");
 				Html html = new Html(builder.toString());
-//				html.setWidth(50);
-			    ToolTipConfig tipsConfig = new ToolTipConfig();  
-			    tipsConfig.setTitle(model.getToolTipTitle());  
-			    tipsConfig.setText(model.getToolTipBody());
-			    tipsConfig.setMouseOffset(new int[] {0, 0});  
-			    tipsConfig.setAnchor("left");  
-			    tipsConfig.setDismissDelay(0);
-			    tipsConfig.setShowDelay(100);
-			    ToolTip tip = new ToolTip(html, tipsConfig);
+			    html.setToolTip(new ToolTipConfig(model.getToolTipTitle(), model.getToolTipBody()));
 				return html;
 			}
 

@@ -80,10 +80,11 @@
 			</div>
 
 			<!-- SEARCH BOX -->
-			<div class="span-24 notopmargin">
-					<div class="span-23 inner-6 view">
-						<g:SimplePanel ui:field="bigSearchBox" />
-					</div>
+			<div class="span-24 notopmargin" style="margin-top: 10px !important;">
+				<h4>Search the Commons</h4>
+				<div class="span-23 inner-6 view notopmargin">
+					<g:SimplePanel ui:field="bigSearchBox" />
+				</div>
 			</div>
 			
 			<!-- START PROJECT & MY PROJECTS -->
