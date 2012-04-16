@@ -46,6 +46,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.History;
 
 public class AppActivityMapper implements ActivityMapper {
 	
@@ -89,6 +90,8 @@ public class AppActivityMapper implements ActivityMapper {
 
 	@Override
 	public Activity getActivity(Place place) {
+		recordPageVisit(History.getToken());
+		
 		AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
 		
@@ -195,4 +198,8 @@ public class AppActivityMapper implements ActivityMapper {
 		return new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
 	}
 
+	private static native void recordPageVisit(String token) /*-{		
+		$wnd._gaq.push(['_trackPageview', token]);		
+	}-*/;
+	
 }
