@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -167,7 +168,9 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	public void createLink(String selectedEntityId) {			
 		Link link = (Link) entityFactory.newInstance(Link.class.getName());
 		link.setParentId(selectedEntityId); // user selects where to save
-		link.setLinksTo(entityBundle.getEntity().getId()); // links to this entity
+		Reference ref = new Reference();
+		ref.setTargetId(entityBundle.getEntity().getId());
+		link.setLinksTo(ref); // links to this entity
 		link.setLinksToClassName(entityBundle.getEntity().getEntityType());
 		link.setName(entityBundle.getEntity().getName()); // copy name of this entity as default
 		link.setEntityType(Link.class.getName());		
