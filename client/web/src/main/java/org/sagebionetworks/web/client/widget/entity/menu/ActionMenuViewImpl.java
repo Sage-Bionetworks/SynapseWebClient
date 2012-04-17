@@ -217,35 +217,17 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private void configureAddMenu(final Entity entity, final EntityType entityType) {		
 		// create add menu button from children
 		Menu menu = new Menu();		
-		MenuItem item;
 		int numAdded = 0;
 		
 		List<EntityType> children = entityType.getValidChildTypes();
-		List<EntityType> skipTypes = presenter.getAddSkipTypes();
-		if(children != null) {
-			// fill map
-			Map<String,EntityType> classToTypeMap = new HashMap<String, EntityType>();
-			for(EntityType child : children) {
-				if(skipTypes.contains(child)) continue; // skip some types				
-				classToTypeMap.put(child.getClassName(), child);
-			}
-			 
+		List<EntityType> skipTypes = presenter.getAddSkipTypes();		
+		if(children != null) {			 
 			// add child tabs in order
-			for(String className : DisplayUtils.ENTITY_TYPE_DISPLAY_ORDER) {
-				if(classToTypeMap.containsKey(className)) {
-					EntityType child = classToTypeMap.get(className);
-					classToTypeMap.remove(className);
-					menu.add(createAddMenuItem(child, entity));
-					numAdded++;
-				}
-			}
-
-			// add any remaining tabs that weren't covered by the display order
-			for(String className : classToTypeMap.keySet()) {
-				EntityType child = classToTypeMap.get(className);
+			for(EntityType child : DisplayUtils.orderForDisplay(children)) {
+				if(skipTypes.contains(child)) continue; // skip some types
 				menu.add(createAddMenuItem(child, entity));
 				numAdded++;
-			}							
+			}
 		}
 			
 		if(numAdded==0) {

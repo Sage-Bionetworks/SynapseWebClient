@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
-import org.sagebionetworks.repo.model.HasPreviews;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
@@ -642,5 +642,33 @@ public class DisplayUtils {
 		return count > 0;
 	}
 
+	public static ArrayList<EntityType> orderForDisplay(List<EntityType> children) {
+		ArrayList<EntityType> ordered = new ArrayList<EntityType>();
+		
+		if(children != null) {
+			// fill map
+			Map<String,EntityType> classToTypeMap = new HashMap<String, EntityType>();
+			for(EntityType child : children) {
+				classToTypeMap.put(child.getClassName(), child);
+			}
+			 
+			// add child tabs in order
+			for(String className : DisplayUtils.ENTITY_TYPE_DISPLAY_ORDER) {
+				if(classToTypeMap.containsKey(className)) {
+					EntityType child = classToTypeMap.get(className);
+					classToTypeMap.remove(className);
+					ordered.add(child);
+				}
+			}
 
+			// add any remaining tabs that weren't covered by the display order
+			for(String className : classToTypeMap.keySet()) {
+				EntityType child = classToTypeMap.get(className);
+				ordered.add(child);
+			}							
+		}
+		
+		return ordered;
+	}
+	
 }
