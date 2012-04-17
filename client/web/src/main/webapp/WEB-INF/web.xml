@@ -5,8 +5,7 @@
 
 
 <web-app>
-	<!-- this filter redirects http to https 
-	
+
 	<filter>
 		<filter-name>sslFilter</filter-name>
 		<filter-class>org.sagebionetworks.web.server.servlet.filter.SSLFilter</filter-class>
@@ -16,9 +15,6 @@
 		<filter-name>sslFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-      -->
-      
-
 
 	<!-- This filter allows us to use Guice for dependency injection in the 
 		server side servlets -->
@@ -33,27 +29,15 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
+
+
 	<!-- This is where we register the ServerModule containing all of the mapping 
 		with Guice. -->
 	<listener>
 		<listener-class>org.sagebionetworks.web.server.PortalContextListner</listener-class>
 	</listener>
 
-	<!-- Comment the below security constraint out if you are working in GWT 
-		development mode -->
-<!-- 	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>Protected Context</web-resource-name>
-			<url-pattern>/*</url-pattern>
-		</web-resource-collection>
-		<user-data-constraint>
-			<transport-guarantee>CONFIDENTIAL</transport-guarantee>
-		</user-data-constraint>
-	</security-constraint>
- --> 
- 
- 
- 
+
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>Portal.html</welcome-file>
