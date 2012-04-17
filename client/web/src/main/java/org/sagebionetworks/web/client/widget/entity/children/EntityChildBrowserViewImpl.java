@@ -198,18 +198,14 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 			final LocationData location) {
 		int numAdded=0;
 		if(entityType != null && location != null) {
+			
 			List<EntityType> skipTypes = presenter.getContentsSkipTypes();
-			List<EntityType> children = new ArrayList<EntityType>();
-			children.addAll(entityType.getValidChildTypes());
+			List<EntityType> children = entityType.getValidChildTypes();
 			if(children != null && children.size() > 0) {
 				// fill map
 				Map<String,EntityType> classToTypeMap = new HashMap<String, EntityType>();
-				for(int i=0; i<children.size(); i++) {
-					EntityType child = children.get(i);
-					if(skipTypes.contains(child)) {
-						children.remove(child);
-						continue; // skip some types
-					}
+				for(EntityType child : children) {
+					if(skipTypes.contains(child)) continue; // skip some types				
 					classToTypeMap.put(child.getClassName(), child);
 				}
 				 
@@ -217,17 +213,19 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 				for(String className : DisplayUtils.ENTITY_TYPE_DISPLAY_ORDER) {
 					if(classToTypeMap.containsKey(className)) {
 						EntityType child = classToTypeMap.get(className);
-						children.remove(child);
+						classToTypeMap.remove(className);
 						tabPanel.add(createChildTab(child, location));	
 						numAdded++;					
 					}
 				}
 	
 				// add any remaining tabs that weren't covered by the display order
-				for(final EntityType child : children) {				
+				// add any remaining tabs that weren't covered by the display order
+				for(String className : classToTypeMap.keySet()) {
+					EntityType child = classToTypeMap.get(className);
 					tabPanel.add(createChildTab(child, location));	
 					numAdded++;
-				}
+				}							
 			}
 		}
 
