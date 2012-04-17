@@ -189,7 +189,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    // RStudio Button
 //		colLeftContainer.add(createRstudioWidget(bundle.getEntity()), widgetMargin);
 		// Create Activity Feed widget
-		colLeftContainer.add(createActivityFeedWidget(bundle.getEntity()), widgetMargin);
+//		colLeftContainer.add(createActivityFeedWidget(bundle.getEntity()), widgetMargin);
 
 		/*
 		 * Right Column
