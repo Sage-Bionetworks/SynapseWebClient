@@ -204,6 +204,8 @@ public class FormFieldFactory {
 			@Override
 			public String validate(Field<?> field, String value) {
 				try{
+					// Allow null values
+					if(value == null) return null;
 					// If it can be parsed it is double.
 					Double.parseDouble(value);
 					return null;
@@ -227,6 +229,8 @@ public class FormFieldFactory {
 			@Override
 			public String validate(Field<?> field, String value) {
 				try{
+					// Allow null values
+					if(value == null) return null;
 					// If it can be parsed it is long.
 					Long.parseLong(value);
 					return null;
@@ -368,6 +372,10 @@ public class FormFieldFactory {
 				if(field.getValue() != null){
 					ModelData model = field.getValue();
 					row.setValue((String)model.get(ConceptAutoCompleteEditorFactory.KEY_PREFERRED_LABEL));
+				}else{
+					// When null we must still set a value.
+					// This is a fix for PLFM-1213
+					row.setValue(field.getRawValue());
 				}
 			}
 		});
@@ -394,6 +402,7 @@ public class FormFieldFactory {
 		field.setFireChangeEventOnSetValue(true);
 		field.setFieldLabel(row.getLabel());
 		field.setToolTip(row.getDescription());
+		field.setAllowBlank(true);
 		return field;
 	}
 }
