@@ -1,7 +1,7 @@
 <configuration>
 	<filters>
 		<filter>
-			<columnId>dataset.Number_of_Samples</columnId>
+			<columnId>dataset.numSamples</columnId>
 			<defaultValue>Any Sample Size</defaultValue>
 			<operator>GREATER_THAN</operator>
 			<values>
@@ -32,7 +32,7 @@
 			</values>
 		</filter>
 		<filter>
-			<columnId>dataset.Species</columnId>
+			<columnId>dataset.species</columnId>
 			<defaultValue>All Species</defaultValue>
 			<operator>EQUALS</operator>
 			<values>
@@ -235,7 +235,7 @@
 			</values>
 		</filter>
 		<filter>
-			<columnId>dataset.Disease</columnId>
+			<columnId>dataset.disease</columnId>
 			<defaultValue>All Diseases</defaultValue>
 			<operator>EQUALS</operator>
 			<values>

@@ -65,7 +65,7 @@
 			<display>Layer URL</display>
 			<description>The link to this dataset's layers</description>
 		</column>
-		<column id="dataset.Disease">
+		<column id="dataset.disease">
 			<type>StringArray</type>
 			<display>Disease</display>
 			<description>What disease is this dataset about</description>
@@ -75,17 +75,17 @@
 			<display>Sample Source</display>
 			<description>Sample source</description>
 		</column>
-		<column id="dataset.Tissue_Tumor">
+		<column id="dataset.tissueType">
 			<type>StringArray</type>
-			<display>Tumor / Tissue Type</display>
-			<description>Tumor / Tissue Type</description>
+			<display>Tissue Type</display>
+			<description>Tissue</description>
 		</column>
 		<column id="dataset.Institution">
 			<type>StringArray</type>
 			<display>Institution</display>
 			<description>Institution</description>
 		</column>
-		<column id="dataset.Species">
+		<column id="dataset.species">
 			<type>StringArray</type>
 			<display>Species</display>
 			<description>Species</description>
@@ -95,30 +95,15 @@
 			<display>Study Size</display>
 			<description>Study Size</description>
 		</column>
-		<column id="dataset.Number_of_Samples">
+		<column id="dataset.numSamples">
 			<type>IntegerArray</type>
 			<display>Number of Samples</display>
 			<description>Number of Samples</description>
 		</column>
-		<column id="dataset.Reference/PubMed ID">
+		<column id="dataset.pubmedId">
 			<type>LongArray</type>
 			<display>Reference / PubMed ID</display>
 			<description>Reference / PubMed ID</description>
-		</column>
-		<column id="dataset.hasExpressionData">
-			<type>Boolean</type>
-			<display>hasExpressionData</display>
-			<description>hasExpressionData</description>
-		</column>
-		<column id="dataset.hasGeneticData">
-			<type>Boolean</type>
-			<display>hasGeneticData</display>
-			<description>hasGeneticData</description>
-		</column>
-		<column id="dataset.hasClinicalData">
-			<type>Boolean</type>
-			<display>hasClinicalData</display>
-			<description>hasClinicalData</description>
 		</column>
 		
 		<!-- These are for layers -->
