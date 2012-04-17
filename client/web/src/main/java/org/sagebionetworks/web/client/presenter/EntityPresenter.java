@@ -8,6 +8,7 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_REFERE
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -91,7 +92,11 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					
 					// Redirect if Entity is a Link
 					if(bundle.getEntity() instanceof Link) {
-						entityId = ((Link)bundle.getEntity()).getLinksTo();
+						Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+						entityId = null;
+						if(ref != null){
+							entityId = ref.getTargetId();
+						}
 						refresh();
 						return;
 					} 					
