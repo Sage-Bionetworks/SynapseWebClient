@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.services.NodeService;
 import org.sagebionetworks.web.server.RestTemplateProvider;
 import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclAccessType;
 import org.sagebionetworks.web.shared.users.AclPrincipal;
 import org.springframework.http.HttpEntity;
@@ -363,30 +364,38 @@ public class NodeServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public List<AclPrincipal> getAllUsers() {
+	public List<AclPrincipal> getAllUsers() throws RestServiceException {
 		// Build up the path
 		StringBuilder builder = new StringBuilder();
 		builder.append(urlProvider.getRepositoryServiceUrl() + "/");
 		builder.append(ServiceUtils.REPOSVC_PATH_GET_USERS);
 		String url = builder.toString();	
 		String userList = getJsonStringForUrl(url, HttpMethod.GET);
-		return generateAclPrincipals(userList);
+		try {
+			return generateAclPrincipals(userList);
+		} catch (JSONException e) {
+			throw new RestServiceException(e.getMessage());
+		}
 	}
 
 
 	@Override
-	public List<AclPrincipal> getAllGroups() {
+	public List<AclPrincipal> getAllGroups() throws RestServiceException {
 		// Build up the path
 		StringBuilder builder = new StringBuilder();
 		builder.append(urlProvider.getRepositoryServiceUrl() + "/");
 		builder.append(ServiceUtils.AUTHSVC_GET_GROUPS_PATH);
 		String url = builder.toString();	
 		String groupList = getJsonStringForUrl(url, HttpMethod.GET);
-		return generateAclPrincipals(groupList);
+		try {
+			return generateAclPrincipals(groupList);
+		} catch (JSONException e) {
+			throw new RestServiceException(e.getMessage());
+		}
 	}
 
 	@Override
-	public List<AclPrincipal> getAllUsersAndGroups() {
+	public List<AclPrincipal> getAllUsersAndGroups() throws RestServiceException {
 		List<AclPrincipal> users = getAllUsers();
 		List<AclPrincipal> groups = getAllGroups();
 		List<AclPrincipal> all = new ArrayList<AclPrincipal>();
@@ -481,7 +490,7 @@ public class NodeServiceImpl extends RemoteServiceServlet implements
 		return UserDataProvider.getThreadLocalUserToken(this.getThreadLocalRequest());
 	}
 
-	private List<AclPrincipal> generateAclPrincipals(String userList) {
+	private List<AclPrincipal> generateAclPrincipals(String userList) throws JSONException {
 		List<AclPrincipal> principals = new ArrayList<AclPrincipal>();
 		JSONArray list = null;
 		try {
@@ -492,23 +501,19 @@ public class NodeServiceImpl extends RemoteServiceServlet implements
 		// create principal objects from JSON
 		for(int i=0; i<list.length(); i++) {
 			JSONObject principalObj;
-			try {
-				principalObj = list.getJSONObject(i);
-				AclPrincipal principal = new AclPrincipal();
-				if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_NAME)) principal.setName(principalObj.getString(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_NAME));
-				if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_ID)) principal.setId(principalObj.getString(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_ID));
-				if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_URI)) principal.setUri(principalObj.getString(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_URI));
-				if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_ETAG)) principal.setEtag(principalObj.getString(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_ETAG));
-				if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_INDIVIDUAL)) principal.setIndividual(principalObj.getBoolean(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_INDIVIDUAL));
-				if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_CREATION_DATE)) {
-					Long creationDate = principalObj.getLong(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_CREATION_DATE);
-					if(creationDate != null)
-						principal.setCreationDate(new Date(creationDate));
-				}			
-				principals.add(principal);
-			} catch (JSONException e) {
-				e.printStackTrace();
+			principalObj = list.getJSONObject(i);
+			AclPrincipal principal = new AclPrincipal();
+			if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_NAME)) principal.setName(principalObj.getString(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_NAME));
+			if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_ID)) principal.setId(principalObj.getString(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_ID));
+			if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_URI)) principal.setUri(principalObj.getString(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_URI));
+			if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_ETAG)) principal.setEtag(principalObj.getString(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_ETAG));
+			if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_INDIVIDUAL)) principal.setIndividual(principalObj.getBoolean(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_INDIVIDUAL));
+			if(principalObj.has(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_CREATION_DATE) && !principalObj.isNull(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_CREATION_DATE)) {				
+				Long creationDate = principalObj.getLong(ServiceUtils.AUTHSVC_ACL_PRINCIPAL_CREATION_DATE);
+				if(creationDate != null)
+					principal.setCreationDate(new Date(creationDate));
 			}			
+			principals.add(principal);
 		}
 		return principals;
 	}

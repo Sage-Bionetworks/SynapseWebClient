@@ -2,8 +2,8 @@ package org.sagebionetworks.web.client.services;
 
 import java.util.List;
 
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclAccessType;
 import org.sagebionetworks.web.shared.users.AclPrincipal;
 
@@ -43,10 +43,10 @@ public interface NodeService extends RemoteService {
 
 	public String getNodeType(String resourceId);
 
-	public List<AclPrincipal> getAllUsers();
+	public List<AclPrincipal> getAllUsers() throws RestServiceException;
 	
-	public List<AclPrincipal> getAllGroups();
+	public List<AclPrincipal> getAllGroups() throws RestServiceException;
 	
-	public List<AclPrincipal> getAllUsersAndGroups();
+	public List<AclPrincipal> getAllUsersAndGroups() throws RestServiceException;
 
 }
