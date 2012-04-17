@@ -166,6 +166,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// Node Model Creator
 		bind(NodeModelCreator.class).to(NodeModelCreatorImpl.class);
 		
+		// JSNI impls
+		bind(SynapseJSNIUtils.class).to(SynapseJSNIUtilsImpl.class);
+		
 		/*
 		 * Places
 		 */
