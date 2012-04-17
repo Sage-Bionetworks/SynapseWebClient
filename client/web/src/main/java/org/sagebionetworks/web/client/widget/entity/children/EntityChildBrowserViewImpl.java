@@ -201,31 +201,13 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 			
 			List<EntityType> skipTypes = presenter.getContentsSkipTypes();
 			List<EntityType> children = entityType.getValidChildTypes();
-			if(children != null && children.size() > 0) {
-				// fill map
-				Map<String,EntityType> classToTypeMap = new HashMap<String, EntityType>();
-				for(EntityType child : children) {
-					if(skipTypes.contains(child)) continue; // skip some types				
-					classToTypeMap.put(child.getClassName(), child);
-				}
-				 
+			if(children != null && children.size() > 0) {				 
 				// add child tabs in order
-				for(String className : DisplayUtils.ENTITY_TYPE_DISPLAY_ORDER) {
-					if(classToTypeMap.containsKey(className)) {
-						EntityType child = classToTypeMap.get(className);
-						classToTypeMap.remove(className);
-						tabPanel.add(createChildTab(child, location));	
-						numAdded++;					
-					}
-				}
-	
-				// add any remaining tabs that weren't covered by the display order
-				// add any remaining tabs that weren't covered by the display order
-				for(String className : classToTypeMap.keySet()) {
-					EntityType child = classToTypeMap.get(className);
+				for(EntityType child : DisplayUtils.orderForDisplay(children)) {
+					if(skipTypes.contains(child)) continue;
 					tabPanel.add(createChildTab(child, location));	
-					numAdded++;
-				}							
+					numAdded++;					
+				}
 			}
 		}
 
