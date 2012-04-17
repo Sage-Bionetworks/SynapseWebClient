@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.place.AnalysesHome;
 import org.sagebionetworks.web.client.place.Analysis;
 import org.sagebionetworks.web.client.place.BCCOverview;
@@ -54,17 +56,20 @@ public class AppActivityMapper implements ActivityMapper {
 	private PortalGinInjector ginjector;
 	@SuppressWarnings("rawtypes")
 	private List<Class> openAccessPlaces; 
+	private SynapseJSNIUtils synapseJSNIUtils;
 
 	/**
 	 * AppActivityMapper associates each Place with its corresponding
 	 * {@link Activity}
+	 * @param synapseJSNIUtilsImpl 
 	 * @param clientFactory
 	 *            Factory to be passed to activities
 	 */
 	@SuppressWarnings("rawtypes")
-	public AppActivityMapper(PortalGinInjector ginjector) {
+	public AppActivityMapper(PortalGinInjector ginjector, SynapseJSNIUtils synapseJSNIUtils) {
 		super();
 		this.ginjector = ginjector;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		
 		openAccessPlaces = new ArrayList<Class>();
 		openAccessPlaces.add(Home.class);		
@@ -90,7 +95,7 @@ public class AppActivityMapper implements ActivityMapper {
 
 	@Override
 	public Activity getActivity(Place place) {
-		//recordPageVisit(History.getToken());
+		synapseJSNIUtils.recordPageVisit(synapseJSNIUtils.getCurrentHistoryToken());
 		
 		AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
@@ -197,9 +202,5 @@ public class AppActivityMapper implements ActivityMapper {
 	public Place getDefaultPlace() {
 		return new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
 	}
-
-	private static native void recordPageVisit(String token) /*-{		
-		$wnd._gaq.push(['_trackPageview', token]);		
-	}-*/;
 	
 }

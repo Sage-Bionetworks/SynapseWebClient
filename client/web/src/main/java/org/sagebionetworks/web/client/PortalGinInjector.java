@@ -55,4 +55,5 @@ public interface PortalGinInjector extends Ginjector {
 	public SearchPresenter getSearchPresenter();
 	
 	public BCCSignup getBCCSignup();
+	
 }
