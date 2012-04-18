@@ -11,10 +11,14 @@ import org.sagebionetworks.web.shared.BCCSignupProfile;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -69,16 +73,23 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 
 	@Override
 	public void showOverView() {
-		Button applyForChallengeButton = new Button("Apply to Join the Challenge", null, new SelectionListener<ButtonEvent>() {			
+		LayoutContainer megaButton = new LayoutContainer();
+		megaButton.setStyleName("mega-button");
+		megaButton.setStyleAttribute("margin-top", "10px;");
+		megaButton.setStyleAttribute("float", "left;");
+		Anchor applyForChallengeLink = new Anchor();
+		applyForChallengeLink.setText("Join the Challenge");
+		applyForChallengeLink.addClickHandler(new ClickHandler() {			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				BCCSignupProfile profile = presenter.getBCCSignupProfile();
 				final BCCCallback callback = presenter.getBCCSignupCallback();
 				BCCSignupHelper.showDialog(profile, callback);				
 			}
 		});
+		megaButton.add(applyForChallengeLink);
 		applyForChallenge.clear();
-		applyForChallenge.add(applyForChallengeButton);
+		applyForChallenge.add(megaButton);
 	}
 
 	@Override

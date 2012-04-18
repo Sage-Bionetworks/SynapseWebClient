@@ -165,7 +165,6 @@
 						</h4>
 					</a>
 					<br></br>
-					<br></br>
 					<g:SimplePanel ui:field="applyForChallenge" />
 					<br></br>
 					<br></br>
