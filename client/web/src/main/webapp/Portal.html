@@ -59,37 +59,6 @@
 		<script language='javascript' src='resources/flash/swfobject.js'></script>
 				
 		<!-- Search autocomplete script. Temporary -->
-		<script>
-		var TRANSMART_SEARCH = "http://transmart.sagebase.org/transmart/search/search?sourcepage=search&id=";
-		$(function() {
-			$( "#query" ).autocomplete({
-				source: function( request, response ) {
-					$.ajax({
-						url: "http://transmart.sagebase.org/transmart/search/loadSearch",
-						dataType: "jsonp",
-						data: {
-							query: "all:" + request.term						
-						},
-						success: function( data ) {
-							response( $.map( data.rows, function( item ) {
-								return {
-									label: item.display + ": " + item.keyword,
-									value: item.name,
-									id: item.id
-								}
-							}));
-						}
-					});
-				},
-				minLength: 1,
-				select: function( event, ui ) {
-					if(ui.item.id) {					
-						document.location =  TRANSMART_SEARCH + ui.item.id;
-					}
-				}
-			});
-		});
-	</script>
 	
 		<!-- put this last -->
 		<script type="text/javascript">
