@@ -190,12 +190,12 @@ public class DisplayConstants {
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
 	public static final String LABEL_WHERE_SAVE_LINK = "Where would you like to save a Link to this page?";
 	public static final String ERROR_NOT_FOUND = "Sorry, the requested object was not found or no longer exists.";
-	public static final String ERROR_ENTITY_CANT_SHORTCUTS = "Sorry, the requested entity can not contain shortcuts.";
+	public static final String ERROR_ENTITY_CANT_LINKS = "Sorry, the requested entity can not contain links.";
 	public static final String ERROR_ENTITY_CREATION = "Sorry, creation failed. Please try again.";
 	public static final String LABEL_SUCCESS = "Success";
 	public static final String TEXT_LINK_SAVED = "Link saved.";
 	public static final String ERROR_UPDATE_FAILED = "Update failed. Please try again.";
-	public static final String TEXT_NO_REFERENCES = "No shortcuts point to this";
+	public static final String TEXT_NO_REFERENCES = "No others point to this";
 	public static final String BUTTON_FILTER_ONLY_MY_CREATION = "Show Projects I Created";
 	public static final String BUTTON_FILTER_USER_UPDATABLE = "Show Projects I Can Edit";
 	public static final String STATUS_CAN_EDIT = "Can Edit";

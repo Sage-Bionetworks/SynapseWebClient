@@ -92,7 +92,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	public void handleSubmitResult(String resultHtml) {
 		if(resultHtml == null) resultHtml = "";
 		// response from server 
-		if(resultHtml.contains(DisplayUtils.UPLOAD_SUCCESS)) {
+		if(!resultHtml.contains(DisplayUtils.UPLOAD_SUCCESS)) {
 			view.showErrorMessage(DisplayConstants.ERROR_UPLOAD);
 			handlerManager.fireEvent(new CancelEvent());
 		} else {

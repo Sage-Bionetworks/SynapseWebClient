@@ -58,7 +58,8 @@ public class EntityTypeProvider {
 	 * @param entityType The short name for an entity, such as "project"
 	 * @return
 	 */
-	public EntityType getEntityTypeForString(String entityType) {		
+	public EntityType getEntityTypeForString(String entityType) {
+		entityType = entityType.replaceFirst("/", "");
 		if(entityType != null) { 
 			for(EntityType type : values) {
 				if(type.getName().equals(entityType) || (type.getAliases() != null && type.getAliases().contains(entityType))) {

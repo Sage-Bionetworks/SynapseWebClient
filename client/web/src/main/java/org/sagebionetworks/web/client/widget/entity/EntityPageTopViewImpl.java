@@ -86,6 +86,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
 	
+	private static final String REFERENCES_KEY_ID = "id";
+	private static final String REFERENCES_KEY_NAME = "name";
+	private static final String REFERENCES_KEY_TYPE = "type";
+	
 	@UiField
 	SimplePanel colLeftPanel;
 	@UiField
@@ -339,16 +343,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		    List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
 		    			
 		    // ref by column
-			ColumnConfig colConfig = new ColumnConfig("id", "Referenced By", 200);			
+			ColumnConfig colConfig = new ColumnConfig(REFERENCES_KEY_ID, "Referenced By", 200);			
 			columns.add(colConfig);		
 			GridCellRenderer<BaseModelData> cellRenderer = configureReferencedByGridCellRenderer();
 			colConfig.setRenderer(cellRenderer);
 			colConfig.setSortable(false);
-			
-			// type column
-			ColumnConfig colConfigType = new ColumnConfig("type", "Type", 80);
-			colConfigType.setSortable(false);
-			columns.add(colConfigType);						
 			
 		    ColumnModel cm = new ColumnModel(columns);
 		    
@@ -371,9 +370,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 							List<BaseModelData> dataList = new ArrayList<BaseModelData>();
 							for(EntityHeader header : result.getResults()) {			
 								BaseModelData model = new BaseModelData();
-								model.set("id", header.getId());
-								model.set("name", header.getName());
-								model.set("type", header.getType());
+								model.set(REFERENCES_KEY_ID, header.getId());
+								model.set(REFERENCES_KEY_NAME, header.getName());
+								model.set(REFERENCES_KEY_TYPE, header.getType());
+								
 								dataList.add(model);
 							}
 							PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(dataList);
@@ -394,7 +394,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	        BasePagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(proxy);
 	        loader.setRemoteSort(false);
 	        loader.setReuseLoadConfig(true);
-	        loader.setLimit(10);
+	        loader.setLimit(200);
 	        loader.setOffset(0);            
 	                
 	        // add initial data to the store
@@ -445,8 +445,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		GridCellRenderer<BaseModelData> cellRenderer = new GridCellRenderer<BaseModelData>() {
 			public String render(BaseModelData model, String property, ColumnData config, int rowIndex, int colIndex, ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
 				// catch all for types that don't need specific rendering beyond string
-				if("id".equals(property) && model.get("id") != null) {
-					return presenter.createEntityLink(model.get("id").toString(), null, model.get("name").toString());
+				if(REFERENCES_KEY_ID.equals(property) && model.get(REFERENCES_KEY_ID) != null) {
+					return DisplayUtils.getIconHtml(presenter.getIconForType(model.get(REFERENCES_KEY_TYPE).toString()))
+							+ " "
+							+ presenter.createEntityLink(model.get(REFERENCES_KEY_ID).toString(),null, model.get(REFERENCES_KEY_NAME).toString());
 				} else {
 					return null;
 				}

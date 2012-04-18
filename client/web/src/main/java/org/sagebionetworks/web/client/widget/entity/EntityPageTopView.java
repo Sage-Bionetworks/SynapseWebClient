@@ -8,6 +8,7 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -46,9 +47,11 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 //
 //		String getRstudioUrlBase();
 
-		String createEntityLink(String id, String version, String display);
-
 		void loadShortcuts(int offset, int limit, AsyncCallback<PaginatedResults<EntityHeader>> asyncCallback);
+
+		String createEntityLink(String id, String version, String display);
+		
+		ImageResource getIconForType(String typeString);
 
 	}
 
