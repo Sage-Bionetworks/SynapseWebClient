@@ -120,18 +120,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 							eh.setName(hit.getName());
 							eh.setType("project");
 							eheaders.add(eh);
-						}
-						
-						
-						if(eheaders.size() == 0) {
-							EntityHeader eh = new EntityHeader();
-							eh.setId("9");
-							eh.setName("Nine");
-							eh.setType("project");
-							eheaders.add(eh);
-							
-						}
-						
+						}						
 						view.setUpdatableEntities(eheaders);
 					} catch (RestServiceException e) {
 						onFailure(e);
