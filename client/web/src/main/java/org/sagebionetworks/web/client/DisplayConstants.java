@@ -96,7 +96,7 @@ public class DisplayConstants {
 	 * Service Constants (move to another file?)
 	 */
 	public static final String SINGLE_SIGN_ON_USERID = "SSO";
-	public static final String OPEN_ID_SAGE_LOGIN_BUTTON_TEXT = "Login with a Sagebase.org Account";
+	public static final String OPEN_ID_SAGE_LOGIN_BUTTON_TEXT = "Login with a Google Account";
 	public static final String OPEN_ID_PROVIDER_GOOGLE_VALUE = "https://www.google.com/accounts/o8/id";
 	public static final String OPEN_ID_PROVIDER_SAGE_VALUE = "https://www.google.com/accounts/o8/site-xrds?hd=sagebase.org";
 
