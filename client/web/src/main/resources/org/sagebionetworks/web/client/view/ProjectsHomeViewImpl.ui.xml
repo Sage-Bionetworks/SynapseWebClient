@@ -45,47 +45,63 @@
 					<div class="">
 						<div class="span-12 inner-12 view">
 		                	<div class="span-6 notopmargin">
-		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Organize.png" alt=" "/></div>
 		                    </div>
-		                    <h4 class="colored">Feature</h4>
-		                    <p>Description</p>
+		                    <h4 class="colored">Organize Your Work</h4>
+		                    <p>With Synapse you can organize the parts in your workflow (data, code, etc) into a hierarchy like a file system.</p>
 		                </div>
 						<div class="span-12 inner-12 view last">
 		                	<div class="span-6 notopmargin">
-		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_StoreData.png" alt=" "/></div>
 		                    </div>
-		                    <h4 class="colored">Feature</h4>
-		                    <p>Description</p>
+		                    <h4 class="colored">Store Data, Code &amp; Results</h4>
+		                    <p>You can upload your data, code and results to Synapse, or simply store a reference to where they are on your local computer system.</p>
 		                </div>
 					
 						<div class="span-12 inner-12 view">
 		                	<div class="span-6 notopmargin">
-		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Acl.png" alt=" "/></div>
 		                    </div>
-		                    <h4 class="colored">Feature</h4>
-		                    <p>Description</p>
-		                </div>
+		                    <h4 class="colored">Set Sharing Level</h4>
+		                    <p>You have complete fine-grained control over how users and groups can interact with your work. Work privately or collaborate openly, and everything in between.</p>
+		                </div>					
 						<div class="span-12 inner-12 view last">
 		                	<div class="span-6 notopmargin">
-		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Describe.png" alt=" "/></div>
 		                    </div>
-		                    <h4 class="colored">Feature</h4>
-		                    <p>Description</p>
+		                    <h4 class="colored">Custom, Searchable Annotations</h4>
+		                    <p>Assign any key/value pair you want, and those values become searchable and available to those granted access to see.</p>
+		                </div>		                
+		                
+						<div class="span-12 inner-12 view">
+		                	<div class="span-6 notopmargin">
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Annotations.png" alt=" "/></div>
+		                    </div>
+		                    <h4 class="colored">Full Programmatic API &amp; R Integration</h4>
+		                    <p>Synapse is built on a REST API, so you can interact with Synapse using any programming language. We have built out full featured clients for R and Java.</p>
+		                </div>
+					
+						<div class="span-12 inner-12 view last">
+		                	<div class="span-6 notopmargin">
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_R.png" alt=" "/></div>
+		                    </div>
+		                    <h4 class="colored">Attach Figures and Documents</h4>
+		                    <p>Upload documents and images via the website or programmatically.</p>
 		                </div>
 					
 						<div class="span-12 inner-12 view">
 		                	<div class="span-6 notopmargin">
-		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Attachments.png" alt=" "/></div>
 		                    </div>
-		                    <h4 class="colored">Feature</h4>
-		                    <p>Description</p>
+		                    <h4 class="colored">Describe &amp; Version</h4>
+		                    <p>Describe each of the elements in your workflow, and then version those when you see fit. This allows you to explicitly record which version of the code you ran on which version of the data.</p>
 		                </div>
 						<div class="span-12 inner-12 view last">
 		                	<div class="span-6 notopmargin">
-		                    	<div class="item left"><a href="images/slide-1-1.jpg" class="item-preview spec-border-ie" rel="prettyPhoto" title=""><img class="img-preview spec-border"  src="images/gallery/4col-1.jpg" alt=" "/></a></div>
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Links.png" alt=" "/></div>
 		                    </div>
-		                    <h4 class="colored">Feature</h4>
-		                    <p>Description</p>
+		                    <h4 class="colored">Create Links &amp; See Usage</h4>
+		                    <p>See some data stored elsewhere on Synapse? Make a link to store it in your project. Want to see what projects are using your data? They are displayed automatically.</p>
 		                </div>
 					
 					</div>		

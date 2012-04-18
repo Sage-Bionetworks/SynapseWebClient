@@ -144,6 +144,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 					"<div class=\"span-12 notopmargin\">" +
 					"	<h3>Start Your Own Project</h3>" +
    					"	<p>Get started using Synapse today by creating your own Project. Projects provide an organizational structure for you to interact with your data, code and analyses.</p>" +
+   					"<ul class=\"list arrow-list\"><li>Organize your work</li><li>Store Data, Code & Results</li><li>Set Sharing Level</li><li>Custom, Searchable Annotations </li><li>Full Programmatic API & R Integration </li><li>Attach Figures and Documents</li><li>Describe & Version </li><li>Create Links & See Usage </li></ul>" + 
 					" 	<div class=\"mega-button\" style=\"margin-top: 10px;\">" +
 					" 		<a href=\"#ProjectsHome:0\">Start a Project</a>" +
 					" 	</div>" +

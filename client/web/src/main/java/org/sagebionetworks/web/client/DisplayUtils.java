@@ -447,7 +447,7 @@ public class DisplayUtils {
 
 	public static String createEntityLink(String id, String version,
 			String display) {
-		return "<a href=\"" + DisplayUtils.getSynapseHistoryToken(id) + "\" class=\"link\">" + display + "</a>";
+		return "<a href=\"" + DisplayUtils.getSynapseHistoryToken(id) + "\">" + display + "</a>";
 	}
 	
 	public static enum IconSize { PX16, PX24 };

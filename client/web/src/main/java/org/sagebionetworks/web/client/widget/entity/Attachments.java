@@ -64,50 +64,49 @@ public class Attachments implements AttachmentsView.Presenter,
 
 	@Override
 	public void deleteAttachment(final String tokenId) {
-		view.attachmentDeleted(tokenId, "joke");
-//		List<AttachmentData> attachments = entity.getAttachments();
-//		if(tokenId != null) {
-//			// find attachment via token and remove it
-//			AttachmentData found = null; 
-//			for(AttachmentData data : attachments) {
-//				if(tokenId.equals(data.getTokenId())) {
-//					found = data;
-//				}
-//			}
-//			
-//			if(found != null) {
-//				// save name and remove from entity
-//				final String deletedName = found.getName();
-//				attachments.remove(found);
-//				JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-//				try {
-//					entity.writeToJSONObject(adapter);
-//				} catch (JSONObjectAdapterException e) {
-//					view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
-//					return;
-//				}
-//
-//				// update entity minus attachment
-//				synapseClient.createOrUpdateEntity(adapter.toJSONString(), null, false, new AsyncCallback<String>() {
-//					
-//					@Override
-//					public void onSuccess(String result) {						
-//						view.attachmentDeleted(tokenId, deletedName);
-//					}
-//					
-//					@Override
-//					public void onFailure(Throwable caught) {
-//						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
-//							view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
-//						}						
-//					}
-//				});
-//			} else {
-//				view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
-//			}
-//		} else {
-//			view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
-//		}
+		List<AttachmentData> attachments = entity.getAttachments();
+		if(tokenId != null) {
+			// find attachment via token and remove it
+			AttachmentData found = null; 
+			for(AttachmentData data : attachments) {
+				if(tokenId.equals(data.getTokenId())) {
+					found = data;
+				}
+			}
+			
+			if(found != null) {
+				// save name and remove from entity
+				final String deletedName = found.getName();
+				attachments.remove(found);
+				JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+				try {
+					entity.writeToJSONObject(adapter);
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
+					return;
+				}
+
+				// update entity minus attachment
+				synapseClient.createOrUpdateEntity(adapter.toJSONString(), null, false, new AsyncCallback<String>() {
+					
+					@Override
+					public void onSuccess(String result) {						
+						view.attachmentDeleted(tokenId, deletedName);
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+							view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
+						}						
+					}
+				});
+			} else {
+				view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
+			}
+		} else {
+			view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
+		}
 	}
 
 }
