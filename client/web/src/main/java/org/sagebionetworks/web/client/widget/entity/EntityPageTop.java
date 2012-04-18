@@ -2,15 +2,14 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntitySchemaCache;
+import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -19,11 +18,11 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,6 +37,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private GlobalApplicationState globalApplicationState;
 	private EntitySchemaCache schemaCache;	
 	private JSONObjectAdapter jsonObjectAdapter;
+	private EntityTypeProvider entityTypeProvider;
+	private IconsImageBundle iconsImageBundle;
 	
 	private EntityBundle bundle;
 	private String entityTypeDisplay; 
@@ -51,7 +52,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			EntitySchemaCache schemaCache,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			EntityTypeProvider entityTypeProvider,
+			IconsImageBundle iconsImageBundle) {
 		this.view = view;
 		this.nodeService = service;
 		this.synapseClient = synapseClient;
@@ -60,6 +63,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.globalApplicationState = globalApplicationState;
 		this.schemaCache = schemaCache;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.entityTypeProvider = entityTypeProvider;
+		this.iconsImageBundle = iconsImageBundle; 
 		view.setPresenter(this);
 	}	
 
@@ -196,8 +201,17 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	
 	@Override
 	public String createEntityLink(String id, String version, String display) {
-		return DisplayUtils.createEntityLink(id, version, display);
+		return DisplayUtils.createEntityLink(id, version, display);		
 	}
+	
+	@Override
+	public ImageResource getIconForType(String typeString) {		
+		EntityType type = entityTypeProvider.getEntityTypeForString(typeString);
+		if(type == null) {
+			return DisplayUtils.getSynapseIconForEntity(null, IconSize.PX16, iconsImageBundle);
+		}
+		return DisplayUtils.getSynapseIconForEntityType(type, IconSize.PX16, iconsImageBundle);
+	}	
 
 	@Override
 	public void loadShortcuts(int offset, int limit, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {

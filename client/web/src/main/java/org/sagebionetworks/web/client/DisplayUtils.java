@@ -147,6 +147,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String getIconHtml(ImageResource icon) {
+		if(icon == null) return null;		
 		return "<span class=\"iconSpan\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
 	}
 		
@@ -448,7 +449,7 @@ public class DisplayUtils {
 			String display) {
 		return "<a href=\"" + DisplayUtils.getSynapseHistoryToken(id) + "\" class=\"link\">" + display + "</a>";
 	}
-
+	
 	public static enum IconSize { PX16, PX24 };
 	
 	public static ImageResource getSynapseIconForEntityType(EntityType type, IconSize iconSize, IconsImageBundle iconsImageBundle) {
