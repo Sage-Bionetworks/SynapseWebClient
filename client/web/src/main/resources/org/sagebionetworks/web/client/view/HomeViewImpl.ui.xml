@@ -108,7 +108,7 @@
 							system to crawl repositories, like GEO, ArrayExpress, and TCGA,
 							and
 							to manage contributions from users.</p>
-						<a class="button_readmore" href="#Synapse:102610"></a>
+						<a class="button_readmore" href="#Synapse:syn150935"></a>
 					</div>					
 				</div>
 
@@ -117,7 +117,29 @@
 						<h3>Top Synapse Contributors</h3>
 						<p>Synapse users who are actively contributing data</p>
 						<div class="span-12 last serv">
-							<g:Anchor ui:field="demoCharlesLink">
+							<a href="#Synapse:syn160764">
+								<div class="big-rounded-icon-white left">
+									<div class="icon-white-big">
+										<img src="static/images/people/Carlos_Caldas.jpg" />
+									</div>
+								</div>
+								<h5>Carlos Caldas</h5>
+								<p class="notopmargin small-italic">This dataset contains phenotype, expression and CNV data from ~1500 individuals with breast cancer.</p>
+							</a>
+						</div>
+						<div class="span-12 last serv">
+							<a href="#Synapse:syn169310">
+								<div class="big-rounded-icon-white left">
+									<div class="icon-white-big">
+										<img src="static/images/people/lyon_gholson.jpg" />
+									</div>
+								</div>
+								<h5>Gholson Lyon</h5>
+								<p class="notopmargin small-italic">This dataset contains targeted exome sequencing data from a family with Ogden Syndrome.</p>
+							</a>
+						</div>
+						<div class="span-12 last serv">
+							<a href="#Synapse:syn4494">
 								<div class="big-rounded-icon-white left">
 									<div class="icon-white-big">
 										<img src="static/images/people/charles.jpg" />
@@ -127,30 +149,7 @@
 								<p class="notopmargin small-italic">DNA copy number, mRNA expression profiles, candidate
 									gene resequencing, and clinical traits from 218 prostate
 									tumors.</p>
-							</g:Anchor>
-						</div>
-						<div class="span-12 last serv">
-							<div class="big-rounded-icon-white left margin15">
-								<div class="icon-white-big">
-									<img src="static/images/people/amanda.jpg" />
-								</div>
-							</div>
-							<h5>Amanda Myers, University of Miami</h5>
-							<p class="notopmargin small-italic">Genotypes, mRNA expression profiles, and clinical
-								traits
-								from 176 Alzheimer disease and 188 non-diseased brain
-								samples.</p>
-						</div>
-						<div class="span-12 last serv">
-							<div class="big-rounded-icon-white left margin15">
-								<div class="icon-white-big">
-									<img src="static/images/people/beatriz.jpg" />
-								</div>
-							</div>
-							<h5>Beatriz Carvalho &amp; Gerrit Meijer, VUMC</h5>
-							<p class="small-italic">DNA copy number, mRNA expression, and tumor traits
-								from
-								36 colorectal adenocarcinoma and 33 adenoma tumors.</p>
+							</a>
 						</div>
 					</div>
 				</div>

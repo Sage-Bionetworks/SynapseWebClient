@@ -213,6 +213,7 @@ public class DisplayConstants {
 	public static final String ERROR_DELETING_ATTACHMENT = "An error occurred deleting the Attachment. Please try again.";
 	public static final String LABEL_DELETED = "deleted";
 	public static final String ERRROR_ATTACHMENT_FAILED = "Failed to upload attachment: ";
+	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
 		
 }
 

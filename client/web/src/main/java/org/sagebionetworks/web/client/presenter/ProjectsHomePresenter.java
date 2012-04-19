@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -85,9 +86,13 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					} 
+					if(caught instanceof BadRequestException) {
+						view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
+					} else {
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
+							view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+						} 
+					}
 				}
 			});
 		} catch (JSONObjectAdapterException e) {

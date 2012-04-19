@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -12,7 +11,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
