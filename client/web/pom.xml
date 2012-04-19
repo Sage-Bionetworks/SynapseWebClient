@@ -131,6 +131,11 @@
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>synapseJavaClient</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.sagebionetworks</groupId>
+			<artifactId>bccSetup</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 
 		<!-- Using the Spring RestTemplate for all REST calls -->
