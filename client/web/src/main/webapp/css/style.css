@@ -2528,7 +2528,7 @@ a.btn3	{
 .arrow-list li{
 	margin:0px;	
 	display:block;
-	padding:11px 0px 11px 35px;
+	padding:5px 0px 5px 35px;
 	background: url(../images/list-arrow.png) no-repeat;
 	background-position:left center;
 	font-style:italic;

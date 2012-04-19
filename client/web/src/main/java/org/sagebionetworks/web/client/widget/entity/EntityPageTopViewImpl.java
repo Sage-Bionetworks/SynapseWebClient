@@ -680,7 +680,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					public void onSaveAttachment(UploadResult result) {
 						if(result != null){
 							if(UploadStatus.SUCCESS == result.getUploadStatus()){
-								showInfo(DisplayConstants.TEXT_ATTACHMENT_SUCCESS, null);
+								showInfo(DisplayConstants.TEXT_ATTACHMENT_SUCCESS, "");
 							}else{
 								showErrorMessage(DisplayConstants.ERRROR_ATTACHMENT_FAILED+result.getMessage());
 							}

@@ -32,8 +32,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	SimplePanel header;
 	@UiField
 	SimplePanel footer;
-	@UiField 
-	Anchor demoCharlesLink;
 	@UiField
 	SimplePanel bigSearchBox;
 	@UiField
