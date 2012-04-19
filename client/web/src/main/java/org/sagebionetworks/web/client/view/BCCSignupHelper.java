@@ -30,7 +30,7 @@ public class BCCSignupHelper {
 	public static void showDialog(BCCSignupProfile profile, final BCCCallback callback) {
         final Dialog window = new Dialog();
         window.setMaximizable(false);
-        window.setSize(400, 300);
+        window.setSize(ProfilePanel.WIDTH, 600);
         window.setPlain(true); 
         window.setModal(true); 
         window.setBlinkModal(true); 
@@ -48,11 +48,15 @@ public class BCCSignupHelper {
 	            @Override
 	            public void componentSelected(ButtonEvent ce) {
 	            	BCCSignupProfile completedProfile = new BCCSignupProfile();
+	            	completedProfile.setTitle(profilePanel.getTitle());
 	            	completedProfile.setFname(profilePanel.getFirstName());
 	            	completedProfile.setLname(profilePanel.getLastName());
 	            	completedProfile.setEmail(profilePanel.getEmail());
+	            	completedProfile.setTeam(profilePanel.getTeam());
+	            	completedProfile.setLab(profilePanel.getLab());
 	            	completedProfile.setOrganization(profilePanel.getOrganization());
 	            	completedProfile.setPhone(profilePanel.getPhone());
+	            	completedProfile.setPostToBridge(profilePanel.getBridge());
 	            	if (callback!=null) callback.submit(completedProfile);
 	            }
 	        });
