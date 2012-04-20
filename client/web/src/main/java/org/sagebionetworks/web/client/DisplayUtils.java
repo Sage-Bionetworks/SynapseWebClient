@@ -369,10 +369,10 @@ public class DisplayUtils {
 	
 	public static String getRClientEntityLoad(String id) {
 		String rSnipet = "# " + DisplayConstants.LABEL_R_CLIENT_GET_ENTITY
-				+ " <br/>" + "entity_" + id + " <- getEntity(" + id + ")"
+				+ " <br/>" + "entity_" + id + " <- getEntity('" + id + "')"
 				+ "<br/><br/>"
 				+ "# " + DisplayConstants.LABEL_R_CLIENT_LOAD_ENTITY
-				+ " <br/>" + "entity_" + id + " <- loadEntity(" + id + ")";
+				+ " <br/>" + "entity_" + id + " <- loadEntity('" + id + "')";
 		return rSnipet;
 	}	
 	
