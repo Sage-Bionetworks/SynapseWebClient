@@ -67,7 +67,7 @@
 		                </div>					
 						<div class="span-12 inner-12 view last">
 		                	<div class="span-6 notopmargin">
-		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Describe.png" alt=" "/></div>
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Annotations.png" alt=" "/></div>
 		                    </div>
 		                    <h4 class="colored">Custom, Searchable Annotations</h4>
 		                    <p>Assign any key/value pair you want, and those values become searchable and available to those granted access to see.</p>
@@ -75,7 +75,7 @@
 		                
 						<div class="span-12 inner-12 view">
 		                	<div class="span-6 notopmargin">
-		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Annotations.png" alt=" "/></div>
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_R.png" alt=" "/></div>
 		                    </div>
 		                    <h4 class="colored">Full Programmatic API &amp; R Integration</h4>
 		                    <p>Synapse is built on a REST API, so you can interact with Synapse using any programming language. We have built out full featured clients for R and Java.</p>
@@ -83,7 +83,7 @@
 					
 						<div class="span-12 inner-12 view last">
 		                	<div class="span-6 notopmargin">
-		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_R.png" alt=" "/></div>
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Attachments.png" alt=" "/></div>
 		                    </div>
 		                    <h4 class="colored">Attach Figures and Documents</h4>
 		                    <p>Upload documents and images via the website or programmatically.</p>
@@ -91,7 +91,7 @@
 					
 						<div class="span-12 inner-12 view">
 		                	<div class="span-6 notopmargin">
-		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Attachments.png" alt=" "/></div>
+		                    	<div class="item left"><img class="img-preview spec-border"  src="images/ProjectOverView_Describe.png" alt=" "/></div>
 		                    </div>
 		                    <h4 class="colored">Describe &amp; Version</h4>
 		                    <p>Describe each of the elements in your workflow, and then version those when you see fit. This allows you to explicitly record which version of the code you ran on which version of the data.</p>
