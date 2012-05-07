@@ -151,7 +151,7 @@ public class FileAttachmentServelet extends HttpServlet {
 				String name = item.getFieldName();
 				InputStream stream = item.openStream();
 				String fileName = item.getName();
-				File temp = writeToTempFile(stream);
+				File temp = ServiceUtils.writeToTempFile(stream, MAX_ATTACHMENT_SIZE_IN_BYTES);
 				try{
 					// Now upload the file
 					AttachmentData data = client.uploadAttachmentToSynapse(entityId, temp, fileName);
@@ -240,38 +240,5 @@ public class FileAttachmentServelet extends HttpServlet {
 		return client;
 	}
 
-	/**
-	 * Write the data in the passed input stream to a temp file.
-	 * 
-	 * @param stream
-	 * @return
-	 * @throws IOException
-	 */
-	public File writeToTempFile(InputStream stream) throws IOException {
-		File temp = File.createTempFile("tempUploadedFile", ".tmp");
-		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp, false));
-		try {
-			long size = 0;
-			byte[] buffer = new byte[1024];
-			int length = 0;
-			while ((length = stream.read(buffer)) > 0) {
-				out.write(buffer, 0, length);
-				size += length;
-				if(size > MAX_ATTACHMENT_SIZE_IN_BYTES) throw new IllegalArgumentException("File size exceeds the limit of "+MAX_ATTACHMENT_MEGABYTES+" MB for attachments");
-			}
-		} catch (Throwable e) {
-			// if is any errors delete the tmp file
-			if (out != null) {
-				out.close();
-			}
-			temp.delete();
-			throw new RuntimeException(e);
-		}finally {
-			if (out != null) {
-				out.close();
-			}
-		}
-		return temp;
-	}
 
 }
