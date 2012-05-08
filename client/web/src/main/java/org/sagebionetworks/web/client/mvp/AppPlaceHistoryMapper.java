@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Dataset;
 import org.sagebionetworks.web.client.place.DatasetsHome;
+import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Layer;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -41,6 +42,6 @@ import com.google.gwt.place.shared.WithTokenizers;
 		ComingSoon.Tokenizer.class, PhenoEdit.Tokenizer.class,
 		Lookup.Tokenizer.class, Synapse.Tokenizer.class,
 		PublicProfile.Tokenizer.class, Search.Tokenizer.class,
-		BCCOverview.Tokenizer.class})
+		BCCOverview.Tokenizer.class, Governance.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }
