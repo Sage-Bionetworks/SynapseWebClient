@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>client</artifactId>
 		<groupId>org.sagebionetworks</groupId>
-		<version>0.13-SNAPSHOT</version>
+		<version>0.13.1</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -102,11 +102,6 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
 
-			<!-- Build number generator -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-			</plugin>
 		</plugins>
 	</build>
 
