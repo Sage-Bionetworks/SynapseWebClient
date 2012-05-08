@@ -24,6 +24,8 @@ import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.view.EntityViewImpl;
+import org.sagebionetworks.web.client.view.GovernanceView;
+import org.sagebionetworks.web.client.view.GovernanceViewImpl;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.view.HomeViewImpl;
 import org.sagebionetworks.web.client.view.LoginView;
@@ -211,8 +213,14 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// BCCOverviewView
 		bind(BCCOverviewViewImpl.class).in(Singleton.class);
-		bind(BCCOverviewView.class).to(BCCOverviewViewImpl.class);									
-				// LookupView
+		bind(BCCOverviewView.class).to(BCCOverviewViewImpl.class);	
+		
+		// CominSoonView
+		bind(GovernanceViewImpl.class).in(Singleton.class);
+		bind(GovernanceView.class).to(GovernanceViewImpl.class);									
+		
+
+		// LookupView
 		bind(LookupViewImpl.class).in(Singleton.class);
 		bind(LookupView.class).to(LookupViewImpl.class);					
 		

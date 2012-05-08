@@ -57,13 +57,14 @@
         <div class="footer-line-wrapper">
             <div class="footer-container">
                 <div class="span-24 notopmargin footer-line">
-                    <div class="span-10 notopmargin">
+                    <div class="span-8 notopmargin">
                         <p>Copyright 2011 <a class="link" href="http://www.sagebase.org">Sage Bionetworks</a></p>
                     </div>
-                    <div class="span-14 notopmargin last">
+                    <div class="span-16 notopmargin last">
                     	<p class="right">
 	                    	<a class="link" href="#Home:0">Home</a> / 
 							<a class="link" href="#ComingSoon:0">Privacy Policy</a> /
+							<a class="link" href="#Governance:0">Governance</a> /
 							<a class="link" href="#ComingSoon:0">Platform support</a> /
 							<a class="link" href="#ComingSoon:0">Creative Commons License</a> /
 							<a class="link" href="#ComingSoon:0">FAQ</a> /

@@ -10,13 +10,13 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.place.AnalysesHome;
 import org.sagebionetworks.web.client.place.Analysis;
 import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Dataset;
 import org.sagebionetworks.web.client.place.DatasetsHome;
+import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Layer;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.GovernancePresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.LookupPresenter;
@@ -48,7 +49,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.History;
 
 public class AppActivityMapper implements ActivityMapper {
 	
@@ -83,6 +83,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(ProjectsHome.class);
 		openAccessPlaces.add(Project.class);
 		openAccessPlaces.add(ComingSoon.class);
+		openAccessPlaces.add(Governance.class);
 		openAccessPlaces.add(BCCOverview.class);
 		openAccessPlaces.add(Lookup.class);
 		openAccessPlaces.add(Step.class);
@@ -162,6 +163,11 @@ public class AppActivityMapper implements ActivityMapper {
 			// user's profile page
 			ComingSoonPresenter presenter = ginjector.getComingSoonPresenter();
 			presenter.setPlace((ComingSoon)place);
+			return presenter;
+		} else if (place instanceof Governance) {
+			// user's profile page
+			GovernancePresenter presenter = ginjector.getGovernancePresenter();
+			presenter.setPlace((Governance)place);
 			return presenter;
 		} else if (place instanceof BCCOverview) {
 			// user's profile page
