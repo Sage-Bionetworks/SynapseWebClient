@@ -1,0 +1,43 @@
+.colored { color:#FF0000;}
+.link { color:#FF0000;}
+.color-line { background:#FF0000}
+a.button_readmore:hover {
+	background-color:#ff0000;
+}
+.new-item { 
+	background-color:#FF0000;
+}
+.featured { 
+	background-color:#FF0000;
+}
+.more{
+	background-color:#FF0000;
+}
+.ca-more{
+	background-color:#FF0000;
+}
+.ca-close{
+	background-color:#FF0000;
+}
+.ca-item .title { 
+	background-color:#FF0000;
+}
+.mega-button {
+	background-color:#FF0000;
+}
+.ca-content .live {
+	background-color:#FF0000;
+}
+
+.ca-content .buy {
+	background-color:#FF0000;
+}
+.va-slice h3:hover{
+	color:#FF0000;
+}
+.va-slice ul li a{
+	background:#FF0000;
+}
+.va-more{
+	background-color:#FF0000;
+}
