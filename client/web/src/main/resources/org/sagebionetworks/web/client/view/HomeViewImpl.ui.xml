@@ -1,0 +1,167 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+ 	
+ 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
+ 
+	<ui:style>		
+	</ui:style>
+	<g:HTMLPanel>
+		<!-- MAIN CONTAINER -->
+		<!-- HEADER -->
+		<div class="color-line"></div>
+		<div class="clear"></div>
+		<div class="container">
+
+			<g:SimplePanel ui:field="header" />
+
+			<!-- MAIN CONTENT -->
+			<div>				
+				<!-- SLOGAN -->
+				<div class="span-24 separator" style="margin-top: 20px"></div>
+				<div class="span-24" style="margin-top: 10px">
+					<div class="span-24 last" style="margin-top: 10px">
+						<h3>
+							Welcome to
+							<a class="link" href="#Home:0">SYNAPSE</a>
+						</h3>
+						<p>Synapse is a collaborative compute space that allows scientists to share and analyze data together.</p>
+					</div>
+				</div>
+				<div class="span-24 separator notopmargin" style="margin-bottom: 18px !important;"></div>
+
+				<!-- TOP COLUMN 1 -->
+				<div class="span-8 notopmargin">
+					<h4>Introduction to Synapse</h4>
+					<div class="span-8 notopmargin">
+						<div class="span-8 notopmargin">
+							<div class="item">
+								<iframe width="300" height="169"
+									src="http://www.youtube.com/embed/ACuPT4i5Jg0" frameborder="0"
+									allowfullscreen="true"></iframe>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<!-- TOP COLUMN 2 -->
+				<div class="span-8 notopmargin">
+					<h4>Top Features</h4>
+					<ul class="list check-list">
+						<li>Search across public data including curated GEO, TCGA, and Array Express</li>
+						<li>Find raw data or follow an analysis path to processed results</li>
+						<li>Load data directly into analytical tools like R, and record your analysis</li>
+						<li>
+							Create
+							<span style="font-weight: bold;">Public</span>
+							<g:Image resource='{icons.users16}' />
+							or
+							<span style="font-weight: bold;">Private</span>
+							<g:Image resource='{icons.lock16}' />
+							projects to share your work
+						</li>
+					</ul>
+				</div>
+				
+				<!-- TOP COLUMN 3 -->
+				<div class="span-8 notopmargin last">
+					<h4>We&apos;re in Beta</h4>
+					<p>Synapse is currently in Beta development. This site has been
+						developed to demonstrate our vision for the technology and solicit
+						feedback from the community. The ability to create accounts and
+						download Sage-hosted data is operational now.</p>
+					<p class="small-italic">
+						Interested in working with Sage to start a pilot project on
+						Synapse? Please let us know at
+						<a class="link" href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a>
+					</p>
+				</div>
+			</div>
+
+			<!-- SEARCH BOX -->
+			<div class="span-24 notopmargin" style="margin-top: 10px !important;">
+				<h4>Search the Commons</h4>
+				<div class="span-23 inner-6 view notopmargin">
+					<g:SimplePanel ui:field="bigSearchBox" />
+				</div>
+			</div>
+			
+			<!-- START PROJECT & MY PROJECTS -->
+			<g:SimplePanel ui:field="projectPanel" />
+
+			<div class="span-24 separator"></div>
+			<div class="span-24 from_portfolio">
+				<div class="span-12 notopmargin">
+					<div class="span-12 notopmargin last">
+						<h3>Projects in the Spotlight</h3>
+					</div>
+					<div>
+						<g:SimplePanel ui:field="bccSignup" />
+					</div>
+					<div class="span-6 inner-6 view notopmargin last">
+						<h5>
+							<a class="link" href="#Synapse:syn150935">Synapse Commons Repository</a>
+						</h5>
+						<p>The Synapse Commons Repository is the place to access publicly
+							available data sets. To build this project we have developed a
+							system to crawl repositories, like GEO, ArrayExpress, and TCGA,
+							and
+							to manage contributions from users.</p>
+						<a class="button_readmore" href="#Synapse:syn150935"></a>
+					</div>					
+				</div>
+
+				<div class="span-12 notopmargin main-service last">
+					<div class="span-12 notopmargin why last">
+						<h3>Top Synapse Contributors</h3>
+						<p>Synapse users who are actively contributing data</p>
+						<div class="span-12 last serv">
+							<a href="#Synapse:syn160764">
+								<div class="big-rounded-icon-white left">
+									<div class="icon-white-big">
+										<img src="static/images/people/Carlos_Caldas.jpg" />
+									</div>
+								</div>
+								<h5>Carlos Caldas</h5>
+								<p class="notopmargin small-italic">This dataset contains phenotype, expression and CNV data from ~1500 individuals with breast cancer.</p>
+							</a>
+						</div>
+						<div class="span-12 last serv">
+							<a href="#Synapse:syn169310">
+								<div class="big-rounded-icon-white left">
+									<div class="icon-white-big">
+										<img src="static/images/people/lyon_gholson.jpg" />
+									</div>
+								</div>
+								<h5>Gholson Lyon</h5>
+								<p class="notopmargin small-italic">This dataset contains targeted exome sequencing data from a family with Ogden Syndrome.</p>
+							</a>
+						</div>
+						<div class="span-12 last serv">
+							<a href="#Synapse:syn4494">
+								<div class="big-rounded-icon-white left">
+									<div class="icon-white-big">
+										<img src="static/images/people/charles.jpg" />
+									</div>
+								</div>
+								<h5>Charles Sawyers et al, MSKCC</h5>
+								<p class="notopmargin small-italic">DNA copy number, mRNA expression profiles, candidate
+									gene resequencing, and clinical traits from 218 prostate
+									tumors.</p>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="span-24 separator"></div>
+
+
+			<div class="clear"></div>
+		</div> <!-- close class="container" -->
+		<g:SimplePanel ui:field="footer" />
+
+	</g:HTMLPanel>
+</ui:UiBinder> 
