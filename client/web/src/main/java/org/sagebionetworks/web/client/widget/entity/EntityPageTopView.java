@@ -52,7 +52,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		String createEntityLink(String id, String version, String display);
 		
 		ImageResource getIconForType(String typeString);
-
 	}
 
 }
