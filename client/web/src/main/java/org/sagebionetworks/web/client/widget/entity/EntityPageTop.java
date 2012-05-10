@@ -244,9 +244,4 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		view.setEntityBundle(bundle, entityTypeDisplay, isAdmin, canEdit);
 	}
 
-	@Override
-	public void reload() {
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(bundle.getEntity().getId()));
-	}
-
 }
