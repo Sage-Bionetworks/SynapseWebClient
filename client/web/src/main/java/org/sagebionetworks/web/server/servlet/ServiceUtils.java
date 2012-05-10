@@ -141,7 +141,7 @@ public class ServiceUtils {
 	 */
 	public static File writeToTempFile(InputStream stream, final long maxAttachmentSizeBytes) throws IOException {
 		File temp = File.createTempFile("tempUploadedFile", ".tmp");
-		writeToTempFile(stream, maxAttachmentSizeBytes);
+		writeToFile(temp, stream, maxAttachmentSizeBytes);
 		return temp;
 	}
 
