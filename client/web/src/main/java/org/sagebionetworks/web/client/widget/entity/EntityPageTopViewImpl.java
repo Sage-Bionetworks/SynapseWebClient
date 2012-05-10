@@ -681,7 +681,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 						if(result != null){
 							if(UploadStatus.SUCCESS == result.getUploadStatus()){
 								showInfo(DisplayConstants.TEXT_ATTACHMENT_SUCCESS, "");
-								presenter.reload();
 							}else{
 								showErrorMessage(DisplayConstants.ERRROR_ATTACHMENT_FAILED+result.getMessage());
 							}
