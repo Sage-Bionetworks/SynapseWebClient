@@ -66,17 +66,11 @@ public class FileUpload extends HttpServlet {
 				
 				if(!file.createNewFile()) {
 					throw new IOException("Unable to create server temporary file for upload: " + file.getAbsolutePath());
-				}
-				try{
-					BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file, false));
-	                int len;
-	                int BUFFER_SIZE = 8192;
-	                byte[] buffer = new byte[BUFFER_SIZE];
-	                while ((len = stream.read(buffer, 0, buffer.length)) != -1) {
-	                    out.write(buffer, 0, len);
-	                }
-	// TODO : check file size and restrict to a limit?                
-	                
+				}				
+				
+				ServiceUtils.writeToFile(file, stream, Long.MAX_VALUE); // TODO : check file size and restrict to a limit?      
+				
+				try{	                
 	                TokenProvider tokenProvider = new TokenProvider() {					
 						@Override
 						public String getSessionToken() {

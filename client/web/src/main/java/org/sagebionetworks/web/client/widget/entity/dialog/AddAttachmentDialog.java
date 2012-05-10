@@ -142,7 +142,7 @@ public class AddAttachmentDialog {
 		result.setUploadStatus(UploadStatus.SUCCESS);
 		if(html != null){
 			GwtAdapterFactory factory = new GwtAdapterFactory();
-			String json = html.substring("<pre>".length(), (html.length()-"</pre>".length()));
+			String json = html.substring("<pre style=\"word-wrap: break-word; white-space: pre-wrap;\">".length(), (html.length()-"</pre>".length()));
 			JSONObjectAdapter adapter;
 			try {
 				adapter = factory.createNew(json);
