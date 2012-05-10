@@ -53,6 +53,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		
 		ImageResource getIconForType(String typeString);
 
+		void reload();
 	}
 
 }
