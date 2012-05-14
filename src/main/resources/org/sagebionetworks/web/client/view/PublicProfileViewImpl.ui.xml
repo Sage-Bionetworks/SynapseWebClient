@@ -1,0 +1,40 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+		
+	<ui:style>
+		.important {
+			font-weight: bold;
+		}
+		
+		.rowTop {
+			vertical-align: top;
+		}
+	</ui:style>
+		
+	<g:HTMLPanel>
+
+	<!-- MAIN CONTAINER -->
+		<!-- HEADER -->
+        <div class="color-line"></div>
+        <div class="clear"></div>
+    	<div class="container"> 		
+			<g:SimplePanel ui:field="header" />
+	        	<div class="span-24 notopmargin">
+
+					<ul class="breadcrumbs">
+						<li class="breadcrumb"><a href="#">Home</a> > Profile</li>
+					</ul>
+					
+					<g:SimplePanel ui:field="userInfoPanel" />	
+
+				</div>
+					
+            <div class="clear"></div>
+        </div> <!-- close class="container" -->
+		<g:SimplePanel ui:field="footer" />
+
+	</g:HTMLPanel>
+</ui:UiBinder> 
