@@ -10,7 +10,7 @@
 	<name>Synapse Portal</name>
 
 	<properties>
-	        <!-- Synapse Web Client "John". -->
+	        <!-- Synapse Web Client "Dave". -->
 		<!-- GWT needs at least java 1.5 -->
 		<maven.compiler.source>1.6</maven.compiler.source>
 		<maven.compiler.target>1.6</maven.compiler.target>
