@@ -2,3 +2,4 @@ target
 .maven
 /.classpath
 /.project
+/.settings
