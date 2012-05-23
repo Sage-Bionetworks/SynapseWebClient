@@ -17,8 +17,7 @@ import com.google.inject.Inject;
 
 public class BreadcrumbViewImpl extends LayoutContainer implements BreadcrumbView {
 	private static final int MAX_BREADCRUMB_LENGTH = 25;
-	private static final String BREADCRUMB_SEP = "&nbsp;&raquo;&nbsp;";
-
+	
 	public interface BreadcrumbViewImplUiBinder extends
 			UiBinder<Widget, BreadcrumbViewImpl> {
 	}
@@ -64,13 +63,13 @@ public class BreadcrumbViewImpl extends LayoutContainer implements BreadcrumbVie
 				}
 			});
 			if (i > 0) {
-				panel.add(new Html(BREADCRUMB_SEP));
+				panel.add(new Html(DisplayUtils.BREADCRUMB_SEP));
 			}
 			panel.add(anchor);
 		}
 		if (current != null) {
 			current = stubString(current);
-			panel.add(new Html(BREADCRUMB_SEP + current));
+			panel.add(new Html(DisplayUtils.BREADCRUMB_SEP + current));
 		}
 		panel.layout(true);
 		this.layout(true);

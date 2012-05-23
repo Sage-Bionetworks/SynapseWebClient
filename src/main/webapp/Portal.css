@@ -249,8 +249,17 @@
 }
 
 .hitattribution {
-	color: green;
+	color: #508743;
 }
+
+.hitBreadcrumbParent {
+	color: #b1b1b1;	
+}
+
+.hitBreadcrumbElement {
+	color: #595959;
+}
+
 
 .addProjectBox {
 	width: 570px;
@@ -288,3 +297,10 @@ a.shortBtn {
 }
 
 
+
+
+
+
+
+
+	

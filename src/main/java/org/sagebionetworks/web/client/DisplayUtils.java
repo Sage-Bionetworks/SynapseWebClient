@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
@@ -61,7 +63,8 @@ public class DisplayUtils {
 	private static final String REGEX_CLEAN_ENTITY_NAME = "^[a-z,A-Z,0-9,_,., ,\\-,\\+,(,)]+";
 	public static final String REPO_ENTITY_NAME_KEY = "name";
 	public static final String WHITE_SPACE = "&nbsp;";
-		
+	public static final String BREADCRUMB_SEP = "&nbsp;&raquo;&nbsp;";
+	
 	public static final String NODE_DESCRIPTION_KEY = "description";
 	public static final String LAYER_COLUMN_DESCRIPTION_KEY_PREFIX = "colDesc_";
 	public static final String LAYER_COLUMN_UNITS_KEY_PREFIX = "colUnits_";
@@ -135,7 +138,7 @@ public class DisplayUtils {
 		SearchQuery query = new SearchQuery();
 		// start with a blank, valid query
 		query.setQueryTerm(Arrays.asList(new String[] {""}));		
-		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on"}));		
+		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));		
 		query.setFacet(FACETS_DISPLAY_ORDER);
 		
 		return query;
@@ -407,6 +410,10 @@ public class DisplayUtils {
 	
 	
 	public static String getSynapseHistoryToken(String value) {
+		Set<String> s = new HashSet<String>();
+		for(String x : s) {
+			
+		}
 		return "#" + getPlaceString(Synapse.class) + ":" + value;
 	}
 	

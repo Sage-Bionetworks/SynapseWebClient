@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.gwttime.time.DateTime;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.search.Facet;
 import org.sagebionetworks.repo.model.search.FacetConstraint;
 import org.sagebionetworks.repo.model.search.FacetTypeNames;
@@ -346,24 +348,51 @@ public class SearchViewImpl extends Composite implements SearchView {
 		
 		ImageResource icon = presenter.getIconForHit(hit);
 		
-		StringBuilder attribution = new StringBuilder();
-		attribution.append("Created by ").append(hit.getCreated_by()).append(" on ").append(DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000))).append(", ");
-		attribution.append("Updated by ").append(hit.getModified_by()).append(" on ").append(DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)));
-		
-		StringBuilder resultHtml = new StringBuilder();
-		resultHtml.append("<div class=\"span-18 last serv notopmargin hit\">\n");		
-		resultHtml.append("	   <h4>").append(i).append(". \n");
-		if(icon != null) resultHtml.append(DisplayUtils.getIconHtml(icon));
-		resultHtml.append("         <a class=\"link\" href=\"").append(DisplayUtils.getSynapseHistoryToken(hit.getId())).append("\">").append(hit.getName()).append("</a>");
-		resultHtml.append("    </h4>\n");
-		resultHtml.append("<p class=\"notopmargin\">");
-		if(null != hit.getDescription()) {
-			resultHtml.append("<span class=\"hitdescription\">").append(DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR)).append("</span><br>\n");
-		}
-		resultHtml.append("<span class=\"hitattribution\">").append(attribution.toString()).append("</span></p>\n");					
-		resultHtml.append("</div>\n");
+		String attribution = "Created by " + hit.getCreated_by() + " on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000)) + ", "
+			+ "Updated by " + hit.getModified_by() + " on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000));
 
-		return resultHtml.toString();
+		
+		
+		String resultHtml = "<div class=\"span-18 last serv notopmargin hit\">\n"; 
+		resultHtml += "	   <h4>" + i + ". \n";
+		if(icon != null) 
+			resultHtml += DisplayUtils.getIconHtml(icon);
+		resultHtml += "         <a class=\"link\" href=\"" + DisplayUtils.getSynapseHistoryToken(hit.getId()) + "\">" + hit.getName() + "</a>";
+		resultHtml += "    </h4>\n";
+		resultHtml += "<p class=\"notopmargin\">";
+		if(null != hit.getPath()) {
+			resultHtml += getPathHtml(hit.getPath()) + "<br/>\n";
+		}
+		if(null != hit.getDescription()) {
+			resultHtml += "<span class=\"hitdescription\">" + DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR) + "</span><br>\n";
+		}
+		resultHtml += "<span class=\"hitattribution\">" + attribution + "</span></p>\n";					
+		resultHtml += "</div>\n";
+
+		return resultHtml;
+	}
+
+	private String getPathHtml(EntityPath path) {		
+		List<EntityHeader> headers = path.getPath();
+		String pathHtml = "";
+		for(int i=0; i<headers.size(); i++) {
+			if(i == 0) continue; // skip "root"
+			EntityHeader header = headers.get(i); 
+			pathHtml += "<a href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\""; 
+			if(i >= headers.size()-1) {
+				// last one show full color
+				pathHtml += " class=\"hitBreadcrumbElement\"";
+			} else {
+				// grey parents
+				pathHtml += " class=\"hitBreadcrumbParent\"";
+			}
+			pathHtml += ">" + header.getName() + "</a>";
+			
+			if(i<headers.size() - 1) {
+				pathHtml += DisplayUtils.BREADCRUMB_SEP;
+			}
+		}
+		return pathHtml;
 	}
 
 	private LayoutContainer createDateFacet(final Facet facet) {
