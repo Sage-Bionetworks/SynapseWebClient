@@ -50,14 +50,15 @@ public class ServiceUtils {
 	public static final String AUTHSVC_ACL_PRINCIPAL_ETAG = "etag";
 	public static final String AUTHSVC_ACL_PRINCIPAL_INDIVIDUAL = "individual";
 	
+	@Deprecated
 	public static StringBuilder getBaseUrlBuilder(ServiceUrlProvider urlProvider, NodeType type) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(urlProvider.getRepositoryServiceUrl() + "/");
 		builder.append(REPOSVC_PATH_ENTITY);
 		return builder;
 	}
-
 	
+	@Deprecated
 	public static String handleHttpClientErrorException(HttpClientErrorException ex) {
 	//		if(ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 	//		throw new UnauthorizedException();
