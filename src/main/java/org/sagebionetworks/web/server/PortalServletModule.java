@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import org.sagebionetworks.web.server.servlet.BCCSignupImpl;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.server.servlet.FileAttachmentServelet;
+import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.FileUpload;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
@@ -92,8 +92,8 @@ public class PortalServletModule extends ServletModule {
 		serve("/Portal/upload").with(FileUpload.class);
 		
 		// Attachments
-		bind(FileAttachmentServelet.class).in(Singleton.class);
-		serve("/Portal/attachment").with(FileAttachmentServelet.class);
+		bind(FileAttachmentServlet.class).in(Singleton.class);
+		serve("/Portal/attachment").with(FileAttachmentServlet.class);
 		
 		// Setup the LinkedIn service mapping
 		bind(LinkedInServiceImpl.class).in(Singleton.class);
