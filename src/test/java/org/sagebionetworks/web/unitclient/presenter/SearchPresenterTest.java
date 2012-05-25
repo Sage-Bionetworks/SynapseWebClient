@@ -1,14 +1,21 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -133,5 +140,17 @@ public class SearchPresenterTest {
 		assertEquals(searchPresenter.getRedirect(), new Synapse(term)); 
 	}
 
+	@Test 
+	public void testGetAppliedFacets() {
+		List<KeyValue> facets = searchPresenter.getAppliedFacets();
+		boolean found = false;
+		for(KeyValue facet : facets) {
+			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()) && facet.getNot() == Boolean.TRUE)
+				found = true;
+
+		}
+		assertTrue(found);
+	}
+	
 }
 

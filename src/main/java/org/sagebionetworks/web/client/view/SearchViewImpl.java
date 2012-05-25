@@ -192,6 +192,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 		currentFacets.setWidth(513);
 		currentFacets.setAutoHeight(true);
 		for(final KeyValue facet : presenter.getAppliedFacets()) {
+			// Don't display the !link node_type facet
+			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()) && facet.getNot() == Boolean.TRUE)
+				continue;
 			String text = facet.getValue();
 			if(text.contains("..")) {				
 				text = presenter.getDisplayForTimeFacet(facet.getKey(), facet.getValue());

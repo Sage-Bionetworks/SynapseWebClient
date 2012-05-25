@@ -26,6 +26,7 @@ import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -138,7 +139,17 @@ public class DisplayUtils {
 		SearchQuery query = new SearchQuery();
 		// start with a blank, valid query
 		query.setQueryTerm(Arrays.asList(new String[] {""}));		
-		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));		
+		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));
+		
+		// exclude links
+		List<KeyValue> bq = new ArrayList<KeyValue>();
+		KeyValue kv = new KeyValue();
+		kv.setKey("node_type");
+		kv.setValue("link");
+		kv.setNot(true);
+		bq.add(kv);
+		query.setBooleanQuery(bq);
+		
 		query.setFacet(FACETS_DISPLAY_ORDER);
 		
 		return query;
