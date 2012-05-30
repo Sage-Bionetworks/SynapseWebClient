@@ -629,7 +629,6 @@ public class DisplayUtils {
 		builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
 		builder.append("&"+DisplayUtils.WAIT_FOR_URL+"=true");
-		builder.append(fileName);
 		return builder.toString();
 	}
 	
