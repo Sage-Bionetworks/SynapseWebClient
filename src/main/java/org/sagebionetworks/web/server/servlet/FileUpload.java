@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,6 +30,9 @@ public class FileUpload extends HttpServlet {
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	
+	private FileItemIterator fileItemIterator;
+	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+	
 	/**
 	 * Injected with Gin
 	 */
@@ -47,14 +48,31 @@ public class FileUpload extends HttpServlet {
 		this.urlProvider = provider;
 	}
 	
+	/**
+	 * Used for testing or if you want to specify what the FileItems are to upload outside of the requests
+	 * @param fileItemIterator
+	 */
+	public void setFileItemIterator(FileItemIterator fileItemIterator) {
+		this.fileItemIterator = fileItemIterator;
+	}
+	
+	/**
+	 * Unit test can override this.
+	 * 
+	 * @param provider
+	 */
+	public void setSynapseProvider(SynapseProvider synapseProvider) {
+		this.synapseProvider = synapseProvider;
+	}
+	
     public void doPost(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {
-        ServletFileUpload upload = new ServletFileUpload();
+    	ServletFileUpload upload = new ServletFileUpload();
         
-        try{
-            FileItemIterator iter = upload.getItemIterator(request);
+        try{ 
+            if(fileItemIterator == null) fileItemIterator = upload.getItemIterator(request);
 
-            while (iter.hasNext()) {
-                FileItemStream item = iter.next();
+            while (fileItemIterator.hasNext()) {
+                FileItemStream item = fileItemIterator.next();
 
                 String name = item.getFieldName();
                 InputStream stream = item.openStream();
@@ -82,7 +100,7 @@ public class FileUpload extends HttpServlet {
 					String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
 					if(entityId != null) {					
 						String makeAttachment = request.getParameter(DisplayUtils.MAKE_ATTACHMENT_PARAM_KEY);
-						Synapse synapseClient = ServiceUtils.createSynapseClient(tokenProvider, urlProvider);
+						Synapse synapseClient = ServiceUtils.createSynapseClient(synapseProvider, urlProvider, tokenProvider.getSessionToken());						
 						Entity locationable = synapseClient.getEntityById(entityId);
 						if("true".equals(makeAttachment)) {
 							// TODO : create Attachment entity, and set locationable
@@ -93,7 +111,7 @@ public class FileUpload extends HttpServlet {
 						}						
 						Locationable uploaded = synapseClient.uploadLocationableToSynapse((Locationable)locationable, file);
 						logger.info("Uploaded file " + item.getName() + " ("+ file.getName() +") to Synapse id: " + uploaded.getId());
-						OutputStream os = response.getOutputStream();					
+						OutputStream os = response.getOutputStream();						
 						PrintStream printStream = new PrintStream(os);
 						printStream.print(DisplayUtils.UPLOAD_SUCCESS);
 						printStream.close();

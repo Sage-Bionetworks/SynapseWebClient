@@ -106,6 +106,14 @@ public class ServiceUtils {
 		return synapseClient;
 	}	
 	
+	public static Synapse createSynapseClient(SynapseProvider synapseProvider, ServiceUrlProvider urlProvider, String sessionToken) {
+		Synapse client = synapseProvider.createNewClient();
+		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
+		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
+		client.setSessionToken(sessionToken);
+		return client;
+	}
+
 	
 	
 	public static void writeToFile(File temp, InputStream stream, final long maxAttachmentSizeBytes) throws IOException {
