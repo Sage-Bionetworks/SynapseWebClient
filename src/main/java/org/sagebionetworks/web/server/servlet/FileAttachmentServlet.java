@@ -34,12 +34,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.inject.Inject;
 
 /**
- * Handles attachment uplaods.
- * 
+ * Handles attachment uploads.
+ *
  * @author jmhill
- * 
+ *
  */
-public class FileAttachmentServelet extends HttpServlet {
+public class FileAttachmentServlet extends HttpServlet {
 
 	public static final int MAX_TIME_OUT = 10 * 1000;
 	public static final long BYTES_PER_MEGABYTE = 1048576;
@@ -56,10 +56,16 @@ public class FileAttachmentServelet extends HttpServlet {
 	@SuppressWarnings("unused")
 	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+	private TokenProvider tokenProvider = new TokenProvider() {
+		@Override
+		public String getSessionToken() {
+			return UserDataProvider.getThreadLocalUserToken(FileAttachmentServlet.perThreadRequest.get());
+		}
+	};
 
 	/**
 	 * Unit test can override this.
-	 * 
+	 *
 	 * @param provider
 	 */
 	public void setSynapseProvider(SynapseProvider synapseProvider) {
@@ -68,7 +74,7 @@ public class FileAttachmentServelet extends HttpServlet {
 
 	/**
 	 * Essentially the constructor. Setup synapse client.
-	 * 
+	 *
 	 * @param provider
 	 */
 	@Inject
@@ -76,21 +82,27 @@ public class FileAttachmentServelet extends HttpServlet {
 		this.urlProvider = provider;
 	}
 
+	/**
+	 * Unit test uses this to provide a mock token provider
+	 *
+	 * @param tokenProvider
+	 */
+	public void setTokenProvider(TokenProvider tokenProvider) {
+		this.tokenProvider = tokenProvider;
+	}
+
 	@Override
 	protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		FileAttachmentServlet.perThreadRequest.set(arg0);
 		super.service(arg0, arg1);
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String token = getSessionToken(request);
-		if (token == null) {
-			setForbiddenMessage(response);
-			return;
-		}
+
 		// Now get the signed url
 		Synapse client = createNewClient(token);
 		String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
@@ -115,8 +127,8 @@ public class FileAttachmentServelet extends HttpServlet {
 			response.getOutputStream().write(("Failed to get the pre-signed url"+e.getMessage()).getBytes("UTF-8"));
 			response.getOutputStream().flush();
 			return;
-		} 
-		
+		}
+
 	}
 
 	@Override
@@ -195,26 +207,20 @@ public class FileAttachmentServelet extends HttpServlet {
 			}
 			return;
 		}
-	}	
-	
+	}
+
 	/**
 	 * Get the session token
 	 * @param request
 	 * @return
 	 */
 	public String getSessionToken(final HttpServletRequest request){
-		TokenProvider tokenProvider = new TokenProvider() {
-			@Override
-			public String getSessionToken() {
-				return UserDataProvider.getThreadLocalUserToken(request);
-			}
-		};
 		return tokenProvider.getSessionToken();
 	}
 
 	/**
 	 * The call was forbidden
-	 * 
+	 *
 	 * @param response
 	 * @throws IOException
 	 * @throws UnsupportedEncodingException
@@ -229,7 +235,7 @@ public class FileAttachmentServelet extends HttpServlet {
 
 	/**
 	 * Create a new Synapse client.
-	 * 
+	 *
 	 * @return
 	 */
 	private Synapse createNewClient(String sessionToken) {
