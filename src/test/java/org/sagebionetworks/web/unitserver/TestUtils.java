@@ -13,12 +13,11 @@ public class TestUtils {
 			@Override
 			public void describeTo(Description description) {
 				// nothing
-			}
-			// check that first character is A
+			} 
 			@Override
 			public boolean matches(Object item) {
 				byte[] actual=(byte[]) item;				
-				assertTrue(actual.length >= expected.length); // buffer must be larger
+				assertTrue(actual.length >= expected.length); // buffer must be equal or larger
 				// check that expected prefixes actual. 
 				int i=0;
 				while(i<expected.length) {
