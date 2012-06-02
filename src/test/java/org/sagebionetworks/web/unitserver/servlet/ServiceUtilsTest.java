@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Logger;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.ServiceUtils;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 
-import com.sun.istack.logging.Logger;
 
 /**
  * This is a unit test of the UserAccountServiceImpl service. It depends on a
@@ -32,7 +32,7 @@ import com.sun.istack.logging.Logger;
  */
 public class ServiceUtilsTest {
 
-	public static Logger logger = Logger.getLogger(ServiceUtilsTest.class);
+	public static Logger logger = Logger.getLogger(ServiceUtilsTest.class.getName());
 
 	@Test
 	public void testCreateSynapseClient() {
