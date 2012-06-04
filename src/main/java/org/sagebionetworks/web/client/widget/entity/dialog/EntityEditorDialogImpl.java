@@ -42,14 +42,15 @@ public class EntityEditorDialogImpl implements EntityEditorDialog{
 	 * @param annos
 	 * @param callback
 	 */
-	public void showEditEntityDialog(final JSONObjectAdapter newAdapter,ObjectSchema schema, final Annotations newAnnos, Set<String> filter, final Callback callback){
+	public void showEditEntityDialog(final String windowTitle, final JSONObjectAdapter newAdapter,
+			ObjectSchema schema, final Annotations newAnnos, Set<String> filter, final Callback callback){
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
-	    window.setSize(733, 700);
+	    window.setSize(733, 660);
 	    window.setPlain(true);  
 	    window.setModal(true);  
 	    window.setBlinkModal(true);  
-	    window.setHeading("Edit Entity");  
+	    window.setHeading(windowTitle);
 	    window.setLayout(new FitLayout());
 	    // We want okay to say save
 	    window.okText = "Save";
