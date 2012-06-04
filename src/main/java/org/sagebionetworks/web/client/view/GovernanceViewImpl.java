@@ -3,10 +3,8 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.entity.TempPropertyPresenter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.table.QueryServiceTableResourceProvider;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -28,23 +26,15 @@ public class GovernanceViewImpl extends Composite implements GovernanceView {
 	private Presenter presenter;
 	private IconsImageBundle icons;
 	private Header headerWidget;
-	
-	private TempPropertyPresenter props;
-
-	
+		
 	@Inject
 	public GovernanceViewImpl(GovernanceViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle,
-			QueryServiceTableResourceProvider queryServiceTableResourceProvider,
-			TempPropertyPresenter props) {		
+			SageImageBundle imageBundle) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
-		
-		this.props = props;
-		this.props.initializeWithTestData();
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());

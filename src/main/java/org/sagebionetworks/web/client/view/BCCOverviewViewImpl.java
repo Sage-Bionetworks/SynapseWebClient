@@ -3,16 +3,11 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.entity.TempPropertyPresenter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.table.QueryServiceTableResourceProvider;
 import org.sagebionetworks.web.shared.BCCSignupProfile;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -39,23 +34,15 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 	private IconsImageBundle icons;
 	private Header headerWidget;
 	
-	private TempPropertyPresenter props;
-
-	
 	@Inject
 	public BCCOverviewViewImpl(BCCOverviewViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle,
-			QueryServiceTableResourceProvider queryServiceTableResourceProvider,
-			TempPropertyPresenter props) {		
+			SageImageBundle imageBundle) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
-		
-		this.props = props;
-		this.props.initializeWithTestData();
-		
+				
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
 				
