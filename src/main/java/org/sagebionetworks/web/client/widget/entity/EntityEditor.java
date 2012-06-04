@@ -12,6 +12,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -71,8 +72,17 @@ public class EntityEditor {
 	    // Create a new Adapter to capture the editor's changes
 	    final JSONObjectAdapter newAdapter = copyEntityToAdapter(entity);
 	    
+	    // Create dialog title
+	    StringBuilder title = new StringBuilder();
+	    if (isNew) {
+		title.append("Create ");
+	    } else {
+		title.append("Edit ");
+	    }
+	    title.append(DisplayUtils.getEntityTypeDisplay(schema));
+
 	    // Show the edit dialog.
-	    editorDialog.showEditEntityDialog(newAdapter, schema, newAnnos, filter, new EntityEditorDialog.Callback(){
+	    editorDialog.showEditEntityDialog(title.toString(), newAdapter, schema, newAnnos, filter, new EntityEditorDialog.Callback(){
 
 			@Override
 			public void saveEntity(JSONObjectAdapter newAdapter, Annotations newAnnos) {
