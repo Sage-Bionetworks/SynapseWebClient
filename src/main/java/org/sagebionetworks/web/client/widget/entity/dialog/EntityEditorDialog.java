@@ -25,13 +25,14 @@ public interface EntityEditorDialog {
 
 	/**
 	 * Show the edit entity dialog.
+	 * @param windowTitle
 	 * @param newAdapter
 	 * @param schema
 	 * @param newAnnos
 	 * @param filter
 	 * @param callback
 	 */
-	public void showEditEntityDialog(JSONObjectAdapter newAdapter,	ObjectSchema schema, Annotations newAnnos, Set<String> filter,
+	public void showEditEntityDialog(String windowTitle, JSONObjectAdapter newAdapter,	ObjectSchema schema, Annotations newAnnos, Set<String> filter,
 			Callback callback);
 	
 	/**
