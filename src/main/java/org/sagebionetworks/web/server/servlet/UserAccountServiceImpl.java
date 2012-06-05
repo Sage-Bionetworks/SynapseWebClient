@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.ServiceConstants;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -326,6 +327,11 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
 
 		if (response.getStatusCode() != HttpStatus.CREATED && response.getStatusCode() != HttpStatus.OK) {
+			if(response.getStatusCode() == HttpStatus.BAD_REQUEST) {
+				throw new BadRequestException(response.getBody());
+			}
+			
+			// all other exceptions are general
 			throw new RestClientException("Status code:" + response.getStatusCode().value());
 		}		
 	}
