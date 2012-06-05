@@ -6,12 +6,12 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FormEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.extjs.gxt.ui.client.widget.TabItem;
@@ -124,6 +124,16 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 			fileUploadField.setAllowBlank(false);
 			fileUploadField.setName("uploadedfile");
 			fileUploadField.setFieldLabel("File");
+			
+			fileUploadField.addListener(Events.OnChange, new Listener<BaseEvent>() {
+				@Override
+				public void handleEvent(BaseEvent be) {
+					final String fullPath = fileUploadField.getValue();
+					final int lastIndex = fullPath.lastIndexOf('\\');
+					final String fileName = fullPath.substring(lastIndex + 1);
+					fileUploadField.setValue(fileName);
+				}
+			});
 			formPanel.add(fileUploadField);			
 		} else {		
 			formPanel.reset();

@@ -86,10 +86,20 @@ public class AddAttachmentDialog {
 		panel.setLabelAlign(LabelAlign.RIGHT);
 		panel.setBodyBorder(false);
 
-		FileUploadField file = new FileUploadField();
+		final FileUploadField file = new FileUploadField();
 		file.setAllowBlank(false);
 		file.setName("uploadedfile");
 		file.setFieldLabel("File");
+		file.addListener(Events.OnChange, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				final String fullPath = file.getValue();
+				final int lastIndex = fullPath.lastIndexOf('\\');
+				final String fileName = fullPath.substring(lastIndex + 1);
+				file.setValue(fileName);
+			}
+		});
+
 		
 		Margins margins = new Margins(10, 10, 0, 10);
 		FormData basicFormData = new FormData("-50");
