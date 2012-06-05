@@ -24,7 +24,7 @@ public class AccessMenuButton implements AccessMenuButtonView.Presenter {
 	public void createAccessButton(AccessLevel level, NodeType type, String id) {
 		nodeType = type;
 		nodeId = id;
-		accessControlListEditor.setResource(type, id);		
+		accessControlListEditor.setResource(id);		
 		view.createAccessMenu(level, accessControlListEditor);
 	}
 

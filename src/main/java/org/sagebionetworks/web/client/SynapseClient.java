@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
@@ -15,16 +13,11 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("synapse")	
 public interface SynapseClient extends RemoteService {
-	
-	
-	
 
 	public EntityWrapper getEntity(String entityId);
 	
 	public void deleteEntity(String entityId) throws RestServiceException;
 
-	//public EntityWrapper createEntity(EntityType type, JSONObjectAdaptor properties);
-	
 	public String getEntityTypeRegistryJSON();
 	
 	public EntityWrapper getEntityPath(String entityId);
@@ -88,7 +81,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String getUserProfile() throws RestServiceException;;
+	public String getUserProfile() throws RestServiceException;
 	
 	/**
 	 * Updates the user's profile json object 
@@ -96,5 +89,21 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	public void updateUserProfile(String userProfileJson) throws RestServiceException;
+	
+	
+	public EntityWrapper getNodeAcl(String id) throws RestServiceException;
+	
+	public EntityWrapper createAcl(EntityWrapper acl) throws RestServiceException;
+	
+	public EntityWrapper updateAcl(EntityWrapper acl) throws RestServiceException;
+	
+	public EntityWrapper deleteAcl(String ownerEntityId) throws RestServiceException;
+
+	public boolean hasAccess(String ownerEntityId, String accessType) throws RestServiceException;
+
+	public EntityWrapper getAllUsers() throws RestServiceException;
+	
+	public EntityWrapper getAllGroups() throws RestServiceException;
+	
 	
 }

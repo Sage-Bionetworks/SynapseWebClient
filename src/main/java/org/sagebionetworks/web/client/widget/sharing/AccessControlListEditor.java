@@ -1,321 +1,210 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.UserGroup;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.AclAccessType;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclPrincipal;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-import org.sagebionetworks.web.shared.users.UserData;
 
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AccessControlListEditor implements AccessControlListEditorView.Presenter {
 	
-	private static final String ETAG = "etag";
-	private static final String ACL_RESOURCE_ACCESS = "resourceAccess";
-	private static final String ACL_ENTRY_ACCESS_TYPE = "accessType";
-	private static final String ACL_ENTRY_PRINCIPAL_ID = "groupName";
-	private static final String ACL_ENTRY_CREATEDBY = "createdBy";
-	private static final String ACL_ENTRY_RESOURCE_ID = "id";
-
-	
 	private AccessControlListEditorView view;
-	private NodeServiceAsync nodeService;
-	private UserAccountServiceAsync userAccountService;
-	private NodeType nodeType;
-	private String nodeId;
-	private JSONObject originalAcl;
-	private List<AclPrincipal> principals;
 	private NodeModelCreator nodeModelCreator;
-	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
+	private SynapseClientAsync synapseClient;
+	private AuthenticationController authenticationController;
+	JSONObjectAdapter jsonObjectAdapter = null;
+	
 	private Entity entity;
+	private AccessControlList acl;
+	private Map<String, AclPrincipal> allPrincipals;
+	
 	
 	@Inject
 	public AccessControlListEditor(AccessControlListEditorView view,
-			NodeServiceAsync nodeService,
-			UserAccountServiceAsync userAccountService,
+			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState, 
+			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
-		this.nodeService = nodeService;
-		this.userAccountService = userAccountService;
+		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 		view.setPresenter(this);
 	}	
 	
-    /**
-     * Use Entity based setResource instead
-     * @param type
-     * @param id
-     */
-    @Deprecated
-	public void setResource(final NodeType type, final String id) {						
-		this.nodeType = type;
-		this.nodeId = id;	
-	}
-	
 	public void setResource(Entity entity) {
-		this.entity = entity;
-		this.nodeType = DisplayUtils.getNodeTypeForEntity(entity);
-		this.nodeId = entity.getId();
+		this.entity=entity;
+	}
+		
+	public void setResource(String entityId) {
+		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				try {
+					entity = nodeModelCreator.createEntity(result, Entity.class);
+				} catch (RestServiceException e) {
+					onFailure(e);
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.asWidget().setVisible(false);
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {							
+					view.showErrorMessage("Initialization failed. Please try again.");
+				}
+			}
+
+		});
 	}
 	
 	public Widget asWidget() {
-		view.setPresenter(this);
-		view.showLoading();
-		nodeService.getAllUsersAndGroups(new AsyncCallback<List<AclPrincipal>>() {
-			@Override
-			public void onSuccess(final List<AclPrincipal> usersAndGroupsList) {
-				principals = usersAndGroupsList;
-				nodeService.getNodeAclJSON(nodeType, nodeId, new AsyncCallback<String>() {		
-					@Override
-					public void onSuccess(String result) {
-						try {
-							nodeModelCreator.validate(result);
-						} catch (RestServiceException ex) {
-							onFailure(ex);
-							return;
-						}					
-						originalAcl = JSONParser.parseStrict(result).isObject();				
-						final List<AclEntry> entries = createAclEntries(originalAcl);
-						boolean isInherited = false;
-						
-						if(originalAcl.containsKey(ACL_ENTRY_RESOURCE_ID) && !nodeId.equals(originalAcl.get(ACL_ENTRY_RESOURCE_ID).isString().stringValue())) {
-							isInherited = true;
+		try {
+			retrieveAllPrincipals(new VoidCallback() {
+				public void success() {
+					refresh(new VoidCallback() {
+						@Override
+						public void success() {
+							// nothing more to do
 						}
-						view.setAclDetails(entries, principals, isInherited);
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {							
-							view.showErrorMessage("Sharing settings unavailable.");
+						@Override
+						public void failure(Throwable t) {
+							throw new RuntimeException(t);
 						}
-					}
-				});				
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {							
-					view.showErrorMessage("Unable to retrieve Users and Groups. Please try reloading the page.");
+					});	
 				}
-			}					
-		});
+				public void failure(Throwable throwable) {
+					throw new RuntimeException(throwable);					
+				}
+			});
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		return view.asWidget();
 	}	
 	
+	// create a new ACL and push to Synapse
 	@Override
 	public void createAcl() {
-		// create acl with current user as the administrator (owner)
-		UserData currentUser = authenticationController.getLoggedInUser();
-		List<AclAccessType> accessList = AclUtils.getAclAccessTypes(PermissionLevel.CAN_ADMINISTER);
-		nodeService.createAcl(nodeType, nodeId, currentUser.getEmail(), accessList, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				try {
-					nodeModelCreator.validate(result);
-				} catch (RestServiceException ex) {
-					onFailure(null);
-					return;
-				}	
-				view.showLoading();
-				refresh();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
-					view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
-				}
-			}
-		});
+		acl = newACLforEntity(this.entity);
+		createACLInSynapse();
 	}
 	
+	// add the given ACL level and persist
 	@Override
-	public void addAccess(AclPrincipal principal, PermissionLevel permissionLevel) {
-		if(principal != null && permissionLevel != null) {
-			// TODO : check if access conflicts or overlaps!!
-			
-			// create new Resource Access entry
-			JSONObject newResourceAccess = new JSONObject();
-			newResourceAccess.put(ACL_ENTRY_PRINCIPAL_ID, new JSONString(principal.getName()));
-			
-			List<AclAccessType> accessList = AclUtils.getAclAccessTypes(permissionLevel);
-			JSONArray jsonList = new JSONArray();
-			for(int i=0; i<accessList.size(); i++) {
-				jsonList.set(i, new JSONString(accessList.get(i).toString()));
-			}
-			newResourceAccess.put(ACL_ENTRY_ACCESS_TYPE, jsonList);
-			
-			// add new entry to list
-			JSONObject newAcl = new JSONObject(originalAcl.getJavaScriptObject()); // clone
-			JSONArray resourceAccessList = newAcl.get(ACL_RESOURCE_ACCESS).isArray();
-			resourceAccessList.set(resourceAccessList.size(), newResourceAccess);			
-			newAcl.put(ACL_RESOURCE_ACCESS, resourceAccessList);
-			
-			// persist
-			String etag = originalAcl.get(ETAG).isString().stringValue();
-			nodeService.updateAcl(nodeType, nodeId, newAcl.toString(), etag, new AsyncCallback<String>() {				
-				@Override
-				public void onSuccess(String result) {
-					try {
-						nodeModelCreator.validate(result);
-					} catch (RestServiceException ex) {
-						onFailure(null);
-						return;
-					}					
-					refresh();					
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
-						view.showErrorMessage("Addition failed. Please try again.");
-					}
-				}
-			});
+	public void addAccess(Long principal, PermissionLevel permissionLevel) {
+		if (this.entity==null) throw new IllegalStateException("Entity must be specified.");
+		if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
+		ResourceAccess ra = findPrincipal(principal, acl);
+		if (ra==null) {
+			ra = new ResourceAccess();
+			ra.setPrincipalId(principal);
+			ra.setAccessType(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(permissionLevel)));
+			acl.getResourceAccess().add(ra);
+		} else {
+			ra.getAccessType().addAll(AclUtils.getACCESS_TYPEs(permissionLevel));
 		}
+		updateACLInSynapse();
 	}
 
+	// edit the current ACL to give the given principal the given permission level, then persist
+	//
+	// "Change failed. Please try again."
 	@Override
-	public void changeAccess(AclEntry aclEntry, PermissionLevel permissionLevel) {
-		if(aclEntry != null && permissionLevel != null) {
-			Integer resourceIndex = getResourceAccessIndex(aclEntry.getPrincipal());
-			if(resourceIndex != null) {
-				// add replace permissions to list
-				JSONObject newAcl = new JSONObject(originalAcl.getJavaScriptObject()); // clone
-				JSONArray resourceAccessList = newAcl.get(ACL_RESOURCE_ACCESS).isArray();			
-				JSONObject newResourceAccess = resourceAccessList.get(resourceIndex).isObject();
-				
-				// update access
-				List<AclAccessType> accessList = AclUtils.getAclAccessTypes(permissionLevel);
-				JSONArray jsonList = new JSONArray();
-				for(int i=0; i<accessList.size(); i++) {
-					jsonList.set(i, new JSONString(accessList.get(i).toString()));
-				}
-				newResourceAccess.put(ACL_ENTRY_ACCESS_TYPE, jsonList);				
-				resourceAccessList.set(resourceAccessList.size(), newResourceAccess);
-				newAcl.put(ACL_RESOURCE_ACCESS, resourceAccessList);
-				
-				// persist
-				String etag = originalAcl.get(ETAG).isString().stringValue();
-				nodeService.updateAcl(nodeType, nodeId, newAcl.toString(), etag, new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String result) {
-						try {
-							nodeModelCreator.validate(result);
-						} catch (RestServiceException ex) {
-							onFailure(null);							
-							return;
-						}					
-						refresh();					
-					}
-	
-					@Override
-					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
-							view.showErrorMessage("Change failed. Please try again.");
-						}						
-					}	
-				});
-			} else {
-				view.showErrorMessage("An error occured. Please try reloading the page.");
-			}
-
-		}		
+	public void changeAccess(Long principalId, PermissionLevel permissionLevel) {
+		if (this.entity==null) throw new IllegalStateException("Entity must be specified.");
+		if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
+		ResourceAccess ra = findPrincipal(principalId, acl);
+		if (ra==null) {
+			ra = new ResourceAccess();
+			ra.setPrincipalId(principalId);
+			ra.setAccessType(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(permissionLevel)));
+			acl.getResourceAccess().add(ra);
+		} else {
+			ra.setAccessType(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(permissionLevel)));
+		}
+		updateACLInSynapse();
 	}
 	
+	// clone the current ACL, copying over the entries but skipping the given one
+	// "Remove failed. Please try again."
 	@Override
-	public void removeAccess(AclEntry aclEntry) {
-		if(aclEntry != null) {
-			Integer resourceIndex = getResourceAccessIndex(aclEntry.getPrincipal());
-			if(resourceIndex != null) {
-				// add replace permissions to list
-				JSONObject newAcl = new JSONObject(originalAcl.getJavaScriptObject()); // clone
-				JSONArray resourceAccessList = newAcl.get(ACL_RESOURCE_ACCESS).isArray();
-				
-				// copy over old values and skip removed one
-				JSONArray newResourceAccessList = new JSONArray();
-				int count = 0;
-				for(int i=0; i<resourceAccessList.size(); i++) {
-					if(i == resourceIndex) continue;
-					newResourceAccessList.set(count, resourceAccessList.get(i));
-					count++;
-				}
-				// replace list with new one
-				newAcl.put(ACL_RESOURCE_ACCESS, newResourceAccessList);
-				
-				// persist
-				String etag = originalAcl.get(ETAG).isString().stringValue();
-				nodeService.updateAcl(nodeType, nodeId, newAcl.toString(), etag, new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String result) {
-						try {
-							nodeModelCreator.validate(result);
-						} catch (RestServiceException ex) {
-							onFailure(null);
-							return;
-						}					
-						refresh();					
-					}
-	
-					@Override
-					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {						
-							view.showErrorMessage("Remove failed. Please try again.");						
-						}
-					}	
-				});
-			} else {
-				view.showErrorMessage("An error occured. Please try reloading the page.");
-			}
-
-		}		
+	public void removeAccess(Long principalId) {
+		if (this.entity==null) throw new IllegalStateException("Entity must be specified.");
+		if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
+		ResourceAccess ra = findPrincipal(principalId, acl);
+		if (ra==null) {
+			throw new IllegalStateException("ACL does not have a record for "+principalId);
+		} else {
+			acl.getResourceAccess().remove(ra);
+		}
+		updateACLInSynapse();
 	}
+
 
 	@Override
 	public void deleteAcl() {
-		// delete this ACL		
-		nodeService.deleteAcl(nodeType, nodeId, new AsyncCallback<String>() {
+		if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
+		synapseClient.deleteAcl(acl.getId(), new AsyncCallback<EntityWrapper>(){
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(EntityWrapper result) {
 				try {
-					nodeModelCreator.validate(result);
-				} catch (RestServiceException ex) {
-					onFailure(null);
-					return;
-				}	
-				view.showLoading();
-				refresh();				
+					acl = nodeModelCreator.createEntity(result, AccessControlList.class);
+				} catch (RestServiceException e) {
+					onFailure(e);
+				}
+				refresh(new VoidCallback(){
+					@Override
+					public void success() {
+						// nothing more to do
+					}
+					@Override
+					public void failure(Throwable t) {
+						onFailure(t);
+					}
+				});
 			}
+			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				view.asWidget().setVisible(false);
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {							
 					view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
 				}
 			}
+
 		});
 	}
 
@@ -324,91 +213,316 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	 * Private Methods
 	 */
 	
-	private void refresh() {		
-		nodeService.getNodeAclJSON(nodeType, nodeId, new AsyncCallback<String>() {		
+	private void createACLInSynapse() {
+		EntityWrapper aclEntityWrapper = null;
+		try {
+			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
+			aclEntityWrapper = new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName(), null);
+		} catch (JSONObjectAdapterException e) {
+			view.asWidget().setVisible(false);
+			view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
+		}
+		synapseClient.createAcl(aclEntityWrapper, new AsyncCallback<EntityWrapper>(){
+
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(EntityWrapper result) {
 				try {
-					nodeModelCreator.validate(result);
-				} catch (RestServiceException ex) {
-					onFailure(null);
-					return;
-				}					
-				originalAcl = JSONParser.parseStrict(result).isObject();				
-				final List<AclEntry> entries = createAclEntries(originalAcl);
-				boolean isInherited = false;
-				
-				if(originalAcl.containsKey(ACL_ENTRY_RESOURCE_ID) && !nodeId.equals(originalAcl.get(ACL_ENTRY_RESOURCE_ID).isString().stringValue())) {
-					isInherited = true;
+					acl = nodeModelCreator.createEntity(result, AccessControlList.class);
+				} catch (RestServiceException e) {
+					onFailure(e);
 				}
-				view.setAclDetails(entries, principals, isInherited);
+				refresh(new VoidCallback(){
+					@Override
+					public void success() {
+						// nothing more to do
+					}
+					@Override
+					public void failure(Throwable t) {
+						onFailure(t);
+					}
+				});
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
-					view.showErrorMessage("Sharing settings unavailable.");
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {							
+					view.asWidget().setVisible(false);
+					view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
 				}
 			}
-		});				
+		});
 	}
 	
-	private Integer getResourceAccessIndex(AclPrincipal principal) {
-		JSONArray resouceAccessList = originalAcl.get(ACL_RESOURCE_ACCESS).isArray();
-		
-		for(int i=0; i<resouceAccessList.size(); i++) {
-			if(resouceAccessList.get(i) != null) {				
-				JSONObject resourceAccess = resouceAccessList.get(i).isObject();
-				if(resourceAccess.get(ACL_ENTRY_PRINCIPAL_ID).isString().stringValue().equals(principal.getName()))
-					return i;
-			}
-		}		
-		return null;
-	}
 	
-	private List<AclEntry> createAclEntries(JSONObject acl) {
-		List<AclEntry> entries = new ArrayList<AclEntry>();
-
-		if(acl.containsKey(ACL_RESOURCE_ACCESS)) {
-			JSONArray accesses = acl.get(ACL_RESOURCE_ACCESS).isArray();
-			for(int i=0; i<accesses.size(); i++) {
-				JSONObject accessObj = accesses.get(i).isObject();				
-				if(accessObj.containsKey(ACL_ENTRY_PRINCIPAL_ID) 
-						&& accessObj.containsKey(ACL_ENTRY_ACCESS_TYPE)) {
-						String principalId = accessObj.get(ACL_ENTRY_PRINCIPAL_ID).isString().stringValue();
-						AclPrincipal principal = getPrincipalById(principalId);
-						List<AclAccessType> accessTypes = extractAccessTypes(accessObj.get(ACL_ENTRY_ACCESS_TYPE).isArray());						
-						if(principal == null || accessTypes == null) continue; // skip if malformed
-						boolean isOwner = false;
-						if(originalAcl.containsKey(ACL_ENTRY_CREATEDBY) && originalAcl.get(ACL_ENTRY_CREATEDBY).isString().stringValue().equals(principal.getName()))
-							isOwner = true;
-						entries.add(new AclEntry(principal, accessTypes, isOwner));												
-				}
-			}
+	private void updateACLInSynapse() {
+		EntityWrapper aclEntityWrapper = null;
+		try {
+			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
+			aclEntityWrapper = new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName(), null);
+		} catch (JSONObjectAdapterException e) {
+			view.asWidget().setVisible(false);
+			view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
 		}
+		synapseClient.updateAcl(aclEntityWrapper, new AsyncCallback<EntityWrapper>(){
+	
+				@Override
+				public void onSuccess(EntityWrapper result) {
+					try {
+						acl = nodeModelCreator.createEntity(result, AccessControlList.class);
+					} catch (RestServiceException e) {
+						onFailure(e);
+					}
+					refresh(new VoidCallback(){
+						@Override
+						public void success() {
+							// nothing more to do
+						}
+						@Override
+						public void failure(Throwable t) {
+							onFailure(t);
+						}
+					});
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {							
+						view.asWidget().setVisible(false);
+						view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
+					}
+				}
+			});
+	}
+	
+	interface Callback<T> {
+		void success(T data);
+		void failure(Throwable t);
+	}
+	
+	interface VoidCallback {
+		void success();
+		void failure(Throwable t);
+	}
+	
+	class VoidCallbackAdapter implements VoidCallback {
+		@Override
+		public void success() {};
+		@Override
+		public void failure(Throwable t) {
+			if (t instanceof RuntimeException) 
+				throw (RuntimeException)t; 
+			else throw new RuntimeException(t);
+		}
+	}
+	
+	private void getUsers(final Callback<Collection<UserProfile>> callback) throws Exception {
+		synapseClient.getAllUsers(new AsyncCallback<EntityWrapper>(){
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				try {
+					PaginatedResults<UserProfile> userProfiles = 
+						nodeModelCreator.createPaginatedResults(result.getEntityJson(), UserProfile.class);
+					List<UserProfile> users = new ArrayList<UserProfile>();
+					for (UserProfile up : userProfiles.getResults()) {
+						users.add(up);
+					}	
+					callback.success(users);
+				} catch (Throwable t) {
+					onFailure(t);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.failure(caught);
+			}
+		});
+	}
+	
+	private void getCurrentACL(String entityId, final Callback<AccessControlList> callback) {
+		synapseClient.getNodeAcl(entityId, new AsyncCallback<EntityWrapper>(){
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				try {
+					AccessControlList currentACL = nodeModelCreator.createEntity(result, AccessControlList.class);
+					if (currentACL==null) callback.failure(new NullPointerException("Failed to retriev current sharing settings."));
+					callback.success(currentACL);
+				} catch (Throwable e) {
+					onFailure(new RuntimeException(result.getEntityJson(), e));					
+				}									
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.failure(caught);
+			}
+		});
+	}
+	
+	private void getGroups(final Callback<Collection<UserGroup>> callback) throws RestServiceException {
+		synapseClient.getAllGroups(new AsyncCallback<EntityWrapper>(){
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				try {
+					List<UserGroup> groups = new ArrayList<UserGroup>();
+					PaginatedResults<UserGroup> userGroups = nodeModelCreator.createPaginatedResults(result.getEntityJson(), UserGroup.class);
+					for (UserGroup gp : userGroups.getResults()) {
+						groups.add(gp);
+					}	
+					callback.success(groups);
+				} catch (Throwable t) {
+					onFailure(t);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.failure(caught);
+			}
+		});
+	}
+	
+	private void retrieveAllPrincipals(final VoidCallback callback) throws Exception {
+		if (this.entity==null) throw new IllegalStateException("Entity must be specified.");
+		getUsers(new Callback<Collection<UserProfile>>() {
+			public void success(final Collection<UserProfile> users) {
+				try {
+					allPrincipals = getAclPrincipalsFromUsers(users, entity.getCreatedBy());
+					getGroups(new Callback<Collection<UserGroup>> () {
+						public void success(final Collection<UserGroup> groups) {
+							allPrincipals.putAll(getAclPrincipalsFromGroups(groups, entity.getCreatedBy()));					
+							callback.success();
+						}
+						public void failure(Throwable t) {
+							if (t instanceof RuntimeException) throw (RuntimeException)t; else throw new RuntimeException(t);
+						}
+					});
+				} catch (Throwable t) {
+					failure(t);
+				}
+			}
+			public void failure(Throwable t) {
+				callback.failure(t);
+			}
+		});
+	}
+	
+	private void refresh(final VoidCallback callback) {
+		if (this.entity==null) throw new IllegalStateException("Entity must be specified.");
+		if (this.allPrincipals==null) throw new IllegalStateException("Principals list must be specified.");
+		view.setPresenter(this);
+		view.showLoading();
+		getCurrentACL(entity.getId(), new Callback<AccessControlList>() {
+			public void success(AccessControlList newAcl) {
+				try {
+					acl=newAcl;
+					List<AclEntry> aclEntries = getAclEntries(acl, allPrincipals);
+					boolean isEditable = isInherited(acl, entity);
+					view.setAclDetails(aclEntries, allPrincipals.values(), isEditable);
+					callback.success();
+				} catch (Throwable t) {
+					failure(t);
+				}
+			}
+			public void failure(Throwable caught) {
+				callback.failure(caught);
+			}
+		});
 		
+	}
+	
+	
+	/*
+	 * Utility Methods
+	 */
+	public static boolean isInherited(AccessControlList acl, Entity entity) {
+		return !acl.getId().equals(entity.getId());
+	}
+	
+	// TODO implement this!
+	public static boolean hasRootAsParent(Entity entity) {
+		return false;
+	}
+	
+	public static ResourceAccess buildResourceAccess(Long principalId, Collection<ACCESS_TYPE> accessTypes) {
+		ResourceAccess ra = new ResourceAccess();
+		ra.setPrincipalId(principalId);
+		Set<ACCESS_TYPE> ats = new HashSet<ACCESS_TYPE>();
+		ats.addAll(accessTypes);
+		ra.setAccessType(ats);
+		return ra;
+	}
+	
+
+	public static Map<String, AclPrincipal> getAclPrincipalsFromGroups(Collection<UserGroup> groups, String ownerId) {
+		Map<String, AclPrincipal> principals = new HashMap<String, AclPrincipal>();
+		for (UserGroup g : groups) {
+			AclPrincipal p = new AclPrincipal();
+			p.setPrincipalId(Long.parseLong(g.getId()));
+			p.setIndividual(false);
+			p.setDisplayName(g.getName());
+			p.setOwner(false);
+			principals.put(g.getId(), p);
+		}
+		return principals;
+	}
+	
+	public static Map<String, AclPrincipal> getAclPrincipalsFromUsers(Collection<UserProfile> users, String ownerId) {
+		Map<String, AclPrincipal> principals = new HashMap<String, AclPrincipal>();
+		for (UserProfile up : users) {
+			AclPrincipal p = new AclPrincipal();
+			p.setPrincipalId(Long.parseLong(up.getOwnerId()));
+			p.setIndividual(true);
+			p.setDisplayName(up.getDisplayName());
+			p.setOwner(ownerId.equals(up.getOwnerId()));
+			principals.put(up.getOwnerId(), p);
+		}
+		return principals;
+	}
+	
+	public static List<AclEntry> getAclEntries(AccessControlList acl, Map<String, AclPrincipal> universe) {
+		List<AclEntry> entries = new ArrayList<AclEntry>();
+		for (ResourceAccess ra : acl.getResourceAccess()) {
+			AclEntry entry = new AclEntry();
+			String principalIdString = ra.getPrincipalId().toString();
+			if (universe.containsKey(principalIdString)) {
+				entry.setPrincipal(universe.get(principalIdString));
+			} else {
+				throw new IllegalArgumentException(
+						"Access Control List has a principal not represented in the given Users or Groups.");
+			}
+			entry.setAccessTypes(new ArrayList<ACCESS_TYPE>(ra.getAccessType()));
+			entries.add(entry);
+		}
 		return entries;
 	}
+	
+	public static AccessControlList newACLforEntity(Entity entity) {
+		if (entity==null) throw new IllegalStateException("Entity must be specified.");
+		AccessControlList acl = new AccessControlList();
+		acl.setId(entity.getId());
+		Set<ResourceAccess> ras = new HashSet<ResourceAccess>();
+		acl.setResourceAccess(ras);
+		addOwnerAdministrativeAccess(acl, entity);	
+		return acl;
+	}
+	
+	public static void addOwnerAdministrativeAccess(AccessControlList acl, Entity entity) {
+		Set<ResourceAccess> ras = acl.getResourceAccess();
+		ras.add(buildResourceAccess(Long.parseLong(entity.getCreatedBy()), 
+				AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER)));
+	}
 
-	private AclPrincipal getPrincipalById(String principalId) {		
-		if(principals != null) {
-			// TODO : linear search could be optimized
-			for(AclPrincipal principal : principals) {
-				if(principal.getName().equals(principalId))
-					return principal;
-			}
+	/**
+	 * Note this returns a **pointer** to the ResourceAccess record.  Therefore, changing
+	 * the returned object also changes the parent ACL.
+	 * @param principalId
+	 * @param acl
+	 * @return
+	 */
+	public static ResourceAccess findPrincipal(Long principalId, AccessControlList acl) {
+		for (ResourceAccess ra : acl.getResourceAccess()) {
+			if (ra.getPrincipalId().equals(principalId)) return ra;
 		}
 		return null;
 	}
-
-	private List<AclAccessType> extractAccessTypes(JSONArray accessList) {
-		List<AclAccessType> list = new ArrayList<AclAccessType>();
-		for(int i=0; i<accessList.size(); i++) {			
-			AclAccessType accessType = AclUtils.getAclAccessType(accessList.get(i).isString().stringValue());
-			if(accessType != null) 
-				list.add(accessType);				
-		}
-		return list;
-	}
+	
 
 }

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
@@ -19,10 +20,11 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 
 	/**
 	 * Sets the details needed to display the form
-	 * @param entries
-	 * @param principals
+	 * @param entries the current ACL
+	 * @param principals the available principals
+	 * @param isEditable
 	 */
-	public void setAclDetails(List<AclEntry> entries, List<AclPrincipal> principals, boolean isEditable);
+	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isEditable);
 	
 	/**
 	 * Set the view to a loading state while async loads
@@ -36,11 +38,11 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 		
 		void createAcl();
 		
-		void addAccess(AclPrincipal principal, PermissionLevel permissionLevel);
+		void addAccess(Long principalId, PermissionLevel permissionLevel);
 		
-		void changeAccess(AclEntry aclEntry, PermissionLevel permissionLevel);
+		void changeAccess(Long principalId, PermissionLevel permissionLevel);
 		
-		void removeAccess(AclEntry aclEntry);
+		void removeAccess(Long principalId);
 		
 		void deleteAcl();
 	}

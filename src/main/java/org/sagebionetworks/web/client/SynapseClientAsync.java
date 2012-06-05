@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
@@ -44,5 +45,19 @@ public interface SynapseClientAsync {
 	void getUserProfile(AsyncCallback<String> callback);
 
 	void updateUserProfile(String userProfileJson, AsyncCallback<Void> callback);
+	
+	public void getNodeAcl(String id, AsyncCallback<EntityWrapper> callback);
+	
+	public void createAcl(EntityWrapper acl, AsyncCallback<EntityWrapper> callback);
+	
+	public void updateAcl(EntityWrapper acl, AsyncCallback<EntityWrapper> callback);
+	
+	public void deleteAcl(String ownerEntityId, AsyncCallback<EntityWrapper> callback);
+
+	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
+
+	public void getAllUsers(AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	
+	public void getAllGroups(AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 	
 }

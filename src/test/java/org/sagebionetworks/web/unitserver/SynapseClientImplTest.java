@@ -111,7 +111,7 @@ public class SynapseClientImplTest {
 		int mask = ANNOTATIONS;
 		EntityBundleTransport transprot =new EntityBundleTransport();
 		// Make the call
-		synapseClient.handleAnnotaions(annos.getId(), mask, transprot, mockSynapse);
+		synapseClient.handleAnnotations(annos.getId(), mask, transprot, mockSynapse);
 		assertNotNull(transprot.getAnnotaionsJson());
 		Annotations clone = EntityFactory.createEntityFromJSONString(transprot.getAnnotaionsJson(), Annotations.class);
 		assertEquals(annos, clone);

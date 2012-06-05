@@ -5,10 +5,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.ontology.Enumeration;
 import org.sagebionetworks.web.client.ontology.EnumerationTerm;
 import org.sagebionetworks.web.client.ontology.NcboOntologyTerm;
@@ -19,7 +21,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.editpanels.FormField.ColumnType;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.AclAccessType;
 
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONNumber;
@@ -51,19 +52,22 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
     private List<FormField> formFields;
     private AuthenticationController authenticationController;
     private GlobalApplicationState globalApplicationState;
+    private SynapseClientAsync synapseClient;
  
     @Inject
 	public AnnotationEditor(AnnotationEditorView view,
 			NodeServiceAsync service, NodeModelCreator nodeModelCreator,
 			StaticEnumerations staticEnumerations,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			SynapseClientAsync synapseClient) {
         this.view = view;
 		this.service = service;
 		this.nodeModelCreator = nodeModelCreator;
 		this.staticEnumerations = staticEnumerations;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.synapseClient = synapseClient;
         view.setPresenter(this);
     }
     
@@ -91,7 +95,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 				}
 								
 				// check for update access, then create the grid in the view accordingly
-				service.hasAccess(type, id, AclAccessType.UPDATE, new AsyncCallback<Boolean>() {
+				synapseClient.hasAccess(id, ACCESS_TYPE.UPDATE.name(), new AsyncCallback<Boolean>() {
 					@Override
 					public void onSuccess(Boolean result) {
 						setupFormAndGenerate(result);
