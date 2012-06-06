@@ -307,7 +307,7 @@ public class GwtTestSuite extends GWTTestCase {
 		// the is our transport object
 		EntityBundleTransport transport = new EntityBundleTransport();
 		transport.setEntityJson(factory.createJsonStringForEntity(entity));
-		transport.setAnnotaionsJson(factory.createJsonStringForEntity(annos));
+		transport.setAnnotationsJson(factory.createJsonStringForEntity(annos));
 		transport.setPermissionsJson(factory.createJsonStringForEntity(uep));
 		transport.setEntityPathJson(factory.createJsonStringForEntity(path));
 		

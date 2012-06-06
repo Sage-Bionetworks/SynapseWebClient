@@ -138,8 +138,8 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 				entity = factory.createEntity(transport.getEntityJson());
 			}
 			// annotaions?
-			if(transport.getAnnotaionsJson() != null){
-				annotations = factory.initializeEntity(transport.getAnnotaionsJson(), new Annotations());
+			if(transport.getAnnotationsJson() != null){
+				annotations = factory.initializeEntity(transport.getAnnotationsJson(), new Annotations());
 			}
 			// permissions?
 			if(transport.getPermissionsJson() != null){

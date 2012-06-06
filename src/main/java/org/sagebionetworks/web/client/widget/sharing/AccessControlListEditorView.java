@@ -24,7 +24,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 	 * @param principals the available principals
 	 * @param isEditable
 	 */
-	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isEditable);
+	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isEditable, boolean canEnableInheritance);
 	
 	/**
 	 * Set the view to a loading state while async loads

@@ -107,7 +107,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 	
 	@Override
-	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isInherited) {		
+	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isInherited, boolean canEnableInheritance) {		
 		this.removeAll(true);
 		
 		// setup view

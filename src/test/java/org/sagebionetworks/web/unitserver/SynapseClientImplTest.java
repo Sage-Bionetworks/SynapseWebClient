@@ -112,8 +112,8 @@ public class SynapseClientImplTest {
 		EntityBundleTransport transprot =new EntityBundleTransport();
 		// Make the call
 		synapseClient.handleAnnotations(annos.getId(), mask, transprot, mockSynapse);
-		assertNotNull(transprot.getAnnotaionsJson());
-		Annotations clone = EntityFactory.createEntityFromJSONString(transprot.getAnnotaionsJson(), Annotations.class);
+		assertNotNull(transprot.getAnnotationsJson());
+		Annotations clone = EntityFactory.createEntityFromJSONString(transprot.getAnnotationsJson(), Annotations.class);
 		assertEquals(annos, clone);
 	}
 	
@@ -149,7 +149,7 @@ public class SynapseClientImplTest {
 		assertNotNull(bundle);
 		// We should have all of the strings
 		assertNotNull(bundle.getEntityJson());
-		assertNotNull(bundle.getAnnotaionsJson());
+		assertNotNull(bundle.getAnnotationsJson());
 		assertNotNull(bundle.getEntityPathJson());
 		assertNotNull(bundle.getPermissionsJson());
 		assertNotNull(bundle.getChildCount());
@@ -163,7 +163,7 @@ public class SynapseClientImplTest {
 		assertNotNull(bundle);
 		// We should have all of the strings
 		assertNull(bundle.getEntityJson());
-		assertNull(bundle.getAnnotaionsJson());
+		assertNull(bundle.getAnnotationsJson());
 		assertNull(bundle.getEntityPathJson());
 		assertNull(bundle.getPermissionsJson());
 		assertNull(bundle.getChildCount());
