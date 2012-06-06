@@ -232,8 +232,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 			});
 		}		
-	}
-
+	}	
 	
 	/*
 	 * Private Methods

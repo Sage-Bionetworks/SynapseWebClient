@@ -69,6 +69,7 @@ import com.google.gwt.cell.client.widget.PreviewDisclosurePanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -201,7 +202,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Annotation Editor widget
 		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
-		colRightContainer.add(createAttachmentsWidget(bundle), widgetMargin);
+		colRightContainer.add(createAttachmentsWidget(bundle, canEdit), widgetMargin);
 	    // Create References widget
 		colRightContainer.add(createReferencesWidget(bundle.getEntity(), bundle.getReferencedBy()), widgetMargin);
 		// Create R Client widget
@@ -565,6 +566,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
+		SafeHtmlBuilder txt = new SafeHtmlBuilder();
+		
 		lc.add(new Html("<h3>Description</h3>"));	
 
 		// Add the description body
@@ -653,7 +656,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 	
-	private Widget createAttachmentsWidget(EntityBundle bundle) {
+	private Widget createAttachmentsWidget(EntityBundle bundle, boolean canEdit) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
@@ -670,27 +673,29 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         String baseURl = GWT.getModuleBaseURL()+"attachment";
         final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId();
 
-        Anchor addBtn = new Anchor();
-        addBtn.setHTML(DisplayUtils.getIconHtml(iconsImageBundle.add16()));
-        addBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, new AddAttachmentDialog.Callback() {
-					@Override
-					public void onSaveAttachment(UploadResult result) {
-						if(result != null){
-							if(UploadStatus.SUCCESS == result.getUploadStatus()){
-								showInfo(DisplayConstants.TEXT_ATTACHMENT_SUCCESS, "");
-							}else{
-								showErrorMessage(DisplayConstants.ERRROR_ATTACHMENT_FAILED+result.getMessage());
+        if(canEdit) {
+	        Anchor addBtn = new Anchor();
+	        addBtn.setHTML(DisplayUtils.getIconHtml(iconsImageBundle.add16()));
+	        addBtn.addClickHandler(new ClickHandler() {			
+				@Override
+				public void onClick(ClickEvent event) {
+					AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, new AddAttachmentDialog.Callback() {
+						@Override
+						public void onSaveAttachment(UploadResult result) {
+							if(result != null){
+								if(UploadStatus.SUCCESS == result.getUploadStatus()){
+									showInfo(DisplayConstants.TEXT_ATTACHMENT_SUCCESS, "");
+								}else{
+									showErrorMessage(DisplayConstants.ERRROR_ATTACHMENT_FAILED+result.getMessage());
+								}
 							}
+							presenter.fireEntityUpdatedEvent();
 						}
-						presenter.fireEntityUpdatedEvent();
-					}
-				});
-			}
-		});
-        c.add(addBtn, new HBoxLayoutData(new Margins(0)));
+					});
+				}
+			});
+	        c.add(addBtn, new HBoxLayoutData(new Margins(0)));
+        }
         lc.add(c);
 
         // We just create a new one each time.
