@@ -7,18 +7,16 @@ import org.sagebionetworks.repo.model.registry.EntityTypeMetadata;
 public class EntityType {
 
 	private String name;
-	private String urlPrefix;
 	private String className;
 	private String defaultParentPath;
 	private EntityTypeMetadata metadata;
     private List<EntityType> validParentTypes;
     private List<EntityType> validChildTypes;   
         
-	public EntityType(String name, String urlPrefix, String className,
+	public EntityType(String name, String className,
 			String defaultParentPath, EntityTypeMetadata metadata) {
 		super();
 		this.name = name;
-		this.urlPrefix = urlPrefix;
 		this.className = className;
 		this.defaultParentPath = defaultParentPath;
 		this.metadata = metadata;		
@@ -44,10 +42,6 @@ public class EntityType {
 		return name;
 	}
 
-	public String getUrlPrefix() {
-		return urlPrefix;
-	}
-
 	public String getClassName() {
 		return className;
 	}
@@ -63,7 +57,15 @@ public class EntityType {
 	public List<String> getAliases() {
 		return metadata.getAliases();
 	}
-	
+
+	@Override
+	public String toString() {
+		return "EntityType [name=" + name + ", className=" + className
+				+ ", defaultParentPath=" + defaultParentPath + ", metadata="
+				+ metadata + ", validParentTypes=" + validParentTypes
+				+ ", validChildTypes=" + validChildTypes + "]";
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -77,8 +79,6 @@ public class EntityType {
 		result = prime * result
 				+ ((metadata == null) ? 0 : metadata.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((urlPrefix == null) ? 0 : urlPrefix.hashCode());
 		return result;
 	}
 
@@ -111,21 +111,18 @@ public class EntityType {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (urlPrefix == null) {
-			if (other.urlPrefix != null)
+		if (validChildTypes == null) {
+			if (other.validChildTypes != null)
 				return false;
-		} else if (!urlPrefix.equals(other.urlPrefix))
+		} else if (!validChildTypes.equals(other.validChildTypes))
+			return false;
+		if (validParentTypes == null) {
+			if (other.validParentTypes != null)
+				return false;
+		} else if (!validParentTypes.equals(other.validParentTypes))
 			return false;
 		return true;
 	}
-
-	@Override
-	public String toString() {
-		return "EntityType [name=" + name + ", urlPrefix=" + urlPrefix
-				+ ", className=" + className + ", defaultParentPath="
-				+ defaultParentPath + ", metadata=" + metadata
-				+ ", validParentTypes=" + validParentTypes
-				+ ", validChildTypes=" + validChildTypes + "]";
-	}
+	
     
 }

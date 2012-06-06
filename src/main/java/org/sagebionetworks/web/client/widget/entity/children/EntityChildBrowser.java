@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.HasPreviews;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Preview;
@@ -83,9 +82,9 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 		view.createBrowser(entity, entityType, canEdit);
 		 
 		// load preview if has previews
-		if(entity instanceof HasPreviews) {
-			loadPreview();
-		}
+//		if(entity instanceof HasPreviews) {
+//			loadPreview();
+//		}
 				
 		return view.asWidget();
 	}

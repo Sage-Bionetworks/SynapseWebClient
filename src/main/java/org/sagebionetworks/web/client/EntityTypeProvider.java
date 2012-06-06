@@ -105,14 +105,14 @@ public class EntityTypeProvider {
 	private void createEntityTypes() {
 		values = new ArrayList<EntityType>();
 		if(typeMetadatas != null) {
-			Map<String, EntityType> pathToType = new HashMap<String, EntityType>();
+			Map<String, EntityType> classToType = new HashMap<String, EntityType>();
 			
 			// create each type
 			for(EntityTypeMetadata meta : typeMetadatas) {				
 				EntityType type = new EntityType(meta.getName(),
-						meta.getUrlPrefix(), meta.getClassName(),
+						meta.getEntityType(),
 						meta.getDefaultParentPath(), meta);
-				pathToType.put(type.getUrlPrefix(), type);
+				classToType.put(type.getClassName(), type);
 				values.add(type);				
 			}
 			
@@ -120,8 +120,8 @@ public class EntityTypeProvider {
 			for(EntityType type : values) {
 				List<EntityType> parents = new ArrayList<EntityType>();
 				for(String parentUrlString : type.getMetadata().getValidParentTypes()) {
-					if(pathToType.containsKey(parentUrlString)) {
-						EntityType parent = pathToType.get(parentUrlString);
+					if(classToType.containsKey(parentUrlString)) {
+						EntityType parent = classToType.get(parentUrlString);
 						if(!parents.contains(parent)) {
 							parents.add(parent);
 						}
@@ -131,19 +131,19 @@ public class EntityTypeProvider {
 			}
 			
 			// calculate and fill children			
-			Map<EntityType, Set<EntityType>> typeToChildTypes = new HashMap<EntityType, Set<EntityType>>();
+			Map<String, Set<EntityType>> classNameToChildTypes = new HashMap<String, Set<EntityType>>();
 			for(EntityType type : values) {
 				for(EntityType parent : type.getValidParentTypes()) {					
-					if(!typeToChildTypes.containsKey(parent)) {
-						typeToChildTypes.put(parent, new HashSet<EntityType>());
+					if(!classNameToChildTypes.containsKey(parent)) {
+						classNameToChildTypes.put(parent.getClassName(), new HashSet<EntityType>());
 					}
 					// add this type to its parent
-					typeToChildTypes.get(parent).add(type);
+					classNameToChildTypes.get(parent.getClassName()).add(type);
 				}
 			}
 			for(EntityType type : values) {
-				if(typeToChildTypes.containsKey(type)) {
-					Set<EntityType> children = typeToChildTypes.get(type);					
+				if(classNameToChildTypes.containsKey(type.getClassName())) {
+					Set<EntityType> children = classNameToChildTypes.get(type.getClassName());					
 					type.setValidChildTypes(new ArrayList<EntityType>(children));
 				}
 			}
