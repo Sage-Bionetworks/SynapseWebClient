@@ -17,7 +17,9 @@ import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.tips.ToolTip;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -106,12 +108,12 @@ public class PropertyWidgetViewImpl extends LayoutContainer implements PropertyW
 				String value = model.get(property);
 				if (value == null) {
 					value = "";
-				}
-				StringBuilder builder = new StringBuilder();
-				builder.append("<div style='font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;'>");
-				builder.append(value);
-				builder.append("</div>");
-				Html html = new Html(builder.toString());
+				} 
+				SafeHtmlBuilder builder = new SafeHtmlBuilder();
+				builder.appendHtmlConstant("<div style='font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;'>");
+				builder.appendEscaped(value);
+				builder.appendHtmlConstant("</div>");
+				Html html = new Html(builder.toSafeHtml().asString());
 			    html.setToolTip(new ToolTipConfig(model.getToolTipTitle(), model.getToolTipBody()));
 				return html;
 			}
@@ -134,12 +136,11 @@ public class PropertyWidgetViewImpl extends LayoutContainer implements PropertyW
 					ListStore<EntityRowModel> store, Grid<EntityRowModel> grid) {
 				String value = model.get(property);
 
-				StringBuilder builder = new StringBuilder();
-				builder.append("<div style='font-weight:bold; color:grey; white-space:normal; overflow:hidden; text-overflow:ellipsis;'>");
-				builder.append(value);
-				builder.append(":</div>");
-				Html html = new Html(builder.toString());
-				return html;
+				SafeHtmlBuilder builder = new SafeHtmlBuilder();
+				builder.appendHtmlConstant("<div style='font-weight:bold; color:grey; white-space:normal; overflow:hidden; text-overflow:ellipsis;'>");
+				builder.appendEscaped(value);
+				builder.appendHtmlConstant(":</div>");
+				return new HTML(builder.toSafeHtml());
 			}
 
 		};

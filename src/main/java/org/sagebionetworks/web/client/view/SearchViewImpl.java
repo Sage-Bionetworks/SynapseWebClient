@@ -46,6 +46,9 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -53,6 +56,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -132,9 +136,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 		
 		// create search result list
 		List<Hit> hits = searchResults.getHits();
-		String resultsHtml = "";				
+		SafeHtml resultsHtml;				
 		if (hits != null && hits.size() > 0) {
-			resultsHtml = createSearchResults(hits, resultsHtml, searchResults.getStart().intValue());			
+			resultsHtml = createSearchResults(hits, searchResults.getStart().intValue());			
 
 			// create facet widgets
 			createFacetWidgets(searchResults);			
@@ -143,7 +147,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 			createPagination(searchResults);
 			
 		} else {
-			resultsHtml = "<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1 + searchTerm + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART2 + "</h4>";
+			resultsHtml = new SafeHtmlBuilder().appendHtmlConstant("<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1)
+			.appendEscaped(searchTerm)
+			.appendHtmlConstant(DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART2 + "</h4>").toSafeHtml();
 		}
 
 		// show existing facets			
@@ -151,7 +157,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		
 
 		resultsPanel.clear();
-		resultsPanel.add(new Html(resultsHtml));
+		resultsPanel.add(new HTML(resultsHtml));
 		loadShowing = false;
 		
 		// scroll user to top of page
@@ -260,16 +266,16 @@ public class SearchViewImpl extends Composite implements SearchView {
 		facetPanel.add(vp);
 	}
 
-	private String createSearchResults(List<Hit> hits, String resultsHtml, int start) {
+	private SafeHtml createSearchResults(List<Hit> hits, int start) {
+		SafeHtmlBuilder resultsBuilder = new SafeHtmlBuilder();
 		int i = start + 1;
 		for(Hit hit : hits) {
 			if(hit.getId() != null) {
-				String a = getResultHtml(i, hit); 
-				resultsHtml += a;
+				resultsBuilder.append(getResultHtml(i, hit)); 				
 				i++;
 			}
 		}
-		return resultsHtml;
+		return resultsBuilder.toSafeHtml();
 	}
 
 	@Override
@@ -347,55 +353,66 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	}
 
-	private String getResultHtml(int i, Hit hit) {				
-		
+	private SafeHtml getResultHtml(int i, Hit hit) {				
+				
 		ImageResource icon = presenter.getIconForHit(hit);
 		
-		String attribution = "Created by " + hit.getCreated_by() + " on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000)) + ", "
-			+ "Updated by " + hit.getModified_by() + " on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000));
+		
+		SafeHtml attribution = new SafeHtmlBuilder()
+		.appendHtmlConstant("Created by ").appendEscaped(hit.getCreated_by())
+		.appendHtmlConstant(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000)) + ", ")
+		.appendHtmlConstant("Updated by ").appendEscaped(hit.getModified_by())
+		.appendHtmlConstant(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)))
+		.toSafeHtml();
 
 		
-		
-		String resultHtml = "<div class=\"span-18 last serv notopmargin hit\">\n"; 
-		resultHtml += "	   <h4>" + i + ". \n";
+		SafeHtmlBuilder resultBuilder = new SafeHtmlBuilder();
+		resultBuilder.appendHtmlConstant("<div class=\"span-18 last serv notopmargin hit\">\n") 
+		.appendHtmlConstant("	   <h4>" + i + ". \n");
 		if(icon != null) 
-			resultHtml += DisplayUtils.getIconHtml(icon);
-		resultHtml += "         <a class=\"link\" href=\"" + DisplayUtils.getSynapseHistoryToken(hit.getId()) + "\">" + hit.getName() + "</a>";
-		resultHtml += "    </h4>\n";
-		resultHtml += "<p class=\"notopmargin\">";
+			resultBuilder.appendHtmlConstant(DisplayUtils.getIconHtml(icon));
+		resultBuilder.appendHtmlConstant("         <a class=\"link\" href=\"" + DisplayUtils.getSynapseHistoryToken(hit.getId()) + "\">")
+		.appendEscaped(hit.getName())
+		.appendHtmlConstant("</a>");
+		
+		resultBuilder.appendHtmlConstant("    </h4>\n")
+		.appendHtmlConstant("<p class=\"notopmargin\">");
 		if(null != hit.getPath()) {
-			resultHtml += getPathHtml(hit.getPath()) + "<br/>\n";
+			resultBuilder.append(getPathHtml(hit.getPath())).appendHtmlConstant("<br/>\n");
 		}
 		if(null != hit.getDescription()) {
-			resultHtml += "<span class=\"hitdescription\">" + DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR) + "</span><br>\n";
+			resultBuilder.appendHtmlConstant("<span class=\"hitdescription\">")
+			.appendEscaped(DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR))
+			.appendHtmlConstant("</span><br>\n");
 		}
-		resultHtml += "<span class=\"hitattribution\">" + attribution + "</span></p>\n";					
-		resultHtml += "</div>\n";
+		resultBuilder.appendHtmlConstant("<span class=\"hitattribution\">").append(attribution).appendHtmlConstant("</span></p>\n")					
+		.appendHtmlConstant("</div>\n");
 
-		return resultHtml;
+		return resultBuilder.toSafeHtml();
 	}
 
-	private String getPathHtml(EntityPath path) {		
+	private SafeHtml getPathHtml(EntityPath path) {		
 		List<EntityHeader> headers = path.getPath();
-		String pathHtml = "";
+		SafeHtmlBuilder pathBuilder = new SafeHtmlBuilder();
 		for(int i=0; i<headers.size(); i++) {
 			if(i == 0) continue; // skip "root"
 			EntityHeader header = headers.get(i); 
-			pathHtml += "<a href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\""; 
+			String safeLink = "<a href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\""; 
 			if(i >= headers.size()-1) {
 				// last one show full color
-				pathHtml += " class=\"hitBreadcrumbElement\"";
+				safeLink += " class=\"hitBreadcrumbElement\"";
 			} else {
 				// grey parents
-				pathHtml += " class=\"hitBreadcrumbParent\"";
+				safeLink += " class=\"hitBreadcrumbParent\"";
 			}
-			pathHtml += ">" + header.getName() + "</a>";
+			safeLink += ">" + SafeHtmlUtils.fromString(header.getName()) + "</a>";
+			pathBuilder.appendHtmlConstant(safeLink);
 			
 			if(i<headers.size() - 1) {
-				pathHtml += DisplayUtils.BREADCRUMB_SEP;
+				pathBuilder.appendHtmlConstant(DisplayUtils.BREADCRUMB_SEP);
 			}
 		}
-		return pathHtml;
+		return pathBuilder.toSafeHtml();
 	}
 
 	private LayoutContainer createDateFacet(final Facet facet) {

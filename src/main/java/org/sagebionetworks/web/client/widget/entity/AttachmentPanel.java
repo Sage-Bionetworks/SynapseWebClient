@@ -10,7 +10,11 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -36,40 +40,34 @@ public class AttachmentPanel extends ContentPanel {
 		setHeaderVisible(false);
 		Widget attachmentBody = null;
 		if(attachments == null){
-			attachmentBody = new Html("No attachments");
+			attachmentBody = new HTML(SafeHtmlUtils.fromSafeConstant("No attachments"));
 			this.setHeight(150);
 		}else{
 			UnorderedListPanel ulp = new UnorderedListPanel();
 			
 			for(AttachmentData data: attachments){
-				StringBuilder builder = new StringBuilder();
-				builder.append("<a href=\"");
-				builder.append(DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getTokenId(), data.getTokenId()));
-				builder.append("\" target=\"_blank\" name=\"");
-				builder.append(data.getName());
-				builder.append("\"");
-				builder.append(">");
-				String iconNumber = DisplayUtils.getAttachmentIcon(data.getName());
-				builder.append("<div class=\"icon-white-small icon"+iconNumber+"-white\">");
-				builder.append("<div style=\"margin-left:20px\">");
-				builder.append(DisplayUtils.replaceWhiteSpace(data.getName()));
-				builder.append("</div>");
-				builder.append("</div>");
-				builder.append("</a>");
-				Html listItem = new Html(builder.toString());
+				SafeHtmlBuilder builder = new SafeHtmlBuilder();				
+				SafeHtml safeName = SafeHtmlUtils.fromString(data.getName()); 
+				builder.appendHtmlConstant("<a href=\"" + DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getTokenId(), data.getTokenId()) 
+						+ "\" target=\"_blank\" name=\"" + safeName.asString() + "\">");
+				SafeHtml iconNumber = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getAttachmentIcon(data.getName()));
+				builder.appendHtmlConstant("<div class=\"icon-white-small icon"+iconNumber.asString()+"-white\">");
+				builder.appendHtmlConstant("<div style=\"margin-left:20px\">");
+				builder.appendEscaped(DisplayUtils.replaceWhiteSpace(data.getName()));
+				builder.appendHtmlConstant("</div>");
+				builder.appendHtmlConstant("</div>");
+				builder.appendHtmlConstant("</a>");
+				Html listItem = new Html(builder.toSafeHtml().asString());
 				ToolTipConfig config = new ToolTipConfig();
 			    // If we have a preview then show it as a tooltip.
 			    if(data.getPreviewId() != null){
-			    	StringBuilder imageBuilder = new StringBuilder();
-			    	imageBuilder.append("<div class=\"preview-image-loading\" >");
-			    	imageBuilder.append(DisplayUtils.IMAGE_CENTERING_TABLE_START);
-			    	imageBuilder.append("<img style=\"margin:auto; display:block;\" src=\"");
-			    	imageBuilder.append(DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getPreviewId(), null));
-			    	imageBuilder.append("\"");
-			    	imageBuilder.append("/>");
-			    	imageBuilder.append(DisplayUtils.IMAGE_CENTERING_TABLE_END);
-			    	imageBuilder.append("</div>");
-			    	config.setText(imageBuilder.toString());  
+			    	SafeHtml previewToolip = SafeHtmlUtils.fromSafeConstant("<div class=\"preview-image-loading\" >"
+			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_START
+			    		+ "<img style=\"margin:auto; display:block;\" src=\"" 
+			    		+ DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getPreviewId(), null) + "\"/>"
+			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_END
+			    		+ "</div>");
+			    	config.setText(previewToolip.asString());  
 			    }else{
 				    config.setText(data.getName());  
 			    }

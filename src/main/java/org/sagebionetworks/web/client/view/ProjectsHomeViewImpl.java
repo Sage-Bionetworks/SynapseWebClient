@@ -14,12 +14,14 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -69,7 +71,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 	private void addCreateProject() {		
 		FlexTable horizontalTable = new FlexTable();
 
-		horizontalTable.setWidget(0, 0, new Html("<h1 class=\"left\">" + DisplayConstants.LABEL_PROJECT_NAME + "</h1>"));
+		horizontalTable.setWidget(0, 0, new HTML(SafeHtmlUtils.fromSafeConstant("<h1 class=\"left\">" + DisplayConstants.LABEL_PROJECT_NAME + "</h1>")));
 		
 		final TextBox searchField = new TextBox();
 	    searchField.setStyleName(DisplayUtils.HOMESEARCH_BOX_STYLE_NAME + " " + ADD_PROJECT_BOX_STYLE);

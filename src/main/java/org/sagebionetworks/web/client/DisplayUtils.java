@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.plaf.synth.SynthGraphicsUtils;
+
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
 import org.sagebionetworks.repo.model.Analysis;
@@ -54,9 +56,13 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTML;
 
 public class DisplayUtils {
 
@@ -324,9 +330,8 @@ public class DisplayUtils {
 		ContentPanel cp = new ContentPanel();
 		cp.setHeaderVisible(false);
 		cp.setCollapsible(true);
-		cp.setLayout(new CenterLayout());				
-		Html html = new Html(DisplayUtils.getIconHtml(sageImageBundle.loading31()));		
-		cp.add(html);		
+		cp.setLayout(new CenterLayout());								
+		cp.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()))));		
 		return cp;
 	}
 
@@ -381,13 +386,14 @@ public class DisplayUtils {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}
 	
-	public static String getRClientEntityLoad(String id) {
-		String rSnipet = "# " + DisplayConstants.LABEL_R_CLIENT_GET_ENTITY
-				+ " <br/>" + "entity_" + id + " <- getEntity('" + id + "')"
-				+ "<br/><br/>"
-				+ "# " + DisplayConstants.LABEL_R_CLIENT_LOAD_ENTITY
-				+ " <br/>" + "entity_" + id + " <- loadEntity('" + id + "')";
-		return rSnipet;
+	public static SafeHtml getRClientEntityLoad(String id) {
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant("# " + DisplayConstants.LABEL_R_CLIENT_GET_ENTITY + " <br/>")  
+		.appendEscaped(id).appendHtmlConstant(" &lt;- getEntity('").appendEscaped(id).appendHtmlConstant("')")
+		.appendHtmlConstant("<br/><br/># " + DisplayConstants.LABEL_R_CLIENT_LOAD_ENTITY + " <br/>")
+		.appendEscaped(id).appendHtmlConstant(" &lt;- loadEntity('")
+		.appendEscaped(id).appendHtmlConstant("')");
+		return shb.toSafeHtml();
 	}	
 	
 	public static String convertDateToString(Date toFormat) {
@@ -493,7 +499,10 @@ public class DisplayUtils {
 		window.setHeight(114);
 		window.setWidth(221);		
 		window.setBorders(false);
-		window.add(new Html(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + message), new MarginData(20, 0, 0, 45));		
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()));
+		shb.appendEscaped(message);
+		window.add(new Html(shb.toSafeHtml().asString()), new MarginData(20, 0, 0, 45));		
 		window.setBodyStyleName("whiteBackground");
 		return window;
 	}

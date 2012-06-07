@@ -28,8 +28,12 @@ import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -39,8 +43,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	private boolean licenseAcceptanceRequired;	
 	private boolean showCitation;
 	private String citationText;	
-	private String licenseTextHtml;
-	private String downloadHtml;
+	private SafeHtml licenseTextHtml;
+	private SafeHtml safeDownloadHtml;
 	private Window eulaWindow;
 	private Window downloadWindow;
 	final CheckBox acceptLicenseCheckBox = new CheckBox();
@@ -127,7 +131,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 
 	@Override
 	public void setLicenseHtml(String licenseHtml) {
-		licenseTextHtml = licenseHtml;
+		licenseTextHtml = SafeHtmlUtils.fromSafeConstant(licenseHtml);
 		
 		// replace the view content if this is after initialization
 		if(licenseTextContainer != null) {
@@ -146,20 +150,24 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	public void setDownloadUrls(List<FileDownload> downloads) {
 		if(downloads != null && downloads.size() > 0) {
 			// build a list of links in HTML
-			StringBuilder sb = new StringBuilder();
+			SafeHtmlBuilder sb = new SafeHtmlBuilder();
 			for(int i=0; i<downloads.size(); i++) {
 				FileDownload dl = downloads.get(i);
-				sb.append("<a href=\"" + dl.getUrl() + "\" target=\"new\">" + dl.getDisplay() + "</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
+				sb.appendHtmlConstant("<a href=\"" + dl.getUrl() + "\" target=\"new\">")
+				.appendEscaped(dl.getDisplay())
+				.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
 				if(dl.getChecksum() != null) {
-					sb.append("&nbsp;<small>md5 checksum: " + dl.getChecksum() + "</small>");
+					sb.appendHtmlConstant("&nbsp;<small>md5 checksum: ")
+					.appendEscaped(dl.getChecksum())
+					.appendHtmlConstant("</small>");
 				}
-				sb.append("<br/>");				
+				sb.appendHtmlConstant("<br/>");				
 			}
-			downloadHtml = sb.toString();
+			safeDownloadHtml = sb.toSafeHtml();
 
 			// replace the view content if this is after initialization
 			if(downloadContentContainer != null) {
-				downloadHtml = sb.toString();
+				safeDownloadHtml = sb.toSafeHtml();
 				fillDownloadContentContainer();
 			}			
 		} else {
@@ -171,21 +179,25 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	public void setDownloadLocations(List<LocationData> locations, String md5) {
 		if(locations != null && locations.size() > 0) {
 			// build a list of links in HTML
-			StringBuilder sb = new StringBuilder();
+			SafeHtmlBuilder sb = new SafeHtmlBuilder();
 			String displayString = "Download";  // TODO : add display to LocationData
 			for(int i=0; i<locations.size(); i++) {
 				LocationData dl = locations.get(i);
-				sb.append("<a href=\"" + dl.getPath() + "\" target=\"new\">" + displayString + "</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
+				sb.appendHtmlConstant("<a href=\"" + dl.getPath() + "\" target=\"new\">")
+				.appendEscaped(displayString)
+				.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
 				if(md5 != null) {
-					sb.append("&nbsp;<small>md5 checksum: " + md5 + "</small>");
+					sb.appendHtmlConstant("&nbsp;<small>md5 checksum: ")
+					.appendEscaped(md5)
+					.appendHtmlConstant("</small>");
 				}
-				sb.append("<br/>");				
+				sb.appendHtmlConstant("<br/>");				
 			}
-			downloadHtml = sb.toString();
+			safeDownloadHtml = sb.toSafeHtml();
 
 			// replace the view content if this is after initialization
 			if(downloadContentContainer != null) {
-				downloadHtml = sb.toString();
+				safeDownloadHtml = sb.toSafeHtml();
 				fillDownloadContentContainer();
 			}			
 		} else {
@@ -197,8 +209,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	public void clear() {
 		// defaults
 		citationText = "";
-		licenseTextHtml = "";
-		downloadHtml = "";		
+		licenseTextHtml = SafeHtmlUtils.fromSafeConstant("");
+		safeDownloadHtml = SafeHtmlUtils.fromSafeConstant("");		
 	}
 
 	@Override
@@ -226,19 +238,19 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	
 	@Override
 	public void showDownloadsLoading() {
-		downloadHtml = DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " Loading...";
+		safeDownloadHtml = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " Loading...");
 		fillDownloadContentContainer();
 	}
 	
 	@Override
 	public void setNoDownloads() {
-		downloadHtml = DisplayConstants.TEXT_NO_DOWNLOADS;
+		safeDownloadHtml = SafeHtmlUtils.fromSafeConstant(DisplayConstants.TEXT_NO_DOWNLOADS);
 		fillDownloadContentContainer();		
 	}
 
 	@Override
 	public void setUnauthorizedDownloads() {
-		downloadHtml = DisplayConstants.TEXT_UNAUTH_DOWNLOADS;
+		safeDownloadHtml = SafeHtmlUtils.fromSafeConstant(DisplayConstants.TEXT_UNAUTH_DOWNLOADS);
 		fillDownloadContentContainer();		
 	}
 
@@ -356,7 +368,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		downloadContentContainer.setStyleAttribute("backgroundColor", "white");
 		downloadContentContainer.setBorders(false);
 		downloadContentContainer.setScrollMode(Style.Scroll.AUTOY);
-		if(downloadHtml == null || downloadHtml.equals("")) {
+		if(safeDownloadHtml == null || safeDownloadHtml.equals("")) {
 			setNoDownloads();
 		} else {
 			fillDownloadContentContainer();
@@ -379,14 +391,14 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	private void fillDownloadContentContainer() {
 		if(downloadContentContainer != null) {
 			downloadContentContainer.removeAll();				
-			downloadContentContainer.add(new Html(downloadHtml));
+			downloadContentContainer.add(new HTML(safeDownloadHtml));
 			downloadContentContainer.layout(true);
 		}
 	}
 
 	private void refillLicenseTextContainer() {
 		licenseTextContainer.removeAll();
-		licenseTextContainer.add(new Html(licenseTextHtml));
+		licenseTextContainer.add(new HTML(licenseTextHtml));
 		licenseTextContainer.layout(true);
 	}
 

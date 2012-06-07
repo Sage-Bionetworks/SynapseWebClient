@@ -52,8 +52,10 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -135,9 +137,10 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		
 		if(numAdded == 0) {
 			final TabItem tab = new TabItem("None");			
-			tab.addStyleName("pad-text");											
-			Html noChildren = new Html(DisplayConstants.LABEL_CONTAINS_NO_CHILDREN);
-			tab.add(noChildren, new MarginData(10));
+			tab.addStyleName("pad-text");														
+			tab.add(new Html(SafeHtmlUtils.fromSafeConstant(
+					DisplayConstants.LABEL_CONTAINS_NO_CHILDREN).asString()),
+					new MarginData(10));
 			tabPanel.add(tab);  
 		}
 
@@ -145,10 +148,10 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 		lc.add(tabPanel);
-		lc.add(new Html(DisplayUtils.getIconHtml(iconsImageBundle
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle
 				.informationBalloon16())
 				+ " <span style=\"font-size: 80%\">"
-				+ DisplayConstants.TEXT_RIGHT_CLICK_FOR_CONTEXT_MENU + "</span>"));
+				+ DisplayConstants.TEXT_RIGHT_CLICK_FOR_CONTEXT_MENU + "</span>")));
 		lc.layout();
 		add(lc);
 	}
@@ -182,7 +185,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 					@Override
 					public void onFailure(Throwable caught) {
 						tab.remove(loading);
-						tab.add(new Html(DisplayConstants.ERROR_GENERIC_RELOAD), new MarginData(10));
+						tab.add(new Html(SafeHtmlUtils.fromSafeConstant(DisplayConstants.ERROR_GENERIC_RELOAD).asString()), new MarginData(10));
 						tab.layout(true);						
 					}
 				});
@@ -419,7 +422,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 			@Override
 			public void onFailure(Throwable caught) {
 				tab.remove(loading);
-				tab.add(new Html(DisplayConstants.ERROR_GENERIC_RELOAD), new MarginData(10));
+				tab.add(new Html(SafeHtmlUtils.fromSafeConstant(DisplayConstants.ERROR_GENERIC_RELOAD).asString()), new MarginData(10));
 				tab.layout(true);
 			}
 		});
@@ -427,8 +430,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 
 	private void setNoPreview() {
 		// no data in preview
-		previewTab.add(new Html(DisplayConstants.LABEL_NO_PREVIEW_DATA),
-				new MarginData(10));
+		previewTab.add(new Html(SafeHtmlUtils.fromSafeConstant(DisplayConstants.LABEL_NO_PREVIEW_DATA).asString()), new MarginData(10));
 		previewTab.layout(true);
 	}
 

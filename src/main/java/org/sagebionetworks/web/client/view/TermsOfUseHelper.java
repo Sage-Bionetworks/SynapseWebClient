@@ -6,9 +6,10 @@ import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.HTML;
 
 public class TermsOfUseHelper {
 
@@ -25,8 +26,7 @@ public class TermsOfUseHelper {
         window.okText = "I Agree";
         window.setButtons(Dialog.OKCANCEL);
         window.setHideOnButtonClick(true);
-        Html html = new Html(content);
-        window.add(html);
+        window.add(new HTML(SafeHtmlUtils.fromSafeConstant(content)));
         // List for the button selection
         Button saveButton = window.getButtonById(Dialog.OK);
         saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
