@@ -96,18 +96,19 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		AclEntry ownerEntry = null;
 		for(AclEntry aclEntry : entries) {
 			if(aclEntry.getPrincipal().isOwner()) {
+				if (ownerEntry!=null) throw new IllegalArgumentException("Multiple 'owner' entries, "+ownerEntry.getPrincipal()+" and "+aclEntry.getPrincipal());
 				ownerEntry = aclEntry;
 				continue;
 			}
 			permissionsStore.add(new PermissionsTableEntry(aclEntry));
 		}
-		permissionsStore.sort(PRINCIPAL_COLUMN_ID, SortDir.ASC);
+		//permissionsStore.sort(PRINCIPAL_COLUMN_ID, SortDir.ASC);
 		if (ownerEntry!=null) permissionsStore.insert(new PermissionsTableEntry(ownerEntry), 0); // insert owner first
 		return permissionsStore;
 	}
 	
 	@Override
-	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isInherited, boolean canEnableInheritance) {		
+	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isInherited, final boolean canEnableInheritance) {		
 		this.removeAll(true);
 		
 		// setup view
@@ -224,6 +225,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				}
 			});
 			add(deleteAclButton, new MarginData(5, 0, 0, 0));
+			deleteAclButton.setEnabled(canEnableInheritance);
 			add(new Label(DisplayUtils.getIconHtml(iconsImageBundle.warning16()) + " " + DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT), new MarginData(5, 0, 0, 0));
 
 		}

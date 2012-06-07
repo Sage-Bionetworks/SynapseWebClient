@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitserver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
@@ -106,7 +107,7 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testHandleAnnotaions() throws SynapseException, JSONObjectAdapterException{
+	public void testHandleAnnotations() throws SynapseException, JSONObjectAdapterException{
 		// we want the entity
 		int mask = ANNOTATIONS;
 		EntityBundleTransport transprot =new EntityBundleTransport();
@@ -139,6 +140,26 @@ public class SynapseClientImplTest {
 		assertNotNull(transprot.getEntityPathJson());
 		EntityPath clone = EntityFactory.createEntityFromJSONString(transprot.getEntityPathJson(), EntityPath.class);
 		assertEquals(path, clone);
+	}
+	
+	@Test
+	public void testHandleUsers() {
+		fail("NYI");
+	}
+	
+	@Test
+	public void testHandleGroups() {
+		fail("NYI");
+	}
+	
+	@Test
+	public void testHandleACL() {
+		fail("NYI");
+	}
+	
+	@Test
+	public void testHandle() {
+		fail("NYI");
 	}
 	
 	@Test
@@ -261,5 +282,41 @@ public class SynapseClientImplTest {
 		annos.setId(out.getId());
 		verify(mockSynapse).updateAnnotations(out.getId(), annos);
 	}
+	
+	@Test
+	public void testGetNodeAcl() throws Exception {
+		fail("NYI");
+	}
 
+	@Test
+	public void testCreateAcl() throws Exception {
+		fail("NYI");
+	}
+
+	@Test
+	public void testUpdateAcl() throws Exception {
+		fail("NYI");
+	}
+
+	@Test
+	public void testDeleteAcl() throws Exception {
+		fail("NYI");
+	}
+
+	@Test
+	public void testHasAccess() throws Exception {
+		fail("NYI");
+	}
+
+
+	@Test
+	public void testGetAllUsers() throws Exception {
+		fail("NYI");
+	}
+
+
+	@Test
+	public void testGetAllGroups() throws Exception {
+		fail("NYI");
+	}
 }

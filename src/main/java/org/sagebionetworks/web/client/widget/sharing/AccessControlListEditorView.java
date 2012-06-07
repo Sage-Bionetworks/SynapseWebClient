@@ -24,7 +24,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 	 * @param principals the available principals
 	 * @param isEditable
 	 */
-	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isEditable, boolean canEnableInheritance);
+	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isInherited, boolean canEnableInheritance);
 	
 	/**
 	 * Set the view to a loading state while async loads
@@ -36,14 +36,35 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 	 */
 	public interface Presenter {
 		
+		/**
+		 * Create an ACL for the current entity (which otherwise inherits its ACL from an ancestor)
+		 */
 		void createAcl();
 		
+		/**
+		 * Add the given principal to the ACL, with the given permission level
+		 * @param principalId
+		 * @param permissionLevel
+		 */
 		void addAccess(Long principalId, PermissionLevel permissionLevel);
 		
+		/**
+		 * Change the access level of the given principal (already in the ACL) to the given permission level
+		 * @param principalId
+		 * @param permissionLevel
+		 */
 		void changeAccess(Long principalId, PermissionLevel permissionLevel);
 		
+		/**
+		 * Remove the given principal from the ACL
+		 * 
+		 * @param principalId
+		 */
 		void removeAccess(Long principalId);
 		
+		/**
+		 * Delete the ACL for the current entity, making the entity inherit its access permissions from its ancestor's ACL
+		 */
 		void deleteAcl();
 	}
 }

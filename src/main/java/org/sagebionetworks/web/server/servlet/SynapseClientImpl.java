@@ -62,7 +62,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
 	
-		/**
+	/**
 	 * Injected with Gin
 	 */
 	@SuppressWarnings("unused")
@@ -673,7 +673,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			// first delete the ACL
 			synapseClient.deleteACL(ownerEntityId);
 			// now get the ACL governing this entity, which will be some ancestor, the 'permissions benefactor'
-			AccessControlList acl = synapseClient.getACL(ownerEntityId);
+			AccessControlList acl = getAcl(ownerEntityId);
 			JSONObjectAdapter aclJson = acl
 					.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(aclJson.toJSONString(), aclJson
