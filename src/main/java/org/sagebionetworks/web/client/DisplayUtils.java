@@ -3,11 +3,13 @@ package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.swing.plaf.synth.SynthGraphicsUtils;
@@ -53,16 +55,20 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
 
@@ -449,7 +455,7 @@ public class DisplayUtils {
 	/*
 	 * Private methods
 	 */
-	private static String getPlaceString(Class place) {
+	private static String getPlaceString(Class<Synapse> place) {
 		String fullPlaceName = place.getName();		
 		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
 		return fullPlaceName;
@@ -697,5 +703,103 @@ public class DisplayUtils {
 		
 		return ordered;
 	}
-	
+
+	/**
+	 * A list of tags that core attributes like 'title' cannot be applied to.
+	 * This prevents them from having methods like addToolTip applied to them
+	 */
+	public static final String[] CORE_ATTR_INVALID_ELEMENTS = {"base", "head", "html", "meta",
+															   "param", "script", "style", "title"};
+
+	/**
+	 * A counter variable for assigning unqiue id's to tool-tippified elements
+	 */
+	private static int tooltipCount= 0;
+	private static int popoverCount= 0;
+
+	/**
+	 * Adds a twitter bootstrap tooltip to the given widget
+	 *
+	 * CAUTION - If not used with a non-block level element like
+	 * an anchor, img, or span the results will probably not be
+	 * quite what you want.  Read the twitter bootstrap documentation
+	 * for the options that you can specify in optionsMap
+	 *
+	 * @param util the JSNIUtils class (or mock)
+	 * @param widget the widget to attach the tooltip to
+	 * @param optionsMap a map containing the options for the tooltip and the text
+	 */
+	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
+		final Element el = widget.getElement();
+
+		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId(); 
+		optionsMap.put("id", id);
+		optionsMap.put("rel", "tooltip");
+
+		if (el.getNodeType() == 1 && ! isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
+			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
+			
+			applyAttributes(el, optionsMap);
+
+			widget.addAttachHandler( new AttachEvent.Handler() {
+				@Override
+				public void onAttachOrDetach(AttachEvent event) {
+					if (event.isAttached()) {
+						util.bindBootstrapTooltip(el.getId());
+					}
+				}
+			});
+		}
+	}
+
+	/**
+	 * Adds a popover to a target widget
+	 * 
+	 * Same warnings apply as to {@link #addTooltip(SynapseJSNIUtils, Widget, String) addTooltip}
+	 */
+	public static void addPopover(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
+		final Element el = widget.getElement();
+
+		String id = isNullOrEmpty(el.getId()) ? "sbn-popover-"+(popoverCount++) : el.getId();
+		optionsMap.put("id", id);
+		optionsMap.put("rel", "popover");
+
+		if (el.getNodeType() == 1 && ! isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
+			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
+
+			applyAttributes(el, optionsMap);
+
+			widget.addAttachHandler( new AttachEvent.Handler() {
+				@Override
+				public void onAttachOrDetach(AttachEvent event) {
+					if (event.isAttached()) {
+						util.bindBootstrapPopover(el.getId());
+					}
+				}
+			});
+		}
+	}
+
+	private static void applyAttributes(final Element el,
+			Map<String, String> optionsMap) {
+		for (Entry<String, String> option : optionsMap.entrySet()) {
+			DOM.setElementAttribute(el, option.getKey(), option.getValue());
+		}
+	}
+
+	// Private methods
+
+	private static boolean isNullOrEmpty(final String string) {
+		return string == null || string.isEmpty();
+	}
+
+	private static boolean isPresent(String needle, String[] haystack) {
+		for (String el : haystack) {
+			if (needle.equalsIgnoreCase(el)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }
