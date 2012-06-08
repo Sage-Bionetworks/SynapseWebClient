@@ -19,15 +19,21 @@ public class EntityBundleTransport implements IsSerializable {
 	public static int ENTITY_PATH	      	= 0x8;
 	public static int ENTITY_REFERENCEDBY 	= 0x10;
 	public static int CHILD_COUNT			= 0x20;
+	public static int ACL					= 0x40;
+	public static int USERS					= 0x80;
+	public static int GROUPS				= 0x100;
 	
 	public static String HELLO = ":)";
 
 	private String entityJson;
-	private String annotaionsJson;
+	private String annotationsJson;
 	private String permissionsJson;
 	private String entityPathJson;
 	private String entityReferencedByJson;
 	private Long childCount;
+	private String aclJson;
+	private String usersJson;
+	private String groupsJson;
 	
 	public Long getChildCount() {
 		return childCount;
@@ -41,11 +47,11 @@ public class EntityBundleTransport implements IsSerializable {
 	public void setEntityJson(String entityJson) {
 		this.entityJson = entityJson;
 	}
-	public String getAnnotaionsJson() {
-		return annotaionsJson;
+	public String getAnnotationsJson() {
+		return annotationsJson;
 	}
-	public void setAnnotaionsJson(String annotaionsJson) {
-		this.annotaionsJson = annotaionsJson;
+	public void setAnnotationsJson(String annotationsJson) {
+		this.annotationsJson = annotationsJson;
 	}
 	public String getPermissionsJson() {
 		return permissionsJson;
@@ -65,12 +71,36 @@ public class EntityBundleTransport implements IsSerializable {
 	public void setEntityReferencedByJson(String entityReferencedByJson) {
 		this.entityReferencedByJson = entityReferencedByJson;
 	}
+	
+	public String getAclJson() {
+		return aclJson;
+	}
+	public void setAclJson(String aclJson) {
+		this.aclJson = aclJson;
+	}
+	public String getUsersJson() {
+		return usersJson;
+	}
+	public void setUsersJson(String usersJson) {
+		this.usersJson = usersJson;
+	}
+	public String getGroupsJson() {
+		return groupsJson;
+	}
+	public void setGroupsJson(String groupsJson) {
+		this.groupsJson = groupsJson;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((annotaionsJson == null) ? 0 : annotaionsJson.hashCode());
+				+ ((groupsJson == null) ? 0 : groupsJson.hashCode());
+		result = prime * result + ((aclJson == null) ? 0 : aclJson.hashCode());
+		result = prime * result
+				+ ((annotationsJson == null) ? 0 : annotationsJson.hashCode());
+		result = prime * result
+				+ ((childCount == null) ? 0 : childCount.hashCode());
 		result = prime * result
 				+ ((entityJson == null) ? 0 : entityJson.hashCode());
 		result = prime * result
@@ -81,6 +111,8 @@ public class EntityBundleTransport implements IsSerializable {
 						: entityReferencedByJson.hashCode());
 		result = prime * result
 				+ ((permissionsJson == null) ? 0 : permissionsJson.hashCode());
+		result = prime * result
+				+ ((usersJson == null) ? 0 : usersJson.hashCode());
 		return result;
 	}
 	@Override
@@ -92,10 +124,25 @@ public class EntityBundleTransport implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		EntityBundleTransport other = (EntityBundleTransport) obj;
-		if (annotaionsJson == null) {
-			if (other.annotaionsJson != null)
+		if (groupsJson == null) {
+			if (other.groupsJson != null)
 				return false;
-		} else if (!annotaionsJson.equals(other.annotaionsJson))
+		} else if (!groupsJson.equals(other.groupsJson))
+			return false;
+		if (aclJson == null) {
+			if (other.aclJson != null)
+				return false;
+		} else if (!aclJson.equals(other.aclJson))
+			return false;
+		if (annotationsJson == null) {
+			if (other.annotationsJson != null)
+				return false;
+		} else if (!annotationsJson.equals(other.annotationsJson))
+			return false;
+		if (childCount == null) {
+			if (other.childCount != null)
+				return false;
+		} else if (!childCount.equals(other.childCount))
 			return false;
 		if (entityJson == null) {
 			if (other.entityJson != null)
@@ -117,14 +164,22 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!permissionsJson.equals(other.permissionsJson))
 			return false;
+		if (usersJson == null) {
+			if (other.usersJson != null)
+				return false;
+		} else if (!usersJson.equals(other.usersJson))
+			return false;
 		return true;
 	}
 	@Override
 	public String toString() {
 		return "EntityBundleTransport [entityJson=" + entityJson
-				+ ", annotaionsJson=" + annotaionsJson + ", permissionsJson="
+				+ ", annotationsJson=" + annotationsJson + ", permissionsJson="
 				+ permissionsJson + ", entityPathJson=" + entityPathJson
-				+ ", entityReferencedByJson=" + entityReferencedByJson + "]";
+				+ ", entityReferencedByJson=" + entityReferencedByJson
+				+ ", childCount=" + childCount + ", aclJson=" + aclJson
+				+ ", usersJson=" + usersJson + ", GroupsJson=" + groupsJson
+				+ "]";
 	}
 	
 	

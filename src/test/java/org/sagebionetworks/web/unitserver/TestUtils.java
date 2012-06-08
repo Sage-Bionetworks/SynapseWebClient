@@ -4,8 +4,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.junit.Test;
 
 public class TestUtils {
+	
+	// JUnit complains if there are no tests in this class
+	@Test
+	public void testDummy() {}
 	
 	@SuppressWarnings("rawtypes")
 	public static BaseMatcher createByteArrayPrefixMatcher(final byte[] expected) {

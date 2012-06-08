@@ -6,7 +6,6 @@ import static org.junit.Assert.fail;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Date;
 import java.util.logging.Logger;
 
 import org.junit.After;
@@ -20,7 +19,6 @@ import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
-import org.sagebionetworks.web.shared.users.AclPrincipal;
 import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 
@@ -60,12 +58,6 @@ public class UserAccountServiceImplTest {
 	private String user1password = "password";
 	private UserRegistration user2 = new UserRegistration("bar@foo.com", "bar", "foo", "barfoo");
 	private String user2password = "otherpass";
-	
-	private static AclPrincipal user1acl = new AclPrincipal("test@test.com", "test user", new Date(), null, null, true);
-	private static AclPrincipal user2acl = new AclPrincipal("bar@foo.com", "barfoo", new Date(), null, null, true);
-	
-	private static AclPrincipal group1 = new AclPrincipal("people@fake.com", "People", new Date(), null, null, false);
-	private static AclPrincipal group2 = new AclPrincipal("morePeople@fake.com", "More People", new Date(), null, null, false);
 	
 	@BeforeClass
 	public static void beforeClass() throws Exception{
@@ -168,7 +160,6 @@ public class UserAccountServiceImplTest {
 		user1.setFirstName("John");
 		user1.setLastName("Doe");
 		user1.setDisplayName(user1.getFirstName() + " " + user1.getLastName());
-		user1acl.setName(user1.getDisplayName());
 		
 		try {
 			UserData userData = service.initiateSession(user1.getEmail(), user1password, false);

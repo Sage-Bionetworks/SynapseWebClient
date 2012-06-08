@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,23 +91,24 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 	
 	private ListStore<PermissionsTableEntry> loadPermissionsStore(
-			List<AclEntry> entries) {
+			Collection<AclEntry> entries) {
 		final ListStore<PermissionsTableEntry> permissionsStore = new ListStore<PermissionsTableEntry>();
 		AclEntry ownerEntry = null;
 		for(AclEntry aclEntry : entries) {
-			if(aclEntry.isOwner()) {
+			if(aclEntry.getPrincipal().isOwner()) {
+				if (ownerEntry!=null) throw new IllegalArgumentException("Multiple 'owner' entries, "+ownerEntry.getPrincipal()+" and "+aclEntry.getPrincipal());
 				ownerEntry = aclEntry;
 				continue;
 			}
 			permissionsStore.add(new PermissionsTableEntry(aclEntry));
 		}
-		permissionsStore.sort(PRINCIPAL_COLUMN_ID, SortDir.ASC);
-		permissionsStore.insert(new PermissionsTableEntry(ownerEntry), 0); // insert owner first
+		//permissionsStore.sort(PRINCIPAL_COLUMN_ID, SortDir.ASC);
+		if (ownerEntry!=null) permissionsStore.insert(new PermissionsTableEntry(ownerEntry), 0); // insert owner first
 		return permissionsStore;
 	}
 	
 	@Override
-	public void setAclDetails(List<AclEntry> entries, List<AclPrincipal> principals, boolean isInherited) {		
+	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isInherited, final boolean canEnableInheritance) {		
 		this.removeAll(true);
 		
 		// setup view
@@ -191,7 +193,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				public void componentSelected(ButtonEvent ce) {
 					List<PeopleModel> selectedPrincipals = combo.getSelection();
 					if(selectedPrincipals != null && selectedPrincipals.size() > 0) {
-						AclPrincipal principal = selectedPrincipals.get(0).getAclPrincipal();
+						Long principal = selectedPrincipals.get(0).getPrincipalId();
 						List<SimpleComboValue<PermissionLevelSelect>> selectedPermissions = selectPermissionLevel.getSelection();
 						if(selectedPermissions != null && selectedPermissions.size() > 0) {
 							PermissionLevel level = selectedPermissions.get(0).getValue().getLevel();
@@ -223,6 +225,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				}
 			});
 			add(deleteAclButton, new MarginData(5, 0, 0, 0));
+			deleteAclButton.setEnabled(canEnableInheritance);
 			add(new Label(DisplayUtils.getIconHtml(iconsImageBundle.warning16()) + " " + DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT), new MarginData(5, 0, 0, 0));
 
 		}
@@ -262,7 +265,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	 * Private Methods
 	 */	
 	private void showAddMessage(String message) {
-		// TODO : put this on the form somewher
+		// TODO : put this on the form somewhere
 		showErrorMessage(message);
 	}
 
@@ -313,7 +316,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_VIEW));			
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			public void componentSelected(MenuEvent menuEvent) {
-				presenter.changeAccess(aclEntry, PermissionLevel.CAN_VIEW);
+				presenter.changeAccess(aclEntry.getPrincipal().getPrincipalId(), PermissionLevel.CAN_VIEW);
 			}
 		});
 		menu.add(item);
@@ -321,7 +324,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_EDIT));			
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			public void componentSelected(MenuEvent menuEvent) {
-				presenter.changeAccess(aclEntry, PermissionLevel.CAN_EDIT);
+				presenter.changeAccess(aclEntry.getPrincipal().getPrincipalId(), PermissionLevel.CAN_EDIT);
 			}
 		});
 		menu.add(item);
@@ -329,7 +332,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER));			
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			public void componentSelected(MenuEvent menuEvent) {
-				presenter.changeAccess(aclEntry, PermissionLevel.CAN_ADMINISTER);
+				presenter.changeAccess(aclEntry.getPrincipal().getPrincipalId(), PermissionLevel.CAN_ADMINISTER);
 			}
 		});
 		menu.add(item);
@@ -397,7 +400,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			        }  
 			      });  
 			    }  
-			    if(entry.getAclEntry().isOwner()) {
+			    if(entry.getAclEntry().getPrincipal().isOwner()) {
 				    Button b = new Button(DisplayConstants.MENU_PERMISSION_LEVEL_IS_OWNER);
 				    b.setWidth(grid.getColumnModel().getColumnWidth(colIndex) - 15);
 				    b.disable();
@@ -421,7 +424,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			public Object render(final PermissionsTableEntry model, String property, ColumnData config, int rowIndex,  
 			      final int colIndex, ListStore<PermissionsTableEntry> store, Grid<PermissionsTableEntry> grid) {				 
 				  final PermissionsTableEntry entry = store.getAt(rowIndex);
-			    if(entry.getAclEntry().isOwner()) {
+			    if(entry.getAclEntry().getPrincipal().isOwner()) {
 					return new Label("");		    	
 			    } else {				    
 					Anchor removeAnchor = new Anchor();
@@ -429,7 +432,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					removeAnchor.addClickHandler(new ClickHandler() {			
 						@Override
 						public void onClick(ClickEvent event) {
-							presenter.removeAccess(entry.getAclEntry());
+							presenter.removeAccess(entry.getAclEntry().getPrincipal().getPrincipalId());
 						}
 					});
 					return removeAnchor;
@@ -449,12 +452,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			super();			
 			this.aclEntry = aclEntry;
 			AclPrincipal principal = aclEntry.getPrincipal();
-			this.set(PRINCIPAL_COLUMN_ID, principal.getName());			
+			this.set(PRINCIPAL_COLUMN_ID, principal);			
+			this.set(REMOVE_COLUMN_ID, principal);			
 			PermissionLevel level = AclUtils.getPermissionLevel(aclEntry.getAccessTypes());			
 			if(level != null) {
 				this.set(ACCESS_COLUMN_ID, permissionDisplay.get(level)); 
 			}			
-			this.set(REMOVE_COLUMN_ID, aclEntry.getPrincipalId());			
 		}
 		public AclEntry getAclEntry() {
 			return aclEntry;
@@ -462,16 +465,19 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 
 	private class PeopleModel extends BaseModelData {
-		private AclPrincipal aclPrincipal;
-		public PeopleModel(AclPrincipal aclPrincipal) {
-			this.aclPrincipal = aclPrincipal;
-			String groupStr = aclPrincipal.isIndividual() ? "" : " (Group)"; 			
-			this.set("name", aclPrincipal.getName() + groupStr);
+		private Long principalId;
+		private boolean isIndividual;
+		
+		public PeopleModel(AclPrincipal principal) {
+			this.principalId = principal.getPrincipalId();
+			this.isIndividual = principal.isIndividual();
+			String groupStr = isIndividual ? "" : " (Group)"; 			
+			this.set("name", principal.getDisplayName() + groupStr);
 		}
 		
-		public AclPrincipal getAclPrincipal() {
-			return aclPrincipal;
-		}
+		public Long getPrincipalId() {return principalId;}
+		
+		public boolean isIndividual() {return isIndividual;}
 	}
 
 	private class PermissionLevelSelect {

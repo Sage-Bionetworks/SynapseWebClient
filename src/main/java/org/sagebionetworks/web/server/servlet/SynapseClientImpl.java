@@ -13,6 +13,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
@@ -21,6 +23,8 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.UserGroup;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -31,6 +35,8 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseClient;
+import org.sagebionetworks.web.client.transform.JSONEntityFactory;
+import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -55,7 +61,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
-
+	
 	/**
 	 * Injected with Gin
 	 */
@@ -268,7 +274,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			// Add the entity?
 			handleEntity(entityId, partsMask, transport, synapseClient);
 			// Add the annotations?
-			handleAnnotaions(entityId, partsMask, transport, synapseClient);
+			handleAnnotations(entityId, partsMask, transport, synapseClient);
 			// Add the permissions?
 			handlePermissions(entityId, partsMask, transport, synapseClient);
 			// Add the path?
@@ -278,6 +284,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					synapseClient);
 			// Add Referenced By?
 			handleEntityChildCount(entityId, partsMask, transport,	synapseClient);
+			// Add the ACL?
+			handleACL(entityId, partsMask, transport, synapseClient);
+			// Add the users?
+			handleUsers(entityId, partsMask, transport, synapseClient);
+			// Add the groups?
+			handleGroups(entityId, partsMask, transport, synapseClient);
 			return transport;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -345,12 +357,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 * @throws SynapseException
 	 * @throws JSONObjectAdapterException
 	 */
-	public void handleAnnotaions(String entityId, int partsMask,
+	public void handleAnnotations(String entityId, int partsMask,
 			EntityBundleTransport transport, Synapse synapseClient)
 			throws SynapseException, JSONObjectAdapterException {
 		if ((EntityBundleTransport.ANNOTATIONS & partsMask) > 0) {
 			Annotations annos = synapseClient.getAnnotations(entityId);
-			transport.setAnnotaionsJson(EntityFactory
+			transport.setAnnotationsJson(EntityFactory
 					.createJSONStringForEntity(annos));
 		}
 	}
@@ -395,6 +407,44 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					.createJSONStringForEntity(results));
 		}
 	}
+
+	public void handleACL(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient)
+			throws SynapseException, JSONObjectAdapterException {
+		if ((EntityBundleTransport.ACL & partsMask) > 0) {
+			AccessControlList acl = getAcl(entityId);
+			transport.setAclJson(EntityFactory
+					.createJSONStringForEntity(acl));
+		}
+	}
+	
+	private static final int USER_PAGINATION_OFFSET = 0;
+	// before we hit this limit we will use another mechanism to find users
+	private static final int USER_PAGINATION_LIMIT = 1000; 
+	private static final int GROUPS_PAGINATION_OFFSET = 0;
+	// before we hit this limit we will use another mechanism to find groups
+	private static final int GROUPS_PAGINATION_LIMIT = 1000; 
+
+	public void handleUsers(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient)
+			throws SynapseException, JSONObjectAdapterException {
+		if ((EntityBundleTransport.USERS & partsMask) > 0) {
+			PaginatedResults<UserProfile> userProfiles = synapseClient.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT);
+			transport.setUsersJson(EntityFactory
+					.createJSONStringForEntity(userProfiles));
+		}
+	}
+
+	public void handleGroups(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient)
+			throws SynapseException, JSONObjectAdapterException {
+		if ((EntityBundleTransport.GROUPS & partsMask) > 0) {
+			PaginatedResults<UserGroup> userGroups = synapseClient.getGroups(GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
+			transport.setGroupsJson(EntityFactory
+					.createJSONStringForEntity(userGroups));
+		}
+	}
+
 
 	@Override
 	public String getEntityReferencedBy(String entityId)
@@ -557,5 +607,121 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		} 
 	}
+	
+	public AccessControlList getAcl(String id) throws SynapseException {
+		Synapse synapseClient = createSynapseClient();
+		EntityHeader benefactor = synapseClient.getEntityBenefactor(id);
+		String benefactorId = benefactor.getId();
+		return synapseClient.getACL(benefactorId);
+	}
+	
+	@Override
+	public EntityWrapper getNodeAcl(String id) throws RestServiceException {
+		try {
+			AccessControlList acl = getAcl(id);
+			JSONObjectAdapter aclJson = acl
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aclJson.toJSONString(), aclJson
+					.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	@Override
+	public EntityWrapper createAcl(EntityWrapper aclEW) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			AccessControlList acl = jsonEntityFactory.createEntity(aclEW.getEntityJson(), AccessControlList.class);
+			acl = synapseClient.createACL(acl);
+			JSONObjectAdapter aclJson = acl
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aclJson.toJSONString(), aclJson
+					.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	@Override
+	public EntityWrapper updateAcl(EntityWrapper aclEW) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			AccessControlList acl = jsonEntityFactory.createEntity(aclEW.getEntityJson(), AccessControlList.class);
+			acl = synapseClient.updateACL(acl);
+			JSONObjectAdapter aclJson = acl
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aclJson.toJSONString(), aclJson
+					.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	@Override
+	public EntityWrapper deleteAcl(String ownerEntityId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			// first delete the ACL
+			synapseClient.deleteACL(ownerEntityId);
+			// now get the ACL governing this entity, which will be some ancestor, the 'permissions benefactor'
+			AccessControlList acl = getAcl(ownerEntityId);
+			JSONObjectAdapter aclJson = acl
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aclJson.toJSONString(), aclJson
+					.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	@Override
+	public boolean hasAccess(String ownerEntityId, String accessType) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			return synapseClient.canAccess(ownerEntityId, ACCESS_TYPE.valueOf(accessType));
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+	
+	@Override
+	public EntityWrapper getAllUsers() throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<UserProfile> userProfiles = synapseClient.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT);
+			JSONObjectAdapter upJson = userProfiles.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(upJson.toJSONString(), upJson.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	@Override
+	public EntityWrapper getAllGroups() throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<UserGroup> userGroups = synapseClient.getGroups(GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
+			JSONObjectAdapter ugJson = userGroups.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(ugJson.toJSONString(), ugJson.getClass().getName(), null);		
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
 
 }

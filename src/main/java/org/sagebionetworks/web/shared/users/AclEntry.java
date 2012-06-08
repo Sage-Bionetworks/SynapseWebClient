@@ -2,33 +2,25 @@ package org.sagebionetworks.web.shared.users;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class AclEntry implements IsSerializable {
 
 	private AclPrincipal principal;
-	private List<AclAccessType> accessTypes;
-	private boolean isOwner;
+	private List<ACCESS_TYPE> accessTypes;
 	
 	public AclEntry() {
 		
 	}
 
-	public AclEntry(AclPrincipal principal, List<AclAccessType> accessTypes, boolean isOwner) {
+	public AclEntry(AclPrincipal principal, List<ACCESS_TYPE> accessTypes) {
 		super();
 		this.principal = principal;
 		this.accessTypes = accessTypes;
-		this.isOwner = isOwner;
 	}
 
-	/**
-	 * The identifier used to key this entry
-	 * @return
-	 */
-	public String getPrincipalId() {
-		return principal.getName();
-	}
-	
 	public AclPrincipal getPrincipal() {
 		return principal;
 	}
@@ -37,20 +29,12 @@ public class AclEntry implements IsSerializable {
 		this.principal = principal;
 	}
 
-	public List<AclAccessType> getAccessTypes() {
+	public List<ACCESS_TYPE> getAccessTypes() {
 		return accessTypes;
 	}
 
-	public void setAccessTypes(List<AclAccessType> accessTypes) {
+	public void setAccessTypes(List<ACCESS_TYPE> accessTypes) {
 		this.accessTypes = accessTypes;
-	}
-	
-	public boolean isOwner() {
-		return isOwner;
-	}
-
-	public void setOwner(boolean isOwner) {
-		this.isOwner = isOwner;
 	}
 
 	@Override
@@ -59,7 +43,6 @@ public class AclEntry implements IsSerializable {
 		int result = 1;
 		result = prime * result
 				+ ((accessTypes == null) ? 0 : accessTypes.hashCode());
-		result = prime * result + (isOwner ? 1231 : 1237);
 		result = prime * result
 				+ ((principal == null) ? 0 : principal.hashCode());
 		return result;
@@ -79,8 +62,6 @@ public class AclEntry implements IsSerializable {
 				return false;
 		} else if (!accessTypes.equals(other.accessTypes))
 			return false;
-		if (isOwner != other.isOwner)
-			return false;
 		if (principal == null) {
 			if (other.principal != null)
 				return false;
@@ -92,6 +73,8 @@ public class AclEntry implements IsSerializable {
 	@Override
 	public String toString() {
 		return "AclEntry [principal=" + principal + ", accessTypes="
-				+ accessTypes + ", isOwner=" + isOwner + "]";
+				+ accessTypes + "]";
 	}
+	
+
 }

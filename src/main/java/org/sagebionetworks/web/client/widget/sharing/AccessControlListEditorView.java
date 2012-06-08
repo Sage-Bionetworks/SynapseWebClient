@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
@@ -19,10 +20,11 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 
 	/**
 	 * Sets the details needed to display the form
-	 * @param entries
-	 * @param principals
+	 * @param entries the current ACL
+	 * @param principals the available principals
+	 * @param isEditable
 	 */
-	public void setAclDetails(List<AclEntry> entries, List<AclPrincipal> principals, boolean isEditable);
+	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isInherited, boolean canEnableInheritance);
 	
 	/**
 	 * Set the view to a loading state while async loads
@@ -34,14 +36,35 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 	 */
 	public interface Presenter {
 		
+		/**
+		 * Create an ACL for the current entity (which otherwise inherits its ACL from an ancestor)
+		 */
 		void createAcl();
 		
-		void addAccess(AclPrincipal principal, PermissionLevel permissionLevel);
+		/**
+		 * Add the given principal to the ACL, with the given permission level
+		 * @param principalId
+		 * @param permissionLevel
+		 */
+		void addAccess(Long principalId, PermissionLevel permissionLevel);
 		
-		void changeAccess(AclEntry aclEntry, PermissionLevel permissionLevel);
+		/**
+		 * Change the access level of the given principal (already in the ACL) to the given permission level
+		 * @param principalId
+		 * @param permissionLevel
+		 */
+		void changeAccess(Long principalId, PermissionLevel permissionLevel);
 		
-		void removeAccess(AclEntry aclEntry);
+		/**
+		 * Remove the given principal from the ACL
+		 * 
+		 * @param principalId
+		 */
+		void removeAccess(Long principalId);
 		
+		/**
+		 * Delete the ACL for the current entity, making the entity inherit its access permissions from its ancestor's ACL
+		 */
 		void deleteAcl();
 	}
 }

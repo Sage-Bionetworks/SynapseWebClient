@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.shared.NodeType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -19,15 +20,15 @@ public class AclUtils {
 	 * @param nodeId
 	 * @return
 	 */
-	public static void getHighestPermissionLevel(final NodeType nodeType, final String nodeId, final NodeServiceAsync nodeService, final AsyncCallback<PermissionLevel> callback) {		
+	public static void getHighestPermissionLevel(final NodeType nodeType, final String nodeId, final SynapseClientAsync synapseClient, final AsyncCallback<PermissionLevel> callback) {		
 		
 		// TODO : making two rest calls is not ideal. need to change hasAccess API to include multi params
-		nodeService.hasAccess(nodeType, nodeId, AclAccessType.UPDATE, new AsyncCallback<Boolean>() {
+		synapseClient.hasAccess(nodeId, ACCESS_TYPE.UPDATE.name(), new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean canUpdate) {
 				if(canUpdate) {
 					// CAN EDIT, now check can administer
-					nodeService.hasAccess(nodeType, nodeId, AclAccessType.CHANGE_PERMISSIONS, new AsyncCallback<Boolean>() {
+					synapseClient.hasAccess(nodeId, ACCESS_TYPE.CHANGE_PERMISSIONS.name(), new AsyncCallback<Boolean>() {
 						@Override
 						public void onSuccess(Boolean canAdmin) {
 							if(canAdmin) {
@@ -56,75 +57,75 @@ public class AclUtils {
 		});
 	}
 
-	public static PermissionLevel getPermissionLevel(List<AclAccessType> accessTypes) {		
+	public static PermissionLevel getPermissionLevel(List<ACCESS_TYPE> accessTypes) {		
 		// TODO : this should be updated to be more generic
-		if(accessTypes.contains(AclAccessType.READ)
-			&& accessTypes.contains(AclAccessType.CREATE)
-			&& accessTypes.contains(AclAccessType.UPDATE)
-			&& accessTypes.contains(AclAccessType.DELETE)
-			&& accessTypes.contains(AclAccessType.CHANGE_PERMISSIONS)) {
+		if(accessTypes.contains(ACCESS_TYPE.READ)
+			&& accessTypes.contains(ACCESS_TYPE.CREATE)
+			&& accessTypes.contains(ACCESS_TYPE.UPDATE)
+			&& accessTypes.contains(ACCESS_TYPE.DELETE)
+			&& accessTypes.contains(ACCESS_TYPE.CHANGE_PERMISSIONS)) {
 			return PermissionLevel.CAN_ADMINISTER;
-		} else if(accessTypes.contains(AclAccessType.READ) 
-				&& accessTypes.contains(AclAccessType.CREATE)
-				&& accessTypes.contains(AclAccessType.UPDATE)
-				&& !accessTypes.contains(AclAccessType.DELETE)
-				&& !accessTypes.contains(AclAccessType.CHANGE_PERMISSIONS)) {
+		} else if(accessTypes.contains(ACCESS_TYPE.READ) 
+				&& accessTypes.contains(ACCESS_TYPE.CREATE)
+				&& accessTypes.contains(ACCESS_TYPE.UPDATE)
+				&& !accessTypes.contains(ACCESS_TYPE.DELETE)
+				&& !accessTypes.contains(ACCESS_TYPE.CHANGE_PERMISSIONS)) {
 			return PermissionLevel.CAN_EDIT;
-		} else if(accessTypes.contains(AclAccessType.READ) 
-				&& !accessTypes.contains(AclAccessType.CREATE)
-				&& !accessTypes.contains(AclAccessType.UPDATE)
-				&& !accessTypes.contains(AclAccessType.DELETE)
-				&& !accessTypes.contains(AclAccessType.CHANGE_PERMISSIONS)) {
+		} else if(accessTypes.contains(ACCESS_TYPE.READ) 
+				&& !accessTypes.contains(ACCESS_TYPE.CREATE)
+				&& !accessTypes.contains(ACCESS_TYPE.UPDATE)
+				&& !accessTypes.contains(ACCESS_TYPE.DELETE)
+				&& !accessTypes.contains(ACCESS_TYPE.CHANGE_PERMISSIONS)) {
 			return PermissionLevel.CAN_VIEW;
 		} else {
 			return null;
 		}
 	}
 	
-	public static List<AclAccessType> getAclAccessTypes(PermissionLevel permissionLevel) {
+	public static List<ACCESS_TYPE> getACCESS_TYPEs(PermissionLevel permissionLevel) {
 		return getPermissionLevelMap().get(permissionLevel);
 	}
 	
-	public static AclAccessType getAclAccessType(String accessType) {
-		if(AclAccessType.READ.toString().equals(accessType)) return AclAccessType.READ;
-		else if(AclAccessType.CREATE.toString().equals(accessType)) return AclAccessType.CREATE;
-		else if(AclAccessType.DELETE.toString().equals(accessType)) return AclAccessType.DELETE;
-		else if(AclAccessType.CHANGE_PERMISSIONS.toString().equals(accessType)) return AclAccessType.CHANGE_PERMISSIONS;
-		else if(AclAccessType.UPDATE.toString().equals(accessType)) return AclAccessType.UPDATE;
+	public static ACCESS_TYPE getACCESS_TYPE(String accessType) {
+		if(ACCESS_TYPE.READ.toString().equals(accessType)) return ACCESS_TYPE.READ;
+		else if(ACCESS_TYPE.CREATE.toString().equals(accessType)) return ACCESS_TYPE.CREATE;
+		else if(ACCESS_TYPE.DELETE.toString().equals(accessType)) return ACCESS_TYPE.DELETE;
+		else if(ACCESS_TYPE.CHANGE_PERMISSIONS.toString().equals(accessType)) return ACCESS_TYPE.CHANGE_PERMISSIONS;
+		else if(ACCESS_TYPE.UPDATE.toString().equals(accessType)) return ACCESS_TYPE.UPDATE;
 		else return null;
 	}
 
 
-	private static Map<PermissionLevel, List<AclAccessType>> getPermissionLevelMap() {
-		Map<PermissionLevel, List<AclAccessType>> permToAclAccessType = new HashMap<PermissionLevel, List<AclAccessType>>();
-		permToAclAccessType.put(PermissionLevel.CAN_VIEW,
-				Arrays.asList(new AclAccessType[] { AclAccessType.READ }));
-		permToAclAccessType.put(
+	private static Map<PermissionLevel, List<ACCESS_TYPE>> getPermissionLevelMap() {
+		Map<PermissionLevel, List<ACCESS_TYPE>> permToACCESS_TYPE = new HashMap<PermissionLevel, List<ACCESS_TYPE>>();
+		permToACCESS_TYPE.put(PermissionLevel.CAN_VIEW,
+				Arrays.asList(new ACCESS_TYPE[] { ACCESS_TYPE.READ }));
+		permToACCESS_TYPE.put(
 				PermissionLevel.CAN_EDIT,
-				Arrays.asList(new AclAccessType[] { AclAccessType.READ,
-						AclAccessType.READ, AclAccessType.CREATE,
-						AclAccessType.UPDATE }));
-		permToAclAccessType.put(PermissionLevel.CAN_ADMINISTER,
-				Arrays.asList(new AclAccessType[] { 
-						AclAccessType.READ, AclAccessType.CREATE,
-						AclAccessType.UPDATE, AclAccessType.DELETE,
-						AclAccessType.CHANGE_PERMISSIONS }));
+				Arrays.asList(new ACCESS_TYPE[] { ACCESS_TYPE.READ,
+						ACCESS_TYPE.READ, ACCESS_TYPE.CREATE,
+						ACCESS_TYPE.UPDATE }));
+		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER,
+				Arrays.asList(new ACCESS_TYPE[] { 
+						ACCESS_TYPE.READ, ACCESS_TYPE.CREATE,
+						ACCESS_TYPE.UPDATE, ACCESS_TYPE.DELETE,
+						ACCESS_TYPE.CHANGE_PERMISSIONS }));
 		
-		return permToAclAccessType;
+		return permToACCESS_TYPE;
 	}
 	
-	private static Map<AclAccessType, List<PermissionLevel>> getAclAccessTypeMap() {
-		Map<AclAccessType, List<PermissionLevel>> accessTypeToPerm = new HashMap<AclAccessType, List<PermissionLevel>>();
+	private static Map<ACCESS_TYPE, List<PermissionLevel>> getACCESS_TYPEMap() {
+		Map<ACCESS_TYPE, List<PermissionLevel>> accessTypeToPerm = new HashMap<ACCESS_TYPE, List<PermissionLevel>>();
 		
-		accessTypeToPerm.put(AclAccessType.READ,
+		accessTypeToPerm.put(ACCESS_TYPE.READ,
 				Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_ADMINISTER }));
-		accessTypeToPerm.put(AclAccessType.CREATE,
+		accessTypeToPerm.put(ACCESS_TYPE.CREATE,
 				Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_EDIT, PermissionLevel.CAN_ADMINISTER }));
-		accessTypeToPerm.put(AclAccessType.UPDATE,
+		accessTypeToPerm.put(ACCESS_TYPE.UPDATE,
 				Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_EDIT, PermissionLevel.CAN_ADMINISTER }));
-		accessTypeToPerm.put(AclAccessType.DELETE,
+		accessTypeToPerm.put(ACCESS_TYPE.DELETE,
 				Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_ADMINISTER }));
-		accessTypeToPerm.put(AclAccessType.CHANGE_PERMISSIONS,
+		accessTypeToPerm.put(ACCESS_TYPE.CHANGE_PERMISSIONS,
 				Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_ADMINISTER }));
 		
 		return accessTypeToPerm;
