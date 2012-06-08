@@ -8,13 +8,14 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -141,7 +142,10 @@ public class LookupViewImpl extends Composite implements LookupView {
 	
 	private void setWindowMessage(String message) {
 		lookingUpWindow.removeAll();
-		lookingUpWindow.add(new Html(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + message), new MarginData(20, 0, 0, 45));
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " ")
+		.appendEscaped(message);
+		lookingUpWindow.add(new HTML(shb.toSafeHtml()), new MarginData(20, 0, 0, 45));
 	}
 
 

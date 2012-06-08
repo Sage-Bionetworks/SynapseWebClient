@@ -13,12 +13,13 @@ import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -86,13 +87,13 @@ public class HomeViewImpl extends Composite implements HomeView {
 				public void onSuccess(String showBCCSignup) {
 					if (showBCCSignup==null || !showBCCSignup.equalsIgnoreCase("true")) return;
 					Panel sp = new SimplePanel();
-					sp.add(new Html(
+					sp.add(new HTML(SafeHtmlUtils.fromSafeConstant(
 							"<div class=\"span-6 inner-6 view notopmargin\">" +
 							"<h5><a class=\"link\" href=\"#BCCOverview:0\">Sage / DREAM Breast Cancer Prognosis Challenge</a></h5>"+
 	                    "<p>The goal of the breast cancer prognosis challenge is to assess the accuracy of computational models "+
 					    "designed to predict breast cancer survival based on clinical information about the patient's tumor as "+
 					    "well as genome-wide molecular profiling data including gene expression and copy number profiles.</p>"+
-	                	"<a class=\"button_readmore\"  href=\"#BCCOverview:0\"></a></div>"));
+	                	"<a class=\"button_readmore\"  href=\"#BCCOverview:0\"></a></div>")));
 					bccSignup.clear();
 					bccSignup.add(sp);
 				}
@@ -138,7 +139,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 			mainService.setStyleName("span-24 main-service");
 			
 			// Create a project
-			mainService.add(new Html(
+			mainService.add(new HTML(SafeHtmlUtils.fromSafeConstant(
 					"<div class=\"span-12 notopmargin\">" +
 					"	<h3>Start Your Own Project</h3>" +
    					"	<p>Get started using Synapse today by creating your own Project. Projects provide an organizational structure for you to interact with your data, code and analyses.</p>" +
@@ -146,14 +147,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 					" 	<div class=\"mega-button\" style=\"margin-top: 10px;\">" +
 					" 		<a href=\"#ProjectsHome:0\">Start a Project</a>" +
 					" 	</div>" +
-					"</div>"));
+					"</div>")));
 
 			
 			// My Projects
 			LayoutContainer myProjectLayout = new LayoutContainer();
 			myProjectLayout.setStyleName("span-12 notopmargin last");
 			VerticalPanel vp = new VerticalPanel();
-			vp.add(new Html("<h3>My Projects</h3>"));
+			vp.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>My Projects</h3>")));
 			vp.add(myEntitiesBrowser.asWidget());
 			myProjectLayout.add(vp);			
 			mainService.add(myProjectLayout);

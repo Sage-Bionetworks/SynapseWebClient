@@ -89,8 +89,8 @@ public class DisplayConstants {
 	public static final String LABEL_PERMISSION_TEXT_ADD_PEOPLE = "Add People";
 	public static final String BUTTON_SHOW_R_CLIENT_INSTALL = "Show R Client Installation Code";
 	public static final String LABEL_R_CLIENT_INSTALL = "Install Synapse R Client";
-	public static final String LABEL_R_CLIENT_GET_ENTITY = "Obtain a pointer in the Synapse R Client";
-	public static final String LABEL_R_CLIENT_LOAD_ENTITY = "Load the data in the Synapse R Client";
+	public static final String LABEL_R_CLIENT_GET_ENTITY = "Obtain a pointer";
+	public static final String LABEL_R_CLIENT_LOAD_ENTITY = "Load the data";
 		
 	/*
 	 * Service Constants (move to another file?)

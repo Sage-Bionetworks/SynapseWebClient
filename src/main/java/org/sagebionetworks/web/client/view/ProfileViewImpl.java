@@ -24,11 +24,13 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -57,11 +59,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Button createPasswordButton;
 	private SageImageBundle sageImageBundle;
 	private Button changePasswordButton;
-	private Html changePasswordLabel;
+	private HTML changePasswordLabel;
 	private FormPanel userFormPanel;
 	private Button updateWithLinkedInButton;
 	private Button updateUserInfoButton;
-	private Html updateUserInfoLabel;
+	private HTML updateUserInfoLabel;
 	private FormPanel connectFormPanel;
 	private Button linkedInButton;
 	private Html linkedInLabel;
@@ -111,13 +113,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    updateWithLinkedInPanel.clear();
 	    updateWithLinkedInPanel.add(linkedInButton);
 	    
-		updateUserInfoLabel.setHtml("");
+		updateUserInfoLabel.setHTML(SafeHtmlUtils.fromSafeConstant(""));
 		
 		updateUserInfoPanel.clear();
 		updateUserInfoPanel.add(userFormPanel);
 		setUpdateUserInfoDefaultIcon();
 		
-		changePasswordLabel.setHtml("");
+		changePasswordLabel.setHTML(SafeHtmlUtils.fromSafeConstant(""));
 		
 		changePasswordPanel.clear();
 		changePasswordPanel.add(resetFormPanel);
@@ -141,7 +143,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void showPasswordChangeSuccess() {
 		changePasswordButton.setText(DisplayConstants.BUTTON_CHANGE_PASSWORD);
 		changePasswordButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.checkGreen16()));
-		changePasswordLabel.setHtml(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) + " Password Changed");
+		changePasswordLabel.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) + " Password Changed"));
 	}
 
 	@Override
@@ -213,7 +215,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	     newPasswordConfirm.setPassword(true);
 	     fieldSet.add(newPasswordConfirm, formData);  
 
-	     changePasswordLabel = new Html();
+	     changePasswordLabel = new HTML();
 	     fieldSet.add(changePasswordLabel);
 	     
 	     resetFormPanel.add(fieldSet);  
@@ -224,7 +226,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    	 @Override
 	    	 public void componentSelected(ButtonEvent ce) {
 	    		 if(newPassword.getValue() != null && newPasswordConfirm.getValue() != null && newPassword.getValue().equals(newPasswordConfirm.getValue())) {
-	    			 changePasswordLabel.setHtml("");
+	    			 changePasswordLabel.setHTML(SafeHtmlUtils.fromSafeConstant(""));
 	    			 DisplayUtils.changeButtonToSaving(changePasswordButton, sageImageBundle);
 	    			 presenter.resetPassword(currentPassword.getValue(), newPassword.getValue());
 	    		 } else {
@@ -279,7 +281,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	     lastName.setAllowBlank(false);
 	     fieldSet.add(lastName, formData);
 
-	     updateUserInfoLabel = new Html();
+	     updateUserInfoLabel = new HTML();
 	     fieldSet.add(updateUserInfoLabel);
 	     
 	     userFormPanel.add(fieldSet);  
@@ -294,7 +296,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    		 } else if(lastName.getValue().trim().equals("") || lastName.getValue() == null) {
 	    			 MessageBox.alert("Error", "Please enter your last name.", null);
 	    		 } else {
-	    			 updateUserInfoLabel.setHtml("");
+	    			 updateUserInfoLabel.setHTML(SafeHtmlUtils.fromSafeConstant(""));
 	    			 DisplayUtils.changeButtonToSaving(updateUserInfoButton, sageImageBundle);
 	    			 presenter.updateProfile(firstName.getValue(), lastName.getValue());
 	    		 }

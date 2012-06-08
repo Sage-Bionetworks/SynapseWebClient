@@ -4,14 +4,16 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -63,13 +65,16 @@ public class BreadcrumbViewImpl extends LayoutContainer implements BreadcrumbVie
 				}
 			});
 			if (i > 0) {
-				panel.add(new Html(DisplayUtils.BREADCRUMB_SEP));
+				panel.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.BREADCRUMB_SEP)));
 			}
 			panel.add(anchor);
 		}
 		if (current != null) {
 			current = stubString(current);
-			panel.add(new Html(DisplayUtils.BREADCRUMB_SEP + current));
+			SafeHtmlBuilder shb = new SafeHtmlBuilder();
+			shb.appendHtmlConstant(DisplayUtils.BREADCRUMB_SEP);
+			shb.appendEscaped(current);
+			panel.add(new HTML(shb.toSafeHtml()));
 		}
 		panel.layout(true);
 		this.layout(true);

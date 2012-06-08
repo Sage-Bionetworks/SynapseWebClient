@@ -6,6 +6,7 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.custom.Portlet;
 import com.google.gwt.user.client.Element;
 
+@Deprecated
 public class SynapsePortlet extends Portlet {
 
 	public SynapsePortlet(String title, boolean isTop, boolean isTitle) {

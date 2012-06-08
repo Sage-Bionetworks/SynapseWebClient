@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Link;
@@ -43,7 +41,9 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -95,7 +95,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			downloadButton = licensedDownloader.asWidget(entity, false);
 			downloadButton.setHeight("25px");
 			add(downloadButton);
-			this.add(new Html("&nbsp;"));	
+			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));	
 		}
 		// Configure the button
 		licensedDownloader.configureHeadless(entity, false);
@@ -105,7 +105,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			editButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
 			editButton.setHeight(25);
 			this.add(editButton);
-			this.add(new Html("&nbsp;"));			
+			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
 		}				
 		if (canEdit) editButton.enable();
 		else editButton.disable();
@@ -116,7 +116,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			shareButton = new Button(DisplayConstants.BUTTON_SHARE, AbstractImagePrototype.create(iconsImageBundle.mailGrey16()));
 			shareButton.setHeight(25);
 			this.add(shareButton);
-			this.add(new Html("&nbsp;"));
+			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
 		if (isAdministrator) shareButton.enable();
 		else shareButton.disable();
@@ -127,7 +127,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			addButton = new Button(DisplayConstants.BUTTON_ADD, AbstractImagePrototype.create(iconsImageBundle.add16()));
 			addButton.setHeight(25);
 			this.add(addButton);
-			this.add(new Html("&nbsp;"));
+			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
 		if (canEdit) addButton.enable();
 		else addButton.disable();

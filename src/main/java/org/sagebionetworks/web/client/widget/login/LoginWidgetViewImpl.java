@@ -29,10 +29,13 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -53,19 +56,19 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		messageLabel = new Label();
 	}
 	
-	private String createSSOLoginButton(boolean userHasExplictlyAcceptedTermsOfUse) {
+	private SafeHtml createSSOLoginButton(boolean userHasExplictlyAcceptedTermsOfUse) {
 		// federated login button
-		StringBuilder sb = new StringBuilder();		
-		sb.append("<form accept-charset=\"UTF-8\" action=\""+ presenter.getOpenIdActionUrl() +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">");
-		sb.append("    <input name=\"OPEN_ID_PROVIDER\" type=\"hidden\" value=\""+ DisplayConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>");
-		sb.append("    <input name=\"RETURN_TO_URL\" type=\"hidden\" value=\""+  getRedirectURL() +"\"/>");
+		SafeHtmlBuilder sb = new SafeHtmlBuilder()		
+		.appendHtmlConstant("<form accept-charset=\"UTF-8\" action=\""+ presenter.getOpenIdActionUrl() +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
+		.appendHtmlConstant("    <input name=\"OPEN_ID_PROVIDER\" type=\"hidden\" value=\""+ DisplayConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>")
+		.appendHtmlConstant("    <input name=\"RETURN_TO_URL\" type=\"hidden\" value=\""+  getRedirectURL() +"\"/>");
 		if (userHasExplictlyAcceptedTermsOfUse) {
-			sb.append("    <input name=\""+ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
+			sb.appendHtmlConstant("    <input name=\""+ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
 		}
-		sb.append("    <button id=\"login-via-gapp-google\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"http://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>");
-		sb.append("</form>");		
-		sb.append("<p>&nbsp;</p>");
-		return sb.toString();
+		sb.appendHtmlConstant("    <button id=\"login-via-gapp-google\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"http://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")
+		.appendHtmlConstant("</form>")		
+		.appendHtmlConstant("<p>&nbsp;</p>");
+		return sb.toSafeHtml();
 	}
 	
 	public String getRedirectURL() {
@@ -86,7 +89,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		vp = new VerticalPanel();
 		vp.setSpacing(10);
 		
-		Html ssoLoginButton = new Html(createSSOLoginButton(/*acceptTermsOfUse*/explicitlyAcceptsTermsOfUse));
+		HTML ssoLoginButton = new HTML(createSSOLoginButton(/*acceptTermsOfUse*/explicitlyAcceptsTermsOfUse));
 		vp.add(ssoLoginButton);
 		
 		createForm();

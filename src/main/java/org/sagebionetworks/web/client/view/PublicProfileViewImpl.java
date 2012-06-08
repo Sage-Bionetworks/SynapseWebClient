@@ -10,10 +10,12 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
 import com.extjs.gxt.ui.client.widget.Html;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -83,15 +85,16 @@ public class PublicProfileViewImpl extends Composite implements PublicProfileVie
 	@Override
 	public void updateWithUserInfo(String name, ArrayList<String> userInfo) {
 		// User's name
-		String panelHtml = "<h2>" + name + "</h2> <ul>";
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant("<h2>").appendEscaped(name).appendHtmlConstant("</h2> <ul>");
 		
 		// Rest of user's info
 		for(int i = 0; i < userInfo.size(); i++) {
-			panelHtml += "<li>" + userInfo.get(i) + "</li>";
+			shb.appendHtmlConstant("<li>").appendEscaped(userInfo.get(i)).appendHtmlConstant("</li>");
 		}
 		
-		panelHtml += "</ul>";
-		userInfoPanel.add(new Html(panelHtml));
+		shb.appendHtmlConstant("</ul>");
+		userInfoPanel.add(new HTML(shb.toSafeHtml()));
 	}
 	
 	/*

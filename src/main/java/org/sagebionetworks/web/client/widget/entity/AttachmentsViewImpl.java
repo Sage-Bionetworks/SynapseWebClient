@@ -28,6 +28,9 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.tips.ToolTip;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Widget;
@@ -120,44 +123,40 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 			List<AttachmentData> attachments) {		
 		 
 		for(AttachmentData data: attachments){
-			StringBuilder builder = new StringBuilder();
-			builder.append("<a href=\"");
-			builder.append(DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getTokenId(), data.getTokenId()));
-			builder.append("\" target=\"_blank\" name=\"");
-			builder.append(data.getName());
-			builder.append("\"");
-			builder.append(">");
-			String iconNumber = DisplayUtils.getAttachmentIcon(data.getName());
-			builder.append("<div class=\"icon-white-small icon"+iconNumber+"-white\">");
-			builder.append("<div style=\"margin-left:20px\">");
-			builder.append(DisplayUtils.replaceWhiteSpace(data.getName()));
-			builder.append("</div>");
-			builder.append("</div>");
-			builder.append("</a>");
-			Html listItem = new Html(builder.toString());
-		    // If we have a preview then show it as a tooltip.
-			String tooltip;
-		    if(data.getPreviewId() != null){
-		    	StringBuilder imageBuilder = new StringBuilder();
-		    	imageBuilder.append("<div class=\"preview-image-loading\" >");
-		    	imageBuilder.append(DisplayUtils.IMAGE_CENTERING_TABLE_START);
-		    	imageBuilder.append("<img style=\"margin:auto; display:block;\" src=\"");
-		    	imageBuilder.append(DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getPreviewId(), null));
-		    	imageBuilder.append("\"");
-		    	imageBuilder.append("/>");
-		    	imageBuilder.append(DisplayUtils.IMAGE_CENTERING_TABLE_END);
-		    	imageBuilder.append("</div>");
-		    	tooltip = imageBuilder.toString();  
-		    }else{
-			    tooltip = data.getName();			    
-		    }		    
-		    //listItem.setToolTip(config); 
+			SafeHtml dataName = SafeHtmlUtils.fromString(data.getName());
 			
-			BaseModelData model = new BaseModelData();
+			SafeHtmlBuilder builder = new SafeHtmlBuilder();
+			builder.appendHtmlConstant("<a href=\"" 
+					+ DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getTokenId(), data.getTokenId()) 
+					+ "\" target=\"_blank\" name=\"" 
+					+ dataName.asString() 
+					+ "\">");
+			SafeHtml iconNumber = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getAttachmentIcon(data.getName()));
+			builder.appendHtmlConstant("<div class=\"icon-white-small icon"+iconNumber.asString()+"-white\">");
+			builder.appendHtmlConstant("<div style=\"margin-left:20px\">");
+			builder.appendEscaped(DisplayUtils.replaceWhiteSpace(data.getName()));
+			builder.appendHtmlConstant("</div>");
+			builder.appendHtmlConstant("</div>");
+			builder.appendHtmlConstant("</a>");
+			Html listItem = new Html(builder.toSafeHtml().asString());
+		    // If we have a preview then show it as a tooltip.
+			SafeHtml previewToolip;
+		    if(data.getPreviewId() != null){
+		    	previewToolip = SafeHtmlUtils.fromSafeConstant("<div class=\"preview-image-loading\" >"
+			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_START
+			    		+ "<img style=\"margin:auto; display:block;\" src=\"" 
+			    		+ DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getPreviewId(), null) + "\"/>"
+			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_END
+			    		+ "</div>");  
+		    }else{
+			    previewToolip = dataName;			    
+		    }		    
+
+		    BaseModelData model = new BaseModelData();
 			model.set(LINK_KEY, listItem.getHtml());
 			model.set(ATTACHMENT_DATA_TOKEN_KEY, data.getTokenId());
-			model.set(ATTACHMENT_DATA_NAME_KEY, data.getName());
-			model.set(TOOLTIP_TEXT_KEY, tooltip);
+			model.set(ATTACHMENT_DATA_NAME_KEY, SafeHtmlUtils.fromString(data.getName()).asString());
+			model.set(TOOLTIP_TEXT_KEY, previewToolip.asString());
 			gridStore.add(model);
 		}
 		
@@ -181,6 +180,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 				builder.append("<div style='font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;'>");
 				builder.append(value);
 				builder.append("</div>");
+				// TODO : determine if value should be SafeHtml escaped
 				Html html = new Html(builder.toString());
 				String tooltip = (String)model.get(TOOLTIP_TEXT_KEY);
 				if(tooltip != null) {

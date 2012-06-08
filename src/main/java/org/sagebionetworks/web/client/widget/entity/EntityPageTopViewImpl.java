@@ -69,7 +69,9 @@ import com.google.gwt.cell.client.widget.PreviewDisclosurePanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -265,37 +267,38 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * @return
 	 */
 	private Html createMetadata(Entity entity) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("<div style=\"font-size: 80%\">");
-		builder.append("Added by: ");
-		builder.append(entity.getCreatedBy());
-		builder.append(" on: ");
-		builder.append(entity.getCreatedOn());
-		builder.append("<br/>Last updated by: ");
-		builder.append(entity.getModifiedBy());
-		builder.append(" on: ");
-		builder.append(entity.getModifiedOn());
-		builder.append("<br/>");
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		builder.appendHtmlConstant("<div style=\"font-size: 80%\">");
+		builder.appendHtmlConstant("Added by: ");
+		builder.appendEscaped(entity.getCreatedBy());
+		builder.appendHtmlConstant(" on: ");
+		builder.appendEscaped(String.valueOf(entity.getCreatedOn()));
+		builder.appendHtmlConstant("<br/>Last updated by: ");
+		builder.appendEscaped(entity.getModifiedBy());
+		builder.appendHtmlConstant(" on: ");
+		builder.appendEscaped(String.valueOf(entity.getModifiedOn()));
+		builder.appendHtmlConstant("<br/>");
 		if(entity instanceof Versionable){
 			Versionable vb = (Versionable) entity;
-			builder.append("Current version: ");
-			builder.append(vb.getVersionLabel());
-			builder.append(" (#");
+			builder.appendHtmlConstant("Current version: ");
+			builder.appendEscaped(vb.getVersionLabel());
+			builder.appendHtmlConstant(" (#");
 			builder.append(vb.getVersionNumber());
-			builder.append(")");
+			builder.appendHtmlConstant(")");
 		}
-		builder.append("<div/>");
-	    return new Html(builder.toString());
+		builder.appendHtmlConstant("<div/>");
+	    return new Html(builder.toSafeHtml().asString());
 	}	
 	
 	private Widget createRClientWidget(Entity entity) {			  
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		lc.add(new Html("<h3>Synapse R Client</h3>"));  
+		lc.add(new Html(SafeHtmlUtils.fromSafeConstant("<h3>Synapse R Client</h3>").asString()));  
 
-	    // setup install code widgets		
-	    Html loadEntityCode = new Html(DisplayUtils.getRClientEntityLoad(entity.getId()));
+	    // setup install code widgets
+		SafeHtml rClientLoad = DisplayUtils.getRClientEntityLoad(entity.getId());
+	    Html loadEntityCode = new Html(rClientLoad.asString());
 	    loadEntityCode.setStyleName(DisplayUtils.STYLE_CODE_CONTENT);		
 		
 		final LayoutContainer container = new LayoutContainer();
@@ -324,7 +327,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		vp.add(getRClientButton);
 		vp.add(container);
 		
-		lc.add(new Html("<p>The Synapse R Client allows you to interact with the Synapse system programmatically.</p>"));
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<p>The Synapse R Client allows you to interact with the Synapse system programmatically.</p>")));
 		lc.add(loadEntityCode);
 		lc.add(vp);
 		
@@ -336,8 +339,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-
-		lc.add(new Html("<h3>Others Using this " + entityTypeProvider.getEntityDispalyName(entity) + "</h3>"));	    
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant("<h3>Others Using this ").appendEscaped(entityTypeProvider.getEntityDispalyName(entity)).appendHtmlConstant("</h3>");
+		lc.add(new HTML(shb.toSafeHtml()));	    
 
 	    
 	    if(referencedBy.getTotalNumberOfResults() > 0) {	    
@@ -435,7 +439,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			loader.load();
 
 	    } else {
-	    	lc.add(new Html(DisplayConstants.TEXT_NO_REFERENCES + " " + entityTypeProvider.getEntityDispalyName(entity) + "."));
+	    	SafeHtmlBuilder shbNoRef = new SafeHtmlBuilder();
+	    	shbNoRef.appendHtmlConstant(DisplayConstants.TEXT_NO_REFERENCES + " ").appendEscaped(entityTypeProvider.getEntityDispalyName(entity)).appendHtmlConstant(".");
+	    	lc.add(new HTML(shbNoRef.toSafeHtml()));
 	    }
 	    lc.layout();
 	    return lc;  
@@ -464,12 +470,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
-		lc.add(new Html("<h3>Activity Feed</h3>"));  
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Activity Feed</h3>")));  
 	    
 		if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {			
-			lc.add(new HTML(DisplayConstants.DEMO_COMMENTS));
+			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.DEMO_COMMENTS)));
 		} else {
-			lc.add(new Html("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_ACTIVITY + "</div>"));
+			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_ACTIVITY + "</div>")));
 		}
 				
 		lc.layout();
@@ -482,7 +488,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoHeight(true);
 
 		String typeDisplay = entityTypeProvider.getEntityDispalyName(entity);
-		lc.add(new Html("<h3>" + typeDisplay + " " + "Contents</h3>"));
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant("<h3>").appendEscaped(typeDisplay).appendHtmlConstant("Contents</h3>");
+		lc.add(new HTML(shb.toSafeHtml()));
 		lc.add(entityChildBrowser.asWidget(entity, canEdit));
 		lc.layout();
 		return lc;
@@ -494,7 +502,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 //		lc.setAutoWidth(true);
 //		lc.setAutoHeight(true);
 //
-//		lc.add(new Html("<h3>RStudio</h3>"));  	        	    	    	 
+//		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>RStudio</h3>")));  	        	    	    	 
 //	    
 //	    showRstudio = new SplitButton("&nbsp;&nbsp;Load in RStudio Server");
 //	    showRstudio.setIcon(AbstractImagePrototype.create(iconsImageBundle.rstudio24()));
@@ -515,9 +523,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 //	    	showRstudio.setText("&nbsp;&nbsp;Please Login to Load in RStudio");
 //	    }
 //	    
-//	    final Html label = new Html("<a href=\"http://rstudio.org/\" class=\"link\">RStudio&trade;</a> is a free and open source integrated development environment (IDE) for R. " +
+//	    final Html label = new Html(SafeHtmlUtils.fromSafeConstant("<a href=\"http://rstudio.org/\" class=\"link\">RStudio&trade;</a> is a free and open source integrated development environment (IDE) for R. " +
 //	    		"You can run it on your desktop (Windows, Mac, or Linux) or even over the web using RStudio Server.<br/></br>" +
-//	    		"If you do not have a copy of RStudio Server setup, you can create one by <a href=\"http://rstudio.org/download/server\" class=\"link\">following these directions</a>.");
+//	    		"If you do not have a copy of RStudio Server setup, you can create one by <a href=\"http://rstudio.org/download/server\" class=\"link\">following these directions</a>.").asString());
 //	    	    
 //	    showRstudio.addSelectionListener(new SelectionListener<ButtonEvent>() {
 //			@Override
@@ -547,12 +555,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
-		String title = "<h2>"
-				+ AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(bundle.getEntity(), DisplayUtils.IconSize.PX24, iconsImageBundle)).getHTML() 
-				+ "&nbsp;"
-				+ bundle.getEntity().getName()
-				+ "&nbsp;(" + bundle.getEntity().getId() + ")</h2>";
-    	lc.add(new Html(title));  
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant("<h2>")
+		.appendHtmlConstant(AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(bundle.getEntity(), DisplayUtils.IconSize.PX24, iconsImageBundle)).getHTML()) 
+		.appendHtmlConstant("&nbsp;")
+		.appendEscaped(bundle.getEntity().getName())
+		.appendHtmlConstant("&nbsp;(")
+		.appendEscaped(bundle.getEntity().getId())
+		.appendHtmlConstant(")</h2>");
+    	lc.add(new HTML(shb.toSafeHtml()));  
 		
 	    // Metadata
 	    lc.add(createMetadata(bundle.getEntity()));
@@ -566,17 +577,22 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		SafeHtmlBuilder txt = new SafeHtmlBuilder();
 		
-		lc.add(new Html("<h3>Description</h3>"));	
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Description</h3>")));	
 
+		
 		// Add the description body
 	    String description = bundle.getEntity().getDescription();
+	    SafeHtml descriptionSafeHtml = null;
 	    if(description == null || "".equals(description)) {
-	    	description = "<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>";
+	    	descriptionSafeHtml = SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>");	    	
+	    } else {
+	    	// escape user content, but convert new lines to <br>
+	    	SafeHtmlBuilder shb = new SafeHtmlBuilder();
+    		shb.appendEscapedLines(description);
+    		descriptionSafeHtml = shb.toSafeHtml();
 	    }
-	    lc.add(new Html(description));
-
+	    lc.add(new HTML(descriptionSafeHtml));	    
 		
 		lc.layout();
 		return lc;
@@ -586,11 +602,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		lc.add(new Html("<h3>Properties &amp; Annotations</h3>"));  
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Properties &amp; Annotations</h3>")));  
 	    
 	    // Create the property body
 	    // the headers for properties.
-	    //propertiesHeader.add(new Html("<h4>Properties &amp; Annotations</h4>"));
 	    propertyWidget.setEntityBundle(bundle);
 	    lc.add(propertyWidget.asWidget());
 	    lc.layout();
@@ -606,12 +621,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		lc.add(new Html("<h3>Visual Attachments</h3>"));
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Visual Attachments</h3>")));
 		String baseURl = GWT.getModuleBaseURL()+"attachment";
-		StringBuilder bodyBuilder = new  StringBuilder();
+		SafeHtmlBuilder bodyBuilder = new SafeHtmlBuilder();
 		int col = 0;
 		List<AttachmentData> list = entity.getAttachments();
-		bodyBuilder.append("<div class=\"span-17 left notopmargin\">");
+		bodyBuilder.appendHtmlConstant("<div class=\"span-17 left notopmargin\">");
 		for(AttachmentData data: list){
 			// Ignore all attachemtns without a preview.
 			if(data.getPreviewId() == null) continue;
@@ -623,35 +638,29 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}else{
 				col++;
 			}
-			bodyBuilder.append("<div class=\"");
-			bodyBuilder.append(style);
-			bodyBuilder.append("\">");
-			bodyBuilder.append("<div class=\"preview-image-loading view\" >");
+			bodyBuilder.appendHtmlConstant("<div class=\"" + style + "\">");
+			bodyBuilder.appendHtmlConstant("<div class=\"preview-image-loading view\" >");
 			// Using a table to center the image because the alternatives were not an option for this case.
 			// The solution is from: http://stackoverflow.com/questions/388180/how-to-make-an-image-center-vertically-horizontally-inside-a-bigger-div
 			// We could not use the background approach because we are using a background sprit to show loading.
 			// We could not use the second approach because we do not know the dimensions of the image (we just know its width<=160 and height<=160).
 			// That left the third option...a table that causes people to go blind!
-			bodyBuilder.append(DisplayUtils.IMAGE_CENTERING_TABLE_START);
-			bodyBuilder.append("<a class=\"item-preview spec-border-ie\" href=\"");
-			bodyBuilder.append(DisplayUtils.createAttachmentUrl(baseURl, entity.getId(), data.getTokenId(), data.getName()));
-			bodyBuilder.append("\" target=\"_blank\" name=\"");
-			bodyBuilder.append(data.getName());
-			bodyBuilder.append("\"");
-			bodyBuilder.append(">");
-			bodyBuilder.append("<img style=\"margin:auto; display:block;\" src=\"");
-			bodyBuilder.append(DisplayUtils.createAttachmentUrl(baseURl, entity.getId(), data.getPreviewId(), null));
-			bodyBuilder.append("\"");
-			bodyBuilder.append(" ");
-			bodyBuilder.append("/>");
-			bodyBuilder.append("</a>");
-			bodyBuilder.append(DisplayUtils.IMAGE_CENTERING_TABLE_END);
-			bodyBuilder.append("</div>");
-			bodyBuilder.append("</div>");
+			bodyBuilder.appendHtmlConstant(DisplayUtils.IMAGE_CENTERING_TABLE_START)
+			.appendHtmlConstant("<a class=\"item-preview spec-border-ie\" href=\"" 
+					+ DisplayUtils.createAttachmentUrl(baseURl, entity.getId(), data.getTokenId(), data.getName()) 
+					+ "\" target=\"_blank\" name=\""
+					+ SafeHtmlUtils.fromString(data.getName()).asString()
+					+ "\">")
+			.appendHtmlConstant("<img style=\"margin:auto; display:block;\" src=\"" 
+					+ DisplayUtils.createAttachmentUrl(baseURl, entity.getId(), data.getPreviewId(), null)
+					+ "\" />")
+			.appendHtmlConstant("</a>")
+			.appendHtmlConstant(DisplayUtils.IMAGE_CENTERING_TABLE_END)
+			.appendHtmlConstant("</div>")
+			.appendHtmlConstant("</div>");
 		}
-		bodyBuilder.append("</div>");
-		Html body = new Html(bodyBuilder.toString());
-		lc.add(body);
+		bodyBuilder.appendHtmlConstant("</div>");
+		lc.add(new HTML(bodyBuilder.toSafeHtml()));
 		lc.layout();
 		return lc;
 	}
