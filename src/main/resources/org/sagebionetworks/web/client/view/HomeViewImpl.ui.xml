@@ -117,6 +117,17 @@
 						<h3>Top Synapse Contributors</h3>
 						<p>Synapse users who are actively contributing data</p>
 						<div class="span-12 last serv">
+							<a href="#Synapse:syn308572">
+								<div class="big-rounded-icon-white left">
+									<div class="icon-white-big">
+										<img src="static/images/people/lyon_gholson.jpg" />
+									</div>
+								</div>
+								<h5>Gholson Lyon</h5>
+								<p class="notopmargin small-italic">This dataset contains targeted exome sequencing data from a family with Ogden Syndrome.</p>
+							</a>
+						</div>
+						<div class="span-12 last serv">
 							<a href="#Synapse:syn160764">
 								<div class="big-rounded-icon-white left">
 									<div class="icon-white-big">
@@ -125,17 +136,6 @@
 								</div>
 								<h5>Carlos Caldas</h5>
 								<p class="notopmargin small-italic">This dataset contains phenotype, expression and CNV data from ~1500 individuals with breast cancer.</p>
-							</a>
-						</div>
-						<div class="span-12 last serv">
-							<a href="#Synapse:syn169310">
-								<div class="big-rounded-icon-white left">
-									<div class="icon-white-big">
-										<img src="static/images/people/lyon_gholson.jpg" />
-									</div>
-								</div>
-								<h5>Gholson Lyon</h5>
-								<p class="notopmargin small-italic">This dataset contains targeted exome sequencing data from a family with Ogden Syndrome.</p>
 							</a>
 						</div>
 						<div class="span-12 last serv">

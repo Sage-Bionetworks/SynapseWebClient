@@ -250,7 +250,7 @@ public class DisplayUtils {
 				MessageBox.info(DisplayConstants.ERROR_LOGIN_REQUIRED, DisplayConstants.ERROR_LOGIN_REQUIRED, null);
 				placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			} else {
-				MessageBox.info("Unauthorized", "Sorry, there was a failure due to insufficient privileges.", null);
+				MessageBox.info(DisplayConstants.TITLE_UNAUTHORIZED, DisplayConstants.ERROR_FAILURE_PRIVLEDGES, null);
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
