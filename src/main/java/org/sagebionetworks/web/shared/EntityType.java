@@ -62,8 +62,7 @@ public class EntityType {
 	public String toString() {
 		return "EntityType [name=" + name + ", className=" + className
 				+ ", defaultParentPath=" + defaultParentPath + ", metadata="
-				+ metadata + ", validParentTypes=" + validParentTypes
-				+ ", validChildTypes=" + validChildTypes + "]";
+				+ metadata + "]";
 	}
 
 	@Override
@@ -72,13 +71,6 @@ public class EntityType {
 		int result = 1;
 		result = prime * result
 				+ ((className == null) ? 0 : className.hashCode());
-		result = prime
-				* result
-				+ ((defaultParentPath == null) ? 0 : defaultParentPath
-						.hashCode());
-		result = prime * result
-				+ ((metadata == null) ? 0 : metadata.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
 
@@ -96,33 +88,10 @@ public class EntityType {
 				return false;
 		} else if (!className.equals(other.className))
 			return false;
-		if (defaultParentPath == null) {
-			if (other.defaultParentPath != null)
-				return false;
-		} else if (!defaultParentPath.equals(other.defaultParentPath))
-			return false;
-		if (metadata == null) {
-			if (other.metadata != null)
-				return false;
-		} else if (!metadata.equals(other.metadata))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (validChildTypes == null) {
-			if (other.validChildTypes != null)
-				return false;
-		} else if (!validChildTypes.equals(other.validChildTypes))
-			return false;
-		if (validParentTypes == null) {
-			if (other.validParentTypes != null)
-				return false;
-		} else if (!validParentTypes.equals(other.validParentTypes))
-			return false;
 		return true;
 	}
-	
+
+
+
     
 }

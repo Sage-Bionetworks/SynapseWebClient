@@ -3,10 +3,8 @@ package org.sagebionetworks.web.client;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.sagebionetworks.repo.model.Entity;
@@ -19,7 +17,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class EntityTypeProvider {
@@ -84,20 +81,6 @@ public class EntityTypeProvider {
 		return null;
 	}
 	
-//	public EntityType getEntityTypeForUri(String uri) {
-//		if(uri == null) throw new IllegalArgumentException("URI cannot be null");
-//		int maxIndex = -1;
-//		EntityType maxType = null;
-//		for(EntityType type: values) {
-//			int index = uri.lastIndexOf(type.getUrlPrefix());
-//			if(index > maxIndex){
-//				maxIndex = index;
-//				maxType = type;
-//			}
-//		}
-//		if(maxType != null) return maxType;
-//		throw new IllegalArgumentException("Unknown Entity type for URI: "+uri);
-//	}	
 	
 	/*
 	 * Private Methods
@@ -131,20 +114,31 @@ public class EntityTypeProvider {
 			}
 			
 			// calculate and fill children			
-			Map<String, Set<EntityType>> classNameToChildTypes = new HashMap<String, Set<EntityType>>();
+			Map<String, List<String>> classNameToChildTypes = new HashMap<String, List<String>>();
 			for(EntityType type : values) {
 				for(EntityType parent : type.getValidParentTypes()) {					
-					if(!classNameToChildTypes.containsKey(parent)) {
-						classNameToChildTypes.put(parent.getClassName(), new HashSet<EntityType>());
-					}
+					if(!classNameToChildTypes.containsKey(parent.getClassName())) {
+						classNameToChildTypes.put(parent.getClassName(), new ArrayList<String>());
+					}				
 					// add this type to its parent
-					classNameToChildTypes.get(parent.getClassName()).add(type);
+					List<String> children = classNameToChildTypes.get(parent.getClassName());
+					if(!children.contains(type.getClassName())) {
+						children.add(type.getClassName());
+					}					
 				}
 			}
 			for(EntityType type : values) {
 				if(classNameToChildTypes.containsKey(type.getClassName())) {
-					Set<EntityType> children = classNameToChildTypes.get(type.getClassName());					
-					type.setValidChildTypes(new ArrayList<EntityType>(children));
+					List<String> children = classNameToChildTypes.get(type.getClassName());
+					List<EntityType> childrenTypes = new ArrayList<EntityType>();
+					for(String className : children) {
+						if(classToType.containsKey(className)) {
+							childrenTypes.add(classToType.get(className));
+						} else {
+							throw new RuntimeException("Type with className: " + className + " not known.");
+						}
+					}
+					type.setValidChildTypes(childrenTypes);
 				}
 			}
 
