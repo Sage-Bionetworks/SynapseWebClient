@@ -405,7 +405,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				// grey parents
 				safeLink += " class=\"hitBreadcrumbParent\"";
 			}
-			safeLink += ">" + SafeHtmlUtils.fromString(header.getName()) + "</a>";
+			safeLink += ">" + SafeHtmlUtils.fromString(header.getName()).asString() + "</a>";
 			pathBuilder.appendHtmlConstant(safeLink);
 			
 			if(i<headers.size() - 1) {
