@@ -8,6 +8,10 @@
 	<g:HTMLPanel>
 
 		<div class="span-24 notopmargin">
+			<div id="alertWrapper" >
+				<div id="alertContainer" >
+				</div> 
+			</div>
 			<div class="span-16 logo">
 				<a href="#">
 					<g:Image resource="{sageImages.sageLogoAndTitle}" />
