@@ -3682,16 +3682,3 @@ background:#000 url(../images/cross.png) no-repeat center center;
 	font-style: italic;
 	color: #999;
 }
-
-#alertWrapper {
-	position:relative;
-	width: 100%;
-	top: 10px;
-	left: 0;
-}
-
-#alertContainer {
-	width: 100%;
-	margin-left: auto;
-	margin-right: auto;
-}

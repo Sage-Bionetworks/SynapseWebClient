@@ -2,8 +2,12 @@ package org.sagebionetworks.web.client.widget;
 
 
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 
 public class Alert extends Composite {
 
@@ -20,8 +24,12 @@ public class Alert extends Composite {
 	}
 	
 	private FlowPanel panel;
+	private Button closeButton;
+	private InlineHTML headingEl;
+	private InlineLabel bodyEl;
+
 	private String heading;
-	private String body;
+
 	private boolean fullHeader = false;
 	private boolean blockStyle = false;
 	
@@ -36,38 +44,32 @@ public class Alert extends Composite {
 	private void init(String heading, String body) {
 		panel = new FlowPanel();
 
+		// The use of setStyleName throughout this class is INTENTIONAL
+		// It allows us to get rid of any classes that GWT
+		// might decide to helpfully add by default
 		panel.setStyleName("alert");
 		panel.addStyleName("fade");
 		panel.addStyleName("in");
 		
-		this.heading = heading;
-		this.body = body;
-
-		initWidget(panel);
-		build();
-	}
-	
-	public void build() {
+		this.closeButton = new Button("x");
+		closeButton.setStyleName("close");
+		closeButton.getElement().setAttribute("data-dismiss", "alert");
 		
-		SafeHtmlBuilder text = new SafeHtmlBuilder();
-
-		text.appendHtmlConstant("<button class=\"close\" data-dismiss=\"alert\">×</button>");
-		if (blockStyle || fullHeader) {
-			panel.addStyleDependentName("block");
-		}
-
-		if (heading != null) {
-			text.appendHtmlConstant(fullHeader?"<h4 class=\"alert-heading\">":"<strong>");
-			text.appendEscaped(heading);
-			text.appendHtmlConstant(fullHeader?"</h4>":"</strong> ");
-		}
-
-		text.appendEscaped(body);
-
-		panel.getElement().setInnerHTML(text.toSafeHtml().asString());
-
+		this.heading = heading;
+		this.headingEl = new InlineHTML();
+		this.headingEl.setStyleName("heading");
+		this.headingEl.setText(this.heading);
+		
+		this.bodyEl = new InlineLabel(body);
+		this.bodyEl.setStyleName("");
+		
+		panel.add(closeButton);
+		panel.add(this.headingEl);
+		panel.add(this.bodyEl);
+		
+		initWidget(panel);
 	}
-	
+
 	public void setBlockStyle(boolean isBlock) {
 		panel.setStyleDependentName("block", isBlock);
 	}
@@ -79,29 +81,49 @@ public class Alert extends Composite {
 	}
 
 	public void setFullHeader(boolean fullHeader) {
-		this.fullHeader = fullHeader;
-		build();
+		if (fullHeader) {
+			SafeHtmlBuilder builder = new SafeHtmlBuilder();
+			builder.appendHtmlConstant("<h4 class=\"alert-heading\">");
+			builder.appendEscaped(this.heading);
+			builder.appendHtmlConstant("</h4>");
+			this.headingEl.setHTML(builder.toSafeHtml());
+		} else {
+			this.headingEl.setHTML("");
+			this.headingEl.setText(this.heading + " ");
+		}
 	}
-
+	
 	public boolean isFullHeader() {
 		return fullHeader;
 	}
 
 	public void setHeading(String heading) {
 		this.heading = heading;
-		build();
+		this.headingEl.setText(this.heading + " ");
 	}
 
 	public String getHeading() {
-		return heading;
+		return this.heading;
 	}
 
 	public void setBody(String body) {
-		this.body = body;
-		build();
+		this.bodyEl.setText(body);
 	}
 
 	public String getBody() {
-		return body;
+		return bodyEl.getText();
+	}
+	
+	public void setTimeout(int delay) {
+		final Button button = this.closeButton;
+		
+		Timer timer = new Timer() {
+
+			@Override
+			public void run() {
+				button.click();
+			}
+		};
+		timer.schedule(delay);
 	}
 }

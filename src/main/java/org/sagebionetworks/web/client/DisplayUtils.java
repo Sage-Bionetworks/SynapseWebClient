@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.Alert;
+import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -66,6 +67,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -352,7 +354,10 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showInfo(String title, String message) {
-		Info.display(title, message);
+		Alert alert = new Alert(title, message);
+		alert.setAlertType(AlertType.Info);
+		alert.setTimeout(4000);
+		displayGlobalAlert(alert);
 	}
 	
 	public static void showErrorMessage(String message) {
