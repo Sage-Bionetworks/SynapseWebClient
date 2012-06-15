@@ -161,61 +161,29 @@ public class LicensedDownloaderTest {
 		
 		// Null locations
 		resetMocks();			
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		((Locationable)entity).setLocations(null);		
 		licensedDownloader.loadDownloadLocations(entity, false);
 		verify(mockView).showDownloadsLoading();
 		verify(mockView).setNoDownloads();	
-								
-		// Success Test: No download
-		resetMocks();
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
-		entity.setLocations(locations);		
-		licensedDownloader.loadDownloadLocations(entity, false);
-		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocations(locations, entity.getMd5());
 
 		// Not Logged in Test: Download
-		resetMocks();			
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(null); // not logged in
+		resetMocks();
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false); // not logged in
 		entity.setLocations(locations);
 		licensedDownloader.loadDownloadLocations(entity, true);
 		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocations(locations, entity.getMd5());
-		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockView).setNeedToLogIn();
 
 		// Success Test: Download
 		resetMocks();			
 		entity.setLocations(locations);
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadLocations(entity, true);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setDownloadLocations(locations, entity.getMd5());
-		verify(mockView).showWindow();
 	}
 
-	@Ignore // This entire tests does not make sense anymore.
-	@Test
-	public void testAsWidgetParameterized() throws Exception {
-
-		// License Accepted == True
-		resetMocks();
-		configureTestLoadMocks();
-
-		// Success Test: No download
-		entity.setLocations(locations);		
-		
-		licensedDownloader.asWidget(entity, false);		
-
-		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocations(locations, entity.getMd5());
-		verify(mockView).setLicenceAcceptanceRequired(false);
-		verify(mockView).setLicenseHtml(licenseAgreement.getLicenseHtml());
-
-	}
-	
-	
 	@Test
 	public void testAsWidget(){
 		// make sure this version of asWidget can not be used		

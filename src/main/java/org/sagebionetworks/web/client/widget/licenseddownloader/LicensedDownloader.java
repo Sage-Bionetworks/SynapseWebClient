@@ -87,23 +87,18 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 */
 	public void loadDownloadLocations(final Entity entity, final Boolean showDownloadLocations) {		
 		if(entity != null) {
-			view.showDownloadsLoading();		
+			view.showDownloadsLoading();
 			if(entity instanceof Locationable) {
 				Locationable locationable = (Locationable)entity;
 				List<LocationData> locations = locationable.getLocations();				
-				if(locations != null && locations.size() > 0) {
-					this.view.setDownloadLocations(locations, locationable.getMd5());
-					
-					// show download if requested
-					if(showDownloadLocations != null && showDownloadLocations == true) {
-						if(downloadAttempted()) {
-							showWindow();
-						} else {
-							view.setUnauthorizedDownloads();
-						}
-					}			
+				if (this.authenticationController.isLoggedIn()) {
+					if(locations != null && locations.size() > 0) {
+						this.view.setDownloadLocations(locations, locationable.getMd5());
+					} else {
+						this.view.setNoDownloads();
+					}
 				} else {
-					view.setNoDownloads();
+					this.view.setNeedToLogIn();
 				}
 			} else {
 				view.setNoDownloads();
@@ -116,13 +111,12 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		// TODO : more?
 	}		
 
-	public boolean downloadAttempted() {
-		if(authenticationController.getLoggedInUser() != null) {
+	public boolean isDownloadAllowed() {
+		if(authenticationController.isLoggedIn()) {
 			return true;
-		} else {
-			view.showInfo("Login Required", "Please Login to download data.");
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
 		}
+		view.showInfo("Login Required", "Please Login to download data.");
+		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
 		return false;
 	}
 		

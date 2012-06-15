@@ -91,8 +91,10 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 			eulaWindow.show();		
 		} else {
 			// show download window
-			createDownloadWindow();
-			downloadWindow.show();
+			if (presenter.isDownloadAllowed()) {
+				createDownloadWindow();
+				downloadWindow.show();
+			}
 		}		
 	}
 
@@ -254,6 +256,10 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		fillDownloadContentContainer();		
 	}
 
+	@Override
+	public void setNeedToLogIn() {
+		safeDownloadHtml = SafeHtmlUtils.fromSafeConstant(DisplayConstants.ERROR_LOGIN_REQUIRED);
+	}
 
 	/*
 	 * Protected Methods
@@ -401,11 +407,5 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		licenseTextContainer.add(new HTML(licenseTextHtml));
 		licenseTextContainer.layout(true);
 	}
-
-
-
-
-	
-	
 
 }
