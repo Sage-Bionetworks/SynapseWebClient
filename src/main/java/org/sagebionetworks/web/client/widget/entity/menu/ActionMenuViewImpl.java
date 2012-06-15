@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -97,8 +98,16 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			add(downloadButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));	
 		}
+		if (downloadButton instanceof Button) {
+			Button dlButton = (Button)downloadButton;
+			if (entity instanceof Locationable)
+				dlButton.enable();
+			else
+				dlButton.disable(); 
+		}
 		// Configure the button
 		licensedDownloader.configureHeadless(entity, false);
+
 
 		// edit button
 		if(editButton == null) {			
