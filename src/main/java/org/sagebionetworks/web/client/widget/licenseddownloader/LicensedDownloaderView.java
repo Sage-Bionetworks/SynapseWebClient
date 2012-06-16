@@ -74,6 +74,8 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 		 */
 		public void setLicenseAccepted();
 		
+		public boolean isDownloadAllowed();
+
 	}
 
 	public void showDownloadFailure();
@@ -81,5 +83,7 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	public void setNoDownloads();
 
 	public void setUnauthorizedDownloads();
+
+	public void setNeedToLogIn();
 	
 }

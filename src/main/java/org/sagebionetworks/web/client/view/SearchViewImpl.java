@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.view;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.gwttime.time.DateTime;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -17,6 +19,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -99,17 +102,20 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private ContentPanel loadingPanel;
 	private boolean loadShowing;
 	private List<Button> facetButtons;
-
+	private SynapseJSNIUtils synapseJSNIUtils;
+	
 	@Inject
 	public SearchViewImpl(SearchViewImplUiBinder binder, Header headerWidget,
 			Footer footerWidget, IconsImageBundle iconsImageBundle,
-			SageImageBundle sageImageBundle) {
+			SageImageBundle sageImageBundle, 
+			SynapseJSNIUtils synapseJSNIUtils) {
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
-
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		loadShowing = false;
@@ -556,8 +562,15 @@ public class SearchViewImpl extends Composite implements SearchView {
 				if(constraint.getValue().contains(":")) {
 					continue;
 				}
+				String stub = DisplayUtils.stubStr(constraint.getValue(), FACET_NAME_LENGTH_CHAR);
+				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
+				if (!stub.equalsIgnoreCase(constraint.getValue())) {
+					Map<String, String> optionsMap = new TreeMap<String, String>();
+					optionsMap.put("title", constraint.getValue());
+					optionsMap.put("data-placement", "right");
+					DisplayUtils.addTooltip(this.synapseJSNIUtils, a, optionsMap);
+				}
 				
-				Anchor a = new Anchor(DisplayUtils.stubStr(constraint.getValue(), FACET_NAME_LENGTH_CHAR) + " (" + constraint.getCount() + ")");			
 				a.addClickHandler(new ClickHandler() {				
 					@Override
 					public void onClick(ClickEvent event) {
