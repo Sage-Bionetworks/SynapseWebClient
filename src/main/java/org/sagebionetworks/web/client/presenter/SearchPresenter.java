@@ -35,6 +35,7 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -94,7 +95,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		this.place = place;
 		view.setPresenter(this);
 		redirect = null;
-			
+
 		// TODO : perhaps not pass the json query in the token? could run up against URL limits. could possibly pop it off of global app state		
 		String queryString = place.toToken();
 		// if query parses into SearchQuery, use that, otherwise use it as a
@@ -280,6 +281,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		try {
 			currentSearch.writeToJSONObject(adapter);
+			History.newItem(adapter.toJSONString());
 			synapseClient.search(adapter.toJSONString(), new AsyncCallback<EntityWrapper>() {			
 				@Override
 				public void onSuccess(EntityWrapper result) {
