@@ -94,34 +94,15 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		view.setPresenter(this);
 		redirect = null;
 		String queryTerm = place.toToken();
-
+		if (queryTerm == null) queryTerm = "";
+		
 		if (willRedirect(queryTerm)) {
 			redirect = new Synapse(queryTerm);
 			return;
 		}
 
-		currentSearch = checkForJson(place);
+		currentSearch = checkForJson(queryTerm);
 		executeSearch();
-	}
-
-	private SearchQuery checkForJson(Search place) {
-		String queryString = place.toToken();
-
-		SearchQuery query = getBaseSearchQuery();
-		query.setQueryTerm(Arrays.asList(queryString.split(" ")));
-		
-		// if query parses into SearchQuery, use that, otherwise use it as a
-		// search Term
-		if (queryString != null && queryString.startsWith("{")) {
-			try {
-				query = new SearchQuery(jsonObjectAdapter.createNew(queryString));
-				// passed a searchQuery
-			} catch (JSONObjectAdapterException e) {
-				// fall through to a use as search term
-			}
-		} 
-
-		return query;
 	}
 
 	@Override
@@ -262,6 +243,25 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			}
 		}
 		return false;
+	}
+
+	private SearchQuery checkForJson(String queryString) {
+		SearchQuery query = getBaseSearchQuery();
+
+		query.setQueryTerm(Arrays.asList(queryString.split(" ")));
+
+		// if query parses into SearchQuery, use that, otherwise use it as a
+		// search Term
+		if (queryString != null && queryString.startsWith("{")) {
+			try {
+				query = new SearchQuery(jsonObjectAdapter.createNew(queryString));
+				// passed a searchQuery
+			} catch (JSONObjectAdapterException e) {
+				// fall through to a use as search term
+			}
+		} 
+
+		return query;
 	}
 
 	private SearchQuery getBaseSearchQuery() {
