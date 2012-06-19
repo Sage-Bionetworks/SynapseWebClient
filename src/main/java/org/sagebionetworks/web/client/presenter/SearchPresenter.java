@@ -145,8 +145,19 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			// set start back to zero so we go to first page with the new facet
 			currentSearch.setStart(new Long(0));			
 		}
+
+		executeNewSearch();
+	}
+
+	private void executeNewSearch() {
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		
-		executeSearch();
+		try {
+			currentSearch.writeToJSONObject(adapter);
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+		}
+		setSearchTerm(adapter.toJSONString());
 	}
 
 	@Override
@@ -174,13 +185,13 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		
 		// set to first page
 		currentResult.setStart(new Long(0));
-		executeSearch();
+		executeNewSearch();
 	}
 
 	@Override
 	public void clearSearch() {
 		currentSearch = getBaseSearchQuery();
-		executeSearch();
+		executeNewSearch();
 	}
 	
 	@Override
@@ -201,7 +212,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
 	public void setStart(int newStart) {
 		currentSearch.setStart(new Long(newStart));
-		executeSearch();
+		executeNewSearch();
 	}
 
 	@Override
