@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -35,7 +34,6 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -281,7 +279,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		try {
 			currentSearch.writeToJSONObject(adapter);
-			History.newItem(adapter.toJSONString());
 			synapseClient.search(adapter.toJSONString(), new AsyncCallback<EntityWrapper>() {			
 				@Override
 				public void onSuccess(EntityWrapper result) {
