@@ -320,7 +320,9 @@ a.shortBtn {
 	margin-right: 5px;
 }
 
-
+.facet-btn {
+	float: left;
+}
 
 
 
