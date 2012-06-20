@@ -218,6 +218,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				}
 			}
 			Button btn = new Button(text, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
+			btn.addStyleName("facet-btn");
 			btn.setIconAlign(IconAlign.RIGHT);
 			btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
@@ -249,20 +250,18 @@ public class SearchViewImpl extends Composite implements SearchView {
 						switch (type) {
 						case LITERAL:
 							widget = createLiteralFacet(facet); 
-							if(widget != null) vp.add(widget);
 							break;
 						case CONTINUOUS:
 							widget = createContinuousFacet(facet); 
-							if(widget != null) vp.add(widget);
 							break;
 						case DATE:
 							widget = createDateFacet(facet); 
-							if(widget != null) vp.add(widget);
 							break;
 						default:
 							// facet type not supported
 							break;
 						}
+						if(widget != null) vp.add(widget);
 					}
 					continue;
 				}
