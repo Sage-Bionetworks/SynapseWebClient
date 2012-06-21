@@ -122,6 +122,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 */
 	
 	private void setUser(UserData userData) {
+		//initialize buttons
 		if(userButton == null) {
 			userButton = new Button();
 			userButton.setHeight(25);
@@ -148,27 +149,31 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				}
 			});
 		}
-		//clear header commands
-		commandBar.remove(loginButton);
-		commandBar.remove(registerButton);
-		commandBar.remove(userButton);
+		
 		if(userData != null) {
-			//has user data, add user commands (and set to the current user name)
+			//has user data, update the user name and add user commands (and set to the current user name)
 			userButton.setText(userData.getUserName());
-			commandBar.add(userButton);
+			commandBar.remove(loginButton);
+			commandBar.remove(registerButton);
+			if (commandBar.getWidgetIndex(userButton) == -1)
+				commandBar.add(userButton);
 		} else {
 			//no user data, add register and login
-			commandBar.add(registerButton);			
-			commandBar.add(loginButton);
+			commandBar.remove(userButton);
+			if (commandBar.getWidgetIndex(registerButton) == -1)
+			{
+				commandBar.add(registerButton);			
+				commandBar.add(loginButton);
+			}
 		}
 	}
 
 	private void configureUserMenu() {				
 		// create drop down menu
 		Menu menu = new Menu();
-		addMenuItem(DisplayConstants.TEXT_USER_SETTINGS, 
-				new Profile(DisplayUtils.DEFAULT_PLACE_TOKEN),
-				menu);
+//		addMenuItem(DisplayConstants.TEXT_USER_SETTINGS, 
+//				new Profile(DisplayUtils.DEFAULT_PLACE_TOKEN),
+//				menu);
 		
 		addMenuItem(DisplayConstants.TEXT_USER_VIEW_PROFILE, 
 				new Profile(DisplayUtils.DEFAULT_PLACE_TOKEN),

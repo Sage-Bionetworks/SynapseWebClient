@@ -14,7 +14,6 @@
 				</a>
 			</div>
 			<g:HorizontalPanel ui:field="commandBar" />
-			<g:TextArea ui:field="testField"/>
 			<div class="span-24 notopmargin">
 				<div class="push-16 span-8 last notopmargin" style="text-align: right;">
 					<g:SimplePanel ui:field="searchBoxPanel" />
