@@ -13,21 +13,8 @@
 					<g:Image resource="{sageImages.sageLogoAndTitle}" />
 				</a>
 			</div>
-			<div class="span-8 last">
-				<h5 style="text-align: right;">
-					<span ui:field="userName" />
-				</h5>
-				<div class="menu-right"></div>
-				<ul class="sf-menu">
-					<li>
-						<g:Anchor ui:field="topRightLink1" />
-					</li>
-					<li>
-						<g:Hyperlink ui:field="topRightLink2" />
-					</li>
-				</ul>
-				<div class="menu-left"></div>
-			</div>
+			<g:HorizontalPanel ui:field="commandBar" />
+			<g:TextArea ui:field="testField"/>
 			<div class="span-24 notopmargin">
 				<div class="push-16 span-8 last notopmargin" style="text-align: right;">
 					<g:SimplePanel ui:field="searchBoxPanel" />
