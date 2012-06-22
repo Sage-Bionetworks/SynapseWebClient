@@ -125,12 +125,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		//initialize buttons
 		if(userButton == null) {
 			userButton = new Button();
-			userButton.setHeight(25);
+			userButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.user16()));
+			userButton.setHeight(35);
 			configureUserMenu();
 		}
 		if(loginButton == null) {
 			loginButton = new Button(DisplayConstants.BUTTON_LOGIN);
-			loginButton.setHeight(25);
 			loginButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
@@ -142,7 +142,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		{
 			AbstractImagePrototype icon = null;
 			registerButton = new Button(DisplayConstants.BUTTON_REGISTER);
-			registerButton.setHeight(25);
 			registerButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
@@ -178,12 +177,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 //				menu);
 		
 		addMenuItem(DisplayConstants.TEXT_USER_VIEW_PROFILE,
-				AbstractImagePrototype.create(iconsImageBundle.userBusiness16()),
+				AbstractImagePrototype.create(iconsImageBundle.user16()),
 				new Profile(DisplayUtils.DEFAULT_PLACE_TOKEN),
 				menu);
 		
 		addMenuItem(DisplayConstants.BUTTON_LOGOUT,
-				AbstractImagePrototype.create(iconsImageBundle.external16()),
+				null,
 				new LoginPlace(LoginPlace.LOGOUT_TOKEN),
 				menu);
 		
