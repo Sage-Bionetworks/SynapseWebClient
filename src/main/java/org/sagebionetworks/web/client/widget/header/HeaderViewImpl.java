@@ -125,12 +125,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		//initialize buttons
 		if(userButton == null) {
 			userButton = new Button();
-			userButton.setHeight(25);
+			userButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.user16()));
+			userButton.setHeight(35);
 			configureUserMenu();
 		}
 		if(loginButton == null) {
 			loginButton = new Button(DisplayConstants.BUTTON_LOGIN);
-			loginButton.setHeight(25);
 			loginButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
@@ -140,8 +140,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 		if (registerButton == null)
 		{
+			AbstractImagePrototype icon = null;
 			registerButton = new Button(DisplayConstants.BUTTON_REGISTER);
-			registerButton.setHeight(25);
 			registerButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
@@ -171,24 +171,27 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private void configureUserMenu() {				
 		// create drop down menu
 		Menu menu = new Menu();
-//		addMenuItem(DisplayConstants.TEXT_USER_SETTINGS, 
+//		addMenuItem(DisplayConstants.TEXT_USER_SETTINGS,
+//				AbstractImagePrototype.create(iconsImageBundle.cog16()),
 //				new Profile(DisplayUtils.DEFAULT_PLACE_TOKEN),
 //				menu);
 		
-		addMenuItem(DisplayConstants.TEXT_USER_VIEW_PROFILE, 
+		addMenuItem(DisplayConstants.TEXT_USER_VIEW_PROFILE,
+				AbstractImagePrototype.create(iconsImageBundle.user16()),
 				new Profile(DisplayUtils.DEFAULT_PLACE_TOKEN),
 				menu);
 		
-		addMenuItem(DisplayConstants.BUTTON_LOGOUT, 
+		addMenuItem(DisplayConstants.BUTTON_LOGOUT,
+				null,
 				new LoginPlace(LoginPlace.LOGOUT_TOKEN),
 				menu);
 		
 		userButton.setMenu(menu);
 	}
 	
-	private void addMenuItem(String text, final Place place, Menu menu)
+	private void addMenuItem(String text, AbstractImagePrototype icon, final Place place, Menu menu)
 	{
-		MenuItem menuItem = new MenuItem(text);
+		MenuItem menuItem = new MenuItem(text, icon);
 		menuItem.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {
