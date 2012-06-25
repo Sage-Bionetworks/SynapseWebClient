@@ -182,11 +182,15 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				menu);
 		
 		addMenuItem(DisplayConstants.BUTTON_LOGOUT,
-				null,
 				new LoginPlace(LoginPlace.LOGOUT_TOKEN),
 				menu);
 		
 		userButton.setMenu(menu);
+	}
+	
+	private void addMenuItem(String text, final Place place, Menu menu)
+	{
+		addMenuItem(text, null, place, menu);
 	}
 	
 	private void addMenuItem(String text, AbstractImagePrototype icon, final Place place, Menu menu)
