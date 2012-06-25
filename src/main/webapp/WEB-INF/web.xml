@@ -11,6 +11,11 @@
 		<filter-class>org.sagebionetworks.web.server.servlet.filter.SSLFilter</filter-class>
 	</filter>
 
+	<filter>
+		<filter-name>guiceFilter</filter-name>
+		<filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+	</filter>
+
 	<filter-mapping>
 		<filter-name>sslFilter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -19,10 +24,6 @@
 	<!-- This filter allows us to use Guice for dependency injection in the 
 		server side servlets -->
 
-	<filter>
-		<filter-name>guiceFilter</filter-name>
-		<filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
-	</filter>
 
 	<filter-mapping>
 		<filter-name>guiceFilter</filter-name>
