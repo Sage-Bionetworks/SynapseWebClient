@@ -4,7 +4,9 @@ import java.util.logging.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.sagebionetworks.repo.ServiceConstants;
+import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;
@@ -29,7 +31,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.gwt.user.server.rpc.UnexpectedException;
 import com.google.inject.Inject;
 
-public class UserAccountServiceImpl extends RemoteServiceServlet implements UserAccountService {
+public class UserAccountServiceImpl extends RemoteServiceServlet implements UserAccountService, TokenProvider {
 	
 	public static final long serialVersionUID = 498269726L;
 
@@ -44,7 +46,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	 * Injected with Gin
 	 */
 	private ServiceUrlProvider urlProvider;
+
+	private TokenProvider tokenProvider = this;
 	
+	@SuppressWarnings("unused")
+	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+
 
 	/**
 	 * Injected via Gin.
@@ -65,6 +72,16 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		this.urlProvider = provider;
 	}
 
+	/**
+	 * This allows integration tests to override the token provider.
+	 * 
+	 * @param tokenProvider
+	 */
+	public void setTokenProvider(TokenProvider tokenProvider) {
+		this.tokenProvider = tokenProvider;
+	}
+	
+	
 	@Override
 	public void sendPasswordResetEmail(String userId) throws RestServiceException {
 		// First make sure the service is ready to go.
@@ -201,9 +218,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		throw new RestClientException("An error occured. Please try again.");
 	}
 
-	
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 */
+	@Deprecated
 	@Override
-	public UserData initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws TermsOfUseException, UnauthorizedException {
+	public UserData initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws RestServiceException {
 		// First make sure the service is ready to go.
 		validateService();
 		
@@ -254,15 +274,21 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			UserSession initSession = response.getBody();
 			String displayName = initSession.getDisplayName();
 			String sessionToken = initSession.getSessionToken();
-			userData = new UserData(username, displayName, sessionToken, false);
+			String principalId = getPrincipalId();
+			
+			userData = new UserData(principalId, username, displayName, sessionToken, false);
 		} else {			
 			throw new UnauthorizedException("Unable to authenticate.");
 		}
 		return userData;		
 	}
 
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 */
+	@Deprecated
 	@Override
-	public UserData getUser(String sessionToken) throws AuthenticationException {
+	public UserData getUser(String sessionToken) throws AuthenticationException, RestServiceException {
 		// First make sure the service is ready to go.
 		validateService();
 		
@@ -288,7 +314,8 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		UserData userData = null;		
 		if((response.getStatusCode() == HttpStatus.CREATED || response.getStatusCode() == HttpStatus.OK) && response.hasBody()) {
 			GetUser getUser = response.getBody();
-			userData = new UserData(getUser.getEmail(), getUser.getDisplayName(), sessionToken, false);
+			String principalId = getPrincipalId();
+			userData = new UserData(principalId, getUser.getEmail(), getUser.getDisplayName(), sessionToken, false);
 		} else {			
 			throw new AuthenticationException("Unable to authenticate.");
 		}
@@ -337,6 +364,10 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 */
+	@Deprecated
 	@Override
 	public void updateUser(String firstName, String lastName, String displayName) throws RestServiceException {
 		// First make sure the service is ready to go.
@@ -402,6 +433,10 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}		
 	}
 
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 */
+	@Deprecated
 	@Override
 	public boolean ssoLogin(String sessionToken) throws RestServiceException {
 		// First make sure the service is ready to go.
@@ -510,6 +545,10 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		
 	}
 	
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 */
+	@Deprecated
 	@Override
 	public String getTermsOfUse() {
 		// call Synapse client instead of making its own call
@@ -517,4 +556,39 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, HttpMethod.GET, null, String.class);
 		return response.getBody();
 	}
+	
+	@Override
+	public String getSessionToken() {
+		// By default, we get the token from the request cookies.
+		return UserDataProvider.getThreadLocalUserToken(this
+				.getThreadLocalRequest());
+	}
+	
+	/**
+	 * The synapse client is stateful so we must create a new one for each
+	 * request
+	 */
+	private Synapse createSynapseClient() {
+		// Create a new syanpse
+		Synapse synapseClient = synapseProvider.createNewClient();
+		synapseClient.setSessionToken(tokenProvider.getSessionToken());
+		synapseClient.setRepositoryEndpoint(urlProvider
+				.getRepositoryServiceUrl());
+		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
+		return synapseClient;
+	}
+
+	private String getPrincipalId() throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		UserProfile userProfile;
+		try {
+			userProfile = synapseClient.getMyProfile();
+		} catch (SynapseException e) {
+			throw new RestServiceException(e.getMessage());
+		}
+		String principalId = userProfile.getOwnerId();
+		return principalId;
+	}
+
+
 }
