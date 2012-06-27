@@ -30,8 +30,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public boolean isLoggedIn() {
 		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
 		if(loginCookieString != null) {
-			currentUser = new UserData(loginCookieString);			
-			return true;
+			currentUser = UserData.getInstanceFromCookie(loginCookieString);
+			if(currentUser != null)
+				return true;
 		} 
 		return false;
 	}
