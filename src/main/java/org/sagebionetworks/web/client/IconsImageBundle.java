@@ -121,7 +121,7 @@ public interface IconsImageBundle extends ClientBundle {
 		
 	@Source("images/icons/lock-unlock-16.png")
 	ImageResource lockUnlocked16();	
-
+	
 	@Source("images/icons/magnifier-zoom-16.png")
 	ImageResource magnify16();		
 	
@@ -179,12 +179,18 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/user-business-16.png")
 	ImageResource userBusiness16();
 
+	@Source("images/icons/user-16.png")
+	ImageResource user16();
+	
+	@Source("images/icons/user--pencil-16.png")
+	ImageResource userEdit16();
+	
 	@Source("images/icons/users-16.png")
 	ImageResource users16();
 	
 	@Source("images/icons/exclamation-16.png")
 	ImageResource warning16();	
-
+	
 	
 	/*
 	 * Synapse Icons
