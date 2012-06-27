@@ -103,7 +103,7 @@ public class DisplayUtils {
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
 	public static final String WAIT_FOR_URL = "waitForUrl";
-	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "CreatedByPrincipalId";
+	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "createdByPrincipalId";
 	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";

@@ -274,7 +274,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			UserSession initSession = response.getBody();
 			String displayName = initSession.getDisplayName();
 			String sessionToken = initSession.getSessionToken();
-			String principalId = getPrincipalId();
+			String principalId = getPrincipalId(sessionToken);
 			
 			userData = new UserData(principalId, username, displayName, sessionToken, false);
 		} else {			
@@ -314,7 +314,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		UserData userData = null;		
 		if((response.getStatusCode() == HttpStatus.CREATED || response.getStatusCode() == HttpStatus.OK) && response.hasBody()) {
 			GetUser getUser = response.getBody();
-			String principalId = getPrincipalId();
+			String principalId = getPrincipalId(sessionToken);
 			userData = new UserData(principalId, getUser.getEmail(), getUser.getDisplayName(), sessionToken, false);
 		} else {			
 			throw new AuthenticationException("Unable to authenticate.");
@@ -513,6 +513,9 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		if (urlProvider == null)
 			throw new IllegalStateException(
 					"The org.sagebionetworks.rest.api.root.url was not set");
+		if (tokenProvider == null) {
+			throw new IllegalStateException("The token provider was not set");
+		}
 	}
 
 	
@@ -569,17 +572,24 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	 * request
 	 */
 	private Synapse createSynapseClient() {
+		return createSynapseClient(null);
+	}
+
+	private Synapse createSynapseClient(String sessionToken) {
 		// Create a new syanpse
 		Synapse synapseClient = synapseProvider.createNewClient();
-		synapseClient.setSessionToken(tokenProvider.getSessionToken());
+		if(sessionToken == null) {
+			sessionToken = tokenProvider.getSessionToken();
+		}
+		synapseClient.setSessionToken(sessionToken);
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
 		return synapseClient;
 	}
 
-	private String getPrincipalId() throws RestServiceException {
-		Synapse synapseClient = createSynapseClient();
+	private String getPrincipalId(String sessionToken) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient(sessionToken);
 		UserProfile userProfile;
 		try {
 			userProfile = synapseClient.getMyProfile();
