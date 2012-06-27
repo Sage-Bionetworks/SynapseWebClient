@@ -13,16 +13,32 @@ public interface UserAccountServiceAsync {
 
 	void setPassword(String email, String newPassword, AsyncCallback<Void> callback);
 
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 */
+	@Deprecated
 	void initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse, AsyncCallback<UserData> callback);
 
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 */
+	@Deprecated
 	void getUser(String sessionToken, AsyncCallback<UserData> callback);	
 
 	void createUser(UserRegistration userInfo, AsyncCallback<Void> callback);
 	
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 */
+	@Deprecated
 	void updateUser(String firstName, String lastName, String displayName, AsyncCallback<Void> callback);
 
 	void terminateSession(String sessionToken, AsyncCallback<Void> callback);
 
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 */
+	@Deprecated
 	void ssoLogin(String sessionToken, AsyncCallback<Boolean> callback);
 
 	void getPrivateAuthServiceUrl(AsyncCallback<String> callback);
@@ -31,6 +47,10 @@ public interface UserAccountServiceAsync {
 	
 	void getSynapseWebUrl(AsyncCallback<String> callback);
 	
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 */
+	@Deprecated
 	void getTermsOfUse(AsyncCallback<String> callback);
 
 }
