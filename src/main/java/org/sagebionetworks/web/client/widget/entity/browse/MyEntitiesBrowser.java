@@ -100,7 +100,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	public void loadUserUpdateable() {
 		if(!authenticationController.isLoggedIn()) return;		
 		UserData user = authenticationController.getLoggedInUser();		
-		SearchQuery query = createUpdateQuery(user.getEmail());
+		SearchQuery query = createUpdateQuery(user.getPrincipalId());
 		
 		view.showLoading();
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
@@ -140,7 +140,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 
 	}
 
-	private SearchQuery createUpdateQuery(String username) {
+	private SearchQuery createUpdateQuery(String principalId) {
 		SearchQuery query = new SearchQuery();
 		
 		// BQ
@@ -149,7 +149,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		kv = new KeyValue();
 		//kv.setKey("update_acl");
 		kv.setKey("acl");
-		kv.setValue(username);
+		kv.setValue(principalId);
 		bq.add(kv);
 		
 		kv = new KeyValue();
@@ -182,7 +182,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		if(authenticationController.isLoggedIn()) {
 			view.showLoading();
 			List<WhereCondition> where = new ArrayList<WhereCondition>();
-			where.add(new WhereCondition(DisplayUtils.ENTITY_CREATEDBY_KEY, WhereOperator.EQUALS, authenticationController.getLoggedInUser().getEmail()));
+			where.add(new WhereCondition(DisplayUtils.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, authenticationController.getLoggedInUser().getPrincipalId()));
 			searchService.searchEntities("project", where, 1, 1000, null, false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {
