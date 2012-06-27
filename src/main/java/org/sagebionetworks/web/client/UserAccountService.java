@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 
@@ -19,9 +17,9 @@ public interface UserAccountService extends RemoteService {
 	
 	public void setPassword(String email, String newPassword);
 
-	public UserData initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws TermsOfUseException, UnauthorizedException;
+	public UserData initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws RestServiceException;
 	
-	public UserData getUser(String sessionToken) throws AuthenticationException;
+	public UserData getUser(String sessionToken) throws AuthenticationException, RestServiceException;
 
 	public void createUser(UserRegistration userInfo) throws RestServiceException;
 	
