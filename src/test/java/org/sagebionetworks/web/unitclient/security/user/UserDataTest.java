@@ -10,10 +10,10 @@ public class UserDataTest {
 	
 	@Test
 	public void testToCookie(){
-		UserData user = new UserData("10", "magic", "abcxyz", false);
+		UserData user = new UserData("1", "10", "magic", "abcxyz", false);
 		String cookieString = user.getCookieString();
 		System.out.println(cookieString);
-		UserData copy = UserData.createFromCookieString(cookieString);
+		UserData copy = UserData.getInstanceFromCookie(cookieString);
 		assertNotNull(copy);
 		assertEquals(user, copy);
 	}

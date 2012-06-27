@@ -35,7 +35,7 @@ public class ProfilePresenterTest {
 	CookieProvider mockCookieProvider;
 	Profile place = Mockito.mock(Profile.class);
 	
-	UserData testUser = new UserData("testuser@test.com", "tester", "token", false);
+	UserData testUser = new UserData("1", "testuser@test.com", "tester", "token", false);
 	String password = "password";
 	
 	@Before
