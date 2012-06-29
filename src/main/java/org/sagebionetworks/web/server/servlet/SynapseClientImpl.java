@@ -14,7 +14,9 @@ import org.json.JSONObject;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
@@ -25,10 +27,12 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -37,6 +41,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
+import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -149,7 +154,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					e.getMessage()));
 		}
 	}
-
+	
 	@Override
 	public String getEntityTypeRegistryJSON() {
 		return SynapseClientImpl.getEntityTypeRegistryJson();
@@ -723,5 +728,61 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} 
 	}
 	
-
+	@Override
+	public EntityWrapper createAccessRequirement(EntityWrapper arEW) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			AccessRequirement ar = jsonEntityFactory.createEntity(arEW.getEntityJson(), AccessRequirement.class);
+			AccessRequirement result = synapseClient.createAccessRequirement(ar);
+			JSONObjectAdapter arJson = result.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(arJson.toJSONString(), arJson.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	@Override
+	public AccessRequirementsTransport getUnmetAccessRequirements(String entityId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			VariableContentPaginatedResults<AccessRequirement> accessRequirements = 
+				synapseClient.getUnmetAccessReqAccessRequirements(entityId);
+			JSONObjectAdapter arJson = accessRequirements.writeToJSONObject(adapterFactory.createNew());
+			AccessRequirementsTransport transport = new AccessRequirementsTransport();
+			transport.setAccessRequirementsString(arJson.toJSONString());	
+			Entity e = synapseClient.getEntityById(entityId);
+			transport.setEntityString(EntityFactory.createJSONStringForEntity(e));
+			transport.setEntityClassAsString(e.getClass().getName());
+			UserProfile userProfile = synapseClient.getMyProfile();
+			transport.setUserProfileString(EntityFactory.createJSONStringForEntity(userProfile));
+			return transport;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	@Override
+	public EntityWrapper createAccessApproval(EntityWrapper aaEW) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			AccessApproval aa = jsonEntityFactory.createEntity(aaEW.getEntityJson(), 
+					(Class<AccessApproval>)Class.forName(aaEW.getEntityClassName()));
+			AccessApproval result = synapseClient.createAccessApproval(aa);
+			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (ClassNotFoundException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
 }

@@ -37,10 +37,20 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 	JSONEntityFactory factory;
 	JSONObjectAdapter jsonObjectAdapter;
 	
+	@Override
+	public JSONEntity newInstance(String className) {
+		return factory.newInstance(className);
+	}
+	
 	@Inject
 	public NodeModelCreatorImpl(JSONEntityFactory factory, JSONObjectAdapter jsonObjectAdapter) {
 		this.factory = factory;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+	}
+	
+	@Override
+	public JSONObjectAdapter getObjectAdapter() {
+		return this.jsonObjectAdapter;
 	}
 	
 	@Override
@@ -67,6 +77,23 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 	public <T extends JSONEntity> T createEntity(String jsonString, Class<? extends T> clazz) throws RestServiceException{
 		try {
 			return factory.createEntity(jsonString, clazz);
+		} catch (JSONObjectAdapterException e) {
+			throw new RestServiceException(e.getMessage());
+		}
+	}
+	
+	/**
+	 * 
+	 * @param <T>
+	 * @param jsonString
+	 * @param entityClassName string representation of entity Class
+	 * @return
+	 * @throws RestServiceException
+	 */
+	@Override
+	public <T extends JSONEntity> T createEntity(String jsonString, String entityClassName) throws RestServiceException{
+		try {
+			return (T)factory.createEntity(jsonString, entityClassName);
 		} catch (JSONObjectAdapterException e) {
 			throw new RestServiceException(e.getMessage());
 		}

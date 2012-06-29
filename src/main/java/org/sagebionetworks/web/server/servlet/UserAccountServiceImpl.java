@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.sagebionetworks.repo.ServiceConstants;
+import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;

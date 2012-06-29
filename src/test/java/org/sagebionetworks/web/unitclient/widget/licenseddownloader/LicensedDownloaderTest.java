@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -35,6 +36,10 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.JSONEntityFactory;
+import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -88,9 +93,12 @@ public class LicensedDownloaderTest {
 		AsyncMockStubber.callSuccessWith(registryJson).when(mockSynapseClient).getEntityTypeRegistryJSON(any(AsyncCallback.class));
 		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
 
+		AdapterFactory adapterFactory = new AdapterFactoryImpl();
+		JSONEntityFactory factory = new JSONEntityFactoryImpl(adapterFactory);
+		NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(factory, adapterFactory.createNew());
 		
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
-				jsonObjectAdapterProvider);
+				jsonObjectAdapterProvider, mockSynapseClient, nodeModelCreator);
 		
 		verify(mockView).setPresenter(licensedDownloader);
 		
@@ -157,13 +165,13 @@ public class LicensedDownloaderTest {
 				
 		// null model
 		resetMocks();
-		licensedDownloader.loadDownloadLocations(null, null);
+		licensedDownloader.loadDownloadLocations(null);
 		
 		// Null locations
 		resetMocks();			
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		((Locationable)entity).setLocations(null);		
-		licensedDownloader.loadDownloadLocations(entity, false);
+		licensedDownloader.loadDownloadLocations(entity);
 		verify(mockView).showDownloadsLoading();
 		verify(mockView).setNoDownloads();	
 
@@ -171,7 +179,7 @@ public class LicensedDownloaderTest {
 		resetMocks();
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false); // not logged in
 		entity.setLocations(locations);
-		licensedDownloader.loadDownloadLocations(entity, true);
+		licensedDownloader.loadDownloadLocations(entity);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setNeedToLogIn();
 
@@ -179,7 +187,7 @@ public class LicensedDownloaderTest {
 		resetMocks();			
 		entity.setLocations(locations);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		licensedDownloader.loadDownloadLocations(entity, true);
+		licensedDownloader.loadDownloadLocations(entity);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setDownloadLocations(locations, entity.getMd5());
 	}
@@ -211,7 +219,6 @@ public class LicensedDownloaderTest {
 	@Test
 	public void testSetLicenseAccepted() {
 		// without callback
-		licensedDownloader.setLicenseAcceptedCallback(null);
 
 		licensedDownloader.setLicenseAccepted();		
 		verify(mockView).setLicenceAcceptanceRequired(false);
@@ -220,8 +227,7 @@ public class LicensedDownloaderTest {
 		// with callback
 		resetMocks();		
 		AsyncCallback<Void> callback = mock(AsyncCallback.class);
-		licensedDownloader.setLicenseAcceptedCallback(callback);
-
+	
 		licensedDownloader.setLicenseAccepted();		
 		verify(callback).onSuccess(null);
 		verify(mockView).setLicenceAcceptanceRequired(false);

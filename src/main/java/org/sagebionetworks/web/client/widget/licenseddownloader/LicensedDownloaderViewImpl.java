@@ -374,7 +374,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		downloadContentContainer.setStyleAttribute("backgroundColor", "white");
 		downloadContentContainer.setBorders(false);
 		downloadContentContainer.setScrollMode(Style.Scroll.AUTOY);
-		if(safeDownloadHtml == null || safeDownloadHtml.equals("")) {
+		if(safeDownloadHtml == null || safeDownloadHtml.asString().equals("")) {
 			setNoDownloads();
 		} else {
 			fillDownloadContentContainer();

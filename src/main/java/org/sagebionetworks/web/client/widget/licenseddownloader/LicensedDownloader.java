@@ -2,20 +2,29 @@ package org.sagebionetworks.web.client.widget.licenseddownloader;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.AccessApproval;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.FileDownload;
 import org.sagebionetworks.web.shared.LicenseAgreement;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,19 +39,29 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	private LicensedDownloaderView view;
 	private AuthenticationController authenticationController;
+	private NodeModelCreator nodeModelCreator;
 
-	private boolean requireLicenseAcceptance;
-	private AsyncCallback<Void> licenseAcceptedCallback;
 	private GlobalApplicationState globalApplicationState;
+	private SynapseClientAsync synapseClient;
+	private JSONObjectAdapter jsonObjectAdapter;
+	
+	private Long accessRequirementId = null;
+	private String entityId;
+	private String userPrincipalId;
 	
 	@Inject
 	public LicensedDownloader(LicensedDownloaderView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			SynapseClientAsync synapseClient,
+			NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.synapseClient = synapseClient;
+		this.nodeModelCreator = nodeModelCreator;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 		view.setPresenter(this);		
 	}
 
@@ -55,9 +74,65 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * @param entity
 	 * @param showDownloadLocations
 	 */
-	public void configureHeadless(Entity entity, boolean showDownloadLocations) {
+	public void configureHeadless(Entity entity) {
 		view.setPresenter(this);
-		loadDownloadLocations(entity, showDownloadLocations);		
+		this.entityId = entity.getId();
+		refresh(null);
+	}
+	
+	interface Callback {
+		void invoke();
+	}
+	
+	/**
+	 * Check for unmet access requirements and refresh accordingly
+	 *
+	 * @param callback an optional step to call after successful completion, or null if none
+	 */
+	public void refresh(final Callback callback) {
+		synapseClient.getUnmetAccessRequirements(entityId, new AsyncCallback<AccessRequirementsTransport>(){
+
+			@Override
+			public void onSuccess(AccessRequirementsTransport result) {
+				Entity entity = null;
+				VariableContentPaginatedResults<AccessRequirement> ars = new VariableContentPaginatedResults<AccessRequirement>();
+				try {
+					entity = nodeModelCreator.createEntity(result.getEntityString(), result.getEntityClassAsString());
+					loadDownloadLocations(entity);		
+					ars = nodeModelCreator.initializeEntity(result.getAccessRequirementsString(), ars);
+					
+					UserProfile userProfile = nodeModelCreator.createEntity(result.getUserProfileString(), UserProfile.class);
+					userPrincipalId = userProfile.getOwnerId();
+				} catch (RestServiceException e) {
+					throw new RuntimeException(e);
+				}
+				// first, clear license agreement.  then, if there is an agreement required, set it below
+				setLicenseAgreement(null);
+				for (AccessRequirement ar : ars.getResults()) {
+					if (ar instanceof TermsOfUseAccessRequirement) {
+						// for tier 2 requirements, set license agreement
+						// TODO handle multiple requirements
+						String touContent = ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
+						LicenseAgreement licenseAgreement = new LicenseAgreement();
+						// TODO support option in which TOU is in a location
+						licenseAgreement.setLicenseHtml(touContent);
+						licenseAgreement.setEulaId(ar.getId().toString());
+						setLicenseAgreement(licenseAgreement);
+						break;
+					} else {
+						onFailure(new IllegalArgumentException(ar.getClass().toString()));
+					}
+				}
+				if (callback!=null) callback.invoke();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showInfo("Error", caught.getMessage());
+			}
+
+			
+		});
 	}
 	
 	/**
@@ -66,8 +141,9 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * @param showDownloadLocations
 	 * @return
 	 */
-	public Widget asWidget(Entity entity, boolean showDownloadLocations) {
-		configureHeadless(entity, showDownloadLocations);
+	public Widget asWidget(Entity entity) {
+		configureHeadless(entity);
+		
 		return view.asWidget();
 	}	
 	
@@ -85,7 +161,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * Loads the download locations for the given Layer 
 	 * @param entity Layer model object
 	 */
-	public void loadDownloadLocations(final Entity entity, final Boolean showDownloadLocations) {		
+	public void loadDownloadLocations(final Entity entity) {		
 		if(entity != null) {
 			view.showDownloadsLoading();
 			if(entity instanceof Locationable) {
@@ -104,11 +180,6 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 				view.setNoDownloads();
 			}
 		}
-	}
-				
-	private void setDownloadUnavailable() {
-		this.view.setDownloadUrls(null);
-		// TODO : more?
 	}		
 
 	public boolean isDownloadAllowed() {
@@ -127,15 +198,18 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	public void hideWindow() {
 		this.view.hideWindow();
 	}
-		
+	
 	public void setLicenseAgreement(LicenseAgreement agreement) {
 		if (agreement != null) {
 			if (agreement.getCitationHtml() != null) {
 				view.setCitationHtml(agreement.getCitationHtml());
 			}
 			view.setLicenseHtml(agreement.getLicenseHtml());
+			this.setRequireLicenseAcceptance(true);
+			this.accessRequirementId = Long.parseLong(agreement.getEulaId());
 		} else {
 			this.setRequireLicenseAcceptance(false);
+			this.accessRequirementId = null;
 		}
 	}
 	
@@ -150,27 +224,37 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		
 	public void clear() {
 		view.clear();
-		this.licenseAcceptedCallback = null;		
 	}
 	
 	public void setRequireLicenseAcceptance(boolean requireLicenseAcceptance) {
-		this.requireLicenseAcceptance = requireLicenseAcceptance;
 		this.view.setLicenceAcceptanceRequired(requireLicenseAcceptance);
-	}
-	
-	@Deprecated
-	public void setLicenseAcceptedCallback(AsyncCallback<Void> callback) {
-		this.licenseAcceptedCallback = callback;
 	}
 	
 	@Override
 	public void setLicenseAccepted() {		
-		// send out to using class to let know of acceptance
-		if(licenseAcceptedCallback != null) 
-			licenseAcceptedCallback.onSuccess(null);
-		// allow the view to skip the license agreement now and show the download view
-		setRequireLicenseAcceptance(false);
-		showWindow();		
+		TermsOfUseAccessApproval agreement = new TermsOfUseAccessApproval();
+		agreement.setAccessorId(userPrincipalId);
+		agreement.setRequirementId(accessRequirementId);
+		JSONObjectAdapter approvalJson = null;
+		try {
+			approvalJson = agreement.writeToJSONObject(jsonObjectAdapter.createNew());
+		} catch (JSONObjectAdapterException e) {
+			view.showInfo("Error", e.getMessage());
+			return;
+		}
+		EntityWrapper ew = new EntityWrapper(approvalJson.toJSONString(), agreement.getClass().getName(), null);
+		synapseClient.createAccessApproval(ew, new AsyncCallback<EntityWrapper>(){
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				refresh(new Callback() {
+					public void invoke() {showWindow();}
+				});
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showInfo("Error", caught.getMessage());
+			}			
+		});
 	}
 
 }

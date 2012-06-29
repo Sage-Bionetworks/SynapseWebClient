@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
+import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
@@ -56,8 +56,14 @@ public interface SynapseClientAsync {
 
 	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
 
-	public void getAllUsers(AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	public void getAllUsers(AsyncCallback<EntityWrapper> callback);
 	
-	public void getAllGroups(AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	public void getAllGroups(AsyncCallback<EntityWrapper> callback);
 	
+	public void createAccessRequirement(EntityWrapper arEW, AsyncCallback<EntityWrapper> callback);
+
+	public void getUnmetAccessRequirements(String entityId, AsyncCallback<AccessRequirementsTransport> callback);
+
+	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
+
 }
