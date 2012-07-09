@@ -19,8 +19,6 @@ public interface UserAccountServiceAsync {
 
 	void createUser(UserRegistration userInfo, AsyncCallback<Void> callback);
 	
-	void updateUser(String firstName, String lastName, String displayName, AsyncCallback<Void> callback);
-
 	void terminateSession(String sessionToken, AsyncCallback<Void> callback);
 
 	void ssoLogin(String sessionToken, AsyncCallback<Boolean> callback);

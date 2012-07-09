@@ -101,6 +101,7 @@ public class DisplayUtils {
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
+	public static final String USER_PROFILE_PARAM_KEY = "userId";
 	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
 	public static final String WAIT_FOR_URL = "waitForUrl";
 	public static final String ENTITY_CREATEDBY_KEY = "createdBy";
@@ -647,15 +648,41 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createAttachmentUrl(String baseURl, String entityId, String tokenId, String fileName){
+		return createAttachmentUrl(baseURl, entityId, tokenId, fileName, DisplayUtils.ENTITY_PARAM_KEY);
+	}
+	
+
+	/**
+	 * Create the url to a profile attachment image.
+	 * @param baseURl
+	 * @param userId
+	 * @param tokenId
+	 * @param fileName
+	 * @return
+	 */
+	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String tokenId, String fileName){
+		return createAttachmentUrl(baseURl, userId, tokenId, fileName, DisplayUtils.USER_PROFILE_PARAM_KEY);
+	}
+	
+	/**
+	 * Create the url to an attachment image.
+	 * @param baseURl
+	 * @param id
+	 * @param tokenId
+	 * @param fileName
+	 * @return
+	 */
+	public static String createAttachmentUrl(String baseURl, String id, String tokenId, String fileName, String paramKey){
 		StringBuilder builder = new StringBuilder();
 		builder.append(baseURl);
-		builder.append("?"+DisplayUtils.ENTITY_PARAM_KEY+"=");
-		builder.append(entityId);
+		builder.append("?"+paramKey+"=");
+		builder.append(id);
 		builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
 		builder.append("&"+DisplayUtils.WAIT_FOR_URL+"=true");
 		return builder.toString();
 	}
+	
 	
 	/**
 	 * Does this entity have attachment previews?
