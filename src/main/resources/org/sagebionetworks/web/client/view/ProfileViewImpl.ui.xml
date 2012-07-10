@@ -29,30 +29,27 @@
 					<ul class="breadcrumbs">
 						<li class="breadcrumb"><a href="#">Home</a> > Profile</li>
 					</ul>
-					<g:VerticalPanel width="100%">
-						<g:cell horizontalAlignment="ALIGN_RIGHT" width="100%">
-							<g:SimplePanel ui:field="editProfileButtonPanel" />
-						</g:cell>
-						<g:HorizontalPanel>
-							<g:VerticalPanel>
-								<g:cell verticalAlignment="ALIGN_BOTTOM" horizontalAlignment="ALIGN_CENTER" width="100%">
-									<g:SimplePanel ui:field="profilePicturePanel" />
-								</g:cell>
-								<g:cell verticalAlignment="ALIGN_TOP" horizontalAlignment="ALIGN_CENTER" width="100%">
-									<g:SimplePanel ui:field="editPhotoButtonPanel" />
-								</g:cell>
-							</g:VerticalPanel>
+					<div class="span-2 push-22 last notopmargin">
+						<g:SimplePanel ui:field="editProfileButtonPanel" />
+					</div>
+					<div class="span-24 notopmargin last">
+						<div class="span-5 inner-5 view notopmargin">
+							<!-- profile picture, and edit photo (if visible) -->
+							<g:SimplePanel ui:field="profilePicturePanel" />
+							<div class="span-4 push-2 notopmargin">
+								<g:SimplePanel ui:field="editPhotoButtonPanel" />
+							</div>
+						</div>
+						<div class="span-19 notopmargin last">
 							<g:SimplePanel ui:field="viewProfilePanel" />
-						</g:HorizontalPanel>
-					</g:VerticalPanel>
-					
-					<g:VerticalPanel styleName="user-profile-edit-table">
-						<g:cell horizontalAlignment="ALIGN_RIGHT">
-							<g:SimplePanel ui:field="updateWithLinkedInPanel" />
-						</g:cell>
+						</div>
+					</div>
+					<div class="user-profile-linkedin-bar span-13 push-11 last notopmargin">
+						<g:SimplePanel ui:field="updateWithLinkedInPanel" />
+					</div>
+					<div class="span-24 notopmargin last">
 						<g:SimplePanel ui:field="updateUserInfoPanel" />
-					</g:VerticalPanel>
-					
+					</div>
 					<p>&nbsp;</p>					
 					
 				</div>

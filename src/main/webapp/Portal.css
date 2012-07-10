@@ -337,44 +337,27 @@ a.shortBtn {
 	float: left;
 }
 
-.user-profile-name {
-	font-size: 24px;
-	color: #000000;
-	line-height: 37px;
-}
-
 .user-profile-headline {
-	margin: 0;
-	color: #222222;
-	font-size: 16px;
-	display: block;
-	margin-left: 3px;	
 }
 
-.user-profile-industry {
-	font-size: 14px;
-	color: #747474;
-	margin-left: 3px;
-	margin-top: 2px;
-}
-
-.user-profile-location {
-	font-size: 14px;
-	color: #747474;
-	margin-left: 3px;
-	margin-top: 2px;
+.user-profile-industry-location {
+	margin: 0 0 5px;
+	font-style: italic;
 }
 
 .user-profile-summary {
-	font-size: 14px;
-	color: #000000;
-	line-height: 1.2;
-	margin-left: 3px;
-	margin-top: 2px;
+	clear: both;
 }
 
 .user-profile-linkedin {
 	margin-right: 3px;
+}
+.user-profile-linkedin-bar {
+	margin-bottom: 3px !important;
+}
+
+.user-profile-change-photo {
+	
 }
 
 .user-profile-edit-table td {
@@ -383,11 +366,13 @@ a.shortBtn {
 }
 
 .profile-image-loading {
-	background: white url(images/ui-anim_basic_16x16.gif) no-repeat center center;
-	width: 180px;
-	min-height: 100px;
+	background: url(images/ui-anim_basic_16x16.gif) no-repeat center center;
+	min-width: 50px;
+	width: auto !important;
+	width: 50px;
+	min-height: 50px;
 	height: auto !important;
-	height:	100px;
+	height:	50px;
 }
 
 
