@@ -146,11 +146,11 @@ public class DisplayUtils {
 	public static final String UPLOAD_SUCCESS = "Upload Success";
 	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
-			Study.class.getName(), Data.class.getName(), Code.class.getName(), 
-			Link.class.getName(), Analysis.class.getName(),
-			Step.class.getName(), RObject.class.getName(),
-			PhenotypeData.class.getName(), ExpressionData.class.getName(),
-			GenotypeData.class.getName() };
+			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
+			Code.class.getName(), Link.class.getName(), 
+			Analysis.class.getName(), Step.class.getName(), 
+			RObject.class.getName(), PhenotypeData.class.getName(), 
+			ExpressionData.class.getName(),	GenotypeData.class.getName() };
 	
 	
 	public static SearchQuery getDefaultSearchQuery() {		
