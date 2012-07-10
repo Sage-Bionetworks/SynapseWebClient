@@ -80,7 +80,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Button cancelUpdateUserButton;
 	private Button linkedInButton;
 	private Anchor linkedInImportLink;
-	private Grid profileGrid;
 	private Button editProfileButton;
 	private Anchor editPhotoLink;
 	
@@ -95,11 +94,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private TextField<String> location;
 	
 	//View profile widgets
-	private Label nameWidget;
-	private Label headlineWidget;
-	private Label industryWidget;
-	private Label locationWidget;
-	private Html summaryWidget;
+	private Html profileWidget;
 	private Image defaultProfilePicture;
 	private Html profilePictureHtml;
 	
@@ -145,7 +140,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			//view only
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
 			updateViewProfile(profile);
-			viewProfilePanel.add(profileGrid);
+			viewProfilePanel.add(profileWidget);
 			if (isOwner) {
 				editPhotoButtonPanel.add(editPhotoLink);
 				editProfileButtonPanel.add(editProfileButton);
@@ -171,6 +166,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    	}
 	    });
 	    editPhotoLink = new Anchor();
+	    editPhotoLink.addStyleName("user-profile-change-photo");
 	    editPhotoLink.setText("Edit Photo");
 	}
 
@@ -341,46 +337,68 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 }
 
 	 private void createViewProfile() {
-		 profileGrid = new Grid(5, 1);
-
-		 nameWidget = new Label();
-		 nameWidget.addStyleName("user-profile-name");
-		 headlineWidget = new Label();
-		 headlineWidget.addStyleName("user-profile-headline");
-		 industryWidget = new Label();
-		 industryWidget.addStyleName("user-profile-industry");
-		 locationWidget = new Label();
-		 locationWidget.addStyleName("user-profile-location");
-		 summaryWidget = new Html();
-		 summaryWidget.addStyleName("user-profile-summary");
-		 
-		 profileGrid.setWidget(0, 0, nameWidget);
-		 profileGrid.setWidget(1, 0, headlineWidget);
-		 profileGrid.setWidget(2, 0, industryWidget);
-		 profileGrid.setWidget(3, 0, locationWidget);
-		 profileGrid.setWidget(4, 0, summaryWidget);
+		 profileWidget = new Html();
 		 profilePictureHtml = new Html();
 		 defaultProfilePicture = new Image(sageImageBundle.defaultProfilePicture());
 	 }
 	 
+	 /**
+	  * just return the empty string if input string parameter s is null, otherwise returns s.
+	  */
+	 private String fixIfNullString(String s)
+	 {
+		if (s == null)
+			return "";
+		else return s;
+	 }
+	 
 	 private void updateViewProfile(UserProfile profile) {
-		 
-		 if (profile.getLastName() != null && profile.getLastName().length()>0)
-			 nameWidget.setText(profile.getFirstName() + " " + profile.getLastName());
+		 String name, industry, location, summary;
+		 String givenName = fixIfNullString(profile.getFirstName());
+		 String familyName = fixIfNullString(profile.getLastName());
+		 if (givenName.length() > 0 && familyName.length()>0)
+			 name = givenName + " " + familyName;
 		 else
-			 nameWidget.setText(profile.getDisplayName());
-		 String company = profile.getCompany() != null && profile.getCompany().length() > 0 ? " at " + profile.getCompany() : "";
-		 String position = profile.getPosition() == null ? "" : profile.getPosition();
-		 headlineWidget.setText(position + company);
-		 industryWidget.setText(profile.getIndustry());
-		 locationWidget.setText(profile.getLocation());
-		 String summary = profile.getSummary();
-		 if (summary != null)
-		 {
-			 SafeHtmlBuilder builder = new SafeHtmlBuilder();
-			 builder.appendEscapedLines(profile.getSummary());
-			 summaryWidget.setHtml(builder.toSafeHtml().asString());
+			 name = profile.getDisplayName();
+		 String company = fixIfNullString(profile.getCompany());
+		 String position = fixIfNullString(profile.getPosition());
+		 industry = fixIfNullString(profile.getIndustry());
+		 location = fixIfNullString(profile.getLocation());
+		 summary = fixIfNullString(profile.getSummary());
+		 
+		 //build profile html
+		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		 builder.appendHtmlConstant("<h2>");
+		 builder.appendEscapedLines(name);
+		 builder.appendHtmlConstant("</h2>");
+		 if (position.length()>0 || company.length()>0) {
+			 builder.appendHtmlConstant("<h4 class=\"user-profile-headline\">");
+			 String atString = position.length()>0 && company.length()>0 ? " at " : "";
+			 builder.appendEscapedLines(position + atString + company);
+			 builder.appendHtmlConstant("</h4>");
 		 }
+		 
+		 builder.appendHtmlConstant("<p class=\"user-profile-industry-location\">");
+		 
+		 if (industry.length()>0) {
+			 builder.appendEscapedLines(industry);
+			 if (location.length()>0) 
+				 builder.appendHtmlConstant(" | ");
+		 }
+		 if (location.length()>0) {
+			 builder.appendEscapedLines(location);
+		 }
+		 builder.appendHtmlConstant("</p>");
+			
+		 
+		 if (summary.length()>0) {
+			 builder.appendHtmlConstant("<p class=\"user-profile-summary\">");
+			 builder.appendEscapedLines(summary);
+			 builder.appendHtmlConstant("</p>");
+		 }
+		 
+
+		 profileWidget.setHtml(builder.toSafeHtml().asString());
 		 
 		 profilePicturePanel.clear();
 		 if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0)
