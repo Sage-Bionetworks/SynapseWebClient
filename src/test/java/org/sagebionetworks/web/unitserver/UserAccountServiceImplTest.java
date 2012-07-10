@@ -154,22 +154,6 @@ public class UserAccountServiceImplTest {
 		assertEquals(userData.getEmail(), user1.getEmail());
 	}
 	
-	@Test
-	public void testUpdateUser() {
-		// 'Update' user1's info
-		user1.setFirstName("John");
-		user1.setLastName("Doe");
-		user1.setDisplayName(user1.getFirstName() + " " + user1.getLastName());
-		
-		try {
-			UserData userData = service.initiateSession(user1.getEmail(), user1password, false);
-			service.updateUser(user1.getFirstName(), user1.getLastName(), user1.getDisplayName());
-			assertEquals(user1.getDisplayName(), userData.getUserName());
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	}
-	
 	@Test(expected=UnauthorizedException.class)
 	public void testUnAuthenticateUser() throws Exception {
 		// try fake user

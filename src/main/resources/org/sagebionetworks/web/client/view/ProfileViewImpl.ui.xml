@@ -29,38 +29,32 @@
 					<ul class="breadcrumbs">
 						<li class="breadcrumb"><a href="#">Home</a> > Profile</li>
 					</ul>
-					<h2>Profile</h2>
-
-					<h3>Synapse R Client &amp; Synapse REST API</h3>
-					<p style="padding-bottom:5px">To login to this website without using a Google account or to use the Synapse R Client or REST API, 
-					you will need to have a Synapse specific password. To setup a Synapse password, click the button below. It will send you an email 
-					with instructions on how to complete the process.</p>
-					<g:SimplePanel ui:field="setupPasswordButtonPanel" />
+					<g:VerticalPanel width="100%">
+						<g:cell horizontalAlignment="ALIGN_RIGHT" width="100%">
+							<g:SimplePanel ui:field="editProfileButtonPanel" />
+						</g:cell>
+						<g:HorizontalPanel>
+							<g:VerticalPanel>
+								<g:cell verticalAlignment="ALIGN_BOTTOM" horizontalAlignment="ALIGN_CENTER" width="100%">
+									<g:SimplePanel ui:field="profilePicturePanel" />
+								</g:cell>
+								<g:cell verticalAlignment="ALIGN_TOP" horizontalAlignment="ALIGN_CENTER" width="100%">
+									<g:SimplePanel ui:field="editPhotoButtonPanel" />
+								</g:cell>
+							</g:VerticalPanel>
+							<g:SimplePanel ui:field="viewProfilePanel" />
+						</g:HorizontalPanel>
+					</g:VerticalPanel>
 					
-					<p>&nbsp;</p>
-					<p>&nbsp;</p>
+					<g:VerticalPanel styleName="user-profile-edit-table">
+						<g:cell horizontalAlignment="ALIGN_RIGHT">
+							<g:SimplePanel ui:field="updateWithLinkedInPanel" />
+						</g:cell>
+						<g:SimplePanel ui:field="updateUserInfoPanel" />
+					</g:VerticalPanel>
 					
-					<h3>Change Your Profile</h3>
-					<p style="padding-bottom:5px">You can import profile information from LinkedIn: </p>
-					<g:SimplePanel ui:field="updateWithLinkedInPanel" />
-					<p><small></small></p>
-	
-					<p>&nbsp;</p>
-	
-					<p style="padding-bottom:5px">Or manually edit the fields below.</p>
-					<g:SimplePanel ui:field="updateUserInfoPanel" />
-					<p><small></small></p>
-					
-					<p>&nbsp;</p>
 					<p>&nbsp;</p>					
 					
-					<h3>Change Synapse Password</h3>
-					<g:SimplePanel ui:field="changePasswordPanel" />
-					<p><small></small></p>
-					
-					<p>&nbsp;</p>
-					<p>&nbsp;</p>					
-
 				</div>
 					
 <!-- start footer -->
