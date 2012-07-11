@@ -30,6 +30,7 @@ import com.extjs.gxt.ui.client.widget.layout.ColumnLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -37,6 +38,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
@@ -407,7 +409,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 		 profileWidget.setHtml(builder.toSafeHtml().asString());
 		 
-		 profilePicturePanel.clear();
 		 if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0)
 		 {
 			 profilePicturePanel.add(profilePictureHtml);
@@ -420,7 +421,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 {
 			 profilePicturePanel.add(defaultProfilePicture);
 		 }
-		 
+
+		DOM.getElementById("pictureCanvasId").getStyle().setDisplay(Display.BLOCK);
+		
 		 String userId = profile.getOwnerId();
 		 final String actionUrl =  baseProfileAttachmentUrl+ "?" + DisplayUtils.USER_PROFILE_PARAM_KEY + "=" + userId;
 		 if (editPhotoHandler != null)
@@ -479,5 +482,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		editProfileButtonPanel.clear();
 		editPhotoButtonPanel.clear();
 		profilePicturePanel.clear();
+		DOM.getElementById("pictureCanvasId").getStyle().setDisplay(Display.NONE);
 	}
 }
