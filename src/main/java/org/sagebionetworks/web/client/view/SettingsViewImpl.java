@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
@@ -46,6 +47,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel changePasswordPanel;
 	@UiField
 	SimplePanel setupPasswordButtonPanel;
+	@UiField
+	SimplePanel breadcrumbsPanel;
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -55,21 +58,18 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	private SageImageBundle sageImageBundle;
 	private Button changePasswordButton;
 	private HTML changePasswordLabel;
-	private FormPanel connectFormPanel;
-	private Button viewProfileButton;
-	private String picToken;
-	
+	private Breadcrumb breadcrumb;	
 	
 	@Inject
 	public SettingsViewImpl(SettingsViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle, SageImageBundle sageImageBundle) {		
+			SageImageBundle imageBundle, SageImageBundle sageImageBundle,Breadcrumb breadcrumb) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = icons;
 		this.headerWidget = headerWidget;
 		this.sageImageBundle = sageImageBundle;
-		
+		this.breadcrumb = breadcrumb;
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
@@ -85,6 +85,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public void render() {
+		//set the Settings page breadcrumb
+		breadcrumbsPanel.clear();
+		breadcrumbsPanel.add(breadcrumb.asWidget("Settings"));
+		
 		createResetForm();
 		
 		changePasswordLabel.setHTML(SafeHtmlUtils.fromSafeConstant(""));

@@ -76,7 +76,30 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 		view.setLinksList(links, current);
 		return view.asWidget();
 	}
-
+	/**
+	 * Use when the only page link is back to the Home page 
+	 * @param currentPageName
+	 * @return
+	 */
+	public Widget asWidget(String currentPageName){
+		List<LinkData> links = new ArrayList<LinkData>();
+		links.add(new LinkData("Home", new Home(
+				DisplayUtils.DEFAULT_PLACE_TOKEN)));
+		return asWidget(links, currentPageName);
+	}
+	
+	/**
+	 * Create Breadcrumbs for an arbitrary set of link data, ending in the current page name
+	 * @param links
+	 * @param currentPageName
+	 * @return
+	 */
+	public Widget asWidget(List<LinkData> links, String currentPageName){
+		view.setPresenter(this);
+		view.setLinksList(links, currentPageName);
+		return view.asWidget();
+	}
+	
 	/**
 	 * Not used
 	 */

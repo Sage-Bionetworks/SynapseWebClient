@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -69,6 +70,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel editPhotoButtonPanel;
 	@UiField
 	public SimplePanel profilePicturePanel;
+	@UiField
+	SimplePanel breadcrumbsPanel;
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -82,7 +85,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Anchor linkedInImportLink;
 	private Button editProfileButton;
 	private Anchor editPhotoLink;
-	
+	private Breadcrumb breadcrumb;
 	
 	//Edit profile form fields
 	private TextField<String> firstName;
@@ -105,13 +108,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle, SageImageBundle sageImageBundle) {		
+			SageImageBundle imageBundle, SageImageBundle sageImageBundle,Breadcrumb breadcrumb) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = icons;
 		this.headerWidget = headerWidget;
 		this.sageImageBundle = sageImageBundle;
-		
+		this.breadcrumb = breadcrumb;
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
@@ -151,6 +154,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void render() {
+		//set the Settings page breadcrumb
+		breadcrumbsPanel.clear();
+		breadcrumbsPanel.add(breadcrumb.asWidget("Profile"));
+				
 		createViewProfile();
 		createProfileForm();
 		

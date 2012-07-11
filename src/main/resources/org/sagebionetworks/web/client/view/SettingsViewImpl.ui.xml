@@ -26,9 +26,9 @@
 	        	<div class="span-24 notopmargin">	
 	<!-- end header -->
 					<div class="span-24 separator"></div>
-					<ul class="breadcrumbs">
-						<li class="breadcrumb"><a href="#">Home</a> > Settings</li>
-					</ul>
+					<div class="span-24 notopmargin" style="white-space: normal;">
+						<g:SimplePanel ui:field="breadcrumbsPanel"/>
+					</div>
 					<h2>Settings</h2>
 
 					<h3>Synapse R Client &amp; Synapse REST API</h3>

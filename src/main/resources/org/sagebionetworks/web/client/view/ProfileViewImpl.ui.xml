@@ -28,9 +28,7 @@
 	<!-- end header -->
 					<div class="span-24 notopmargin" style="margin-top: 5px !important">
 						<div class="span-20 notopmargin" style="white-space: normal;">
-							<ul class="breadcrumbs">
-								<li class="breadcrumb"><a href="#">Home</a> > Profile</li>
-							</ul>
+							<g:SimplePanel ui:field="breadcrumbsPanel"/>
 						</div>
 						<div class="span-4 last right notopmargin">
 							<g:SimplePanel ui:field="editProfileButtonPanel" />
