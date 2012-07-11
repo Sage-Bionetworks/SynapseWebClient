@@ -492,13 +492,13 @@ public class DisplayUtils {
 	public static enum IconSize { PX16, PX24 };
 	
 	public static ImageResource getSynapseIconForEntityType(EntityType type, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		if(type == null) return null;
-		return getSynapseIconForEntityClassName(type.getClassName(), iconSize, iconsImageBundle);
+		String className = type == null ? null : type.getClassName();		
+		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
 	}
 
 	public static ImageResource getSynapseIconForEntity(Entity entity, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		if(entity == null) return null;
-		return getSynapseIconForEntityClassName(entity.getClass().getName(), iconSize, iconsImageBundle);
+		String className = entity == null ? null : entity.getClass().getName();
+		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
 	}
 
 	/**

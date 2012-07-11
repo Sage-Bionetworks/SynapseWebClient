@@ -207,7 +207,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	
 	@Override
 	public ImageResource getIconForType(String typeString) {		
-		EntityType type = entityTypeProvider.getEntityTypeForString(typeString);
+		EntityType type = entityTypeProvider.getEntityTypeForString(typeString);		
+		// try class name as some references are short names, some class names
+		if(type == null) 
+			type = entityTypeProvider.getEntityTypeForClassName(typeString);
 		if(type == null) {
 			return DisplayUtils.getSynapseIconForEntity(null, IconSize.PX16, iconsImageBundle);
 		}
