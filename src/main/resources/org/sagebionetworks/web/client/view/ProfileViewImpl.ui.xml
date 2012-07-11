@@ -23,24 +23,29 @@
         <div class="clear"></div>
     	<div class="container"> 		
 			<g:SimplePanel ui:field="header" />
+				<div class="span-24 separator"></div>
 	        	<div class="span-24 notopmargin">	
 	<!-- end header -->
-
-					<ul class="breadcrumbs">
-						<li class="breadcrumb"><a href="#">Home</a> > Profile</li>
-					</ul>
-					<div class="span-2 push-22 last notopmargin">
-						<g:SimplePanel ui:field="editProfileButtonPanel" />
+					<div class="span-24 notopmargin" style="margin-top: 5px !important">
+						<div class="span-20 notopmargin" style="white-space: normal;">
+							<ul class="breadcrumbs">
+								<li class="breadcrumb"><a href="#">Home</a> > Profile</li>
+							</ul>
+						</div>
+						<div class="span-4 last right notopmargin">
+							<g:SimplePanel ui:field="editProfileButtonPanel" />
+						</div>
 					</div>
+					
 					<div class="span-24 notopmargin last">
-						<div class="span-5 inner-5 view notopmargin">
+						<div class="span-5 inner-6 view notopmargin">
 							<!-- profile picture, and edit photo (if visible) -->
 							<g:SimplePanel ui:field="profilePicturePanel" />
 							<div class="span-4 push-2 notopmargin">
 								<g:SimplePanel ui:field="editPhotoButtonPanel" />
 							</div>
 						</div>
-						<div class="span-19 notopmargin last">
+						<div class="span-18 notopmargin last">
 							<g:SimplePanel ui:field="viewProfilePanel" />
 						</div>
 					</div>
