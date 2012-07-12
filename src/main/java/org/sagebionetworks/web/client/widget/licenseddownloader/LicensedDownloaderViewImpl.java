@@ -40,7 +40,7 @@ import com.google.inject.Inject;
 public class LicensedDownloaderViewImpl extends LayoutContainer implements LicensedDownloaderView {
 
 	private Presenter presenter;
-	private boolean licenseAcceptanceRequired;	
+	private APPROVAL_REQUIRED approvalRequired;	
 	private boolean showCitation;
 	private String citationText;	
 	private SafeHtml licenseTextHtml;
@@ -79,8 +79,9 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	 * View Impls
 	 */
 	@Override
-	public void showWindow() {		
-		if(licenseAcceptanceRequired) {
+	public void showWindow() {
+		switch (approvalRequired) {
+		case LICENSE_ACCEPTANCE:
 			// show License window
 			createEulaWindow();
 			// clear out selections if window has already been shown
@@ -89,13 +90,24 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 				acceptLicenseButton.disable();
 			}
 			eulaWindow.show();		
-		} else {
+			break;
+		case ACT_APPROVAL:
+			// TODO show information dialog
+			// show License window
+			createEulaWindow();
+			eulaWindow.show();		
+			break;
+		case NONE:
 			// show download window
 			if (presenter.isDownloadAllowed()) {
 				createDownloadWindow();
 				downloadWindow.show();
 			}
-		}		
+			break;
+		default:
+			throw new IllegalStateException(approvalRequired.toString());
+		}
+	
 	}
 
 	@Override
@@ -127,8 +139,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	}
 
 	@Override
-	public void setLicenceAcceptanceRequired(boolean licenseRequired) {
-		this.licenseAcceptanceRequired = licenseRequired;		
+	public void setApprovalRequired(APPROVAL_REQUIRED approvalRequired) {
+		this.approvalRequired = approvalRequired;		
 	}
 
 	@Override
@@ -271,16 +283,30 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		eulaWindow.setPlain(true);
 		eulaWindow.setModal(true);
 		eulaWindow.setBlinkModal(true);
-		eulaWindow.setHeading("License Acceptance Required");
+		String title = "";
+		if (approvalRequired.equals(APPROVAL_REQUIRED.LICENSE_ACCEPTANCE)) {
+			eulaWindow.setHeading("License Acceptance Required");
+			title = "End-User License Agreement<br/>";
+		} else if (approvalRequired.equals(APPROVAL_REQUIRED.ACT_APPROVAL)) {
+			eulaWindow.setHeading("Access and Compliance Team Approval Required");
+			title = "Instructions<br/>";
+		} else {
+			throw new RuntimeException("Unexpected APPROVAL_REQUIRED: "+approvalRequired);
+		}
 		eulaWindow.setLayout(new FitLayout());
 		eulaWindow.setResizable(false);		
 		
 		RowData standardPadding = new RowData();
-		standardPadding.setMargins(new Margins(15, 15, 0, 15));
+		int horizontal = 15;
+		int horizontalDelta = 10;
+		int bottom = 0;
+		int vertical = 10;
+		int verticalDelta = 5;
+		standardPadding.setMargins(new Margins(vertical+verticalDelta, horizontal, bottom, horizontal));
 		RowData h1Padding = new RowData();
-		h1Padding.setMargins(new Margins(10, 15, 0, 15));
+		h1Padding.setMargins(new Margins(vertical, horizontal, bottom, horizontal));
 		RowData h2Padding = new RowData();
-		h2Padding.setMargins(new Margins(10, 15, 0, 25));
+		h2Padding.setMargins(new Margins(vertical, horizontal, bottom, horizontal+horizontalDelta));
 		
 		ContentPanel panel = new ContentPanel();		
 		panel.setLayoutData(new RowLayout(Orientation.VERTICAL));		
@@ -289,12 +315,12 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		panel.setHeaderVisible(false);		
 		panel.setBodyStyle("backgroundColor: #e8e8e8");
 
-		Label topTxtLabel = new Label("End-User License Agreement<br/>");
+		Label topTxtLabel = new Label(title);
 		topTxtLabel.setStyleAttribute("font-weight", "bold");
 		panel.add(topTxtLabel, standardPadding);
 		
-		Label top2TxtLabel = new Label("&nbsp;&nbsp;Please read the following License Agreement.");
-		panel.add(top2TxtLabel, standardPadding);
+//		Label top2TxtLabel = new Label("&nbsp;&nbsp;Please read the following License Agreement.");
+//		panel.add(top2TxtLabel, standardPadding);
 		
 		licenseTextContainer = new LayoutContainer();
 		licenseTextContainer.setHeight(200);
@@ -325,7 +351,6 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 			}
 		});
 		
-		panel.add(acceptLicenseCheckBox, standardPadding);
 		
 		acceptLicenseButton = new Button("Accept", new SelectionListener<ButtonEvent>() {
 			@Override
@@ -336,15 +361,28 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		});
 		acceptLicenseButton.disable();
 		Button cancelLicenseButton = new Button("Cancel", new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						eulaWindow.hide();
-					}
-				});
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				eulaWindow.hide();
+			}
+		});
 
 		panel.layout(true);
-		eulaWindow.addButton(acceptLicenseButton);
-		eulaWindow.addButton(cancelLicenseButton);
+		if (approvalRequired.equals(APPROVAL_REQUIRED.LICENSE_ACCEPTANCE)) {
+			panel.add(acceptLicenseCheckBox, standardPadding);
+			eulaWindow.addButton(acceptLicenseButton);
+			eulaWindow.addButton(cancelLicenseButton);
+		} else if (approvalRequired.equals(APPROVAL_REQUIRED.ACT_APPROVAL)) {
+			Button okLicenseButton = new Button("OK", new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					eulaWindow.hide();
+				}
+			});
+			eulaWindow.addButton(okLicenseButton);
+		} else {
+			throw new RuntimeException("Unexpected APPROVAL_REQUIRED: "+approvalRequired);
+		}
 		eulaWindow.add(panel);
 		eulaWindow.layout(true);
 	}

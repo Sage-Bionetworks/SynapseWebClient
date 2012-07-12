@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.licenseddownloader;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
@@ -20,6 +21,10 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED;
+import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.NONE;
+import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.LICENSE_ACCEPTANCE;
+import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.ACT_APPROVAL;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.FileDownload;
@@ -45,7 +50,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
 	
-	private Long accessRequirementId = null;
+	private AccessRequirement accessRequirement;
 	private String entityId;
 	private String userPrincipalId;
 	
@@ -84,6 +89,45 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		void invoke();
 	}
 	
+	public void unmetAccessRequirementsCallback(AccessRequirementsTransport result, Callback callback) {
+		Entity entity = null;
+		VariableContentPaginatedResults<AccessRequirement> ars = new VariableContentPaginatedResults<AccessRequirement>();
+		try {
+			entity = nodeModelCreator.createEntity(result.getEntityString(), result.getEntityClassAsString());
+			loadDownloadLocations(entity);		
+			ars = nodeModelCreator.initializeEntity(result.getAccessRequirementsString(), ars);
+			
+			UserProfile userProfile = nodeModelCreator.createEntity(result.getUserProfileString(), UserProfile.class);
+			userPrincipalId = userProfile.getOwnerId();
+		} catch (RestServiceException e) {
+			throw new RuntimeException(e);
+		}
+		// first, clear license agreement.  then, if there is an agreement required, set it below
+		setLicenseAgreement(null, null);
+		for (AccessRequirement ar : ars.getResults()) {
+			if (ar instanceof TermsOfUseAccessRequirement) {
+				// for tier 2 requirements, set license agreement
+				String touContent = ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
+				LicenseAgreement licenseAgreement = new LicenseAgreement();
+				// TODO support option in which TOU is in a location
+				licenseAgreement.setLicenseHtml(touContent);
+				setLicenseAgreement(licenseAgreement, ar);
+				break;
+			} else if (ar instanceof ACTAccessRequirement) {
+				// for tier 3 requirements, set ACT contact instructions
+				String actContactInfo = ((ACTAccessRequirement)ar).getActContactInfo();
+				LicenseAgreement licenseAgreement = new LicenseAgreement();
+				// TODO support option in which ACT contact info is in a location
+				licenseAgreement.setLicenseHtml(actContactInfo);
+				setLicenseAgreement(licenseAgreement, ar);
+				break;
+		} else {
+			view.showInfo("Error", ar.getClass().toString());
+			}
+		}
+		if (callback!=null) callback.invoke();		
+	}
+	
 	/**
 	 * Check for unmet access requirements and refresh accordingly
 	 *
@@ -94,36 +138,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 
 			@Override
 			public void onSuccess(AccessRequirementsTransport result) {
-				Entity entity = null;
-				VariableContentPaginatedResults<AccessRequirement> ars = new VariableContentPaginatedResults<AccessRequirement>();
-				try {
-					entity = nodeModelCreator.createEntity(result.getEntityString(), result.getEntityClassAsString());
-					loadDownloadLocations(entity);		
-					ars = nodeModelCreator.initializeEntity(result.getAccessRequirementsString(), ars);
-					
-					UserProfile userProfile = nodeModelCreator.createEntity(result.getUserProfileString(), UserProfile.class);
-					userPrincipalId = userProfile.getOwnerId();
-				} catch (RestServiceException e) {
-					throw new RuntimeException(e);
-				}
-				// first, clear license agreement.  then, if there is an agreement required, set it below
-				setLicenseAgreement(null);
-				for (AccessRequirement ar : ars.getResults()) {
-					if (ar instanceof TermsOfUseAccessRequirement) {
-						// for tier 2 requirements, set license agreement
-						// TODO handle multiple requirements
-						String touContent = ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
-						LicenseAgreement licenseAgreement = new LicenseAgreement();
-						// TODO support option in which TOU is in a location
-						licenseAgreement.setLicenseHtml(touContent);
-						licenseAgreement.setEulaId(ar.getId().toString());
-						setLicenseAgreement(licenseAgreement);
-						break;
-					} else {
-						onFailure(new IllegalArgumentException(ar.getClass().toString()));
-					}
-				}
-				if (callback!=null) callback.invoke();
+				unmetAccessRequirementsCallback(result, callback);
 			}
 			
 			@Override
@@ -199,17 +214,22 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.view.hideWindow();
 	}
 	
-	public void setLicenseAgreement(LicenseAgreement agreement) {
-		if (agreement != null) {
+	public void setLicenseAgreement(LicenseAgreement agreement, AccessRequirement ar) {
+		accessRequirement = ar;
+		if (agreement != null && accessRequirement!=null) {
 			if (agreement.getCitationHtml() != null) {
 				view.setCitationHtml(agreement.getCitationHtml());
 			}
 			view.setLicenseHtml(agreement.getLicenseHtml());
-			this.setRequireLicenseAcceptance(true);
-			this.accessRequirementId = Long.parseLong(agreement.getEulaId());
+			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
+				this.setRequireApproval(LICENSE_ACCEPTANCE);
+			} else if (accessRequirement instanceof ACTAccessRequirement) {
+				this.setRequireApproval(ACT_APPROVAL);
+			} else {
+				throw new IllegalArgumentException(ar.getClass().toString());
+			}
 		} else {
-			this.setRequireLicenseAcceptance(false);
-			this.accessRequirementId = null;
+			this.setRequireApproval(NONE);
 		}
 	}
 	
@@ -226,15 +246,15 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		view.clear();
 	}
 	
-	public void setRequireLicenseAcceptance(boolean requireLicenseAcceptance) {
-		this.view.setLicenceAcceptanceRequired(requireLicenseAcceptance);
+	public void setRequireApproval(APPROVAL_REQUIRED licenseApproval) {
+		this.view.setApprovalRequired(licenseApproval);
 	}
 	
 	@Override
 	public void setLicenseAccepted() {		
 		TermsOfUseAccessApproval agreement = new TermsOfUseAccessApproval();
 		agreement.setAccessorId(userPrincipalId);
-		agreement.setRequirementId(accessRequirementId);
+		agreement.setRequirementId(accessRequirement.getId());
 		JSONObjectAdapter approvalJson = null;
 		try {
 			approvalJson = agreement.writeToJSONObject(jsonObjectAdapter.createNew());
