@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Preview;
@@ -133,6 +134,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 		ignore.add(entityType); 
 		// ignore certain types		
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Preview.class.getName()));
+		ignore.add(entityTypeProvider.getEntityTypeForClassName(Folder.class.getName()));
 		
 		return ignore;
 	}
