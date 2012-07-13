@@ -21,6 +21,7 @@ import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
+import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
 
@@ -94,6 +95,10 @@ public class PortalServletModule extends ServletModule {
 		// Attachments
 		bind(FileAttachmentServlet.class).in(Singleton.class);
 		serve("/Portal/attachment").with(FileAttachmentServlet.class);
+		
+		// User Profile Attachment (photo)
+		bind(UserProfileAttachmentServlet.class).in(Singleton.class);
+		serve("/Portal/profileAttachment").with(UserProfileAttachmentServlet.class);
 		
 		// Setup the LinkedIn service mapping
 		bind(LinkedInServiceImpl.class).in(Singleton.class);

@@ -1,15 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
 import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
-
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -20,8 +17,6 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FileUploadField;
@@ -55,7 +50,7 @@ public class AddAttachmentDialog {
 	 * 
 	 * @param callback
 	 */
-	public static void showAddAttachmentDialog(String actionUrl, SageImageBundle images, final Callback callback ) {
+	public static void showAddAttachmentDialog(String actionUrl, SageImageBundle images, String windowTitle, String buttonText, final Callback callback ) {
 		// Show a form for adding an Annotations
 		final Dialog dialog = new Dialog();
 		dialog.setMaximizable(false);
@@ -65,7 +60,7 @@ public class AddAttachmentDialog {
 		dialog.setBlinkModal(true);
 		dialog.setButtons(Dialog.CANCEL);
 		dialog.setHideOnButtonClick(true);
-		dialog.setHeading("Add New File Attachment");
+		dialog.setHeading(windowTitle);
 		dialog.setLayout(new FitLayout());
 		dialog.setBorders(false);
 		
@@ -107,7 +102,7 @@ public class AddAttachmentDialog {
 		
 		panel.add(file, basicFormData);
 
-		Button btn = new Button("Attach");
+		Button btn = new Button(buttonText);
 		btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
@@ -152,7 +147,9 @@ public class AddAttachmentDialog {
 		result.setUploadStatus(UploadStatus.SUCCESS);
 		if(html != null){
 			GwtAdapterFactory factory = new GwtAdapterFactory();
-			String json = html.substring("<pre style=\"word-wrap: break-word; white-space: pre-wrap;\">".length(), (html.length()-"</pre>".length()));
+			//search for the first ">" (end of the pre tag)
+			int closeIndex = html.indexOf(">")+1;
+			String json = html.substring(closeIndex, (html.length()-"</pre>".length()));
 			JSONObjectAdapter adapter;
 			try {
 				adapter = factory.createNew(json);

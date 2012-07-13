@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 
@@ -31,8 +32,8 @@ public interface UserAccountServiceAsync {
 	 * This needs to be replaced with a Synapse Java Client call
 	 */
 	@Deprecated
-	void updateUser(String firstName, String lastName, String displayName, AsyncCallback<Void> callback);
-
+	void updateUser(String firstName, String lastName, String displayName, AsyncCallback<Void> callback) throws RestServiceException;
+	
 	void terminateSession(String sessionToken, AsyncCallback<Void> callback);
 
 	/**

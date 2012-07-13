@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -18,27 +21,9 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 * Renders the view for a given presenter
 	 */
 	public void render();
+	
+	public void updateView(UserProfile profile, boolean editable, boolean isOwner);
 
-	/**
-	 * Shows the user that their password change succeeded
-	 */
-	public void showPasswordChangeSuccess();
-	
-	/**
-	 * Alerts the view that the password change failed
-	 */
-	public void passwordChangeFailed();	
-	
-	/**
-	 * Show the user that their email has been sent
-	 */
-	public void showRequestPasswordEmailSent();
-	
-	/**
-	 * Alerts the view that the password request email failed to send.
-	 */
-	public void requestPasswordEmailFailed();
-	
 	/**
 	 * Show the user that the user's information has been updated.
 	 */
@@ -53,20 +38,16 @@ public interface ProfileView extends IsWidget, SynapseView {
 	
 	public interface Presenter extends SynapsePresenter {
 
-		void resetPassword(String existingPassword, String newPassword);
-
-		void createSynapsePassword();
-		
-		void updateProfile(String firstName, String lastName);
+		void updateProfile(String firstName, String lastName,String summary, String position, String location, String industry, String company, AttachmentData pic);
 
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
 		
 		void redirectToLinkedIn();
 		
+		void redirectToEditProfile();
+		
+		void redirectToViewProfile();
+		
 		void goTo(Place place);
-
-
 	}
-
-
 }

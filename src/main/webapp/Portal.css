@@ -337,8 +337,43 @@ a.shortBtn {
 	float: left;
 }
 
+.user-profile-headline {
+}
 
+.user-profile-industry-location {
+	margin: 0 0 5px;
+	font-style: italic;
+}
 
+.user-profile-summary {
+	clear: both;
+}
+
+.user-profile-linkedin {
+	margin-right: 3px;
+}
+.user-profile-linkedin-bar {
+	margin-bottom: 3px !important;
+}
+
+.user-profile-change-photo {
+	
+}
+
+.user-profile-edit-table td {
+	padding-bottom: 5px;
+	vertical-align: bottom;
+}
+
+.profile-image-loading {
+	background: url(images/ui-anim_basic_16x16.gif) no-repeat center center;
+	min-width: 50px;
+	width: auto !important;
+	width: 50px;
+	min-height: 50px;
+	height: auto !important;
+	height:	50px;
+}
 
 
 	

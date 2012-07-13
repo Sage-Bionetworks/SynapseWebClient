@@ -23,44 +23,40 @@
         <div class="clear"></div>
     	<div class="container"> 		
 			<g:SimplePanel ui:field="header" />
+				<div class="span-24 separator"></div>
 	        	<div class="span-24 notopmargin">	
 	<!-- end header -->
-
-					<ul class="breadcrumbs">
-						<li class="breadcrumb"><a href="#">Home</a> > Profile</li>
-					</ul>
-					<h2>Profile</h2>
-
-					<h3>Synapse R Client &amp; Synapse REST API</h3>
-					<p style="padding-bottom:5px">To login to this website without using a Google account or to use the Synapse R Client or REST API, 
-					you will need to have a Synapse specific password. To setup a Synapse password, click the button below. It will send you an email 
-					with instructions on how to complete the process.</p>
-					<g:SimplePanel ui:field="setupPasswordButtonPanel" />
+					<div class="span-24 notopmargin" style="margin-top: 5px !important">
+						<div class="span-20 notopmargin" style="white-space: normal;">
+							<g:SimplePanel ui:field="breadcrumbsPanel"/>
+						</div>
+						<div class="span-4 last right notopmargin">
+							<g:SimplePanel ui:field="editProfileButtonPanel" />
+						</div>
+					</div>
 					
-					<p>&nbsp;</p>
-					<p>&nbsp;</p>
-					
-					<h3>Change Your Profile</h3>
-					<p style="padding-bottom:5px">You can import profile information from LinkedIn: </p>
-					<g:SimplePanel ui:field="updateWithLinkedInPanel" />
-					<p><small></small></p>
-	
-					<p>&nbsp;</p>
-	
-					<p style="padding-bottom:5px">Or manually edit the fields below.</p>
-					<g:SimplePanel ui:field="updateUserInfoPanel" />
-					<p><small></small></p>
-					
-					<p>&nbsp;</p>
+					<div class="span-24 notopmargin last">
+						<div id="pictureCanvasId" class="span-5 inner-6 view notopmargin">
+							<!-- profile picture, and edit photo (if visible) -->
+							<center>
+								<g:SimplePanel ui:field="profilePicturePanel" />
+							</center>
+							<div class="span-4 push-2 notopmargin">
+								<g:SimplePanel ui:field="editPhotoButtonPanel" />
+							</div>
+						</div>
+						<div class="span-18 notopmargin last">
+							<g:SimplePanel ui:field="viewProfilePanel" />
+						</div>
+					</div>
+					<div class="user-profile-linkedin-bar span-13 push-11 last notopmargin">
+						<g:SimplePanel ui:field="updateWithLinkedInPanel" />
+					</div>
+					<div class="span-24 notopmargin last">
+						<g:SimplePanel ui:field="updateUserInfoPanel" />
+					</div>
 					<p>&nbsp;</p>					
 					
-					<h3>Change Synapse Password</h3>
-					<g:SimplePanel ui:field="changePasswordPanel" />
-					<p><small></small></p>
-					
-					<p>&nbsp;</p>
-					<p>&nbsp;</p>					
-
 				</div>
 					
 <!-- start footer -->

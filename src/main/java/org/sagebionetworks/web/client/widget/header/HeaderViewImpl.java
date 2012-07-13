@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.place.DatasetsHome;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
+import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
@@ -140,7 +141,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 		if (registerButton == null)
 		{
-			AbstractImagePrototype icon = null;
 			registerButton = new Button(DisplayConstants.BUTTON_REGISTER);
 			registerButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
@@ -171,14 +171,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private void configureUserMenu() {				
 		// create drop down menu
 		Menu menu = new Menu();
-//		addMenuItem(DisplayConstants.TEXT_USER_SETTINGS,
-//				AbstractImagePrototype.create(iconsImageBundle.cog16()),
-//				new Profile(DisplayUtils.DEFAULT_PLACE_TOKEN),
-//				menu);
-		
-		addMenuItem(DisplayConstants.TEXT_USER_VIEW_PROFILE,
+		addMenuItem(DisplayConstants.TEXT_USER_VIEW_PROFILE, 
 				AbstractImagePrototype.create(iconsImageBundle.user16()),
-				new Profile(DisplayUtils.DEFAULT_PLACE_TOKEN),
+				new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN),
+				menu);
+		
+		addMenuItem(DisplayConstants.TEXT_USER_SETTINGS, 
+				new Settings(DisplayUtils.DEFAULT_PLACE_TOKEN),
 				menu);
 		
 		addMenuItem(DisplayConstants.BUTTON_LOGOUT,

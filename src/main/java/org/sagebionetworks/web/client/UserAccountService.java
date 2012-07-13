@@ -5,6 +5,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -22,7 +23,7 @@ public interface UserAccountService extends RemoteService {
 	public UserData getUser(String sessionToken) throws AuthenticationException, RestServiceException;
 
 	public void createUser(UserRegistration userInfo) throws RestServiceException;
-	
+			
 	public void updateUser(String firstName, String lastName, String displayName) throws RestServiceException;
 	
 	public void terminateSession(String sessionToken) throws RestServiceException;
