@@ -101,7 +101,7 @@ public	class ProfilePanel extends FormPanel {
         
         Label bridgeLabel = new Label("Please check the box below if you would like to have your name and team affiliation "+
         		"posted onto BRIDGE.  BRIDGE is an open growth community platform linked to Synapse, where citizen-patients, "+
-        		"researchers and funders are building models of disease together.");
+        		"researchers and funders are building models of disease together.\nPlease allow a week delay before expecting to find your information posted on BRIDGE");
         bridgeLabel.setAutoWidth(false);
         bridgeLabel.setWidth(WIDTH-50);
         
@@ -119,8 +119,8 @@ public	class ProfilePanel extends FormPanel {
 
         profilePanel.add(new Label(""), formData); // a blank row
         
-        Label bridgeLabel2 = new Label("(While we are working to automate our processes, "+
-        		"please allow a week delay before expecting to find your information posted on BRIDGE.)");
+        Label bridgeLabel2 = new Label("On submission of your registration we will generate an email with details of how to access contest resources. "+
+        		"Please allow several minutes for this message to be generated.");
         bridgeLabel2.setAutoWidth(false);
         bridgeLabel2.setWidth(WIDTH-50);
         
