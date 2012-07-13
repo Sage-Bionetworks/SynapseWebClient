@@ -147,11 +147,11 @@ public class DisplayUtils {
 	public static final String UPLOAD_SUCCESS = "Upload Success";
 	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
-			Study.class.getName(), Data.class.getName(), Code.class.getName(), 
-			Link.class.getName(), Analysis.class.getName(),
-			Step.class.getName(), RObject.class.getName(),
-			PhenotypeData.class.getName(), ExpressionData.class.getName(),
-			GenotypeData.class.getName() };
+			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
+			Code.class.getName(), Link.class.getName(), 
+			Analysis.class.getName(), Step.class.getName(), 
+			RObject.class.getName(), PhenotypeData.class.getName(), 
+			ExpressionData.class.getName(),	GenotypeData.class.getName() };
 	
 	
 	public static SearchQuery getDefaultSearchQuery() {		
@@ -493,13 +493,13 @@ public class DisplayUtils {
 	public static enum IconSize { PX16, PX24 };
 	
 	public static ImageResource getSynapseIconForEntityType(EntityType type, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		if(type == null) return null;
-		return getSynapseIconForEntityClassName(type.getClassName(), iconSize, iconsImageBundle);
+		String className = type == null ? null : type.getClassName();		
+		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
 	}
 
 	public static ImageResource getSynapseIconForEntity(Entity entity, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		if(entity == null) return null;
-		return getSynapseIconForEntityClassName(entity.getClass().getName(), iconSize, iconsImageBundle);
+		String className = entity == null ? null : entity.getClass().getName();
+		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
 	}
 
 	/**
