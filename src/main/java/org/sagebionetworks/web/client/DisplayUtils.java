@@ -103,8 +103,7 @@ public class DisplayUtils {
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
 	public static final String WAIT_FOR_URL = "waitForUrl";
-	public static final String ENTITY_CREATEDBY_KEY = "createdBy";
-	public static final String ENTITY_UPDATEDBY_KEY = "updatedBy";
+	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "createdByPrincipalId";
 	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
@@ -147,11 +146,11 @@ public class DisplayUtils {
 	public static final String UPLOAD_SUCCESS = "Upload Success";
 	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
-			Study.class.getName(), Data.class.getName(), Code.class.getName(), 
-			Link.class.getName(), Analysis.class.getName(),
-			Step.class.getName(), RObject.class.getName(),
-			PhenotypeData.class.getName(), ExpressionData.class.getName(),
-			GenotypeData.class.getName() };
+			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
+			Code.class.getName(), Link.class.getName(), 
+			Analysis.class.getName(), Step.class.getName(), 
+			RObject.class.getName(), PhenotypeData.class.getName(), 
+			ExpressionData.class.getName(),	GenotypeData.class.getName() };
 	
 	
 	public static SearchQuery getDefaultSearchQuery() {		
@@ -493,13 +492,13 @@ public class DisplayUtils {
 	public static enum IconSize { PX16, PX24 };
 	
 	public static ImageResource getSynapseIconForEntityType(EntityType type, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		if(type == null) return null;
-		return getSynapseIconForEntityClassName(type.getClassName(), iconSize, iconsImageBundle);
+		String className = type == null ? null : type.getClassName();		
+		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
 	}
 
 	public static ImageResource getSynapseIconForEntity(Entity entity, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		if(entity == null) return null;
-		return getSynapseIconForEntityClassName(entity.getClass().getName(), iconSize, iconsImageBundle);
+		String className = entity == null ? null : entity.getClass().getName();
+		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
 	}
 
 	/**

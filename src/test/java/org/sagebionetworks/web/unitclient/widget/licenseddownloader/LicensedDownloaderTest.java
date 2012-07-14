@@ -145,7 +145,7 @@ public class LicensedDownloaderTest {
 		entityPath.setPath(path);
 		
 		// User
-		user1 = new UserData("email@email.com", "Username", "token", false);
+		user1 = new UserData("1", "email@email.com", "Username", "token", false);
 		
 		licenseAgreement = new LicenseAgreement();		
 		licenseAgreement.setLicenseHtml("some agreement");
