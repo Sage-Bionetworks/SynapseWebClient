@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import org.sagebionetworks.repo.ServiceConstants;
+import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;

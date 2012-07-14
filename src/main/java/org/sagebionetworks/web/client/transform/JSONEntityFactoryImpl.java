@@ -54,6 +54,11 @@ public class JSONEntityFactoryImpl implements JSONEntityFactory {
 		JSONEntity entity = this.internalFactory.newInstance(className);
 		return initializeEntity(json, entity);
 	}
+	
+	@Override
+	public JSONEntity newInstance(String className) {
+		return this.internalFactory.newInstance(className);
+	}
 
 	/**
 	 * Initialize the passed new JSONEntity using the provided JSON string

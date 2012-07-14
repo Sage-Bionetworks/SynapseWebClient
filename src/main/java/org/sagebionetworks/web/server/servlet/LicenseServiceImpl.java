@@ -92,54 +92,6 @@ public class LicenseServiceImpl extends RemoteServiceServlet implements LicenceS
 					"The org.sagebionetworks.rest.api.root.url was not set");
 	}
 
-
-
-	/**
-	 * Returns true if the user has accepted the license agreement for the given dataset 
-	 * @return true for accepted, false otherwise 
-	 */
-	@Override
-	public boolean hasAccepted(String username, String eulaId, String datasetId) {
-		// query for license acceptance
-		// First make sure the service is ready to go.
-		validateService();
-
-		List<WhereCondition> where = new ArrayList<WhereCondition>();
-		where.add(new WhereCondition("datasetId", WhereOperator.EQUALS, datasetId));
-		where.add(new WhereCondition("eulaId", WhereOperator.EQUALS, eulaId));
-		where.add(new WhereCondition("createdBy", WhereOperator.EQUALS, username));
-		List<String> select = new ArrayList<String>();
-		select.add("*");
-		
-		// Build the uri from the parameters
-		SearchParameters params = new SearchParameters(select, ObjectType.agreement.name(), where, 1, 10, null, false);
-
-		// Build the uri from the parameters
-		URI uri = QueryStringUtils.writeQueryUri(urlProvider.getRepositoryServiceUrl() + "/", params);
-
-		logger.info("GET: " + uri.toASCIIString());
-
-		HttpHeaders headers = new HttpHeaders();
-		// If the user data is stored in a cookie, then fetch it and the session token to the header.
-		UserDataProvider.addUserDataToHeader(this.getThreadLocalRequest(), headers);
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<String>("", headers);
-
-		// Make the actual call.
-		try {
-			ResponseEntity<Object> response = templateProvider.getTemplate().exchange(uri, HttpMethod.GET, entity, Object.class);
-			LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) response.getBody();
-			Integer numResults = (Integer) body.get(SearchService.KEY_TOTAL_NUMBER_OF_RESULTS);
-			if(numResults > 0) {
-				return true;
-			} 			
-		} catch (Exception ex) {
-			logger.severe(ex.getMessage());
-		}				
-		return false;
-	}
-
-
 	@Override
 	public void logUserDownload(String username, String objectUri, String fileUri) {
 		
