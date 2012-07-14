@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.BCCSignupAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.BCCCallback;
 import org.sagebionetworks.web.client.view.BCCOverviewView;
 import org.sagebionetworks.web.shared.BCCSignupProfile;
-import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -28,7 +28,6 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		this.bccSignup=bccSignup;
 		this.authenticationController = authenticationController;
 		this.view = view;
-
 		view.setPresenter(this);
 	}
 
@@ -54,10 +53,10 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 	@Override
 	public BCCSignupProfile getBCCSignupProfile() {
 		BCCSignupProfile profile = new BCCSignupProfile();
-		UserData userData = authenticationController.getLoggedInUser();
+		UserSessionData userData  = authenticationController.getLoggedInUser();
 		if (userData!=null) {
-			if (userData.getEmail()!=null) profile.setEmail(userData.getEmail());
-			String fAndlName = userData.getUserName(); // TODO need API to get these separately
+			if (userData.getProfile().getOwnerId()!=null) profile.setEmail(userData.getProfile().getOwnerId());
+			String fAndlName = userData.getProfile().getDisplayName(); // TODO need API to get these separately
 			if (null!=fAndlName) {
 				int i = fAndlName.indexOf(" ");
 				if (i>0) {

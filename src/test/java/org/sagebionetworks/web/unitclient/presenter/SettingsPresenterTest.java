@@ -8,6 +8,9 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -16,7 +19,7 @@ import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SettingsView;
-import org.sagebionetworks.web.shared.users.UserData;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -32,11 +35,12 @@ public class SettingsPresenterTest {
 	CookieProvider mockCookieProvider;
 	Settings place = Mockito.mock(Settings.class);
 	
-	UserData testUser = new UserData("testuser@test.com", "tester", "token", false);
+	UserSessionData testUser = new UserSessionData();
+	UserProfile profile = new UserProfile();
 	String password = "password";
 	
 	@Before
-	public void setup() {
+	public void setup() throws JSONObjectAdapterException{
 		mockView = mock(SettingsView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserService = mock(UserAccountServiceAsync.class);
@@ -46,7 +50,13 @@ public class SettingsPresenterTest {
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider);	
 		verify(mockView).setPresenter(profilePresenter);
 
-		profilePresenter.setPlace(place);		
+		profilePresenter.setPlace(place);
+		profile.setDisplayName("tester");
+		profile.setOwnerId("testuser@test.com");
+		profile.setUserName("testuser@test.com");
+		testUser.setProfile(profile);
+		testUser.setSessionToken("token");
+		testUser.setIsSSO(false);
 	}
 	
 	@Test
@@ -72,7 +82,7 @@ public class SettingsPresenterTest {
 	}
 	
 	@Test
-	public void testResetPassword() {
+	public void testResetPassword() throws RestServiceException {
 		reset(mockView);
 		reset(mockAuthenticationController);
 		reset(mockUserService);
@@ -89,7 +99,7 @@ public class SettingsPresenterTest {
 	}
 	
 	@Test
-	public void testCreateSynapsePassword() {
+	public void testCreateSynapsePassword() throws RestServiceException {
 		reset(mockView);
 		reset(mockAuthenticationController);
 		reset(mockUserService);
@@ -100,7 +110,6 @@ public class SettingsPresenterTest {
 		profilePresenter.setPlace(place);
 
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
-		
 		profilePresenter.createSynapsePassword();
 	}	
 }

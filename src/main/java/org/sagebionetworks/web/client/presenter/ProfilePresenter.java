@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -20,7 +21,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -85,7 +85,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	@Override
 	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final AttachmentData pic) {
-		final UserData currentUser = authenticationController.getLoggedInUser();
+		final UserSessionData currentUser = authenticationController.getLoggedInUser();
 		if(currentUser != null) {
 				//get the owner profile (may or may not be currently set
 				synapseClient.getUserProfile(null, new AsyncCallback<String>() {
@@ -102,6 +102,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							ownerProfile.setLocation(location);
 							ownerProfile.setIndustry(industry);
 							ownerProfile.setCompany(company);
+							ownerProfile.setDisplayName(firstName + " " + lastName);
 							if (pic != null)
 								ownerProfile.setPic(pic);
 							
@@ -116,20 +117,20 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 										view.showUserUpdateSuccess();
 										view.showInfo("Success", "Your profile has been updated.");
 										
-										AsyncCallback<UserData> callback = new AsyncCallback<UserData>() {
+										AsyncCallback<String> callback = new AsyncCallback<String>() {
 											@Override
 											public void onFailure(Throwable caught) { }
 
 											@Override
-											public void onSuccess(UserData result) {
+											public void onSuccess(String result) {
 												view.refreshHeader();
 											}
 										};
 										
-										if(currentUser.isSSO()) {
-											authenticationController.loginUserSSO(currentUser.getToken(), callback);
+										if(currentUser.getIsSSO()) {
+											authenticationController.loginUserSSO(currentUser.getSessionToken(), callback);
 										} else {
-											authenticationController.loginUser(currentUser.getToken(), callback);
+											authenticationController.loginUser(currentUser.getSessionToken(), callback);
 										}
 									}
 									

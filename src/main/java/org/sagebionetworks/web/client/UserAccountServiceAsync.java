@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -18,13 +17,13 @@ public interface UserAccountServiceAsync {
 	 * This needs to be replaced with a Synapse Java Client call
 	 */
 	@Deprecated
-	void initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse, AsyncCallback<UserData> callback);
+	void initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse, AsyncCallback<String> callback);
 
 	/**
 	 * This needs to be replaced with a Synapse Java Client call
 	 */
 	@Deprecated
-	void getUser(String sessionToken, AsyncCallback<UserData> callback);	
+	void getUser(String sessionToken, AsyncCallback<String> callback);	
 
 	void createUser(UserRegistration userInfo, AsyncCallback<Void> callback);
 	

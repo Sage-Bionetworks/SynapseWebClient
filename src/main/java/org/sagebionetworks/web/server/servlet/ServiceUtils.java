@@ -2,7 +2,6 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +36,9 @@ public class ServiceUtils {
 	public static final String AUTHSVC_SET_PASSWORD_PATH = "userPassword";
 	public static final String AUTHSVC_INITIATE_SESSION_PATH = "session";
 	public static final String AUTHSVC_CREATE_USER_PATH = "user";
+	@Deprecated
 	public static final String AUTHSVC_GET_USER_PATH = "user";
+	@Deprecated
 	public static final String AUTHSVC_UPDATE_USER_PATH = "user";
 	public static final String AUTHSVC_TERMINATE_SESSION_PATH = "session";
 	public static final String AUTHSVC_REFRESH_SESSION_PATH = "session";

@@ -1,13 +1,16 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SettingsView;
-import org.sagebionetworks.web.shared.users.UserData;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -36,7 +39,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.cookieProvider = cookieProvider;
-		
 		view.setPresenter(this);
 	}
 
@@ -60,13 +62,13 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	@Override
 	public void resetPassword(final String existingPassword, final String newPassword) {
 		// 1. Authenticate user with existing password
-		final UserData currentUser = authenticationController.getLoggedInUser();
+		final UserSessionData currentUser = authenticationController.getLoggedInUser();
 		if(currentUser != null) {
-			authenticationController.loginUser(currentUser.getEmail(), existingPassword, false, new AsyncCallback<UserData>() {				
+			authenticationController.loginUser(currentUser.getProfile().getUserName(), existingPassword, false, new AsyncCallback<String>() {				
 				@Override
-				public void onSuccess(UserData result) {
+				public void onSuccess(String result) {
 					// 2. set password
-					userService.setPassword(currentUser.getEmail(), newPassword, new AsyncCallback<Void>() {
+					userService.setPassword(currentUser.getProfile().getUserName(), newPassword, new AsyncCallback<Void>() {
 						@Override
 						public void onSuccess(Void result) {
 							view.showPasswordChangeSuccess();
@@ -95,9 +97,9 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 
 	@Override
 	public void createSynapsePassword() {
-		final UserData currentUser = authenticationController.getLoggedInUser();
+		final UserSessionData currentUser = authenticationController.getLoggedInUser();
 		if(currentUser != null) {
-			userService.sendSetApiPasswordEmail(currentUser.getEmail(), new AsyncCallback<Void>() {
+			userService.sendSetApiPasswordEmail(currentUser.getProfile().getUserName(), new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
 					view.showRequestPasswordEmailSent();

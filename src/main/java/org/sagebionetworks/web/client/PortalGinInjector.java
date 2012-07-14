@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.LookupPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
-import org.sagebionetworks.web.client.presenter.PublicProfilePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
@@ -55,8 +54,6 @@ public interface PortalGinInjector extends Ginjector {
 	public GovernancePresenter getGovernancePresenter();
 	
 	public LookupPresenter getLookupPresenter();
-	
-	public PublicProfilePresenter getPublicProfilePresenter();
 	
 	public SearchPresenter getSearchPresenter();
 	

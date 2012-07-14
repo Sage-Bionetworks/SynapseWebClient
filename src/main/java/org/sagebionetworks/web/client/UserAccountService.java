@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -18,9 +17,9 @@ public interface UserAccountService extends RemoteService {
 	
 	public void setPassword(String email, String newPassword);
 
-	public UserData initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws RestServiceException;
+	public String initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws RestServiceException;
 	
-	public UserData getUser(String sessionToken) throws AuthenticationException, RestServiceException;
+	public String getUser(String sessionToken) throws AuthenticationException, RestServiceException;
 
 	public void createUser(UserRegistration userInfo) throws RestServiceException;
 			
