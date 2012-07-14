@@ -5,10 +5,18 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.UnsupportedEncodingException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -20,8 +28,6 @@ import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
-import org.sagebionetworks.web.shared.users.UserData;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -40,11 +46,13 @@ public class ProfilePresenterTest {
 	CookieProvider mockCookieProvider;
 	Profile place = Mockito.mock(Profile.class);
 	
-	UserData testUser = new UserData("1", "testuser@test.com", "tester", "token", false);
+	UserSessionData testUser = new UserSessionData();
+	UserProfile userProfile = new UserProfile();
+	String testUserJson;
 	String password = "password";
 	
 	@Before
-	public void setup() {
+	public void setup() throws JSONObjectAdapterException {
 		mockView = mock(ProfileView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserService = mock(UserAccountServiceAsync.class);
@@ -57,7 +65,17 @@ public class ProfilePresenterTest {
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider);	
 		verify(mockView).setPresenter(profilePresenter);
 
-		profilePresenter.setPlace(place);		
+		profilePresenter.setPlace(place);
+		userProfile.setDisplayName("tester");
+		userProfile.setOwnerId("1");
+		userProfile.setUserName("testuser@test.com");
+		testUser.setProfile(userProfile);
+		testUser.setSessionToken("token");
+		testUser.setIsSSO(false);
+		
+		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
+		testUser.writeToJSONObject(adapter);
+		testUserJson = adapter.toJSONString(); 
 	}
 	
 	@Test

@@ -13,13 +13,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.server.RestTemplateProvider;
 import org.sagebionetworks.web.server.RestTemplateProviderImpl;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
-import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 
 import com.sun.grizzly.http.SelectorThread;
@@ -150,8 +151,9 @@ public class UserAccountServiceImplTest {
 		}
 		
 		// assure user was actually created		
-		UserData userData = service.initiateSession(user1.getEmail(), user1password, false);
-		assertEquals(userData.getEmail(), user1.getEmail());
+		String userDataJson = service.initiateSession(user1.getEmail(), user1password, false);
+		UserSessionData userData = EntityFactory.createEntityFromJSONString(userDataJson, UserSessionData.class);
+		assertEquals(userData.getProfile().getUserName(), user1.getEmail());
 	}
 	
 	@Test(expected=UnauthorizedException.class)
@@ -163,8 +165,9 @@ public class UserAccountServiceImplTest {
 	@Test
 	public void testAuthenticateUser() throws Exception {
 		// auth real user
-		UserData userdata = service.initiateSession(user1.getEmail(), user1password, false);
-		assertEquals(user1.getEmail(), userdata.getEmail());
+		String userdataJson = service.initiateSession(user1.getEmail(), user1password, false);
+		UserSessionData userData = EntityFactory.createEntityFromJSONString(userdataJson, UserSessionData.class);
+		assertEquals(user1.getEmail(), userData.getProfile().getUserName());
 		
 	}
 		
@@ -188,17 +191,16 @@ public class UserAccountServiceImplTest {
 		
 	@Test
 	public void testTerminateSession() throws Exception {
-		UserData userdata = null;
-		userdata = service.initiateSession(user1.getEmail(), user1password, false);
+		String userdataJson = service.initiateSession(user1.getEmail(), user1password, false);
 		
-		if(userdata == null) fail("test setup error: user doesn't exist");
-		
+		if(userdataJson == null) fail("test setup error: user doesn't exist");
+		UserSessionData userData = EntityFactory.createEntityFromJSONString(userdataJson, UserSessionData.class);
 		// terminate unknown session
 		service.terminateSession("junk");
 
 		
 		// terminate real session
-		service.terminateSession(userdata.getToken());			
+		service.terminateSession(userData.getSessionToken());			
 	}
 		
 	@Test
