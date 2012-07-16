@@ -9,6 +9,12 @@ import org.sagebionetworks.web.shared.FileDownload;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
+	
+	public enum APPROVAL_REQUIRED {
+		NONE,
+		LICENSE_ACCEPTANCE,
+		ACT_APPROVAL
+	}
 
 	/**
 	 * Set the presenter.
@@ -20,7 +26,7 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	 * Make the view show the License acceptance view first
 	 * @param licenseRequired
 	 */
-	public void setLicenceAcceptanceRequired(boolean licenseRequired);
+	public void setApprovalRequired(APPROVAL_REQUIRED approvalRequired);
 	
 	/**
 	 * Set the license text to display
