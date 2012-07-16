@@ -40,6 +40,11 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 		void onEdit();
 
 		void deleteEntity();
+		
+		/**
+		 * Move an entity by assigning it a new parent entity.
+		 */
+		void moveEntity(String newParentId);
 
 		List<EntityType> getAddSkipTypes();
 
