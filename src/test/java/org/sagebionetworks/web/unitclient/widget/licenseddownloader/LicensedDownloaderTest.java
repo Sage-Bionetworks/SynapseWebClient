@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.licenseddownloader;
 
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Data;
@@ -24,6 +22,8 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -33,7 +33,6 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
@@ -41,7 +40,6 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
 
@@ -62,7 +60,7 @@ public class LicensedDownloaderTest {
 	EntityTypeProvider entityTypeProvider;
 	Locationable entity;
 	Entity parentEntity;
-	UserData user1;
+	UserSessionData user1;
 	LicenseAgreement licenseAgreement;
 	List<LocationData> locations;	
 	EntityPath entityPath;
@@ -132,7 +130,14 @@ public class LicensedDownloaderTest {
 		entityPath.setPath(path);
 		
 		// User
-		user1 = new UserData("1", "email@email.com", "Username", "token", false);
+		user1 = new UserSessionData();
+		UserProfile profile = new UserProfile();
+		profile.setDisplayName("Display Name");
+		profile.setOwnerId("1");
+		profile.setUserName("email@email.com");
+		user1.setProfile(profile);
+		user1.setSessionToken("token");
+		user1.setIsSSO(false);
 		
 		licenseAgreement = new LicenseAgreement();		
 		licenseAgreement.setLicenseHtml("some agreement");

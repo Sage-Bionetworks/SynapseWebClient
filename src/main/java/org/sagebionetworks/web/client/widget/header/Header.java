@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.header;
 
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Lookup;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.shared.users.UserData;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -18,12 +21,14 @@ public class Header implements HeaderView.Presenter {
 	private HeaderView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
+	private NodeModelCreator nodeModelCreator;
 	
 	@Inject
-	public Header(HeaderView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState) {
+	public Header(HeaderView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}
 	
@@ -50,8 +55,8 @@ public class Header implements HeaderView.Presenter {
 	}
 
 	@Override
-	public UserData getUser() {		
-		return authenticationController.getLoggedInUser();
+	public UserSessionData getUser() {
+		return authenticationController.getLoggedInUser(); 
 	}
 
 	@Override

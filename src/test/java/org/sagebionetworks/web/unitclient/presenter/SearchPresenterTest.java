@@ -95,8 +95,7 @@ public class SearchPresenterTest {
 	@Test
 	public void testQueryTerm() throws Exception {		
 		
-		Search place = new Search(exampleTerm);
-		searchPresenter.setPlace(place);
+		searchPresenter.setPlace(new Search(exampleTerm));
 		verify(mockSynapseClient).search(eq(exampleTermSearchQueryJson), any(AsyncCallback.class));
 
 	}
@@ -109,34 +108,28 @@ public class SearchPresenterTest {
 		verify(mockSynapseClient).search(eq(exampleTermSearchQueryJson), any(AsyncCallback.class));
 
 	}
-	
-	@SuppressWarnings("unchecked")
-	@Test 
-	public void testSetSearchTerm() throws Exception {
-		searchPresenter.setSearchTerm(exampleTerm);
-		verify(mockSynapseClient).search(eq(exampleTermSearchQueryJson), any(AsyncCallback.class));
-	}
 
 	@SuppressWarnings("unchecked")
 	@Test 
-	public void testSetSearchTermSynapseIdPrefixNotId() throws Exception {
+	public void testSetPlaceSynapseIdPrefixNotId() throws Exception {
 		// test for a word with the prefix but not a synapse ID
 		String term = DisplayUtils.SYNAPSE_ID_PREFIX + "apse"; // # 'synapse'
+
 		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
 		query.setQueryTerm(Arrays.asList(new String[] {term}));
 		String json = query.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
 
-		searchPresenter.setSearchTerm(term);
+		searchPresenter.setPlace(new Search(term));
 		verify(mockSynapseClient).search(eq(json), any(AsyncCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test 
-	public void testSetSearchTermSynapseIdPrefix() throws Exception {
+	public void testSetPlaceSynapseIdPrefix() throws Exception {
 		// test for a word with the prefix and is a synapse ID
 		String term = DisplayUtils.SYNAPSE_ID_PREFIX + "1234567890"; // # 'syn1234567890'
-
-		searchPresenter.setSearchTerm(term);		
+		
+		searchPresenter.setPlace(new Search(term));		
 		assertEquals(searchPresenter.getRedirect(), new Synapse(term)); 
 	}
 

@@ -93,24 +93,16 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		this.place = place;
 		view.setPresenter(this);
 		redirect = null;
-
-		// TODO : perhaps not pass the json query in the token? could run up against URL limits. could possibly pop it off of global app state		
-		String queryString = place.toToken();
-		// if query parses into SearchQuery, use that, otherwise use it as a
-		// search Term
-		if (queryString != null && queryString.startsWith("{")) {
-			try {
-				currentSearch = new SearchQuery(jsonObjectAdapter.createNew(queryString));
-				// passed a searchQuery
-				executeSearch();
-				return;
-			} catch (JSONObjectAdapterException e) {
-				// fall through to a use as search term
-			}
+		String queryTerm = place.toToken();
+		if (queryTerm == null) queryTerm = "";
+		
+		if (willRedirect(queryTerm)) {
+			redirect = new Synapse(queryTerm);
+			return;
 		}
-		// passed a serachTerm
-		currentSearch = getBaseSearchQuery();
-		setSearchTerm(queryString);
+
+		currentSearch = checkForJson(queryTerm);
+		executeSearch();
 	}
 
 	@Override
@@ -121,21 +113,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 
 	@Override
 	public void setSearchTerm(String queryTerm) {		
-		if(queryTerm == null) queryTerm = "";
-		
-		if(queryTerm.startsWith(DisplayUtils.SYNAPSE_ID_PREFIX)) {
-			String remainder = queryTerm.replaceFirst(DisplayUtils.SYNAPSE_ID_PREFIX, "");
-			if(remainder.matches("^[0-9]+$")) {
-				redirect = new Synapse(queryTerm);
-				return;
-			}
-		}
-		
-		currentSearch = getBaseSearchQuery();					
-				
-		// set new search term & run search. split each word into its own value
-		currentSearch.setQueryTerm(Arrays.asList(queryTerm.split(" ")));					
-		executeSearch();
+		globalApplicationState.getPlaceChanger().goTo(new Search(queryTerm));
 	}
 
 	@Override
@@ -167,8 +145,19 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			// set start back to zero so we go to first page with the new facet
 			currentSearch.setStart(new Long(0));			
 		}
+
+		executeNewSearch();
+	}
+
+	private void executeNewSearch() {
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		
-		executeSearch();
+		try {
+			currentSearch.writeToJSONObject(adapter);
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+		}
+		setSearchTerm(adapter.toJSONString());
 	}
 
 	@Override
@@ -196,13 +185,13 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		
 		// set to first page
 		currentResult.setStart(new Long(0));
-		executeSearch();
+		executeNewSearch();
 	}
 
 	@Override
 	public void clearSearch() {
 		currentSearch = getBaseSearchQuery();
-		executeSearch();
+		executeNewSearch();
 	}
 	
 	@Override
@@ -223,7 +212,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
 	public void setStart(int newStart) {
 		currentSearch.setStart(new Long(newStart));
-		executeSearch();
+		executeNewSearch();
 	}
 
 	@Override
@@ -256,7 +245,36 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	/*
 	 * Private Methods
 	 */
-	
+
+	private boolean willRedirect(String queryTerm) {
+		if(queryTerm.startsWith(DisplayUtils.SYNAPSE_ID_PREFIX)) {
+			String remainder = queryTerm.replaceFirst(DisplayUtils.SYNAPSE_ID_PREFIX, "");
+			if(remainder.matches("^[0-9]+$")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private SearchQuery checkForJson(String queryString) {
+		SearchQuery query = getBaseSearchQuery();
+
+		query.setQueryTerm(Arrays.asList(queryString.split(" ")));
+
+		// if query parses into SearchQuery, use that, otherwise use it as a
+		// search Term
+		if (queryString != null && queryString.startsWith("{")) {
+			try {
+				query = new SearchQuery(jsonObjectAdapter.createNew(queryString));
+				// passed a searchQuery
+			} catch (JSONObjectAdapterException e) {
+				// fall through to a use as search term
+			}
+		} 
+
+		return query;
+	}
+
 	private SearchQuery getBaseSearchQuery() {
 		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
 		timeValueToDisplay.clear();
