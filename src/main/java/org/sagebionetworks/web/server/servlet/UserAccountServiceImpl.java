@@ -208,6 +208,10 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			if(response.getBody().equals("")) {
 				return;
 			}
+		} catch (RestClientException ex) {
+			if (ex.getMessage().toLowerCase().contains("no content-type found"))
+				return;
+			else throw ex;
 		} catch (UnexpectedException ex) {
 			return;
 		} catch (NullPointerException nex) {
