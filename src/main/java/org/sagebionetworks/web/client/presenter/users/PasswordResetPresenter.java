@@ -7,7 +7,9 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.shared.users.UserData;
@@ -108,13 +110,19 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 				@Override
 				public void onSuccess(Void result) {				
 					view.showPasswordResetSuccess();
-					view.showInfo("Your password has been reset."); 
-					globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)); // redirect to home page
+					view.showInfo("Your password has been reset.");
+					//quick fix: log user out (clear out cached user and cookie info) and force relogin
+					authenticationController.logoutUser();
+					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+					//globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)); // redirect to home page
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage("Password reset failed. Please try again.");				
+					view.showErrorMessage("Password reset failed. Please try again.");
+					//try registering again
+					authenticationController.logoutUser();
+					globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(DisplayUtils.DEFAULT_PLACE_TOKEN));
 				}
 			});		
 		}
