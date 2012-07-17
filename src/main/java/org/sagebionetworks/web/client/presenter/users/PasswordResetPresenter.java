@@ -109,11 +109,13 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			userService.setPassword(currentUser.getEmail(), newPassword, new AsyncCallback<Void>() {			
 				@Override
 				public void onSuccess(Void result) {				
-					view.showPasswordResetSuccess();
-					view.showInfo("Your password has been reset.");
+					// TODO : reinstate this with better ToU fix
+					//view.showPasswordResetSuccess();
+					view.showInfo("Your password has been reset. Please login again to verify.");
 					//quick fix: log user out (clear out cached user and cookie info) and force relogin
 					authenticationController.logoutUser();
 					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+					// TODO : reinstate this with better ToU fix
 					//globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)); // redirect to home page
 				}
 				
