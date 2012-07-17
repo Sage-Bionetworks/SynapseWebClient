@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view.users;
 
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.filter.QueryFilter;
@@ -210,7 +211,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	@Override
 	public void showInfo(String infoMessage) {
-		Info.display("Message", infoMessage);
+		DisplayUtils.showInfo("", infoMessage);
 	}
 
 
