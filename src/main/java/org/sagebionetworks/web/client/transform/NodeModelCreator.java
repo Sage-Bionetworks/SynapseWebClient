@@ -4,6 +4,7 @@ package org.sagebionetworks.web.client.transform;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.shared.DownloadLocation;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -54,5 +55,11 @@ public interface NodeModelCreator {
 	<T extends JSONEntity> PaginatedResults<T> createPaginatedResults(String jsonString, Class<? extends JSONEntity> clazz);
 
 	<T extends JSONEntity> BatchResults<T> createBatchResults(String jsonString, Class<? extends JSONEntity> clazz);
+
+	public <T extends JSONEntity> T createEntity(String jsonString, String entityClassName) throws RestServiceException;
+
+	public JSONEntity newInstance(String className);
+
+	public JSONObjectAdapter getObjectAdapter();
 
 }

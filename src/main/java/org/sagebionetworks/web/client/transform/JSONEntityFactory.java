@@ -58,4 +58,6 @@ public interface JSONEntityFactory {
 	 */
 	public Entity createEntity(String json) throws JSONObjectAdapterException;
 
+	public JSONEntity newInstance(String className);
+
 }

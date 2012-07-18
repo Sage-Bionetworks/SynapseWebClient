@@ -93,7 +93,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			boolean canEdit) {			
 		int height = 25;
 		if(downloadButton == null){
-			downloadButton = licensedDownloader.asWidget(entity, false);
+			downloadButton = licensedDownloader.asWidget(entity);
 			downloadButton.setHeight("25px");
 			add(downloadButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));	
@@ -106,7 +106,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				dlButton.disable(); 
 		}
 		// Configure the button
-		licensedDownloader.configureHeadless(entity, false);
+		licensedDownloader.configureHeadless(entity);
 
 
 		// edit button

@@ -8,6 +8,19 @@
 	text-align: center;
 } */
 
+.sf-j-menu {
+	float: right !important;
+	margin-bottom: 1em;
+	margin-top: 2em;
+	font-size:10px;
+	font-family:Oswald;
+}
+
+.sf-j-menu td {
+	padding: 4px 0px 4px 10px;
+}
+
+
 .sendButton {
 	display: block;
 	font-size: 16pt;
@@ -320,7 +333,9 @@ a.shortBtn {
 	margin-right: 5px;
 }
 
-
+.facet-btn {
+	float: left;
+}
 
 
 

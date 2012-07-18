@@ -41,7 +41,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
-	JSONObjectAdapter jsonObjectAdapter = null;
+	private JSONObjectAdapter jsonObjectAdapter = null;
 	
 	private String entityId;
 	private UserEntityPermissions uep;

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
 import org.sagebionetworks.web.client.widget.entity.ComboValue;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -86,6 +87,8 @@ public class AddAnnotationDialog {
 		FormPanel form = DialogUtils.createNewFormPanel();
 		final TextField<String> nameField = new TextField<String>();
 		nameField.setAllowBlank(false);
+		nameField.setRegex(WebConstants.VALID_ANNOTATION_NAME_REGEX);
+		nameField.getMessages().setRegexText("Annotation names may only contain letters, numbers, '_' and '.'");
 		nameField.setEmptyText("Set the annotation name...");
 		nameField.setFieldLabel("Name");
 		ListStore<ComboValue> store = new ListStore<ComboValue>();

@@ -15,7 +15,7 @@
 		<maven.compiler.source>1.6</maven.compiler.source>
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-		<synapse.version>1.0.1</synapse.version>
+		<synapse.version>1.1.0-RC</synapse.version>
 		<gwtVersion>2.4.0</gwtVersion>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 		<guiceVersion>3.0-rc2</guiceVersion>
@@ -91,7 +91,7 @@
 
 		<pluginManagement>
 			<plugins>
-				<!-- Tell the eclipse m2e plugin to execute these lifecycle mappings
+				<!-- Tell the eclipse m2e plugin to execute these lifecycle mappings 
 					See: http://wiki.eclipse.org/M2E_plugin_execution_not_covered -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -166,7 +166,7 @@
 						</goals>
 					</execution>
 				</executions>
-				<!-- Plugin configuration. There are many available options, see gwt-maven-plugin
+				<!-- Plugin configuration. There are many available options, see gwt-maven-plugin 
 					documentation at codehaus.org -->
 				<configuration>
 					<runTarget>Portal.html</runTarget>
@@ -199,7 +199,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- We use this assembly to package the GWT RPC dependencies so they
+			<!-- We use this assembly to package the GWT RPC dependencies so they 
 				are aviablible fore integration testing. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -358,7 +358,7 @@
 			<version>0.2</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- We are using this to serialize column metadata. We can drop it when
+		<!-- We are using this to serialize column metadata. We can drop it when 
 			the API provides this functionality -->
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
