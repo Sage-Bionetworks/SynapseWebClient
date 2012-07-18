@@ -6,7 +6,7 @@
 	<groupId>org.sagebionetworks</groupId>
 	<artifactId>portal</artifactId>
 	<packaging>war</packaging>
-	<version>develop-SNAPSHOT</version>
+	<version>1.3.0</version>
 	<name>Synapse Portal</name>
 
 	<properties>
