@@ -103,7 +103,7 @@ public class AppActivityMapper implements ActivityMapper {
 		// set current and last places
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
 		if(storedCurrentPlace != null && !(storedCurrentPlace instanceof PasswordReset)) {
-			if(!(storedCurrentPlace instanceof LoginPlace) || !(place instanceof LoginPlace)) {
+			if(!(storedCurrentPlace instanceof LoginPlace) && !(place instanceof LoginPlace)) {
 				// only update last place if we are not going from login to login place (this is due to SSO vs regular login difference)
 				globalApplicationState.setLastPlace(storedCurrentPlace);
 			}

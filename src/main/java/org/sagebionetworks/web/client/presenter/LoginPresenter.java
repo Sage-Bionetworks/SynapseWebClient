@@ -155,6 +155,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			} 
 		} else {
 			// standard view
+			authenticationController.logoutUser();
 			view.showLogin(openIdActionUrl, openIdReturnUrl);
 		}
 	}

@@ -373,9 +373,14 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		HttpMethod method = HttpMethod.POST;
 		
 		logger.info(method.toString() + ": " + url + ", JSON: " + jsonString);
-		
-		// Make the actual call.
-		ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
+		ResponseEntity<String> response;
+		try {
+			response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
+		} catch (RestClientException ex) {
+			if (ex.getMessage().toLowerCase().contains("no content-type found"))
+				return;
+			else throw ex;
+		}
 
 		if (response.getStatusCode() != HttpStatus.CREATED && response.getStatusCode() != HttpStatus.OK) {
 			if(response.getStatusCode() == HttpStatus.BAD_REQUEST) {

@@ -49,7 +49,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
 	private Window logginInWindow;
-
+	private Header headerWidget;
+	
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
 	
 	@Inject
@@ -60,7 +61,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		this.loginWidget = loginWidget;
 		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
-			
+		this.headerWidget = headerWidget;
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 
@@ -125,7 +126,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void showLogin(String openIdActionUrl, String openIdReturnUrl) {
 		clear();
-		
+		headerWidget.refresh();
 		loginWidget.setOpenIdActionUrl(openIdActionUrl);
 		loginWidget.setOpenIdReturnUrl(openIdReturnUrl);
 		
