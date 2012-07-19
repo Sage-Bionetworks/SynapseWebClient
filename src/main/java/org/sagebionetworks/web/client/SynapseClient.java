@@ -85,12 +85,18 @@ public interface SynapseClient extends RemoteService {
 	public String getUserProfile() throws RestServiceException;
 	
 	/**
+	 * Returns the specified user's profile object in json string
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public String getUserProfile(String userId) throws RestServiceException;
+	
+	/**
 	 * Updates the user's profile json object 
 	 * @param userProfileJson json object of the user's profile
 	 * @throws RestServiceException
 	 */
 	public void updateUserProfile(String userProfileJson) throws RestServiceException;
-	
 	
 	public EntityWrapper getNodeAcl(String id) throws RestServiceException;
 	
@@ -105,6 +111,9 @@ public interface SynapseClient extends RemoteService {
 	public EntityWrapper getAllUsers() throws RestServiceException;
 	
 	public EntityWrapper getAllGroups() throws RestServiceException;
+
+	public String createUserProfileAttachmentPresignedUrl(String id,
+			String tokenOrPreviewId) throws RestServiceException;
 
 	EntityWrapper createAccessRequirement(EntityWrapper arEW)
 			throws RestServiceException;

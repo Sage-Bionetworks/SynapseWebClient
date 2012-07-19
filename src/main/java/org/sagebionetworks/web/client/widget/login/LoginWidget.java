@@ -3,9 +3,12 @@ package org.sagebionetworks.web.client.widget.login;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
-import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -18,12 +21,14 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private List<UserListener> listeners = new ArrayList<UserListener>();	
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
+	private NodeModelCreator nodeModelCreator;
 	
 	@Inject
-	public LoginWidget(LoginWidgetView view, AuthenticationController controller) {
+	public LoginWidget(LoginWidgetView view, AuthenticationController controller, NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		view.setPresenter(this);
-		this.authenticationController = controller;		
+		this.authenticationController = controller;	
+		this.nodeModelCreator = nodeModelCreator;
 	}
 
 	public Widget asWidget() {
@@ -37,10 +42,16 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	
 	@Override
 	public void setUsernameAndPassword(final String username, final String password, final boolean explicitlyAcceptsTermsOfUse) {		
-		authenticationController.loginUser(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<UserData>() {
+		authenticationController.loginUser(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(UserData result) {
-				fireUserChage(result);
+			public void onSuccess(String result) {
+				UserSessionData userSessionData = null;
+				if (result != null){
+					try {
+						userSessionData = nodeModelCreator.createEntity(result, UserSessionData.class);
+					} catch (RestServiceException e) {}
+				}
+				fireUserChage(userSessionData);
 			}
 
 			@Override
@@ -70,7 +81,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	}
 
 	// needed?
-	private void fireUserChage(UserData user) {
+	private void fireUserChage(UserSessionData user) {
 		for(UserListener listener: listeners){
 			listener.userChanged(user);
 		}

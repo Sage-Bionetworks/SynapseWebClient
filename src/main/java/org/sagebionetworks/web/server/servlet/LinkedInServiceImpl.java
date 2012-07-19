@@ -83,7 +83,8 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 		Token accessToken = oAuthService.getAccessToken(rToken, v);
 		
 		// Post a request to LinkedIn to get the user's public information
-		OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.linkedin.com/v1/people/~");
+		// Note: three-current-positions is used for position and company
+		OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,summary,industry,location:(name),three-current-positions,picture-url)");
 		oAuthService.signRequest(accessToken, request);
 		Response response = request.send();
 		return response.getBody();

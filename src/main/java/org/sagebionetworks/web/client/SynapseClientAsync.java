@@ -43,8 +43,12 @@ public interface SynapseClientAsync {
 	void deleteEntity(String entityId, AsyncCallback<Void> callback);
 
 	void getUserProfile(AsyncCallback<String> callback);
-
+	
+	void getUserProfile(String userId, AsyncCallback<String> callback);
+	
 	void updateUserProfile(String userProfileJson, AsyncCallback<Void> callback);
+	
+	void createUserProfileAttachmentPresignedUrl(String id, String tokenOrPreviewId, AsyncCallback<String> callback);
 	
 	public void getNodeAcl(String id, AsyncCallback<EntityWrapper> callback);
 	

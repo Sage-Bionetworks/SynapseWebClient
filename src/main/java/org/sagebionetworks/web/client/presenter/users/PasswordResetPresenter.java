@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter.users;
 
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -11,8 +12,8 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
-import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -32,9 +33,10 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private GlobalApplicationState globalApplicationState;
+	private NodeModelCreator nodeModelCreator;
 	
 	@Inject
-	public PasswordResetPresenter(PasswordResetView view, CookieProvider cookieProvider, UserAccountServiceAsync userService, AuthenticationController authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState){
+	public PasswordResetPresenter(PasswordResetView view, CookieProvider cookieProvider, UserAccountServiceAsync userService, AuthenticationController authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator){
 		this.view = view;
 		this.userService = userService;
 		this.authenticationController = authenticationController;
@@ -43,6 +45,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		// Set the presenter on the view
 		this.cookieProvider = cookieProvider;
 		this.globalApplicationState = globalApplicationState;
+		this.nodeModelCreator=nodeModelCreator;
 		
 		view.setPresenter(this);
 	}
@@ -68,9 +71,9 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			// show same error if service fails as with an invalid token					
 			final String errorMessage = "Password reset period has expired. <a href=\"#PasswordReset:0\">Please request another Password Reset</a>.";
 			String sessionToken = place.toToken();
-			authenticationController.loginUser(sessionToken, new AsyncCallback<UserData>() {
+			authenticationController.loginUser(sessionToken, new AsyncCallback<String>() {
 				@Override
-				public void onSuccess(UserData result) {
+				public void onSuccess(String result) {
 					if(result != null) {
 						view.showResetForm();
 					} else {
@@ -104,9 +107,9 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 
 	@Override
 	public void resetPassword(final String newPassword) {
-		UserData currentUser = authenticationController.getLoggedInUser();
+		UserSessionData currentUser = authenticationController.getLoggedInUser(); 
 		if(currentUser != null) {
-			userService.setPassword(currentUser.getEmail(), newPassword, new AsyncCallback<Void>() {			
+			userService.setPassword(currentUser.getProfile().getUserName(), newPassword, new AsyncCallback<Void>() {			
 				@Override
 				public void onSuccess(Void result) {				
 					// TODO : reinstate this with better ToU fix

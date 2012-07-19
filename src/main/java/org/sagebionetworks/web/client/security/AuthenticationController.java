@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.security;
 
-import org.sagebionetworks.web.shared.users.UserData;
+import org.sagebionetworks.repo.model.UserSessionData;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -18,20 +18,20 @@ public interface AuthenticationController {
 	 * @param password
 	 * @return
 	 */
-	public void loginUser(String username, String password, boolean explicitlyAcceptsTermsOfUse, AsyncCallback<UserData> callback);
+	public void loginUser(String username, String password, boolean explicitlyAcceptsTermsOfUse, AsyncCallback<String> callback);
 	
 	/**
 	 * Logs in the user represented by the token
 	 * @param token
 	 */
-	public void loginUser(String token, AsyncCallback<UserData> callback);
+	public void loginUser(String token, AsyncCallback<String> callback);
 	
 	/**
 	 * Sets the current user 
 	 * @param displayName
 	 * @param token
 	 */
-	public void loginUserSSO(String token, AsyncCallback<UserData> callback);
+	public void loginUserSSO(String token, AsyncCallback<String> callback);
 	
 	/**
 	 * Terminates the session of the current user
@@ -42,7 +42,7 @@ public interface AuthenticationController {
 	 * Get the currently logged in user, if any.
 	 * @return the current user
 	 */
-	public UserData getLoggedInUser();
+	public UserSessionData getLoggedInUser();
 	
 	
 	/**

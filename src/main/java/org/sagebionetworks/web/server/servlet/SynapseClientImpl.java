@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.search.SearchResults;
@@ -599,13 +600,26 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
+	
+	@Override
+	public String getUserProfile(String userId) throws RestServiceException {
+		try {
+			Synapse synapseClient = createSynapseClient();
+			String targetUserId = userId == null ? "" : "/"+userId;
+			JSONObject userProfile = synapseClient.getSynapseEntity(urlProvider.getRepositoryServiceUrl(), "/userProfile"+targetUserId);
+			return userProfile.toString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
 
 	@Override
 	public void updateUserProfile(String userProfileJson)
 			throws RestServiceException {
 		try {
 			Synapse synapseClient = createSynapseClient();
-			synapseClient.putEntity("/userProfile", new JSONObject(userProfileJson));			
+			JSONObject userProfileJSONObject = new JSONObject(userProfileJson);
+			synapseClient.putEntity("/userProfile", userProfileJSONObject);			
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONException e) {
@@ -721,6 +735,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			PaginatedResults<UserGroup> userGroups = synapseClient.getGroups(GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
 			JSONObjectAdapter ugJson = userGroups.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(ugJson.toJSONString(), ugJson.getClass().getName(), null);		
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+
+	@Override
+	public String createUserProfileAttachmentPresignedUrl(String id,
+			String tokenOrPreviewId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PresignedUrl url = synapseClient.createUserProfileAttachmentPresignedUrl(id, tokenOrPreviewId);
+			return EntityFactory.createJSONStringForEntity(url);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {

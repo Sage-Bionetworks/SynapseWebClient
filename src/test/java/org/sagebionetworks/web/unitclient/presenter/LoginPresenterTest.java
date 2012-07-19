@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -23,6 +24,7 @@ public class LoginPresenterTest {
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserAccountServiceAsync;
 	GlobalApplicationState mockGlobalApplicationState;
+	NodeModelCreator mockNodeModelCreator;
 	
 	@Before
 	public void setup(){
@@ -30,7 +32,8 @@ public class LoginPresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserAccountServiceAsync = mock(UserAccountServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockUserAccountServiceAsync, mockGlobalApplicationState);
+		mockNodeModelCreator = mock(NodeModelCreator.class);
+		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockUserAccountServiceAsync, mockGlobalApplicationState, mockNodeModelCreator);
 		
 		verify(mockView).setPresenter(loginPresenter);
 	}	

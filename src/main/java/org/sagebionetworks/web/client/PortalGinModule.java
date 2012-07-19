@@ -36,10 +36,10 @@ import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
 import org.sagebionetworks.web.client.view.ProjectsHomeViewImpl;
-import org.sagebionetworks.web.client.view.PublicProfileView;
-import org.sagebionetworks.web.client.view.PublicProfileViewImpl;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.view.SearchViewImpl;
+import org.sagebionetworks.web.client.view.SettingsView;
+import org.sagebionetworks.web.client.view.SettingsViewImpl;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
 import org.sagebionetworks.web.client.view.table.ColumnFactoryImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
@@ -207,6 +207,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ProfileViewImpl.class).in(Singleton.class);
 		bind(ProfileView.class).to(ProfileViewImpl.class);		
 		
+		// SettingsView
+		bind(SettingsViewImpl.class).in(Singleton.class);
+		bind(SettingsView.class).to(SettingsViewImpl.class);	
+		
 		// CominSoonView
 		bind(ComingSoonViewImpl.class).in(Singleton.class);
 		bind(ComingSoonView.class).to(ComingSoonViewImpl.class);									
@@ -223,10 +227,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// LookupView
 		bind(LookupViewImpl.class).in(Singleton.class);
 		bind(LookupView.class).to(LookupViewImpl.class);					
-		
-		// PublicProfileView
-		bind(PublicProfileViewImpl.class).in(Singleton.class);
-		bind(PublicProfileView.class).to(PublicProfileViewImpl.class);
 		
 		// SearchView
 		bind(SearchViewImpl.class).in(Singleton.class);

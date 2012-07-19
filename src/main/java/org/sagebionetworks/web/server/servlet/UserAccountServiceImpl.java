@@ -8,6 +8,9 @@ import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;
@@ -16,7 +19,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.users.GetUser;
-import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 import org.sagebionetworks.web.shared.users.UserSession;
 import org.springframework.http.HttpEntity;
@@ -228,7 +230,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	 */
 	@Deprecated
 	@Override
-	public UserData initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws RestServiceException {
+	public String initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws RestServiceException {
 		// First make sure the service is ready to go.
 		validateService();
 		
@@ -274,18 +276,27 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			}
 		}
 		
-		UserData userData = null;		
+		String userSessionJson = null;		
 		if((response.getStatusCode() == HttpStatus.CREATED || response.getStatusCode() == HttpStatus.OK) && response.hasBody()) {
-			UserSession initSession = response.getBody();
-			String displayName = initSession.getDisplayName();
-			String sessionToken = initSession.getSessionToken();
-			String principalId = getPrincipalId(sessionToken);
-			
-			userData = new UserData(principalId, username, displayName, sessionToken, false);
+			try {
+				UserSession initSession = response.getBody();
+				//String displayName = initSession.getDisplayName();
+				String sessionToken = initSession.getSessionToken();
+				UserProfile profile = getUserProfile(sessionToken);
+				profile.setUserName(username);
+				UserSessionData userData = new UserSessionData();
+				userData.setIsSSO(false);
+				userData.setSessionToken(sessionToken);
+				userData.setProfile(profile);
+				userSessionJson = EntityFactory.createJSONStringForEntity(userData);
+			} catch (JSONObjectAdapterException e) {
+				e.printStackTrace();
+				throw new UnauthorizedException(e.getMessage());
+			}
 		} else {			
 			throw new UnauthorizedException("Unable to authenticate.");
 		}
-		return userData;		
+		return userSessionJson;			
 	}
 
 	/**
@@ -293,7 +304,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	 */
 	@Deprecated
 	@Override
-	public UserData getUser(String sessionToken) throws AuthenticationException, RestServiceException {
+	public String getUser(String sessionToken) throws AuthenticationException, RestServiceException {
 		// First make sure the service is ready to go.
 		validateService();
 		
@@ -316,15 +327,23 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw new AuthenticationException("Unable to authenticate.");
 		}
 		
-		UserData userData = null;		
+		String userSessionJson = null;
 		if((response.getStatusCode() == HttpStatus.CREATED || response.getStatusCode() == HttpStatus.OK) && response.hasBody()) {
-			GetUser getUser = response.getBody();
-			String principalId = getPrincipalId(sessionToken);
-			userData = new UserData(principalId, getUser.getEmail(), getUser.getDisplayName(), sessionToken, false);
+			try {
+				//GetUser getUser = response.getBody();
+				UserProfile profile = getUserProfile(sessionToken);
+				UserSessionData userData = new UserSessionData();
+				userData.setIsSSO(false);
+				userData.setSessionToken(sessionToken);
+				userData.setProfile(profile);
+				userSessionJson = EntityFactory.createJSONStringForEntity(userData);
+			} catch (JSONObjectAdapterException e) {
+				throw new AuthenticationException(e);
+			}
 		} else {			
 			throw new AuthenticationException("Unable to authenticate.");
 		}
-		return userData;		
+		return userSessionJson;		
 	}	
 
 	
@@ -354,9 +373,14 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		HttpMethod method = HttpMethod.POST;
 		
 		logger.info(method.toString() + ": " + url + ", JSON: " + jsonString);
-		
-		// Make the actual call.
-		ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
+		ResponseEntity<String> response;
+		try {
+			response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
+		} catch (RestClientException ex) {
+			if (ex.getMessage().toLowerCase().contains("no content-type found"))
+				return;
+			else throw ex;
+		}
 
 		if (response.getStatusCode() != HttpStatus.CREATED && response.getStatusCode() != HttpStatus.OK) {
 			if(response.getStatusCode() == HttpStatus.BAD_REQUEST) {
@@ -593,7 +617,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		return synapseClient;
 	}
 
-	private String getPrincipalId(String sessionToken) throws RestServiceException {
+	private UserProfile getUserProfile(String sessionToken) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient(sessionToken);
 		UserProfile userProfile;
 		try {
@@ -601,8 +625,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		} catch (SynapseException e) {
 			throw new RestServiceException(e.getMessage());
 		}
-		String principalId = userProfile.getOwnerId();
-		return principalId;
+		return userProfile;
 	}
 
 
