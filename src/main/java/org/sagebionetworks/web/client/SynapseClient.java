@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
@@ -113,6 +114,15 @@ public interface SynapseClient extends RemoteService {
 
 	public String createUserProfileAttachmentPresignedUrl(String id,
 			String tokenOrPreviewId) throws RestServiceException;
+
+	EntityWrapper createAccessRequirement(EntityWrapper arEW)
+			throws RestServiceException;
+
+	AccessRequirementsTransport getUnmetAccessRequirements(String entityId)
+			throws RestServiceException;
+
+	EntityWrapper createAccessApproval(EntityWrapper aaEW)
+			throws RestServiceException;
 	
 	
 }

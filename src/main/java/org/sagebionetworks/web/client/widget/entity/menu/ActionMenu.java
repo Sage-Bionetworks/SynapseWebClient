@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.menu;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -101,6 +102,45 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	@SuppressWarnings("unchecked")
 	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
+	}
+
+	@Override
+	public void moveEntity(String newParentId) {
+		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
+		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
+		
+		entityBundle.getEntity().setParentId(newParentId);		
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		try {
+			entityBundle.getEntity().writeToJSONObject(adapter);
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
+		}
+		
+		// update the entity
+		synapseClient.createOrUpdateEntity(adapter.toJSONString(), null, false, new AsyncCallback<String>() {			
+			@Override
+			public void onSuccess(String result) {				
+				view.showInfo(entityTypeDisplay + " Moved", "The " + entityTypeDisplay + " was successfully moved."); 
+				// Reload this entity
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(entityBundle.getEntity().getId()));
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(caught instanceof BadRequestException) {
+					view.showErrorMessage(DisplayConstants.ERROR_CANT_MOVE_HERE);
+					return;
+				}
+				if(caught instanceof NotFoundException) {
+					view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
+					return;
+				}
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_MOVE_FAILURE);			
+				}
+			}
+		});
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.licenseddownloader;
 
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -13,8 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -24,6 +27,8 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -33,10 +38,17 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.JSONEntityFactory;
+import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
+import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -62,6 +74,7 @@ public class LicensedDownloaderTest {
 	Entity parentEntity;
 	UserSessionData user1;
 	LicenseAgreement licenseAgreement;
+	AccessRequirement accessRequirement;
 	List<LocationData> locations;	
 	EntityPath entityPath;
 	EntityWrapper StudyEntityWrapper;
@@ -86,9 +99,12 @@ public class LicensedDownloaderTest {
 		AsyncMockStubber.callSuccessWith(registryJson).when(mockSynapseClient).getEntityTypeRegistryJSON(any(AsyncCallback.class));
 		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
 
+		AdapterFactory adapterFactory = new AdapterFactoryImpl();
+		JSONEntityFactory factory = new JSONEntityFactoryImpl(adapterFactory);
+		NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(factory, adapterFactory.createNew());
 		
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
-				jsonObjectAdapterProvider);
+				jsonObjectAdapterProvider, mockSynapseClient, nodeModelCreator);
 		
 		verify(mockView).setPresenter(licensedDownloader);
 		
@@ -141,6 +157,8 @@ public class LicensedDownloaderTest {
 		
 		licenseAgreement = new LicenseAgreement();		
 		licenseAgreement.setLicenseHtml("some agreement");
+		
+		accessRequirement = new TermsOfUseAccessRequirement();
 
 		// create a DownloadLocation model for this test
 		LocationData downloadLocation = new LocationData();				
@@ -162,13 +180,13 @@ public class LicensedDownloaderTest {
 				
 		// null model
 		resetMocks();
-		licensedDownloader.loadDownloadLocations(null, null);
+		licensedDownloader.loadDownloadLocations(null);
 		
 		// Null locations
 		resetMocks();			
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		((Locationable)entity).setLocations(null);		
-		licensedDownloader.loadDownloadLocations(entity, false);
+		licensedDownloader.loadDownloadLocations(entity);
 		verify(mockView).showDownloadsLoading();
 		verify(mockView).setNoDownloads();	
 
@@ -176,7 +194,7 @@ public class LicensedDownloaderTest {
 		resetMocks();
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false); // not logged in
 		entity.setLocations(locations);
-		licensedDownloader.loadDownloadLocations(entity, true);
+		licensedDownloader.loadDownloadLocations(entity);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setNeedToLogIn();
 
@@ -184,7 +202,7 @@ public class LicensedDownloaderTest {
 		resetMocks();			
 		entity.setLocations(locations);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		licensedDownloader.loadDownloadLocations(entity, true);
+		licensedDownloader.loadDownloadLocations(entity);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setDownloadLocations(locations, entity.getMd5());
 	}
@@ -199,7 +217,7 @@ public class LicensedDownloaderTest {
 	@Test 
 	public void testSetLicenseAgreement() {		
 		// test license only
-		licensedDownloader.setLicenseAgreement(licenseAgreement);				
+		licensedDownloader.setLicenseAgreement(licenseAgreement, accessRequirement);				
 		verify(mockView).setLicenseHtml(licenseAgreement.getLicenseHtml());
 		
 		reset(mockView);
@@ -207,7 +225,7 @@ public class LicensedDownloaderTest {
 		// test license and citation
 		String citationHtml = "citation";
 		licenseAgreement.setCitationHtml(citationHtml);
-		licensedDownloader.setLicenseAgreement(licenseAgreement);
+		licensedDownloader.setLicenseAgreement(licenseAgreement, accessRequirement);
 		verify(mockView).setCitationHtml(citationHtml);
 		verify(mockView).setLicenseHtml(licenseAgreement.getLicenseHtml());		
 	}
@@ -216,20 +234,21 @@ public class LicensedDownloaderTest {
 	@Test
 	public void testSetLicenseAccepted() {
 		// without callback
-		licensedDownloader.setLicenseAcceptedCallback(null);
 
+		licensedDownloader.setLicenseAgreement(licenseAgreement, accessRequirement);
 		licensedDownloader.setLicenseAccepted();		
-		verify(mockView).setLicenceAcceptanceRequired(false);
+		verify(mockView).setApprovalRequired(APPROVAL_REQUIRED.LICENSE_ACCEPTANCE);
 
-		
 		// with callback
 		resetMocks();		
-		AsyncCallback<Void> callback = mock(AsyncCallback.class);
-		licensedDownloader.setLicenseAcceptedCallback(callback);
-
+	
 		licensedDownloader.setLicenseAccepted();		
-		verify(callback).onSuccess(null);
-		verify(mockView).setLicenceAcceptanceRequired(false);
+		
+		AccessRequirementsTransport result = new AccessRequirementsTransport();
+		// TODO populate result so that the following can be tested
+		//licensedDownloader.unmetAccessRequirementsCallback(result, null);
+		// verify(mockView).setApprovalRequired(APPROVAL_REQUIRED.NONE);
+		
 	}
 	
 	/*

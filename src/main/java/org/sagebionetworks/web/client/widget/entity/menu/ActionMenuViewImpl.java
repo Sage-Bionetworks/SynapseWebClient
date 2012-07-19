@@ -93,7 +93,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			boolean canEdit) {			
 		int height = 25;
 		if(downloadButton == null){
-			downloadButton = licensedDownloader.asWidget(entity, false);
+			downloadButton = licensedDownloader.asWidget(entity);
 			downloadButton.setHeight("25px");
 			add(downloadButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));	
@@ -106,7 +106,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				dlButton.disable(); 
 		}
 		// Configure the button
-		licensedDownloader.configureHeadless(entity, false);
+		licensedDownloader.configureHeadless(entity);
 
 
 		// edit button
@@ -336,9 +336,51 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private int addIsAdministratorToolMenuItems(Menu menu, Entity entity, EntityType entityType) {
 		int numAdded = 0;
 		final String typeDisplay = typeProvider.getEntityDispalyName(entityType);
-		MenuItem item = new MenuItem(DisplayConstants.LABEL_DELETE + " " + typeDisplay);
-		item.setIcon(AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
-		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+		
+		// Move entity
+		MenuItem itemMove = new MenuItem(DisplayConstants.LABEL_MOVE + " " + typeDisplay);
+		itemMove.setIcon(AbstractImagePrototype.create(iconsImageBundle.moveButton16()));		
+		itemMove.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {				
+				final Window window = new Window();  
+
+				EntityTreeBrowser tree = myEntitiesBrowser.getEntityTreeBrowser();
+				tree.setMakeLinks(false);
+				tree.setShowContextMenu(false);
+				myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
+					@Override
+					public void onSelection(String selectedEntityId) {
+						presenter.moveEntity(selectedEntityId);
+						window.hide();
+					}
+				});
+				
+				window.setSize(483, 329);
+				window.setPlain(true);
+				window.setModal(true);
+				window.setBlinkModal(true);
+				window.setHeading(DisplayConstants.LABEL_MOVE + " " + typeDisplay);
+				window.setLayout(new FitLayout());
+				window.add(myEntitiesBrowser.asWidget(), new FitData(4)); 				
+				window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						window.hide();
+					}
+				}));
+				window.setButtonAlign(HorizontalAlignment.CENTER);
+				window.show();
+
+			}
+		});
+		menu.add(itemMove);
+		numAdded++;	
+		
+		// Delete entity
+		MenuItem itemDelete = new MenuItem(DisplayConstants.LABEL_DELETE + " " + typeDisplay);
+		itemDelete.setIcon(AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
+		itemDelete.addSelectionListener(new SelectionListener<MenuEvent>() {
 			public void componentSelected(MenuEvent menuEvent) {
 				MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay +"?", new Listener<MessageBoxEvent>() {					
 					@Override
@@ -351,8 +393,8 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				});
 			}
 		});
-		menu.add(item);		
-		numAdded++;
+		menu.add(itemDelete);		
+		numAdded++;	
 		
 		return numAdded;
 	}

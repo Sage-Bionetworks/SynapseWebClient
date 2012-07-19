@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -210,6 +211,10 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			if(response.getBody().equals("")) {
 				return;
 			}
+		} catch (RestClientException ex) {
+			if (ex.getMessage().toLowerCase().contains("no content-type found"))
+				return;
+			else throw ex;
 		} catch (UnexpectedException ex) {
 			return;
 		} catch (NullPointerException nex) {
@@ -278,6 +283,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 				//String displayName = initSession.getDisplayName();
 				String sessionToken = initSession.getSessionToken();
 				UserProfile profile = getUserProfile(sessionToken);
+				profile.setUserName(username);
 				UserSessionData userData = new UserSessionData();
 				userData.setIsSSO(false);
 				userData.setSessionToken(sessionToken);
@@ -290,7 +296,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		} else {			
 			throw new UnauthorizedException("Unable to authenticate.");
 		}
-		return userSessionJson;		
+		return userSessionJson;			
 	}
 
 	/**

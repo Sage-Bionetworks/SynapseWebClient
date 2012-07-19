@@ -166,7 +166,9 @@ public class DisplayConstants {
 	public static final String BUTTON_DOWNLOAD = "Download";
 	public static final String LABEL_DELETE = "Delete";
 	public static final String LABEL_CREATE = "Create";
+	public static final String LABEL_MOVE = "Move";
 	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. Please try again.";
+	public static final String ERROR_ENTITY_MOVE_FAILURE = "Move failed. Please try again.";
 	public static final String PROMPT_SURE_DELETE = "Are you sure you want to delete this";
 	public static final String LABEL_NO_PREVIEW_DATA = "A Preview has not been created.";
 	public static final String LABEL_CONTAINS_NO_CHILDREN = "This object contains no children.";
@@ -207,7 +209,8 @@ public class DisplayConstants {
 	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
-	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you can not save a Link to the requested spot.";
+	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you cannot save a Link to the requested spot.";
+	public static final String ERROR_CANT_MOVE_HERE = "Sorry, you cannot move this item to the requested spot.";
 	public static final String TEXT_RIGHT_CLICK_FOR_CONTEXT_MENU = "Right click on an item in the list to Edit or Delete.";
 	public static final String ERROR_USER_PROFILE_SAVE = "An error occurred saving to your user profile.";
 	public static final String LABEL_UPDATED = "Upated";
