@@ -41,7 +41,7 @@ public	class ProfilePanel extends FormPanel {
 	  
 	    TextField<String> title = new TextField<String>(); 
 	    profilePanel.setTitle(title);
-	    title.setFieldLabel("Tile");  
+	    title.setFieldLabel("Title");  
 	    title.setAllowBlank(true);  
         if (null!=profile.getTitle()) title.setValue(profile.getTitle());
         profilePanel.add(title, formData);  
@@ -59,13 +59,6 @@ public	class ProfilePanel extends FormPanel {
 	    lastName.setAllowBlank(false);  
 	    if (null!=profile.getLname()) lastName.setValue(profile.getLname());
 	    profilePanel.add(lastName, formData);  
-	  
-	    TextField<String> team = new TextField<String>(); 
-	    profilePanel.setTeam(team);
-	    team.setFieldLabel("Team Affiliation (if any)");  
-	    team.setAllowBlank(true);  
-        if (null!=profile.getTeam()) team.setValue(profile.getTeam());
-        profilePanel.add(team, formData);
 	  
 	    TextField<String> lab = new TextField<String>(); 
 	    profilePanel.setLab(lab);
@@ -97,6 +90,13 @@ public	class ProfilePanel extends FormPanel {
 	    if (null!=profile.getEmail()) phone.setValue(profile.getPhone());
         profilePanel.add(phone, formData);  
         
+	    TextField<String> team = new TextField<String>(); 
+	    profilePanel.setTeam(team);
+	    team.setFieldLabel("Team you wish to create or join (optional)");  
+	    team.setAllowBlank(true);  
+        if (null!=profile.getTeam()) team.setValue(profile.getTeam());
+        profilePanel.add(team, formData);
+	  
         profilePanel.add(new Label(""), formData); // a blank row
         
         Label bridgeLabel = new Label("Please check the box below if you would like to have your name and team affiliation "+
