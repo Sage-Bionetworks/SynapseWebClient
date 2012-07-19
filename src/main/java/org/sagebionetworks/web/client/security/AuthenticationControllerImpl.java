@@ -1,36 +1,45 @@
 package org.sagebionetworks.web.client.security;
 
+import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.shared.users.UserData;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.extjs.gxt.ui.client.widget.Info;
-import com.extjs.gxt.ui.client.widget.MessageBox;
-import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	private static String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
-	private static UserData currentUser;
+	private static UserSessionData currentUser;
 	
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;
+	private NodeModelCreator nodeModelCreator;
 
 	@Inject
-	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService){
+	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, NodeModelCreator nodeModelCreator){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
+		this.nodeModelCreator = nodeModelCreator;
 	}
 
 	@Override
 	public boolean isLoggedIn() {
 		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
 		if(loginCookieString != null) {
-			currentUser = UserData.getInstanceFromCookie(loginCookieString);
+			try {
+				currentUser = nodeModelCreator.createEntity(loginCookieString, UserSessionData.class);
+			} catch (Throwable e) {
+				//invalid user
+				e.printStackTrace();
+			}
 			if(currentUser != null)
 				return true;
 		} 
@@ -38,17 +47,23 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	@Override
-	public void loginUser(final String username, String password, boolean explicitlyAcceptsTermsOfUse, final AsyncCallback<UserData> callback) {
+	public void loginUser(final String username, String password, boolean explicitlyAcceptsTermsOfUse, final AsyncCallback<String> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));		
-		userAccountService.initiateSession(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<UserData>() {		
+		userAccountService.initiateSession(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<String>() {		
 			@Override
-			public void onSuccess(UserData userData) {				
-				String cookie = userData.getCookieString();
-				cookies.setCookie(CookieKeys.USER_LOGIN_DATA, cookie);
-				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userData.getToken());
+			public void onSuccess(String userSessionJson) {
+				UserSessionData userSessionData = null;
+				try {
+					cookies.setCookie(CookieKeys.USER_LOGIN_DATA, userSessionJson);
+					userSessionData = nodeModelCreator.createEntity(userSessionJson, UserSessionData.class);
+					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken());
+				} catch (RestServiceException e) {
+					//can't save the cookie
+					e.printStackTrace();
+				}
 				
-				AuthenticationControllerImpl.currentUser = userData;
-				callback.onSuccess(userData);
+				AuthenticationControllerImpl.currentUser = userSessionData;
+				callback.onSuccess(userSessionJson);
 			}
 			
 			@Override
@@ -59,19 +74,21 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	@Override
-	public void loginUser(final String token, final AsyncCallback<UserData> callback) {
+	public void loginUser(final String token, final AsyncCallback<String> callback) {
 		setUser(token, callback, false);
 	}
 	
 	@Override
-	public void loginUserSSO(final String token, final AsyncCallback<UserData> callback) {
+	public void loginUserSSO(final String token, final AsyncCallback<String> callback) {
 		setUser(token, callback, true);
 	}
 
 	@Override
-	public UserData getLoggedInUser() {
-		isLoggedIn(); // make sure we've read the cookie
-		return currentUser;
+	public UserSessionData getLoggedInUser() {
+		if (isLoggedIn()) {
+			return currentUser;
+		}
+		else return null;
 	}
 
 	@Override
@@ -101,19 +118,29 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	/*
 	 * Private Methods
 	 */
-	private void setUser(String token, final AsyncCallback<UserData> callback, final boolean isSSO) {
+	private void setUser(String token, final AsyncCallback<String> callback, final boolean isSSO) {
 		if(token == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
-		userAccountService.getUser(token, new AsyncCallback<UserData>() {
+		userAccountService.getUser(token, new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(UserData userData) {
-				if(userData != null) {
-					userData.setSSO(isSSO);
-					String cookie = userData.getCookieString();
-					cookies.setCookie(CookieKeys.USER_LOGIN_DATA, cookie);
-					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userData.getToken());
+			public void onSuccess(String userSessionJson) {
+				if (userSessionJson != null) {
+					String updatedSessionJson = userSessionJson;
+					UserSessionData userSessionData = null;
+					try {
+						userSessionData = nodeModelCreator.createEntity(userSessionJson, UserSessionData.class);
+						userSessionData.setIsSSO(isSSO);
+						JSONObjectAdapter adapter = userSessionData.writeToJSONObject(JSONObjectGwt.createNewAdapter());
+						updatedSessionJson = adapter.toJSONString();
+						cookies.setCookie(CookieKeys.USER_LOGIN_DATA, updatedSessionJson);
+						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken());
+					} catch (JSONObjectAdapterException e){
+						callback.onFailure(e);
+					} catch( RestServiceException e){
+						callback.onFailure(e);
+					}
 					
-					AuthenticationControllerImpl.currentUser = userData;
-					callback.onSuccess(userData);
+					AuthenticationControllerImpl.currentUser = userSessionData;
+					callback.onSuccess(updatedSessionJson);
 				} else {
 					callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 				}

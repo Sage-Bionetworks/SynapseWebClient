@@ -25,6 +25,8 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -50,7 +52,6 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.UserData;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
 
@@ -71,7 +72,7 @@ public class LicensedDownloaderTest {
 	EntityTypeProvider entityTypeProvider;
 	Locationable entity;
 	Entity parentEntity;
-	UserData user1;
+	UserSessionData user1;
 	LicenseAgreement licenseAgreement;
 	AccessRequirement accessRequirement;
 	List<LocationData> locations;	
@@ -145,7 +146,14 @@ public class LicensedDownloaderTest {
 		entityPath.setPath(path);
 		
 		// User
-		user1 = new UserData("1", "email@email.com", "Username", "token", false);
+		user1 = new UserSessionData();
+		UserProfile profile = new UserProfile();
+		profile.setDisplayName("Display Name");
+		profile.setOwnerId("1");
+		profile.setUserName("email@email.com");
+		user1.setProfile(profile);
+		user1.setSessionToken("token");
+		user1.setIsSSO(false);
 		
 		licenseAgreement = new LicenseAgreement();		
 		licenseAgreement.setLicenseHtml("some agreement");

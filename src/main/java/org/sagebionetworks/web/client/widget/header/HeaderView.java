@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.header;
 
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
-import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -29,7 +29,7 @@ public interface HeaderView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		UserData getUser();
+		UserSessionData getUser();
 
 		void lookupId(String synapseId);
 	}

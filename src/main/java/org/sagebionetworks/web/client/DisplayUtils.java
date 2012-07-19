@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javax.swing.plaf.synth.SynthGraphicsUtils;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
@@ -29,6 +26,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -47,7 +45,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.sagebionetworks.web.shared.users.UserData;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
@@ -57,7 +54,6 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -67,13 +63,10 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
@@ -101,6 +94,7 @@ public class DisplayUtils {
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
+	public static final String USER_PROFILE_PARAM_KEY = "userId";
 	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
 	public static final String WAIT_FOR_URL = "waitForUrl";
 	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "createdByPrincipalId";
@@ -251,7 +245,7 @@ public class DisplayUtils {
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
-	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, UserData currentUser) {
+	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, UserSessionData currentUser) {
 		if(ex instanceof UnauthorizedException) {
 			// send user to login page						
 			Info.display("Session Timeout", "Your session has timed out. Please login again.");
@@ -646,15 +640,41 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createAttachmentUrl(String baseURl, String entityId, String tokenId, String fileName){
+		return createAttachmentUrl(baseURl, entityId, tokenId, fileName, DisplayUtils.ENTITY_PARAM_KEY);
+	}
+	
+
+	/**
+	 * Create the url to a profile attachment image.
+	 * @param baseURl
+	 * @param userId
+	 * @param tokenId
+	 * @param fileName
+	 * @return
+	 */
+	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String tokenId, String fileName){
+		return createAttachmentUrl(baseURl, userId, tokenId, fileName, DisplayUtils.USER_PROFILE_PARAM_KEY);
+	}
+	
+	/**
+	 * Create the url to an attachment image.
+	 * @param baseURl
+	 * @param id
+	 * @param tokenId
+	 * @param fileName
+	 * @return
+	 */
+	public static String createAttachmentUrl(String baseURl, String id, String tokenId, String fileName, String paramKey){
 		StringBuilder builder = new StringBuilder();
 		builder.append(baseURl);
-		builder.append("?"+DisplayUtils.ENTITY_PARAM_KEY+"=");
-		builder.append(entityId);
+		builder.append("?"+paramKey+"=");
+		builder.append(id);
 		builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
 		builder.append("&"+DisplayUtils.WAIT_FOR_URL+"=true");
 		return builder.toString();
 	}
+	
 	
 	/**
 	 * Does this entity have attachment previews?

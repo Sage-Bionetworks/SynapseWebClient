@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -25,7 +26,6 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -99,8 +99,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public void loadUserUpdateable() {
 		if(!authenticationController.isLoggedIn()) return;		
-		UserData user = authenticationController.getLoggedInUser();		
-		SearchQuery query = createUpdateQuery(user.getPrincipalId());
+		UserSessionData user = authenticationController.getLoggedInUser(); 
+		SearchQuery query = createUpdateQuery(user.getProfile().getOwnerId());
 		
 		view.showLoading();
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
@@ -182,7 +182,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		if(authenticationController.isLoggedIn()) {
 			view.showLoading();
 			List<WhereCondition> where = new ArrayList<WhereCondition>();
-			where.add(new WhereCondition(DisplayUtils.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, authenticationController.getLoggedInUser().getPrincipalId()));
+			UserSessionData userSessionData = authenticationController.getLoggedInUser();
+			where.add(new WhereCondition(DisplayUtils.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, userSessionData.getProfile().getOwnerId()));
 			searchService.searchEntities("project", where, 1, 1000, null, false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {

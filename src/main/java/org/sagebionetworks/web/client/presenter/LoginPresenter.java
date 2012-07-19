@@ -1,16 +1,17 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.ServiceConstants;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
-import org.sagebionetworks.web.shared.users.UserData;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -30,14 +31,15 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
+	private NodeModelCreator nodeModelCreator;
 	
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState){
+	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator){
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
-
+		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	} 
 
@@ -92,10 +94,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private void showView(final LoginPlace place) {
 		String token = place.toToken();
 		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {
-			UserData currentUser = authenticationController.getLoggedInUser();
+			UserSessionData currentUser = authenticationController.getLoggedInUser(); 
 			boolean isSso = false;
 			if(currentUser != null)
-				isSso = currentUser.isSSO();
+				isSso = currentUser.getIsSSO();
 			authenticationController.logoutUser();
 			view.showLogout(isSso);
 		} else if (token!=null && ServiceConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN.equals(token)) {
@@ -121,9 +123,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			view.showLoggingInLoader();
 			if(token != null) {
 				String sessionToken = token;	
-				authenticationController.loginUserSSO(sessionToken, new AsyncCallback<UserData>() {	
+				authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {	
 					@Override
-					public void onSuccess(UserData result) {
+					public void onSuccess(String result) {
 						view.hideLoggingInLoader();
 						// user is logged in. forward to destination						
 						forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
@@ -153,12 +155,13 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			} 
 		} else {
 			// standard view
+			authenticationController.logoutUser();
 			view.showLogin(openIdActionUrl, openIdReturnUrl);
 		}
 	}
 	
 	@Override
-	public void setNewUser(UserData newUser) {	
+	public void setNewUser(UserSessionData newUser) {	
 		// Allow the user to proceed.		
 		forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());		
 	}

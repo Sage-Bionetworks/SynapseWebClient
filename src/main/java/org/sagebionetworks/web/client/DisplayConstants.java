@@ -118,7 +118,7 @@ public class DisplayConstants {
 	public static final String BUTTON_SAVING = "Saving";
 	public static final String BUTTON_CHANGE_PASSWORD = "Change Password";
 	public static final String BUTTON_UPDATE_WITH_LINKED_IN = "Update With LinkedIn";
-	public static final String BUTTON_CHANGE_USER_INFO = "Change Your Profile";
+	public static final String BUTTON_CHANGE_USER_INFO = "Update";
 	public static final String LABEL_SINGLE_SIGN_ON_LOGGING_IN = "Logging you in.";
 	public static final String LABEL_SEARCHING = "Searching...";
 	public static final String LABEL_FOUND_FORWARDING = "Found. Forwarding now.";
@@ -189,6 +189,7 @@ public class DisplayConstants {
 	public static final String LABEL_TO_EXTERNAL = "Link External Location";
 	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
 	public static final String TEXT_ATTACHMENT_SUCCESS = "Attachment Uploaded to Synapse";
+	public static final String TEXT_PROFILE_PICTURE_SUCCESS = "Profile Photo Uploaded to Synapse";
 	public static final String ERROR_UPLOAD = "An error occured during upload. Please try again.";
 	public static final String LABEL_UPLOADING = "Uploading...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
@@ -218,6 +219,7 @@ public class DisplayConstants {
 	public static final String ERROR_DELETING_ATTACHMENT = "An error occurred deleting the Attachment. Please try again.";
 	public static final String LABEL_DELETED = "deleted";
 	public static final String ERRROR_ATTACHMENT_FAILED = "Failed to upload attachment: ";
+	public static final String ERROR_PROFILE_PICTURE_FAILED = "Failed to upload photo: ";
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
 	public static final String ERROR_FAILURE_PRIVLEDGES = "Sorry, you do not have sufficient privileges for access.";
 	public static final String TITLE_UNAUTHORIZED = "Unauthorized";
