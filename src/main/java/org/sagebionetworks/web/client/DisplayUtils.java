@@ -67,6 +67,9 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
@@ -514,6 +517,25 @@ public class DisplayUtils {
 		window.add(new Html(shb.toSafeHtml().asString()), new MarginData(20, 0, 0, 45));		
 		window.setBodyStyleName("whiteBackground");
 		return window;
+	}
+	
+	/**
+	 * Create a loading panel with a centered spinner.
+	 * 
+	 * @param sageImageBundle
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public static HorizontalPanel createLoadingPanel(SageImageBundle sageImageBundle) {
+		HorizontalPanel hp = new HorizontalPanel();
+		hp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		hp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		hp.setPixelSize(940, 500);
+		Widget w = new HTML(SafeHtmlUtils.fromSafeConstant(
+				DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " Loading..."));	
+		hp.add(w);
+		return hp;
 	}
 	
 	public static ImageResource getSynapseIconForEntityClassName(String className, IconSize iconSize, IconsImageBundle iconsImageBundle) {
