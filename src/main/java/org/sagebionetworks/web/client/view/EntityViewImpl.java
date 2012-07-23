@@ -85,7 +85,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@Override
 	public void showLoading() {
 		if (loadingPanel == null)
-			loadingPanel = DisplayUtils.createLoadingPanel(sageImageBundle);
+			loadingPanel = DisplayUtils.createFullWidthLoadingPanel(sageImageBundle);
 		entityPageTopPanel.setWidget(loadingPanel);
 	}
 
