@@ -9,13 +9,11 @@ import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -23,6 +21,7 @@ import com.google.inject.Inject;
 public class EntityViewImpl extends Composite implements EntityView {
 	
 	private SageImageBundle sageImageBundle;
+	private HorizontalPanel loadingPanel;
 
 	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {}
 
@@ -33,7 +32,6 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@UiField
 	SimplePanel entityPageTopPanel;
 		
-	@SuppressWarnings("unused")
 	private Presenter presenter;
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
@@ -86,10 +84,9 @@ public class EntityViewImpl extends Composite implements EntityView {
 
 	@Override
 	public void showLoading() {
-		Element e = entityPageTopPanel.getWidget().getElement();
-		
-		entityPageTopPanel.setWidget(new HTML(SafeHtmlUtils.fromSafeConstant(
-				DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " Loading...")));
+		if (loadingPanel == null)
+			loadingPanel = DisplayUtils.createLoadingPanel(sageImageBundle);
+		entityPageTopPanel.setWidget(loadingPanel);
 	}
 
 	@Override
