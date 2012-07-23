@@ -106,6 +106,9 @@ public class DisplayUtils {
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
 	public static final String ETAG_KEY = "etag";
 	
+	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
+	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
+	
 	/**
 	 * Sometimes we are forced to use a table to center an image in a fixed space. 
 	 * This is the third option from: http://stackoverflow.com/questions/388180/how-to-make-an-image-center-vertically-horizontally-inside-a-bigger-div
@@ -527,11 +530,11 @@ public class DisplayUtils {
 	 * @param height
 	 * @return
 	 */
-	public static HorizontalPanel createLoadingPanel(SageImageBundle sageImageBundle) {
+	public static HorizontalPanel createFullWidthLoadingPanel(SageImageBundle sageImageBundle) {
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		hp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		hp.setPixelSize(940, 500);
+		hp.setPixelSize(FULL_ENTITY_PAGE_WIDTH, FULL_ENTITY_PAGE_HEIGHT);
 		Widget w = new HTML(SafeHtmlUtils.fromSafeConstant(
 				DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " Loading..."));	
 		hp.add(w);
