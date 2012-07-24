@@ -42,6 +42,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private IconsImageBundle iconsImageBundle;
 	
 	private EntityBundle bundle;
+	private boolean readOnly;
 	private String entityTypeDisplay; 
 	private HandlerManager handlerManager = new HandlerManager(this);
 	private String rStudioUrl;
@@ -75,8 +76,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      * 
      * @param bundle
      */
-    public void setBundle(EntityBundle bundle) {
+    public void setBundle(EntityBundle bundle, boolean readOnly) {
     	this.bundle = bundle;
+    	this.readOnly = readOnly;
 //    	if(bundle != null){
 //    		// get current user profile
 //    		synapseClient.getUserProfile(new AsyncCallback<String>() {
@@ -245,7 +247,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private void sendDetailsToView(boolean isAdmin, boolean canEdit) {
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		view.setEntityBundle(bundle, entityTypeDisplay, isAdmin, canEdit);
+		view.setEntityBundle(bundle, entityTypeDisplay, isAdmin, canEdit, readOnly);
 	}
 
 }

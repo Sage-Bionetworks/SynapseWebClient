@@ -16,8 +16,11 @@
 					</div>
 				</div>
 
-				<div class="span-17 left"><g:SimplePanel ui:field="colLeftPanel" /></div>
-				<div class="span-7 right last" style="float:right; !important"><g:SimplePanel ui:field="colRightPanel" /></div>				
+				<div class="span-24">
+					<div class="span-17 notopmargin left"><g:SimplePanel ui:field="colLeftPanel" /></div>
+					<div class="span-7 notopmargin right last" style="float:right; !important"><g:SimplePanel ui:field="colRightPanel" /></div>
+					<div class="span-24 notopmargin left last"><g:SimplePanel ui:field="fullWidthPanel" /></div>
+				</div>								
 	</g:HTMLPanel>
 </ui:UiBinder>
 

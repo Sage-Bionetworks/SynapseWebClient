@@ -74,13 +74,13 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(Entity entity, boolean canEdit) {		
+	public Widget asWidget(Entity entity) {		
 		view.setPresenter(this);
 		this.entity = entity; 		
 		
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entity);
-		view.createBrowser(entity, entityType, canEdit);
+		view.createBrowser(entity, entityType);
 		 
 		// load preview if has previews
 //		if(entity instanceof HasPreviews) {

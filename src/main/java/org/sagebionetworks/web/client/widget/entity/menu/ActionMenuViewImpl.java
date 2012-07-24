@@ -60,6 +60,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private LicensedDownloader licensedDownloader;
 	private Widget downloadButton = null;
 	private EntityTypeProvider typeProvider;
+	private boolean readOnly;
 
 	
 	private Button editButton;
@@ -90,8 +91,9 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 
 	@Override
 	public void createMenu(Entity entity, EntityType entityType, boolean isAdministrator,
-			boolean canEdit) {			
-		int height = 25;
+			boolean canEdit, boolean readOnly) {
+		this.readOnly = readOnly;
+		
 		if(downloadButton == null){
 			downloadButton = licensedDownloader.asWidget(entity);
 			downloadButton.setHeight("25px");
@@ -116,7 +118,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			this.add(editButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
 		}				
-		if (canEdit) editButton.enable();
+		if (canEdit && !readOnly) editButton.enable();
 		else editButton.disable();
 		configureEditButton(entity, entityType);	
 		
@@ -127,7 +129,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			this.add(shareButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
-		if (isAdministrator) shareButton.enable();
+		if (isAdministrator && !readOnly) shareButton.enable();
 		else shareButton.disable();
 		configureShareButton(entity);		
 
@@ -138,7 +140,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			this.add(addButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
-		if (canEdit) addButton.enable();
+		if (canEdit && !readOnly) addButton.enable();
 		else addButton.disable();
 		configureAddMenu(entity, entityType);
 
@@ -179,7 +181,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		if(editButton != null) editButton.removeAllListeners();
 		if(shareButton != null) shareButton.removeAllListeners();	
 	}
-
+	
 	/*
 	 * Private Methods
 	 */
@@ -259,12 +261,14 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		return item;
 	}
 	
-	private void configureToolsMenu(Entity entity, EntityType entityType, boolean isAdministrator, boolean canEdit) {				
+	private void configureToolsMenu(Entity entity, EntityType entityType, boolean isAdministrator, boolean canEdit) {
+		toolsButton.enable();
+		
 		// create drop down menu
 		Menu menu = new Menu();
 		int numAdded = 0;
 		// add restricted items to the Tools menu
-		if(canEdit) {
+		if(canEdit && !readOnly) {
 			numAdded += addCanEditToolMenuItems(menu, entity, entityType);
 		}
 		// add tools for logged in users		
@@ -272,7 +276,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			numAdded += addAuthenticatedToolMenuItems(menu, entity, entityType);
 		}
 
-		if(isAdministrator) {
+		if(isAdministrator && !readOnly) {
 			numAdded += addIsAdministratorToolMenuItems(menu, entity, entityType);
 		}
 

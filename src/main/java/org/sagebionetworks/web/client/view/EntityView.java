@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.model.EntityBundle;
 
@@ -24,10 +23,11 @@ public interface EntityView extends IsWidget, SynapseView {
 
 	/**
 	 * Set entity to display
+	 * @param readOnly 
 	 * @param entity
 	 * @param entityMetadata 
 	 */
-	public void setEntityBundle(EntityBundle bundle);
+	public void setEntityBundle(EntityBundle bundle, boolean readOnly);
 
 	
 }

@@ -20,7 +20,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void setEntityBundle(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit);
+	public void setEntityBundle(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly);
 	
 	/**
 	 * Sets the RStudio URL for the view
@@ -54,5 +54,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		ImageResource getIconForType(String typeString);
 
 	}
+
 
 }

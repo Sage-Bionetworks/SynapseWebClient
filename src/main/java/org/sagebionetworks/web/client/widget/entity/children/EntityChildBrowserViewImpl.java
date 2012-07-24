@@ -107,8 +107,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 	}
 
 	@Override
-	public void createBrowser(final Entity entity, EntityType entityType,
-			boolean canEdit) {
+	public void createBrowser(final Entity entity, EntityType entityType) {
 		if(lc != null && tabPanel != null) {
 			// out with the old
 			this.remove(lc);

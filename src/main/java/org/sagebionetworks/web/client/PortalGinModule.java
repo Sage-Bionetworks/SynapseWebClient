@@ -64,9 +64,13 @@ import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
+import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
+import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
@@ -348,6 +352,11 @@ public class PortalGinModule extends AbstractGinModule {
 		// Attachments		
 		bind(AttachmentsView.class).to(AttachmentsViewImpl.class);
 
+		// SnapshotWidget		
+		bind(SnapshotWidgetView.class).to(SnapshotWidgetViewImpl.class);
+
+		// SnapshotWidget		
+		bind(EntitySearchBoxView.class).to(EntitySearchBoxViewImpl.class);
 	}
 
 }

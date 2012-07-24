@@ -112,7 +112,8 @@ public class DisplayConstants {
 	
 	public static final String SERVICE_HEADER_ETAG_KEY = "ETag";
 
-	public static final String SYNAPSE_ID_PREFIX = "Synapse Id: ";		
+	public static final String SYNAPSE_ID = "Synapse Id";
+	public static final String SYNAPSE_ID_PREFIX = SYNAPSE_ID + ": ";		
 	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
 	public static final String LABEL_LOGOUT_TEXT = "Logout";
 	public static final String BUTTON_CANCEL = "Cancel";
@@ -233,7 +234,29 @@ public class DisplayConstants {
 	public static final String ATTACHMENT_DIALOG_WINDOW_TITLE = "Add New File Attachment";
 	public static final String ATTACH_PROFILE_PIC_DIALOG_TITLE = "Upload a New Photo";
 	public static final String ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT = "Upload Photo";
-			
+	public static final String LABEL_ADD_TO_SNAPSHOT = "ADD ENTITY<br/>TO SNAPSHOT";
+	public static final String LABEL_CREATE_NEW_GROUP = "Create New Group";
+	public static final String BUTTON_ADD_ENTITY_TO_GROUP = "Add To Snapshot";
+	public static final String LABEL_NAME = "Name";
+	public static final String NOTE = "Note";
+	public static final String LABEL_ADD_GROUP = "Add Group";	
+	public static final String GROUP_ADDED = "Group Added";
+	public static final String GROUP_REMOVED = "Group Removed";
+	public static final String ENTRY_ADDED = "Entry Added";
+	public static final String ENTRY_REMOVED = "Entry Removed";
+	public static final String SYNAPSE_ENTITY = "Synapse Entity";
+	public static final String ERROR_FAILED_PERSIST = "Sorry, the change could not be saved. Please reload the page and try again.";
+	public static final String CONTENTS = "Contents";
+	public static final String ERROR_NAME_MUST_BE_DEFINED = "You must provide a name";
+	public static final String ERROR_NO_EDIT_PERMISSION = "You do not have permission to edit.";
+	public static final String UPDATE_SAVED = "Update Saved";
+	public static final String ERROR_INVALID_VERSION_FORMAT = "Invalid version format.";
+	public static final String DESCRIPTION = "Description";
+	public static final String OK = "OK";
+	public static final String ERROR_IN_READ_ONLY_MODE = "Sorry, that operation is not allowed in read only mode.";
+	public static final String WHY_VERSION_READ_ONLY_MODE = "You are not allowed to modify an Entity when viewing a particular verion.";
+	public static final String READ_ONLY = "READ ONLY";	
+
 	/*
 	 * Element ids for Selenium
 	 */
@@ -257,5 +280,6 @@ public class DisplayConstants {
 	public static final String ID_INP_NEWPASSWORD = "id_inp_new_password";
 	public static final String ID_INP_CONFIRMPASSWORD = "id_inp_confirm_password";
 	public static final String ID_BTN_SUBMIT = "id_btn_submit";
+
 }
 
