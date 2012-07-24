@@ -69,12 +69,15 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		view.setPresenter(this);
 	}	
 
+    /**
+     * Update the bundle attached to this EntityPageTop. Consider calling refresh()
+     * to notify an attached view.
+     * 
+     * @param bundle
+     */
     public void setBundle(EntityBundle bundle) {
     	this.bundle = bundle;
-    	if(bundle != null){
-    		// Let the view know
-    		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit());
-
+//    	if(bundle != null){
 //    		// get current user profile
 //    		synapseClient.getUserProfile(new AsyncCallback<String>() {
 //    			@Override
@@ -93,8 +96,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 //    				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());    					    				
 //    			}
 //    		});
-
-    	}
+//
+//    	}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -114,13 +117,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}	
 	
 	public Widget asWidget(EntityBundle bundle) {
-		view.setPresenter(this);				
+		view.setPresenter(this);
 		return view.asWidget();
 	}
 	
 	@Override
 	public void refresh() {
-		// TODO : tell consumer to refresh?
 		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit());
 	}	
 
