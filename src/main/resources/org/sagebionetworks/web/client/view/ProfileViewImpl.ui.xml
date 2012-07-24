@@ -27,10 +27,10 @@
 	        	<div class="span-24 notopmargin">	
 	<!-- end header -->
 					<div class="span-24 notopmargin" style="margin-top: 5px !important">
-						<div class="span-22 notopmargin" style="white-space: normal;">
+						<div class="span-18 notopmargin" style="white-space: normal;">
 							<g:SimplePanel ui:field="breadcrumbsPanel"/>
 						</div>
-						<div class="span-2 last right notopmargin">
+						<div class="user-profile-linkedin-bar span-6 last right notopmargin">
 							<g:SimplePanel ui:field="editProfileButtonPanel" />
 						</div>
 					</div>

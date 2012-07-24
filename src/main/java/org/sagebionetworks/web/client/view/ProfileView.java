@@ -38,7 +38,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	
 	public interface Presenter extends SynapsePresenter {
 
-		void updateProfile(String firstName, String lastName,String summary, String position, String location, String industry, String company, AttachmentData pic);
+		void updateProfile(String firstName, String lastName,String summary, String position, String location, String industry, String company, String email, AttachmentData pic);
 
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
 		

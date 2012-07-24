@@ -84,7 +84,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 
 	@Override
-	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final AttachmentData pic) {
+	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final AttachmentData pic) {
 		final UserSessionData currentUser = authenticationController.getLoggedInUser();
 		if(currentUser != null) {
 				//get the owner profile (may or may not be currently set
@@ -94,7 +94,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						try {
 							final UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
 							ownerProfile = profile;
-							
 							ownerProfile.setFirstName(firstName);
 							ownerProfile.setLastName(lastName);
 							ownerProfile.setSummary(summary);
@@ -103,6 +102,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							ownerProfile.setIndustry(industry);
 							ownerProfile.setCompany(company);
 							ownerProfile.setDisplayName(firstName + " " + lastName);
+							if (email != null)
+								ownerProfile.setEmail(email);
+							//supplement with data that came from crowd during authentication
+							ownerProfile.setUserName(authenticationController.getLoggedInUser().getProfile().getUserName());
+														
 							if (pic != null)
 								ownerProfile.setPic(pic);
 							
@@ -141,7 +145,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 									}
 								});
 							} catch (JSONObjectAdapterException e) {
-								DisplayUtils.handleServiceException(e, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+								DisplayUtils.handleJSONAdapterException(e, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 							}
 
 						} catch (RestServiceException e) {
@@ -235,12 +239,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				    	t.printStackTrace();
 				    }
 					 
-					    //TODO: get the profile picture data from picture-url
+					//get the profile picture data from picture-url
 				    String picUrl = linkedInProfile.getElementsByTagName("picture-url").item(0).getFirstChild().getNodeValue();
 				    //update the profile, if the image is successfully saved.
-				    AttachmentData pic = null;
+				    //if url is the only thing set in the AttachmentData, the Synapse client will pull from the url and upload to S3 (and fill in the rest) for me.
+				    AttachmentData pic = new AttachmentData();
+				    pic.setUrl(picUrl);
 				    
-				    updateProfile(firstName, lastName, summary, position.toString(), location, industry, company.toString(), pic);
+				    updateProfile(firstName, lastName, summary, position.toString(), location, industry, company.toString(), null, pic);
 				}
 				
 				@Override

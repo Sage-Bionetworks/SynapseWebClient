@@ -81,6 +81,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private SageImageBundle sageImageBundle;
 	private FormPanel userFormPanel;
 	private HorizontalPanel linkedInPanel;
+	private HorizontalPanel editProfileCommandPanel;
 	private Button updateUserInfoButton;
 	private Button cancelUpdateUserButton;
 	private Button linkedInButton;
@@ -148,7 +149,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			viewProfilePanel.add(profileWidget);
 			if (isOwner) {
 				editPhotoButtonPanel.add(editPhotoLink);
-				editProfileButtonPanel.add(editProfileButton);
+				editProfileButtonPanel.add(editProfileCommandPanel);
 			}
 				
 		}
@@ -164,8 +165,18 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		createProfileForm();
 		
 		createLinkedInPanel();
-	    
-	    editProfileButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
+		
+	    createEditProfileCommandsPanel();
+		
+	    editPhotoLink = new Anchor();
+	    editPhotoLink.addStyleName("user-profile-change-photo");
+	    editPhotoLink.setText("Edit Photo");
+	}
+
+	private void createEditProfileCommandsPanel() {
+		editProfileCommandPanel = new HorizontalPanel();
+		
+		editProfileButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
 	    editProfileButton.setHeight(25);
 	    editProfileButton.setBorders(false);
 	    editProfileButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
@@ -174,11 +185,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    		presenter.redirectToEditProfile();
 	    	}
 	    });
-	    editPhotoLink = new Anchor();
-	    editPhotoLink.addStyleName("user-profile-change-photo");
-	    editPhotoLink.setText("Edit Photo");
+	    
+		editProfileCommandPanel.add(linkedInPanel);
+		editProfileCommandPanel.add(editProfileButton);
+		editProfileCommandPanel.setCellWidth(editProfileButton, "15%");
 	}
-
+	 
 	private void createLinkedInPanel() {
 		linkedInPanel = new HorizontalPanel();
 		linkedInImportLink = new Anchor();
@@ -301,7 +313,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    			 MessageBox.alert("Error", "Please enter your last name.", null);
 	    		 } else {
 	    			 DisplayUtils.changeButtonToSaving(updateUserInfoButton, sageImageBundle);
-	    			 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), null);
+	    			 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), null, null);
 	    		 }
 		
 	    	 }
@@ -432,7 +444,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 	    		//upload a new photo. UI to send to S3, then update the profile with the new attachment data (by redirecting back to view profile)
-						AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, "Upload a New Photo","Upload Photo",new AddAttachmentDialog.Callback() {
+						AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, 
+								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_TITLE,
+								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
 							@Override
 							public void onSaveAttachment(UploadResult result) {
 								if(result != null){

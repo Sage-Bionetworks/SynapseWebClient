@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.server.servlet;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -27,6 +30,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -619,10 +623,38 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			Synapse synapseClient = createSynapseClient();
 			JSONObject userProfileJSONObject = new JSONObject(userProfileJson);
+			UserProfile profile = EntityFactory.createEntityFromJSONObject(userProfileJSONObject, UserProfile.class);
+			AttachmentData pic = profile.getPic();
+			if (pic != null && pic.getTokenId() == null && pic.getUrl() != null){
+				//special case, client provided just enough information to pull the pic from an external location (so store in s3 before updating the profile).
+				log.info("Downloading picture from url: " + pic.getUrl());
+				URL url = new URL(pic.getUrl());
+			    URLConnection conn = url.openConnection();
+			    conn.setDoInput(true);
+			    conn.setDoOutput(false);
+			    File temp = ServiceUtils.writeToTempFile(conn.getInputStream(), UserProfileAttachmentServlet.MAX_ATTACHMENT_SIZE_IN_BYTES);
+			    try{
+					// Now upload the file
+			    	String contentType = conn.getContentType();
+			    	String fileName = temp.getName();
+			    	if (contentType != null && contentType.equalsIgnoreCase("image/jpeg") && !fileName.toLowerCase().endsWith(".jpg"))
+			    		fileName = profile.getOwnerId() + ".jpg";
+					pic = synapseClient.uploadUserProfileAttachmentToSynapse(profile.getOwnerId(), temp, fileName);
+				}finally{
+					// Unconditionally delete the tmp file
+					temp.delete();
+				}
+			    profile.setPic(pic);
+				userProfileJSONObject = EntityFactory.createJSONObjectForEntity(profile);
+			}
 			synapseClient.putEntity("/userProfile", userProfileJSONObject);			
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} catch (IOException e) {
 			throw new UnknownErrorException(e.getMessage());
 		} 
 	}

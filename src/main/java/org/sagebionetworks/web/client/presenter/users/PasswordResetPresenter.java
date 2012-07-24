@@ -35,6 +35,8 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
 	
+	private String registrationToken = null;
+	
 	@Inject
 	public PasswordResetPresenter(PasswordResetView view, CookieProvider cookieProvider, UserAccountServiceAsync userService, AuthenticationController authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator){
 		this.view = view;
@@ -64,6 +66,11 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		// show proper view if token is present
 		if(DisplayUtils.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
 			view.showRequestForm();
+		} else if (place.toToken().startsWith("register_")) {
+			// if this is a registration token, we don't have enough information
+			// to log them in, but we can still set the password from this token
+			registrationToken = place.toToken();
+			view.showResetForm();
 		} else {
 			// Show password reset form
 			view.showMessage(AbstractImagePrototype.create(sageImageBundle.loading16()).getHTML() + " Loading Password Reset...");
@@ -107,29 +114,38 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 
 	@Override
 	public void resetPassword(final String newPassword) {
-		UserSessionData currentUser = authenticationController.getLoggedInUser(); 
-		if(currentUser != null) {
-			userService.setPassword(currentUser.getProfile().getUserName(), newPassword, new AsyncCallback<Void>() {			
-				@Override
-				public void onSuccess(Void result) {				
-					// TODO : reinstate this with better ToU fix
-					//view.showPasswordResetSuccess();
-					view.showInfo("Your password has been reset. Please login again to verify.");
-					//quick fix: log user out (clear out cached user and cookie info) and force relogin
-					authenticationController.logoutUser();
-					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-					// TODO : reinstate this with better ToU fix
-					//globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)); // redirect to home page
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage("Password reset failed. Please try again.");
-					//try registering again
-					authenticationController.logoutUser();
-					globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(DisplayUtils.DEFAULT_PLACE_TOKEN));
-				}
-			});		
+		if (registrationToken != null) {
+			userService.setRegistrationUserPassword(registrationToken,	newPassword, new AsyncCallback<Void>() {
+						@Override
+						public void onSuccess(Void result) {
+							view.showInfo("Your password has been set. Please login to verify.");
+							globalApplicationState.getPlaceChanger().goTo(
+									new LoginPlace(LoginPlace.LOGIN_TOKEN));
+						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showErrorMessage("Password reset failed. Please try again.");
+						}
+					});
+		} else {
+			UserSessionData currentUser = authenticationController.getLoggedInUser();
+			if (currentUser != null) {
+				userService.setPassword(currentUser.getProfile().getUserName(),
+						newPassword, new AsyncCallback<Void>() {
+							@Override
+							public void onSuccess(Void result) {
+								view.showInfo("Your password has been reset.");
+								view.showPasswordResetSuccess();
+								globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)); // redirect to home page
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								view.showErrorMessage("Password reset failed. Please try again.");
+							}
+						});
+			}
 		}
 	}
 }

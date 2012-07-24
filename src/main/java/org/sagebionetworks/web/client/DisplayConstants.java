@@ -128,6 +128,7 @@ public class DisplayConstants {
 	public static final String ERROR_USER_ALREADY_EXISTS = "There was a problem creating your account: The email address provided is already in use. If you have forgotten your password, please use the \"Forgot Password\" button from the login page.";
 	public static final String ERROR_UNABLE_TO_LOAD = "An error occured trying to load.";
 	public static final String ERROR_GENERIC = "An error occured. Please try again.";
+	public static final String ERROR_INCOMPATIBLE_CLIENT_VERSION = "Your client version is incompatible with the repository. Please try reloading the page.";
 	public static final String ERROR_GENERIC_RELOAD = "An error occured. Please try reloading the page.";
 	public static final String ERROR_SAVE_MESSAGE = "An error occuring attempting to save. Please try again.";
 	public static final String ERROR_BAD_REQUEST_MESSAGE = "An unknown communication error occured. Please reload the page.";
@@ -223,6 +224,10 @@ public class DisplayConstants {
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
 	public static final String ERROR_FAILURE_PRIVLEDGES = "Sorry, you do not have sufficient privileges for access.";
 	public static final String TITLE_UNAUTHORIZED = "Unauthorized";
+	public static final String ATTACHMENT_DIALOG_BUTTON_TEXT = "Attach";
+	public static final String ATTACHMENT_DIALOG_WINDOW_TITLE = "Add New File Attachment";
+	public static final String ATTACH_PROFILE_PIC_DIALOG_TITLE = "Upload a New Photo";
+	public static final String ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT = "Upload Photo";
 		
 }
 
