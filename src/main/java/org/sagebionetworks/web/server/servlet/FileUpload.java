@@ -30,46 +30,60 @@ public class FileUpload extends HttpServlet {
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	
-	private FileItemIterator fileItemIterator;
-	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-	
 	/**
 	 * Injected with Gin
 	 */
 	@SuppressWarnings("unused")
 	private ServiceUrlProvider urlProvider;
-		
-	/**
-	 * Essentially the constructor. Setup synapse client.
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider){
-		this.urlProvider = provider;
-	}
-	
-	/**
-	 * Used for testing or if you want to specify what the FileItems are to upload outside of the requests
-	 * @param fileItemIterator
-	 */
-	public void setFileItemIterator(FileItemIterator fileItemIterator) {
-		this.fileItemIterator = fileItemIterator;
-	}
-	
+	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+	private TokenProvider tokenProvider = new TokenProvider() {
+		@Override
+		public String getSessionToken() {
+			return UserDataProvider.getThreadLocalUserToken(FileAttachmentServlet.perThreadRequest.get());
+		}
+	};
+
 	/**
 	 * Unit test can override this.
-	 * 
+	 *
 	 * @param provider
 	 */
 	public void setSynapseProvider(SynapseProvider synapseProvider) {
 		this.synapseProvider = synapseProvider;
 	}
+
+	/**
+	 * Essentially the constructor. Setup synapse client.
+	 *
+	 * @param provider
+	 */
+	@Inject
+	public void setServiceUrlProvider(ServiceUrlProvider provider) {
+		this.urlProvider = provider;
+	}
+
+	/**
+	 * Unit test uses this to provide a mock token provider
+	 *
+	 * @param tokenProvider
+	 */
+	public void setTokenProvider(TokenProvider tokenProvider) {
+		this.tokenProvider = tokenProvider;
+	}
+		
+	@Override
+	protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
+			throws ServletException, IOException {
+		FileUpload.perThreadRequest.set(arg0);
+		super.service(arg0, arg1);
+	}
 	
+	@Override
     public void doPost(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {
     	ServletFileUpload upload = new ServletFileUpload();
         
         try{ 
-            if(fileItemIterator == null) fileItemIterator = upload.getItemIterator(request);
+			FileItemIterator fileItemIterator = upload.getItemIterator(request);
 
             while (fileItemIterator.hasNext()) {
                 FileItemStream item = fileItemIterator.next();
