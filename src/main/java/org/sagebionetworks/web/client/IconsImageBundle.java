@@ -142,6 +142,9 @@ public interface IconsImageBundle extends ClientBundle {
 			
 	@Source("images/icons/mail--arrow-16.png")
 	ImageResource mailArrow16();	
+	
+	@Source("images/icons/move-button-grey-16.png")
+	ImageResource moveButton16();				
 			
 	@Source("images/icons/navigation-000-button-16.png")
 	ImageResource NavigateRight16();

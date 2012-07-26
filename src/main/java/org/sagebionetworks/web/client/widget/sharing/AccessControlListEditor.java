@@ -74,12 +74,15 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 	public Widget asWidget() {
 		if (entityId==null) throw new IllegalStateException("Entity ID must be specified.");
-
+		
+		// Hide the view panel contents until async callback completes
+		view.showLoading();
+		
 		int partsMask = EntityBundleTransport.ACL | 
 			EntityBundleTransport.GROUPS |
 			EntityBundleTransport.USERS |
 			EntityBundleTransport.PERMISSIONS;
-		synapseClient.getEntityBundle(entityId, partsMask, new AsyncCallback<EntityBundleTransport>(){
+		synapseClient.getEntityBundle(entityId, partsMask, new AsyncCallback<EntityBundleTransport>(){				
 				@Override
 				public void onSuccess(EntityBundleTransport bundle) {
 					try {
