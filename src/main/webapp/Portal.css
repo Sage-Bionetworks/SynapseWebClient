@@ -310,7 +310,7 @@ a.shortBtn {
 }
 
 #alertWrapper {
-	position: absolute;
+	position: fixed;
 	width: 100%;
 	top: 5px;
 	left: 0;
