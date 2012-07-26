@@ -76,6 +76,49 @@
 						data on 1,200 breast cancer patients obtained by Carlos Caldas of
 						Cancer Research UK and Anne-Lise Borresen-Dale of Oslo University
 						Hospital. </p>
+	
+					<h4>July 18 Challenge Launch Webinar</h4>
+
+					<iframe width="300" height="169"
+							src="https://www.youtube.com/embed/xSfd5mkkmGM" frameborder="0"
+							allowfullscreen="true"></iframe>
+
+					<br></br>
+					<br></br>
+
+					<h2>Contest Resources</h2>
+					<br></br>
+					<a href="https://sagebionetworks.jira.com/wiki/display/BCC/"
+						target="_blank">
+						<h4>
+							<span style="text-decoration:underline;">Technical Information</span>
+						</h4>
+					</a>
+					<br></br>
+					<a href="https://groups.google.com/a/sagebase.org/group/bcc/"
+						target="_blank">
+						<h4>
+							<span style="text-decoration:underline;">Discussion Forum</span>
+						</h4>
+					</a>
+					<br></br>
+	
+					<a href="http://validation.bcc.sagebase.org/bcc-leaderboard-public.php"
+						target="_blank">
+						<h4>
+							<span style="text-decoration:underline;">Real-time Leader Board</span>
+						</h4>
+					</a>
+					<br></br>
+					
+					<a href="https://sagebionetworks.jira.com/wiki/display/BCC/Breast+Cancer+Challenge%3A+FAQs+Aggregated+From+Participants"
+						target="_blank">
+						<h4>
+							<span style="text-decoration:underline;">FAQs, Aggregated from Participants</span>
+						</h4>
+					</a>
+					<br></br>
+	
 						
 						<h5>The challenge consists of building predictive models of
 						breast cancer survival, specified by survival data containing:</h5>
@@ -149,22 +192,6 @@
 						environment to ensure reproducibility of the results.</p>
 
 
-					<h2>Contest Resources</h2>
-					<br></br>
-					<a href="https://sagebionetworks.jira.com/wiki/display/BCC/"
-						target="_blank">
-						<h4>
-							<span style="text-decoration:underline;">Technical Information</span>
-						</h4>
-					</a>
-					<br></br>
-					<a href="https://groups.google.com/a/sagebase.org/group/bcc/"
-						target="_blank">
-						<h4>
-							<span style="text-decoration:underline;">Discussion Forum</span>
-						</h4>
-					</a>
-					<br></br>
 					<g:SimplePanel ui:field="applyForChallenge" />
 					<br></br>
 					<br></br>
