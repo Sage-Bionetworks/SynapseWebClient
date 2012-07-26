@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -186,6 +187,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		// ignore certain types
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Link.class.getName()));
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Preview.class.getName()));
+		ignore.add(entityTypeProvider.getEntityTypeForClassName(Study.class.getName()));
 		
 		return ignore;
 	}
