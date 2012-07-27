@@ -123,8 +123,9 @@ public class ProfilePresenterTest {
 		String location = "Seattle Area";
 		String industry = "Biotech";
 		String company = "Sage Bionetworks";
+		String email = "johnsmith@sagebio.org";
 		AttachmentData pic = new AttachmentData();
-		profilePresenter.updateProfile(firstName, lastName, summary, position, location, industry, company, pic);
+		profilePresenter.updateProfile(firstName, lastName, summary, position, location, industry, company, email, pic);
 	}
 	
 	@Test
