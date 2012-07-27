@@ -53,4 +53,6 @@ public interface UserAccountServiceAsync {
 	@Deprecated
 	void getTermsOfUse(AsyncCallback<String> callback);
 
+	void setRegistrationUserPassword(String registrationToken, String newPassword, AsyncCallback<Void> callback);
+
 }

@@ -33,21 +33,25 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
+import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class BreadcrumbTest {
 		
@@ -131,6 +135,25 @@ public class BreadcrumbTest {
 		breadcrumb.asWidget(entityPath);
 		verify(mockView).setLinksList(any(List.class), (String)isNotNull());				
 	}
+	
+
+	@Test
+	public void testAsWidgetLinksList(){
+		//verify that setting the breadcrumb sets the view's links
+		reset(mockView);
+		List<LinkData> links = new ArrayList<LinkData>();
+		LinkData homeLink = new LinkData("MyHomeLink", new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+		links.add(homeLink);
+		String currentPageName  = "CurrentPage";
+		breadcrumb.asWidget(links, currentPageName);
+		verify(mockView).setLinksList(links, currentPageName);
+		
+		//also verify the single page off of home works
+		reset(mockView);
+		breadcrumb.asWidget(currentPageName);
+		verify(mockView).setLinksList(any(List.class), (String)isNotNull());
+	}
+	
 	
 	@Test
 	public void testAsWidget(){

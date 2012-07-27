@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.shared;
 
-import org.sagebionetworks.repo.model.Entity;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class AccessRequirementsTransport implements IsSerializable {

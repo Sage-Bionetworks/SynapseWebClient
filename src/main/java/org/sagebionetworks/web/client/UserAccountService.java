@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.UserRegistration;
@@ -36,4 +35,6 @@ public interface UserAccountService extends RemoteService {
 	public String getSynapseWebUrl();
 
 	public String getTermsOfUse();
+	
+	public void setRegistrationUserPassword(String registrationToken, String newPassword);
 }

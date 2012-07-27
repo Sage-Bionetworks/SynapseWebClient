@@ -178,6 +178,51 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
+	public void setRegistrationUserPassword(String registrationToken, String newPassword) {
+		// First make sure the service is ready to go.
+			validateService();
+			
+			JSONObject obj = new JSONObject();
+			try {
+				obj.put("registrationToken", registrationToken);
+				obj.put("password", newPassword);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			
+			// Build up the path
+			String url = urlProvider.getPrivateAuthBaseUrl() + "/" + ServiceUtils.AUTHSVC_SET_REGISTRATION_USER_PASSWORD_PATH;
+			String jsonString = obj.toString();
+			
+			// Setup the header
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			HttpEntity<String> entity = new HttpEntity<String>(jsonString, headers);
+			HttpMethod method = HttpMethod.POST;
+			
+			logger.info(method.toString() + ": " + url + ", with registration token " + registrationToken); 
+			
+			// Make the actual call.
+			try {
+				ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
+				if(response.getBody().equals("")) {
+					return;
+				}
+			} catch (RestClientException ex) {
+				if (ex.getMessage().toLowerCase().contains("no content-type found"))
+					return;
+				else throw ex;
+			} catch (UnexpectedException ex) {
+				return;
+			} catch (NullPointerException nex) {
+				// TODO : change this to properly deal with a 204!!!
+				return; // this is expected
+			}
+			
+			throw new RestClientException("An error occured. Please try again.");
+	}
+
+	@Override
 	public void setPassword(String email, String newPassword) {
 		// First make sure the service is ready to go.
 		validateService();
@@ -283,7 +328,18 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 				//String displayName = initSession.getDisplayName();
 				String sessionToken = initSession.getSessionToken();
 				UserProfile profile = getUserProfile(sessionToken);
-				profile.setUserName(username);
+				String fName = null;
+				String lName = null;
+				if (initSession.getDisplayName() != null) {
+					String[] firstLast = initSession.getDisplayName().split(" ");
+					if (firstLast.length > 1) {
+						fName = firstLast[0];
+						//everything else can go in the last name
+						lName = initSession.getDisplayName().substring(fName.length()+1).trim();
+					}
+				}
+				
+				fillInCrowdInfo(fName, lName, username, profile);
 				UserSessionData userData = new UserSessionData();
 				userData.setIsSSO(false);
 				userData.setSessionToken(sessionToken);
@@ -299,6 +355,20 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		return userSessionJson;			
 	}
 
+	private void fillInCrowdInfo(String fName, String lName, String email, UserProfile profile)
+	{
+		profile.setUserName(email);
+		if (profile.getFirstName() == null || profile.getFirstName().length() == 0){
+			profile.setFirstName(fName);
+		}
+		if (profile.getLastName() == null || profile.getLastName().length() == 0){
+			profile.setLastName(lName);
+		}
+		if (profile.getEmail() == null || profile.getEmail().length() == 0){
+			profile.setEmail(email);
+		}
+	}
+	
 	/**
 	 * This needs to be replaced with a Synapse Java Client call
 	 */
@@ -330,8 +400,9 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		String userSessionJson = null;
 		if((response.getStatusCode() == HttpStatus.CREATED || response.getStatusCode() == HttpStatus.OK) && response.hasBody()) {
 			try {
-				//GetUser getUser = response.getBody();
+				GetUser getUser = response.getBody();
 				UserProfile profile = getUserProfile(sessionToken);
+				fillInCrowdInfo(getUser.getFirstName(), getUser.getLastName(), getUser.getEmail(), profile);
 				UserSessionData userData = new UserSessionData();
 				userData.setIsSSO(false);
 				userData.setSessionToken(sessionToken);

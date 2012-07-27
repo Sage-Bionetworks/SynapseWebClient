@@ -31,6 +31,7 @@ import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -282,6 +283,18 @@ public class DisplayUtils {
 		// For other exceptions, allow the consumer to send a good message to the user
 		return false;
 	}
+	
+	/**
+	 * Handle JSONObjectAdapterException.  This will occur when the client is pointing to an incompatible repo version. 
+	 * @param ex
+	 * @param placeChanger
+	 */
+	public static boolean handleJSONAdapterException(JSONObjectAdapterException ex, PlaceChanger placeChanger, UserSessionData currentUser) {
+		MessageBox.info("Incompatible Client Version", DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION, null);
+		placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+		return true;
+	}
+
 	
 	/*
 	 * Button Saving 
