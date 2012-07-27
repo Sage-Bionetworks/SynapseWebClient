@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
@@ -37,7 +38,6 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -161,6 +161,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public EntityBundleTransport getEntityBundle(String entityId, int partsMask)
+			throws RestServiceException {
+		try {			
+			Synapse synapseClient = createSynapseClient();			
+			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);
+			return convertBundleToTransport(eb, partsMask);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
 	public String getEntityTypeRegistryJSON() {
 		return SynapseClientImpl.getEntityTypeRegistryJson();
 	}
@@ -214,6 +226,53 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	/*
 	 * Private Methods
 	 */
+
+	// Convert repo-side EntityBundle to serializable EntityBundleTransport
+	private EntityBundleTransport convertBundleToTransport(EntityBundle eb, int partsMask) 
+			throws RestServiceException {
+		EntityBundleTransport ebt = new EntityBundleTransport();
+		try {
+			if ((EntityBundleTransport.ENTITY & partsMask) > 0) {
+				Entity e = eb.getEntity();
+				ebt.setEntityJson(EntityFactory.createJSONStringForEntity(e));
+			}
+			if ((EntityBundleTransport.ANNOTATIONS & partsMask) > 0) {
+				Annotations a = eb.getAnnotations();
+				ebt.setAnnotationsJson(EntityFactory.createJSONStringForEntity(a));
+			}
+			if ((EntityBundleTransport.PERMISSIONS & partsMask) > 0) {
+				UserEntityPermissions uep = eb.getPermissions();
+				ebt.setPermissionsJson(EntityFactory.createJSONStringForEntity(uep));
+			}
+			if ((EntityBundleTransport.ENTITY_PATH & partsMask) > 0) {
+				EntityPath path = eb.getPath();
+				ebt.setEntityPathJson(EntityFactory.createJSONStringForEntity(path));
+			}
+			if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
+				PaginatedResults<EntityHeader> rb = eb.getReferencedBy();
+				ebt.setEntityReferencedByJson(EntityFactory.createJSONStringForEntity(rb));
+			}
+			if ((EntityBundleTransport.CHILD_COUNT & partsMask) > 0) {
+				Long cc = eb.getChildCount();
+				ebt.setChildCount(cc);
+			}
+			if ((EntityBundleTransport.ACL & partsMask) > 0) {
+				AccessControlList acl = eb.getAccessControlList();
+				ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
+			}
+			if ((EntityBundleTransport.USERS & partsMask) > 0) {
+				PaginatedResults<UserProfile> u = eb.getUsers();
+				ebt.setUsersJson(EntityFactory.createJSONStringForEntity(u));
+			}
+			if ((EntityBundleTransport.GROUPS & partsMask) > 0) {
+				PaginatedResults<UserGroup> g = eb.getGroups();
+				ebt.setGroupsJson(EntityFactory.createJSONStringForEntity(g));
+			}
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+		return ebt;
+	}
 
 	/**
 	 * The synapse client is stateful so we must create a new one for each
@@ -274,187 +333,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return jsonString;
 	}
 
-	@Override
-	public EntityBundleTransport getEntityBundle(String entityId, int partsMask)
-			throws RestServiceException {
-		try {
-			// Get all of the requested parts
-			EntityBundleTransport transport = new EntityBundleTransport();
-			Synapse synapseClient = createSynapseClient();
-			// Add the entity?
-			handleEntity(entityId, partsMask, transport, synapseClient);
-			// Add the annotations?
-			handleAnnotations(entityId, partsMask, transport, synapseClient);
-			// Add the permissions?
-			handlePermissions(entityId, partsMask, transport, synapseClient);
-			// Add the path?
-			handleEntityPath(entityId, partsMask, transport, synapseClient);
-			// Add Referenced By?
-			handleEntityReferencedBy(entityId, partsMask, transport,
-					synapseClient);
-			// Add Referenced By?
-			handleEntityChildCount(entityId, partsMask, transport,	synapseClient);
-			// Add the ACL?
-			handleACL(entityId, partsMask, transport, synapseClient);
-			// Add the users?
-			handleUsers(entityId, partsMask, transport, synapseClient);
-			// Add the groups?
-			handleGroups(entityId, partsMask, transport, synapseClient);
-			return transport;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	private void handleEntityChildCount(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient) throws SynapseException {
-		if ((EntityBundleTransport.CHILD_COUNT & partsMask) > 0) {
-			Long count = synapseClient.getChildCount(entityId);
-			transport.setChildCount(count);
-		}
-	}
-
-	/**
-	 * Set the entity path if requested
-	 * 
-	 * @param entityId
-	 * @param partsMask
-	 * @param transport
-	 * @param synapseClient
-	 * @throws SynapseException
-	 * @throws JSONObjectAdapterException
-	 */
-	public void handleEntityPath(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient)
-			throws SynapseException, JSONObjectAdapterException {
-		if ((EntityBundleTransport.ENTITY_PATH & partsMask) > 0) {
-			EntityPath path = synapseClient.getEntityPath(entityId);
-			transport.setEntityPathJson(EntityFactory
-					.createJSONStringForEntity(path));
-		}
-	}
-
-	/**
-	 * Add the permissions to the bundle if requested.
-	 * 
-	 * @param entityId
-	 * @param partsMask
-	 * @param transport
-	 * @param synapseClient
-	 * @throws SynapseException
-	 * @throws JSONObjectAdapterException
-	 */
-	public void handlePermissions(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient)
-			throws SynapseException, JSONObjectAdapterException {
-		if ((EntityBundleTransport.PERMISSIONS & partsMask) > 0) {
-			UserEntityPermissions permissions = synapseClient
-					.getUsersEntityPermissions(entityId);
-			transport.setPermissionsJson(EntityFactory
-					.createJSONStringForEntity(permissions));
-		}
-	}
-
-	/**
-	 * Add the annotations to the bundle if requested.
-	 * 
-	 * @param entityId
-	 * @param partsMask
-	 * @param transport
-	 * @param synapseClient
-	 * @throws SynapseException
-	 * @throws JSONObjectAdapterException
-	 */
-	public void handleAnnotations(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient)
-			throws SynapseException, JSONObjectAdapterException {
-		if ((EntityBundleTransport.ANNOTATIONS & partsMask) > 0) {
-			Annotations annos = synapseClient.getAnnotations(entityId);
-			transport.setAnnotationsJson(EntityFactory
-					.createJSONStringForEntity(annos));
-		}
-	}
-
-	/**
-	 * Add an entity to the bundle if requested
-	 * 
-	 * @param entityId
-	 * @param partsMask
-	 * @param transport
-	 * @param synapseClient
-	 * @throws SynapseException
-	 * @throws JSONObjectAdapterException
-	 */
-	public void handleEntity(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient)
-			throws SynapseException, JSONObjectAdapterException {
-		if ((EntityBundleTransport.ENTITY & partsMask) > 0) {
-			Entity e = synapseClient.getEntityById(entityId);
-			transport.setEntityJson(EntityFactory.createJSONStringForEntity(e));
-		}
-	}
-
-	/**
-	 * Set the entity path if requested
-	 * 
-	 * @param entityId
-	 * @param partsMask
-	 * @param transport
-	 * @param synapseClient
-	 * @throws SynapseException
-	 * @throws JSONObjectAdapterException
-	 */
-	public void handleEntityReferencedBy(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient)
-			throws SynapseException, JSONObjectAdapterException {
-		if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
-			// TODO : support entity version
-			PaginatedResults<EntityHeader> results = synapseClient
-					.getEntityReferencedBy(entityId, null);
-			transport.setEntityReferencedByJson(EntityFactory
-					.createJSONStringForEntity(results));
-		}
-	}
-
-	public void handleACL(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient)
-			throws SynapseException, JSONObjectAdapterException {
-		if ((EntityBundleTransport.ACL & partsMask) > 0) {
-			AccessControlList acl = getAcl(entityId);
-			transport.setAclJson(EntityFactory
-					.createJSONStringForEntity(acl));
-		}
-	}
-	
 	private static final int USER_PAGINATION_OFFSET = 0;
 	// before we hit this limit we will use another mechanism to find users
 	private static final int USER_PAGINATION_LIMIT = 1000; 
 	private static final int GROUPS_PAGINATION_OFFSET = 0;
 	// before we hit this limit we will use another mechanism to find groups
 	private static final int GROUPS_PAGINATION_LIMIT = 1000; 
-
-	public void handleUsers(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient)
-			throws SynapseException, JSONObjectAdapterException {
-		if ((EntityBundleTransport.USERS & partsMask) > 0) {
-			PaginatedResults<UserProfile> userProfiles = synapseClient.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT);
-			transport.setUsersJson(EntityFactory
-					.createJSONStringForEntity(userProfiles));
-		}
-	}
-
-	public void handleGroups(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient)
-			throws SynapseException, JSONObjectAdapterException {
-		if ((EntityBundleTransport.GROUPS & partsMask) > 0) {
-			PaginatedResults<UserGroup> userGroups = synapseClient.getGroups(GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
-			transport.setGroupsJson(EntityFactory
-					.createJSONStringForEntity(userGroups));
-		}
-	}
-
 
 	@Override
 	public String getEntityReferencedBy(String entityId)
