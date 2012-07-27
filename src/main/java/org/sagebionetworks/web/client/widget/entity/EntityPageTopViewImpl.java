@@ -679,7 +679,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	        addBtn.addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
-					AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle,"Add New File Attachment", "Attach",new AddAttachmentDialog.Callback() {
+					AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle,DisplayConstants.ATTACHMENT_DIALOG_WINDOW_TITLE, DisplayConstants.ATTACHMENT_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
 						@Override
 						public void onSaveAttachment(UploadResult result) {
 							if(result != null){

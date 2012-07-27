@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -38,6 +39,7 @@ import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -418,5 +420,29 @@ public class SynapseClientImplTest {
 		org.sagebionetworks.web.shared.PaginatedResults<UserGroup> clone = 
 			nodeModelCreator.createPaginatedResults(ew.getEntityJson(), UserGroup.class);
 		assertEquals(this.pgugs.getResults(), clone.getResults());
+	}
+	
+	@Test
+	public void testGetUserProfile() throws Exception {
+		//verify call is directly calling the synapse client provider
+		JSONObject testUserJSONObject = new JSONObject("{ username: \"Test User\"}");
+		String testRepoUrl = "http://mytestrepourl";
+		String testUserId = "myUserId";
+		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(testRepoUrl);
+		when(mockSynapse.getSynapseEntity(testRepoUrl, "/userProfile/" + testUserId)).thenReturn(testUserJSONObject);
+		String userProfile = synapseClient.getUserProfile(testUserId);
+		assertEquals(userProfile, testUserJSONObject.toString());
+	}
+	
+	@Test
+	public void testCreateUserProfileAttachment() throws Exception {
+		//verify call is directly calling the synapse client provider
+		PresignedUrl testPresignedUrl = new PresignedUrl();
+		testPresignedUrl.setPresignedUrl("http://mytestpresignedurl");
+		String testId = "myTestId";
+		String testToken = "myTestToken";
+		when(mockSynapse.createUserProfileAttachmentPresignedUrl(testId, testToken)).thenReturn(testPresignedUrl);
+		String presignedUrl = synapseClient.createUserProfileAttachmentPresignedUrl(testId, testToken);
+		assertEquals(presignedUrl, EntityFactory.createJSONStringForEntity(testPresignedUrl));
 	}
 }
