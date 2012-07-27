@@ -130,7 +130,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return UserDataProvider.getThreadLocalUserToken(this
 				.getThreadLocalRequest());
 	}
-
+	
 	/*
 	 * SynapseClient Service Methods
 	 */
@@ -596,10 +596,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	@Override
 	public String getUserProfile() throws RestServiceException {
-		try {
-			Synapse synapseClient = createSynapseClient();
-			JSONObject userProfile = synapseClient.getSynapseEntity(urlProvider.getRepositoryServiceUrl(), "/userProfile");
-			return userProfile.toString();
+		try	{
+			//cached, in a cookie?
+			UserProfile profile = UserDataProvider.getThreadLocalUserProfile(this.getThreadLocalRequest());
+			if (profile == null){
+				Synapse synapseClient = createSynapseClient();
+				profile = synapseClient.getMyProfile();
+			}
+			return EntityFactory.createJSONStringForEntity(profile);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
@@ -641,8 +647,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			    		fileName = profile.getOwnerId() + ".jpg";
 					pic = synapseClient.uploadUserProfileAttachmentToSynapse(profile.getOwnerId(), temp, fileName);
 				}finally{
-					// Unconditionally delete the tmp file
+					// Unconditionally delete the tmp file and close the input stream
 					temp.delete();
+					try {
+						conn.getInputStream().close();
+					} catch (Throwable t) {
+						t.printStackTrace();
+					}
 				}
 			    profile.setPic(pic);
 				userProfileJSONObject = EntityFactory.createJSONObjectForEntity(profile);
@@ -816,8 +827,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			Entity e = synapseClient.getEntityById(entityId);
 			transport.setEntityString(EntityFactory.createJSONStringForEntity(e));
 			transport.setEntityClassAsString(e.getClass().getName());
-			UserProfile userProfile = synapseClient.getMyProfile();
-			transport.setUserProfileString(EntityFactory.createJSONStringForEntity(userProfile));
+			transport.setUserProfileString(getUserProfile());
 			return transport;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

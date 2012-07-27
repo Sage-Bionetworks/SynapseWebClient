@@ -332,9 +332,10 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 				String lName = null;
 				if (initSession.getDisplayName() != null) {
 					String[] firstLast = initSession.getDisplayName().split(" ");
-					if (firstLast.length == 2) {
+					if (firstLast.length > 1) {
 						fName = firstLast[0];
-						lName = firstLast[1];
+						//everything else can go in the last name
+						lName = initSession.getDisplayName().substring(fName.length()+1).trim();
 					}
 				}
 				

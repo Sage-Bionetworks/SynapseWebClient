@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter.users;
 
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -24,7 +25,7 @@ import com.google.inject.Inject;
 
 @SuppressWarnings("unused")
 public class PasswordResetPresenter extends AbstractActivity implements PasswordResetView.Presenter {
-	
+	public static final String REGISTRATION_TOKEN_PREFIX = "register_";
 	private PasswordReset place;	
 	private PasswordResetView view;
 	private CookieProvider cookieProvider;
@@ -66,7 +67,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		// show proper view if token is present
 		if(DisplayUtils.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
 			view.showRequestForm();
-		} else if (place.toToken().startsWith("register_")) {
+		} else if (place.toToken().startsWith(REGISTRATION_TOKEN_PREFIX)) {
 			// if this is a registration token, we don't have enough information
 			// to log them in, but we can still set the password from this token
 			registrationToken = place.toToken();
@@ -118,14 +119,14 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			userService.setRegistrationUserPassword(registrationToken,	newPassword, new AsyncCallback<Void>() {
 						@Override
 						public void onSuccess(Void result) {
-							view.showInfo("Your password has been set. Please login to verify.");
+							view.showInfo(DisplayConstants.PASSWORD_SET_TEXT);
 							globalApplicationState.getPlaceChanger().goTo(
 									new LoginPlace(LoginPlace.LOGIN_TOKEN));
 						}
 
 						@Override
 						public void onFailure(Throwable caught) {
-							view.showErrorMessage("Password reset failed. Please try again.");
+							view.showErrorMessage(DisplayConstants.PASSWORD_SET_FAILED_TEXT);
 						}
 					});
 		} else {
@@ -135,14 +136,14 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 						newPassword, new AsyncCallback<Void>() {
 							@Override
 							public void onSuccess(Void result) {
-								view.showInfo("Your password has been reset.");
+								view.showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
 								view.showPasswordResetSuccess();
 								globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)); // redirect to home page
 							}
 
 							@Override
 							public void onFailure(Throwable caught) {
-								view.showErrorMessage("Password reset failed. Please try again.");
+								view.showErrorMessage(DisplayConstants.PASSWORD_RESET_FAILED_TEXT);
 							}
 						});
 			}

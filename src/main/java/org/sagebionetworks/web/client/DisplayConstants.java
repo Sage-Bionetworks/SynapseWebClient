@@ -70,6 +70,10 @@ public class DisplayConstants {
 	public static final String PERMISSIONS_CREATE_NEW_ACL_TEXT = "By creating local sharing settings you ignore the permissions that are inherited from its parent.";
 	public static final String PERMISSIONS_DELETE_ACL_TEXT = "By deleting local sharing settings you inherit sharing settings from the parent.";
 	
+	public static final String PASSWORD_RESET_FAILED_TEXT = "Password reset failed. Please try again.";
+	public static final String PASSWORD_SET_FAILED_TEXT = "Password change failed. Please try again.";
+	public static final String PASSWORD_RESET_TEXT = "Your password has been reset.";
+	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
 	/*
 	 * Buttons, titles and labels
 	 */
