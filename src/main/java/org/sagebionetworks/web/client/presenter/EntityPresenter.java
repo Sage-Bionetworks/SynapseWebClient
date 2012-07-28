@@ -79,6 +79,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	@Override
 	public void refresh() {
+		
+		// Hide the view panel contents until async callback completes
+		view.showLoading();
+		
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ENTITY_REFERENCEDBY | CHILD_COUNT;
