@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -12,11 +13,15 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityViewImpl extends Composite implements EntityView {
+	
+	private SageImageBundle sageImageBundle;
+	private HorizontalPanel loadingPanel;
 
 	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {}
 
@@ -27,7 +32,6 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@UiField
 	SimplePanel entityPageTopPanel;
 		
-	@SuppressWarnings("unused")
 	private Presenter presenter;
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
@@ -37,11 +41,13 @@ public class EntityViewImpl extends Composite implements EntityView {
 			EntityViewImplUiBinder binder,
 			Header headerWidget,
 			Footer footerWidget,
-			EntityPageTop entityPageTop) {		
+			EntityPageTop entityPageTop,
+			SageImageBundle sageImageBundle) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.headerWidget = headerWidget;
 		this.entityPageTop = entityPageTop;
+		this.sageImageBundle = sageImageBundle;
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -67,8 +73,8 @@ public class EntityViewImpl extends Composite implements EntityView {
 				presenter.refresh();
 			}
 		});
-		entityPageTopPanel.clear();
-		entityPageTopPanel.add(entityPageTop.asWidget());
+		entityPageTopPanel.setWidget(entityPageTop.asWidget());
+		entityPageTop.refresh();
 	}
 		
 	@Override
@@ -78,8 +84,10 @@ public class EntityViewImpl extends Composite implements EntityView {
 
 	@Override
 	public void showLoading() {
+		if (loadingPanel == null)
+			loadingPanel = DisplayUtils.createFullWidthLoadingPanel(sageImageBundle);
+		entityPageTopPanel.setWidget(loadingPanel);
 	}
-
 
 	@Override
 	public void showInfo(String title, String message) {
