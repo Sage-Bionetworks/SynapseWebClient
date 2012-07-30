@@ -236,8 +236,12 @@ public class DisplayConstants {
 	public static final String ID_BTN_LOGIN2 = "id_btn_login2";
 	public static final String ID_MNU_USER_PROFILE = "id_mnu_user_profile";
 	public static final String ID_MNU_USER_LOGOUT = "id_mnu_user_logout";
-	
-	
-		
+	public static final String ID_BTN_LOGIN_GOOGLE = "login-via-gapp-google";
+	public static final String ID_INP_EMAIL_ADDRESS = "id_inp_email_address";
+	public static final String ID_INP_FIRSTNAME = "id_inp_email_password";
+	public static final String ID_INP_LASTNAME = "id_inp_lastname";
+	public static final String ID_INP_NEWPASSWORD = "id_inp_new_password";
+	public static final String ID_INP_CONFIRMPASSWORD = "id_inp_confirm_password";
+	public static final String ID_BTN_SUBMIT = "id_btn_submit";
 }
 
