@@ -250,6 +250,7 @@ public class DisplayConstants {
 	public static final String ID_MNU_USER_SETTINGS = "id_mnu_user_settings";
 	public static final String ID_BTN_LOGIN_GOOGLE = "login-via-gapp-google";
 	public static final String ID_INP_EMAIL_ADDRESS = "id_inp_email_address";
+	public static final String ID_INP_EMAIL_ADDRESS2 = "id_inp_email_address2";
 	public static final String ID_INP_FIRSTNAME = "id_inp_email_password";
 	public static final String ID_INP_LASTNAME = "id_inp_lastname";
 	public static final String ID_INP_NEWPASSWORD = "id_inp_new_password";

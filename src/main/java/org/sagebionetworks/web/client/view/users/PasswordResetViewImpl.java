@@ -96,6 +96,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	     final TextField<String> emailAddress = new TextField<String>();  
 	     emailAddress.setFieldLabel("Email Address");  
 	     emailAddress.setAllowBlank(false);
+	     emailAddress.setId(DisplayConstants.ID_INP_EMAIL_ADDRESS2);
 	     fieldSet.add(emailAddress, formData);  
 	   
 	     requestFormPanel.add(fieldSet);  
