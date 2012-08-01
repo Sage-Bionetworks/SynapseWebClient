@@ -36,15 +36,8 @@
 					</div>
 					
 					<div class="span-24 notopmargin last">
-						<div id="pictureCanvasId" class="span-5 inner-6 view notopmargin">
-							<!-- profile picture, and edit photo (if visible) -->
-							<center>
-								<g:SimplePanel ui:field="profilePicturePanel" />
-							</center>
-							<div class="span-4 push-2 notopmargin">
-								<g:SimplePanel ui:field="editPhotoButtonPanel" />
-							</div>
-						</div>
+						<g:SimplePanel ui:field="pictureCanvasPanel"/>
+						
 						<div class="span-18 notopmargin last">
 							<g:SimplePanel ui:field="viewProfilePanel" />
 						</div>
