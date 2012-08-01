@@ -15,7 +15,10 @@ import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -112,6 +115,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		cp.add(message, new MarginData(0, 0, 0, 10));
 		
 		Button loginAgain = new Button(DisplayConstants.BUTTON_LOGIN_AGAIN);
+		loginAgain.setId(DisplayConstants.ID_BTN_LOGIN_AGAIN);
 		loginAgain.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
@@ -147,6 +151,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 				presenter.goTo(new PasswordReset(DisplayUtils.DEFAULT_PLACE_TOKEN));								
 			}
 		});
+		forgotPasswordButton.setId(DisplayConstants.ID_BTN_FORGOT_PWD);
 		passwordResetButtonPanel.clear();
 		passwordResetButtonPanel.add(forgotPasswordButton);
 		
@@ -157,6 +162,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 				presenter.goTo(new RegisterAccount(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			}
 		});
+		registerButton.setId(DisplayConstants.ID_BTN_REGISTER2);
 		registerButtonPanel.add(registerButton);
 	}
 	

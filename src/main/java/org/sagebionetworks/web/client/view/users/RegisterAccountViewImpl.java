@@ -134,16 +134,19 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		     final TextField<String> email = new TextField<String>();  
 		     email.setFieldLabel("Email Address");
 		     email.setAllowBlank(false);
+		     email.setId(DisplayConstants.ID_INP_EMAIL_ADDRESS);
 		     fieldSet.add(email, formData);  
 
 		     final TextField<String> firstName = new TextField<String>();  
 		     firstName.setFieldLabel("First Name");  
-		     firstName.setAllowBlank(false);  
+		     firstName.setAllowBlank(false);
+		     firstName.setId(DisplayConstants.ID_INP_FIRSTNAME);
 		     fieldSet.add(firstName, formData);  
 		   
 		     final TextField<String> lastName = new TextField<String>();  
 		     lastName.setFieldLabel("Last Name");
 		     lastName.setAllowBlank(false);
+		     lastName.setId(DisplayConstants.ID_INP_LASTNAME);
 		     fieldSet.add(lastName, formData);
 		     
 		     Label passwordLabel = new Label(DisplayUtils.getIconHtml(iconsImageBundle.lock16()) + " Password setup instructions will be sent via email.");
@@ -163,6 +166,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 						}
 					}
 		     });
+		     registerButton.setId(DisplayConstants.ID_BTN_REGISTER2);
 		     setRegisterButtonDefaultTextAndIcon();
 		     formPanel.addButton(registerButton);
 		     
