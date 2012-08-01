@@ -69,12 +69,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel editProfileButtonPanel;
 	@UiField
-	SimplePanel editPhotoButtonPanel;
-	@UiField
-	public SimplePanel profilePicturePanel;
-	@UiField
 	SimplePanel breadcrumbsPanel;
+	@UiField
+	SimplePanel pictureCanvasPanel;
 	
+	private LayoutContainer pictureCanvasContainer;
+	private LayoutContainer profilePictureContainer;
+	private LayoutContainer editPhotoButtonContainer;
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
@@ -123,6 +124,27 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
+		
+		createViewProfile();
+		createProfileForm();
+		createLinkedInPanel();
+		createEditProfileCommandsPanel();
+		
+	    editPhotoLink = new Anchor();
+	    editPhotoLink.addStyleName("user-profile-change-photo");
+	    editPhotoLink.setText("Edit Photo");
+	    pictureCanvasContainer = new LayoutContainer();
+	    pictureCanvasContainer.setStyleName("span-5 inner-6 view notopmargin");
+	    pictureCanvasPanel.clear();
+	    pictureCanvasPanel.add(pictureCanvasContainer);
+	    
+	    profilePictureContainer = new LayoutContainer();
+	    profilePictureContainer.addStyleName("center");
+		editPhotoButtonContainer = new LayoutContainer();
+		editPhotoButtonContainer.setStyleName("span-4 push-2 notopmargin");
+		
+		pictureCanvasContainer.add(profilePictureContainer);
+		pictureCanvasContainer.add(editPhotoButtonContainer);
 	}
 
 
@@ -150,7 +172,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			updateViewProfile(profile);
 			viewProfilePanel.add(profileWidget);
 			if (isOwner) {
-				editPhotoButtonPanel.add(editPhotoLink);
+				editPhotoButtonContainer.add(editPhotoLink);
+				editPhotoButtonContainer.layout();
 				editProfileButtonPanel.add(editProfileCommandPanel);
 			}
 				
@@ -162,17 +185,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		//set the Settings page breadcrumb
 		breadcrumbsPanel.clear();
 		breadcrumbsPanel.add(breadcrumb.asWidget("Profile"));
-				
-		createViewProfile();
-		createProfileForm();
-		
-		createLinkedInPanel();
-		
-	    createEditProfileCommandsPanel();
-		
-	    editPhotoLink = new Anchor();
-	    editPhotoLink.addStyleName("user-profile-change-photo");
-	    editPhotoLink.setText("Edit Photo");
 	}
 
 	private void createEditProfileCommandsPanel() {
@@ -423,19 +435,18 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 		 profileWidget.setHtml(builder.toSafeHtml().asString());
 		 
-		 if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0)
-		 {
-			 profilePicturePanel.add(profilePictureHtml);
+		 if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
+			 profilePictureContainer.add(profilePictureHtml);
 			 profilePictureHtml.setHtml(SafeHtmlUtils.fromSafeConstant("<div class=\"profile-image-loading\" >"
 			    		+ "<img style=\"margin:auto; display:block;\" src=\"" 
 			    		+ DisplayUtils.createUserProfileAttachmentUrl(baseProfileAttachmentUrl, profile.getOwnerId(), profile.getPic().getPreviewId(), null) + "\"/>"
 			    		+ "</div>").asString());
 		 }
-		 else
-		 {
-			 profilePicturePanel.add(defaultProfilePicture);
+		 else {
+			 profilePictureContainer.add(defaultProfilePicture);
 		 }
-		 setElementStyle(PICTURE_CANVAS_ID, Display.BLOCK);
+		 profilePictureContainer.layout();
+		 pictureCanvasContainer.setVisible(true);
 		 
 		 String userId = profile.getOwnerId();
 		 final String actionUrl =  baseProfileAttachmentUrl+ "?" + DisplayUtils.USER_PROFILE_PARAM_KEY + "=" + userId;
@@ -493,14 +504,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		updateUserInfoPanel.clear();
 		viewProfilePanel.clear();
 		editProfileButtonPanel.clear();
-		editPhotoButtonPanel.clear();
-		profilePicturePanel.clear();
-		setElementStyle(PICTURE_CANVAS_ID, Display.NONE);
-	}
-	
-	private void setElementStyle(String id, Style.Display display){
-		Element pictureCanvasElement = DOM.getElementById(id);
-		if (pictureCanvasElement != null && pictureCanvasElement.getStyle() != null)
-			pictureCanvasElement.getStyle().setDisplay(display);
+		editPhotoButtonContainer.removeAll();
+		profilePictureContainer.removeAll();
+		pictureCanvasContainer.setVisible(false);
 	}
 }
