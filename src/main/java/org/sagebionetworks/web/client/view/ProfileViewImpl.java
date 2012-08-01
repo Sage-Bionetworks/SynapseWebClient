@@ -30,6 +30,7 @@ import com.extjs.gxt.ui.client.widget.layout.ColumnLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -39,14 +40,13 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -105,7 +105,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Html profilePictureHtml;
 	
 	private HandlerRegistration editPhotoHandler = null;
-	
+
+	private static final String PICTURE_CANVAS_ID = "pictureCanvasId";
+
 	private String baseProfileAttachmentUrl = GWT.getModuleBaseURL()+"profileAttachment";
 	
 	@Inject
@@ -433,9 +435,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 {
 			 profilePicturePanel.add(defaultProfilePicture);
 		 }
-
-		DOM.getElementById("pictureCanvasId").getStyle().setDisplay(Display.BLOCK);
-		
+		 setElementStyle(PICTURE_CANVAS_ID, Display.BLOCK);
+		 
 		 String userId = profile.getOwnerId();
 		 final String actionUrl =  baseProfileAttachmentUrl+ "?" + DisplayUtils.USER_PROFILE_PARAM_KEY + "=" + userId;
 		 if (editPhotoHandler != null)
@@ -481,12 +482,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void showLoading() {
 	}
 
-
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
-
 
 	@Override
 	public void clear() {
@@ -496,6 +495,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		editProfileButtonPanel.clear();
 		editPhotoButtonPanel.clear();
 		profilePicturePanel.clear();
-		DOM.getElementById("pictureCanvasId").getStyle().setDisplay(Display.NONE);
+		setElementStyle(PICTURE_CANVAS_ID, Display.NONE);
+	}
+	
+	private void setElementStyle(String id, Style.Display display){
+		Element pictureCanvasElement = DOM.getElementById(id);
+		if (pictureCanvasElement != null && pictureCanvasElement.getStyle() != null)
+			pictureCanvasElement.getStyle().setDisplay(display);
 	}
 }
