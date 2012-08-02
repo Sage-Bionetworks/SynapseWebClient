@@ -8,8 +8,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("linkedin")
 public interface LinkedInService extends RemoteService {
 
-	public LinkedInInfo returnAuthUrl();
+	public LinkedInInfo returnAuthUrl(String returnUrl);
 
-	public String getCurrentUserInfo(String requestToken, String secret, String verifier);
+	public String getCurrentUserInfo(String requestToken, String secret, String verifier, String callbackUrl);
 
 }

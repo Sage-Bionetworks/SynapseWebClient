@@ -632,23 +632,31 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			UserProfile profile = EntityFactory.createEntityFromJSONObject(userProfileJSONObject, UserProfile.class);
 			AttachmentData pic = profile.getPic();
 			if (pic != null && pic.getTokenId() == null && pic.getUrl() != null){
-				//special case, client provided just enough information to pull the pic from an external location (so store in s3 before updating the profile).
+				//special case, client provided just enough information to pull the pic from an external location (so try to store in s3 before updating the profile).
 				log.info("Downloading picture from url: " + pic.getUrl());
 				URL url = new URL(pic.getUrl());
-			    URLConnection conn = url.openConnection();
-			    conn.setDoInput(true);
-			    conn.setDoOutput(false);
-			    File temp = ServiceUtils.writeToTempFile(conn.getInputStream(), UserProfileAttachmentServlet.MAX_ATTACHMENT_SIZE_IN_BYTES);
-			    try{
-					// Now upload the file
+				pic.setUrl(null);
+				File temp = null;
+				URLConnection conn = null;
+				try
+			    {
+			    	conn = url.openConnection();
+				    conn.setDoInput(true);
+				    conn.setDoOutput(false);
+				    temp = ServiceUtils.writeToTempFile(conn.getInputStream(), UserProfileAttachmentServlet.MAX_ATTACHMENT_SIZE_IN_BYTES);
+				 	// Now upload the file
 			    	String contentType = conn.getContentType();
 			    	String fileName = temp.getName();
 			    	if (contentType != null && contentType.equalsIgnoreCase("image/jpeg") && !fileName.toLowerCase().endsWith(".jpg"))
 			    		fileName = profile.getOwnerId() + ".jpg";
 					pic = synapseClient.uploadUserProfileAttachmentToSynapse(profile.getOwnerId(), temp, fileName);
-				}finally{
+				} catch (Throwable t){
+					//couldn't pull the picture from the external server.  log and move on with the update
+					t.printStackTrace();
+				} finally{
 					// Unconditionally delete the tmp file and close the input stream
-					temp.delete();
+					if (temp != null)
+						temp.delete();
 					try {
 						conn.getInputStream().close();
 					} catch (Throwable t) {
