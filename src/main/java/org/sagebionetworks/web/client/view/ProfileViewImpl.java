@@ -30,7 +30,6 @@ import com.extjs.gxt.ui.client.widget.layout.ColumnLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -38,15 +37,12 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -69,23 +65,23 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel editProfileButtonPanel;
 	@UiField
-	SimplePanel editPhotoButtonPanel;
-	@UiField
-	public SimplePanel profilePicturePanel;
-	@UiField
 	SimplePanel breadcrumbsPanel;
+	@UiField
+	SimplePanel pictureCanvasPanel;
 	
+	private LayoutContainer pictureCanvasContainer;
+	private LayoutContainer profilePictureContainer;
+	private LayoutContainer editPhotoButtonContainer;
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
 	private FormPanel userFormPanel;
-	private HorizontalPanel linkedInPanel;
+	private HorizontalPanel linkedInPanelForViewProfile;
+	private HorizontalPanel linkedInPanelForEditProfile;
 	private HorizontalPanel editProfileCommandPanel;
 	private Button updateUserInfoButton;
 	private Button cancelUpdateUserButton;
-	private Button linkedInButton;
-	private Anchor linkedInImportLink;
 	private Button editProfileButton;
 	private Anchor editPhotoLink;
 	private Breadcrumb breadcrumb;
@@ -105,7 +101,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Html profilePictureHtml;
 	
 	private HandlerRegistration editPhotoHandler = null;
-	
+
 	private String baseProfileAttachmentUrl = GWT.getModuleBaseURL()+"profileAttachment";
 	
 	@Inject
@@ -121,6 +117,29 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
+		
+		createViewProfile();
+		createProfileForm();
+		linkedInPanelForViewProfile = createLinkedInPanel();
+		linkedInPanelForEditProfile = createLinkedInPanel();
+		
+		createEditProfileCommandsPanel();
+		
+	    editPhotoLink = new Anchor();
+	    editPhotoLink.addStyleName("user-profile-change-photo");
+	    editPhotoLink.setText("Edit Photo");
+	    pictureCanvasContainer = new LayoutContainer();
+	    pictureCanvasContainer.setStyleName("span-5 inner-6 view notopmargin");
+	    pictureCanvasPanel.clear();
+	    pictureCanvasPanel.add(pictureCanvasContainer);
+	    
+	    profilePictureContainer = new LayoutContainer();
+	    profilePictureContainer.addStyleName("center");
+		editPhotoButtonContainer = new LayoutContainer();
+		editPhotoButtonContainer.setStyleName("span-4 push-2 notopmargin");
+		
+		pictureCanvasContainer.add(profilePictureContainer);
+		pictureCanvasContainer.add(editPhotoButtonContainer);
 	}
 
 
@@ -139,7 +158,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		{
 		    updateUserForm(profile);
 		 	updateUserInfoPanel.add(userFormPanel);
-		 	updateWithLinkedInPanel.add(linkedInPanel);
+		 	updateWithLinkedInPanel.add(linkedInPanelForEditProfile);
 		}
 		else
 		{
@@ -148,7 +167,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			updateViewProfile(profile);
 			viewProfilePanel.add(profileWidget);
 			if (isOwner) {
-				editPhotoButtonPanel.add(editPhotoLink);
+				editPhotoButtonContainer.add(editPhotoLink);
+				editPhotoButtonContainer.layout();
 				editProfileButtonPanel.add(editProfileCommandPanel);
 			}
 				
@@ -160,17 +180,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		//set the Settings page breadcrumb
 		breadcrumbsPanel.clear();
 		breadcrumbsPanel.add(breadcrumb.asWidget("Profile"));
-				
-		createViewProfile();
-		createProfileForm();
-		
-		createLinkedInPanel();
-		
-	    createEditProfileCommandsPanel();
-		
-	    editPhotoLink = new Anchor();
-	    editPhotoLink.addStyleName("user-profile-change-photo");
-	    editPhotoLink.setText("Edit Photo");
 	}
 
 	private void createEditProfileCommandsPanel() {
@@ -186,17 +195,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    	}
 	    });
 	    
-		editProfileCommandPanel.add(linkedInPanel);
+		editProfileCommandPanel.add(linkedInPanelForViewProfile);
 		editProfileCommandPanel.add(editProfileButton);
 		editProfileCommandPanel.setCellWidth(editProfileButton, "15%");
 	}
 	 
-	private void createLinkedInPanel() {
-		linkedInPanel = new HorizontalPanel();
-		linkedInImportLink = new Anchor();
+	private HorizontalPanel createLinkedInPanel() {
+		HorizontalPanel linkedInPanel = new HorizontalPanel();
+		Anchor linkedInImportLink = new Anchor();
 		linkedInImportLink.addStyleName("user-profile-linkedin");
 		linkedInImportLink.setText("Import from ");
-		linkedInButton = new Button();
+		Button linkedInButton = new Button();
 	    linkedInButton.setIcon(AbstractImagePrototype.create(sageImageBundle.linkedinsmall()));
 	    linkedInButton.setSize(sageImageBundle.linkedinsmall().getWidth() + 1, sageImageBundle.linkedinsmall().getHeight() + 1);
 	    linkedInButton.setBorders(false);
@@ -216,11 +225,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    
 	    linkedInPanel.add(linkedInImportLink);
 	    linkedInPanel.add(linkedInButton);
+	    return linkedInPanel;
 	}
 	
 	private void linkedInClicked()
 	{
-		linkedInButton.disable();
 		presenter.redirectToLinkedIn();
 	}
 	
@@ -421,21 +430,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 		 profileWidget.setHtml(builder.toSafeHtml().asString());
 		 
-		 if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0)
-		 {
-			 profilePicturePanel.add(profilePictureHtml);
+		 if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
+			 profilePictureContainer.add(profilePictureHtml);
 			 profilePictureHtml.setHtml(SafeHtmlUtils.fromSafeConstant("<div class=\"profile-image-loading\" >"
 			    		+ "<img style=\"margin:auto; display:block;\" src=\"" 
 			    		+ DisplayUtils.createUserProfileAttachmentUrl(baseProfileAttachmentUrl, profile.getOwnerId(), profile.getPic().getPreviewId(), null) + "\"/>"
 			    		+ "</div>").asString());
 		 }
-		 else
-		 {
-			 profilePicturePanel.add(defaultProfilePicture);
+		 else {
+			 profilePictureContainer.add(defaultProfilePicture);
 		 }
-
-		DOM.getElementById("pictureCanvasId").getStyle().setDisplay(Display.BLOCK);
-		
+		 profilePictureContainer.layout();
+		 pictureCanvasContainer.setVisible(true);
+		 
 		 String userId = profile.getOwnerId();
 		 final String actionUrl =  baseProfileAttachmentUrl+ "?" + DisplayUtils.USER_PROFILE_PARAM_KEY + "=" + userId;
 		 if (editPhotoHandler != null)
@@ -481,12 +488,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void showLoading() {
 	}
 
-
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
-
 
 	@Override
 	public void clear() {
@@ -494,8 +499,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		updateUserInfoPanel.clear();
 		viewProfilePanel.clear();
 		editProfileButtonPanel.clear();
-		editPhotoButtonPanel.clear();
-		profilePicturePanel.clear();
-		DOM.getElementById("pictureCanvasId").getStyle().setDisplay(Display.NONE);
+		editPhotoButtonContainer.removeAll();
+		profilePictureContainer.removeAll();
+		pictureCanvasContainer.setVisible(false);
 	}
 }
