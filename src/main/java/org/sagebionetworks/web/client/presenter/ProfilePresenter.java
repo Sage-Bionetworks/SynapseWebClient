@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -23,7 +24,6 @@ import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -46,6 +46,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
 	private UserProfile ownerProfile;
+	private GWTWrapper gwt;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -55,7 +56,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
-			CookieProvider cookieProvider) {
+			CookieProvider cookieProvider,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -64,6 +66,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.cookieProvider = cookieProvider;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
+		this.gwt = gwt;
 		view.setPresenter(this);
 	}
 
@@ -170,7 +173,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void redirectToLinkedIn() {
-		linkedInService.returnAuthUrl(GWT.getHostPageBaseURL(), new AsyncCallback<LinkedInInfo>() {
+		linkedInService.returnAuthUrl(gwt.getHostPageBaseURL(), new AsyncCallback<LinkedInInfo>() {
 			@Override
 			public void onSuccess(LinkedInInfo result) {
 				// Store the requestToken secret in a cookie, set to expire in five minutes
@@ -212,7 +215,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if(secret == null || secret.equals("")) {
 			view.showErrorMessage("You request has timed out. Please reload the page and try again.");
 		} else {
-			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, GWT.getHostPageBaseURL(), new AsyncCallback<String>() {
+			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
 					Document linkedInProfile = XMLParser.parse(result);
@@ -303,6 +306,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				
 				String requestToken = "";
 				String verifier = "";
+				if (token.startsWith("?"))
+					token = token.substring(1);
 				String[] oAuthTokens = token.split("&");
 				for(String s : oAuthTokens) {
 					String[] tokenParts = s.split("=");
