@@ -31,6 +31,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.xml.client.Document;
 import com.google.gwt.xml.client.Element;
+import com.google.gwt.xml.client.Node;
+import com.google.gwt.xml.client.NodeList;
 import com.google.gwt.xml.client.XMLParser;
 import com.google.inject.Inject;
 
@@ -204,6 +206,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
+	private String getLinkedInProfileElementValue(Document linkedInProfile, String elementName) {
+		String val = "";
+		NodeList elements = linkedInProfile.getElementsByTagName(elementName);
+		if (elements.getLength() > 0){
+			Node n = elements.item(0);
+			if (n.hasChildNodes())
+				val = n.getFirstChild().getNodeValue();
+		}
+		return val;
+	}
+	
 	/**
 	 * This method will update the current user's profile using LinkedIn
 	 */
@@ -219,10 +232,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				@Override
 				public void onSuccess(String result) {
 					Document linkedInProfile = XMLParser.parse(result);
-				    final String firstName = linkedInProfile.getElementsByTagName("first-name").item(0).getFirstChild().getNodeValue();
-				    final String lastName = linkedInProfile.getElementsByTagName("last-name").item(0).getFirstChild().getNodeValue();
-				    final String summary = linkedInProfile.getElementsByTagName("summary").item(0).getFirstChild().getNodeValue();
-				    final String industry = linkedInProfile.getElementsByTagName("industry").item(0).getFirstChild().getNodeValue();
+				    final String firstName = getLinkedInProfileElementValue(linkedInProfile, "first-name");
+				    final String lastName = getLinkedInProfileElementValue(linkedInProfile, "last-name");
+				    final String summary = getLinkedInProfileElementValue(linkedInProfile, "summary");
+				    final String industry = getLinkedInProfileElementValue(linkedInProfile, "industry");
 				    //location is in child element <location><name>locationname</name></location>
 				    String location = "";
 				    //parse out position
@@ -244,12 +257,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				    }
 					 
 					//get the profile picture data from picture-url
-				    String picUrl = linkedInProfile.getElementsByTagName("picture-url").item(0).getFirstChild().getNodeValue();
+				    String picUrl = getLinkedInProfileElementValue(linkedInProfile, "picture-url");
+				    AttachmentData pic = null;
 				    //update the profile, if the image is successfully saved.
 				    //if url is the only thing set in the AttachmentData, the Synapse client will pull from the url and upload to S3 (and fill in the rest) for me.
-				    AttachmentData pic = new AttachmentData();
-				    pic.setUrl(picUrl);
-				    
+				    if (picUrl.length() > 0) {
+					    pic = new AttachmentData();
+					    pic.setUrl(picUrl);
+				    }
 				    updateProfile(firstName, lastName, summary, position.toString(), location, industry, company.toString(), null, pic);
 				}
 				
