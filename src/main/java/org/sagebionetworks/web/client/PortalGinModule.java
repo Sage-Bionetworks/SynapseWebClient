@@ -157,6 +157,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UrlCacheImpl.class).in(Singleton.class);
 		bind(UrlCache.class).to(UrlCacheImpl.class);
 		
+		//GWT utility methods
+		bind(GWTWrapperImpl.class).in(Singleton.class);
+		bind(GWTWrapper.class).to(GWTWrapperImpl.class);
+				
 	
 		// Adapter factoyr
 		bind(AdapterFactory.class).to(GwtAdapterFactory.class);

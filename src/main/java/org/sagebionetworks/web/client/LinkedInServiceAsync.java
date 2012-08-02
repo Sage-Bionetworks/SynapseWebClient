@@ -6,9 +6,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface LinkedInServiceAsync {
 
-	void returnAuthUrl(AsyncCallback<LinkedInInfo> callback);
+	void returnAuthUrl(String returnUrl, AsyncCallback<LinkedInInfo> callback);
 	
-	void getCurrentUserInfo(String requestToken, String secret, String verifier,
+	void getCurrentUserInfo(String requestToken, String secret, String verifier, String callbackUrl,
 			AsyncCallback<String> callback);
 
 }

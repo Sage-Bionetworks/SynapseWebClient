@@ -77,12 +77,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
 	private FormPanel userFormPanel;
-	private HorizontalPanel linkedInPanel;
+	private HorizontalPanel linkedInPanelForViewProfile;
+	private HorizontalPanel linkedInPanelForEditProfile;
 	private HorizontalPanel editProfileCommandPanel;
 	private Button updateUserInfoButton;
 	private Button cancelUpdateUserButton;
-	private Button linkedInButton;
-	private Anchor linkedInImportLink;
 	private Button editProfileButton;
 	private Anchor editPhotoLink;
 	private Breadcrumb breadcrumb;
@@ -121,7 +120,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		createViewProfile();
 		createProfileForm();
-		createLinkedInPanel();
+		linkedInPanelForViewProfile = createLinkedInPanel();
+		linkedInPanelForEditProfile = createLinkedInPanel();
+		
 		createEditProfileCommandsPanel();
 		
 	    editPhotoLink = new Anchor();
@@ -157,7 +158,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		{
 		    updateUserForm(profile);
 		 	updateUserInfoPanel.add(userFormPanel);
-		 	updateWithLinkedInPanel.add(linkedInPanel);
+		 	updateWithLinkedInPanel.add(linkedInPanelForEditProfile);
 		}
 		else
 		{
@@ -194,17 +195,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    	}
 	    });
 	    
-		editProfileCommandPanel.add(linkedInPanel);
+		editProfileCommandPanel.add(linkedInPanelForViewProfile);
 		editProfileCommandPanel.add(editProfileButton);
 		editProfileCommandPanel.setCellWidth(editProfileButton, "15%");
 	}
 	 
-	private void createLinkedInPanel() {
-		linkedInPanel = new HorizontalPanel();
-		linkedInImportLink = new Anchor();
+	private HorizontalPanel createLinkedInPanel() {
+		HorizontalPanel linkedInPanel = new HorizontalPanel();
+		Anchor linkedInImportLink = new Anchor();
 		linkedInImportLink.addStyleName("user-profile-linkedin");
 		linkedInImportLink.setText("Import from ");
-		linkedInButton = new Button();
+		Button linkedInButton = new Button();
 	    linkedInButton.setIcon(AbstractImagePrototype.create(sageImageBundle.linkedinsmall()));
 	    linkedInButton.setSize(sageImageBundle.linkedinsmall().getWidth() + 1, sageImageBundle.linkedinsmall().getHeight() + 1);
 	    linkedInButton.setBorders(false);
@@ -224,11 +225,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    
 	    linkedInPanel.add(linkedInImportLink);
 	    linkedInPanel.add(linkedInButton);
+	    return linkedInPanel;
 	}
 	
 	private void linkedInClicked()
 	{
-		linkedInButton.disable();
 		presenter.redirectToLinkedIn();
 	}
 	
