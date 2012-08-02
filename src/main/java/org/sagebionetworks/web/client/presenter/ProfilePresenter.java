@@ -23,6 +23,7 @@ import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -169,7 +170,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void redirectToLinkedIn() {
-		linkedInService.returnAuthUrl(new AsyncCallback<LinkedInInfo>() {
+		linkedInService.returnAuthUrl(GWT.getHostPageBaseURL(), new AsyncCallback<LinkedInInfo>() {
 			@Override
 			public void onSuccess(LinkedInInfo result) {
 				// Store the requestToken secret in a cookie, set to expire in five minutes
@@ -211,7 +212,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if(secret == null || secret.equals("")) {
 			view.showErrorMessage("You request has timed out. Please reload the page and try again.");
 		} else {
-			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, new AsyncCallback<String>() {
+			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, GWT.getHostPageBaseURL(), new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
 					Document linkedInProfile = XMLParser.parse(result);

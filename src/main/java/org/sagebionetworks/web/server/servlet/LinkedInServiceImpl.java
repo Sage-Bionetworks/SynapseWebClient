@@ -13,12 +13,6 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
@@ -29,6 +23,7 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 	// OAuth service for authentication and integration with LinkedIn
 	private OAuthService oAuthService;
 
+	private String portalCallbackUrl;
 	
 	/**
 	 * The template is injected with Gin
@@ -64,8 +59,8 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 	 * requestToken secret
 	 */
 	@Override
-	public LinkedInInfo returnAuthUrl() {
-		validateService();
+	public LinkedInInfo returnAuthUrl(String callbackUrl) {
+		validateService(callbackUrl);
 		
 		Token requestToken = oAuthService.getRequestToken();
 		String authUrl = oAuthService.getAuthorizationUrl(requestToken);
@@ -74,9 +69,8 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 	}
 	
 	@Override
-	public String getCurrentUserInfo(String requestToken, String secret, String verifier) {
-		validateService();
-		
+	public String getCurrentUserInfo(String requestToken, String secret, String verifier, String callbackUrl) {
+		validateService(callbackUrl);
 		// Create the access token
 		Token rToken = new Token(requestToken, secret);
 		Verifier v = new Verifier(verifier);
@@ -94,7 +88,7 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 	 * Validate that the service is ready to go. If any of the injected data is
 	 * missing then it cannot run. Public for tests.
 	 */
-	public void validateService() {
+	public void validateService(String newCallbackUrl) {
 		if (templateProvider == null)
 			throw new IllegalStateException(
 					"The org.sagebionetworks.web.server.RestTemplateProvider was not injected into this service");
@@ -104,12 +98,13 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 		if (urlProvider == null)
 			throw new IllegalStateException(
 					"The org.sagebionetworks.rest.api.root.url was not set");
-		if(oAuthService == null) {
+		if(oAuthService == null || !newCallbackUrl.equals(portalCallbackUrl)) {
+			portalCallbackUrl = newCallbackUrl;
 			oAuthService = new ServiceBuilder().provider(LinkedInApi.class)
 											   .apiKey("0oq37ippxz8c")
 											   .apiSecret("2JpVsFPqHqT0Xou4")
-											   .callback(urlProvider.getPortalBaseUrl() + "/#Profile:")
-											   .build();
+											   .callback(portalCallbackUrl + "#Profile:")
+											   .build();			
 		}
 	}
 }
