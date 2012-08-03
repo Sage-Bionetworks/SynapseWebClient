@@ -107,7 +107,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						new AcceptTermsOfUseCallback() {
 							public void accepted() {
 								view.acceptTermsOfUse();
-								globalApplicationState.getPlaceChanger().goTo(new LoginPlace("0"));
+								globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
 							} 
 						});			
 				}
