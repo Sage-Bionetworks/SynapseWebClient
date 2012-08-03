@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.shared;
 
+import org.sagebionetworks.repo.model.EntityBundle;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -13,15 +15,15 @@ public class EntityBundleTransport implements IsSerializable {
 	/**
 	 * Masks for requesting what should be included in the bundle.s
 	 */
-	public static int ENTITY 		      	= 0x1;
-	public static int ANNOTATIONS	      	= 0x2;
-	public static int PERMISSIONS	     	= 0x4;
-	public static int ENTITY_PATH	      	= 0x8;
-	public static int ENTITY_REFERENCEDBY 	= 0x10;
-	public static int CHILD_COUNT			= 0x20;
-	public static int ACL					= 0x40;
-	public static int USERS					= 0x80;
-	public static int GROUPS				= 0x100;
+	public static int ENTITY 		      	= EntityBundle.ENTITY;
+	public static int ANNOTATIONS	      	= EntityBundle.ANNOTATIONS;
+	public static int PERMISSIONS	     	= EntityBundle.PERMISSIONS;
+	public static int ENTITY_PATH	      	= EntityBundle.ENTITY_PATH;
+	public static int ENTITY_REFERENCEDBY 	= EntityBundle.ENTITY_REFERENCEDBY;
+	public static int CHILD_COUNT			= EntityBundle.CHILD_COUNT;
+	public static int ACL					= EntityBundle.ACL;
+	public static int USERS					= EntityBundle.USERS;
+	public static int GROUPS				= EntityBundle.GROUPS;
 	
 	public static String HELLO = ":)";
 
