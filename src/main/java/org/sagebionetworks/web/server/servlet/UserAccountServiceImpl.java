@@ -431,24 +431,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}		
 	}
 
-	/**
-	 * Make a Synapse Java Client call to revalidate using the given session token
-	 */
-	@Override
-	public boolean ssoLogin(String sessionToken) throws RestServiceException {
-		// First make sure the service is ready to go.
-		validateService();
-		Synapse synapseClient = createSynapseClient(sessionToken);
-		try {
-			return synapseClient.revalidateSession();
-		} catch (SynapseTermsOfUseException e) {
-			throw new TermsOfUseException(e.getMessage());
-		} catch (SynapseException e) {
-			throw new RestServiceException(e.getMessage());
-		}
-	}
-	
-
 	@Override
 	public String getPrivateAuthServiceUrl() {
 		return urlProvider.getPrivateAuthBaseUrl();

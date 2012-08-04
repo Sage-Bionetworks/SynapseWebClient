@@ -35,12 +35,6 @@ public interface UserAccountServiceAsync {
 	
 	void terminateSession(String sessionToken, AsyncCallback<Void> callback);
 
-	/**
-	 * This needs to be replaced with a Synapse Java Client call
-	 */
-	@Deprecated
-	void ssoLogin(String sessionToken, AsyncCallback<Boolean> callback);
-
 	void getPrivateAuthServiceUrl(AsyncCallback<String> callback);
 
 	void getPublicAuthServiceUrl(AsyncCallback<String> callback);

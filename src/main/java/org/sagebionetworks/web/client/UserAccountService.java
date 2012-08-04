@@ -26,8 +26,6 @@ public interface UserAccountService extends RemoteService {
 	
 	public void terminateSession(String sessionToken) throws RestServiceException;
 	
-	public boolean ssoLogin(String sessionToken) throws RestServiceException;
-		
 	public String getPrivateAuthServiceUrl();
 	
 	public String getPublicAuthServiceUrl();
