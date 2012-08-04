@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -15,10 +14,6 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.CHILD_COUNT;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.USERS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.GROUPS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ACL;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -27,12 +22,14 @@ import java.util.Set;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
@@ -157,93 +154,20 @@ public class SynapseClientImplTest {
 		bene.setId("syn999");
 		when(mockSynapse.getEntityBenefactor(anyString())).thenReturn(bene);
 		
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | CHILD_COUNT;
+		int emptyMask = 0;
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(entity);
+		bundle.setAnnotations(annos);
+		bundle.setPermissions(eup);
+		bundle.setPath(path);
+		bundle.setChildCount(0L);
+		when(mockSynapse.getEntityBundle(anyString(),Matchers.eq(mask))).thenReturn(bundle);
+		
+		EntityBundle emptyBundle = new EntityBundle();
+		when(mockSynapse.getEntityBundle(anyString(),Matchers.eq(emptyMask))).thenReturn(emptyBundle);
+		
 		when(mockSynapse.canAccess("syn101", ACCESS_TYPE.READ)).thenReturn(true);
-	}
-	
-	@Test
-	public void testHandleEntity() throws SynapseException, JSONObjectAdapterException{
-		// we want the entity
-		int mask = ENTITY;
-		EntityBundleTransport transport =new EntityBundleTransport();
-		// Make the call
-		synapseClient.handleEntity(entity.getId(), mask, transport, mockSynapse);
-		assertNotNull(transport.getEntityJson());
-		ExampleEntity clone = EntityFactory.createEntityFromJSONString(transport.getEntityJson(), ExampleEntity.class);
-		assertEquals(entity, clone);
-	}
-	
-	@Test
-	public void testHandleAnnotations() throws SynapseException, JSONObjectAdapterException{
-		// we want the entity
-		int mask = ANNOTATIONS;
-		EntityBundleTransport transport =new EntityBundleTransport();
-		// Make the call
-		synapseClient.handleAnnotations(annos.getId(), mask, transport, mockSynapse);
-		assertNotNull(transport.getAnnotationsJson());
-		Annotations clone = EntityFactory.createEntityFromJSONString(transport.getAnnotationsJson(), Annotations.class);
-		assertEquals(annos, clone);
-	}
-	
-	@Test
-	public void testHandlePermissions() throws SynapseException, JSONObjectAdapterException{
-		// we want the entity
-		int mask = PERMISSIONS;
-		EntityBundleTransport transport =new EntityBundleTransport();
-		// Make the call
-		synapseClient.handlePermissions(entityId, mask, transport, mockSynapse);
-		assertNotNull(transport.getPermissionsJson());
-		UserEntityPermissions clone = EntityFactory.createEntityFromJSONString(transport.getPermissionsJson(), UserEntityPermissions.class);
-		assertEquals(eup, clone);
-	}
-	
-	@Test
-	public void testHandlePath() throws SynapseException, JSONObjectAdapterException{
-		// we want the entity
-		int mask = ENTITY_PATH;
-		EntityBundleTransport transport =new EntityBundleTransport();
-		// Make the call
-		synapseClient.handleEntityPath(entityId, mask, transport, mockSynapse);
-		assertNotNull(transport.getEntityPathJson());
-		EntityPath clone = EntityFactory.createEntityFromJSONString(transport.getEntityPathJson(), EntityPath.class);
-		assertEquals(path, clone);
-	}
-	
-	@Test
-	public void testHandleUsers() throws Exception {
-		// we want the users
-		int mask = USERS;
-		EntityBundleTransport transport = new EntityBundleTransport();
-		// Make the call
-		synapseClient.handleUsers(entityId, mask, transport, mockSynapse);
-		assertNotNull(transport.getUsersJson());
-		org.sagebionetworks.web.shared.PaginatedResults<UserProfile> clone = 
-			nodeModelCreator.createPaginatedResults(transport.getUsersJson(), UserProfile.class);
-		assertEquals(this.pgups.getResults(), clone.getResults());
-	}
-	
-	@Test
-	public void testHandleGroups() throws Exception {
-		// we want the groups
-		int mask = GROUPS;
-		EntityBundleTransport transport = new EntityBundleTransport();
-		// Make the call
-		synapseClient.handleGroups(entityId, mask, transport, mockSynapse);
-		assertNotNull(transport.getGroupsJson());
-		org.sagebionetworks.web.shared.PaginatedResults<UserGroup> clone = 
-			nodeModelCreator.createPaginatedResults(transport.getGroupsJson(), UserGroup.class);
-		assertEquals(this.pgugs.getResults(), clone.getResults());
-	}
-	
-	@Test
-	public void testHandleACL() throws Exception {
-		// we want the ACL
-		int mask = ACL;
-		EntityBundleTransport transport =new EntityBundleTransport();
-		// Make the call
-		synapseClient.handleACL(entityId, mask, transport, mockSynapse);
-		assertNotNull(transport.getAclJson());
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(transport.getAclJson(), AccessControlList.class);
-		assertEquals(acl, clone);
 	}
 	
 	@Test
