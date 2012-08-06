@@ -13,6 +13,13 @@ package org.sagebionetworks.web.shared;
 public class WebConstants {
 	
 	/**
+	 * Regex defining a valid entity name. Characters are selected to ensure
+	 * compatibility across services and clients.
+	 * 
+	 */
+	public static final String VALID_ENTITY_NAME_REGEX = "^[a-z,A-Z,0-9,_,.]+";
+	
+	/**
 	 * Regex defining a valid annotation name. Characters are selected to ensure
 	 * compatibility across services and clients.
 	 * 
