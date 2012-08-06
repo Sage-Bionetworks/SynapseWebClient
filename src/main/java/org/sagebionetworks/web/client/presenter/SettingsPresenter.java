@@ -67,7 +67,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 				@Override
 				public void onSuccess(String result) {
 					// 2. set password
-					userService.setPassword(currentUser.getSessionToken(), newPassword, new AsyncCallback<Void>() {
+					userService.setPassword(newPassword, new AsyncCallback<Void>() {
 						@Override
 						public void onSuccess(Void result) {
 							view.showPasswordChangeSuccess();
@@ -98,7 +98,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	public void createSynapsePassword() {
 		final UserSessionData currentUser = authenticationController.getLoggedInUser();
 		if(currentUser != null) {
-			userService.sendSetApiPasswordEmail(currentUser.getSessionToken(), new AsyncCallback<Void>() {
+			userService.sendSetApiPasswordEmail(new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
 					view.showRequestPasswordEmailSent();
