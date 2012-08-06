@@ -195,7 +195,7 @@ public class AnnotationEditorViewImpl extends LayoutContainer implements Annotat
 	@Override
 	public void showPersistSuccess() {		
 		store.commitChanges();
-		Info.display("Saved", "Annotation change saved.");
+		showInfo("Saved", "Annotation change saved.");
 	}
 
 	@Override
@@ -227,7 +227,7 @@ public class AnnotationEditorViewImpl extends LayoutContainer implements Annotat
 
 	@Override
 	public void showInfo(String title, String message) {
-		Info.display(title, message);
+		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
