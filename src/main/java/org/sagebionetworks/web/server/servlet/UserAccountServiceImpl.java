@@ -457,36 +457,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}
 	}
 
-	
-	/*
-	 * Private Methods
-	 */
-	private String getJsonStringForUrl(String url, HttpMethod method) {
-		// First make sure the service is ready to go.
-		validateService();
-
-		logger.info(method.toString() + ": " + url);
-		
-		// Setup the header
-		HttpHeaders headers = new HttpHeaders();
-		// If the user data is stored in a cookie, then fetch it and the session token to the header.
-		UserDataProvider.addUserDataToHeader(this.getThreadLocalRequest(), headers);
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<String>("", headers);
-		
-		// Make the actual call.
-		ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
-
-		if (response.getStatusCode() == HttpStatus.OK) {			
-			return response.getBody();
-		} else {
-			// TODO: better error handling
-			throw new UnknownError("Status code:"
-					+ response.getStatusCode().value());
-		}
-		
-	}
-	
 	/**
 	 * This needs to be replaced with a Synapse Java Client call
 	 */
