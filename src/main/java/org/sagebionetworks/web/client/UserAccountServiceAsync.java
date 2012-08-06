@@ -9,9 +9,9 @@ public interface UserAccountServiceAsync {
 
 	void sendPasswordResetEmail(String emailAddress, AsyncCallback<Void> callback);
 	
-	void sendSetApiPasswordEmail(String emailAddress, AsyncCallback<Void> callback);
+	void sendSetApiPasswordEmail(String sessionToken, AsyncCallback<Void> callback);
 
-	void setPassword(String email, String newPassword, AsyncCallback<Void> callback);
+	void setPassword(String sessionToken, String newPassword, AsyncCallback<Void> callback);
 
 	/**
 	 * This needs to be replaced with a Synapse Java Client call

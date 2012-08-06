@@ -132,7 +132,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		} else {
 			UserSessionData currentUser = authenticationController.getLoggedInUser();
 			if (currentUser != null) {
-				userService.setPassword(currentUser.getProfile().getUserName(),
+				userService.setPassword(currentUser.getSessionToken(),
 						newPassword, new AsyncCallback<Void>() {
 							@Override
 							public void onSuccess(Void result) {

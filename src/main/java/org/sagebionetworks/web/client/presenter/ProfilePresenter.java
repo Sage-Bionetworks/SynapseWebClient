@@ -110,9 +110,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							ownerProfile.setDisplayName(firstName + " " + lastName);
 							if (email != null)
 								ownerProfile.setEmail(email);
-							//supplement with data that came from crowd during authentication
-							ownerProfile.setUserName(authenticationController.getLoggedInUser().getProfile().getUserName());
-														
 							if (pic != null)
 								ownerProfile.setPic(pic);
 							

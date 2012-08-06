@@ -95,7 +95,8 @@ public class DisplayConstants {
 	public static final String LABEL_R_CLIENT_INSTALL = "Install Synapse R Client";
 	public static final String LABEL_R_CLIENT_GET_ENTITY = "Obtain a pointer";
 	public static final String LABEL_R_CLIENT_LOAD_ENTITY = "Load the data";
-		
+	public static final String LOGIN_USERNAME_LABEL = "Email Address";
+	
 	/*
 	 * Service Constants (move to another file?)
 	 */

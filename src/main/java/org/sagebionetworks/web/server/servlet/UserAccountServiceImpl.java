@@ -129,13 +129,13 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 //		}						
 	}
 
-	public void sendSetApiPasswordEmail(String emailAddress) throws RestServiceException {
+	public void sendSetApiPasswordEmail(String sessionToken) throws RestServiceException {
 		// First make sure the service is ready to go.
 		validateService();
 		
 		JSONObject obj = new JSONObject();
 		try {
-			obj.put("email", emailAddress);
+			obj.put("sessionToken", sessionToken);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -219,14 +219,14 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public void setPassword(String email, String newPassword) {
+	public void setPassword(String sessionToken, String newPassword) {
 		// First make sure the service is ready to go.
 		validateService();
 		
 		JSONObject obj = new JSONObject();
 		try {
-			obj.put("email", email);
-			obj.put("password", newPassword);
+			obj.put("sessionToken", sessionToken);
+			obj.put("newPassword", newPassword);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -244,7 +244,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		HttpMethod method = HttpMethod.POST;
 		
 		// NOTE: do not log the JSON as it includes the user's new clear text password!
-		logger.info(method.toString() + ": " + url + ", for user " + email); 
+		logger.info(method.toString() + ": " + url + ", for user "); 
 		
 		// Make the actual call.
 		try {

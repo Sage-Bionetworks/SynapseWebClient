@@ -12,9 +12,9 @@ public interface UserAccountService extends RemoteService {
 
 	public void sendPasswordResetEmail(String emailAddress) throws RestServiceException;
 	
-	void sendSetApiPasswordEmail(String emailAddress) throws RestServiceException;
+	void sendSetApiPasswordEmail(String sessionToken) throws RestServiceException;
 	
-	public void setPassword(String email, String newPassword);
+	public void setPassword(String sessionToken, String newPassword);
 
 	public String initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws RestServiceException;
 	

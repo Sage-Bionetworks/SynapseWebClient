@@ -53,7 +53,6 @@ public class SettingsPresenterTest {
 		profilePresenter.setPlace(place);
 		profile.setDisplayName("tester");
 		profile.setOwnerId("testuser@test.com");
-		profile.setUserName("testuser@test.com");
 		testUser.setProfile(profile);
 		testUser.setSessionToken("token");
 		testUser.setIsSSO(false);
@@ -95,7 +94,7 @@ public class SettingsPresenterTest {
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
 		String newPassword = "otherpassword";
 		
-		profilePresenter.resetPassword(password, newPassword);
+		profilePresenter.resetPassword(newPassword);
 	}
 	
 	@Test
