@@ -143,7 +143,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 							public void handleEvent(MessageBoxEvent be) { 												
 								Button btn = be.getButtonClicked();
 								if(Dialog.YES.equals(btn.getItemId())) {
-									presenter.deleteEntity(model.getId());
+									presenter.deleteEntity(model);
 									
 								}
 							}
@@ -310,6 +310,11 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 				callback.onFailure(caught);
 			}
 		});
+	}
+
+	@Override
+	public void removeEntity(EntityTreeModel entityModel) {
+		store.remove(entityModel);
 	}
 	
 }
