@@ -133,24 +133,17 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		// First make sure the service is ready to go.
 		validateService();
 		
-		JSONObject obj = new JSONObject();
-		try {
-			obj.put("sessionToken", sessionToken);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
 		// Build up the path
 		String url = urlProvider.getPrivateAuthBaseUrl() + "/" + ServiceUtils.AUTHSVC_SEND_API_PASSWORD_PATH;
-		String jsonString = obj.toString();
 		
 		// Setup the header
 		HttpHeaders headers = new HttpHeaders();
+		UserDataProvider.addUserDataToHeader(this.getThreadLocalRequest(), headers);
+		HttpEntity<String> entity = new HttpEntity<String>("", headers);
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<String>(jsonString, headers);
 		HttpMethod method = HttpMethod.POST;
 		
-		logger.info(method.toString() + ": " + url + ", JSON: " + jsonString);
+		logger.info(method.toString() + ": " + url);
 		
 		// Make the actual call.
 		try {
@@ -225,7 +218,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		
 		JSONObject obj = new JSONObject();
 		try {
-			obj.put("sessionToken", sessionToken);
 			obj.put("newPassword", newPassword);
 		} catch (JSONException e) {
 			e.printStackTrace();
