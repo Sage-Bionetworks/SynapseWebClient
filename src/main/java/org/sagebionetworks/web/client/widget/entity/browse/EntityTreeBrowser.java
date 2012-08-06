@@ -172,11 +172,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 
 	@Override
-	public void deleteEntity(final String entityId) {
+	public void deleteEntity(final EntityTreeModel entityModel) {
+		final String entityId = entityModel.getId();
 		synapseClient.deleteEntity(entityId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo("Deleted", "Synapse id " + entityId + " was successfully deleted.");
+				view.removeEntity(entityModel);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

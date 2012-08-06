@@ -25,6 +25,12 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseWidgetView {
 	public void setRootEntities(List<EntityHeader> rootEntities);
 	
 	/**
+	 * Remove an entity from the view identified by entityId
+	 * @param entityModel
+	 */
+	public void removeEntity(EntityTreeModel entityModel);
+
+	/**
 	 * Show links if true
 	 * @param makeLinks Make the labels entity links if true 
 	 */
@@ -49,7 +55,7 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseWidgetView {
 
 		ImageResource getIconForType(String type);
 
-		void deleteEntity(String entityId);
+		void deleteEntity(EntityTreeModel model);
 
 		void onEdit(String entityId);
 
