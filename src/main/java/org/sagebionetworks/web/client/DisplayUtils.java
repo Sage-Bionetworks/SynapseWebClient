@@ -255,7 +255,7 @@ public class DisplayUtils {
 	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, UserSessionData currentUser) {
 		if(ex instanceof UnauthorizedException) {
 			// send user to login page						
-			Info.display("Session Timeout", "Your session has timed out. Please login again.");
+			showInfo("Session Timeout", "Your session has timed out. Please login again.");
 			placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			return true;
 		} else if(ex instanceof ForbiddenException) {			
@@ -361,7 +361,9 @@ public class DisplayUtils {
 	}
 
 	/**
-	 * Shows an info message to the user
+	 * Shows an info message to the user in the "Global Alert area".
+	 * For more precise control over how the message appears,
+	 * use the {@link displayGlobalAlert(Alert)} method.
 	 * @param title
 	 * @param message
 	 */
@@ -869,6 +871,11 @@ public class DisplayUtils {
 		return false;
 	}
 
+	/**
+	 * The preferred method for creating new global alerts.  For a
+	 * default 'info' type alert, you can also use {@link showInfo(String, String)}
+	 * @param alert
+	 */
 	public static void displayGlobalAlert(Alert alert) {
 		Element container = DOM.getElementById(ALERT_CONTAINER_ID);
 		DOM.insertChild(container, alert.getElement(), 0);
