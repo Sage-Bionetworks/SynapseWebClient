@@ -109,12 +109,14 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		//initialize buttons
 		if(userButton == null) {
 			userButton = new Button();
+			userButton.setId(DisplayConstants.ID_BTN_USER);
 			userButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.user16()));
 			userButton.setHeight(35);
 			configureUserMenu();
 		}
 		if(loginButton == null) {
 			loginButton = new Button(DisplayConstants.BUTTON_LOGIN);
+			loginButton.setId(DisplayConstants.ID_BTN_LOGIN);
 			loginButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
@@ -125,6 +127,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		if (registerButton == null)
 		{
 			registerButton = new Button(DisplayConstants.BUTTON_REGISTER);
+			registerButton.setId(DisplayConstants.ID_BTN_REGISTER);
 			registerButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
@@ -157,25 +160,28 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		addMenuItem(DisplayConstants.TEXT_USER_VIEW_PROFILE, 
 				AbstractImagePrototype.create(iconsImageBundle.user16()),
 				new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN),
+				DisplayConstants.ID_MNU_USER_PROFILE,
 				menu);
 		
 		addMenuItem(DisplayConstants.TEXT_USER_SETTINGS, 
 				new Settings(DisplayUtils.DEFAULT_PLACE_TOKEN),
+				DisplayConstants.ID_MNU_USER_SETTINGS,
 				menu);
 		
 		addMenuItem(DisplayConstants.BUTTON_LOGOUT,
 				new LoginPlace(LoginPlace.LOGOUT_TOKEN),
+				DisplayConstants.ID_MNU_USER_LOGOUT,
 				menu);
 		
 		userButton.setMenu(menu);
 	}
 	
-	private void addMenuItem(String text, final Place place, Menu menu)
+	private void addMenuItem(String text, final Place place, String id, Menu menu)
 	{
-		addMenuItem(text, null, place, menu);
+		addMenuItem(text, null, place, id, menu);
 	}
 	
-	private void addMenuItem(String text, AbstractImagePrototype icon, final Place place, Menu menu)
+	private void addMenuItem(String text, AbstractImagePrototype icon, final Place place, String id, Menu menu)
 	{
 		MenuItem menuItem = new MenuItem(text, icon);
 		menuItem.addSelectionListener(new SelectionListener<MenuEvent>() {
@@ -184,6 +190,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				globalApplicationState.getPlaceChanger().goTo(place);
 			}
 		});
+		menuItem.setId(id);
 		menu.add(menuItem);
 	}
 }

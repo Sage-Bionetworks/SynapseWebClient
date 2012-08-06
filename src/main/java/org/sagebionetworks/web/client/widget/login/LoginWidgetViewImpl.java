@@ -56,7 +56,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		if (userHasExplictlyAcceptedTermsOfUse) {
 			sb.appendHtmlConstant("    <input name=\""+ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
 		}
-		sb.appendHtmlConstant("    <button id=\"login-via-gapp-google\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"http://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")
+		sb.appendHtmlConstant("    <button id=\"" + DisplayConstants.ID_BTN_LOGIN_GOOGLE + "\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"http://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")
 		.appendHtmlConstant("</form>")		
 		.appendHtmlConstant("<p>&nbsp;</p>");
 		return sb.toSafeHtml();
@@ -113,11 +113,13 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		firstName.setFieldLabel(DisplayConstants.LOGIN_USERNAME_LABEL);
 		firstName.setAllowBlank(false);
 		firstName.getFocusSupport().setPreviousId(formPanel.getButtonBar().getId());
+		firstName.setId(DisplayConstants.ID_INP_EMAIL_NAME);
 		fieldSet.add(firstName, formData);
 
 		password.setFieldLabel("Password");
 		password.setAllowBlank(false);
 		password.setPassword(true);
+		password.setId(DisplayConstants.ID_INP_EMAIL_PASSWORD);
 		fieldSet.add(password, formData);
 
 		fieldSet.add(messageLabel);
@@ -129,6 +131,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 				presenter.setUsernameAndPassword(firstName.getValue(), password.getValue(), false);
 			}
 		});
+		loginButton.setId(DisplayConstants.ID_BTN_LOGIN2);
 
 		fieldSet.add(loginButton);
 		formPanel.add(fieldSet);		

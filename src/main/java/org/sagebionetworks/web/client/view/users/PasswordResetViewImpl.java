@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view.users;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -94,7 +95,8 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	   
 	     final TextField<String> emailAddress = new TextField<String>();  
 	     emailAddress.setFieldLabel("Email Address");  
-	     emailAddress.setAllowBlank(false);  
+	     emailAddress.setAllowBlank(false);
+	     emailAddress.setId(DisplayConstants.ID_INP_EMAIL_ADDRESS2);
 	     fieldSet.add(emailAddress, formData);  
 	   
 	     requestFormPanel.add(fieldSet);  
@@ -140,12 +142,14 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	     newPassword.setFieldLabel("New Password");  
 	     newPassword.setAllowBlank(false);
 	     newPassword.setPassword(true);
+	     newPassword.setId(DisplayConstants.ID_INP_NEWPASSWORD);
 	     fieldSet.add(newPassword, formData);  
 	   
 	     final TextField<String> newPasswordConfirm = new TextField<String>();  
 	     newPasswordConfirm.setFieldLabel("Confirm Password");  
 	     newPasswordConfirm.setAllowBlank(false);
 	     newPasswordConfirm.setPassword(true);
+	     newPasswordConfirm.setId(DisplayConstants.ID_INP_CONFIRMPASSWORD);
 	     fieldSet.add(newPasswordConfirm, formData);  
 	   
 	     resetFormPanel.add(fieldSet);  
@@ -163,6 +167,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 				
 			}
 	     });
+	     sendReset.setId(DisplayConstants.ID_BTN_SUBMIT);
 	     resetFormPanel.addButton(sendReset);  		       		  
 	   }
 
