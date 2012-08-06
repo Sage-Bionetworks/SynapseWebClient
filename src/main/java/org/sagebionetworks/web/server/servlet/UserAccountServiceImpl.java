@@ -129,7 +129,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 //		}						
 	}
 
-	public void sendSetApiPasswordEmail(String sessionToken) throws RestServiceException {
+	public void sendSetApiPasswordEmail() throws RestServiceException {
 		// First make sure the service is ready to go.
 		validateService();
 		
@@ -212,7 +212,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public void setPassword(String sessionToken, String newPassword) {
+	public void setPassword(String newPassword) {
 		// First make sure the service is ready to go.
 		validateService();
 		
