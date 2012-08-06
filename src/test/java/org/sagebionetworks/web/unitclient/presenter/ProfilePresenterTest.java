@@ -5,8 +5,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.UnsupportedEncodingException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -71,7 +69,6 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		userProfile.setDisplayName("tester");
 		userProfile.setOwnerId("1");
-		userProfile.setUserName("testuser@test.com");
 		testUser.setProfile(userProfile);
 		testUser.setSessionToken("token");
 		testUser.setIsSSO(false);

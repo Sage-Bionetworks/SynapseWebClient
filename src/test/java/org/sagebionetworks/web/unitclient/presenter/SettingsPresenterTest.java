@@ -94,7 +94,7 @@ public class SettingsPresenterTest {
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
 		String newPassword = "otherpassword";
 		
-		profilePresenter.resetPassword(newPassword);
+		profilePresenter.resetPassword("testuser@test.com", password, newPassword);
 	}
 	
 	@Test

@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -153,7 +154,7 @@ public class UserAccountServiceImplTest {
 		// assure user was actually created		
 		String userDataJson = service.initiateSession(user1.getEmail(), user1password, false);
 		UserSessionData userData = EntityFactory.createEntityFromJSONString(userDataJson, UserSessionData.class);
-		assertEquals(userData.getProfile().getUserName(), user1.getEmail());
+		Assert.assertNotNull(userData.getSessionToken());
 	}
 	
 	@Test(expected=UnauthorizedException.class)
@@ -167,8 +168,7 @@ public class UserAccountServiceImplTest {
 		// auth real user
 		String userdataJson = service.initiateSession(user1.getEmail(), user1password, false);
 		UserSessionData userData = EntityFactory.createEntityFromJSONString(userdataJson, UserSessionData.class);
-		assertEquals(user1.getEmail(), userData.getProfile().getUserName());
-		
+		Assert.assertNotNull(userData.getSessionToken());
 	}
 		
 	@Test

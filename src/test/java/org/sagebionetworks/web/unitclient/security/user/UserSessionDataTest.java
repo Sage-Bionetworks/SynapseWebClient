@@ -17,7 +17,6 @@ public class UserSessionDataTest {
 		UserProfile profile = new UserProfile();
 		profile.setDisplayName("Display Name");
 		profile.setOwnerId("1");
-		profile.setUserName("email@email.com");
 		user.setProfile(profile);
 		user.setSessionToken("token");
 		user.setIsSSO(false);
