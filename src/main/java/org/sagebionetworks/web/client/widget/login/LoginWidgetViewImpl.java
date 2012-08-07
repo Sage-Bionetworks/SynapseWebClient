@@ -110,7 +110,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		fieldSet.setLayout(layout);  
 		fieldSet.setCollapsible(false);
 		
-		firstName.setFieldLabel("Email Address");
+		firstName.setFieldLabel(DisplayConstants.LOGIN_USERNAME_LABEL);
 		firstName.setAllowBlank(false);
 		firstName.getFocusSupport().setPreviousId(formPanel.getButtonBar().getId());
 		firstName.setId(DisplayConstants.ID_INP_EMAIL_NAME);

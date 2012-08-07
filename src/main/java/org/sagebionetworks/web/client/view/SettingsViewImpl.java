@@ -157,6 +157,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	     layout.setLabelWidth(100);  
 	     fieldSet.setLayout(layout);  
 	   
+	     final TextField<String> username = new TextField<String>();  
+	     username.setFieldLabel(DisplayConstants.LOGIN_USERNAME_LABEL);  
+	     username.setAllowBlank(false);
+	     fieldSet.add(username, formData);  
+
 	     final TextField<String> currentPassword = new TextField<String>();  
 	     currentPassword.setFieldLabel("Current Password");  
 	     currentPassword.setAllowBlank(false);
@@ -188,7 +193,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	    		 if(newPassword.getValue() != null && newPasswordConfirm.getValue() != null && newPassword.getValue().equals(newPasswordConfirm.getValue())) {
 	    			 changePasswordLabel.setHTML(SafeHtmlUtils.fromSafeConstant(""));
 	    			 DisplayUtils.changeButtonToSaving(changePasswordButton, sageImageBundle);
-	    			 presenter.resetPassword(currentPassword.getValue(), newPassword.getValue());
+	    			 presenter.resetPassword(username.getValue(), currentPassword.getValue(), newPassword.getValue());
 	    		 } else {
 	    			 MessageBox.alert("Error", "Passwords do not match. Please re-enter your new password.", null);
 	    		 }

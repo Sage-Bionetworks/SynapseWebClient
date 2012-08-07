@@ -235,15 +235,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void showUserUpdateSuccess() {
-		updateUserInfoButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.checkGreen16()));
-		updateUserInfoButton.setText("Profile Updated");
+		changeUserInfoButtonToDefault();
 		presenter.redirectToViewProfile();
 	}
 
 	@Override
 	public void userUpdateFailed() {
-		updateUserInfoButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.error16()));
-		updateUserInfoButton.setText("Profile Update Failed");
+		changeUserInfoButtonToDefault();
+	}
+	
+	private void changeUserInfoButtonToDefault()
+	{
+		updateUserInfoButton.setIcon(null);
+		updateUserInfoButton.setText(DisplayConstants.BUTTON_CHANGE_USER_INFO);
 	}
 
 	 private void createProfileForm() {

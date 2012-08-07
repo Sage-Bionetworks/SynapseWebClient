@@ -4,10 +4,9 @@ import java.util.logging.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.client.exceptions.SynapseTermsOfUseException;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
@@ -18,16 +17,13 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
-import org.sagebionetworks.web.shared.users.GetUser;
 import org.sagebionetworks.web.shared.users.UserRegistration;
-import org.sagebionetworks.web.shared.users.UserSession;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -133,28 +129,21 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 //		}						
 	}
 
-	public void sendSetApiPasswordEmail(String emailAddress) throws RestServiceException {
+	public void sendSetApiPasswordEmail() throws RestServiceException {
 		// First make sure the service is ready to go.
 		validateService();
 		
-		JSONObject obj = new JSONObject();
-		try {
-			obj.put("email", emailAddress);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
 		// Build up the path
 		String url = urlProvider.getPrivateAuthBaseUrl() + "/" + ServiceUtils.AUTHSVC_SEND_API_PASSWORD_PATH;
-		String jsonString = obj.toString();
 		
 		// Setup the header
 		HttpHeaders headers = new HttpHeaders();
+		UserDataProvider.addUserDataToHeader(this.getThreadLocalRequest(), headers);
+		HttpEntity<String> entity = new HttpEntity<String>("", headers);
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<String>(jsonString, headers);
 		HttpMethod method = HttpMethod.POST;
 		
-		logger.info(method.toString() + ": " + url + ", JSON: " + jsonString);
+		logger.info(method.toString() + ": " + url);
 		
 		// Make the actual call.
 		try {
@@ -223,14 +212,13 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public void setPassword(String email, String newPassword) {
+	public void setPassword(String newPassword) {
 		// First make sure the service is ready to go.
 		validateService();
 		
 		JSONObject obj = new JSONObject();
 		try {
-			obj.put("email", email);
-			obj.put("password", newPassword);
+			obj.put("newPassword", newPassword);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -248,7 +236,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		HttpMethod method = HttpMethod.POST;
 		
 		// NOTE: do not log the JSON as it includes the user's new clear text password!
-		logger.info(method.toString() + ": " + url + ", for user " + email); 
+		logger.info(method.toString() + ": " + url + ", for user "); 
 		
 		// Make the actual call.
 		try {
@@ -271,150 +259,52 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	/**
-	 * This needs to be replaced with a Synapse Java Client call
+	 * Calls Synapse Java Client login()
 	 */
-	@Deprecated
 	@Override
 	public String initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws RestServiceException {
 		// First make sure the service is ready to go.
 		validateService();
 		
-		JSONObject obj = new JSONObject();
+		Synapse synapseClient = createSynapseClient();
+		String userSessionJson = null;
 		try {
-			obj.put("email", username);
-			obj.put("password", password);
-			if (explicitlyAcceptsTermsOfUse) obj.put("acceptsTermsOfUse", "true");
-		} catch (JSONException e) {
+			UserSessionData userData = synapseClient.login(username, password, explicitlyAcceptsTermsOfUse);
+			userSessionJson = EntityFactory.createJSONStringForEntity(userData);
+		} catch (JSONObjectAdapterException e) {
 			e.printStackTrace();
+			throw new UnauthorizedException(e.getMessage());
+		} catch (SynapseTermsOfUseException e) {
+			throw new TermsOfUseException(e.getMessage());
+		} catch (SynapseException e) {
+			throw new RestServiceException(e.getMessage());
 		}
 		
-		// Build up the path
-		String url = urlProvider.getPrivateAuthBaseUrl() + "/" + ServiceUtils.AUTHSVC_INITIATE_SESSION_PATH;
-		String jsonString = obj.toString();
-		
-		// Setup the header
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<String>(jsonString, headers);
-		HttpMethod method = HttpMethod.POST;
-		
-		logger.info(method.toString() + ": " + url + ", for user " + username); // DO NOT log the entire json string as it includes the user's password
-		
-		ResponseEntity<UserSession> response = null;
-		try {
-			response = templateProvider.getTemplate().exchange(url, method, entity, UserSession.class);
-		} catch (HttpClientErrorException ex) {
-			HttpStatus status = ex.getStatusCode();
-			switch (status.value()) {
-			case 403:
-				String termsOfUseContent = "";
-				try {
-					String responseBody = ex.getResponseBodyAsString();
-					JSONObject json = new JSONObject(responseBody);
-					termsOfUseContent = json.getString("reason");
-				} catch (JSONException e) {
-					throw new RuntimeException(e);
-				}
-				throw new TermsOfUseException(termsOfUseContent);
-			default:
-				throw new UnauthorizedException(ex.getMessage());
-			}
-		}
-		
-		String userSessionJson = null;		
-		if((response.getStatusCode() == HttpStatus.CREATED || response.getStatusCode() == HttpStatus.OK) && response.hasBody()) {
-			try {
-				UserSession initSession = response.getBody();
-				//String displayName = initSession.getDisplayName();
-				String sessionToken = initSession.getSessionToken();
-				UserProfile profile = getUserProfile(sessionToken);
-				String fName = null;
-				String lName = null;
-				if (initSession.getDisplayName() != null) {
-					String[] firstLast = initSession.getDisplayName().split(" ");
-					if (firstLast.length > 1) {
-						fName = firstLast[0];
-						//everything else can go in the last name
-						lName = initSession.getDisplayName().substring(fName.length()+1).trim();
-					}
-				}
-				
-				fillInCrowdInfo(fName, lName, username, profile);
-				UserSessionData userData = new UserSessionData();
-				userData.setIsSSO(false);
-				userData.setSessionToken(sessionToken);
-				userData.setProfile(profile);
-				userSessionJson = EntityFactory.createJSONStringForEntity(userData);
-			} catch (JSONObjectAdapterException e) {
-				e.printStackTrace();
-				throw new UnauthorizedException(e.getMessage());
-			}
-		} else {			
-			throw new UnauthorizedException("Unable to authenticate.");
-		}
-		return userSessionJson;			
-	}
-
-	private void fillInCrowdInfo(String fName, String lName, String email, UserProfile profile)
-	{
-		profile.setUserName(email);
-		if (profile.getFirstName() == null || profile.getFirstName().length() == 0){
-			profile.setFirstName(fName);
-		}
-		if (profile.getLastName() == null || profile.getLastName().length() == 0){
-			profile.setLastName(lName);
-		}
-		if (profile.getEmail() == null || profile.getEmail().length() == 0){
-			profile.setEmail(email);
-		}
+		return userSessionJson;
 	}
 	
 	/**
-	 * This needs to be replaced with a Synapse Java Client call
+	 * Just calls the Synapse Java Client getUserSessionData()
 	 */
-	@Deprecated
 	@Override
 	public String getUser(String sessionToken) throws AuthenticationException, RestServiceException {
 		// First make sure the service is ready to go.
 		validateService();
-		
-		// Build up the path
-		String url = urlProvider.getPrivateAuthBaseUrl() + "/" + ServiceUtils.AUTHSVC_GET_USER_PATH;				
-		
-		// Setup the header
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add(UserDataProvider.SESSION_TOKEN_KEY, sessionToken);
-		HttpEntity<String> entity = new HttpEntity<String>("", headers);
-		HttpMethod method = HttpMethod.GET;
-		
-		logger.info(method.toString() + ": " + url); 
-		
-		ResponseEntity<GetUser> response = null;
-		try {
-			response = templateProvider.getTemplate().exchange(url, method, entity, GetUser.class);
-		} catch (HttpClientErrorException ex) {
-			throw new AuthenticationException("Unable to authenticate.");
-		}
-		
+		Synapse synapseClient = createSynapseClient(sessionToken);
 		String userSessionJson = null;
-		if((response.getStatusCode() == HttpStatus.CREATED || response.getStatusCode() == HttpStatus.OK) && response.hasBody()) {
-			try {
-				GetUser getUser = response.getBody();
-				UserProfile profile = getUserProfile(sessionToken);
-				fillInCrowdInfo(getUser.getFirstName(), getUser.getLastName(), getUser.getEmail(), profile);
-				UserSessionData userData = new UserSessionData();
-				userData.setIsSSO(false);
-				userData.setSessionToken(sessionToken);
-				userData.setProfile(profile);
-				userSessionJson = EntityFactory.createJSONStringForEntity(userData);
-			} catch (JSONObjectAdapterException e) {
-				throw new AuthenticationException(e);
-			}
-		} else {			
-			throw new AuthenticationException("Unable to authenticate.");
+		try {
+			UserSessionData userData = synapseClient.getUserSessionData();
+			userSessionJson = EntityFactory.createJSONStringForEntity(userData);
+		} catch (JSONObjectAdapterException e) {
+			e.printStackTrace();
+			throw new UnauthorizedException(e.getMessage());
+		} catch (SynapseTermsOfUseException e) {
+			throw new TermsOfUseException(e.getMessage());
+		} catch (SynapseException e) {
+			throw new RestServiceException(e.getMessage());
 		}
-		return userSessionJson;		
+		
+		return userSessionJson;
 	}	
 
 	
@@ -533,57 +423,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}		
 	}
 
-	/**
-	 * This needs to be replaced with a Synapse Java Client call
-	 */
-	@Deprecated
-	@Override
-	public boolean ssoLogin(String sessionToken) throws RestServiceException {
-		// First make sure the service is ready to go.
-		validateService();
-		
-		JSONObject obj = new JSONObject();
-		try {
-			obj.put("sessionToken", sessionToken);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
-		// Build up the path
-		String url = urlProvider.getPrivateAuthBaseUrl() + "/" + ServiceUtils.AUTHSVC_REFRESH_SESSION_PATH;
-		String jsonString = obj.toString();
-		
-		// Setup the header
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<String>(jsonString, headers);
-		HttpMethod method = HttpMethod.PUT;
-		
-		logger.info(method.toString() + ": " + url + ", JSON: " + jsonString);
-		
-		// Make the actual call.
-		try {
-			ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
-		} catch (UnexpectedException ex) {
-			return true;
-		} catch (NullPointerException nex) {
-			// TODO : change this to properly deal with a 204!!!
-			return true; // this is expected
-		} catch (HttpClientErrorException ex) {
-			HttpStatus status = ex.getStatusCode();
-			switch (status.value()) {
-			case 403:
-				throw new TermsOfUseException("Please log and sign the Terms of Use.");
-			default:
-				throw new UnauthorizedException(ex.getMessage());
-			}
-		}
-		return false;
-	}
-	
-
-
-
 	@Override
 	public String getPrivateAuthServiceUrl() {
 		return urlProvider.getPrivateAuthBaseUrl();
@@ -618,36 +457,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}
 	}
 
-	
-	/*
-	 * Private Methods
-	 */
-	private String getJsonStringForUrl(String url, HttpMethod method) {
-		// First make sure the service is ready to go.
-		validateService();
-
-		logger.info(method.toString() + ": " + url);
-		
-		// Setup the header
-		HttpHeaders headers = new HttpHeaders();
-		// If the user data is stored in a cookie, then fetch it and the session token to the header.
-		UserDataProvider.addUserDataToHeader(this.getThreadLocalRequest(), headers);
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<String>("", headers);
-		
-		// Make the actual call.
-		ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
-
-		if (response.getStatusCode() == HttpStatus.OK) {			
-			return response.getBody();
-		} else {
-			// TODO: better error handling
-			throw new UnknownError("Status code:"
-					+ response.getStatusCode().value());
-		}
-		
-	}
-	
 	/**
 	 * This needs to be replaced with a Synapse Java Client call
 	 */
@@ -687,17 +496,4 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
 		return synapseClient;
 	}
-
-	private UserProfile getUserProfile(String sessionToken) throws RestServiceException {
-		Synapse synapseClient = createSynapseClient(sessionToken);
-		UserProfile userProfile;
-		try {
-			userProfile = synapseClient.getMyProfile();
-		} catch (SynapseException e) {
-			throw new RestServiceException(e.getMessage());
-		}
-		return userProfile;
-	}
-
-
 }

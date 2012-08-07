@@ -37,7 +37,6 @@ public class ServiceUtils {
 	public static final String AUTHSVC_SET_PASSWORD_PATH = "userPassword";
 	public static final String AUTHSVC_INITIATE_SESSION_PATH = "session";
 	public static final String AUTHSVC_CREATE_USER_PATH = "user";
-	@Deprecated
 	public static final String AUTHSVC_GET_USER_PATH = "user";
 	@Deprecated
 	public static final String AUTHSVC_UPDATE_USER_PATH = "user";

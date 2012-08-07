@@ -43,7 +43,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 	
 	public interface Presenter extends SynapsePresenter {
 
-		void resetPassword(String existingPassword, String newPassword);
+		void resetPassword(String username, String existingPassword, String newPassword);
 
 		void createSynapsePassword();
 		
