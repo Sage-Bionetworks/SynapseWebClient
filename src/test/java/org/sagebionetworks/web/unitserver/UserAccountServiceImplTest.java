@@ -183,7 +183,7 @@ public class UserAccountServiceImplTest {
 	@Test
 	public void testSendSetApiPasswordEmail() {
 		try {
-			service.sendSetApiPasswordEmail(user1.getEmail());
+			service.sendSetApiPasswordEmail();
 		} catch (RestServiceException e) {
 			fail(e.getMessage());
 		}

@@ -129,7 +129,7 @@ public class PasswordResetPresenterTest {
 		resetAll();
 		presenter = new PasswordResetPresenter(mockView, mockCookieProvider, mockUserService, mockAuthenticationController,mockSageImageBundle,mockIconsImageBundle, mockGlobalApplicationState, mockNodeModelCreator);			
 		presenter.setPlace(place);
-		AsyncMockStubber.callSuccessWith(null).when(mockUserService).setPassword(any(String.class), any(String.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserService).setPassword(any(String.class), any(AsyncCallback.class));
 		presenter.resetPassword("myPassword");
 		//verify password reset text is shown in the view
 		verify(mockView).showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
@@ -141,7 +141,7 @@ public class PasswordResetPresenterTest {
 	public void testServiceFailure() {
 		//without the registration token set, mock a failed user service call
 		resetAll();
-		AsyncMockStubber.callFailureWith(new RestServiceException("unknown error")).when(mockUserService).setPassword(any(String.class), any(String.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new RestServiceException("unknown error")).when(mockUserService).setPassword(any(String.class), any(AsyncCallback.class));
 		presenter = new PasswordResetPresenter(mockView, mockCookieProvider, mockUserService, mockAuthenticationController,mockSageImageBundle,mockIconsImageBundle, mockGlobalApplicationState, mockNodeModelCreator);			
 		presenter.setPlace(place);
 		presenter.resetPassword("myPassword");

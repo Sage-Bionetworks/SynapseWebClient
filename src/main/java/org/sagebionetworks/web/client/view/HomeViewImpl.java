@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 
+import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
@@ -86,6 +87,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 				
 				public void onSuccess(String showBCCSignup) {
 					if (showBCCSignup==null || !showBCCSignup.equalsIgnoreCase("true")) return;
+					ContentPanel panel = new ContentPanel();
+					panel.setUrl("http://www.cnn.com/");
+					panel.setHeaderVisible(false);
+					panel.setBorders(false);
+					panel.setBodyBorder(false);
 					Panel sp = new SimplePanel();
 					sp.add(new HTML(SafeHtmlUtils.fromSafeConstant(
 							"<div class=\"span-6 inner-6 view notopmargin\">" +
@@ -95,7 +101,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 					    "well as genome-wide molecular profiling data including gene expression and copy number profiles.</p>"+
 	                	"<a class=\"button_readmore\"  href=\"#BCCOverview:0\"></a></div>")));
 					bccSignup.clear();
-					bccSignup.add(sp);
+					bccSignup.add(panel);
 				}
 				public void onFailure(Throwable t) {
 					// do nothing
