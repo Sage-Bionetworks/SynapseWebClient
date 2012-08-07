@@ -9,9 +9,9 @@ public interface UserAccountServiceAsync {
 
 	void sendPasswordResetEmail(String emailAddress, AsyncCallback<Void> callback);
 	
-	void sendSetApiPasswordEmail(String emailAddress, AsyncCallback<Void> callback);
+	void sendSetApiPasswordEmail(AsyncCallback<Void> callback);
 
-	void setPassword(String email, String newPassword, AsyncCallback<Void> callback);
+	void setPassword(String newPassword, AsyncCallback<Void> callback);
 
 	/**
 	 * This needs to be replaced with a Synapse Java Client call
@@ -34,12 +34,6 @@ public interface UserAccountServiceAsync {
 	void updateUser(String firstName, String lastName, String displayName, AsyncCallback<Void> callback) throws RestServiceException;
 	
 	void terminateSession(String sessionToken, AsyncCallback<Void> callback);
-
-	/**
-	 * This needs to be replaced with a Synapse Java Client call
-	 */
-	@Deprecated
-	void ssoLogin(String sessionToken, AsyncCallback<Boolean> callback);
 
 	void getPrivateAuthServiceUrl(AsyncCallback<String> callback);
 

@@ -150,7 +150,6 @@ public class LicensedDownloaderTest {
 		UserProfile profile = new UserProfile();
 		profile.setDisplayName("Display Name");
 		profile.setOwnerId("1");
-		profile.setUserName("email@email.com");
 		user1.setProfile(profile);
 		user1.setSessionToken("token");
 		user1.setIsSSO(false);
