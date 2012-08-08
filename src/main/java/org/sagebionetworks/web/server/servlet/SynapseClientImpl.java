@@ -78,18 +78,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	@SuppressWarnings("unused")
 	private ServiceUrlProvider urlProvider;
 	
-	// ********** temporary fix for PLFM-1417
-	private static long usersGroupsCacheTimeout = 5 * 60 * 1000; // 5 minutes, in milliseconds
-	private long lastUsersFetch;
-	private long lastGroupsFetch;
-	private PaginatedResults<UserProfile> users_cached;
-	private PaginatedResults<UserGroup> groups_cached;
-	
-	// change the cache timeout interval for testing purposes
-	public void setTimeout(Long l) {
-		usersGroupsCacheTimeout = l;
-	}
-	// ********** end tempfix
+//	// ********** temporary fix for PLFM-1417
+//	private static long usersGroupsCacheTimeout = 5 * 60 * 1000; // 5 minutes, in milliseconds
+//	private long lastUsersFetch;
+//	private long lastGroupsFetch;
+//	private PaginatedResults<UserProfile> users_cached;
+//	private PaginatedResults<UserGroup> groups_cached;
+//	
+//	// change the cache timeout interval for testing purposes
+//	public void setTimeout(Long l) {
+//		usersGroupsCacheTimeout = l;
+//	}
+//	// ********** end tempfix
 
 	/**
 	 * Essentially the constructor. Setup synapse client.
@@ -358,14 +358,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws SynapseException, JSONObjectAdapterException {
 		if ((EntityBundleTransport.USERS & partsMask) > 0) {
 			
-			// ***** Tempfix for PLFM-1417
-			long timeSinceLastRequest = System.currentTimeMillis() - lastUsersFetch;			
-			if (timeSinceLastRequest > usersGroupsCacheTimeout || users_cached == null) {
-				users_cached = synapseClient.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT);
-				lastUsersFetch = System.currentTimeMillis();
-			}
-			transport.setUsersJson(EntityFactory.createJSONStringForEntity(users_cached));
-			// ***** end tempfix
+//			// ***** Tempfix for PLFM-1417
+//			long timeSinceLastRequest = System.currentTimeMillis() - lastUsersFetch;			
+//			if (timeSinceLastRequest > usersGroupsCacheTimeout || users_cached == null) {
+//				users_cached = synapseClient.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT);
+//				lastUsersFetch = System.currentTimeMillis();
+//			}
+//			transport.setUsersJson(EntityFactory.createJSONStringForEntity(users_cached));
+//			// ***** end tempfix
 			
 		}
 	}
@@ -375,14 +375,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws SynapseException, JSONObjectAdapterException {
 		if ((EntityBundleTransport.GROUPS & partsMask) > 0) {
 			
-			// ***** Tempfix for PLFM-1417
-			long timeSinceLastFetch = System.currentTimeMillis() - lastGroupsFetch;			
-			if (timeSinceLastFetch > usersGroupsCacheTimeout || groups_cached == null) {
-				groups_cached = synapseClient.getGroups(GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
-				lastGroupsFetch = System.currentTimeMillis();
-			}
-			transport.setGroupsJson(EntityFactory.createJSONStringForEntity(groups_cached));
-			// ***** end tempfix
+//			// ***** Tempfix for PLFM-1417
+//			long timeSinceLastFetch = System.currentTimeMillis() - lastGroupsFetch;			
+//			if (timeSinceLastFetch > usersGroupsCacheTimeout || groups_cached == null) {
+//				groups_cached = synapseClient.getGroups(GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
+//				lastGroupsFetch = System.currentTimeMillis();
+//			}
+//			transport.setGroupsJson(EntityFactory.createJSONStringForEntity(groups_cached));
+//			// ***** end tempfix
 			
 		}
 	}
