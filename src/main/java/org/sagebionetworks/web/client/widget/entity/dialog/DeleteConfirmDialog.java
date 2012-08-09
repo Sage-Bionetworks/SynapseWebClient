@@ -24,6 +24,7 @@ public class DeleteConfirmDialog {
 		 d.setSize(300, 100);
 		 d.setHideOnButtonClick(true);
 		 d.setButtons(Dialog.OKCANCEL);
+		 d.setModal(true);
 		 d.show();
 		 
 		 Button okButton = d.getButtonById("ok");

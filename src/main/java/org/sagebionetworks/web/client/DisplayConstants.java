@@ -254,7 +254,7 @@ public class DisplayConstants {
 	public static final String DESCRIPTION = "Description";
 	public static final String OK = "OK";
 	public static final String ERROR_IN_READ_ONLY_MODE = "Sorry, that operation is not allowed in read only mode.";
-	public static final String WHY_VERSION_READ_ONLY_MODE = "You are not allowed to modify an Entity when viewing a particular verion.";
+	public static final String WHY_VERSION_READ_ONLY_MODE = "You are not allowed to modify an Entity when viewing a particular version.";
 	public static final String READ_ONLY = "READ ONLY";	
 
 	/*

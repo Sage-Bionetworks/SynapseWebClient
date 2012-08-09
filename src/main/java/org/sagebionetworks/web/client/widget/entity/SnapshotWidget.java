@@ -83,6 +83,17 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		if(snapshot.getGroups() == null || snapshot.getGroups().size() == 0) {
 			SnapshotGroup defaultGroup = new SnapshotGroup();
 			defaultGroup.setName(DisplayConstants.CONTENTS);
+			
+			// HACK
+			SnapshotGroupRecord record = new SnapshotGroupRecord();
+			record.setNote("some note");
+			Reference ref = new Reference();
+			ref.setTargetId("syn114188");
+			ref.setTargetVersionNumber(new Long(1));
+			record.setEntityReference(ref);
+			defaultGroup.setRecords(Arrays.asList(new SnapshotGroupRecord[] {record}));
+			// HACK
+			
 			snapshot.setGroups(new ArrayList<SnapshotGroup>(Arrays.asList(new SnapshotGroup[] { defaultGroup })));			
 		}		
 		view.setSnapshot(snapshot, canEdit, readOnly);		

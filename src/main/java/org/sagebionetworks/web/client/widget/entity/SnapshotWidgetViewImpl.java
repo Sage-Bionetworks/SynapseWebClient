@@ -95,7 +95,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		List<SnapshotGroup> groups = entity.getGroups();
 		groupDisplays = createListOfSize(groups.size());
 		for(int groupIndex=0; groupIndex<groups.size(); groupIndex++) {						
-			groupDisplays.set(groupIndex, createSnapshotGroupDisplay(groups.get(groupIndex)));			
+			groupDisplays.set(groupIndex, createSnapshotGroupDisplay(groups.get(groupIndex), canEdit));			
 		}
 		
 		// add editor to self for rendering
@@ -119,13 +119,14 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		presenter.loadRowDetails();
 	}
 
-	private SnapshotGroupDisplay createSnapshotGroupDisplay(SnapshotGroup group) {
+	private SnapshotGroupDisplay createSnapshotGroupDisplay(SnapshotGroup group, boolean canEdit) {
 		// create display widget for the group
 		SnapshotGroupDisplay groupDisplay = new SnapshotGroupDisplay();
 		groupDisplay.initialize(SafeHtmlUtils.fromString(group.getName() == null ? "" : group.getName()),
 				SafeHtmlUtils.fromString(group.getDescription() == null ? "" : group.getDescription()),
 				iconsImageBundle, 
-				createEditMenu(groupDisplay, iconsImageBundle));
+				createEditMenu(groupDisplay, iconsImageBundle),
+				(canEdit && !readOnly));
 		return groupDisplay;
 	}
 
@@ -135,7 +136,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 
 	private void addGroup(SnapshotGroup group) {
 		int newGroupIndex = groupDisplays.size();
-		SnapshotGroupDisplay groupDisplay = createSnapshotGroupDisplay(group);		
+		SnapshotGroupDisplay groupDisplay = createSnapshotGroupDisplay(group, canEdit);		
 		groupDisplays.add(groupDisplay);
 		groupsTable.setWidget(newGroupIndex, 0, groupDisplay);
 	}
@@ -155,6 +156,10 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 				NameAndDescriptionEditorDialog.showNameAndDescriptionDialog(groupDisplay.getName().asString(), groupDisplay.getDescription().asString(), null, null, new Callback() {						
 					@Override
 					public void onSave(String nameStr, String descriptionStr) {
+						if(nameStr == null || "".equals(nameStr)) {
+							showErrorMessage(DisplayConstants.ERROR_NAME_MUST_BE_DEFINED);
+							return;
+						}
 						groupDisplay.updateName(SafeHtmlUtils.fromString(nameStr));
 						SafeHtml descriptionSafe = descriptionStr == null ? SafeHtmlUtils.EMPTY_SAFE_HTML : new SafeHtmlBuilder().appendEscapedLines(descriptionStr).toSafeHtml();
 						groupDisplay.updateDescription(descriptionSafe);
@@ -228,6 +233,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 					NameAndDescriptionEditorDialog.showTextAreaDialog(display.getNote().asString(), DisplayConstants.NOTE, new Callback() {						
 						@Override
 						public void onSave(String name, String description) {
+							if(description == null) description = "";
 							display.setNote(new SafeHtmlBuilder().appendEscapedLines(description).toSafeHtml());
 							groupDisplay.updateRowNote(row, display.getNote());
 							presenter.updateGroupRecord(group, row, description);
@@ -348,7 +354,12 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 				public void componentSelected(ButtonEvent ce) {
 					NameAndDescriptionEditorDialog.showNameAndDescriptionDialog(new Callback() {						
 						@Override
-						public void onSave(String name, String description) {							
+						public void onSave(String name, String description) {
+							if(name == null || "".equals(name)) {
+								showErrorMessage(DisplayConstants.ERROR_NAME_MUST_BE_DEFINED);
+								return;
+							}
+
 							SnapshotGroup group = presenter.addGroup(name, description);
 							addGroup(group);
 						}						
@@ -403,7 +414,6 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		BootstrapTable table;
 		LayoutContainer nameContainer;
 		LayoutContainer descriptionContainer;
-		boolean showEdit = false;
 		int uniqueId;
 			
 		/**
@@ -422,16 +432,15 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			
 		}
 		
-		public void initialize(SafeHtml name, SafeHtml description, IconsImageBundle iconsImageBundle, WidgetMenu editMenu) {
+		public void initialize(SafeHtml name, SafeHtml description, IconsImageBundle iconsImageBundle, WidgetMenu editMenu, boolean canEdit) {
 			this.iconsImageBundle = iconsImageBundle;
 			this.name = name;
 			this.description = description;
 			this.nameContainer = new LayoutContainer();
 			this.descriptionContainer = new LayoutContainer();			
-			this.showEdit = editMenu == null ? false : true;
 			
-			LayoutContainer tableContainer = initTable();						
-			LayoutContainer topBar = initTopBar(iconsImageBundle, editMenu);
+			LayoutContainer tableContainer = initTable(canEdit);						
+			LayoutContainer topBar = initTopBar(iconsImageBundle, editMenu, canEdit);
 			
 			this.add(topBar);
 			this.add(tableContainer);
@@ -442,7 +451,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			uniqueId = Random.nextInt();
 		}
 
-		private LayoutContainer initTopBar(IconsImageBundle iconsImageBundle, WidgetMenu editMenu) {
+		private LayoutContainer initTopBar(IconsImageBundle iconsImageBundle, WidgetMenu editMenu, boolean canEdit) {
 			LayoutContainer topBar = new LayoutContainer();
 			topBar.setStyleName("span-24 last");
 			LayoutContainer left = new LayoutContainer();
@@ -456,7 +465,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			left.add(nameContainer);
 
 			// Modifier controls
-			if(editMenu != null) {				
+			if(editMenu != null && canEdit) {				
 				right.add(editMenu.asWidget());
 			}
 
@@ -465,7 +474,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			return topBar;
 		}
 
-		private LayoutContainer initTable() {
+		private LayoutContainer initTable(boolean canEdit) {
 
 			table = new BootstrapTable();			
 			List<String> headerRow = new ArrayList<String>();
@@ -476,7 +485,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			headerRow.add(HEADER_DATE_IDX, HEADER_DATE);
 			headerRow.add(HEADER_CREATEDBY_IDX, HEADER_CREATEDBY);
 			headerRow.add(HEADER_NOTE_IDX, HEADER_NOTE);	
-			if(showEdit) {
+			if(canEdit) {
 				headerRow.add(HEADER_EDIT_MENU_IDX, HEADER_EDIT_MENU);
 			}
 			List<List<String>> tableHeaderRows = new ArrayList<List<String>>();
@@ -484,7 +493,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			table.setHeaders(tableHeaderRows);			
 
 			table.setWidth("100%");		
-			if(!showEdit) {
+			if(!canEdit) {
 				table.getColumnFormatter().setWidth(0, "23%");
 				table.getColumnFormatter().setWidth(1, "7%");
 				table.getColumnFormatter().setWidth(2, "7%");
@@ -545,20 +554,10 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			return name;
 		}
 
-		public void setName(SafeHtml name) {
-			updateName(name);
-		}
-
 		public SafeHtml getDescription() {
 			return description;
 		}
 
-		public void setDescription(SafeHtml description) {
-			updateDescription(description);
-		}			
-
-
-		
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -567,7 +566,6 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			result = prime * result
 					+ ((description == null) ? 0 : description.hashCode());
 			result = prime * result + ((name == null) ? 0 : name.hashCode());
-			result = prime * result + (showEdit ? 1231 : 1237);
 			result = prime * result + uniqueId;
 			return result;
 		}
@@ -592,8 +590,6 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 				if (other.name != null)
 					return false;
 			} else if (!name.equals(other.name))
-				return false;
-			if (showEdit != other.showEdit)
 				return false;
 			if (uniqueId != other.uniqueId)
 				return false;
