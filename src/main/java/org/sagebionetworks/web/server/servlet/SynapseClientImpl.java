@@ -153,9 +153,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 */
 	@Override
 	public EntityWrapper getEntity(String entityId) {
+		return getEntityForVersion(entityId, null);
+	}
+
+	@Override
+	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber) {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			Entity entity = synapseClient.getEntityById(entityId);
+			Entity entity;
+			if(versionNumber == null) {				
+				entity = synapseClient.getEntityById(entityId);
+			} else {
+				entity = synapseClient.getEntityByIdForVersion(entityId, versionNumber);
+			}
 			JSONObjectAdapter entityJson = entity
 					.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(entityJson.toJSONString(), entity
@@ -185,6 +195,36 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	@Override
+	public EntityBundleTransport getEntityBundleForVersion(String entityId,
+			Long versionNumber, int partsMask) throws RestServiceException {
+		try {			
+			Synapse synapseClient = createSynapseClient();			
+			EntityBundle eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
+			return convertBundleToTransport(eb, partsMask);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public String getEntityVersions(String entityId)
+			throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<EntityHeader> versions = synapseClient.getEntityVersions(entityId);
+			JSONObjectAdapter entityJson = versions.writeToJSONObject(adapterFactory.createNew());
+			return entityJson.toJSONString();
+		} catch (SynapseException e) {
+			log.error(e);
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 	@Override
 	public String getEntityTypeRegistryJSON() {
 		return SynapseClientImpl.getEntityTypeRegistryJson();

@@ -39,6 +39,7 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
     public String mayStop() {
         view.clear();
         return null;
+        
     }
 	
 }

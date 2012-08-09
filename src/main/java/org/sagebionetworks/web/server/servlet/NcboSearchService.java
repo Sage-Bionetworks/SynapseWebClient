@@ -33,7 +33,7 @@ public class NcboSearchService extends HttpServlet {
 		String jsonpCallback = request.getParameter(JSONP_PARAM);
 		String limit = request.getParameter(LIMIT_PARAM); 
 		String offsetStr = request.getParameter(OFFSET_PARAM);
-		Integer offset = Integer.parseInt(offsetStr);
+		Integer offset = offsetStr == null ? null : Integer.parseInt(offsetStr);
 		String ontologyids = request.getParameter(ONTOLOGYIDS_PARAM);
 
 		if(searchTerm == null) {

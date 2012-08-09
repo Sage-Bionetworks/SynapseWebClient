@@ -51,6 +51,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityEditor entityEditor;
 	private AutoGenFactory entityFactory;
+	private boolean readOnly = false;
 	
 	@Inject
 	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor, AutoGenFactory entityFactory) {
@@ -67,14 +68,15 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit) {		
+	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit, boolean readOnly) {		
 		view.setPresenter(this);
 		this.entityBundle = bundle; 		
-		
+		this.readOnly = readOnly;
+
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
-		view.createMenu(bundle.getEntity(), entityType, isAdministrator, canEdit);
+		view.createMenu(bundle.getEntity(), entityType, isAdministrator, canEdit, readOnly);
 		return view.asWidget();
 	}
 
@@ -106,6 +108,11 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 
 	@Override
 	public void moveEntity(String newParentId) {
+		if(readOnly) {
+			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
+			return;
+		}
+		
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
 		
@@ -145,6 +152,11 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 
 	@Override
 	public void deleteEntity() {
+		if(readOnly) {
+			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
+			return;
+		}
+		
 		final String parentId = entityBundle.getEntity().getParentId();
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
@@ -248,7 +260,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		});
 		
 	}
-
 	
 	/*
 	 * Private Methods

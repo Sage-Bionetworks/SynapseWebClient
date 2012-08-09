@@ -13,7 +13,13 @@ public interface SynapseClientAsync {
 
 	void getEntity(String entityId, AsyncCallback<EntityWrapper> callback);
 	
+	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<EntityWrapper> callback);
+	
 	void getEntityBundle(String entityId, int partsMask, AsyncCallback<EntityBundleTransport> callback);
+	
+	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundleTransport> callback);
+
+	void getEntityVersions(String entityId, AsyncCallback<String> callback);
 
 	void getEntityTypeRegistryJSON(AsyncCallback<String> callback);
 
