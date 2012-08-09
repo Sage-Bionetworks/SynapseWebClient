@@ -24,9 +24,10 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 	 * @param entityType 
 	 * @param canEdit 
 	 * @param isAdministrator 
+	 * @param readOnly 
 	 */
-	public void createMenu(Entity entity, EntityType entityType, boolean isAdministrator, boolean canEdit);
-	
+	public void createMenu(Entity entity, EntityType entityType, boolean isAdministrator, boolean canEdit, boolean readOnly);
+		
 	/**
 	 * Presenter interface
 	 */
@@ -55,4 +56,5 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 		void createLink(String selectedEntityId);
 
 	}
+
 }

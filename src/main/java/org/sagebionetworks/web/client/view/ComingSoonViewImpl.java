@@ -1,15 +1,26 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -51,7 +62,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		Window.scrollTo(0, 0); // scroll user to top of page
 
 	}
-
 
 	@Override
 	public void showErrorMessage(String message) {

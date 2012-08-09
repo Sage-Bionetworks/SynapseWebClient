@@ -39,6 +39,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private String entityId;
+	private Long versionNumber;
+	private boolean readOnly = false;
 	
 	@Inject
 	public EntityPresenter(EntityView view,
@@ -66,7 +68,11 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.view.setPresenter(this);		
 		
 		// token maps directly to entity id
-		this.entityId = place.toToken();
+		this.entityId = place.getEntityId();
+		this.versionNumber = place.getVersionNumber();
+
+		// asking for a specific version puts you into read only mode
+		readOnly = versionNumber == null ? false : true;
 		
 		refresh();
 	}
@@ -86,7 +92,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ENTITY_REFERENCEDBY | CHILD_COUNT;
-		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundleTransport>() {
+		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override
 			public void onSuccess(EntityBundleTransport transport) {
 				
@@ -100,12 +106,13 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						entityId = null;
 						if(ref != null){
 							entityId = ref.getTargetId();
+							versionNumber = ref.getTargetVersionNumber();
 						}
 						refresh();
 						return;
 					} 					
 					
-					view.setEntityBundle(bundle);					
+					view.setEntityBundle(bundle, readOnly);					
 				} catch (RestServiceException ex) {					
 					onFailure(null);					
 					globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
@@ -119,7 +126,13 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				}
 				globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			}			
-		});
+		};
+		
+		if(versionNumber == null) {
+			synapseClient.getEntityBundle(entityId, mask, callback);
+		} else {
+			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+		}
 
 	}
 	

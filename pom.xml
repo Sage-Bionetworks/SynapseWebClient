@@ -383,7 +383,7 @@
 			<artifactId>rome</artifactId>
 			<version>1.0</version>
 		</dependency>
-		            
+
 		<!-- Test only dependencies -->
 		<dependency>
 			<groupId>com.sun.grizzly</groupId>
@@ -457,4 +457,3 @@
 	</distributionManagement>
 
 </project>
-

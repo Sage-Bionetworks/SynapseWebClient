@@ -77,6 +77,8 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 	}
 	
 	private String getFeedHtml(SyndFeed feed, Integer limit, boolean summariesOnly){
+		//Create a cache (check latest post. if hasn't changed, return cached html. if changed, set the latest post for the feed and calculate the new html response)? 
+		//Most of the requests are going to be the same from the client. The question is how frequent is the feed updated.
 		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
 		StringBuilder htmlResponse = new StringBuilder();
 		List<SyndEntry> entries = feed.getEntries();
@@ -90,7 +92,7 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 			if (summariesOnly){
 				String summary = syndEntry.getDescription().getValue().replaceAll("<p>", "");
 				if (summary.length() > 1000){
-					summary = summary.substring(0, 300) + "...";
+					summary = summary.substring(0, 500) + "...";
 				}
 				htmlResponse.append("<p class=\"clear notopmargin \">" + summary + "</p>");
 			}

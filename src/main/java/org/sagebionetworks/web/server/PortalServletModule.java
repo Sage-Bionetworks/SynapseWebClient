@@ -19,6 +19,7 @@ import org.sagebionetworks.web.server.servlet.NodeServiceImpl;
 import org.sagebionetworks.web.server.servlet.ProjectServiceImpl;
 import org.sagebionetworks.web.server.servlet.RssServiceImpl;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
+import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
@@ -88,6 +89,10 @@ public class PortalServletModule extends ServletModule {
 		// setup the NCBO servlet
 		bind(NcboSearchService.class).in(Singleton.class);
 		serve("/Portal/ncbo/search").with(NcboSearchService.class);
+		
+		// setup the Simple Search servlet
+		bind(SimpleSearchService.class).in(Singleton.class);
+		serve("/Portal/simplesearch").with(SimpleSearchService.class);
 		
 		// setup GWTupload
 		bind(FileUpload.class).in(Singleton.class);

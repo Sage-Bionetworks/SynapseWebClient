@@ -4,17 +4,46 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 
 public class Synapse extends Place{
+	private static final String VERSION_DELIMITER = "."; 
 	
 	private String token;
+	private String entityId;
+	private Long versionNumber;
 
 	public Synapse(String token) {
 		this.token = token;
+		if(token.contains(VERSION_DELIMITER)) {
+			String[] parts = token.split("\\.");
+			if(parts.length == 2) {				
+				entityId = parts[0];
+				versionNumber = Long.parseLong(parts[1]);
+				return;
+			} 		
+		} 
+		// default
+		entityId = token;		
+	}
+
+	public Synapse(String entityId, Long versionNumber) {		
+		this.token = entityId;
+		if(versionNumber != null) 
+			this.token += VERSION_DELIMITER + versionNumber;
+		this.entityId = entityId;
+		this.versionNumber = versionNumber;
 	}
 
 	public String toToken() {
 		return token;
 	}
 	
+	public String getEntityId() {
+		return entityId;
+	}
+
+	public Long getVersionNumber() {
+		return versionNumber;
+	}
+
 	public static class Tokenizer implements PlaceTokenizer<Synapse> {
         @Override
         public String getToken(Synapse place) {

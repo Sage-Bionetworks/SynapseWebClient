@@ -29,9 +29,10 @@ public interface EntityChildBrowserView extends IsWidget, SynapseWidgetView {
 	 * @param entity
 	 * @param entityType
 	 * @param canEdit
+	 * @param readOnly 
 	 * @param shortcuts 
 	 */
-	public void createBrowser(Entity entity, EntityType entityType, boolean canEdit);
+	public void createBrowser(Entity entity, EntityType entityType);
 	
 	/**
 	 * Sets the Preview Table's details. Preview table only if Entity has "preview" EntityType child

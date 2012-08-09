@@ -77,6 +77,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 */
 	@SuppressWarnings("unused")
 	private ServiceUrlProvider urlProvider;
+	
+//	// ********** temporary fix for PLFM-1417
+//	private static long usersGroupsCacheTimeout = 5 * 60 * 1000; // 5 minutes, in milliseconds
+//	private long lastUsersFetch;
+//	private long lastGroupsFetch;
+//	private PaginatedResults<UserProfile> users_cached;
+//	private PaginatedResults<UserGroup> groups_cached;
+//	
+//	// change the cache timeout interval for testing purposes
+//	public void setTimeout(Long l) {
+//		usersGroupsCacheTimeout = l;
+//	}
+//	// ********** end tempfix
 
 	/**
 	 * Essentially the constructor. Setup synapse client.
@@ -140,9 +153,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 */
 	@Override
 	public EntityWrapper getEntity(String entityId) {
+		return getEntityForVersion(entityId, null);
+	}
+
+	@Override
+	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber) {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			Entity entity = synapseClient.getEntityById(entityId);
+			Entity entity;
+			if(versionNumber == null) {				
+				entity = synapseClient.getEntityById(entityId);
+			} else {
+				entity = synapseClient.getEntityByIdForVersion(entityId, versionNumber);
+			}
 			JSONObjectAdapter entityJson = entity
 					.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(entityJson.toJSONString(), entity
@@ -172,6 +195,36 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	@Override
+	public EntityBundleTransport getEntityBundleForVersion(String entityId,
+			Long versionNumber, int partsMask) throws RestServiceException {
+		try {			
+			Synapse synapseClient = createSynapseClient();			
+			EntityBundle eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
+			return convertBundleToTransport(eb, partsMask);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public String getEntityVersions(String entityId)
+			throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<EntityHeader> versions = synapseClient.getEntityVersions(entityId);
+			JSONObjectAdapter entityJson = versions.writeToJSONObject(adapterFactory.createNew());
+			return entityJson.toJSONString();
+		} catch (SynapseException e) {
+			log.error(e);
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			// Since we are not throwing errors, log them
+			log.error(e);
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 	@Override
 	public String getEntityTypeRegistryJSON() {
 		return SynapseClientImpl.getEntityTypeRegistryJson();
@@ -339,6 +392,41 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private static final int GROUPS_PAGINATION_OFFSET = 0;
 	// before we hit this limit we will use another mechanism to find groups
 	private static final int GROUPS_PAGINATION_LIMIT = 1000; 
+
+	public void handleUsers(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient)
+			throws SynapseException, JSONObjectAdapterException {
+		if ((EntityBundleTransport.USERS & partsMask) > 0) {
+			
+//			// ***** Tempfix for PLFM-1417
+//			long timeSinceLastRequest = System.currentTimeMillis() - lastUsersFetch;			
+//			if (timeSinceLastRequest > usersGroupsCacheTimeout || users_cached == null) {
+//				users_cached = synapseClient.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT);
+//				lastUsersFetch = System.currentTimeMillis();
+//			}
+//			transport.setUsersJson(EntityFactory.createJSONStringForEntity(users_cached));
+//			// ***** end tempfix
+			
+		}
+	}
+
+	public void handleGroups(String entityId, int partsMask,
+			EntityBundleTransport transport, Synapse synapseClient)
+			throws SynapseException, JSONObjectAdapterException {
+		if ((EntityBundleTransport.GROUPS & partsMask) > 0) {
+			
+//			// ***** Tempfix for PLFM-1417
+//			long timeSinceLastFetch = System.currentTimeMillis() - lastGroupsFetch;			
+//			if (timeSinceLastFetch > usersGroupsCacheTimeout || groups_cached == null) {
+//				groups_cached = synapseClient.getGroups(GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
+//				lastGroupsFetch = System.currentTimeMillis();
+//			}
+//			transport.setGroupsJson(EntityFactory.createJSONStringForEntity(groups_cached));
+//			// ***** end tempfix
+			
+		}
+	}
+
 
 	@Override
 	public String getEntityReferencedBy(String entityId)
@@ -733,7 +821,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		Synapse synapseClient = createSynapseClient();
 		try {
 			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			AccessApproval aa = jsonEntityFactory.createEntity(aaEW.getEntityJson(), 
+			    			AccessApproval aa = jsonEntityFactory.createEntity(aaEW.getEntityJson(), 
 					(Class<AccessApproval>)Class.forName(aaEW.getEntityClassName()));
 			AccessApproval result = synapseClient.createAccessApproval(aa);
 			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());

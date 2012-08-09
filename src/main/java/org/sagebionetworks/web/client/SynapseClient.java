@@ -17,6 +17,10 @@ public interface SynapseClient extends RemoteService {
 
 	public EntityWrapper getEntity(String entityId);
 	
+	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber);
+	
+	public String getEntityVersions(String entityId) throws RestServiceException;
+	
 	public void deleteEntity(String entityId) throws RestServiceException;
 
 	public String getEntityTypeRegistryJSON();
@@ -38,6 +42,15 @@ public interface SynapseClient extends RemoteService {
 	 * @throws SynapseException 
 	 */
 	public EntityBundleTransport getEntityBundle(String entityId, int partsMask) throws RestServiceException;
+
+	/**
+	 * Get a bundle of information about an entity in a single call
+	 * @param entityId
+	 * @return
+	 * @throws RestServiceException 
+	 * @throws SynapseException 
+	 */
+	public EntityBundleTransport getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask) throws RestServiceException;
 
 	public String getEntityReferencedBy(String entityId) throws RestServiceException;
 	

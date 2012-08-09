@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -76,6 +77,9 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HTMLTable;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
@@ -114,6 +118,7 @@ public class DisplayUtils {
 	
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
+	public static final int BIG_BUTTON_HEIGHT_PX = 36;
 	
 	/**
 	 * Sometimes we are forced to use a table to center an image in a fixed space. 
@@ -131,6 +136,8 @@ public class DisplayUtils {
 	public static final String STYLE_CODE_CONTENT = "codeContent";
 	public static final String STYLE_SMALL_GREY_TEXT = "smallGreyText";
 	public static final String HOMESEARCH_BOX_STYLE_NAME = "homesearchbox";	
+	public static final String STYLE_SMALL_SEARCHBOX = "smallsearchbox";
+	public static final String STYLE_OTHER_SEARCHBOX = "othersearchbox";
 
 
 	/*
@@ -488,12 +495,21 @@ public class DisplayUtils {
 	}
 	
 	
-	public static String getSynapseHistoryToken(String value) {
-		Set<String> s = new HashSet<String>();
-		for(String x : s) {
-			
-		}
-		return "#" + getPlaceString(Synapse.class) + ":" + value;
+	public static String getSynapseHistoryToken(String entityId) {
+		return "#" + getSynapseHistoryTokenNoHash(entityId, null);
+	}
+	
+	public static String getSynapseHistoryTokenNoHash(String entityId) {
+		return getSynapseHistoryTokenNoHash(entityId, null);
+	}
+	
+	public static String getSynapseHistoryToken(String entityId, Long versionNumber) {
+		return "#" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
+	}
+	
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
+		Synapse place = new Synapse(entityId, versionNumber);
+		return getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
 	public static String stubStr(String str, int length) {
@@ -811,7 +827,6 @@ public class DisplayUtils {
 	 */
 	public static final String[] CORE_ATTR_INVALID_ELEMENTS = {"base", "head", "html", "meta",
 															   "param", "script", "style", "title"};
-
 	/**
 	 * A counter variable for assigning unqiue id's to tool-tippified elements
 	 */
@@ -887,8 +902,10 @@ public class DisplayUtils {
 			DOM.setElementAttribute(el, option.getKey(), option.getValue());
 		}
 	}
-
-	// Private methods
+	
+    /*
+     * Private methods
+     */
 
 	private static boolean isNullOrEmpty(final String string) {
 		return string == null || string.isEmpty();
@@ -911,5 +928,15 @@ public class DisplayUtils {
 	public static void displayGlobalAlert(Alert alert) {
 		Element container = DOM.getElementById(ALERT_CONTAINER_ID);
 		DOM.insertChild(container, alert.getElement(), 0);
+	}
+
+	public static String getVersionDisplay(Versionable versionable) {
+		String version;
+		if(versionable.getVersionLabel() != null && !versionable.getVersionNumber().toString().equals(versionable.getVersionLabel())) {
+			version = versionable.getVersionLabel() + " (" + versionable.getVersionNumber() + ")";
+		} else {
+			version = versionable.getVersionNumber().toString(); 			
+		}
+		return version;
 	}
 }
