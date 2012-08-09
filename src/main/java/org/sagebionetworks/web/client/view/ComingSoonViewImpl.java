@@ -61,21 +61,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 
-		BootstrapTable table = new BootstrapTable(); 		
-		List<String> headerRow = Arrays.asList(new String[] { "Header 1", "Header 2" });
-		List<List<String>> tableHeaderRows = new ArrayList<List<String>>();
-		tableHeaderRows.add(headerRow);
-		table.setHeaders(tableHeaderRows);
-		
-		table.setHTML(0, 0, "hello");
-		table.setHTML(0, 1, "world");
-		table.setHTML(1, 0, "hi");
-		table.setHTML(1, 1, "dave");
-		table.setHTML(2, 0, "hi");
-		table.setHTML(2, 1, "tom");
-				
-		entityView.clear();
-		entityView.add(table);
 	}
 
 	@Override
