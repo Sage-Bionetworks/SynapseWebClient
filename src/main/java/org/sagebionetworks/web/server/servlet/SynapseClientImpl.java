@@ -182,7 +182,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					e.getMessage()));
 		}
 	}
-	
+		
 	@Override
 	public EntityBundleTransport getEntityBundle(String entityId, int partsMask)
 			throws RestServiceException {
@@ -463,6 +463,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return urlProvider.getRepositoryServiceUrl();
 	}
 
+	/**
+	 * Update entity
+	 */
+	@Override
+	public EntityWrapper updateEntity(String entityJson) throws RestServiceException {
+		try {
+			// update
+			Entity entity = parseEntityFromJson(entityJson);
+			Synapse synapseClient = createSynapseClient();
+			entity = synapseClient.putEntity(entity);
+			
+			EntityWrapper wrapper = new EntityWrapper();
+			wrapper.setEntityClassName(entity.getClass().getName());
+			wrapper.setEntityJson(entity.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+			return wrapper;			
+		} catch (JSONObjectAdapterException e) {
+			throw new BadRequestException(e.getMessage());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}	
+	
 	@Override
 	public String createOrUpdateEntity(String entityJson, String annoJson,
 			boolean isNew) throws RestServiceException {
