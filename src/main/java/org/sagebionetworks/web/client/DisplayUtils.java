@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
@@ -50,7 +48,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -77,12 +74,12 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HTMLTable;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
+
+	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
+	public static final String BCC_FEED_URL = "https://sagebionetworks.jira.com/wiki/createrssfeed.action?types=page&types=blogpost&spaces=BCC&title=BCC+RSS+Test+Feed&labelString%3D&excludedSpaceKeys%3D&sort=created&maxResults=10&timeSpan=99&showContent=true&confirm=Create+RSS+Feed&os_username=synapse-service&os_password=abc123";
 
 	private static final String ALERT_CONTAINER_ID = "alertContainer";
 	private static final String REGEX_CLEAN_ANNOTATION_KEY = "^[a-z,A-Z,0-9,_,.]+";
@@ -210,6 +207,7 @@ public class DisplayUtils {
 		    	final String href = hrefJSONValue.toString().replaceAll("\"", "");
 			    String innerText = a.getInnerText();
 			    Anchor link = new Anchor();
+			    link.setStylePrimaryName("link");
 			    link.setText(innerText);
 			    
 			    link.addClickHandler(new ClickHandler() {
@@ -939,4 +937,5 @@ public class DisplayUtils {
 		}
 		return version;
 	}
+
 }

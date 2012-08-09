@@ -74,6 +74,9 @@ public class DisplayConstants {
 	public static final String PASSWORD_SET_FAILED_TEXT = "Password change failed. Please try again.";
 	public static final String PASSWORD_RESET_TEXT = "Your password has been reset.";
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
+	
+	public static final String NEWS_UNAVAILABLE_TEXT = "The Synapse news service is currently unavailable.";
+	
 	/*
 	 * Buttons, titles and labels
 	 */
@@ -105,10 +108,6 @@ public class DisplayConstants {
 	public static final String OPEN_ID_PROVIDER_GOOGLE_VALUE = "https://www.google.com/accounts/o8/id";
 	public static final String OPEN_ID_PROVIDER_SAGE_VALUE = "https://www.google.com/accounts/o8/site-xrds?hd=sagebase.org";
 
-	public static final String NEWS_FEED_URL = "http://sciencereengineered.com/feed/";
-	public static final String CHALLENGE_QA_FEED_URL = "http://stats.stackexchange.com/feeds/tag?tagnames=machine-learning+r&sort=newest";
-
-	
 	public static final String SERVICE_PARENT_ID_KEY = "parentId";
 	public static final String SERVICE_ETAG_KEY = "etag";
 	public static final String SERVICE_STATUS_KEY = "status";

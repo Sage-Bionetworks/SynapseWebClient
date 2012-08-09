@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.RSSEntry;
+import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.RssService;
-import org.sagebionetworks.web.server.RestTemplateProvider;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.inject.Inject;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -23,35 +26,7 @@ import com.sun.syndication.io.XmlReader;
 public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 	private static final long serialVersionUID = 1L;
 	
-	/**
-	 * The template is injected with Gin
-	 */
-	private RestTemplateProvider templateProvider;
-
-	/**
-	 * Injected with Gin
-	 */
-	private ServiceUrlProvider urlProvider;
 		
-	/**
-	 * Injected via Gin.
-	 * 
-	 * @param template
-	 */
-	@Inject
-	public void setRestTemplate(RestTemplateProvider template) {
-		this.templateProvider = template;
-	}
-	
-	/**
-	 * Injected via Gin
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider){
-		this.urlProvider = provider;
-	}
-	
 	@Override
 	public String getAllFeedData(String feedUrl) throws RestServiceException {
 		return getFeedData(feedUrl, null, false);
@@ -59,13 +34,12 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 	
 	@Override
 	public String getFeedData(String feedUrl, Integer limit, boolean summariesOnly) throws RestServiceException {
-		validateService();
-		String htmlResponse = "";
+		String jsonResponse = "";
 		try {
 			URL feedSource = new URL(feedUrl);
 			SyndFeedInput input = new SyndFeedInput();
 			SyndFeed feed = input.build(new XmlReader(feedSource));
-			htmlResponse = getFeedHtml(feed, limit, summariesOnly);
+			jsonResponse = getFeed(feed, limit, summariesOnly);
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException("Could not connect to the given url: " + feedUrl, e);
 		} catch (FeedException e) {
@@ -73,55 +47,62 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not read the feed source: " + feedUrl, e);
 		}
-		return htmlResponse;
+		return jsonResponse;
 	}
 	
-	private String getFeedHtml(SyndFeed feed, Integer limit, boolean summariesOnly){
+	public static String getFeed(SyndFeed feed, Integer limit, boolean summariesOnly) {
 		//Create a cache (check latest post. if hasn't changed, return cached html. if changed, set the latest post for the feed and calculate the new html response)? 
 		//Most of the requests are going to be the same from the client. The question is how frequent is the feed updated.
-		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-		StringBuilder htmlResponse = new StringBuilder();
+		RSSFeed jsonFeed = new RSSFeed();
+		jsonFeed.setAuthor(feed.getAuthor());
+		jsonFeed.setDescription(feed.getDescription());
+		jsonFeed.setTitle(feed.getTitle());
+		jsonFeed.setUri(feed.getUri());
+		List<RSSEntry> jsonEntries = new ArrayList<RSSEntry>();
+		jsonFeed.setEntries(jsonEntries);
+		DateFormat df = DateFormat.getDateInstance(DateFormat.LONG);
+		
 		List<SyndEntry> entries = feed.getEntries();
 		if (limit == null)
 			limit = entries.size();
 		for (int i = 0; i < limit && i < entries.size(); i++) {
 			SyndEntry syndEntry = entries.get(i);
-			htmlResponse.append("<h5 class =\"nobottommargin\"><a href=\"" + syndEntry.getLink() + "\">" + syndEntry.getTitle() + "</a></h5>\n");
-			htmlResponse.append("<p class=\"clear small-italic notopmargin nobottommargin\">" + df.format(syndEntry.getPublishedDate()) + "</p>\n");
-			
-			if (summariesOnly){
-				String summary = syndEntry.getDescription().getValue().replaceAll("<p>", "");
-				if (summary.length() > 1000){
-					summary = summary.substring(0, 500) + "...";
+			RSSEntry rssEntry = new RSSEntry();
+			jsonEntries.add(rssEntry);
+			rssEntry.setAuthor(syndEntry.getAuthor());
+			rssEntry.setTitle(syndEntry.getTitle());
+			rssEntry.setDate(df.format(syndEntry.getPublishedDate()));
+			rssEntry.setLink(syndEntry.getLink());
+
+			if (summariesOnly || syndEntry.getContents() == null || syndEntry.getContents().size() == 0){
+				String summary = syndEntry.getDescription().getValue();
+				if (summariesOnly){
+					summary = summary.replaceAll("<p>", "");
+					if (summary.length() > 1000){
+						summary = summary.substring(0, 500) + "...";
+					}
 				}
-				htmlResponse.append("<p class=\"clear notopmargin \">" + summary + "</p>");
+					
+				rssEntry.setContent(summary);
 			}
 			else{ //full content
 				for (Iterator<SyndContent> it = syndEntry.getContents().iterator(); it.hasNext();) {
 			        SyndContent syndContent = it.next();
-			        
+			        StringBuilder content = new StringBuilder();
 			        if (syndContent != null) {
-			        	htmlResponse.append("<p class=\"clear notopmargin \">" + syndContent.getValue() + "</p>");
+			        	content.append(syndContent.getValue() + "\n");
 			        }
+			        rssEntry.setContent(content.toString());
 				}
 		    }
 		}
-		return htmlResponse.toString();
+		
+		try {
+			return EntityFactory.createJSONStringForEntity(jsonFeed);
+		} catch (JSONObjectAdapterException e) {
+			throw new IllegalArgumentException("Could not parse the feed source: " + feed.getUri(), e);
+		}
 	}
 	
-	/**
-	 * Validate that the service is ready to go. If any of the injected data is
-	 * missing then it cannot run. Public for tests.
-	 */
-	public void validateService() {
-		if (templateProvider == null)
-			throw new IllegalStateException(
-					"The org.sagebionetworks.web.server.RestTemplateProvider was not injected into this service");
-		if (templateProvider.getTemplate() == null)
-			throw new IllegalStateException(
-					"The org.sagebionetworks.web.server.RestTemplateProvider returned a null template");
-		if (urlProvider == null)
-			throw new IllegalStateException(
-					"The org.sagebionetworks.rest.api.root.url was not set");
-	}
+	
 }

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -42,8 +41,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	SimplePanel projectPanel;
 	@UiField
 	SimplePanel newsFeed;
-	@UiField
-	SimplePanel qaFeed;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -79,7 +76,15 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.presenter = presenter;
 		Window.scrollTo(0, 0); // scroll user to top of page		
 	}
-
+	
+	@Override
+	public void showNews(String html){
+		HTMLPanel panel = new HTMLPanel(html);
+		DisplayUtils.sendAllLinksToNewWindow(panel);
+		newsFeed.clear();
+		newsFeed.add(panel);
+	}
+	
 	@Override
 	public void refresh() {
 		headerWidget.refresh();
@@ -87,35 +92,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		injectProjectPanel(); 
 		
-	    presenter.showNewsFeed(DisplayConstants.NEWS_FEED_URL, new AsyncCallback<String>() {
-			
-			public void onSuccess(String html) {
-				if (html==null) return;
-				HTMLPanel panel = new HTMLPanel(html);
-				DisplayUtils.sendAllLinksToNewWindow(panel);
-				newsFeed.clear();
-				newsFeed.add(panel);
-			}
-			public void onFailure(Throwable t) {
-				// do nothing
-			}
-	    });
-	    
-	    presenter.showQAFeed(DisplayConstants.CHALLENGE_QA_FEED_URL, new AsyncCallback<String>() {
-			
-			public void onSuccess(String html) {
-				if (html==null) return;
-				HTMLPanel panel = new HTMLPanel(html);
-				DisplayUtils.sendAllLinksToNewWindow(panel);
-				qaFeed.clear();
-				qaFeed.add(panel);
-			}
-			public void onFailure(Throwable t) {
-				// do nothing
-			}
-	    });
-	    
-		presenter.showBCCSignup(new AsyncCallback<String>() {
+	    presenter.showBCCSignup(new AsyncCallback<String>() {
 				
 				public void onSuccess(String showBCCSignup) {
 					if (showBCCSignup==null || !showBCCSignup.equalsIgnoreCase("true")) return;
