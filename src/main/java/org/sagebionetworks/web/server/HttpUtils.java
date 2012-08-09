@@ -74,9 +74,14 @@ public class HttpUtils {
     
     public static void respondJSON(HttpServletResponse response, JSONObject obj, String jsonpCallback) throws IOException {
         if(obj != null) {            
+            respondJSONString(response, obj.toString(), jsonpCallback);
+        }
+    }
+
+    public static void respondJSONString(HttpServletResponse response, String json, String jsonpCallback) throws IOException {
+        if(json != null) {            
             response.setCharacterEncoding("UTF-8");
             response.setHeader("Content-Type", "application/json");            
-            String json = obj.toString();
             if(jsonpCallback != null) {
                 json = jsonpCallback + "(" + json + ")";
             }

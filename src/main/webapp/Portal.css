@@ -250,6 +250,13 @@
 	font-size: 1.2em;
 }
 
+.othersearchbox {	
+	margin: 0;
+	height: 26px;
+	background-color:  #fff;
+	font-size: 1.2em;
+}
+
 .resultssearchbox {
 	width: 500px;
 	margin: 0px 0 0 0;
@@ -358,6 +365,8 @@ a.shortBtn {
 
 .user-profile-change-photo {
 	
+.margin-right-5 {
+	margin-right: 5px;
 }
 
 .user-profile-edit-table td {
@@ -373,9 +382,12 @@ a.shortBtn {
 	min-height: 50px;
 	height: auto !important;
 	height:	50px;
+
+.margin-top-left-10 {
+	margin-top: 10px;
+	margin-left: 10px;
 }
 
 h1, h2, h3, h4, h5, h6 {
 	word-wrap: break-word;
 }
-	
