@@ -355,7 +355,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// SnapshotWidget		
 		bind(SnapshotWidgetView.class).to(SnapshotWidgetViewImpl.class);
 
-		// SnapshotWidget		
+		// EntitySearchBox		
 		bind(EntitySearchBoxView.class).to(EntitySearchBoxViewImpl.class);
 	}
 

@@ -194,10 +194,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// Custom layouts for certain entities
 		if(bundle.getEntity() instanceof Snapshot) {
-		    renderSnapshotEntity(bundle, entityTypeDisplay, canEdit, widgetMargin);
+		    renderSnapshotEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
 		} else {
 			// default entity view
-			renderDefaultEntity(bundle, entityTypeDisplay, canEdit, widgetMargin);
+			renderDefaultEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
 		}
 		
 		colLeftContainer.layout(true);
@@ -206,7 +206,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 
-	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, MarginData widgetMargin) {
+	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Title
 		colLeftContainer.add(EntityViewUtils.createTitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils), widgetMargin);
@@ -241,7 +241,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 
 	private void renderSnapshotEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean canEdit, MarginData widgetMargin) {
+			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Title
 		colLeftContainer.add(EntityViewUtils.createTitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils), widgetMargin);
