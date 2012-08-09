@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -10,7 +11,6 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -20,6 +20,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -39,6 +40,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	SimplePanel bccSignup;
 	@UiField
 	SimplePanel projectPanel;
+	@UiField
+	SimplePanel newsFeed;
+	@UiField
+	SimplePanel qaFeed;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -81,7 +86,35 @@ public class HomeViewImpl extends Composite implements HomeView {
 		headerWidget.setSearchVisible(false);
 		
 		injectProjectPanel(); 
-
+		
+	    presenter.showNewsFeed(DisplayConstants.NEWS_FEED_URL, new AsyncCallback<String>() {
+			
+			public void onSuccess(String html) {
+				if (html==null) return;
+				HTMLPanel panel = new HTMLPanel(html);
+				DisplayUtils.sendAllLinksToNewWindow(panel);
+				newsFeed.clear();
+				newsFeed.add(panel);
+			}
+			public void onFailure(Throwable t) {
+				// do nothing
+			}
+	    });
+	    
+	    presenter.showQAFeed(DisplayConstants.CHALLENGE_QA_FEED_URL, new AsyncCallback<String>() {
+			
+			public void onSuccess(String html) {
+				if (html==null) return;
+				HTMLPanel panel = new HTMLPanel(html);
+				DisplayUtils.sendAllLinksToNewWindow(panel);
+				qaFeed.clear();
+				qaFeed.add(panel);
+			}
+			public void onFailure(Throwable t) {
+				// do nothing
+			}
+	    });
+	    
 		presenter.showBCCSignup(new AsyncCallback<String>() {
 				
 				public void onSuccess(String showBCCSignup) {

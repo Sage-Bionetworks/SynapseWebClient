@@ -55,9 +55,13 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -68,6 +72,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -183,7 +188,34 @@ public class DisplayUtils {
 		if(icon == null) return null;		
 		return "<span class=\"iconSpan\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
 	}
-		
+	
+	/**
+	 * Converts all hrefs to gwt anchors, and handles the anchors by sending them to a new window.
+	 * @param panel
+	 */
+	public static void sendAllLinksToNewWindow(HTMLPanel panel){
+		NodeList<com.google.gwt.dom.client.Element> anchors = panel.getElement().getElementsByTagName("a");
+		for ( int i = 0 ; i < anchors.getLength() ; i++ ) {
+			com.google.gwt.dom.client.Element a = anchors.getItem(i);
+		    JSONObject jsonValue = new JSONObject(a);
+		    JSONValue hrefJSONValue = jsonValue.get("href");
+		    if (hrefJSONValue != null){
+		    	final String href = hrefJSONValue.toString().replaceAll("\"", "");
+			    String innerText = a.getInnerText();
+			    Anchor link = new Anchor();
+			    link.setText(innerText);
+			    
+			    link.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						com.google.gwt.user.client.Window.open(href, "_blank", "");
+					}
+				});
+			    panel.addAndReplaceElement(link, a);
+		    }
+		}
+	}
+	
 	/**
 	 * Add a row to the provided FlexTable.
 	 * 

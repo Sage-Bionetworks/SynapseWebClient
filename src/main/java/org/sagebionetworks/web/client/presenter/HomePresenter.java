@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
@@ -24,19 +25,23 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private CookieProvider cookieProvider;
 	private AuthenticationController authenticationController;
 	private StackConfigServiceAsync stackConfigService;
+	private RssServiceAsync rssService;
+	
 	
 	@Inject
 	public HomePresenter(HomeView view, 
 			CookieProvider cookieProvider, 
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
-			StackConfigServiceAsync stackConfigService){
+			StackConfigServiceAsync stackConfigService,
+			RssServiceAsync rssService){
 		this.view = view;
 		// Set the presenter on the view
 		this.cookieProvider = cookieProvider;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.stackConfigService = stackConfigService;
+		this.rssService = rssService;
 		this.view.setPresenter(this);
 	}
 
@@ -76,6 +81,14 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public void showBCCSignup(AsyncCallback<String> callback) {
 		stackConfigService.getBCCSignupEnabled(callback);
 	}
-	
+
+	@Override
+	public void showNewsFeed(String url, AsyncCallback<String> callback) {
+		rssService.getFeedData(url, 3, true, callback);
+	}
+	@Override
+	public void showQAFeed(String url, AsyncCallback<String> callback) {
+		rssService.getFeedData(url, 3, true, callback);
+	}
 
 }

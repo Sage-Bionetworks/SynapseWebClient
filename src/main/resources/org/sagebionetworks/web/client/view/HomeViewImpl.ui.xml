@@ -155,7 +155,25 @@
 				</div>
 			</div>
 
+			<div class="span-24 separator"></div>
+			<div class="span-24 from_portfolio">
+				<div class="span-12 notopmargin">
+					<h3>News Feed</h3>
+				</div>
+				<div class="span-12 notopmargin last">
+					<h3>Latest Challenge Q&amp;A</h3>
+				</div>
+				<div class="span-12 inner-12 view notopmargin">
+					<g:SimplePanel ui:field="newsFeed" />
+					<a class="button_readmore" href="http://sciencereengineered.com" target="_blank"></a>
+				</div>
+				<div class="span-12 inner-12 view notopmargin last">
+					<g:SimplePanel ui:field="qaFeed" />
+					<a class="button_readmore" href="http://stats.stackexchange.com/questions/tagged/machine-learning+r" target="_blank"></a>
+				</div>								
+			</div>
 
+			
 			<div class="span-24 separator"></div>
 
 

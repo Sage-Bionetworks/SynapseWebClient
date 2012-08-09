@@ -105,6 +105,10 @@ public class DisplayConstants {
 	public static final String OPEN_ID_PROVIDER_GOOGLE_VALUE = "https://www.google.com/accounts/o8/id";
 	public static final String OPEN_ID_PROVIDER_SAGE_VALUE = "https://www.google.com/accounts/o8/site-xrds?hd=sagebase.org";
 
+	public static final String NEWS_FEED_URL = "http://sciencereengineered.com/feed/";
+	public static final String CHALLENGE_QA_FEED_URL = "http://stats.stackexchange.com/feeds/tag?tagnames=machine-learning+r&sort=newest";
+
+	
 	public static final String SERVICE_PARENT_ID_KEY = "parentId";
 	public static final String SERVICE_ETAG_KEY = "etag";
 	public static final String SERVICE_STATUS_KEY = "status";

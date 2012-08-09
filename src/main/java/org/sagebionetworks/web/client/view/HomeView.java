@@ -21,7 +21,8 @@ public interface HomeView extends IsWidget, SynapseView {
 		boolean showLoggedInDetails();	
 		
 		void showBCCSignup(AsyncCallback<String> callback);	
-		
+		void showNewsFeed(String url, AsyncCallback<String> callback);
+		void showQAFeed(String url, AsyncCallback<String> callback);
 	}
 
 }
