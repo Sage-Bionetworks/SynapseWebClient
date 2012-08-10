@@ -296,19 +296,6 @@ public class AccessControlListEditorTest {
 		return groups;
 	}
 	
-	@Test
-	public void getAclPrincipalsFromGroupsTest() throws Exception {
-		Map<String, AclPrincipal> map = AccessControlListEditor.getAclPrincipalsFromGroups(
-				createUserGroups());
-		assertEquals("2", map.keySet().iterator().next());
-		AclPrincipal p = map.get("2");
-		assertTrue(p!=null);
-		assertEquals("bar", p.getDisplayName());
-		assertEquals((Long)2L, (Long)p.getPrincipalId());
-		assertFalse(p.isIndividual());
-		assertFalse(p.isOwner());
-	}
-	
 	private static List<UserProfile> createUserProfiles() {
 		List<UserProfile> ups = new ArrayList<UserProfile>();
 		UserProfile up = new UserProfile();
@@ -316,28 +303,6 @@ public class AccessControlListEditorTest {
 		up.setOwnerId("1");
 		ups.add(up);
 		return ups;
-	}
-	
-	@Test
-	public void getAclPrincipalsFromUsersTest() throws Exception {
-		Map<String, AclPrincipal> map = AccessControlListEditor.getAclPrincipalsFromUsers(
-				createUserProfiles(), "1");
-		assertEquals("1", map.keySet().iterator().next());
-		AclPrincipal p = map.get("1");
-		assertTrue(p!=null);
-		assertEquals("foo", p.getDisplayName());
-		assertEquals((Long)1L, (Long)p.getPrincipalId());
-		assertTrue(p.isIndividual());
-		assertTrue(p.isOwner());
-	}
-	
-	@Test
-	public void findAclEntryTest() throws Exception {
-		AccessControlList acl = createACL();
-		Map<String,AclPrincipal> allPrincipals = createAllPrincipals();
-		List<AclEntry> entries = AccessControlListEditor.getAclEntries(acl, allPrincipals);
-		AclEntry entry = AccessControlListEditor.findAclEntry(entries, 1L);
-		assertEquals((Long)1L, (Long)entry.getPrincipal().getPrincipalId());
 	}
 	
 	private static AccessControlList createACL() {
@@ -375,14 +340,6 @@ public class AccessControlListEditorTest {
 		p.setDisplayName("bar");
 		map.put(p.getPrincipalId().toString(), p);
 		return map;
-	}
-	
-	@Test
-	public void getAclEntriesTest() throws Exception {
-		AccessControlList acl = createACL();
-		Map<String,AclPrincipal> allPrincipals = createAllPrincipals();
-		List<AclEntry> entries = AccessControlListEditor.getAclEntries(acl, allPrincipals);
-		assertEquals(2, entries.size());
 	}
 	
 	@Test
