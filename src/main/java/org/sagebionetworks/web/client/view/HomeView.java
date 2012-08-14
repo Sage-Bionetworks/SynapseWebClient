@@ -16,12 +16,13 @@ public interface HomeView extends IsWidget, SynapseView {
 		
 	public void refresh();
 	
+	public void showNews(String html);
+
 	public interface Presenter extends SynapsePresenter {
 
 		boolean showLoggedInDetails();	
 		
-		void showBCCSignup(AsyncCallback<String> callback);	
-		
+		void showBCCSignup(AsyncCallback<String> callback);			
 	}
 
 }

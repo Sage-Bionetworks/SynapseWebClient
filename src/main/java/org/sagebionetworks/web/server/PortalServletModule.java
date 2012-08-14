@@ -17,6 +17,7 @@ import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
 import org.sagebionetworks.web.server.servlet.NodeServiceImpl;
 import org.sagebionetworks.web.server.servlet.ProjectServiceImpl;
+import org.sagebionetworks.web.server.servlet.RssServiceImpl;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
@@ -108,6 +109,10 @@ public class PortalServletModule extends ServletModule {
 		// Setup the LinkedIn service mapping
 		bind(LinkedInServiceImpl.class).in(Singleton.class);
 		serve("/Portal/linkedin").with(LinkedInServiceImpl.class);
+		
+		// Setup the Rss service mapping
+		bind(RssServiceImpl.class).in(Singleton.class);
+		serve("/Portal/rss").with(RssServiceImpl.class);
 		
 		// The Rest template provider should be a singleton.
 		bind(RestTemplateProviderImpl.class).in(Singleton.class);

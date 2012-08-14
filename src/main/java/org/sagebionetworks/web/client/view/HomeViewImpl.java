@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -20,6 +19,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -39,6 +39,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	SimplePanel bccSignup;
 	@UiField
 	SimplePanel projectPanel;
+	@UiField
+	SimplePanel newsFeed;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -74,15 +76,23 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.presenter = presenter;
 		Window.scrollTo(0, 0); // scroll user to top of page		
 	}
-
+	
+	@Override
+	public void showNews(String html){
+		HTMLPanel panel = new HTMLPanel(html);
+		DisplayUtils.sendAllLinksToNewWindow(panel);
+		newsFeed.clear();
+		newsFeed.add(panel);
+	}
+	
 	@Override
 	public void refresh() {
 		headerWidget.refresh();
 		headerWidget.setSearchVisible(false);
 		
 		injectProjectPanel(); 
-
-		presenter.showBCCSignup(new AsyncCallback<String>() {
+		
+	    presenter.showBCCSignup(new AsyncCallback<String>() {
 				
 				public void onSuccess(String showBCCSignup) {
 					if (showBCCSignup==null || !showBCCSignup.equalsIgnoreCase("true")) return;
