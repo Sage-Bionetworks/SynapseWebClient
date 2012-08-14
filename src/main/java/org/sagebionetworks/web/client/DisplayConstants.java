@@ -74,6 +74,9 @@ public class DisplayConstants {
 	public static final String PASSWORD_SET_FAILED_TEXT = "Password change failed. Please try again.";
 	public static final String PASSWORD_RESET_TEXT = "Your password has been reset.";
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
+	
+	public static final String NEWS_UNAVAILABLE_TEXT = "The Synapse news service is currently unavailable.";
+	
 	/*
 	 * Buttons, titles and labels
 	 */

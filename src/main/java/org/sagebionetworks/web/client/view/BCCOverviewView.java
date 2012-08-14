@@ -13,6 +13,8 @@ public interface BCCOverviewView extends IsWidget, SynapseView {
 	
 	public void showSubmissionError();
 	
+	public void showChallengeInfo(String html);
+	
 	/**
 	 * Set this view's presenter
 	 * @param presenter

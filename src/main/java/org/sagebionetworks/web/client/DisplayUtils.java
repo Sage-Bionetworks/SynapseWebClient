@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
@@ -50,15 +48,18 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -69,15 +70,16 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HTMLTable;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
+
+	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
+	public static final String BCC_FEED_URL = "https://sagebionetworks.jira.com/wiki/createrssfeed.action?types=page&types=blogpost&spaces=BCC&title=BCC+RSS+Test+Feed&labelString%3D&excludedSpaceKeys%3D&sort=created&maxResults=10&timeSpan=99&showContent=true&confirm=Create+RSS+Feed&os_username=synapse-service&os_password=abc123";
 
 	private static final String ALERT_CONTAINER_ID = "alertContainer";
 	private static final String REGEX_CLEAN_ANNOTATION_KEY = "^[a-z,A-Z,0-9,_,.]+";
@@ -190,7 +192,35 @@ public class DisplayUtils {
 		if(icon == null) return null;		
 		return "<span class=\"iconSpan\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
 	}
-		
+	
+	/**
+	 * Converts all hrefs to gwt anchors, and handles the anchors by sending them to a new window.
+	 * @param panel
+	 */
+	public static void sendAllLinksToNewWindow(HTMLPanel panel){
+		NodeList<com.google.gwt.dom.client.Element> anchors = panel.getElement().getElementsByTagName("a");
+		for ( int i = 0 ; i < anchors.getLength() ; i++ ) {
+			com.google.gwt.dom.client.Element a = anchors.getItem(i);
+		    JSONObject jsonValue = new JSONObject(a);
+		    JSONValue hrefJSONValue = jsonValue.get("href");
+		    if (hrefJSONValue != null){
+		    	final String href = hrefJSONValue.toString().replaceAll("\"", "");
+			    String innerText = a.getInnerText();
+			    Anchor link = new Anchor();
+			    link.setStylePrimaryName("link");
+			    link.setText(innerText);
+			    
+			    link.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						com.google.gwt.user.client.Window.open(href, "_blank", "");
+					}
+				});
+			    panel.addAndReplaceElement(link, a);
+		    }
+		}
+	}
+	
 	/**
 	 * Add a row to the provided FlexTable.
 	 * 
@@ -907,4 +937,5 @@ public class DisplayUtils {
 		}
 		return version;
 	}
+
 }
