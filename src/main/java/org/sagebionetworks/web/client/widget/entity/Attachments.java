@@ -59,7 +59,7 @@ public class Attachments implements AttachmentsView.Presenter,
 		this.entity = entity;
 		view.configure(baseUrl, entity.getId(), entity.getAttachments());
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -70,13 +70,13 @@ public class Attachments implements AttachmentsView.Presenter,
 		List<AttachmentData> attachments = entity.getAttachments();
 		if(tokenId != null) {
 			// find attachment via token and remove it
-			AttachmentData found = null; 
+			AttachmentData found = null;
 			for(AttachmentData data : attachments) {
 				if(tokenId.equals(data.getTokenId())) {
 					found = data;
 				}
 			}
-			
+
 			if(found != null) {
 				// save name and remove from entity
 				final String deletedName = found.getName();
@@ -91,17 +91,18 @@ public class Attachments implements AttachmentsView.Presenter,
 
 				// update entity minus attachment
 				synapseClient.createOrUpdateEntity(adapter.toJSONString(), null, false, new AsyncCallback<String>() {
-					
+
 					@Override
-					public void onSuccess(String result) {						
+					public void onSuccess(String result) {
 						view.attachmentDeleted(tokenId, deletedName);
+						bus.fireEvent(new EntityUpdatedEvent());
 					}
-					
+
 					@Override
 					public void onFailure(Throwable caught) {
 						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 							view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
-						}						
+						}
 					}
 				});
 			} else {
