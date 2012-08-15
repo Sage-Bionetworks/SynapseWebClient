@@ -14,6 +14,7 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.inject.Inject;
@@ -62,7 +63,10 @@ public class EntityEditorDialogImpl implements EntityEditorDialog{
 	    editor.setDataCopies(newAdapter, schema, newAnnos, filter);
 	    window.add(editor, new FitData(0));
 	    // List for the button selection
-	    Button saveButton = window.getButtonById(Dialog.OK);
+	    Button saveButton = window.getButtonById(Dialog.OK);	    
+	    // Disable the button until the user enters a valid Entity name.
+	    FormButtonBinding binding = new FormButtonBinding(editor);  
+	    binding.addButton(saveButton);
 	    saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
