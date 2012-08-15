@@ -239,7 +239,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		EntityWrapper aclEntityWrapper = null;
 		try {
 			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
-			aclEntityWrapper = new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName(), null);
+			aclEntityWrapper = new EntityWrapper(aclJson.toJSONString(), AccessControlList.class.getName(), null);
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
 			return;
