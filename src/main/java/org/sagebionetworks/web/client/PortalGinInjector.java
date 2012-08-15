@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 
@@ -59,4 +60,5 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public BCCSignup getBCCSignup();
 	
+	public EventBus getEventBus();
 }

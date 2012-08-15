@@ -111,6 +111,8 @@ import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
 
 import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
 
@@ -118,6 +120,8 @@ public class PortalGinModule extends AbstractGinModule {
 
 	@Override
 	protected void configure() {
+		// Event Bus
+		bind(EventBus.class).to(SimpleEventBus.class).in(Singleton.class);
 		
 		// AuthenticationController
 		bind(AuthenticationControllerImpl.class).in(Singleton.class);

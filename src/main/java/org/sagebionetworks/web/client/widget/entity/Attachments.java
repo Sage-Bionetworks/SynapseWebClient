@@ -11,10 +11,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -29,16 +31,18 @@ public class Attachments implements AttachmentsView.Presenter,
 	private NodeModelCreator nodeModelCreator;
 	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private EventBus bus;
 
 	private Entity entity;
-		
+
 	@Inject
 	public Attachments(AttachmentsView view, SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			NodeModelCreator nodeModelCreator,
 			EntityTypeProvider entityTypeProvider,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			EventBus bus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
@@ -46,6 +50,7 @@ public class Attachments implements AttachmentsView.Presenter,
 		this.nodeModelCreator = nodeModelCreator;
 		this.entityTypeProvider = entityTypeProvider;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.bus = bus;
 
 		view.setPresenter(this);
 	}
