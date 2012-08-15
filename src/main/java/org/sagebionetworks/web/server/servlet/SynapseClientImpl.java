@@ -75,21 +75,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	/**
 	 * Injected with Gin
 	 */
-	@SuppressWarnings("unused")
 	private ServiceUrlProvider urlProvider;
-	
-//	// ********** temporary fix for PLFM-1417
-//	private static long usersGroupsCacheTimeout = 5 * 60 * 1000; // 5 minutes, in milliseconds
-//	private long lastUsersFetch;
-//	private long lastGroupsFetch;
-//	private PaginatedResults<UserProfile> users_cached;
-//	private PaginatedResults<UserGroup> groups_cached;
-//	
-//	// change the cache timeout interval for testing purposes
-//	public void setTimeout(Long l) {
-//		usersGroupsCacheTimeout = l;
-//	}
-//	// ********** end tempfix
 
 	/**
 	 * Essentially the constructor. Setup synapse client.
@@ -104,7 +90,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	/**
 	 * Injected with Gin
 	 */
-	@SuppressWarnings("unused")
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
 	/**
@@ -188,7 +173,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		try {			
 			Synapse synapseClient = createSynapseClient();			
-			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);
+			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);			
 			return convertBundleToTransport(eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -391,42 +376,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private static final int USER_PAGINATION_LIMIT = 1000; 
 	private static final int GROUPS_PAGINATION_OFFSET = 0;
 	// before we hit this limit we will use another mechanism to find groups
-	private static final int GROUPS_PAGINATION_LIMIT = 1000; 
-
-	public void handleUsers(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient)
-			throws SynapseException, JSONObjectAdapterException {
-		if ((EntityBundleTransport.USERS & partsMask) > 0) {
-			
-//			// ***** Tempfix for PLFM-1417
-//			long timeSinceLastRequest = System.currentTimeMillis() - lastUsersFetch;			
-//			if (timeSinceLastRequest > usersGroupsCacheTimeout || users_cached == null) {
-//				users_cached = synapseClient.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT);
-//				lastUsersFetch = System.currentTimeMillis();
-//			}
-//			transport.setUsersJson(EntityFactory.createJSONStringForEntity(users_cached));
-//			// ***** end tempfix
-			
-		}
-	}
-
-	public void handleGroups(String entityId, int partsMask,
-			EntityBundleTransport transport, Synapse synapseClient)
-			throws SynapseException, JSONObjectAdapterException {
-		if ((EntityBundleTransport.GROUPS & partsMask) > 0) {
-			
-//			// ***** Tempfix for PLFM-1417
-//			long timeSinceLastFetch = System.currentTimeMillis() - lastGroupsFetch;			
-//			if (timeSinceLastFetch > usersGroupsCacheTimeout || groups_cached == null) {
-//				groups_cached = synapseClient.getGroups(GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
-//				lastGroupsFetch = System.currentTimeMillis();
-//			}
-//			transport.setGroupsJson(EntityFactory.createJSONStringForEntity(groups_cached));
-//			// ***** end tempfix
-			
-		}
-	}
-
+	private static final int GROUPS_PAGINATION_LIMIT = 1000;
 
 	@Override
 	public String getEntityReferencedBy(String entityId)
@@ -821,7 +771,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		Synapse synapseClient = createSynapseClient();
 		try {
 			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			    			AccessApproval aa = jsonEntityFactory.createEntity(aaEW.getEntityJson(), 
+			    			@SuppressWarnings("unchecked")
+							AccessApproval aa = jsonEntityFactory.createEntity(aaEW.getEntityJson(), 
 					(Class<AccessApproval>)Class.forName(aaEW.getEntityClassName()));
 			AccessApproval result = synapseClient.createAccessApproval(aa);
 			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());
