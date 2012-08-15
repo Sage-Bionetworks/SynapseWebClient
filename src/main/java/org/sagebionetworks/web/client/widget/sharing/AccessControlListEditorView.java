@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.users.AclEntry;
-import org.sagebionetworks.web.shared.users.AclPrincipal;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -24,7 +20,14 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 	 * @param principals the available principals
 	 * @param isEditable
 	 */
-	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isInherited, boolean canEnableInheritance);
+	public void buildWindow(boolean isInherited, boolean canEnableInheritance);
+	
+	/**
+	 * Add an ACL Entry to the permissions dialog
+	 * 
+	 * @param entry
+	 */
+	public void addAclEntry(AclEntry entry);
 	
 	/**
 	 * Set the view to a loading state while async loads
