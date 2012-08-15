@@ -199,10 +199,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Link.class.getName()));
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Preview.class.getName()));
 		
-		// HIDING SNAPSHOT FEATURE
-		// TODO : remove
-		ignore.add(entityTypeProvider.getEntityTypeForClassName(Snapshot.class.getName()));
-		
 		return ignore;
 	}
 
