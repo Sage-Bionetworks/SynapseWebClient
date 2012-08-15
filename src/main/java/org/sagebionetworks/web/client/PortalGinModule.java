@@ -48,6 +48,8 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
+import org.sagebionetworks.web.client.widget.WidgetFactory;
+import org.sagebionetworks.web.client.widget.WidgetFactoryImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
 import org.sagebionetworks.web.client.widget.editpanels.AnnotationEditorView;
@@ -105,6 +107,8 @@ import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowView;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowViewImpl;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
@@ -184,6 +188,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AdapterFactory.class).to(GwtAdapterFactory.class);
 		
 		bind(JiraURLHelper.class).to(JiraURLHelperImpl.class);
+		
+		bind(WidgetFactory.class).to(WidgetFactoryImpl.class);
 		
 		/*
 		 * Vanilla Implementation binding
@@ -385,6 +391,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// EntityMetadata
 		bind(EntityMetadataViewImpl.class).in(Singleton.class);
 		bind(EntityMetadataView.class).to(EntityMetadataViewImpl.class);
+		
+		// ProvenanceWidget
+		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
 	}
 
 }

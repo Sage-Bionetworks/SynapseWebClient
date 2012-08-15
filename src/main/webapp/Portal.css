@@ -414,7 +414,7 @@ a.shortBtn {
 
 .user-profile-change-photo {
 }
-	
+
 .margin-right-5 {
 	margin-right: 5px;
 }
@@ -507,3 +507,18 @@ h1, h2, h3, h4, h5, h6 {
 	word-wrap: break-word;	
 }
 
+.boldText {
+	font-weight: bold;	
+}
+
+.scroll-x {
+	overflow-x: auto;
+}
+
+.scroll-y {
+	overflow-y: auto;
+}
+
+.scroll-auto {
+	overflow: auto;
+}

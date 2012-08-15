@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client;
 
+import java.util.Date;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.History;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
@@ -54,5 +58,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native void _bindBootstrapPopover(String id) /*-{
 		$wnd.jQuery('#'+id).popover();
 	}-*/;
+
+	private static DateTimeFormat smallDateFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm:ssaa");
+	@Override
+	public String convertDateToSmallString(Date toFormat) {
+		return smallDateFormat.format(toFormat);
+	}
+
+	@Override
+	public String getBaseProfileAttachmentUrl() {
+		return GWT.getModuleBaseURL() + "profileAttachment";
+	}
 
 }

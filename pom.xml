@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
-		<synapse.version>2012-11-19-65c60b5-231</synapse.version>
+		<synapse.version>2012-11-21-7abc7a3-233</synapse.version>
 
 		<gwtVersion>2.4.0</gwtVersion>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
@@ -485,6 +485,13 @@
 			<artifactId>guava-io</artifactId>
 			<version>r03</version>
 		</dependency>
+		
+		<!-- Prov Tree layout -->
+		<dependency>
+            <groupId>org.abego.treelayout</groupId>
+            <artifactId>org.abego.treelayout.core</artifactId>
+            <version>1.0.1</version>
+        </dependency>
 
 		<!-- note: This refers to a custom POM in the SageBionetworks artifactory, omitting Guice 2.0 -->
 		<dependency>

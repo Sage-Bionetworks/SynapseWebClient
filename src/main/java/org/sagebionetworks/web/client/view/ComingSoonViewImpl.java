@@ -1,26 +1,17 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
-import com.google.gwt.dom.client.Node;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.Grid;
-import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -40,19 +31,21 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private IconsImageBundle icons;
 	private Header headerWidget;
 	private Footer footerWidget;
+	private ProvenanceWidget provenanceWidget;
 	
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle) {		
+			SageImageBundle imageBundle, ProvenanceWidget provenanceWidget) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
+		this.provenanceWidget = provenanceWidget;
 
 		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());						
+		footer.add(footerWidget.asWidget());		
 	}
 
 
@@ -85,6 +78,13 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
 	@Override
 	public void clear() {		
+	}
+
+	@Override
+	public void setEntity(Entity entity) {
+//		provenanceWidget.buildTree(entity, 1, false);
+//		entityView.clear();
+//		entityView.add(provenanceWidget.asWidget());
 	}
 
 }

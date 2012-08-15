@@ -320,6 +320,16 @@ public class DisplayConstants {
 	public static final String MARKDOWN_CSS_CLASSNAME = "from-markdown";
 	public static final String ENTITY_DESCRIPTION_ATTACHMENT_PREFIX = "Attachment/entity/";
 	public static final String ENTITY_STORAGE_NOT_FOUND_ERROR = "Unable to determine the usage associated with entity id: ";
+	public static final String CODE_EXECUTION = "Code Execution";
+	public static final String MANUAL = "Manual";
+	public static final String UNDEFINED = "Undefined";
+	public static final String NOT_VERSIONED = "not versioned";
+	public static final String ERROR_LAYOUT = "An error occured laying out the Provenance view.";
+	public static final String ENTITY = "Entity";
+	public static final String LOADING = "Loading";
+	public static final String ACTIVITY = "Activity";
+
+
 	/*
 	 * Element ids for Selenium
 	 */
@@ -398,6 +408,10 @@ public class DisplayConstants {
 		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
 		"without restrictions select \"save unrestricted\", below.  Otherwise select \"save restricted\".";
 	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
+	
+	
+	public static final String DEFINE_ACTIVITY = "Please Define Provenance";
+	public static final String HOW_TO_DEFINE_ACTIVITY = "Create Provenance using the Synapse R Client.";
 
 }
 

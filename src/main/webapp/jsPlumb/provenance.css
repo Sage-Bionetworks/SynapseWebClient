@@ -1,0 +1,105 @@
+.provEntityNode {
+	opacity:0.8; 
+	filter:alpha(opacity=80); 
+	width:8em; height:3.9em;
+	padding-top: 0.2em;  
+	z-index:20; 
+	position:absolute;
+	top: 0.2em; 
+	color:black;
+	font-family:helvetica, sans; 
+	font-size:1em;
+	text-align:center;	
+	background-repeat: no-repeat;	
+	background-position: 3.5em 0em;
+}
+
+.provActivityNode { 
+	border:0.1em dotted #ccc; 
+	opacity:0.8; 
+	filter:alpha(opacity=80); 
+	width:9em; height:5.8em; 
+	z-index:20; 
+	position:absolute; 
+	color:black;
+	font-family:helvetica, sans;
+	padding-top:0.3em; 	
+	font-size:1em;
+	text-align:center;
+
+	box-shadow: 2px 2px 10px #aaa;
+   -o-box-shadow: 2px 2px 10px #aaa;
+   -webkit-box-shadow: 2px 2px 10px #aaa;
+   -moz-box-shadow: 2px 2px 10px #aaa;
+   -moz-border-radius:0.3em;
+	border-radius:0.4em;
+}
+
+.provActivityNode .provActivityLabel {
+	font-size: 0.8em;
+	text-transform: uppercase;
+}
+
+.provActivityNode .provActivityUndefinedIcon {
+	margin-top: -0.2em;
+}
+
+.provActivityNode .provEntityNode {
+	position: absolute;
+	top: 1.8em;
+	left: 0.5em;
+}
+
+.provExpandNode {
+	opacity:0.8; 
+	filter:alpha(opacity=80); 
+	width:2.7em; height:1.4em; 
+	z-index:20; 
+	position:absolute;	
+	color:black;
+	font-family:helvetica, sans;
+	padding-top:0em; 
+	font-size:1em;
+	text-align:center;	
+}
+
+.provUndefinedChange {
+	height: 3em;
+	background-image: url('file:///Users/dburdick/code/platform/synapseWebClient/src/main/resources/images/icons/question-16.png');	
+	background-repeat: no-repeat;	
+	background-position: 4em 1.7em;
+} 
+
+.provManualChange {
+	height: 1.5em;
+}
+
+
+.provVersionDisplay {
+	font-size: 0.8em;
+	margin-top: -0.4em
+}
+
+.provDataEntity {
+	background-image: url('file:///Users/dburdick/code/platform/synapseWebClient/src/main/resources/images/icons/synapse-data-16.png');
+}
+
+.provProjectEntity {
+	background-image: url('file:///Users/dburdick/code/platform/synapseWebClient/src/main/resources/images/icons/synapse-project-16.png');
+}
+
+.provCodeEntity {
+	background-image: url('file:///Users/dburdick/code/platform/synapseWebClient/src/main/resources/images/icons/synapse-code-16.png');
+}
+
+
+/* Layout */
+#window1 { left:20em;top:36em;}
+#window2 { left:10em;top:20em;}
+#window3 { left:30em;top:20em;}
+#window4 { left:4em;}
+#window5 { left:22em;}
+#window6 { left:33em;}
+#window7 { left:47em; top: 10em}
+#window8 { left:45em;top:20em;}
+#window9 { left:48em;}

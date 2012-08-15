@@ -22,12 +22,16 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.WidgetFactory;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -91,6 +95,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private static final String REFERENCES_KEY_ID = "id";
 	private static final String REFERENCES_KEY_NAME = "name";
 	private static final String REFERENCES_KEY_TYPE = "type";
+	private static final int PROVENANCE_HEIGHT_PX = 250;
 
 	@UiField
 	SimplePanel colLeftPanel;
@@ -124,6 +129,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private SplitButton showRstudio;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
+	private WidgetFactory widgetFactory;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -135,7 +141,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			EntityChildBrowser entityChildBrowser, Breadcrumb breadcrumb,
 			PropertyWidget propertyWidget,EntityTypeProvider entityTypeProvider,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
-			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils) {
+			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
+			WidgetFactory widgetFactory) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.previewDisclosurePanel = previewDisclosurePanel;
@@ -149,6 +156,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.locationableTitleBar = locationableTitleBar;
+		this.widgetFactory = widgetFactory;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 	}
@@ -307,7 +315,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Create Activity Feed widget
 //		colLeftContainer.add(createActivityFeedWidget(bundle.getEntity()), widgetMargin);
 
-		// ** LEFT **
+		// ** RIGHT **
+		// Provenance Widget for anything other than projects of folders
+		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) 
+			colRightContainer.add(createProvenanceWidget(bundle), widgetMargin);
 		// Annotation Editor widget
 		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
@@ -320,6 +331,27 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ** FULL WIDTH **
 		// none.
 	}
+
+	private Widget createProvenanceWidget(EntityBundle bundle) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);				
+		lc.addStyleName("span-7 notopmargin right last");
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Provenance</h3>")));
+
+	    // Create the property body
+	    // the headers for properties.
+		lc.addStyleName("span-7 notopmargin right last");
+		ProvenanceWidget provenanceWidget = widgetFactory.createProvenanceWidget();		
+		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);
+	    provenanceWidget.buildTree(bundle.getEntity(), 1, false);
+	    LayoutContainer border = new LayoutContainer();
+	    border.addStyleName("x-border");	    
+	    border.add(provenanceWidget.asWidget());
+	    lc.add(border);
+	    lc.layout();
+		return lc;
+	}
+
 
 	private void renderSnapshotEntity(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {

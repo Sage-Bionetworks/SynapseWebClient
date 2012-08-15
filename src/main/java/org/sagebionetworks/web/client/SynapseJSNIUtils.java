@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import java.util.Date;
+
 public interface SynapseJSNIUtils {
 
 	public void recordPageVisit(String token);
@@ -13,4 +15,8 @@ public interface SynapseJSNIUtils {
 	public void bindBootstrapPopover(String id);
 	
 	public void highlightCodeBlocks();
+	
+	public String convertDateToSmallString(Date toFormat);
+	
+	public String getBaseProfileAttachmentUrl();
 }

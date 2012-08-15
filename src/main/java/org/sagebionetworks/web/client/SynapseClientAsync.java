@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -45,7 +47,9 @@ public interface SynapseClientAsync {
 	void createOrUpdateEntity(String entityJson, String annoJson,
 			boolean isNew, AsyncCallback<String> callback);
 	
-	void getEntityTypeBatch(List<String> entityIds,
+	void getEntityTypeBatch(List<String> entityIds, AsyncCallback<String> callback);
+	
+	void getEntityHeaderBatch(String referenceList,
 			AsyncCallback<String> callback);
 
 	void deleteEntityById(String entityId, AsyncCallback<Void> callback);
@@ -89,4 +93,11 @@ public interface SynapseClientAsync {
 	public void markdown2Html(String markdown, String attachmentUrl, AsyncCallback<String> callback);
 	
 	public void getStorageUsage(String entityId, AsyncCallback<Long> callback);
+
+	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
+
+	void getActivityForEntity(String entityId, AsyncCallback<String> callback);
+
+	void getActivity(String activityId, AsyncCallback<String> callback);
+
 }
