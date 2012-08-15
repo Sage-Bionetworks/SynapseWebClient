@@ -293,7 +293,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 
 		// ACL Editor
-		bind(AccessControlListEditorViewImpl.class).in(Singleton.class);
 		bind(AccessControlListEditorView.class).to(AccessControlListEditorViewImpl.class);
 		
 		// PhenotypeEditor
