@@ -3,13 +3,13 @@ package org.sagebionetworks.web.client.widget.entity.menu;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Snapshot;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -198,6 +198,10 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		// ignore certain types
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Link.class.getName()));
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Preview.class.getName()));
+		
+		// HIDING SNAPSHOT FEATURE
+		// TODO : remove
+		ignore.add(entityTypeProvider.getEntityTypeForClassName(Snapshot.class.getName()));
 		
 		return ignore;
 	}
