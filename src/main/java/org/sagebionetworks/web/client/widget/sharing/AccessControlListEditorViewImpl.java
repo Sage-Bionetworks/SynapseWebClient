@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,14 +9,16 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.UrlCache;
+import org.sagebionetworks.web.client.ontology.AdapterModelData;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclPrincipal;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.data.BaseModelData;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
@@ -26,7 +27,6 @@ import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
@@ -36,7 +36,6 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.FieldSet;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboValue;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -45,7 +44,6 @@ import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -63,18 +61,24 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private static final String PRINCIPAL_COLUMN_ID = "principalData";
 	private static final String ACCESS_COLUMN_ID = "accessData";
 	private static final String REMOVE_COLUMN_ID = "removeData";
+	private static final int FIELD_WIDTH = 360;
 	
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;		
+	private IconsImageBundle iconsImageBundle;
+	private UrlCache urlCache;
 	private Grid<PermissionsTableEntry> permissionsGrid;
 	private Map<PermissionLevel, String> permissionDisplay;
 	private SageImageBundle sageImageBundle;
+	private ListStore<PermissionsTableEntry> permissionsStore;
+	private ColumnModel columnModel;
 	
 	
 	@Inject
-	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
+	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
+			SageImageBundle sageImageBundle, UrlCache urlCache) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
+		this.urlCache = urlCache;
 		
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
@@ -92,25 +96,19 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		return this;
 	}
 	
-	private ListStore<PermissionsTableEntry> loadPermissionsStore(
-			Collection<AclEntry> entries) {
-		final ListStore<PermissionsTableEntry> permissionsStore = new ListStore<PermissionsTableEntry>();
-		AclEntry ownerEntry = null;
-		for(AclEntry aclEntry : entries) {
-			if(aclEntry.getPrincipal().isOwner()) {
-				if (ownerEntry!=null) throw new IllegalArgumentException("Multiple 'owner' entries, "+ownerEntry.getPrincipal()+" and "+aclEntry.getPrincipal());
-				ownerEntry = aclEntry;
-				continue;
-			}
+	@Override
+	public void addAclEntry(AclEntry aclEntry) {
+		if (permissionsStore == null || columnModel == null || permissionsGrid == null)
+			throw new IllegalStateException("Permissions window has not been built yet");
+		if (aclEntry.getPrincipal().isOwner()) 
+			permissionsStore.insert(new PermissionsTableEntry(aclEntry), 0); // insert owner first
+		else
 			permissionsStore.add(new PermissionsTableEntry(aclEntry));
-		}
-		//permissionsStore.sort(PRINCIPAL_COLUMN_ID, SortDir.ASC);
-		if (ownerEntry!=null) permissionsStore.insert(new PermissionsTableEntry(ownerEntry), 0); // insert owner first
-		return permissionsStore;
-	}
+		permissionsGrid.reconfigure(permissionsStore, columnModel);
+	}	
 	
 	@Override
-	public void setAclDetails(Collection<AclEntry> entries, Collection<AclPrincipal> principals, boolean isInherited, final boolean canEnableInheritance) {		
+	public void buildWindow(boolean isInherited, final boolean canEnableInheritance) {		
 		this.removeAll(true);
 		
 		// setup view
@@ -123,7 +121,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		add(permissionsLabel, new MarginData(15, 0, 0, 0));
 
 		// show existing permissions
-		ListStore<PermissionsTableEntry> permissionsStore = loadPermissionsStore(entries);
+		permissionsStore = new ListStore<PermissionsTableEntry>();
 		createPermissionsGrid(permissionsStore);	
 		if(isInherited) { 
 			permissionsGrid.disable();
@@ -141,69 +139,60 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			add(new Label(DisplayUtils.getIconHtml(iconsImageBundle.warning16()) + " " + DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT), new MarginData(5, 0, 0, 0));
 		} else {
 			// show add people view
-			
-			ListStore<PeopleModel> allUsersStore = new ListStore<PeopleModel>();  
-			for(AclPrincipal principal : principals) {
-				allUsersStore.add(new PeopleModel(principal));
-			}
-  
 			FormPanel form2 = new FormPanel();  
 			form2.setFrame(false);  
 			form2.setHeaderVisible(false);  
-			form2.setAutoWidth(true);
-			
-			form2.setLayout(new FlowLayout());  
-			  
-			FieldSet fieldSet = new FieldSet();  
-			fieldSet.setHeading(DisplayConstants.LABEL_PERMISSION_TEXT_ADD_PEOPLE );  
-			fieldSet.setCheckboxToggle(false);
-			fieldSet.setCollapsible(false);			
+			form2.setAutoWidth(true);			
+			form2.setLayout(new FlowLayout());
 			
 			FormLayout layout = new FormLayout();  
-			layout.setLabelWidth(75);			
-			fieldSet.setLayout(layout);  
+			layout.setLabelWidth(75);
+			layout.setDefaultWidth(FIELD_WIDTH);
+			  
+			FieldSet fieldSet = new FieldSet();  
+			fieldSet.setHeading(DisplayConstants.LABEL_PERMISSION_TEXT_ADD_PEOPLE);  
+			fieldSet.setCheckboxToggle(false);
+			fieldSet.setCollapsible(false);			
+			fieldSet.setLayout(layout);
 			
-			final ComboBox<PeopleModel> combo = new ComboBox<PeopleModel>();  
-			combo.setEmptyText("Enter email addresses or group names...");  
-			combo.setDisplayField("name");  
-			combo.setWidth(450);
-			combo.setHeight(21);
-			combo.setStore(allUsersStore);		
-			combo.setTypeAhead(true);
-			combo.setFieldLabel("User/Group");
-			combo.setForceSelection(true);
-			combo.setTriggerAction(TriggerAction.ALL);
-			//combo.setTriggerAction(TriggerAction.ALL);  
-			fieldSet.add(combo, new RowData(450,21));
+			// user/group combobox
+			final ComboBox<AdapterModelData> peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl());
+			peopleCombo.setEmptyText("Enter a user or group name...");
+			peopleCombo.setFieldLabel("User/Group");
+			peopleCombo.setForceSelection(true);
+			peopleCombo.setTriggerAction(TriggerAction.ALL);
+			fieldSet.add(peopleCombo);			
+
+			// permission level combobox
+			final SimpleComboBox<PermissionLevelSelect> permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
+			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
+			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT), PermissionLevel.CAN_EDIT));
+			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER), PermissionLevel.CAN_ADMINISTER));			
+			permissionLevelCombo.setEmptyText("Select access level...");
+			permissionLevelCombo.setFieldLabel("Access Level");
+			permissionLevelCombo.setTypeAhead(false);
+			permissionLevelCombo.setEditable(false);
+			permissionLevelCombo.setForceSelection(true);
+			permissionLevelCombo.setTriggerAction(TriggerAction.ALL);
+			fieldSet.add(permissionLevelCombo);
 			
-			final SimpleComboBox<PermissionLevelSelect> selectPermissionLevel = new SimpleComboBox<PermissionLevelSelect>();
-			//ListStore<PermissionLevelSelect> permStore = new Lis
-			selectPermissionLevel.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
-			selectPermissionLevel.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT), PermissionLevel.CAN_EDIT));
-			selectPermissionLevel.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER), PermissionLevel.CAN_ADMINISTER));			
-			selectPermissionLevel.setEmptyText("Select access level...");
-			selectPermissionLevel.setFieldLabel("Access Level");
-			selectPermissionLevel.setTypeAhead(false);
-			selectPermissionLevel.setEditable(false);
-			selectPermissionLevel.setForceSelection(true);
-			selectPermissionLevel.setTriggerAction(TriggerAction.ALL);
-			fieldSet.add(selectPermissionLevel);
-			
+			// share button and listener
 			Button shareButton = new Button("Share");
 			shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
-					List<PeopleModel> selectedPrincipals = combo.getSelection();
-					if(selectedPrincipals != null && selectedPrincipals.size() > 0) {
-						Long principal = selectedPrincipals.get(0).getPrincipalId();
-						List<SimpleComboValue<PermissionLevelSelect>> selectedPermissions = selectPermissionLevel.getSelection();
-						if(selectedPermissions != null && selectedPermissions.size() > 0) {
-							PermissionLevel level = selectedPermissions.get(0).getValue().getLevel();
-							presenter.addAccess(principal, level);
+					if(peopleCombo.getValue() != null) {
+						ModelData selectedModel = peopleCombo.getValue();
+						String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
+						Long principalId = (Long.parseLong(principalIdStr));
+						
+						if(permissionLevelCombo.getValue() != null) {
+							PermissionLevel level = permissionLevelCombo.getValue().getValue().getLevel();
+							presenter.addAccess(principalId, level);
 							
-							// clear out selections
-							combo.clearSelections();
-							selectPermissionLevel.clearSelections();
+							// clear selections
+							peopleCombo.clearSelections();
+							permissionLevelCombo.clearSelections();
 						} else {
 							showAddMessage("Please select a permission level to grant.");
 						}
@@ -214,9 +203,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			});
 
 			fieldSet.add(shareButton);
-			form2.add(fieldSet);
-			//form2.addButton(shareButton);
-			
+			form2.add(fieldSet);			
 			add(form2);
 			
 			Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
@@ -280,7 +267,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		ColumnConfig column = new ColumnConfig();  
 		column.setId(PRINCIPAL_COLUMN_ID);  
 		column.setHeader("People");  
-		column.setWidth(200);  
+		column.setWidth(200);
 		column.setRenderer(peopleRenderer);
 		configs.add(column);  
 				   
@@ -293,14 +280,13 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				   
 		column = new ColumnConfig();  
 		column.setId(REMOVE_COLUMN_ID);  
-		column.setHeader("");  
-		column.setAlignment(HorizontalAlignment.RIGHT);  
+		column.setHeader("");
 		column.setWidth(25);  
 		column.setRenderer(removeRenderer);  
 		configs.add(column);  
 				   				   			   
-		ColumnModel columnModel = new ColumnModel(configs);  				  				 
-		permissionsGrid = new Grid<PermissionsTableEntry>(permissionsStore, columnModel);    
+		columnModel = new ColumnModel(configs);  				  				 
+		permissionsGrid = new Grid<PermissionsTableEntry>(permissionsStore, columnModel);
 		permissionsGrid.setAutoExpandColumn(PRINCIPAL_COLUMN_ID);  
 		permissionsGrid.setBorders(true);		
 		permissionsGrid.setWidth(520);
@@ -367,11 +353,13 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					Grid<PermissionsTableEntry> grid) {
 				PermissionsTableEntry entry = store.getAt(rowIndex);
 				String iconHtml = "";
+				
+				// Default to generic user or group avatar
 				if(entry.getAclEntry().getPrincipal().isIndividual()) {
 					iconHtml = DisplayUtils.getIconHtml(iconsImageBundle.userBusiness16());
 				} else {
 					iconHtml = DisplayUtils.getIconHtml(iconsImageBundle.users16());	
-				}
+				}				
 				return iconHtml + "&nbsp;&nbsp;" + model.get(property);
 			}
 			
@@ -465,22 +453,6 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		}		
 	}
 
-	private class PeopleModel extends BaseModelData {
-		private Long principalId;
-		private boolean isIndividual;
-		
-		public PeopleModel(AclPrincipal principal) {
-			this.principalId = principal.getPrincipalId();
-			this.isIndividual = principal.isIndividual();
-			String groupStr = isIndividual ? "" : " (Group)"; 			
-			this.set("name", principal.getDisplayName() + groupStr);
-		}
-		
-		public Long getPrincipalId() {return principalId;}
-		
-		public boolean isIndividual() {return isIndividual;}
-	}
-
 	private class PermissionLevelSelect {
 		private String display;
 		private PermissionLevel level;
@@ -506,5 +478,4 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			return display;
 		}
 	}
-	
 }
