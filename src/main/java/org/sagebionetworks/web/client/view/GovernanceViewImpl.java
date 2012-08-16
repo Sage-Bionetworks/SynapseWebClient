@@ -26,6 +26,7 @@ public class GovernanceViewImpl extends Composite implements GovernanceView {
 	private Presenter presenter;
 	private IconsImageBundle icons;
 	private Header headerWidget;
+	private Footer footerWidget;
 		
 	@Inject
 	public GovernanceViewImpl(GovernanceViewImplUiBinder binder,
@@ -35,7 +36,8 @@ public class GovernanceViewImpl extends Composite implements GovernanceView {
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
-		
+		this.footerWidget = footerWidget;
+
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 				
@@ -46,6 +48,10 @@ public class GovernanceViewImpl extends Composite implements GovernanceView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 

@@ -27,7 +27,7 @@ public class Portal implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-	    EventBus eventBus = new SimpleEventBus();
+	    EventBus eventBus = ginjector.getEventBus();
 	    PlaceController placeController = new PlaceController(eventBus);
 
 		// Start ActivityManager for the main widget with our ActivityMapper

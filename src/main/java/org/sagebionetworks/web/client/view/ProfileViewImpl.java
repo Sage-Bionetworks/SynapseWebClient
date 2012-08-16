@@ -103,6 +103,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private HandlerRegistration editPhotoHandler = null;
 
 	private String baseProfileAttachmentUrl = GWT.getModuleBaseURL()+"profileAttachment";
+
+	private Footer footerWidget;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
@@ -112,6 +114,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 		this.iconsImageBundle = icons;
 		this.headerWidget = headerWidget;
+		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
 		header.add(headerWidget.asWidget());
@@ -145,8 +148,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;		
-		headerWidget.refresh();				
+		this.presenter = presenter;
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
+		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	

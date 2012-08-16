@@ -103,6 +103,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private boolean loadShowing;
 	private List<Button> facetButtons;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private Footer footerWidget;
 	
 	@Inject
 	public SearchViewImpl(SearchViewImplUiBinder binder, Header headerWidget,
@@ -114,6 +115,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
+		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		
 		header.add(headerWidget.asWidget());
@@ -127,6 +129,10 @@ public class SearchViewImpl extends Composite implements SearchView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		headerWidget.setSearchVisible(false);		
 		Window.scrollTo(0, 0); // scroll user to top of page

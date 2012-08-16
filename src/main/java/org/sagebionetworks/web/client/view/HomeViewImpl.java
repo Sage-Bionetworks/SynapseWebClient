@@ -87,6 +87,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	@Override
 	public void refresh() {
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		headerWidget.setSearchVisible(false);
 		

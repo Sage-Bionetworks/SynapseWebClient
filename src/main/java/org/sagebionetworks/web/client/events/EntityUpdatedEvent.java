@@ -4,13 +4,13 @@ import com.google.gwt.event.shared.GwtEvent;
 
 public class EntityUpdatedEvent extends GwtEvent<EntityUpdatedHandler> {
 
-	private static final Type TYPE = new Type<EntityUpdatedHandler>();
+	private static final Type<EntityUpdatedHandler> TYPE = new Type<EntityUpdatedHandler>();
 	
 	public EntityUpdatedEvent() {
 		
 	}
 	
-	public static Type getType() {
+	public static Type<EntityUpdatedHandler> getType() {
 		return TYPE;
 	}
 	

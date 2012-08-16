@@ -43,6 +43,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 	private Presenter presenter;
 	private IconsImageBundle icons;
 	private Header headerWidget;
+	private Footer footerWidget;
 
 	
 	@Inject
@@ -52,6 +53,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 		initWidget(binder.createAndBindUi(this));
 
 		this.headerWidget = headerWidget;
+		this.footerWidget = footerWidget;
 		this.icons = icons;
 		
 		header.add(headerWidget.asWidget());
@@ -61,7 +63,11 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;		
+		this.presenter = presenter;
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 		
