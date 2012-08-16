@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,7 +45,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityBundle bundle;
 	private boolean readOnly;
 	private String entityTypeDisplay; 
-	private HandlerManager handlerManager = new HandlerManager(this);
+	private EventBus bus;
 	private String rStudioUrl;
 	
 	@Inject
@@ -56,7 +57,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntitySchemaCache schemaCache,
 			JSONObjectAdapter jsonObjectAdapter,
 			EntityTypeProvider entityTypeProvider,
-			IconsImageBundle iconsImageBundle) {
+			IconsImageBundle iconsImageBundle,
+			EventBus bus) {
 		this.view = view;
 		this.nodeService = service;
 		this.synapseClient = synapseClient;
@@ -66,7 +68,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.schemaCache = schemaCache;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.entityTypeProvider = entityTypeProvider;
-		this.iconsImageBundle = iconsImageBundle; 
+		this.iconsImageBundle = iconsImageBundle;
+		this.bus = bus;
 		view.setPresenter(this);
 	}	
 
@@ -106,7 +109,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public void clearState() {
 		view.clear();
 		// remove handlers
-		handlerManager = new HandlerManager(this);		
 		this.bundle = null;		
 	}
     
@@ -130,12 +132,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void fireEntityUpdatedEvent() {
-		handlerManager.fireEvent(new EntityUpdatedEvent());
+		bus.fireEvent(new EntityUpdatedEvent());
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {		
-		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
+		bus.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
 
 	@Override

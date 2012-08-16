@@ -36,6 +36,7 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 	private Presenter presenter;
 	private IconsImageBundle icons;
 	private Header headerWidget;
+	private Footer footerWidget;
 	
 	@Inject
 	public BCCOverviewViewImpl(BCCOverviewViewImplUiBinder binder,
@@ -45,7 +46,8 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
-				
+		this.footerWidget = footerWidget;
+
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
 				
@@ -56,7 +58,11 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.refresh();	
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
+		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 
 	}

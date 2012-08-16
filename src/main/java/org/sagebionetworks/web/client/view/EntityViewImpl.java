@@ -35,6 +35,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 	private Presenter presenter;
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
+	private Footer footerWidget;
 	
 	@Inject
 	public EntityViewImpl(
@@ -46,6 +47,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 		initWidget(binder.createAndBindUi(this));
 
 		this.headerWidget = headerWidget;
+		this.footerWidget = footerWidget;
 		this.entityPageTop = entityPageTop;
 		this.sageImageBundle = sageImageBundle;
 		
@@ -58,8 +60,13 @@ public class EntityViewImpl extends Composite implements EntityView {
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;		
+		this.presenter = presenter;
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
+
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
