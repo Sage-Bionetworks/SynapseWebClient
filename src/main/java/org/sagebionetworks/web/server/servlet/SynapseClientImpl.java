@@ -174,7 +174,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {			
 			Synapse synapseClient = createSynapseClient();			
 			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);			
-			return convertBundleToTransport(eb, partsMask);
+			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -186,7 +186,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {			
 			Synapse synapseClient = createSynapseClient();			
 			EntityBundle eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
-			return convertBundleToTransport(eb, partsMask);
+			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -266,8 +266,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 */
 
 	// Convert repo-side EntityBundle to serializable EntityBundleTransport
-	private EntityBundleTransport convertBundleToTransport(EntityBundle eb, int partsMask) 
-			throws RestServiceException {
+	private EntityBundleTransport convertBundleToTransport(String entityId, 
+			EntityBundle eb, int partsMask) throws RestServiceException {
 		EntityBundleTransport ebt = new EntityBundleTransport();
 		try {
 			if ((EntityBundleTransport.ENTITY & partsMask) > 0) {
@@ -296,6 +296,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}
 			if ((EntityBundleTransport.ACL & partsMask) > 0) {
 				AccessControlList acl = eb.getAccessControlList();
+				if (acl == null) {
+					// ACL is inherited; fetch benefactor ACL.
+					try {
+						acl = getAcl(entityId);
+					} catch (SynapseException e) {
+						e.printStackTrace();
+					}
+				}
 				ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
 			}
 			if ((EntityBundleTransport.USERS & partsMask) > 0) {
