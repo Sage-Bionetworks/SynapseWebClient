@@ -29,11 +29,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.xml.client.Document;
-import com.google.gwt.xml.client.Element;
-import com.google.gwt.xml.client.Node;
-import com.google.gwt.xml.client.NodeList;
-import com.google.gwt.xml.client.XMLParser;
 import com.google.inject.Inject;
 
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter {
@@ -203,17 +198,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
-	private String getLinkedInProfileElementValue(Document linkedInProfile, String elementName) {
-		String val = "";
-		NodeList elements = linkedInProfile.getElementsByTagName(elementName);
-		if (elements.getLength() > 0){
-			Node n = elements.item(0);
-			if (n.hasChildNodes())
-				val = n.getFirstChild().getNodeValue();
-		}
-		return val;
-	}
-	
 	/**
 	 * This method will update the current user's profile using LinkedIn
 	 */
@@ -228,41 +212,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
-					Document linkedInProfile = XMLParser.parse(result);
-				    final String firstName = getLinkedInProfileElementValue(linkedInProfile, "first-name");
-				    final String lastName = getLinkedInProfileElementValue(linkedInProfile, "last-name");
-				    final String summary = getLinkedInProfileElementValue(linkedInProfile, "summary");
-				    final String industry = getLinkedInProfileElementValue(linkedInProfile, "industry");
-				    //location is in child element <location><name>locationname</name></location>
-				    String location = "";
-				    //parse out position
-				    StringBuilder position = new StringBuilder();
-				    //and company
-				    StringBuilder company = new StringBuilder();
-				    
-				    try {
-				    	location = ((Element)linkedInProfile.getElementsByTagName("location").item(0)).getElementsByTagName("name").item(0).getFirstChild().getNodeValue();
-					    Element threeCurrentPositionsElement = (Element)linkedInProfile.getElementsByTagName("three-current-positions").item(0);
-					    Element positionElement = (Element) threeCurrentPositionsElement.getElementsByTagName("position").item(0);
-					    position.append(positionElement.getElementsByTagName("title").item(0).getFirstChild().getNodeValue());
-					    Element companyElement = (Element) positionElement.getElementsByTagName("company").item(0);
-					    company.append(companyElement.getElementsByTagName("name").item(0).getFirstChild().getNodeValue());
-				    }
-				    catch (Throwable t) {
-				    	//error trying to import position, company, or location. go ahead and update the profile with partial results
-				    	t.printStackTrace();
-				    }
-					 
-					//get the profile picture data from picture-url
-				    String picUrl = getLinkedInProfileElementValue(linkedInProfile, "picture-url");
-				    AttachmentData pic = null;
-				    //update the profile, if the image is successfully saved.
-				    //if url is the only thing set in the AttachmentData, the Synapse client will pull from the url and upload to S3 (and fill in the rest) for me.
-				    if (picUrl.length() > 0) {
-					    pic = new AttachmentData();
-					    pic.setUrl(picUrl);
-				    }
-				    updateProfile(firstName, lastName, summary, position.toString(), location, industry, company.toString(), null, pic);
+					//parse the LinkedIn UserProfile json
+					UserProfile linkedInProfile;
+					try {
+						linkedInProfile = nodeModelCreator.createEntity(result, UserProfile.class);
+						 updateProfile(linkedInProfile.getFirstName(), linkedInProfile.getLastName(), 
+						    		linkedInProfile.getSummary(), linkedInProfile.getPosition(), 
+						    		linkedInProfile.getLocation(), linkedInProfile.getIndustry(), 
+						    		linkedInProfile.getCompany(), null, linkedInProfile.getPic());
+					} catch (RestServiceException e) {
+						onFailure(e);
+					}
 				}
 				
 				@Override
