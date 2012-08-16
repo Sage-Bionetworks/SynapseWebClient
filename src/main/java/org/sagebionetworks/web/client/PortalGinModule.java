@@ -128,7 +128,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(GlobalApplicationState.class).to(GlobalApplicationStateImpl.class);
 		
 		// Header & Footer
+		bind(HeaderViewImpl.class).in(Singleton.class);
 		bind(HeaderView.class).to(HeaderViewImpl.class);
+		bind(FooterViewImpl.class).in(Singleton.class);
 		bind(FooterView.class).to(FooterViewImpl.class);
 
 		// EntityType
