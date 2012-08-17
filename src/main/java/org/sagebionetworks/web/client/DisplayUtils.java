@@ -928,8 +928,10 @@ public class DisplayUtils {
 		DOM.insertChild(container, alert.getElement(), 0);
 	}
 
-	public static String getVersionDisplay(Versionable versionable) {
-		String version;
+	public static String getVersionDisplay(Versionable versionable) {		
+		String version = "";
+		if(versionable == null || versionable.getVersionNumber() == null) return version;
+
 		if(versionable.getVersionLabel() != null && !versionable.getVersionNumber().toString().equals(versionable.getVersionLabel())) {
 			version = versionable.getVersionLabel() + " (" + versionable.getVersionNumber() + ")";
 		} else {
