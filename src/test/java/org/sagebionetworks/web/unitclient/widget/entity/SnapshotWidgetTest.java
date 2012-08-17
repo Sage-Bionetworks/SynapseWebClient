@@ -16,8 +16,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Snapshot;
-import org.sagebionetworks.repo.model.SnapshotGroup;
+import org.sagebionetworks.repo.model.Summary;
+import org.sagebionetworks.repo.model.EntityGroup;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -52,7 +52,7 @@ public class SnapshotWidgetTest {
 	
 	SnapshotWidget snapshotWidget;
 	SnapshotWidgetView mockView;
-	Snapshot snapshot;
+	Summary snapshot;
 	String testName = "testName";
 	String testDesc = "testDesc";
 
@@ -70,7 +70,7 @@ public class SnapshotWidgetTest {
 		mockView = mock(SnapshotWidgetView.class);
 		
 		snapshotWidget = new SnapshotWidget(factory, mockView, mockSynapseClient, mockNodeModelCreator, mockGlobal, mockAuthenticationController);
-		snapshot = new Snapshot();
+		snapshot = new Summary();
 		snapshot.setId("syn1234");
 	}
 	
@@ -92,7 +92,7 @@ public class SnapshotWidgetTest {
 	public void testAddGroup() throws Exception {		
 		// read only
 		snapshotWidget.setSnapshot(snapshot, false, true);		
-		SnapshotGroup returnedGroup = snapshotWidget.addGroup("test", null);
+		EntityGroup returnedGroup = snapshotWidget.addGroup("test", null);
 		assertNull(returnedGroup);
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
 		reset(mockView);
@@ -128,7 +128,7 @@ public class SnapshotWidgetTest {
 		AsyncMockStubber.callSuccessWith("return json").when(mockSynapseClient).createOrUpdateEntity(eq(snapshot.getId()), anyString(), eq(false), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("return json").when(mockSynapseClient).getEntity(eq(snapshot.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(snapshot);
-		SnapshotGroup group = snapshotWidget.addGroup(testName, testDesc);
+		EntityGroup group = snapshotWidget.addGroup(testName, testDesc);
 		assertNotNull(group);
 		assertEquals(testName, snapshot.getGroups().get(1).getName());
 		assertEquals(testDesc, snapshot.getGroups().get(1).getDescription());

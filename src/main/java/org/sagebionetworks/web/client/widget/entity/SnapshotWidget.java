@@ -8,9 +8,9 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Snapshot;
-import org.sagebionetworks.repo.model.SnapshotGroup;
-import org.sagebionetworks.repo.model.SnapshotGroupRecord;
+import org.sagebionetworks.repo.model.Summary;
+import org.sagebionetworks.repo.model.EntityGroup;
+import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -45,7 +45,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	private static final int MAX_DESCRIPTION_CHARS = 300;
 	private AdapterFactory factory;
 	private SnapshotWidgetView view;
-	private Snapshot snapshot;
+	private Summary snapshot;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private GlobalApplicationState globalApplicationState;
@@ -75,7 +75,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		view.setPresenter(this);
 	}
 	
-	public void setSnapshot(Snapshot snapshot, boolean canEdit, boolean readOnly) {		
+	public void setSnapshot(Summary snapshot, boolean canEdit, boolean readOnly) {		
 		this.snapshot = snapshot;
 		this.canEdit = canEdit;
 		this.readOnly = readOnly;
@@ -84,9 +84,9 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		
 		// add a default group if there are none, but don't persist unless record is added
 		if(snapshot.getGroups() == null || snapshot.getGroups().size() == 0) {
-			SnapshotGroup defaultGroup = new SnapshotGroup();
+			EntityGroup defaultGroup = new EntityGroup();
 			defaultGroup.setName(DisplayConstants.CONTENTS);			
-			snapshot.setGroups(new ArrayList<SnapshotGroup>(Arrays.asList(new SnapshotGroup[] { defaultGroup })));			
+			snapshot.setGroups(new ArrayList<EntityGroup>(Arrays.asList(new EntityGroup[] { defaultGroup })));			
 		} else {
 			showEdit = false;
 		}
@@ -108,17 +108,17 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	}	
 
 	/**
-	 * Loads the details for all entities referenced in the SnapshotGroupRecords and sends to the view.
+	 * Loads the details for all entities referenced in the EntityGroupRecords and sends to the view.
 	 * Generally the view should be ready to accept these rows 
 	 */
 	@Override
 	public void loadRowDetails() {
-		// iterate through all groups, all records and call setSnapshotGroupRecordDisplay
+		// iterate through all groups, all records and call setEntityGroupRecordDisplay
 		// TODO : do in batch		
 		if(snapshot == null) return;
 		if(snapshot.getGroups() == null) return;		
 		for(int groupIndex=0; groupIndex<snapshot.getGroups().size(); groupIndex++) {
-			SnapshotGroup group = snapshot.getGroups().get(groupIndex);			
+			EntityGroup group = snapshot.getGroups().get(groupIndex);			
 			if(group.getRecords() == null) continue;
 			for(int rowIndex=0; rowIndex<group.getRecords().size(); rowIndex++) {
 				loadIndividualRowDetails(groupIndex, rowIndex);
@@ -130,7 +130,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	 * Adds a group to the entity
 	 */
 	@Override
-	public SnapshotGroup addGroup(final String name, final String description) {
+	public EntityGroup addGroup(final String name, final String description) {
 		// preconditions
 		if(readOnly) {
 			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
@@ -148,11 +148,11 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		}
 
 		// add group
-		final SnapshotGroup group = new SnapshotGroup();
+		final EntityGroup group = new EntityGroup();
 		group.setName(name);
 		group.setDescription(description); // can be null
-		group.setRecords(new ArrayList<SnapshotGroupRecord>());
-		if(snapshot.getGroups() == null) snapshot.setGroups(new ArrayList<SnapshotGroup>());
+		group.setRecords(new ArrayList<EntityGroupRecord>());
+		if(snapshot.getGroups() == null) snapshot.setGroups(new ArrayList<EntityGroup>());
 		snapshot.getGroups().add(group);				
 		updateSnapshot(new AsyncCallback<String>() {
 			@Override
@@ -193,7 +193,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		}
 
 		// update group
-		SnapshotGroup group = snapshot.getGroups().get(groupIndex);
+		EntityGroup group = snapshot.getGroups().get(groupIndex);
 		group.setName(name);
 		group.setDescription(description);
 		updateSnapshot(new AsyncCallback<String>() {
@@ -267,10 +267,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		}
 
 		// add group record
-		SnapshotGroup group = snapshot.getGroups().get(groupIndex);
-		if(group.getRecords() == null) group.setRecords(new ArrayList<SnapshotGroupRecord>());		
+		EntityGroup group = snapshot.getGroups().get(groupIndex);
+		if(group.getRecords() == null) group.setRecords(new ArrayList<EntityGroupRecord>());		
 		final int addedIndex = snapshot.getGroups().get(groupIndex).getRecords().size();
-		SnapshotGroupRecord record = createRecord(entityId, versionNumber, note);			
+		EntityGroupRecord record = createRecord(entityId, versionNumber, note);			
 		snapshot.getGroups().get(groupIndex).getRecords().add(record);		
 		updateSnapshot(new AsyncCallback<String>() {				
 			@Override
@@ -311,7 +311,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		}
 
 		// update record
-		SnapshotGroupRecord record = snapshot.getGroups().get(groupIndex).getRecords().get(rowIndex);
+		EntityGroupRecord record = snapshot.getGroups().get(groupIndex).getRecords().get(rowIndex);
 		record.setNote(note);
 		updateSnapshot(new AsyncCallback<String>() {
 			@Override
@@ -374,7 +374,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			public void onSuccess(EntityWrapper result) {
 				try {
 					// update current entity
-					snapshot = nodeModelCreator.createEntity(result, Snapshot.class);
+					snapshot = nodeModelCreator.createEntity(result, Summary.class);
 					callback.onSuccess(null);
 				} catch (RestServiceException e) {
 					onFailure(e);
@@ -388,8 +388,8 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		});
 	}
 
-	private SnapshotGroupRecordDisplay getUnauthDisplay() {
-		return new SnapshotGroupRecordDisplay(
+	private EntityGroupRecordDisplay getUnauthDisplay() {
+		return new EntityGroupRecordDisplay(
 				null,
 				SafeHtmlUtils.fromSafeConstant(DisplayConstants.TITLE_UNAUTHORIZED),
 				null, null, null, null, null, null, null);
@@ -415,12 +415,12 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		}
 	}
 
-	private SnapshotGroupRecord createRecord(String entityId, Long versionNumber, String note) {
+	private EntityGroupRecord createRecord(String entityId, Long versionNumber, String note) {
 		Reference ref = new Reference();
 		ref.setTargetId(entityId);			
 		ref.setTargetVersionNumber(versionNumber);
 
-		SnapshotGroupRecord record = new SnapshotGroupRecord();
+		EntityGroupRecord record = new EntityGroupRecord();
 		record.setEntityReference(ref);
 		record.setNote(note);
 		return record;
@@ -444,8 +444,8 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		});
 	}	
 
-	private SnapshotGroupRecordDisplay createRecordDisplay(
-			SnapshotGroupRecord record, EntityWrapper result)
+	private EntityGroupRecordDisplay createRecordDisplay(
+			EntityGroupRecord record, EntityWrapper result)
 			throws RestServiceException {	
 		Entity referencedEntity = nodeModelCreator.createEntity(result);
 				
@@ -482,7 +482,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 				SafeHtmlUtils.fromSafeConstant("")
 				: new SafeHtmlBuilder().appendEscapedLines(record.getNote()).toSafeHtml();
 				
-		return new SnapshotGroupRecordDisplay(
+		return new EntityGroupRecordDisplay(
 				referencedEntity.getId(),
 				SafeHtmlUtils.fromString(referencedEntity.getName()),
 				nameLinkUrl,
@@ -494,8 +494,8 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	}
 
 	private void loadIndividualRowDetails(final int groupIndex, final int rowIndex) {
-		SnapshotGroup group = snapshot.getGroups().get(groupIndex);		
-		final SnapshotGroupRecord record = snapshot.getGroups().get(groupIndex).getRecords().get(rowIndex);
+		EntityGroup group = snapshot.getGroups().get(groupIndex);		
+		final EntityGroupRecord record = snapshot.getGroups().get(groupIndex).getRecords().get(rowIndex);
 		final Reference ref = record.getEntityReference();
 		if(ref == null) return;
 				
@@ -503,8 +503,8 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			@Override
 			public void onSuccess(EntityWrapper result) {
 				try {
-					SnapshotGroupRecordDisplay display = createRecordDisplay(record, result);								
-					view.setSnapshotGroupRecordDisplay(groupIndex, rowIndex, display);									
+					EntityGroupRecordDisplay display = createRecordDisplay(record, result);								
+					view.setEntityGroupRecordDisplay(groupIndex, rowIndex, display);									
 				} catch (RestServiceException e) {
 					onFailure(e);
 				}
@@ -513,9 +513,9 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof UnauthorizedException) {
-				SnapshotGroupRecordDisplay unauthDisplay = getUnauthDisplay();
+				EntityGroupRecordDisplay unauthDisplay = getUnauthDisplay();
 				unauthDisplay.setEntityId(ref.getTargetId());
-				view.setSnapshotGroupRecordDisplay(groupIndex, rowIndex, unauthDisplay);
+				view.setEntityGroupRecordDisplay(groupIndex, rowIndex, unauthDisplay);
 				} else {
 					view.showErrorMessage(DisplayConstants.ERROR_FAILED_PERSIST);					
 				}

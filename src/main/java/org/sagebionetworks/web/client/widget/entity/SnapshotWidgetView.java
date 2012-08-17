@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.Snapshot;
-import org.sagebionetworks.repo.model.SnapshotGroup;
+import org.sagebionetworks.repo.model.EntityGroup;
+import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -15,7 +15,7 @@ public interface SnapshotWidgetView extends IsWidget, SynapseWidgetView {
 	
 	public interface Presenter {		
 		
-		SnapshotGroup addGroup(String name, String description);
+		EntityGroup addGroup(String name, String description);
 		
 		void updateGroup(int groupIndex, String name, String description);
 		
@@ -35,8 +35,8 @@ public interface SnapshotWidgetView extends IsWidget, SynapseWidgetView {
 
 	void setPresenter(Presenter presenter);
 	
-	void setSnapshot(Snapshot entity, boolean canEdit, boolean readOnly, boolean showEdit);
+	void setSnapshot(Summary entity, boolean canEdit, boolean readOnly, boolean showEdit);
 
-	void setSnapshotGroupRecordDisplay(int groupIndex, int rowIndex, SnapshotGroupRecordDisplay display);
+	void setEntityGroupRecordDisplay(int groupIndex, int rowIndex, EntityGroupRecordDisplay display);
 
 }

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityGroup;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Snapshot;
-import org.sagebionetworks.repo.model.SnapshotGroup;
+import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -21,8 +21,6 @@ import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
@@ -60,7 +58,7 @@ import com.google.inject.Inject;
  */
 public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotWidgetView, IsWidget {
 
-	private List<SnapshotGroupDisplay> groupDisplays; 
+	private List<EntityGroupDisplay> groupDisplays; 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private boolean canEdit = false;
@@ -89,17 +87,17 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	}
 
 	@Override
-	public void setSnapshot(Snapshot entity, boolean canEdit, boolean readOnly, boolean showEdit) {
+	public void setSnapshot(Summary entity, boolean canEdit, boolean readOnly, boolean showEdit) {
 		this.canEdit = canEdit;
 		this.readOnly = readOnly;
 		this.showEdit = showEdit;
 		this.removeAll();
 		
 		// create & display groups		
-		List<SnapshotGroup> groups = entity.getGroups();
+		List<EntityGroup> groups = entity.getGroups();
 		groupDisplays = createListOfSize(groups.size());
 		for(int groupIndex=0; groupIndex<groups.size(); groupIndex++) {						
-			groupDisplays.set(groupIndex, createSnapshotGroupDisplay(groups.get(groupIndex), showEdit));			
+			groupDisplays.set(groupIndex, createEntityGroupDisplay(groups.get(groupIndex), showEdit));			
 		}
 		
 		// add editor to self for rendering
@@ -139,9 +137,9 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 				});
 	}
 
-	private SnapshotGroupDisplay createSnapshotGroupDisplay(SnapshotGroup group, boolean canEdit) {
+	private EntityGroupDisplay createEntityGroupDisplay(EntityGroup group, boolean canEdit) {
 		// create display widget for the group
-		SnapshotGroupDisplay groupDisplay = new SnapshotGroupDisplay();
+		EntityGroupDisplay groupDisplay = new EntityGroupDisplay();
 		groupDisplay.initialize(SafeHtmlUtils.fromString(group.getName() == null ? "" : group.getName()),
 				SafeHtmlUtils.fromString(group.getDescription() == null ? "" : group.getDescription()),
 				iconsImageBundle, 
@@ -154,9 +152,9 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		return groupsTable.getCellForEvent(event).getRowIndex();
 	}
 
-	private void addGroup(SnapshotGroup group) {
+	private void addGroup(EntityGroup group) {
 		int newGroupIndex = groupDisplays.size();
-		SnapshotGroupDisplay groupDisplay = createSnapshotGroupDisplay(group, canEdit);		
+		EntityGroupDisplay groupDisplay = createEntityGroupDisplay(group, canEdit);		
 		groupDisplays.add(groupDisplay);
 		groupsTable.setWidget(newGroupIndex, 0, groupDisplay);
 	}
@@ -166,7 +164,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		groupsTable.removeRow(groupIndex);
 	}
 	
-	private WidgetMenu createEditMenu(final SnapshotGroupDisplay groupDisplay, IconsImageBundle iconsImageBundle) {
+	private WidgetMenu createEditMenu(final EntityGroupDisplay groupDisplay, IconsImageBundle iconsImageBundle) {
 		WidgetMenu widgetMenu = new WidgetMenu(iconsImageBundle);
 		widgetMenu.showEdit(new ClickHandler() {				
 			@Override
@@ -205,8 +203,8 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	}
 
 	
-	private List<SnapshotGroupDisplay> createListOfSize(int size) {
-		List<SnapshotGroupDisplay> list = new ArrayList<SnapshotGroupDisplay>();
+	private List<EntityGroupDisplay> createListOfSize(int size) {
+		List<EntityGroupDisplay> list = new ArrayList<EntityGroupDisplay>();
 		for(int i=0; i<size; i++) {
 			list.add(null);
 		}
@@ -214,11 +212,11 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	}
 
 	@Override
-	public void setSnapshotGroupRecordDisplay(final int groupIndex, final int rowIndex,
-			final SnapshotGroupRecordDisplay display) {
-		final SnapshotGroupDisplay groupDisplay = groupDisplays.get(groupIndex);
+	public void setEntityGroupRecordDisplay(final int groupIndex, final int rowIndex,
+			final EntityGroupRecordDisplay display) {
+		final EntityGroupDisplay groupDisplay = groupDisplays.get(groupIndex);
 
-		// convert SnapshotGroupRecordDisplay to a row entry
+		// convert EntityGroupRecordDisplay to a row entry
 		
 		// create name link		
 		Widget name;
@@ -342,7 +340,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 					ClickHandler addEntityClickHandler = new ClickHandler() {				
 						@Override
 						public void onClick(ClickEvent event) {
-							SnapshotGroupDisplay group = addEntityToGroupWidget.getGroup();
+							EntityGroupDisplay group = addEntityToGroupWidget.getGroup();
 							String version = addEntityToGroupWidget.getVersion();
 							int groupIndex = -1;
 							for(int i=0; i<groupDisplays.size(); i++) {
@@ -380,7 +378,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 								return;
 							}
 
-							SnapshotGroup group = presenter.addGroup(name, description);
+							EntityGroup group = presenter.addGroup(name, description);
 							addGroup(group);
 						}						
 					});
@@ -405,10 +403,10 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	
 	
 	/* =======================================================================================================================================
-	 * SnapshotGroupDisplay
+	 * EntityGroupDisplay
 	 */
 	
-	private class SnapshotGroupDisplay extends LayoutContainer {		
+	private class EntityGroupDisplay extends LayoutContainer {		
 		private static final String HEADER_NAME = "Name";
 		private static final String HEADER_DOWNLOAD = "Download";
 		private static final String HEADER_VERSION = "Version";
@@ -448,7 +446,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			return table.getCellForEvent(event).getRowIndex();
 		}
 				
-		public SnapshotGroupDisplay() {
+		public EntityGroupDisplay() {
 			
 		}
 		
@@ -598,7 +596,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			SnapshotGroupDisplay other = (SnapshotGroupDisplay) obj;
+			EntityGroupDisplay other = (EntityGroupDisplay) obj;
 			if (!getOuterType().equals(other.getOuterType()))
 				return false;
 			if (description == null) {
@@ -659,7 +657,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		private final String CONTAINER_STYLE = "span-19 notopmargin last";
 		
 		FormPanel form;
-		SimpleComboBox<SnapshotGroupDisplay> groupBox;
+		SimpleComboBox<EntityGroupDisplay> groupBox;
 		LabelField entityIdField;
 		LabelField entityNameField;
 		SimpleComboBox<String> versionBox;
@@ -723,7 +721,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			// version dropdown
 			// TODO : add version dd
 			
-			groupBox = new SimpleComboBox<SnapshotGroupDisplay>();
+			groupBox = new SimpleComboBox<EntityGroupDisplay>();
 			groupBox.setFieldLabel("Group");
 			groupBox.setTypeAhead(false);
 			groupBox.setEditable(false);
@@ -740,7 +738,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			this.layout(true);			
 		}
 		
-		private void configureForm(List<SnapshotGroupDisplay> groups, EntityHeader entityHeader, List<EntityHeader> versions, final ClickHandler addButtonHandler) {
+		private void configureForm(List<EntityGroupDisplay> groups, EntityHeader entityHeader, List<EntityHeader> versions, final ClickHandler addButtonHandler) {
 			this.clear();
 			
 			// fill columns with form fields		     
@@ -787,7 +785,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			return null;
 		}
 		
-		public SnapshotGroupDisplay getGroup() {
+		public EntityGroupDisplay getGroup() {
 			if(groupBox != null && groupBox.getValue() != null) {
 				return groupBox.getValue().getValue();
 			}

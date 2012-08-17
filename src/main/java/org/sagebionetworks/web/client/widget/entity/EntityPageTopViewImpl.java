@@ -5,8 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Snapshot;
-import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
@@ -193,7 +192,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		
 		// Custom layouts for certain entities
-		if(bundle.getEntity() instanceof Snapshot) {
+		if(bundle.getEntity() instanceof Summary) {
 		    renderSnapshotEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
 		} else {
 			// default entity view
@@ -256,7 +255,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// ** FULL WIDTH **
 		// Snapshot entity
-		snapshotWidget.setSnapshot((Snapshot)bundle.getEntity(), canEdit, readOnly);
+		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);
 		fullWidthContainer.add(snapshotWidget.asWidget());
 		
 	} 
