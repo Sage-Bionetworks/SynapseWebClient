@@ -71,6 +71,11 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 
 	@Override
 	public void createProject(String name) {		
+		if (name == null || name.equalsIgnoreCase("")) {
+			view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_IS_EMPTY);
+			return;
+		}
+
 		Project proj = (Project) entityFactory.newInstance(Project.class.getName());
 		proj.setEntityType(Project.class.getName());
 		proj.setName(name);

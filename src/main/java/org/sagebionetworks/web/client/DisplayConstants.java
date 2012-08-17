@@ -231,6 +231,7 @@ public class DisplayConstants {
 	public static final String ERRROR_ATTACHMENT_FAILED = "Failed to upload attachment: ";
 	public static final String ERROR_PROFILE_PICTURE_FAILED = "Failed to upload photo: ";
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
+	public static final String WARNING_PROJECT_NAME_IS_EMPTY = "Sorry, you cannot create a project with an empty name.  Please enter a project name.";
 	public static final String ERROR_FAILURE_PRIVLEDGES = "Sorry, you do not have sufficient privileges for access.";
 	public static final String TITLE_UNAUTHORIZED = "Unauthorized";
 	public static final String ATTACHMENT_DIALOG_BUTTON_TEXT = "Attach";
