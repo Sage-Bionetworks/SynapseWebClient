@@ -280,6 +280,8 @@ public class DisplayConstants {
 	public static final String ID_INP_NEWPASSWORD = "id_inp_new_password";
 	public static final String ID_INP_CONFIRMPASSWORD = "id_inp_confirm_password";
 	public static final String ID_BTN_SUBMIT = "id_btn_submit";
+	public static final String SHOW_LIST_EDITOR = "Show List Editor";
+	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 
 }
 
