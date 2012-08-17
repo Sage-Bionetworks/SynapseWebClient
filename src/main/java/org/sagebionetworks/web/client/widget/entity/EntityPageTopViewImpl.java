@@ -253,8 +253,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
 		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly), widgetMargin);
-		// Create R Client widget
-		colRightContainer.add(createRClientWidget(bundle.getEntity()), widgetMargin);
 
 		// ** FULL WIDTH **
 		// Snapshot entity

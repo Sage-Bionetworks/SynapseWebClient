@@ -42,6 +42,7 @@ import com.google.inject.Inject;
  */
 public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	
+	private static final int MAX_DESCRIPTION_CHARS = 300;
 	private AdapterFactory factory;
 	private SnapshotWidgetView view;
 	private Snapshot snapshot;
@@ -79,13 +80,18 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		this.canEdit = canEdit;
 		this.readOnly = readOnly;
 		
+		boolean showEdit = canEdit;
+		
 		// add a default group if there are none, but don't persist unless record is added
 		if(snapshot.getGroups() == null || snapshot.getGroups().size() == 0) {
 			SnapshotGroup defaultGroup = new SnapshotGroup();
 			defaultGroup.setName(DisplayConstants.CONTENTS);			
 			snapshot.setGroups(new ArrayList<SnapshotGroup>(Arrays.asList(new SnapshotGroup[] { defaultGroup })));			
-		}		
-		view.setSnapshot(snapshot, canEdit, readOnly);		
+		} else {
+			showEdit = false;
+		}
+		
+		view.setSnapshot(snapshot, canEdit, readOnly, showEdit);		
 	}	
 	
 	@Override
@@ -93,6 +99,13 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		// The view is the real widget.
 		return view.asWidget();
 	}
+
+	@Override
+	public void setShowEditor(boolean show) {
+		if(snapshot != null) {
+			view.setSnapshot(snapshot, canEdit, readOnly, show);
+		}
+	}	
 
 	/**
 	 * Loads the details for all entities referenced in the SnapshotGroupRecords and sends to the view.
@@ -459,9 +472,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		}							
 		
 		// desc
-		SafeHtml descSafe = referencedEntity.getDescription() == null ? 
-				SafeHtmlUtils.fromSafeConstant("") 
-				: new SafeHtmlBuilder().appendEscapedLines(referencedEntity.getDescription()).toSafeHtml();  
+		String description = referencedEntity.getDescription() == null ? "" : referencedEntity.getDescription();
+		if(description.length() > MAX_DESCRIPTION_CHARS) 
+			description = description.substring(0, MAX_DESCRIPTION_CHARS) + " ...";
+		SafeHtml descSafe =  new SafeHtmlBuilder().appendEscapedLines(description).toSafeHtml();  
 		
 		// note
 		SafeHtml noteSafe = record.getNote() == null ? 
@@ -513,6 +527,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			// failsafe
 			synapseClient.getEntity(ref.getTargetId(), callback);
 		}
-	}	
+	}
+
 
 }

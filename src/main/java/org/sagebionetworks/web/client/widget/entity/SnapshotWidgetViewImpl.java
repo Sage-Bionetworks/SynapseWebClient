@@ -21,6 +21,8 @@ import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
+import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
@@ -62,11 +64,12 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private boolean canEdit = false;
+	private boolean readOnly = false;
+	private boolean showEdit = false;
 	private EntitySearchBox entitySearchBox;
 	private AddEntityToGroupWidget addEntityToGroupWidget; 
 	private LayoutContainer addEditor;
 	private FlexTable groupsTable;
-	private boolean readOnly = false;
 	
 	@Inject
 	public SnapshotWidgetViewImpl(IconsImageBundle iconsImageBundle, EntitySearchBox entitySearchBox) {
@@ -86,22 +89,28 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	}
 
 	@Override
-	public void setSnapshot(Snapshot entity, boolean canEdit, boolean readOnly) {
+	public void setSnapshot(Snapshot entity, boolean canEdit, boolean readOnly, boolean showEdit) {
 		this.canEdit = canEdit;
 		this.readOnly = readOnly;
+		this.showEdit = showEdit;
 		this.removeAll();
 		
 		// create & display groups		
 		List<SnapshotGroup> groups = entity.getGroups();
 		groupDisplays = createListOfSize(groups.size());
 		for(int groupIndex=0; groupIndex<groups.size(); groupIndex++) {						
-			groupDisplays.set(groupIndex, createSnapshotGroupDisplay(groups.get(groupIndex), canEdit));			
+			groupDisplays.set(groupIndex, createSnapshotGroupDisplay(groups.get(groupIndex), showEdit));			
 		}
 		
 		// add editor to self for rendering
 		if(canEdit && !readOnly) {
-			this.add(createEditor());
-		}
+			// show edit button
+			this.add(getHideShowListEditorButton(!showEdit), new MarginData(0,0,10,0));
+			if(showEdit) {
+				this.add(createEditor());
+			} 			
+		} 
+		
 		
 		groupsTable = new FlexTable();
 		groupsTable.setWidth("100%");		
@@ -117,6 +126,17 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		this.layout(true);
 
 		presenter.loadRowDetails();
+	}
+
+	private Button getHideShowListEditorButton(final boolean show) {
+		String title = show ? DisplayConstants.SHOW_LIST_EDITOR : DisplayConstants.HIDE_LIST_EDITOR; 
+		return new Button(title, AbstractImagePrototype.create(iconsImageBundle.cog16()),
+				new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						presenter.setShowEditor(show);
+					}
+				});
 	}
 
 	private SnapshotGroupDisplay createSnapshotGroupDisplay(SnapshotGroup group, boolean canEdit) {
@@ -224,7 +244,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 				display.getVersion(), display.getDescription(),
 				display.getModifienOn(), display.getContact(),
 				display.getNote());
-		if(canEdit && !readOnly) {
+		if(canEdit && showEdit && !readOnly) {
 			ClickHandler editRow = new ClickHandler() {				
 				@Override
 				public void onClick(ClickEvent event) {
@@ -365,7 +385,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 						}						
 					});
 				}
-			});
+			});		
 			right.add(addGroupBtn, new MarginData(10, 0, 0, 0));
 			
 			addEditor.add(left);

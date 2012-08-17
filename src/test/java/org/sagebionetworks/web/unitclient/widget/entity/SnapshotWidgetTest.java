@@ -80,12 +80,12 @@ public class SnapshotWidgetTest {
 
 		// assure that initial group is created if there are none
 		assertEquals(1, snapshot.getGroups().size());		
-		verify(mockView).setSnapshot(snapshot, true, false); // can edit
+		verify(mockView).setSnapshot(snapshot, true, false, true); // can edit
 
 		// assure that only one inital group is added
 		snapshotWidget.setSnapshot(snapshot, false, false);
 		assertEquals(1, snapshot.getGroups().size());		
-		verify(mockView).setSnapshot(snapshot, false, false); // can not edit		
+		verify(mockView).setSnapshot(snapshot, false, false, true); // can not edit		
 	}
 	
 	@Test

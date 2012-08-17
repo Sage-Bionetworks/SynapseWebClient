@@ -29,11 +29,13 @@ public interface SnapshotWidgetView extends IsWidget, SynapseWidgetView {
 
 		void loadRowDetails();
 		
+		void setShowEditor(boolean show);
+		
 	}
 
 	void setPresenter(Presenter presenter);
 	
-	void setSnapshot(Snapshot entity, boolean canEdit, boolean readOnly);
+	void setSnapshot(Snapshot entity, boolean canEdit, boolean readOnly, boolean showEdit);
 
 	void setSnapshotGroupRecordDisplay(int groupIndex, int rowIndex, SnapshotGroupRecordDisplay display);
 
