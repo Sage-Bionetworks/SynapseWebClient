@@ -118,6 +118,16 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		return principals;
 	}
 	
+	private static AclPrincipal convertProfileToPrincipal(Long ownerPrincipalId, 
+			UserProfile profile, ResourceAccess ra) {
+		AclPrincipal p = new AclPrincipal();
+		p.setDisplayName(profile.getDisplayName());
+		p.setIndividual(true);
+		p.setPrincipalId(ra.getPrincipalId());
+		p.setOwner(ownerPrincipalId.equals(ra.getPrincipalId()));
+		return p;
+	}
+
 	private void setViewDetails() {
 		if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
 		if (this.acl==null) throw new IllegalStateException("ACL is missing.");
@@ -385,11 +395,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 					public void onSuccess(String userProfileJson) {
 						try {								
 							UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
-							AclPrincipal p = new AclPrincipal();
-							p.setDisplayName(profile.getDisplayName());
-							p.setIndividual(true);
-							p.setPrincipalId(ra.getPrincipalId());
-							p.setOwner(ownerPrincipalId.equals(ra.getPrincipalId()));
+							AclPrincipal p = convertProfileToPrincipal(ownerPrincipalId, profile, ra);
 							view.addAclEntry(new AclEntry(p, new ArrayList<ACCESS_TYPE>(ra.getAccessType())));
 						} catch (RestServiceException e) {
 							onFailure(e);
