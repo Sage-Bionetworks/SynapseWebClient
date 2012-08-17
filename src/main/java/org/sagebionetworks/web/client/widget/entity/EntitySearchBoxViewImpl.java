@@ -65,6 +65,8 @@ public class EntitySearchBoxViewImpl extends LayoutContainer implements EntitySe
 		searchPanel.add(searchBox);
 		Html icon = new Html(AbstractImagePrototype.create(iconsImageBundle.magnify16()).getHTML());
 		icon.addStyleName("margin-top-left-10");
+		icon.setStyleAttribute("margin-top", "10px");
+		icon.setStyleAttribute("margin-left", "10px");
 		searchPanel.add(icon);
 		
 		this.add(searchPanel);
