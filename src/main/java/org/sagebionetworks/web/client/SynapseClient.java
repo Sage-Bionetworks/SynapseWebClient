@@ -18,7 +18,7 @@ public interface SynapseClient extends RemoteService {
 	public EntityWrapper getEntity(String entityId);
 	
 	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber);
-	
+		
 	public String getEntityVersions(String entityId) throws RestServiceException;
 	
 	public void deleteEntity(String entityId) throws RestServiceException;
@@ -33,6 +33,13 @@ public interface SynapseClient extends RemoteService {
 	
 	public SerializableWhitelist junk(SerializableWhitelist l);
 	
+	/**
+	 * Updates the entity in the repo  
+	 * @param entityJson - the JSON string representing the entity
+	 * @return the updated version of the entity
+	 * @throws RestServiceException
+	 */
+	public EntityWrapper updateEntity(String entityJson) throws RestServiceException;
 	
 	/**
 	 * Get a bundle of information about an entity in a single call

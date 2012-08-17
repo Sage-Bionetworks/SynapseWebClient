@@ -203,7 +203,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		// create name link		
 		Widget name;
 		if(display.getNameLinkUrl() != null && !"".equals(display.getNameLinkUrl())) {
-			name = new Hyperlink(display.getName(), display.getNameLinkUrl());
+			name = new Hyperlink(display.getName(), display.getNameLinkUrl());			
 			name.setStyleName("link");
 		} else {
 			name = new HTML(display.getName());
