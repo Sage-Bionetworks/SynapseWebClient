@@ -86,7 +86,7 @@ public class UserGroupSearchBox {
 	private static native String getTemplate() /*-{
 		return [ '<tpl for="."><div class="search-item">',
 				'<table cellspacing="0" cellpadding="0" width="100%"><tr valign="top">',
-				'<td><span class="suggestSearchTerm">{displayName}</span></td>',
+				'<td>{displayName}</span></td>',
 				'</tr></table>',
 				'</div></tpl>' ].join("");
 	}-*/;
