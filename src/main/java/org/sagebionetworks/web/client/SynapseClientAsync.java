@@ -65,6 +65,8 @@ public interface SynapseClientAsync {
 	
 	public void updateAcl(EntityWrapper acl, AsyncCallback<EntityWrapper> callback);
 	
+	public void updateAcl(EntityWrapper acl, boolean recursive, AsyncCallback<EntityWrapper> callback);
+	
 	public void deleteAcl(String ownerEntityId, AsyncCallback<EntityWrapper> callback);
 
 	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
