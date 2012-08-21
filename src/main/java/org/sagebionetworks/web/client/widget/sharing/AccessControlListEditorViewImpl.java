@@ -443,7 +443,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			AclPrincipal principal = aclEntry.getPrincipal();
 			this.set(PRINCIPAL_COLUMN_ID, principal);			
 			this.set(REMOVE_COLUMN_ID, principal);			
-			PermissionLevel level = AclUtils.getPermissionLevel(aclEntry.getAccessTypes());			
+			PermissionLevel level = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));			
 			if(level != null) {
 				this.set(ACCESS_COLUMN_ID, permissionDisplay.get(level)); 
 			}			
