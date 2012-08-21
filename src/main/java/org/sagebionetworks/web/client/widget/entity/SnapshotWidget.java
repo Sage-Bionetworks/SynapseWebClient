@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.SnapshotGroup;
 import org.sagebionetworks.repo.model.SnapshotGroupRecord;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -29,7 +28,6 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -74,13 +72,13 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		view.setPresenter(this);
 	}
 	
-	public void setSnapshot(Snapshot snapshot, boolean canEdit, boolean readOnly) {		
+	public void setSnapshot(Snapshot snapshot, boolean canEdit, boolean readOnly) {				
 		this.snapshot = snapshot;
 		this.canEdit = canEdit;
 		this.readOnly = readOnly;
 		
 		// add a default group if there are none, but don't persist unless record is added
-		if(snapshot.getGroups() == null || snapshot.getGroups().size() == 0) {
+		if(snapshot != null && (snapshot.getGroups() == null || snapshot.getGroups().size() == 0)) {
 			SnapshotGroup defaultGroup = new SnapshotGroup();
 			defaultGroup.setName(DisplayConstants.CONTENTS);			
 			snapshot.setGroups(new ArrayList<SnapshotGroup>(Arrays.asList(new SnapshotGroup[] { defaultGroup })));			
@@ -94,6 +92,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		return view.asWidget();
 	}
 
+	public Snapshot getSnapshot() {
+		return snapshot;
+	}
+	
 	/**
 	 * Loads the details for all entities referenced in the SnapshotGroupRecords and sends to the view.
 	 * Generally the view should be ready to accept these rows 
@@ -291,7 +293,11 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			rebuildEverything();
 			return;
 		}
-		if(rowIndex < 0 || rowIndex >= snapshot.getGroups().get(groupIndex).getRecords().size()) {
+		if(rowIndex < 0 
+				|| snapshot.getGroups() == null
+				|| snapshot.getGroups().get(groupIndex) == null
+				|| snapshot.getGroups().get(groupIndex).getRecords() == null
+				|| rowIndex >= snapshot.getGroups().get(groupIndex).getRecords().size()) {
 			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 			rebuildEverything();
 			return;
@@ -355,25 +361,6 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	/*
 	 * Private methods
 	 */
-	private void reloadCurrentSnapshot(final AsyncCallback<String> callback) {		
-		synapseClient.getEntity(snapshot.getId(), new AsyncCallback<EntityWrapper>() {
-			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					// update current entity
-					snapshot = nodeModelCreator.createEntity(result, Snapshot.class);
-					callback.onSuccess(null);
-				} catch (RestServiceException e) {
-					onFailure(e);
-				}
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
-	}
 
 	private SnapshotGroupRecordDisplay getUnauthDisplay() {
 		return new SnapshotGroupRecordDisplay(
@@ -383,14 +370,17 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	}
 
 	private void updateSnapshot(final AsyncCallback<String> callback) {
-		JSONObjectAdapter adapter = factory.createNew();
 		try {
-			snapshot.writeToJSONObject(adapter);
-			// persist					
-			synapseClient.createOrUpdateEntity(adapter.toJSONString(), null, false, new AsyncCallback<String>() {
+			// update current entity
+			synapseClient.updateEntity(snapshot.writeToJSONObject(factory.createNew()).toJSONString(), new AsyncCallback<EntityWrapper>() {
 				@Override
-				public void onSuccess(String result) {
-					reloadCurrentSnapshot(callback);
+				public void onSuccess(EntityWrapper result) {
+					try {
+						snapshot = nodeModelCreator.createEntity(result.getEntityJson(), result.getEntityClassName());
+					} catch (RestServiceException e) {
+						onFailure(e);
+					}
+					callback.onSuccess(null);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -418,11 +408,18 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	 * Generally this is used for failures as successful atomic changes are simple to represent
 	 */
 	private void rebuildEverything() {
-		reloadCurrentSnapshot(new AsyncCallback<String>() {
+		synapseClient.getEntity(snapshot.getId(), new AsyncCallback<EntityWrapper>() {
 			@Override
-			public void onSuccess(String result) {
-				setSnapshot(snapshot, canEdit, readOnly);
+			public void onSuccess(EntityWrapper result) {
+				try {
+					// update current entity
+					snapshot = nodeModelCreator.createEntity(result, Snapshot.class);
+					setSnapshot(snapshot, canEdit, readOnly);
+				} catch (RestServiceException e) {
+					onFailure(e);
+				}
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				setSnapshot(null, canEdit, readOnly);
@@ -475,7 +472,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 				downloadUrl, descSafe,
 				SafeHtmlUtils.fromString(version),
 				referencedEntity.getModifiedOn(),
-				SafeHtmlUtils.fromString(referencedEntity.getCreatedBy()),
+				referencedEntity.getCreatedBy() == null ? SafeHtmlUtils.EMPTY_SAFE_HTML : SafeHtmlUtils.fromString(referencedEntity.getCreatedBy()),
 				noteSafe);		
 	}
 
@@ -499,9 +496,9 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof UnauthorizedException) {
-				SnapshotGroupRecordDisplay unauthDisplay = getUnauthDisplay();
-				unauthDisplay.setEntityId(ref.getTargetId());
-				view.setSnapshotGroupRecordDisplay(groupIndex, rowIndex, unauthDisplay);
+					SnapshotGroupRecordDisplay unauthDisplay = getUnauthDisplay();
+					unauthDisplay.setEntityId(ref.getTargetId());
+					view.setSnapshotGroupRecordDisplay(groupIndex, rowIndex, unauthDisplay);
 				} else {
 					view.showErrorMessage(DisplayConstants.ERROR_FAILED_PERSIST);					
 				}

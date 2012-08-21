@@ -18,6 +18,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.PaginatedResults;
@@ -25,6 +26,7 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
@@ -47,6 +49,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class AccessControlListEditorTest {
 	private static final long PRINCIPAL_ID = 1L;
+	private static final long PRINCIPAL_ID2 = 2L;
 	private static final String ACL_ID = "syn101";
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
@@ -54,11 +57,14 @@ public class AccessControlListEditorTest {
 	private static NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(jsonEntityFactory, jsonObjectAdapter);
 	private SynapseClientAsync mockSynapseClient;
 	private NodeModelCreator mockNodeModelCreator;
+	private static org.sagebionetworks.web.shared.PaginatedResults<JSONEntity> pgGpsJson;
+	private static UserEntityPermissions permissions;
 	
 	@Before
 	public void setup() {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
+		pgGpsJson = createUserGroupsJSON();
 	}
 	
 	private AccessControlListEditor createACLE() {
@@ -66,6 +72,17 @@ public class AccessControlListEditorTest {
 		AccessControlListEditor acle = new AccessControlListEditor(view,
 				mockSynapseClient,
 				nodeModelCreator,
+				null,
+				null, 
+				jsonObjectAdapter);
+		return acle;
+	}
+	
+	private AccessControlListEditor createACLEWithMocks() {
+		AccessControlListEditorView view = mock(AccessControlListEditorView.class); 
+		AccessControlListEditor acle = new AccessControlListEditor(view,
+				mockSynapseClient,
+				mockNodeModelCreator,
 				null,
 				null, 
 				jsonObjectAdapter);
@@ -81,10 +98,10 @@ public class AccessControlListEditorTest {
 			// fill in groups
 			List<UserGroup> gps = createUserGroups();
 			PaginatedResults<UserGroup> pgGps = new PaginatedResults<UserGroup>();
-			pgGps.setResults(gps);
+			pgGps .setResults(gps);
 			ebt.setGroupsJson(EntityFactory.createJSONStringForEntity(pgGps));
 			// fill in UserEntityPermissions
-			UserEntityPermissions permissions = new UserEntityPermissions();
+			permissions = new UserEntityPermissions();
 			permissions.setCanChangePermissions(true);
 			permissions.setCanEnableInheritance(true);
 			permissions.setOwnerPrincipalId(PRINCIPAL_ID);
@@ -114,46 +131,32 @@ public class AccessControlListEditorTest {
 		verify(mockSynapseClient).createAcl(eq(expectedEntityWrapper), any(AsyncCallback.class));
 	}
 	
-	@Ignore
 	@Test
 	public void addAccessTest() throws Exception {
 		final EntityBundleTransport ebt = createEBT();
-		// make a synapseClient that can return the ACL, users, groups, and permissions
-		// and capture the ACL it updates
-		SynapseClientAsync synapseClient = (SynapseClientAsync)Proxy.newProxyInstance(SynapseClientAsync.class.getClassLoader(),
-                new Class<?>[]{SynapseClientAsync.class},
-                new InvocationHandler() {
-					@Override
-					public Object invoke(Object synapseClient, Method method, Object[] args)
-							throws Throwable {
-						if (method.equals(SynapseClientAsync.class.getMethod("getEntityBundle", String.class, Integer.TYPE, AsyncCallback.class))) {
-							((AsyncCallback<EntityBundleTransport>)args[2]).onSuccess(ebt);
-						} else if (method.equals(SynapseClientAsync.class.getMethod("updateAcl", EntityWrapper.class, AsyncCallback.class))) {
-							EntityWrapper ew = (EntityWrapper)args[0];
-							AccessControlList acl = jsonEntityFactory.createEntity(ew.getEntityJson(), AccessControlList.class);
-							assertEquals(ACL_ID, acl.getId());
-							// check that it has admin access for owner
-							boolean foundIt=false;
-							for (ResourceAccess ra : acl.getResourceAccess()) {
-								if (1L == ra.getPrincipalId()) {
-									foundIt=true;
-									Set<ACCESS_TYPE> ats = ra.getAccessType();
-									assertEquals(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT)), ats);
-								}
-							}
-							assertTrue(foundIt);
-						} else {
-							throw new IllegalArgumentException(method.getName());
-						}
-						return null;
-					}
-		});
-		AccessControlListEditor acle = createACLE();
-		Long principalId = 1L;
-		PermissionLevel level = PermissionLevel.CAN_EDIT;
+		AccessControlList acl = AccessControlListEditor.newACLforEntity(ACL_ID, PRINCIPAL_ID);
+		EntityWrapper expectedEntityWrapper = new EntityWrapper(acl.writeToJSONObject(adapterFactory.createNew()).toJSONString(), AccessControlList.class.getName(), null);
+		when(mockNodeModelCreator.createEntity(anyString(), eq(AccessControlList.class))).thenReturn(acl);
+		when(mockNodeModelCreator.createEntity(anyString(), eq(UserEntityPermissions.class))).thenReturn(permissions);
+		when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(UserGroup.class))).thenReturn(pgGpsJson);
+		
+		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(mockSynapseClient).createAcl(any(EntityWrapper.class), any(AsyncCallback.class));		
+				
+		AccessControlListEditor acle = createACLEWithMocks();
 		acle.setResource(ACL_ID);
 		acle.asWidget();
-		acle.addAccess(principalId, level);
+		acle.addAccess(PRINCIPAL_ID2, PermissionLevel.CAN_EDIT);
+		
+		boolean foundIt=false;
+		for (ResourceAccess ra : acl.getResourceAccess()) {
+			if (PRINCIPAL_ID2 == ra.getPrincipalId()) {
+				foundIt=true;
+				Set<ACCESS_TYPE> ats = ra.getAccessType();
+				assertEquals(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT), ats);
+			}
+		}
+		assertTrue(foundIt);
 	}
 	
 	@Test
@@ -179,7 +182,7 @@ public class AccessControlListEditorTest {
 								if (1L == ra.getPrincipalId()) {
 									foundIt=true;
 									Set<ACCESS_TYPE> ats = ra.getAccessType();
-									assertEquals(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT)), ats);
+									assertEquals(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT), ats);
 								}
 							}
 							assertTrue(foundIt);
@@ -237,31 +240,23 @@ public class AccessControlListEditorTest {
 	}
 	
 	@Test
-	@Ignore
 	public void deleteAclTest() throws Exception {
 		final EntityBundleTransport ebt = createEBT();
-		// make a synapseClient that can return the ACL, users, groups, and permissions
-		// and capture the event of deleting the ACL
-		SynapseClientAsync synapseClient = (SynapseClientAsync)Proxy.newProxyInstance(SynapseClientAsync.class.getClassLoader(),
-                new Class<?>[]{SynapseClientAsync.class},
-                new InvocationHandler() {
-					@Override
-					public Object invoke(Object synapseClient, Method method, Object[] args)
-							throws Throwable {
-						if (method.equals(SynapseClientAsync.class.getMethod("getEntityBundle", String.class, Integer.TYPE, AsyncCallback.class))) {
-							((AsyncCallback<EntityBundleTransport>)args[2]).onSuccess(ebt);
-						} else if (method.equals(SynapseClientAsync.class.getMethod("deleteAcl", String.class, AsyncCallback.class))) {
-							assertEquals(ACL_ID, args[0]);
-						} else {
-							throw new IllegalArgumentException(method.getName());
-						}
-						return null;
-					}
-		});
-		AccessControlListEditor acle = createACLE();
+		AccessControlList acl = AccessControlListEditor.newACLforEntity(ACL_ID, PRINCIPAL_ID);
+		EntityWrapper expectedEntityWrapper = new EntityWrapper(acl.writeToJSONObject(adapterFactory.createNew()).toJSONString(), AccessControlList.class.getName(), null);
+		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(mockSynapseClient).createAcl(any(EntityWrapper.class), any(AsyncCallback.class));		
+			
+		when(mockNodeModelCreator.createEntity(anyString(), eq(AccessControlList.class))).thenReturn(acl);
+		when(mockNodeModelCreator.createEntity(anyString(), eq(UserEntityPermissions.class))).thenReturn(permissions);
+		when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(UserGroup.class))).thenReturn(pgGpsJson);
+		
+		AccessControlListEditor acle = createACLEWithMocks();
 		acle.setResource(ACL_ID);
 		acle.asWidget();
 		acle.deleteAcl();
+		
+		verify(mockSynapseClient).deleteAcl(eq(ACL_ID), Matchers.<AsyncCallback<EntityWrapper>>any());
 	}
 	
 	// tests of utility functions
@@ -281,6 +276,17 @@ public class AccessControlListEditorTest {
 		g.setName("bar");
 		groups.add(g);
 		return groups;
+	}
+	
+	private static org.sagebionetworks.web.shared.PaginatedResults<JSONEntity> createUserGroupsJSON() {
+		List<JSONEntity> groups = new ArrayList<JSONEntity>();
+		UserGroup g = new UserGroup();
+		g.setId("2");
+		g.setName("bar");
+		groups.add(g);
+		org.sagebionetworks.web.shared.PaginatedResults<JSONEntity> pr = new org.sagebionetworks.web.shared.PaginatedResults<JSONEntity>();
+		pr.setResults(groups);
+		return pr;
 	}
 
 	private static AccessControlList createACL() {

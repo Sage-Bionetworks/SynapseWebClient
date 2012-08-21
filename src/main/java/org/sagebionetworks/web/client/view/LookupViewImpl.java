@@ -38,6 +38,7 @@ public class LookupViewImpl extends Composite implements LookupView {
 	private SageImageBundle sageImageBundle;
 	private Header headerWidget;
 	private Window lookingUpWindow;
+	private Footer footerWidget;
 	
 	@Inject
 	public LookupViewImpl(LookupViewImplUiBinder binder,
@@ -48,7 +49,8 @@ public class LookupViewImpl extends Composite implements LookupView {
 		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
-		
+		this.footerWidget = footerWidget;
+
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
@@ -59,6 +61,10 @@ public class LookupViewImpl extends Composite implements LookupView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();				
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}

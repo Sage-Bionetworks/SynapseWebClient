@@ -11,10 +11,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -29,16 +31,18 @@ public class Attachments implements AttachmentsView.Presenter,
 	private NodeModelCreator nodeModelCreator;
 	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private EventBus bus;
 
 	private Entity entity;
-		
+
 	@Inject
 	public Attachments(AttachmentsView view, SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			NodeModelCreator nodeModelCreator,
 			EntityTypeProvider entityTypeProvider,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			EventBus bus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
@@ -46,6 +50,7 @@ public class Attachments implements AttachmentsView.Presenter,
 		this.nodeModelCreator = nodeModelCreator;
 		this.entityTypeProvider = entityTypeProvider;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.bus = bus;
 
 		view.setPresenter(this);
 	}
@@ -54,7 +59,7 @@ public class Attachments implements AttachmentsView.Presenter,
 		this.entity = entity;
 		view.configure(baseUrl, entity.getId(), entity.getAttachments());
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -65,13 +70,13 @@ public class Attachments implements AttachmentsView.Presenter,
 		List<AttachmentData> attachments = entity.getAttachments();
 		if(tokenId != null) {
 			// find attachment via token and remove it
-			AttachmentData found = null; 
+			AttachmentData found = null;
 			for(AttachmentData data : attachments) {
 				if(tokenId.equals(data.getTokenId())) {
 					found = data;
 				}
 			}
-			
+
 			if(found != null) {
 				// save name and remove from entity
 				final String deletedName = found.getName();
@@ -86,17 +91,18 @@ public class Attachments implements AttachmentsView.Presenter,
 
 				// update entity minus attachment
 				synapseClient.createOrUpdateEntity(adapter.toJSONString(), null, false, new AsyncCallback<String>() {
-					
+
 					@Override
-					public void onSuccess(String result) {						
+					public void onSuccess(String result) {
 						view.attachmentDeleted(tokenId, deletedName);
+						bus.fireEvent(new EntityUpdatedEvent());
 					}
-					
+
 					@Override
 					public void onFailure(Throwable caught) {
 						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 							view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
-						}						
+						}
 					}
 				});
 			} else {

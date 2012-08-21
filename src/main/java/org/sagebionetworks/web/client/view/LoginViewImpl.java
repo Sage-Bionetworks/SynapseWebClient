@@ -50,6 +50,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private SageImageBundle sageImageBundle;
 	private Window logginInWindow;
 	private Header headerWidget;
+	private Footer footerWidget;
 	
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
 	
@@ -62,6 +63,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
+		this.footerWidget = footerWidget;
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 
@@ -70,6 +72,10 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	

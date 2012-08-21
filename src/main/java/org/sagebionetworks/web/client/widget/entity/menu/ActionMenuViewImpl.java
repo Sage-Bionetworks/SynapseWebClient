@@ -102,6 +102,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		}
 		if (downloadButton instanceof Button) {
 			Button dlButton = (Button)downloadButton;
+			dlButton.setId(DisplayConstants.ID_BTN_DOWNLOAD);
 			if (entity instanceof Locationable)
 				dlButton.enable();
 			else
@@ -114,6 +115,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		// edit button
 		if(editButton == null) {			
 			editButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
+			editButton.setId(DisplayConstants.ID_BTN_EDIT);
 			editButton.setHeight(25);
 			this.add(editButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
@@ -125,6 +127,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		// share button
 		if(shareButton == null) { 
 			shareButton = new Button(DisplayConstants.BUTTON_SHARE, AbstractImagePrototype.create(iconsImageBundle.mailGrey16()));
+			shareButton.setId(DisplayConstants.ID_BTN_SHARE);
 			shareButton.setHeight(25);
 			this.add(shareButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
@@ -136,6 +139,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		// add Button
 		if(addButton == null) {
 			addButton = new Button(DisplayConstants.BUTTON_ADD, AbstractImagePrototype.create(iconsImageBundle.add16()));
+			addButton.setId(DisplayConstants.ID_BTN_ADD);
 			addButton.setHeight(25);
 			this.add(addButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));

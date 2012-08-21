@@ -1,3 +1,4 @@
+
 package org.sagebionetworks.web.client;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public interface SynapseClientAsync {
 	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundleTransport> callback);
 
 	void getEntityVersions(String entityId, AsyncCallback<String> callback);
+
+	void updateEntity(String entityJson, AsyncCallback<EntityWrapper> callback);
 
 	void getEntityTypeRegistryJSON(AsyncCallback<String> callback);
 
@@ -75,5 +78,7 @@ public interface SynapseClientAsync {
 	public void getUnmetAccessRequirements(String entityId, AsyncCallback<AccessRequirementsTransport> callback);
 
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
+
+
 
 }

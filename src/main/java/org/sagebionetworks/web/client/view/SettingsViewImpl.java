@@ -58,7 +58,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	private SageImageBundle sageImageBundle;
 	private Button changePasswordButton;
 	private HTML changePasswordLabel;
-	private Breadcrumb breadcrumb;	
+	private Breadcrumb breadcrumb;
+	private Footer footerWidget;
 	
 	@Inject
 	public SettingsViewImpl(SettingsViewImplUiBinder binder,
@@ -68,6 +69,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 		this.iconsImageBundle = icons;
 		this.headerWidget = headerWidget;
+		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
 		header.add(headerWidget.asWidget());
@@ -79,6 +81,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();				
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

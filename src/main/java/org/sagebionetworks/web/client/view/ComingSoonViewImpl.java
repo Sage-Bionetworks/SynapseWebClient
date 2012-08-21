@@ -39,6 +39,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private Presenter presenter;
 	private IconsImageBundle icons;
 	private Header headerWidget;
+	private Footer footerWidget;
 	
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
@@ -48,7 +49,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
-		
+		this.footerWidget = footerWidget;
+
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());						
 	}
@@ -58,6 +60,10 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
+		header.clear();
+		header.add(headerWidget.asWidget());
+		footer.clear();
+		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 

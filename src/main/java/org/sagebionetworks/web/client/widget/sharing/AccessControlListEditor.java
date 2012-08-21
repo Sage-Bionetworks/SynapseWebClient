@@ -118,6 +118,16 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		return principals;
 	}
 	
+	private static AclPrincipal convertProfileToPrincipal(Long ownerPrincipalId, 
+			UserProfile profile, ResourceAccess ra) {
+		AclPrincipal p = new AclPrincipal();
+		p.setDisplayName(profile.getDisplayName());
+		p.setIndividual(true);
+		p.setPrincipalId(ra.getPrincipalId());
+		p.setOwner(ownerPrincipalId.equals(ra.getPrincipalId()));
+		return p;
+	}
+
 	private void setViewDetails() {
 		if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
 		if (this.acl==null) throw new IllegalStateException("ACL is missing.");
@@ -161,10 +171,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			if (ra==null) {
 				ra = new ResourceAccess();
 				ra.setPrincipalId(principalId);
-				ra.setAccessType(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(permissionLevel)));
+				ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
 				acl.getResourceAccess().add(ra);
 			} else {
-				ra.setAccessType(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(permissionLevel)));
+				ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
 			}
 		} catch (Exception e) {
 			showErrorMessage("Creation of local sharing settings failed. Please try again.");
@@ -385,11 +395,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 					public void onSuccess(String userProfileJson) {
 						try {								
 							UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
-							AclPrincipal p = new AclPrincipal();
-							p.setDisplayName(profile.getDisplayName());
-							p.setIndividual(true);
-							p.setPrincipalId(ra.getPrincipalId());
-							p.setOwner(ownerPrincipalId.equals(ra.getPrincipalId()));
+							AclPrincipal p = convertProfileToPrincipal(ownerPrincipalId, profile, ra);
 							view.addAclEntry(new AclEntry(p, new ArrayList<ACCESS_TYPE>(ra.getAccessType())));
 						} catch (RestServiceException e) {
 							onFailure(e);
@@ -417,8 +423,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	public static void addOwnerAdministrativeAccess(AccessControlList acl, Long creatorPrincipalId) {
 		ResourceAccess ra = new ResourceAccess();
 		ra.setPrincipalId(creatorPrincipalId);
-		Set<ACCESS_TYPE> ats = new HashSet<ACCESS_TYPE>();
-		ats.addAll(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER));
+		Set<ACCESS_TYPE> ats = AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER);
 		ra.setAccessType(ats);
 
 		acl.getResourceAccess().add(ra);
