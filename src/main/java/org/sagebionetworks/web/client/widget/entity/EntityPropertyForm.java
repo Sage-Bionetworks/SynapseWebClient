@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialo
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;
@@ -21,14 +22,12 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
+import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.AnchorLayout;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Element;
@@ -41,9 +40,9 @@ import com.google.inject.Inject;
  * @author jmhill
  * 
  */
-public class EntityPropertyForm extends LayoutContainer {
+public class EntityPropertyForm extends FormPanel {
 
-	Field<?> nameField;
+	TextField<String> nameField;
 	Field<?> descriptionField;
 	List<Field<?>> propertyFields;
 	List<Field<?>> annotationFields;
@@ -230,10 +229,14 @@ public class EntityPropertyForm extends LayoutContainer {
 	/**
 	 * Rebuild the model
 	 */
+	@SuppressWarnings("unchecked")
 	private void rebuildModel(){
 		EntityFormModel model = EntityRowFactory.createEntityRowList(this.adapter, this.schema, this.annos, filter);
 		// The name field is just a text field that cannot be null
-		nameField = formFactory.createField(model.getName());
+		nameField = (TextField<String>) formFactory.createField(model.getName());
+		nameField.setAllowBlank(false);
+		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
+		nameField.getMessages().setRegexText("Entity names may only contain letters, numbers, '_' and '.'");
 		descriptionField = formFactory.createTextAreaField(model.getDescription());
 
 		// Create the list of fields
@@ -241,6 +244,4 @@ public class EntityPropertyForm extends LayoutContainer {
 		annotationFields = formFactory.createFormFields(model.getAnnotations());
 		rebuild();
 	}
-
-
 }
