@@ -81,6 +81,8 @@ public class DisplayUtils {
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
 	public static final String BCC_FEED_URL = "https://sagebionetworks.jira.com/wiki/createrssfeed.action?types=page&types=blogpost&spaces=BCC&title=BCC+RSS+Test+Feed&labelString%3D&excludedSpaceKeys%3D&sort=created&maxResults=10&timeSpan=99&showContent=true&confirm=Create+RSS+Feed&os_username=synapse-service&os_password=abc123";
 
+	public static final String SUPPORT_URL = "support.sagebase.org";
+	
 	private static final String ALERT_CONTAINER_ID = "alertContainer";
 	private static final String REGEX_CLEAN_ANNOTATION_KEY = "^[a-z,A-Z,0-9,_,.]+";
 	private static final String REGEX_CLEAN_ENTITY_NAME = "^[a-z,A-Z,0-9,_,., ,\\-,\\+,(,)]+";
