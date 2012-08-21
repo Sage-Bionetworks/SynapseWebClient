@@ -161,10 +161,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			if (ra==null) {
 				ra = new ResourceAccess();
 				ra.setPrincipalId(principalId);
-				ra.setAccessType(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(permissionLevel)));
+				ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
 				acl.getResourceAccess().add(ra);
 			} else {
-				ra.setAccessType(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(permissionLevel)));
+				ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
 			}
 		} catch (Exception e) {
 			showErrorMessage("Creation of local sharing settings failed. Please try again.");
@@ -417,8 +417,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	public static void addOwnerAdministrativeAccess(AccessControlList acl, Long creatorPrincipalId) {
 		ResourceAccess ra = new ResourceAccess();
 		ra.setPrincipalId(creatorPrincipalId);
-		Set<ACCESS_TYPE> ats = new HashSet<ACCESS_TYPE>();
-		ats.addAll(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER));
+		Set<ACCESS_TYPE> ats = AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER);
 		ra.setAccessType(ats);
 
 		acl.getResourceAccess().add(ra);
