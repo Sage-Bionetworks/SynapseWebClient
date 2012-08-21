@@ -2,9 +2,11 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -443,7 +445,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			AclPrincipal principal = aclEntry.getPrincipal();
 			this.set(PRINCIPAL_COLUMN_ID, principal);			
 			this.set(REMOVE_COLUMN_ID, principal);			
-			PermissionLevel level = AclUtils.getPermissionLevel(aclEntry.getAccessTypes());			
+			PermissionLevel level = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));			
 			if(level != null) {
 				this.set(ACCESS_COLUMN_ID, permissionDisplay.get(level)); 
 			}			
