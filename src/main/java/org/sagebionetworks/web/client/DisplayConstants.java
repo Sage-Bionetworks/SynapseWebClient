@@ -91,6 +91,7 @@ public class DisplayConstants {
 	public static final String BUTTON_PERMISSIONS_DELETE_ACL = "Delete Local Sharing Settings";
 	public static final String MENU_PERMISSION_LEVEL_IS_OWNER = "Is Owner";
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
+	public static final String MENU_PERMISSION_LEVEL_CAN_DOWNLOAD = "Can download";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT = "Can edit";
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
 	public static final String LABEL_PERMISSION_TEXT_ADD_PEOPLE = "Add People";
@@ -289,5 +290,6 @@ public class DisplayConstants {
 	public static final String ID_BTN_SHARE = "id_btn_share";
 	public static final String ID_BTN_ADD = "id_btn_add";
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
+
 }
 

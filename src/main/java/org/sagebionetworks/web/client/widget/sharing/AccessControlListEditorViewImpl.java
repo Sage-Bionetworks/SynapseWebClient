@@ -2,9 +2,11 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -81,7 +83,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		this.urlCache = urlCache;
 		
 		permissionDisplay = new HashMap<PermissionLevel, String>();
-		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
+		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);		
+		permissionDisplay.put(PermissionLevel.CAN_DOWNLOAD, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_DOWNLOAD);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
 		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
 	}
@@ -165,9 +168,9 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 
 			// permission level combobox
 			final SimpleComboBox<PermissionLevelSelect> permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT), PermissionLevel.CAN_EDIT));
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER), PermissionLevel.CAN_ADMINISTER));			
+			for (PermissionLevel level : PermissionLevel.values()) {
+				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(level), level));
+			}
 			permissionLevelCombo.setEmptyText("Select access level...");
 			permissionLevelCombo.setFieldLabel("Access Level");
 			permissionLevelCombo.setTypeAhead(false);
@@ -299,32 +302,18 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Menu createEditAccessMenu(final AclEntry aclEntry) {
 		Menu menu = new Menu();		
 		MenuItem item = null; 
-			
-		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_VIEW));			
-		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-			public void componentSelected(MenuEvent menuEvent) {
-				presenter.changeAccess(aclEntry.getPrincipal().getPrincipalId(), PermissionLevel.CAN_VIEW);
-			}
-		});
-		menu.add(item);
 
-		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_EDIT));			
-		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-			public void componentSelected(MenuEvent menuEvent) {
-				presenter.changeAccess(aclEntry.getPrincipal().getPrincipalId(), PermissionLevel.CAN_EDIT);
-			}
-		});
-		menu.add(item);
-
-		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER));			
-		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-			public void componentSelected(MenuEvent menuEvent) {
-				presenter.changeAccess(aclEntry.getPrincipal().getPrincipalId(), PermissionLevel.CAN_ADMINISTER);
-			}
-		});
-		menu.add(item);
-
-		
+		for (PermissionLevel level : PermissionLevel.values()) {
+			final PermissionLevel canView = level;
+			item = new MenuItem(permissionDisplay.get(canView));
+			item.addSelectionListener(new SelectionListener<MenuEvent>() {
+				public void componentSelected(MenuEvent menuEvent) {
+					presenter.changeAccess(aclEntry.getPrincipal()
+							.getPrincipalId(), canView);
+				}
+			});
+			menu.add(item);
+		}
 		return menu;
 	}  
 
@@ -443,7 +432,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			AclPrincipal principal = aclEntry.getPrincipal();
 			this.set(PRINCIPAL_COLUMN_ID, principal);			
 			this.set(REMOVE_COLUMN_ID, principal);			
-			PermissionLevel level = AclUtils.getPermissionLevel(aclEntry.getAccessTypes());			
+			PermissionLevel level = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));			
 			if(level != null) {
 				this.set(ACCESS_COLUMN_ID, permissionDisplay.get(level)); 
 			}			

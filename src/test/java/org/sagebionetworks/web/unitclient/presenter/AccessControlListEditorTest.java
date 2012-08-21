@@ -138,7 +138,7 @@ public class AccessControlListEditorTest {
 								if (1L == ra.getPrincipalId()) {
 									foundIt=true;
 									Set<ACCESS_TYPE> ats = ra.getAccessType();
-									assertEquals(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT)), ats);
+									assertEquals(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT), ats);
 								}
 							}
 							assertTrue(foundIt);
@@ -179,7 +179,7 @@ public class AccessControlListEditorTest {
 								if (1L == ra.getPrincipalId()) {
 									foundIt=true;
 									Set<ACCESS_TYPE> ats = ra.getAccessType();
-									assertEquals(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT)), ats);
+									assertEquals(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT), ats);
 								}
 							}
 							assertTrue(foundIt);

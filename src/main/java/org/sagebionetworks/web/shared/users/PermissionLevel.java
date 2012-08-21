@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.shared.users;
 
 public enum PermissionLevel {
-	CAN_EDIT, CAN_VIEW, CAN_ADMINISTER
+	CAN_VIEW, CAN_DOWNLOAD, CAN_EDIT, CAN_ADMINISTER
 }
