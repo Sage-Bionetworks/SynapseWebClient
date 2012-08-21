@@ -70,7 +70,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
     }
 
 	@Override
-	public void createProject(String name) {		
+	public void createProject(final String name) {
 		Project proj = (Project) entityFactory.newInstance(Project.class.getName());
 		proj.setEntityType(Project.class.getName());
 		proj.setName(name);
@@ -80,7 +80,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 			synapseClient.createOrUpdateEntity(json.toJSONString(), null, true, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String newProjectId) {
-					view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, DisplayConstants.LABEL_PROJECT_CREATED);
+					view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
 					globalApplicationState.getPlaceChanger().goTo(new Synapse(newProjectId));						
 				}
 				
