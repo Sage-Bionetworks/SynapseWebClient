@@ -144,7 +144,7 @@ public class SynapseClientImplTest {
 		Set<ResourceAccess> ras = new HashSet<ResourceAccess>();
 		ResourceAccess ra = new ResourceAccess();
 		ra.setPrincipalId(101L);
-		ra.setAccessType(new HashSet<ACCESS_TYPE>(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER)));
+		ra.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER));
 		acl.setResourceAccess(ras);
 		when(mockSynapse.getACL(anyString())).thenReturn(acl);
 		when(mockSynapse.createACL((AccessControlList)any())).thenReturn(acl);
