@@ -36,7 +36,6 @@ import com.sun.grizzly.http.SelectorThread;
  */
 
 // TO BE DELETED WHEN BRUCE REPLACES UserAccountService with Syanpse Java client
-@Ignore
 public class UserAccountServiceImplTest {
 	
 	private static Logger logger = Logger.getLogger(UserAccountServiceImplTest.class.getName());
@@ -68,7 +67,7 @@ public class UserAccountServiceImplTest {
 		// container.
 		
 //		// First setup the url
-//		serviceUrl = UriBuilder.fromUri("http://"+serviceHost+"/").port(servicePort).build().toURL();
+		serviceUrl = new URL("https://fakeurl.com");
 //		// Now start the container
 //		selector = LocalAuthServiceStub.startServer(serviceHost, servicePort);
 		
@@ -81,7 +80,7 @@ public class UserAccountServiceImplTest {
 		// Inject the required values
 		service.setRestTemplate(provider);
 		ServiceUrlProvider urlProvider = new ServiceUrlProvider();
-		urlProvider.setAuthServicePrivateUrl(serviceUrl.toString() + "auth/v1");		
+		urlProvider.setAuthServicePrivateUrl(serviceUrl.toString() + "/auth/v1");		
 		service.setServiceUrlProvider(urlProvider);
 		
 //		LocalAuthServiceStub.groups.add(group1);
@@ -143,6 +142,7 @@ public class UserAccountServiceImplTest {
 		dummy.setServiceUrlProvider(urlProvider);
 	}
 	
+	@Ignore
 	@Test
 	public void testCreateUser() throws Exception {
 		try {
@@ -157,12 +157,14 @@ public class UserAccountServiceImplTest {
 		Assert.assertNotNull(userData.getSessionToken());
 	}
 	
+	@Ignore
 	@Test(expected=UnauthorizedException.class)
 	public void testUnAuthenticateUser() throws Exception {
 		// try fake user
 		service.initiateSession("junk", "junk", false);
 	}
 		
+	@Ignore
 	@Test
 	public void testAuthenticateUser() throws Exception {
 		// auth real user
@@ -189,6 +191,7 @@ public class UserAccountServiceImplTest {
 		}
 	}
 		
+	@Ignore
 	@Test
 	public void testTerminateSession() throws Exception {
 		String userdataJson = service.initiateSession(user1.getEmail(), user1password, false);
@@ -213,6 +216,12 @@ public class UserAccountServiceImplTest {
 			fail("The Auth Service URL returned was not valid.");
 		}
 	}
+	
+	@Test
+	public void testGetFastPassUrl() {
+		fdsfds
+	}
+	
 	
 	@Test
 	public void testGetSynapseWebUrl() {

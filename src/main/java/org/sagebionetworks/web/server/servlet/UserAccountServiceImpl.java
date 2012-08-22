@@ -8,6 +8,7 @@ import net.oauth.OAuthException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseTermsOfUseException;
@@ -499,7 +500,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 				String email = userData.getProfile().getUserName();
 				String displayName = userData.getProfile().getDisplayName();
 				String principleId = userData.getProfile().getOwnerId();
-				fastPassUrl = FastPass.url("z5e1lo36kro5", "u453iiuknly519zffhxge43rbqdgkk0e", email, displayName, principleId, false);
+				fastPassUrl = FastPass.url(StackConfiguration.getPortalGetSatisfactionKey(), StackConfiguration.getPortalGetSatisfactionSecret(), email, displayName, principleId, false);
 			}
 		} catch (SynapseTermsOfUseException e) {
 			throw new TermsOfUseException(e.getMessage());
