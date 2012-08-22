@@ -12,10 +12,14 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 
 import com.extjs.gxt.ui.client.widget.Html;
+
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class EntityViewUtils {
@@ -61,34 +65,47 @@ public class EntityViewUtils {
 	 */
 
 	/**
-	 * Basic meata data about this entity
+	 * Basic meta data about this entity
 	 * @param entity
 	 * @return
 	 */
-	private static Html createMetadata(Entity entity) {
-		SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		builder.appendHtmlConstant("<div style=\"font-size: 80%\">");
-		builder.appendHtmlConstant("Added by: ");
-		builder.appendEscaped(entity.getCreatedBy());
-		builder.appendHtmlConstant(" on: ");
-		builder.appendEscaped(String.valueOf(entity.getCreatedOn()));
-		builder.appendHtmlConstant("<br/>Last updated by: ");
-		builder.appendEscaped(entity.getModifiedBy());
-		builder.appendHtmlConstant(" on: ");
-		builder.appendEscaped(String.valueOf(entity.getModifiedOn()));
-		builder.appendHtmlConstant("<br/>");
-		if(entity instanceof Versionable){
-			Versionable vb = (Versionable) entity;
-			builder.appendHtmlConstant("Version: ");
-			builder.appendEscaped(vb.getVersionLabel());
-			builder.appendHtmlConstant(" (");
-			builder.append(vb.getVersionNumber());
-			builder.appendHtmlConstant(")");
-		}
-		builder.appendHtmlConstant("</div>");		
-		
-	    return new Html(builder.toSafeHtml().asString());
-	}	
+	private static Widget createMetadata(Entity entity) {
+		FlowPanel panel = new FlowPanel();
+		panel.getElement().setAttribute("style", "font-size: 80%;");
 
+		InlineLabel label = new InlineLabel();
+		label.setText("Added by: " + entity.getCreatedBy() + " on: "
+				+ String.valueOf(entity.getCreatedOn()));
+		panel.add(label);
+
+		panel.add(new InlineHTML("<br />"));
+
+		label = new InlineLabel();
+		label.setText("Last updated by: " + entity.getModifiedBy() + " on: "
+				+ String.valueOf(entity.getModifiedOn()));
+		panel.add(label);
+
+		if (entity instanceof Versionable) {
+			Versionable vb = (Versionable) entity;
+
+			panel.add(new InlineHTML("<br />"));
+			label = new InlineLabel();
+			StringBuilder sb = new StringBuilder();
+			sb.append("Version: ");
+			sb.append(vb.getVersionLabel());
+			sb.append(" (");
+			sb.append(vb.getVersionNumber());
+			sb.append(")");
+
+			if (vb.getVersionComment() != null) {
+				sb.append(" - ");
+				sb.append(vb.getVersionComment());
+			}
+			label.setText(sb.toString());
+			panel.add(label);
+		}
+
+		return panel;
+	}
 	
 }
