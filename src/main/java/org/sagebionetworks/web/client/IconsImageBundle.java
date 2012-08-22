@@ -246,6 +246,12 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/synapse-robject-24.png")
 	ImageResource synapseRObject24();
 	
+	@Source("images/icons/synapse-summary-16.png")
+	ImageResource synapseSummary16();
+	
+	@Source("images/icons/synapse-summary-24.png")
+	ImageResource synapseSummary24();
+	
 	@Source("images/icons/synapse-step-16.png")
 	ImageResource synapseStep16();
 	
