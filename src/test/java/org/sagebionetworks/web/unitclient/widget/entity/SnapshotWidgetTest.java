@@ -21,9 +21,9 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Snapshot;
-import org.sagebionetworks.repo.model.SnapshotGroup;
-import org.sagebionetworks.repo.model.SnapshotGroupRecord;
+import org.sagebionetworks.repo.model.Summary;
+import org.sagebionetworks.repo.model.EntityGroup;
+import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -60,7 +60,7 @@ public class SnapshotWidgetTest {
 	
 	SnapshotWidget snapshotWidget;
 	SnapshotWidgetView mockView;
-	Snapshot snapshot;
+	Summary snapshot;
 	String testName = "testName";
 	String testDesc = "testDesc";
 	final boolean CAN_EDIT = true;
@@ -96,7 +96,7 @@ public class SnapshotWidgetTest {
 		// assure that only one inital group is added
 		snapshotWidget.setSnapshot(snapshot, false, false);
 		assertEquals(1, snapshot.getGroups().size());		
-		verify(mockView).setSnapshot(snapshot, false, false); // can not edit		
+		verify(mockView).setSnapshot(snapshot, false, false, true); // can not edit		
 	}
 	
 	@Test
@@ -184,7 +184,7 @@ public class SnapshotWidgetTest {
 	public void testAddGroup() throws Exception {		
 		// read only
 		snapshotWidget.setSnapshot(snapshot, false, true);		
-		SnapshotGroup returnedGroup = snapshotWidget.addGroup("test", null);
+		EntityGroup returnedGroup = snapshotWidget.addGroup("test", null);
 		assertNull(returnedGroup);
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
 		reset(mockView);
@@ -217,9 +217,9 @@ public class SnapshotWidgetTest {
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);		
 		// setup - add name and description
 		String expectedJson = setupAddGroup(testName, testDesc);
-		SnapshotGroup group = snapshotWidget.addGroup(testName, testDesc);
+		EntityGroup group = snapshotWidget.addGroup(testName, testDesc);
 
-		Snapshot actualSnapshot = snapshotWidget.getSnapshot();
+		Summary actualSnapshot = snapshotWidget.getSnapshot();
 		
 		// verify service calls
 		verify(mockSynapseClient).updateEntity(eq(expectedJson), any(AsyncCallback.class));

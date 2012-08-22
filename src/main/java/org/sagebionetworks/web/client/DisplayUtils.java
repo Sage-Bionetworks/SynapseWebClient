@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -637,6 +638,10 @@ public class DisplayUtils {
 			// RObject
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseRObject16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseRObject24();			
+		} else if(Summary.class.getName().equals(className)) {
+			// Summary
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseSummary16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseSummary24();			
 		} else if(Step.class.getName().equals(className)) {
 			// Step
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStep16();

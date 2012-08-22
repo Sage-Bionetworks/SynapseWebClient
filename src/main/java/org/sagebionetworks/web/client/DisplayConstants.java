@@ -237,9 +237,9 @@ public class DisplayConstants {
 	public static final String ATTACHMENT_DIALOG_WINDOW_TITLE = "Add New File Attachment";
 	public static final String ATTACH_PROFILE_PIC_DIALOG_TITLE = "Upload a New Photo";
 	public static final String ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT = "Upload Photo";
-	public static final String LABEL_ADD_TO_SNAPSHOT = "ADD ENTITY<br/>TO SNAPSHOT";
+	public static final String LABEL_ADD_TO_SNAPSHOT = "ADD ENTITY<br/>TO SUMMARY";
 	public static final String LABEL_CREATE_NEW_GROUP = "Create New Group";
-	public static final String BUTTON_ADD_ENTITY_TO_GROUP = "Add To Snapshot";
+	public static final String BUTTON_ADD_ENTITY_TO_GROUP = "Add To Summary";
 	public static final String LABEL_NAME = "Name";
 	public static final String NOTE = "Note";
 	public static final String LABEL_ADD_GROUP = "Add Group";	
@@ -259,6 +259,8 @@ public class DisplayConstants {
 	public static final String ERROR_IN_READ_ONLY_MODE = "Sorry, that operation is not allowed in read only mode.";
 	public static final String WHY_VERSION_READ_ONLY_MODE = "You are not allowed to modify an Entity when viewing a particular version.";
 	public static final String READ_ONLY = "READ ONLY";	
+	public static final String SHOW_LIST_EDITOR = "Show List Editor";
+	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 
 	/*
 	 * Element ids for Selenium

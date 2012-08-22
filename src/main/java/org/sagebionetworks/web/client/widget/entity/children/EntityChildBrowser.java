@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Preview;
+import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -135,6 +136,7 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 		// ignore certain types		
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Preview.class.getName()));
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Folder.class.getName()));
+		ignore.add(entityTypeProvider.getEntityTypeForClassName(Summary.class.getName()));
 		
 		return ignore;
 	}
