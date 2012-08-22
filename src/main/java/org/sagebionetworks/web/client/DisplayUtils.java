@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
@@ -26,6 +24,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -50,7 +49,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -72,9 +70,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HTMLTable;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
@@ -607,6 +602,10 @@ public class DisplayUtils {
 			// RObject
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseRObject16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseRObject24();			
+		} else if(Summary.class.getName().equals(className)) {
+			// Summary
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseSummary16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseSummary24();			
 		} else if(Step.class.getName().equals(className)) {
 			// Step
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStep16();

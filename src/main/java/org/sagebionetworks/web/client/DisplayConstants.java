@@ -234,9 +234,9 @@ public class DisplayConstants {
 	public static final String ATTACHMENT_DIALOG_WINDOW_TITLE = "Add New File Attachment";
 	public static final String ATTACH_PROFILE_PIC_DIALOG_TITLE = "Upload a New Photo";
 	public static final String ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT = "Upload Photo";
-	public static final String LABEL_ADD_TO_SNAPSHOT = "ADD ENTITY<br/>TO SNAPSHOT";
+	public static final String LABEL_ADD_TO_SNAPSHOT = "ADD ENTITY<br/>TO SUMMARY";
 	public static final String LABEL_CREATE_NEW_GROUP = "Create New Group";
-	public static final String BUTTON_ADD_ENTITY_TO_GROUP = "Add To Snapshot";
+	public static final String BUTTON_ADD_ENTITY_TO_GROUP = "Add To Summary";
 	public static final String LABEL_NAME = "Name";
 	public static final String NOTE = "Note";
 	public static final String LABEL_ADD_GROUP = "Add Group";	
