@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 
-public class SnapshotGroupRecordDisplay {
+public class EntityGroupRecordDisplay {
 	private String entityId;
 	private SafeHtml name;
 	private String nameLinkUrl;
@@ -15,11 +15,11 @@ public class SnapshotGroupRecordDisplay {
 	private SafeHtml contact;
 	private SafeHtml note;
 		
-	public SnapshotGroupRecordDisplay() {
+	public EntityGroupRecordDisplay() {
 		
 	}
 	
-	public SnapshotGroupRecordDisplay(String entityId, SafeHtml name, String nameLinkUrl,
+	public EntityGroupRecordDisplay(String entityId, SafeHtml name, String nameLinkUrl,
 			String downloadUrl, SafeHtml description, SafeHtml version,
 			Date modifienOn, SafeHtml contact, SafeHtml note) {
 		super();
