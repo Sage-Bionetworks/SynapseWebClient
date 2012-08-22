@@ -39,8 +39,11 @@ public class Footer implements FooterView.Presenter {
 				public void onSuccess(String result) {
 					//TODO: communicate via cookie instead
 //					cookies.setCookie(CookieKeys.FASTPASS, URL.encodeQueryString(result));
-//					openSupportSite();
-					Window.open("http://support.sagebase.org/sagebase?fastpass="+URL.encodeQueryString(result),"_blank","");
+//					openWindowToSupportSite();
+					if (result != null && result.length()>0)
+						Window.open("http://support.sagebase.org/sagebase?fastpass="+URL.encodeQueryString(result),"_blank","");
+					else
+						openWindowToSupportSite();
 				}
 				
 				@Override

@@ -492,12 +492,15 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		String fastPassUrl = "";
 		//get the user
 		try {
-			UserSessionData userData = getUserSessionData(getSessionToken());
-			FastPass.setDomain(DisplayUtils.SUPPORT_URL);
-			String email = userData.getProfile().getUserName();
-			String displayName = userData.getProfile().getDisplayName();
-			String principleId = userData.getProfile().getOwnerId();
-			fastPassUrl = FastPass.url("z5e1lo36kro5", "u453iiuknly519zffhxge43rbqdgkk0e", email, displayName, principleId, false);
+			String sessionToken = getSessionToken();
+			if (sessionToken != null){
+				UserSessionData userData = getUserSessionData(sessionToken);
+				FastPass.setDomain(DisplayUtils.SUPPORT_URL);
+				String email = userData.getProfile().getUserName();
+				String displayName = userData.getProfile().getDisplayName();
+				String principleId = userData.getProfile().getOwnerId();
+				fastPassUrl = FastPass.url("z5e1lo36kro5", "u453iiuknly519zffhxge43rbqdgkk0e", email, displayName, principleId, false);
+			}
 		} catch (SynapseTermsOfUseException e) {
 			throw new TermsOfUseException(e.getMessage());
 		} catch (Exception e) {
