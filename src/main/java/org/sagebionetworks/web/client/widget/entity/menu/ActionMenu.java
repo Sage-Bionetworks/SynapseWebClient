@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.menu;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
