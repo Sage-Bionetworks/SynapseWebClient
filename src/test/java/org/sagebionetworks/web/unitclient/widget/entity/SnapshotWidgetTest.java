@@ -33,7 +33,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.entity.SnapshotGroupRecordDisplay;
+import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidget;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -44,7 +44,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * Unit test for the snapshot widget.
+ * Unit test for the Summary widget.
  * @author dburdick
  *
  */
@@ -65,6 +65,7 @@ public class SnapshotWidgetTest {
 	String testDesc = "testDesc";
 	final boolean CAN_EDIT = true;
 	final boolean READ_ONLY = false;
+	final boolean SHOW_EDIT = true;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{		
@@ -85,18 +86,18 @@ public class SnapshotWidgetTest {
 	@Test
 	public void testSetSnapshot(){
 		snapshotWidget.setSnapshot(null, CAN_EDIT, READ_ONLY);
-		verify(mockView).setSnapshot(null, CAN_EDIT, READ_ONLY);
+		verify(mockView).setSnapshot(null, CAN_EDIT, READ_ONLY, false);
 		
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 
 		// assure that initial group is created if there are none
 		assertEquals(1, snapshot.getGroups().size());		
-		verify(mockView).setSnapshot(snapshot, CAN_EDIT, READ_ONLY); // can edit
+		verify(mockView).setSnapshot(snapshot, CAN_EDIT, READ_ONLY, SHOW_EDIT); // can edit
 
 		// assure that only one inital group is added
 		snapshotWidget.setSnapshot(snapshot, false, false);
 		assertEquals(1, snapshot.getGroups().size());		
-		verify(mockView).setSnapshot(snapshot, false, false, true); // can not edit		
+		verify(mockView).setSnapshot(snapshot, false, false, false); // can not edit		
 	}
 	
 	@Test
@@ -105,7 +106,7 @@ public class SnapshotWidgetTest {
 		snapshotWidget.setSnapshot(null, CAN_EDIT, READ_ONLY);
 		snapshotWidget.loadRowDetails();
 		
-		// empty snapshot 
+		// empty Summary 
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		snapshotWidget.loadRowDetails();		
 	}
@@ -125,7 +126,7 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.loadRowDetails();
 
-		verify(mockView).setSnapshotGroupRecordDisplay(eq(0), eq(0), any(SnapshotGroupRecordDisplay.class)); 
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -143,7 +144,7 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.loadRowDetails();
 
-		verify(mockView).setSnapshotGroupRecordDisplay(eq(0), eq(0), any(SnapshotGroupRecordDisplay.class)); 
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -159,7 +160,7 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.loadRowDetails();
 
-		verify(mockView).setSnapshotGroupRecordDisplay(eq(0), eq(0), any(SnapshotGroupRecordDisplay.class)); 
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -244,9 +245,9 @@ public class SnapshotWidgetTest {
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);		
 		// setup - add name and null description
 		String expectedJson = setupAddGroup(testName, null);
-		SnapshotGroup group = snapshotWidget.addGroup(testName, null);
+		EntityGroup group = snapshotWidget.addGroup(testName, null);
 
-		Snapshot actualSnapshot = snapshotWidget.getSnapshot();
+		Summary actualSnapshot = snapshotWidget.getSnapshot();
 		
 		// verify service calls
 		verify(mockSynapseClient).updateEntity(eq(expectedJson), any(AsyncCallback.class));
@@ -273,11 +274,11 @@ public class SnapshotWidgetTest {
 		// setup - fail update add name and description
 		setupAddGroup(testName, testDesc);
 		AsyncMockStubber.callFailureWith(null).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		snapshotWidget.addGroup(testName, testDesc);
 		
-		Snapshot actualSnapshot = snapshotWidget.getSnapshot();
+		Summary actualSnapshot = snapshotWidget.getSnapshot();
 		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FAILED_PERSIST);
 		verify(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
@@ -318,7 +319,7 @@ public class SnapshotWidgetTest {
 		reset(mockView);
 		
 		// group index out of range
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		snapshotWidget.updateGroup(1, "test", null);		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC);
@@ -332,7 +333,7 @@ public class SnapshotWidgetTest {
 	public void testUpdateGroupSuccessBothDefined() throws Exception {		
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		reset(mockView);
-		Snapshot expectedSnapshot = getSetSnapshotState();
+		Summary expectedSnapshot = getSetSnapshotState();
 		expectedSnapshot.getGroups().get(0).setName(testName);
 		expectedSnapshot.getGroups().get(0).setDescription(testDesc);	
 		setupUpdateEntityWhens(expectedSnapshot);
@@ -345,7 +346,7 @@ public class SnapshotWidgetTest {
 		verify(mockView).showInfo(eq(DisplayConstants.UPDATE_SAVED), anyString());				
 		
 		// validate change to model
-		Snapshot actualSnapshot = snapshotWidget.getSnapshot();
+		Summary actualSnapshot = snapshotWidget.getSnapshot();
 		assertEquals(1, actualSnapshot.getGroups().size());
 		assertEquals(testName, actualSnapshot.getGroups().get(0).getName());
 		assertEquals(testDesc, actualSnapshot.getGroups().get(0).getDescription());
@@ -356,13 +357,13 @@ public class SnapshotWidgetTest {
 	public void testUpdateGroupFailure() throws Exception {		
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		reset(mockView);
-		Snapshot expectedSnapshot = getSetSnapshotState();
+		Summary expectedSnapshot = getSetSnapshotState();
 		expectedSnapshot.getGroups().get(0).setName(testName);
 		expectedSnapshot.getGroups().get(0).setDescription(testDesc);	
 		setupUpdateEntityWhens(expectedSnapshot);
 		AsyncMockStubber.callFailureWith(null).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
 		
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		int groupIndex = 0;
 		snapshotWidget.updateGroup(groupIndex, testName, testDesc);
@@ -394,7 +395,7 @@ public class SnapshotWidgetTest {
 		reset(mockView);
 		
 		// group index out of range
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		snapshotWidget.removeGroup(1);		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC);
@@ -406,7 +407,7 @@ public class SnapshotWidgetTest {
 	public void testRemoveGroupSuccess() throws Exception {		
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		reset(mockView);
-		Snapshot expectedSnapshot = getSetSnapshotState();
+		Summary expectedSnapshot = getSetSnapshotState();
 		expectedSnapshot.getGroups().remove(0);
 		setupUpdateEntityWhens(expectedSnapshot);
 		
@@ -417,7 +418,7 @@ public class SnapshotWidgetTest {
 		verify(mockView).showInfo(eq(DisplayConstants.GROUP_REMOVED), anyString());				
 		
 		// validate change to model
-		Snapshot actualSnapshot = snapshotWidget.getSnapshot();
+		Summary actualSnapshot = snapshotWidget.getSnapshot();
 		assertEquals(0, actualSnapshot.getGroups().size());
 	}
 
@@ -426,12 +427,12 @@ public class SnapshotWidgetTest {
 	public void testRemoveGroupFailure() throws Exception {		
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		reset(mockView);
-		Snapshot expectedSnapshot = getSetSnapshotState();
+		Summary expectedSnapshot = getSetSnapshotState();
 		expectedSnapshot.getGroups().remove(0);
 		setupUpdateEntityWhens(expectedSnapshot);
 		AsyncMockStubber.callFailureWith(null).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
 		
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		snapshotWidget.removeGroup(0);
 		
@@ -469,7 +470,7 @@ public class SnapshotWidgetTest {
 		reset(mockView);
 		
 		// group index out of range
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		snapshotWidget.addGroupRecord(1, "id", "1", null);		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC);
@@ -485,9 +486,9 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		reset(mockView);
-		Snapshot expectedSnapshot = getSetSnapshotState();
-		SnapshotGroupRecord record = createRecord(entityId, versionNumber, note);
-		ArrayList<SnapshotGroupRecord> records = new ArrayList<SnapshotGroupRecord>();
+		Summary expectedSnapshot = getSetSnapshotState();
+		EntityGroupRecord record = createRecord(entityId, versionNumber, note);
+		ArrayList<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
 		records.add(record);
 		expectedSnapshot.getGroups().get(0).setRecords(records);		
 		setupUpdateEntityWhens(expectedSnapshot);
@@ -499,7 +500,7 @@ public class SnapshotWidgetTest {
 		verify(mockView).showInfo(eq(DisplayConstants.ENTRY_ADDED), anyString());				
 		
 		// validate change to model
-		Snapshot actualSnapshot = snapshotWidget.getSnapshot();
+		Summary actualSnapshot = snapshotWidget.getSnapshot();
 		assertEquals(1, actualSnapshot.getGroups().size());
 		assertEquals(entityId, actualSnapshot.getGroups().get(0).getRecords().get(0).getEntityReference().getTargetId());
 		assertEquals(versionNumber, actualSnapshot.getGroups().get(0).getRecords().get(0).getEntityReference().getTargetVersionNumber());
@@ -511,13 +512,13 @@ public class SnapshotWidgetTest {
 	public void testaddGroupRecordFailure() throws Exception {		
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		reset(mockView);
-		Snapshot expectedSnapshot = getSetSnapshotState();
+		Summary expectedSnapshot = getSetSnapshotState();
 		expectedSnapshot.getGroups().get(0).setName(testName);
 		expectedSnapshot.getGroups().get(0).setDescription(testDesc);	
 		setupUpdateEntityWhens(expectedSnapshot);
 		AsyncMockStubber.callFailureWith(null).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
 		
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		snapshotWidget.addGroupRecord(0, "id", "1", "note");
 		
@@ -547,7 +548,7 @@ public class SnapshotWidgetTest {
 		reset(mockView);
 		
 		// group index out of range
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		snapshotWidget.updateGroupRecord(1, 0, "note");		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC);
@@ -562,7 +563,7 @@ public class SnapshotWidgetTest {
 		// bad row index
 		addSingleGroupRecordToSnapshot(snapshot, "id", (long)1, null);
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);		
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		
 		snapshotWidget.updateGroupRecord(0, 1, "note");				
@@ -584,7 +585,7 @@ public class SnapshotWidgetTest {
 		reset(mockView);
 		
 		// build expected		
-		Snapshot expectedSnapshot = createDefaultSnapshot();
+		Summary expectedSnapshot = createDefaultSnapshot();
 		addSingleGroupRecordToSnapshot(expectedSnapshot, entityId, versionNumber, updatedNote);
 		setupUpdateEntityWhens(expectedSnapshot);
 				
@@ -595,7 +596,7 @@ public class SnapshotWidgetTest {
 		verify(mockView).showInfo(eq(DisplayConstants.UPDATE_SAVED), anyString());				
 		
 		// validate change to model
-		Snapshot actualSnapshot = snapshotWidget.getSnapshot();
+		Summary actualSnapshot = snapshotWidget.getSnapshot();
 		assertEquals(1, actualSnapshot.getGroups().size());
 		assertEquals(entityId, actualSnapshot.getGroups().get(0).getRecords().get(0).getEntityReference().getTargetId());
 		assertEquals(versionNumber, actualSnapshot.getGroups().get(0).getRecords().get(0).getEntityReference().getTargetVersionNumber());
@@ -608,13 +609,13 @@ public class SnapshotWidgetTest {
 		addSingleGroupRecordToSnapshot(snapshot, "1", (long)1, "note");		
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		reset(mockView);
-		Snapshot expectedSnapshot = getSetSnapshotState();
+		Summary expectedSnapshot = getSetSnapshotState();
 		expectedSnapshot.getGroups().get(0).setName(testName);
 		expectedSnapshot.getGroups().get(0).setDescription(testDesc);	
 		setupUpdateEntityWhens(expectedSnapshot);
 		AsyncMockStubber.callFailureWith(null).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
 		
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		snapshotWidget.updateGroupRecord(0, 0, "note");
 		
@@ -646,7 +647,7 @@ public class SnapshotWidgetTest {
 		reset(mockView);
 		
 		// group index out of range
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		snapshotWidget.removeGroupRecord(1, 0);		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC);
@@ -661,7 +662,7 @@ public class SnapshotWidgetTest {
 		// bad row index
 		addSingleGroupRecordToSnapshot(snapshot, "id", (long)1, null);
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);		
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		
 		snapshotWidget.removeGroupRecord(0, 1);				
@@ -683,7 +684,7 @@ public class SnapshotWidgetTest {
 		reset(mockView);
 		
 		// build expected		
-		Snapshot expectedSnapshot = createDefaultSnapshot();
+		Summary expectedSnapshot = createDefaultSnapshot();
 		addSingleGroupRecordToSnapshot(expectedSnapshot, entityId, versionNumber, updatedNote);
 		expectedSnapshot.getGroups().get(0).getRecords().remove(0);
 		setupUpdateEntityWhens(expectedSnapshot);
@@ -695,7 +696,7 @@ public class SnapshotWidgetTest {
 		verify(mockView).showInfo(eq(DisplayConstants.ENTRY_REMOVED), anyString());				
 		
 		// validate change to model
-		Snapshot actualSnapshot = snapshotWidget.getSnapshot();
+		Summary actualSnapshot = snapshotWidget.getSnapshot();
 		assertEquals(1, actualSnapshot.getGroups().size());
 		assertEquals(0, actualSnapshot.getGroups().get(0).getRecords().size());
 	}
@@ -706,13 +707,13 @@ public class SnapshotWidgetTest {
 		addSingleGroupRecordToSnapshot(snapshot, "1", (long)1, "note");		
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		reset(mockView);
-		Snapshot expectedSnapshot = getSetSnapshotState();
+		Summary expectedSnapshot = getSetSnapshotState();
 		expectedSnapshot.getGroups().get(0).setName(testName);
 		expectedSnapshot.getGroups().get(0).setDescription(testDesc);	
 		setupUpdateEntityWhens(expectedSnapshot);
 		AsyncMockStubber.callFailureWith(null).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
 		
-		Snapshot rebuildSnapshot = getSetSnapshotState();
+		Summary rebuildSnapshot = getSetSnapshotState();
 		setupRebuildEverythingCallbacks(rebuildSnapshot);
 		snapshotWidget.removeGroupRecord(0, 0);
 		
@@ -730,29 +731,29 @@ public class SnapshotWidgetTest {
 	@SuppressWarnings("unchecked")
 	private String setupAddGroup(String testName, String testDesc) throws JSONObjectAdapterException, RestServiceException {
 		String snapshotJson1 = snapshot.writeToJSONObject(factory.createNew()).toJSONString();
-		Snapshot expectedSnapshot = new Snapshot(factory.createNew(snapshotJson1));
-		expectedSnapshot.setGroups(Arrays.asList(new SnapshotGroup[] { new SnapshotGroup(), new SnapshotGroup() }));
+		Summary expectedSnapshot = new Summary(factory.createNew(snapshotJson1));
+		expectedSnapshot.setGroups(Arrays.asList(new EntityGroup[] { new EntityGroup(), new EntityGroup() }));
 		expectedSnapshot.getGroups().get(0).setName(DisplayConstants.CONTENTS);		
 		expectedSnapshot.getGroups().get(1).setName(testName);
 		expectedSnapshot.getGroups().get(1).setDescription(testDesc);
-		expectedSnapshot.getGroups().get(1).setRecords(Arrays.asList(new SnapshotGroupRecord[] {}));
+		expectedSnapshot.getGroups().get(1).setRecords(Arrays.asList(new EntityGroupRecord[] {}));
 		String expectedJson = expectedSnapshot.writeToJSONObject(factory.createNew()).toJSONString();
-		EntityWrapper expectedWrapper = new EntityWrapper(expectedJson, Snapshot.class.getName(), null);
+		EntityWrapper expectedWrapper = new EntityWrapper(expectedJson, Summary.class.getName(), null);
 		AsyncMockStubber.callSuccessWith(expectedWrapper).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));		
-		when(mockNodeModelCreator.createEntity(expectedJson, Snapshot.class.getName())).thenReturn(expectedSnapshot);
+		when(mockNodeModelCreator.createEntity(expectedJson, Summary.class.getName())).thenReturn(expectedSnapshot);
 		return expectedJson;
 	}
 
-	private Snapshot getSetSnapshotState() throws Exception {
-		Snapshot snapshot = createDefaultSnapshot();
-		SnapshotGroup defaultGroup = new SnapshotGroup();
+	private Summary getSetSnapshotState() throws Exception {
+		Summary snapshot = createDefaultSnapshot();
+		EntityGroup defaultGroup = new EntityGroup();
 		defaultGroup.setName(DisplayConstants.CONTENTS);			
-		snapshot.setGroups(new ArrayList<SnapshotGroup>(Arrays.asList(new SnapshotGroup[] { defaultGroup })));					
+		snapshot.setGroups(new ArrayList<EntityGroup>(Arrays.asList(new EntityGroup[] { defaultGroup })));					
 		return snapshot;
 	}
 
-	private Snapshot createDefaultSnapshot() {
-		Snapshot snapshot = new Snapshot();
+	private Summary createDefaultSnapshot() {
+		Summary snapshot = new Summary();
 		snapshot.setId("syn1234");
 		return snapshot;
 	}
@@ -765,49 +766,49 @@ public class SnapshotWidgetTest {
 		return data;
 	}
 
-	private void addSingleGroupRecordToSnapshot(Snapshot snapshot, String targetId,
+	private void addSingleGroupRecordToSnapshot(Summary snapshot, String targetId,
 			Long targetVersionNumber, String note) {
-		SnapshotGroupRecord ssgRecord = new SnapshotGroupRecord();
+		EntityGroupRecord ssgRecord = new EntityGroupRecord();
 		Reference ref = new Reference();
 		ref.setTargetId(targetId);
 		ref.setTargetVersionNumber(targetVersionNumber);
 		ssgRecord.setEntityReference(ref);
 		ssgRecord.setNote(note);
-		SnapshotGroup ssGroup = new SnapshotGroup();
-		ArrayList<SnapshotGroup> groups = new ArrayList<SnapshotGroup>();
+		EntityGroup ssGroup = new EntityGroup();
+		ArrayList<EntityGroup> groups = new ArrayList<EntityGroup>();
 		groups.add(ssGroup);
-		ArrayList<SnapshotGroupRecord> records = new ArrayList<SnapshotGroupRecord>();
+		ArrayList<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
 		records.add(ssgRecord);
 		ssGroup.setRecords(records);		
 		snapshot.setGroups(groups);
 	}
 
 	@SuppressWarnings("unchecked")
-	private void setupRebuildEverythingCallbacks(Snapshot rebuildSnapshot) throws Exception {
-		EntityWrapper rebuildWrapper = new EntityWrapper(rebuildSnapshot.writeToJSONObject(factory.createNew()).toJSONString(), Snapshot.class.getName(), null);
+	private void setupRebuildEverythingCallbacks(Summary rebuildSnapshot) throws Exception {
+		EntityWrapper rebuildWrapper = new EntityWrapper(rebuildSnapshot.writeToJSONObject(factory.createNew()).toJSONString(), Summary.class.getName(), null);
 		AsyncMockStubber.callSuccessWith(rebuildWrapper).when(mockSynapseClient).getEntity(eq(snapshot.getId()), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntity(rebuildWrapper, Snapshot.class)).thenReturn(rebuildSnapshot);
+		when(mockNodeModelCreator.createEntity(rebuildWrapper, Summary.class)).thenReturn(rebuildSnapshot);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void verifyRebuildEverything(Snapshot rebuildSnapshot, Snapshot actualSnapshot, int expectedRebuildSize) {
+	private void verifyRebuildEverything(Summary rebuildSnapshot, Summary actualSnapshot, int expectedRebuildSize) {
 		verify(mockSynapseClient).getEntity(eq(actualSnapshot.getId()), any(AsyncCallback.class)); // rebuild all
 		assertEquals(expectedRebuildSize, actualSnapshot.getGroups().size()); // check backed out changes after failure
-		verify(mockView).setSnapshot(rebuildSnapshot, CAN_EDIT, READ_ONLY);		
+		//verify(mockView).setSnapshot(rebuildSnapshot, CAN_EDIT, READ_ONLY, SHOW_EDIT);				
 	}
 	
-	private void setupUpdateEntityWhens(Snapshot expectedSnapshot) throws Exception {
-		EntityWrapper expectedWrapper = new EntityWrapper(expectedSnapshot.writeToJSONObject(factory.createNew()).toJSONString(), Snapshot.class.getName(), null);
+	private void setupUpdateEntityWhens(Summary expectedSnapshot) throws Exception {
+		EntityWrapper expectedWrapper = new EntityWrapper(expectedSnapshot.writeToJSONObject(factory.createNew()).toJSONString(), Summary.class.getName(), null);
 		AsyncMockStubber.callSuccessWith(expectedWrapper).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));		
-		when(mockNodeModelCreator.createEntity(anyString(), eq(Snapshot.class.getName()))).thenReturn(expectedSnapshot);
+		when(mockNodeModelCreator.createEntity(anyString(), eq(Summary.class.getName()))).thenReturn(expectedSnapshot);
 	}
 	
-	private SnapshotGroupRecord createRecord(String entityId, Long versionNumber, String note) {
+	private EntityGroupRecord createRecord(String entityId, Long versionNumber, String note) {
 		Reference ref = new Reference();
 		ref.setTargetId(entityId);			
 		ref.setTargetVersionNumber(versionNumber);
 
-		SnapshotGroupRecord record = new SnapshotGroupRecord();
+		EntityGroupRecord record = new EntityGroupRecord();
 		record.setEntityReference(ref);
 		record.setNote(note);
 		return record;
