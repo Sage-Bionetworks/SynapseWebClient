@@ -193,6 +193,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			ignore.add(entityType);
 
 		// ignore certain types
+		ignore.add(entityTypeProvider.getEntityTypeForClassName(Project.class.getName()));
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Link.class.getName()));
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Preview.class.getName()));
 		
