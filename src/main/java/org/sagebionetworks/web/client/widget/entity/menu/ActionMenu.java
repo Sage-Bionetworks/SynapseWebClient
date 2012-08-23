@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.place.shared.Place;
@@ -39,8 +40,6 @@ import com.google.inject.Inject;
 public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresenter {
 	
 	private ActionMenuView view;
-	private NodeServiceAsync nodeService;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
@@ -55,8 +54,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	@Inject
 	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor, AutoGenFactory entityFactory) {
 		this.view = view;
-		this.nodeService = nodeService;
-		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
 		this.globalApplicationState = globalApplicationState;
@@ -79,7 +76,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		return view.asWidget();
 	}
 
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 		// remove handlers
@@ -100,7 +96,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
@@ -141,6 +136,9 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				if(caught instanceof NotFoundException) {
 					view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
 					return;
+				}
+				if (caught instanceof UnauthorizedException) {
+					view.showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
 				}
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_MOVE_FAILURE);			
