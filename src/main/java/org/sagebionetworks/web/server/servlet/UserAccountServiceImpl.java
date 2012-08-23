@@ -57,8 +57,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	
 	@SuppressWarnings("unused")
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-
-
+	
 	/**
 	 * Injected via Gin.
 	 * 
@@ -496,11 +495,10 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			String sessionToken = getSessionToken();
 			if (sessionToken != null){
 				UserSessionData userData = getUserSessionData(sessionToken);
-				FastPass.setDomain(DisplayUtils.SUPPORT_URL);
 				String email = userData.getProfile().getUserName();
 				String displayName = userData.getProfile().getDisplayName();
 				String principleId = userData.getProfile().getOwnerId();
-				fastPassUrl = FastPass.url(StackConfiguration.getPortalGetSatisfactionKey(), StackConfiguration.getPortalGetSatisfactionSecret(), email, displayName, principleId, false);
+				fastPassUrl = getFastPassSupportUrl(email, displayName, principleId);
 			}
 		} catch (SynapseTermsOfUseException e) {
 			throw new TermsOfUseException(e.getMessage());
@@ -508,6 +506,11 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw new RestServiceException(e.getMessage());
 		}
 		return fastPassUrl;		
+	}
+	
+	public String getFastPassSupportUrl(String email, String displayName, String principleId) throws OAuthException, IOException, URISyntaxException {
+		FastPass.setDomain(DisplayUtils.SUPPORT_URL);
+		return FastPass.url(StackConfiguration.getPortalGetSatisfactionKey(), StackConfiguration.getPortalGetSatisfactionSecret(), email, displayName, principleId, false);
 	}
 	
 	/**

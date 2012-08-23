@@ -3,10 +3,13 @@ package org.sagebionetworks.web.unitserver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Logger;
+
+import net.oauth.OAuthException;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -59,6 +62,7 @@ public class UserAccountServiceImplTest {
 	private String user1password = "password";
 	private UserRegistration user2 = new UserRegistration("bar@foo.com", "bar", "foo", "barfoo");
 	private String user2password = "otherpass";
+	
 	
 	@BeforeClass
 	public static void beforeClass() throws Exception{
@@ -218,8 +222,21 @@ public class UserAccountServiceImplTest {
 	}
 	
 	@Test
-	public void testGetFastPassUrl() {
-		fdsfds
+	public void testGetFastPassUrl() throws OAuthException, IOException, URISyntaxException {
+		try {
+			//anonymous user test
+			String fastPassUrl = service.getFastPassSupportUrl();
+			assertEquals(fastPassUrl, "");
+			
+			//This tests the FastPass library, it makes a call to getsatisfaction.com to form the authenticated SSO url string.
+//			fastPassUrl = service.getFastPassSupportUrl("myemail@foo.com", "Mr. Bar", "x1169");
+			//the fastpass url contains all of the right pieces
+//			Assert.assertTrue(fastPassUrl.indexOf("uid=x1169") > -1);
+//			Assert.assertTrue(fastPassUrl.indexOf("email=myemail%40foo.com") > -1);
+//			Assert.assertTrue(fastPassUrl.indexOf("name=Mr.%20Bar") > -1);
+		} catch (RestServiceException e) {
+			fail("The fastpass URL returned was not valid.");
+		}
 	}
 	
 	
