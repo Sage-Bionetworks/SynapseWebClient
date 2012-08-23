@@ -229,11 +229,11 @@ public class UserAccountServiceImplTest {
 			assertEquals(fastPassUrl, "");
 			
 			//This tests the FastPass library, it makes a call to getsatisfaction.com to form the authenticated SSO url string.
-//			fastPassUrl = service.getFastPassSupportUrl("myemail@foo.com", "Mr. Bar", "x1169");
+			fastPassUrl = service.getFastPassSupportUrl("myemail@foo.com", "Mr. Bar", "x1169");
 			//the fastpass url contains all of the right pieces
-//			Assert.assertTrue(fastPassUrl.indexOf("uid=x1169") > -1);
-//			Assert.assertTrue(fastPassUrl.indexOf("email=myemail%40foo.com") > -1);
-//			Assert.assertTrue(fastPassUrl.indexOf("name=Mr.%20Bar") > -1);
+			Assert.assertTrue(fastPassUrl.indexOf("uid=x1169") > -1);
+			Assert.assertTrue(fastPassUrl.indexOf("email=myemail%40foo.com") > -1);
+			Assert.assertTrue(fastPassUrl.indexOf("name=Mr.%20Bar") > -1);
 		} catch (RestServiceException e) {
 			fail("The fastpass URL returned was not valid.");
 		}
