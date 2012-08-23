@@ -1,15 +1,21 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.logging.Logger;
+
+import net.oauth.OAuthException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseTermsOfUseException;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;
@@ -29,6 +35,7 @@ import org.springframework.web.client.RestClientException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.gwt.user.server.rpc.UnexpectedException;
 import com.google.inject.Inject;
+import com.gsfn.FastPass;
 
 public class UserAccountServiceImpl extends RemoteServiceServlet implements UserAccountService, TokenProvider {
 	
@@ -50,8 +57,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	
 	@SuppressWarnings("unused")
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-
-
+	
 	/**
 	 * Injected via Gin.
 	 * 
@@ -290,10 +296,9 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	public String getUser(String sessionToken) throws AuthenticationException, RestServiceException {
 		// First make sure the service is ready to go.
 		validateService();
-		Synapse synapseClient = createSynapseClient(sessionToken);
 		String userSessionJson = null;
 		try {
-			UserSessionData userData = synapseClient.getUserSessionData();
+			UserSessionData userData = getUserSessionData(sessionToken);
 			userSessionJson = EntityFactory.createJSONStringForEntity(userData);
 		} catch (JSONObjectAdapterException e) {
 			e.printStackTrace();
@@ -306,6 +311,11 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		
 		return userSessionJson;
 	}	
+	
+	private UserSessionData getUserSessionData(String sessionToken) throws SynapseException{
+		Synapse synapseClient = createSynapseClient(sessionToken);
+		return synapseClient.getUserSessionData();
+	}
 
 	
 	@Override
@@ -474,6 +484,33 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		// By default, we get the token from the request cookies.
 		return UserDataProvider.getThreadLocalUserToken(this
 				.getThreadLocalRequest());
+	}
+	
+	@Override
+	public String getFastPassSupportUrl() throws RestServiceException {
+		validateService();
+		String fastPassUrl = "";
+		//get the user
+		try {
+			String sessionToken = getSessionToken();
+			if (sessionToken != null){
+				UserSessionData userData = getUserSessionData(sessionToken);
+				String email = userData.getProfile().getUserName();
+				String displayName = userData.getProfile().getDisplayName();
+				String principleId = userData.getProfile().getOwnerId();
+				fastPassUrl = getFastPassSupportUrl(email, displayName, principleId);
+			}
+		} catch (SynapseTermsOfUseException e) {
+			throw new TermsOfUseException(e.getMessage());
+		} catch (Exception e) {
+			throw new RestServiceException(e.getMessage());
+		}
+		return fastPassUrl;		
+	}
+	
+	public String getFastPassSupportUrl(String email, String displayName, String principleId) throws OAuthException, IOException, URISyntaxException {
+		FastPass.setDomain(DisplayUtils.SUPPORT_URL);
+		return FastPass.url(StackConfiguration.getPortalGetSatisfactionKey(), StackConfiguration.getPortalGetSatisfactionSecret(), email, displayName, principleId, false);
 	}
 	
 	/**

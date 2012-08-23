@@ -47,5 +47,9 @@ public class CookieKeys {
 	 * LinkedIn requestToken key
 	 */
 	public static String LINKEDIN = "org.sagebionetworks.synapse.linkedin";
-		
+	
+	/**
+	 * Get Satisfaction fastpass key
+	 */
+	public static String FASTPASS = "fastpass";
 }

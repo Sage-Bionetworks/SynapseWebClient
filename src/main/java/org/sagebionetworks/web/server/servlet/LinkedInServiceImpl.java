@@ -1,17 +1,15 @@
 package org.sagebionetworks.web.server.servlet;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
+import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.LinkedInService;
 import org.sagebionetworks.web.server.RestTemplateProvider;
@@ -29,7 +27,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
@@ -194,8 +191,8 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 		if(oAuthService == null || !newCallbackUrl.equals(portalCallbackUrl)) {
 			portalCallbackUrl = newCallbackUrl;
 			oAuthService = new ServiceBuilder().provider(LinkedInApi.class)
-											   .apiKey("0oq37ippxz8c")
-											   .apiSecret("2JpVsFPqHqT0Xou4")
+											   .apiKey(StackConfiguration.getPortalLinkedInKey())
+											   .apiSecret(StackConfiguration.getPortalLinkedInSecret())
 											   .callback(portalCallbackUrl + "#Profile:")
 											   .build();			
 		}

@@ -3,10 +3,13 @@ package org.sagebionetworks.web.unitserver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Logger;
+
+import net.oauth.OAuthException;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -36,7 +39,6 @@ import com.sun.grizzly.http.SelectorThread;
  */
 
 // TO BE DELETED WHEN BRUCE REPLACES UserAccountService with Syanpse Java client
-@Ignore
 public class UserAccountServiceImplTest {
 	
 	private static Logger logger = Logger.getLogger(UserAccountServiceImplTest.class.getName());
@@ -61,6 +63,7 @@ public class UserAccountServiceImplTest {
 	private UserRegistration user2 = new UserRegistration("bar@foo.com", "bar", "foo", "barfoo");
 	private String user2password = "otherpass";
 	
+	
 	@BeforeClass
 	public static void beforeClass() throws Exception{
 		// Start the local stub implementation of the the platform
@@ -68,7 +71,7 @@ public class UserAccountServiceImplTest {
 		// container.
 		
 //		// First setup the url
-//		serviceUrl = UriBuilder.fromUri("http://"+serviceHost+"/").port(servicePort).build().toURL();
+		serviceUrl = new URL("https://fakeurl.com");
 //		// Now start the container
 //		selector = LocalAuthServiceStub.startServer(serviceHost, servicePort);
 		
@@ -81,7 +84,7 @@ public class UserAccountServiceImplTest {
 		// Inject the required values
 		service.setRestTemplate(provider);
 		ServiceUrlProvider urlProvider = new ServiceUrlProvider();
-		urlProvider.setAuthServicePrivateUrl(serviceUrl.toString() + "auth/v1");		
+		urlProvider.setAuthServicePrivateUrl(serviceUrl.toString() + "/auth/v1");		
 		service.setServiceUrlProvider(urlProvider);
 		
 //		LocalAuthServiceStub.groups.add(group1);
@@ -143,6 +146,7 @@ public class UserAccountServiceImplTest {
 		dummy.setServiceUrlProvider(urlProvider);
 	}
 	
+	@Ignore
 	@Test
 	public void testCreateUser() throws Exception {
 		try {
@@ -157,12 +161,14 @@ public class UserAccountServiceImplTest {
 		Assert.assertNotNull(userData.getSessionToken());
 	}
 	
+	@Ignore
 	@Test(expected=UnauthorizedException.class)
 	public void testUnAuthenticateUser() throws Exception {
 		// try fake user
 		service.initiateSession("junk", "junk", false);
 	}
 		
+	@Ignore
 	@Test
 	public void testAuthenticateUser() throws Exception {
 		// auth real user
@@ -189,6 +195,7 @@ public class UserAccountServiceImplTest {
 		}
 	}
 		
+	@Ignore
 	@Test
 	public void testTerminateSession() throws Exception {
 		String userdataJson = service.initiateSession(user1.getEmail(), user1password, false);
@@ -213,6 +220,25 @@ public class UserAccountServiceImplTest {
 			fail("The Auth Service URL returned was not valid.");
 		}
 	}
+	
+	@Test
+	public void testGetFastPassUrl() throws OAuthException, IOException, URISyntaxException {
+		try {
+			//anonymous user test
+			String fastPassUrl = service.getFastPassSupportUrl();
+			assertEquals(fastPassUrl, "");
+			
+			//This tests the FastPass library, it makes a call to getsatisfaction.com to form the authenticated SSO url string.
+			fastPassUrl = service.getFastPassSupportUrl("myemail@foo.com", "Mr. Bar", "x1169");
+			//the fastpass url contains all of the right pieces
+			Assert.assertTrue(fastPassUrl.indexOf("uid=x1169") > -1);
+			Assert.assertTrue(fastPassUrl.indexOf("email=myemail%40foo.com") > -1);
+			Assert.assertTrue(fastPassUrl.indexOf("name=Mr.%20Bar") > -1);
+		} catch (RestServiceException e) {
+			fail("The fastpass URL returned was not valid.");
+		}
+	}
+	
 	
 	@Test
 	public void testGetSynapseWebUrl() {

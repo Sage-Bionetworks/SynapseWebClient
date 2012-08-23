@@ -41,6 +41,8 @@ public interface UserAccountServiceAsync {
 	
 	void getSynapseWebUrl(AsyncCallback<String> callback);
 	
+	void getFastPassSupportUrl(AsyncCallback<String> callback) throws RestServiceException;
+	
 	/**
 	 * This needs to be replaced with a Synapse Java Client call
 	 */
