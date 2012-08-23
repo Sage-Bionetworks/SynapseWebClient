@@ -98,7 +98,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		return view.asWidget();
 	}
 
-	public Snapshot getSnapshot() {
+	public Summary getSnapshot() {
 		return snapshot;
 	}
 	
@@ -425,7 +425,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			public void onSuccess(EntityWrapper result) {
 				try {
 					// update current entity
-					snapshot = nodeModelCreator.createEntity(result, Snapshot.class);
+					snapshot = nodeModelCreator.createEntity(result, Summary.class);
 					setSnapshot(snapshot, canEdit, readOnly);
 				} catch (RestServiceException e) {
 					onFailure(e);
