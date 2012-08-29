@@ -146,8 +146,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 		if (supportLink == null) {
 			supportLink = new Anchor(DisplayConstants.LINK_COMMUNITY_FORUM);
-			supportLink.setStylePrimaryName("link");
-			supportLink.addStyleName("left");
+			supportLink.addStyleName("supportLink");
 			supportLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
