@@ -95,12 +95,12 @@
 						</h4>
 					</a>
 					<br></br>
-					<a href="https://groups.google.com/a/sagebase.org/group/bcc/"
-						target="_blank">
+					<g:Anchor ui:field="supportLink">
 						<h4>
-							<span style="text-decoration:underline;">Discussion Forum</span>
+							<span style="text-decoration:underline;">Community and Support</span>
 						</h4>
-					</a>
+					</g:Anchor>
+					
 					<br></br>
 	
 					<a href="http://validation.bcc.sagebase.org/bcc-leaderboard-public.php"
@@ -111,14 +111,6 @@
 					</a>
 					<br></br>
 					
-					<a href="https://sagebionetworks.jira.com/wiki/display/BCC/Breast+Cancer+Challenge%3A+FAQs+Aggregated+From+Participants"
-						target="_blank">
-						<h4>
-							<span style="text-decoration:underline;">FAQs, Aggregated from Participants</span>
-						</h4>
-					</a>
-					<br></br>
-	
 						
 						<h5>The challenge consists of building predictive models of
 						breast cancer survival, specified by survival data containing:</h5>
