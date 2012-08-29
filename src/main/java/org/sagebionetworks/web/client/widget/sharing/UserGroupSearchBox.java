@@ -31,6 +31,7 @@ public class UserGroupSearchBox {
 	public static final String KEY_PROFILE_PICTURE = "pic";
 	public static final String KEY_IS_INDIVIDUAL = "isIndividual";
 	public static final String KEY_PRINCIPAL_ID = "ownerId";
+	public static final String KEY_EMAIL = "email";
 
 	/**
 	 * Create a new editor for a given concept URL.
@@ -51,6 +52,7 @@ public class UserGroupSearchBox {
 		type.addField(KEY_PROFILE_PICTURE, KEY_PROFILE_PICTURE);
 		type.addField(KEY_IS_INDIVIDUAL, KEY_IS_INDIVIDUAL);
 		type.addField(KEY_PRINCIPAL_ID, KEY_PRINCIPAL_ID);
+		type.addField(KEY_EMAIL, KEY_EMAIL);
 
 		// The paginated reader
 		JsonPagingLoadResultReader<PagingLoadResult<AdapterModelData>> reader = 
@@ -78,8 +80,8 @@ public class UserGroupSearchBox {
 		combo.setStore(store);
 		combo.setHideTrigger(false);
 		combo.setAllowBlank(false);
-		combo.setMinChars(3);		
-		combo.setPageSize(10);		
+		combo.setMinChars(3);
+		combo.setPageSize(10);
 		return combo;
 	}
 
@@ -87,6 +89,7 @@ public class UserGroupSearchBox {
 		return [ '<tpl for="."><div class="search-item">',
 				'<table cellspacing="0" cellpadding="0" width="100%"><tr valign="top">',
 				'<td>{displayName}</span></td>',
+				'<td align="right"><span class="suggestSearchOntology">{email}</a></span></td>',
 				'</tr></table>',
 				'</div></tpl>' ].join("");
 	}-*/;

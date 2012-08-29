@@ -46,6 +46,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.users.AclPrincipal;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
@@ -194,6 +195,18 @@ public class DisplayUtils {
 	public static String getIconHtml(ImageResource icon) {
 		if(icon == null) return null;		
 		return "<span class=\"iconSpan\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
+	}
+	
+	/**
+	 * Returns a properly aligned name and e-mail address for a given AclPrincipal
+	 * @param principal
+	 * @return
+	 */
+	public static String getUserNameEmailHtml(AclPrincipal principal) {
+		if (principal == null) return "";
+		String name = principal.getDisplayName() == null ? "" : principal.getDisplayName();
+		String email = principal.getEmail() == null ? "" : principal.getEmail();
+		return name + "&nbsp;&nbsp;<span style=\"color: darkGray;\">(" + email + ")</span>";
 	}
 	
 	/**
