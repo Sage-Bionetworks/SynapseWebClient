@@ -99,7 +99,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			RSSEntry entry = feed.getEntries().get(i);
 			//every 4, set as the last (if we support more than 4)
 			String lastString = (i+1)%4==0 ? "last" : "";
-			htmlResponse.append("<div class=\"span-6 serv "+lastString+"\"><div class=\"icon-white-big left icon161-white\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
+			htmlResponse.append("<div class=\"span-6 serv "+lastString+"\"><div class=\"icon-white-big left icon161-white\" style=\"background-color: rgb(122, 122, 122);\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
             htmlResponse.append(entry.getLink());
             htmlResponse.append("\" class=\"service-tipsy north link\">");
             htmlResponse.append(entry.getTitle());

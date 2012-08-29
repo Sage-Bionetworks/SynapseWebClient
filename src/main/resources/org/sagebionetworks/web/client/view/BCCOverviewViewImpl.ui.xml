@@ -95,12 +95,12 @@
 						</h4>
 					</a>
 					<br></br>
-					<a href="https://groups.google.com/a/sagebase.org/group/bcc/"
-						target="_blank">
+					<g:Anchor ui:field="supportLink">
 						<h4>
-							<span style="text-decoration:underline;">Discussion Forum</span>
+							<span style="text-decoration:underline;">Community and Support</span>
 						</h4>
-					</a>
+					</g:Anchor>
+					
 					<br></br>
 	
 					<a href="http://validation.bcc.sagebase.org/bcc-leaderboard-public.php"
@@ -111,14 +111,6 @@
 					</a>
 					<br></br>
 					
-					<a href="https://sagebionetworks.jira.com/wiki/display/BCC/Breast+Cancer+Challenge%3A+FAQs+Aggregated+From+Participants"
-						target="_blank">
-						<h4>
-							<span style="text-decoration:underline;">FAQs, Aggregated from Participants</span>
-						</h4>
-					</a>
-					<br></br>
-	
 						
 						<h5>The challenge consists of building predictive models of
 						breast cancer survival, specified by survival data containing:</h5>
@@ -141,26 +133,13 @@
 					</ul>
 					<h5>The final scoring of the algorithms will be performed by scoring
 						them
-						against data to be obtained from another 500 patients, with tissue
+						against data to be obtained from another 350 patients, with tissue
 						samples already banked. The challenge time line is:</h5>
 					<ul class="list arrow-list">
-						<li>Challenge initiation: April 20th Sage Commons Congress -
-							Description of challenge and opening of registration.</li>
-						<li>Challenge evolution: April 20-October 1 - The challenge will
-							dynamically evolve
-							during the participation phase as participant input, discussions, and
-							suggestions for
-							improvements will be incorporated by the conference organizers to
-							continuously improve the challenge. Moreover, the compute
-							platform
-							provided by Sage Bionetworks and Google will actively add features
-							throughout
-							the duration of the challenge</li>
-						<li>Challenge submission deadline: October 1, 2012 - final
-							submission of all models to be scored against validation data.</li>
-						<li>Challenge conclusion: November 12-16 2012 - DREAM 7
-							conference, review of the results, what was learned, and
-							presentation by the leading group.</li>
+						<li>June-July 17th, 2012: Sign up for the Sage Bionetworks-DREAM Breast Cancer Prognosis Challenge. Registered participants will be notified by email about the initiation of the Challenge.</li>
+						<li>July 17th-October 15th, 2012: A live demo call was held on July 17th to help participants get started with the Challenge. A step by step guide is available <a href="https://sagebionetworks.jira.com/wiki/display/BCC/Getting+Started" target="_blank"><span style="text-decoration:underline;">here</span></a> with additional details about the Challenge available at <a href="https://sagebionetworks.jira.com/wiki/display/BCC/Breast+Cancer+Challenge%3A+Detailed+Description" target="_blank"><span style="text-decoration:underline;">Breast Cancer Challenge: Detailed Description</span></a>. Data from 1,000 samples will be provided to participants for training of models. An additional 500 samples will be used to provide real-time evaluation of all submitted models. The remaining 500 samples will be used for final scoring of all models (taking place after October 15th).</li> 
+						<li>October 15th, 2012: Final submission of all models, to be scored against the 500 Metabric data samples not used in the previous phase. The deadline for submitting models for the Breast Cancer Prognosis Challenge is 5PM EST October 15th, and the best performers will be announced at the DREAM 7 Conference taking place in San Francisco on November 12 to 16.</li>
+						<li>Late 2012: Final assessment of all models in newly generated data. An additional cohort of approximately 350 breast cancer samples with archived fresh frozen tumor samples has been identified by Anne-Lise Borresen-Dale of Oslo University Hospital and a generous donation has been made by the Avon Foundation to obtain gene expression and copy number data on these samples. We are currently curating the clinical records of this patient cohort to harmonize with the current METABRIC dataset and working on generating the genomic profiling data for these samples. We aim to generate these data by the November 12 DREAM conference (being held in San Francisco) and announce initiation of the final evaluation to be performed on this data set. We will keep participants informed on progress in generating these data.</li>
 					</ul>
 					<p>A challenge of standardizing computational models developed for
 						this

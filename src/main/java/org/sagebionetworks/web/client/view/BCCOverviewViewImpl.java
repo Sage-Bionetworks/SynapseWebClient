@@ -15,7 +15,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -30,6 +29,8 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 	SimplePanel footer;
 	@UiField
 	SimplePanel applyForChallenge;
+	@UiField
+	Anchor supportLink;
 //	@UiField
 //	SimplePanel challengeFeedPanel;
 	
@@ -47,10 +48,15 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-
 		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());		
-				
+		footer.add(footerWidget.asWidget());
+		final Header headerSupportWidget = headerWidget;
+		supportLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				headerSupportWidget.gotoSupport();
+			}
+		});
 	}
 
 
