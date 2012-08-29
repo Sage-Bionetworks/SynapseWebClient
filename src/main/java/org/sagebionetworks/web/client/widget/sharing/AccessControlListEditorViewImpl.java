@@ -68,7 +68,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private static final String PRINCIPAL_COLUMN_ID = "principalData";
 	private static final String ACCESS_COLUMN_ID = "accessData";
 	private static final String REMOVE_COLUMN_ID = "removeData";
-	private static final int FIELD_WIDTH = 360;
+	private static final int FIELD_WIDTH = 380;
+	private static final int BUTTON_PADDING = 3;
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -372,15 +373,17 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					ListStore<PermissionsTableEntry> store,
 					Grid<PermissionsTableEntry> grid) {
 				PermissionsTableEntry entry = store.getAt(rowIndex);
-				String iconHtml = "";
+				AclPrincipal principal = entry.getAclEntry().getPrincipal();
+				String principalHtml = DisplayUtils.getUserNameEmailHtml(principal);
 				
+				String iconHtml = "";
 				// Default to generic user or group avatar
 				if(entry.getAclEntry().getPrincipal().isIndividual()) {
 					iconHtml = DisplayUtils.getIconHtml(iconsImageBundle.userBusiness16());
 				} else {
 					iconHtml = DisplayUtils.getIconHtml(iconsImageBundle.users16());	
 				}				
-				return iconHtml + "&nbsp;&nbsp;" + model.get(property);
+				return iconHtml + "&nbsp;&nbsp;" + principalHtml;
 			}
 			
 		};
@@ -417,7 +420,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			    } else {
 				    Button b = new Button((String) model.get(property));  
 				    b.setWidth(grid.getColumnModel().getColumnWidth(colIndex) - 25);  
-				    b.setToolTip("Click to change permissions");				  
+				    b.setToolTip("Click to change");				  
 				    b.setMenu(createEditAccessMenu(entry.getAclEntry()));
 				    return b;
 			    }

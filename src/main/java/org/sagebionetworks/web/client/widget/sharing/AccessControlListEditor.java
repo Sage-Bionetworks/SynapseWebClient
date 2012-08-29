@@ -123,6 +123,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			UserProfile profile, ResourceAccess ra) {
 		AclPrincipal p = new AclPrincipal();
 		p.setDisplayName(profile.getDisplayName());
+		p.setEmail(profile.getEmail());
 		p.setIndividual(true);
 		p.setPrincipalId(ra.getPrincipalId());
 		p.setOwner(ownerPrincipalId.equals(ra.getPrincipalId()));
