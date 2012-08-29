@@ -64,8 +64,7 @@
                     	<p class="right">
 	                    	<a class="link" href="#Home:0">Home</a> / 
 							<a class="link" href="#Governance:0">Governance</a> /
-							<a class="link" href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a> /
-							<g:Anchor stylePrimaryName="link" ui:field="supportLink">Support and Feedback</g:Anchor>
+							<a class="link" href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a>
                     	</p>           
                 	</div>
             	</div>

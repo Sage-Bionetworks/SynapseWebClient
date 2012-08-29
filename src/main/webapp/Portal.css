@@ -69,6 +69,9 @@
 	font-size: 11px;
 }
 
+.supportLink { font-weight: bold; color: #6e6e6e !important; }
+
+
 /* Removes annoying FireFox dotted border */
 :focus {
 	outline: none;
