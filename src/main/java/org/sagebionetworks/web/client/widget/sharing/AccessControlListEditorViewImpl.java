@@ -65,10 +65,12 @@ import com.google.inject.Inject;
 
 public class AccessControlListEditorViewImpl extends LayoutContainer implements AccessControlListEditorView {
  
+	private static final String STYLE_VERTICAL_ALIGN_MIDDLE = "vertical-align:middle !important;";
 	private static final String PRINCIPAL_COLUMN_ID = "principalData";
 	private static final String ACCESS_COLUMN_ID = "accessData";
 	private static final String REMOVE_COLUMN_ID = "removeData";
 	private static final int FIELD_WIDTH = 380;
+	private static final int BUTTON_PADDING = 3;
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private UrlCache urlCache;
@@ -116,15 +118,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	@Override
 	public void buildWindow(boolean isInherited, boolean canEnableInheritance) {		
 		this.removeAll(true);
-		
-		// setup view
 		this.setLayout(new FlowLayout(10));
-//		Label permissionsLabel = isInherited ? new Label(
-//				DisplayConstants.LABEL_SHARING_PANEL_INHERITED + ":")
-//				: new Label(DisplayConstants.LABEL_SHARING_PANEL_EXISTING + ":");
-//		permissionsLabel.setStyleAttribute("font-weight", "bold");
-//		permissionsLabel.setStyleAttribute("font-size", "105%");
-//		add(permissionsLabel, new MarginData(15, 0, 0, 0));
 
 		// show existing permissions
 		permissionsStore = new ListStore<PermissionsTableEntry>();
@@ -226,31 +220,42 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			deleteAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
-					presenter.deleteAcl();					
-				}
-			});
-			buttonPanel.add(deleteAclButton, tableData);
-			deleteAclButton.setEnabled(canEnableInheritance);
-
-			// 'Apply ACL to children' button
-			Button applyAclToChildrenButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_APPLY_ACL_TO_CHILDREN, AbstractImagePrototype.create(iconsImageBundle.arrowCurve16()));
-			applyAclToChildrenButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_APPLY_ACL_TO_CHILDREN_TEXT));
-			applyAclToChildrenButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					MessageBox.confirm(DisplayConstants.LABEL_ARE_YOU_SURE, DisplayConstants.CONFIRM_APPLY_ACL_TO_CHILDREN, new Listener<MessageBoxEvent>() {					
+					MessageBox.confirm(DisplayConstants.LABEL_ARE_YOU_SURE, DisplayConstants.CONFIRM_DELETE_ACL, new Listener<MessageBoxEvent>() {					
 						@Override
 						public void handleEvent(MessageBoxEvent be) { 												
 							Button btn = be.getButtonClicked();
 							if(Dialog.YES.equals(btn.getItemId())) {
-								presenter.applyAclToChildren();									
+								presenter.deleteAcl();										
 							}
 						}
-					});					
+					});									
 				}
 			});
-			buttonPanel.add(applyAclToChildrenButton, tableData);
-			applyAclToChildrenButton.setEnabled(!isInherited);			
+			buttonPanel.add(deleteAclButton, tableData);
+			deleteAclButton.setEnabled(canEnableInheritance);
+			
+			/* DEV NOTE: Disabled 8/30 to retool presentation. Should emphasize
+			 * deletion of child ACLs.
+			 */			
+//			// 'Apply ACL to children' button
+//			Button applyAclToChildrenButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_APPLY_ACL_TO_CHILDREN, AbstractImagePrototype.create(iconsImageBundle.arrowCurve16()));
+//			applyAclToChildrenButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_APPLY_ACL_TO_CHILDREN_TEXT));
+//			applyAclToChildrenButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+//				@Override
+//				public void componentSelected(ButtonEvent ce) {
+//					MessageBox.confirm(DisplayConstants.LABEL_ARE_YOU_SURE, DisplayConstants.CONFIRM_APPLY_ACL_TO_CHILDREN, new Listener<MessageBoxEvent>() {					
+//						@Override
+//						public void handleEvent(MessageBoxEvent be) { 												
+//							Button btn = be.getButtonClicked();
+//							if(Dialog.YES.equals(btn.getItemId())) {
+//								presenter.applyAclToChildren();									
+//							}
+//						}
+//					});					
+//				}
+//			});
+//			buttonPanel.add(applyAclToChildrenButton, tableData);
+//			applyAclToChildrenButton.setEnabled(!isInherited);			
 		}
 		this.add(buttonPanel, new MarginData(10, 0, 0, 0));
 		this.layout(true);		
@@ -310,7 +315,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		column.setId(ACCESS_COLUMN_ID);  
 		column.setHeader("Access");  
 		column.setWidth(110);  
-		column.setRenderer(buttonRenderer);  
+		column.setRenderer(buttonRenderer);
+		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
 		configs.add(column);  
 				   
 		column = new ColumnConfig();  
@@ -318,6 +324,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		column.setHeader("");
 		column.setWidth(25);  
 		column.setRenderer(removeRenderer);  
+		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
 		configs.add(column);  
 				   				   			   
 		columnModel = new ColumnModel(configs);  				  				 
@@ -325,7 +332,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		permissionsGrid.setAutoExpandColumn(PRINCIPAL_COLUMN_ID);  
 		permissionsGrid.setBorders(true);		
 		permissionsGrid.setWidth(520);
-		permissionsGrid.setHeight(150);
+		permissionsGrid.setHeight(180);
 		
 		add(permissionsGrid, new MarginData(5, 0, 0, 0));
 		

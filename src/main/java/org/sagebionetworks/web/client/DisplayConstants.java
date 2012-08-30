@@ -85,6 +85,7 @@ public class DisplayConstants {
 	public static final String LABEL_SHARING_PANEL_INHERITED = "Inherited Sharing Settings";
 	public static final String BUTTON_PERMISSIONS_CREATE_NEW_ACL = "Create Local Sharing Settings";
 	public static final String BUTTON_PERMISSIONS_DELETE_ACL = "Delete Local Sharing Settings";
+	public static final String CONFIRM_DELETE_ACL = "Deleting local sharing settings will cause inheritance from parent. Proceed?";
 	public static final String BUTTON_PERMISSIONS_APPLY_ACL_TO_CHILDREN = "Apply Local Sharing Settings to Children";
 	public static final String CONFIRM_APPLY_ACL_TO_CHILDREN = PERMISSIONS_APPLY_ACL_TO_CHILDREN_TEXT + " Proceed?";
 	public static final String MENU_PERMISSION_LEVEL_IS_OWNER = "Is Owner";
