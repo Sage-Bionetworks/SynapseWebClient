@@ -141,7 +141,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 		if (userCommands == null){
 			userCommands = new HorizontalPanel();
-        	userCommands.addStyleName("span-2 inner-2 view");
+        	userCommands.addStyleName("span-2 inner-2 view header-inner-commands-container");
    		 	Image settings = new Image(iconsImageBundle.settings16());
    		 	settings.addClickHandler(new ClickHandler() {
 				@Override
@@ -176,7 +176,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 		if (userNameContainer == null){
 			userNameContainer = new HorizontalPanel();
-			userNameContainer.removeStyleName("sf-j-menu");
+			userNameContainer.addStyleName("header-inner-commands-container");
 			userNameContainer.add(profilePictureHtml);
 			userNameContainer.add(userAnchor);
 		}

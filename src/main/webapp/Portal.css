@@ -17,9 +17,15 @@
 }
 
 .sf-j-menu td {
-	padding: 4px 0px 4px 10px;
+	padding: 4px 0px 4px 20px;
+	vertical-align:middle !important;
+	text-align: center;
 }
 
+
+.header-inner-commands-container td {
+	padding: 4px 0px 4px 2px;
+}
 
 .sendButton {
 	display: block;
