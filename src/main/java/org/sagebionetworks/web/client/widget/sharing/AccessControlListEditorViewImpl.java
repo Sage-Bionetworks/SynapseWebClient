@@ -18,7 +18,6 @@ import org.sagebionetworks.web.shared.users.AclPrincipal;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -55,6 +54,7 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -69,8 +69,6 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private static final String ACCESS_COLUMN_ID = "accessData";
 	private static final String REMOVE_COLUMN_ID = "removeData";
 	private static final int FIELD_WIDTH = 380;
-	private static final int BUTTON_PADDING = 3;
-	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private UrlCache urlCache;
@@ -377,12 +375,14 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				String principalHtml = DisplayUtils.getUserNameEmailHtml(principal);
 				
 				String iconHtml = "";
-				// Default to generic user or group avatar
-				if(entry.getAclEntry().getPrincipal().isIndividual()) {
-					iconHtml = DisplayUtils.getIconHtml(iconsImageBundle.userBusiness16());
+				if (principal.getPicUrl() != null) {
+					// Principal has a profile picture
+					iconHtml = DisplayUtils.getThumbnailPicHtml(principal.getPicUrl());
 				} else {
-					iconHtml = DisplayUtils.getIconHtml(iconsImageBundle.users16());	
-				}				
+					// Default to generic user or group avatar
+					ImageResource icon = principal.isIndividual() ? iconsImageBundle.userBusinessGrey40() : iconsImageBundle.usersGrey40();
+					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
+				}
 				return iconHtml + "&nbsp;&nbsp;" + principalHtml;
 			}
 			

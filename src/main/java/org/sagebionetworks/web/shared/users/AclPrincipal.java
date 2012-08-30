@@ -5,6 +5,7 @@ public class AclPrincipal {
 	private boolean isIndividual;
 	private String displayName;
 	private String email;
+	private String picUrl;
 	private boolean isOwner;
 	public Long getPrincipalId() {
 		return principalId;
@@ -29,6 +30,12 @@ public class AclPrincipal {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getPicUrl() {
+		return picUrl;
+	}
+	public void setPicUrl(String picUrl) {
+		this.picUrl = picUrl;
 	}
 	public boolean isOwner() {
 		return isOwner;

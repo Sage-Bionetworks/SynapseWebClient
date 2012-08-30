@@ -166,7 +166,6 @@ public class DisplayUtils {
 			RObject.class.getName(), PhenotypeData.class.getName(), 
 			ExpressionData.class.getName(),	GenotypeData.class.getName() };
 	
-	
 	public static SearchQuery getDefaultSearchQuery() {		
 		SearchQuery query = new SearchQuery();
 		// start with a blank, valid query
@@ -198,6 +197,16 @@ public class DisplayUtils {
 	}
 	
 	/**
+	 * Returns a properly aligned icon from an ImageResource
+	 * @param icon
+	 * @return
+	 */
+	public static String getIconThumbnailHtml(ImageResource icon) {
+		if(icon == null) return null;		
+		return "<span class=\"thumbnail-image-container\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
+	}
+	
+	/**
 	 * Returns a properly aligned name and e-mail address for a given AclPrincipal
 	 * @param principal
 	 * @return
@@ -206,8 +215,20 @@ public class DisplayUtils {
 		if (principal == null) return "";
 		String name = principal.getDisplayName() == null ? "" : principal.getDisplayName();
 		String email = principal.getEmail() == null ? "" : principal.getEmail();
-		return name + "&nbsp;&nbsp;<span style=\"color: darkGray;\">(" + email + ")</span>";
+		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, email).asString();
 	}
+	
+	/**
+	 * Returns html for a thumbnail image.
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public static String getThumbnailPicHtml(String url) {
+		if(url == null) return null;
+		return DisplayUtilsGWT.TEMPLATES.profilePicture(url).asString();
+	}
+
 	
 	/**
 	 * Converts all hrefs to gwt anchors, and handles the anchors by sending them to a new window.

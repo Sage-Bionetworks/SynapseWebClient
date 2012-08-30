@@ -16,6 +16,8 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -127,6 +129,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		p.setIndividual(true);
 		p.setPrincipalId(ra.getPrincipalId());
 		p.setOwner(ownerPrincipalId.equals(ra.getPrincipalId()));
+		if (profile.getPic() != null) 
+			p.setPicUrl(DisplayUtils.createUserProfileAttachmentUrl(
+				DisplayUtilsGWT.BASE_PROFILE_ATTACHMENT_URL, profile.getOwnerId(), 
+				profile.getPic().getPreviewId(), null));
 		return p;
 	}
 
