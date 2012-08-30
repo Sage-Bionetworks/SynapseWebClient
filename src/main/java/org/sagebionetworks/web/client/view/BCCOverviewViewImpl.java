@@ -13,6 +13,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -50,13 +51,6 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 		this.footerWidget = footerWidget;
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		final Header headerSupportWidget = headerWidget;
-		supportLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				headerSupportWidget.gotoSupport();
-			}
-		});
 	}
 
 
@@ -92,6 +86,19 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 		megaButton.add(applyForChallengeLink);
 		applyForChallenge.clear();
 		applyForChallenge.add(megaButton);
+		
+		headerWidget.getSupportHRef(new AsyncCallback<String>() {
+			
+			@Override
+			public void onSuccess(String result) {
+				supportLink.setHref(result);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				//should never enter this code.  if the fastpass request fails, it should still return the standard support site url
+			}
+		});
 	}
 
 	@Override

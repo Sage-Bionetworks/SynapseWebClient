@@ -45,7 +45,16 @@ public class HeaderTest {
 	@Test
 	public void testSupportLinkClicked() throws RestServiceException{
 		//getFastPassSupportUrl is called when opening the support site
-		header.gotoSupport();
+		header.getSupportHRef(new AsyncCallback<String>() {
+			
+			@Override
+			public void onSuccess(String result) {
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+		});
 		verify(mockUserService).getFastPassSupportUrl(any(AsyncCallback.class));
 	}
 
