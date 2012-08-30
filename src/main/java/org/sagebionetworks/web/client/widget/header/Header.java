@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -71,31 +70,26 @@ public class Header implements HeaderView.Presenter {
 	}
 	
 	@Override
-	public void gotoSupport() {
+	public void getSupportHRef(final AsyncCallback<String> callback) {
 		try {
 			userAccountService.getFastPassSupportUrl(new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
 					if (result != null && result.length()>0)
-						Window.open("http://support.sagebase.org/sagebase?fastpass="+URL.encodeQueryString(result),"_blank","");
+						callback.onSuccess("http://support.sagebase.org/sagebase?fastpass="+URL.encodeQueryString(result));
 					else
-						openWindowToSupportSite();
+						callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
 					//failed, just go
-					openWindowToSupportSite();
+					callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
 				}
 			});
 		} catch (RestServiceException e) {
 			//if it fails, go to the support site without the fastpass url?
-			openWindowToSupportSite();
+			callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
 		}
 	}
-	
-	private static void openWindowToSupportSite(){
-		Window.open("http://"+DisplayUtils.SUPPORT_URL,"_blank","");
-	}
-
 }

@@ -145,18 +145,22 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
 		}
 		if (supportLink == null) {
-			supportLink = new Anchor(DisplayConstants.LINK_COMMUNITY_FORUM);
+			supportLink = new Anchor(DisplayConstants.LINK_COMMUNITY_FORUM, "", "_blank");
 			supportLink.addStyleName("supportLink");
-			supportLink.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.gotoSupport();
-				}
-			});
-
 			commandBar.add(supportLink);
 		}
+		presenter.getSupportHRef(new AsyncCallback<String>() {
 			
+			@Override
+			public void onSuccess(String result) {
+				supportLink.setHref(result);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				//should never enter this code.  if the fastpass request fails, it should still return the standard support site url
+			}
+		});
 		if(userData != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 			userButton.setText(userData.getProfile().getDisplayName());
