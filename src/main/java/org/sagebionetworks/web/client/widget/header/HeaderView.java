@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.header;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface HeaderView extends IsWidget {
@@ -30,7 +31,7 @@ public interface HeaderView extends IsWidget {
 	 */
 	public interface Presenter {
 		UserSessionData getUser();
-		void gotoSupport();
+		void getSupportHRef(AsyncCallback<String> callback);
 		void lookupId(String synapseId);
 	}
 
