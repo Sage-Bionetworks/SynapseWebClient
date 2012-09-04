@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Settings;
@@ -20,31 +19,19 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.MenuEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.http.client.URL;
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -79,9 +66,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private Anchor registerButton;
 	private Anchor supportLink;
 	private HorizontalPanel userCommands;
-	private HorizontalPanel userNameContainer;
+	private FlowPanel userNameContainer;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private Html profilePictureHtml;
+	private HorizontalPanel userNameWrapper;
 	
 	@Inject
 	public HeaderViewImpl(Binder binder, AuthenticationControllerImpl authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState, SearchBox searchBox, SynapseJSNIUtils synapseJSNIUtils) {
@@ -171,14 +158,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		 	userCommands.add(logout);
 		}
 		
-		if(profilePictureHtml == null){
-			profilePictureHtml = new Html();
-		}
 		if (userNameContainer == null){
-			userNameContainer = new HorizontalPanel();
-			userNameContainer.addStyleName("header-inner-commands-container");
-			userNameContainer.add(profilePictureHtml);
-			userNameContainer.add(userAnchor);
+			userNameContainer = new FlowPanel();
+			userNameContainer.addStyleName("header-username-picture-container");	//border radius applies to div (FlowPanel), not table (HorizontalPanel)
+			userNameWrapper = new HorizontalPanel();
+			userNameContainer.add(userNameWrapper);
 		}
 			
 		if(loginButton == null) {
@@ -214,7 +198,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 			commandBar.add(supportLink);
 		}
-			
+		userNameWrapper.clear();
 		if(userData != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 			UserProfile profile = userData.getProfile();
@@ -222,13 +206,20 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			commandBar.remove(loginButton);
 			commandBar.remove(registerButton);
 			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
-				profilePictureHtml.setHtml(SafeHtmlUtils.fromSafeConstant("<div class=\"profile-image-loading\" >"
-			    		+ "<img width=\"27\" height=\"27\" style=\"margin:auto; display:block;\" src=\"" 
-			    		+ DisplayUtils.createUserProfileAttachmentUrl(baseProfileAttachmentUrl, profile.getOwnerId(), profile.getPic().getPreviewId(), null) + "\"/>"
-			    		+ "</div>").asString());
+				Image profilePicture = new Image();
+				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(baseProfileAttachmentUrl, profile.getOwnerId(), profile.getPic().getPreviewId(), null));
+				profilePicture.setWidth("20px");
+				profilePicture.setHeight("20px");
+				profilePicture.addStyleName("margin:auto; display:block;");
+				profilePicture.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						userAnchor.fireEvent(event);
+					}
+				});
+				userNameWrapper.add(profilePicture);
 			}
-			else
-				profilePictureHtml.setHtml("");
+			userNameWrapper.add(userAnchor);
 			if (commandBar.getWidgetIndex(userNameContainer) == -1){
 				commandBar.add(userNameContainer);
 				commandBar.add(userCommands);

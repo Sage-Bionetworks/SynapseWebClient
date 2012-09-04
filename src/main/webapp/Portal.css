@@ -24,8 +24,18 @@
 
 
 .header-inner-commands-container td {
-	padding: 4px 0px 4px 2px;
+	padding: 4px 2px 4px 2px;
 }
+
+.header-username-picture-container {
+	border: solid #ccc;
+	border-width:0.1em;
+	border-radius:0.4em;
+}
+.header-username-picture-container td {
+	padding: 2px 4px 2px 3px;
+}
+
 
 .sendButton {
 	display: block;
