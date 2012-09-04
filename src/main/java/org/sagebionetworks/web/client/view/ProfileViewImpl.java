@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
@@ -29,7 +30,6 @@ import com.extjs.gxt.ui.client.widget.layout.ColumnData;
 import com.extjs.gxt.ui.client.widget.layout.ColumnLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -102,7 +102,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	private HandlerRegistration editPhotoHandler = null;
 
-	private String baseProfileAttachmentUrl = GWT.getModuleBaseURL()+"profileAttachment";
+	private String baseProfileAttachmentUrl = DisplayUtilsGWT.BASE_PROFILE_ATTACHMENT_URL;
 
 	private Footer footerWidget;
 	
