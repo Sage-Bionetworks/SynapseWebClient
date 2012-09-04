@@ -91,6 +91,19 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 	
+	public void loadBccOverviewDescription() {
+		rssService.getPageContent(DisplayUtils.BCC_SUMMARY_CONTENT_PAGE_URL, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.showBccOverview(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				//don't show the bcc overview
+			}
+		});
+	}
+	
 	public String getHtml(String rssFeedJson) throws RestServiceException {
 		RSSFeed feed = nodeModelCreator.createEntity(rssFeedJson, RSSFeed.class);
 		StringBuilder htmlResponse = new StringBuilder();
@@ -126,4 +139,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public void showBCCSignup(AsyncCallback<String> callback) {
 		stackConfigService.getBCCSignupEnabled(callback);
 	}
+	
+	
 }

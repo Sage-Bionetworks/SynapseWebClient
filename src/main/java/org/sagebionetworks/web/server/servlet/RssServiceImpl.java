@@ -1,12 +1,17 @@
 package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
@@ -104,5 +109,29 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		}
 	}
 	
-	
+	@Override
+	public String getPageContent(String urlString){
+		StringBuilder sb = new StringBuilder();
+		try {
+			URL url = new URL(urlString);
+			URLConnection con = url.openConnection();
+			Pattern p = Pattern.compile("text/html;\\s+charset=([^\\s]+)\\s*");
+			Matcher m = p.matcher(con.getContentType());
+			String charset = m.matches() ? m.group(1) : "UTF-8";
+			Reader r = new InputStreamReader(con.getInputStream(), charset);
+			while (true) {
+				int c = r.read();
+				if (c < 0)
+					break;
+				sb.append((char) c);
+			}
+		} catch (MalformedURLException e) {
+			throw new IllegalArgumentException(
+					"Could not connect to the source: " + urlString, e);
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Could not read the source: "
+					+ urlString, e);
+		}
+		return sb.toString();
+	}	
 }

@@ -80,7 +80,9 @@ import com.google.gwt.user.client.ui.Widget;
 public class DisplayUtils {
 
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
-	public static final String BCC_FEED_URL = "https://sagebionetworks.jira.com/wiki/createrssfeed.action?types=page&types=blogpost&spaces=BCC&title=BCC+RSS+Test+Feed&labelString%3D&excludedSpaceKeys%3D&sort=created&maxResults=10&timeSpan=99&showContent=true&confirm=Create+RSS+Feed&os_username=synapse-service&os_password=abc123";
+	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
+	public static final String BCC_CONTENT_PAGE_URL = "https://sagebionetworks.jira.com/wiki/plugins/viewsource/viewpagesrc.action?pageId=24084517";
+	public static final String BCC_SUMMARY_CONTENT_PAGE_URL = "https://sagebionetworks.jira.com/wiki/plugins/viewstorage/viewpagestorage.action?pageId=24084489";
 
 	public static final String SUPPORT_URL = "support.sagebase.org";
 	

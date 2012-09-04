@@ -10,4 +10,5 @@ public interface RssService extends RemoteService {
 
 	public String getAllFeedData(String url) throws RestServiceException;
 	public String getFeedData(String url, Integer limit, boolean summariesOnly) throws RestServiceException;
+	public String getPageContent(String urlString);
 }

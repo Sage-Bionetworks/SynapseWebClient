@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.Iterator;
-
-import org.sagebionetworks.repo.model.RSSEntry;
-import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.BCCSignupAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.place.BCCOverview;
@@ -15,7 +12,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.BCCCallback;
 import org.sagebionetworks.web.client.view.BCCOverviewView;
 import org.sagebionetworks.web.shared.BCCSignupProfile;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -61,33 +57,48 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		this.view.showOverView();
 		
 
-//		rssService.getFeedData(DisplayConstants.BCC_FEED_URL, 1, false, new AsyncCallback<String>() {
-//			@Override
-//			public void onSuccess(String result) {
-//				try {
-//					view.showChallengeInfo(getHtml(result));
-//				} catch (RestServiceException e) {
-//					onFailure(e);
-//				}
-//			}
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
-//			}
-//		});
+		rssService.getPageContent(DisplayUtils.BCC_CONTENT_PAGE_URL, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.showChallengeInfo(fixHtml(result));
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+			}
+		});
 	}
 	
 
-	public String getHtml(String rssFeedJson) throws RestServiceException {
-		RSSFeed feed = nodeModelCreator.createEntity(rssFeedJson, RSSFeed.class);
-		StringBuilder htmlResponse = new StringBuilder();
-		for (Iterator iterator = feed.getEntries().iterator(); iterator.hasNext();) {
-			RSSEntry entry = (RSSEntry) iterator.next();
-			htmlResponse.append("<h1><a href=\"" + entry.getLink() + "\">" + entry.getTitle() + "</a></h1>\n");
-			htmlResponse.append("<p class=\"clear small-italic notopmargin nobottommargin\">" + entry.getDate() + "</p>\n");
-			htmlResponse.append(entry.getContent());
+	public String fixHtml(String html) {
+		//cut out everything between the confluence wiki start and end body page delimiters (could look for body and /body, but we don't want this extra space anyway).
+		String startEndPageDelimiter = "<p>&nbsp;</p>";
+		int firstPIndex = html.indexOf(startEndPageDelimiter) + startEndPageDelimiter.length();
+		int lastPIndex = html.lastIndexOf(startEndPageDelimiter);
+		//adjust all wiki links so that they include the wiki domain
+		html = html.substring(firstPIndex, lastPIndex).replaceAll("=\"/wiki", "=\""+DisplayUtils.WIKI_URL);
+		return fixEmbeddedYouTube(html);
+	}
+	
+	/**
+	 * if you have plain text in the form www.youtube.com/embed/<videoid> (for example, www.youtube.com/embed/xSfd5mkkmGM), this method will convert the first occurrence of that text to an 
+	 * embedded iframe.
+	 * @return
+	 */
+	public static String fixEmbeddedYouTube(String html){
+		int startYouTubeLinkIndex = html.indexOf("www.youtube.com/embed");
+		while (startYouTubeLinkIndex > -1){
+			int endYoutubeLinkIndex = html.indexOf("<", startYouTubeLinkIndex);
+			StringBuilder sb = new StringBuilder();
+			sb.append(html.substring(0, startYouTubeLinkIndex));
+			sb.append("<iframe width=\"300\" height=\"169\" src=\"https://" + html.substring(startYouTubeLinkIndex, endYoutubeLinkIndex) + "\" frameborder=\"0\" allowfullscreen=\"true\"></iframe>");
+			int t = sb.length();
+			sb.append(html.substring(endYoutubeLinkIndex));
+			html = sb.toString();
+			//search after t (for the next embed)
+			startYouTubeLinkIndex = html.indexOf("www.youtube.com/embed", t); 
 		}
-		return htmlResponse.toString();
+		return html;
 	}
 
 	@Override
