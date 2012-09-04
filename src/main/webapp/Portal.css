@@ -368,6 +368,7 @@ a.shortBtn {
 }
 
 .user-profile-change-photo {
+}
 	
 .margin-right-5 {
 	margin-right: 5px;
@@ -386,6 +387,20 @@ a.shortBtn {
 	min-height: 50px;
 	height: auto !important;
 	height:	50px;
+}
+	
+.profile-image-40px {
+	width: 40px;	
+}
+
+.thumbnail-image-container {
+	display: inline-block;	
+	width: 40px; 
+	height: 40px; 
+	overflow: hidden;
+	position: relative;
+	vertical-align: middle;
+}
 
 .margin-top-left-10 {
 	margin-top: 10px;

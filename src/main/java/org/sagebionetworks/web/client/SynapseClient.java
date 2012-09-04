@@ -122,8 +122,17 @@ public interface SynapseClient extends RemoteService {
 	
 	public EntityWrapper createAcl(EntityWrapper acl) throws RestServiceException;
 	
+	/**
+	 * Update an ACL. Default to non-recursive application.
+	 */
 	public EntityWrapper updateAcl(EntityWrapper acl) throws RestServiceException;
 	
+	/**
+	 * Update an entity's ACL. If 'recursive' is set to true, then any child 
+	 * ACLs will be deleted, such that all child entities inherit this ACL. 
+	 */
+	public EntityWrapper updateAcl(EntityWrapper aclEW, boolean recursive) throws RestServiceException;
+
 	public EntityWrapper deleteAcl(String ownerEntityId) throws RestServiceException;
 
 	public boolean hasAccess(String ownerEntityId, String accessType) throws RestServiceException;
