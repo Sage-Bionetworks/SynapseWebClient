@@ -185,9 +185,6 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/user-business-16.png")
 	ImageResource userBusiness16();
 	
-	@Source("images/icons/user-business-40.png")
-	ImageResource userBusiness40();
-	
 	@Source("images/icons/user-business-grey-40.png")
 	ImageResource userBusinessGrey40();
 
@@ -199,9 +196,6 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/users-16.png")
 	ImageResource users16();
-	
-	@Source("images/icons/users-40.png")
-	ImageResource users40();
 	
 	@Source("images/icons/users-grey-40.png")
 	ImageResource usersGrey40();
