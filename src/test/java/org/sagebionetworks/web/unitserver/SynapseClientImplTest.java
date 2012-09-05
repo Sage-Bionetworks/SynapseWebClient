@@ -4,11 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.CHILD_COUNT;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
@@ -149,6 +146,8 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getACL(anyString())).thenReturn(acl);
 		when(mockSynapse.createACL((AccessControlList)any())).thenReturn(acl);
 		when(mockSynapse.updateACL((AccessControlList)any())).thenReturn(acl);
+		when(mockSynapse.updateACL((AccessControlList)any(), eq(true))).thenReturn(acl);
+		when(mockSynapse.updateACL((AccessControlList)any(), eq(false))).thenReturn(acl);
 
 		EntityHeader bene = new EntityHeader();
 		bene.setId("syn999");
@@ -216,7 +215,7 @@ public class SynapseClientImplTest {
 		example.setDescription("some description");
 		example.setEntityType(ExampleEntity.class.getName());
 		String json = EntityFactory.createJSONStringForEntity(example);
-		System.out.println(json);
+		// System.out.println(json);
 		// Now make sure this can be read back
 		ExampleEntity clone = (ExampleEntity) synapseClient.parseEntityFromJson(json);
 		assertEquals(example, clone);
@@ -314,6 +313,16 @@ public class SynapseClientImplTest {
 		EntityWrapper ew = synapseClient.updateAcl(in);
 		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
 		assertEquals(acl, clone);
+	}
+	
+	@Test
+	public void testUpdateAclRecursive() throws Exception {
+		EntityWrapper in = new EntityWrapper();
+		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
+		EntityWrapper ew = synapseClient.updateAcl(in, true);
+		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		assertEquals(acl, clone);
+		verify(mockSynapse).updateACL(any(AccessControlList.class), eq(true));
 	}
 
 	@Test

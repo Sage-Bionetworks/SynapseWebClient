@@ -40,7 +40,8 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 	public interface Presenter {
 		
 		/**
-		 * Create an ACL for the current entity (which otherwise inherits its ACL from an ancestor)
+		 * Create an ACL for the current entity (which otherwise inherits its 
+		 * ACL from an ancestor)
 		 */
 		void createAcl();
 		
@@ -52,7 +53,8 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 		void addAccess(Long principalId, PermissionLevel permissionLevel);
 		
 		/**
-		 * Change the access level of the given principal (already in the ACL) to the given permission level
+		 * Change the access level of the given principal (already in the ACL) 
+		 * to the given permission level
 		 * @param principalId
 		 * @param permissionLevel
 		 */
@@ -66,8 +68,15 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 		void removeAccess(Long principalId);
 		
 		/**
-		 * Delete the ACL for the current entity, making the entity inherit its access permissions from its ancestor's ACL
+		 * Delete the ACL for the current entity, making the entity inherit its 
+		 * access permissions from its ancestor's ACL
 		 */
 		void deleteAcl();
+
+		/**
+		 * Apply the ACL for the current entity to all of its descendant 
+		 * entities. Any local ACLs for descendant entities will be deleted.
+		 */
+		void applyAclToChildren();
 	}
 }
