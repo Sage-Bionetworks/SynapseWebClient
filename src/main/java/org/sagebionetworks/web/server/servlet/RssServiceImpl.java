@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RssService;
+import org.sagebionetworks.web.server.HttpUtils;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -120,32 +122,14 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 	@Override
 	public String getWikiPageContent(String pageId){
 		String urlString = DisplayUtils.WIKI_CONTENT_URL + pageId;
-		String xml = getRawData(urlString);
-		return parseContent(xml);
-	}
-	
-	public static String getRawData(String urlString){
-		StringBuilder sb = new StringBuilder();
+		String xml = "";
 		try {
-			URL url = new URL(urlString);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			if (conn.getResponseCode() != 200) {
-				throw new IOException(conn.getResponseMessage());
-			}
-			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			String line;
-			while ((line = rd.readLine()) != null) {
-				sb.append(line);
-			}
-			rd.close();
-			conn.disconnect();
-		} catch (MalformedURLException e) {
-			throw new IllegalArgumentException("Could not connect to the source: " + urlString, e);
+			xml = HttpUtils.httpGet(urlString, new HashMap<String, String>());
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not read from the source: " + urlString, e);
 		}
-		return sb.toString();
-
+		
+		return parseContent(xml);
 	}
 	
 	public static String parseContent(String xml){

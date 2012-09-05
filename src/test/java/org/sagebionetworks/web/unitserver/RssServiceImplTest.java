@@ -85,11 +85,6 @@ public class RssServiceImplTest {
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void testInvalidWikiUrl() throws RestServiceException{
-		service.getRawData("invalid url");
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
 	public void testInvalidWikiXml() throws RestServiceException{
 		service.parseContent("invalid xml");
 	}

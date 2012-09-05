@@ -60,7 +60,7 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		rssService.getWikiPageContent(DisplayUtils.BCC_CONTENT_PAGE_ID, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				view.showChallengeInfo(fixHtml(result));
+				view.showChallengeInfo(DisplayUtils.fixWikiLinks(DisplayUtils.fixEmbeddedYouTube(result)));
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -69,34 +69,6 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		});
 	}
 	
-
-	public String fixHtml(String html) {
-		//adjust all wiki links so that they include the wiki domain
-		html = html.replaceAll("=\"/wiki", "=\""+DisplayUtils.WIKI_URL);
-		return fixEmbeddedYouTube(html);
-	}
-	
-	/**
-	 * if you have plain text in the form www.youtube.com/embed/<videoid> (for example, www.youtube.com/embed/xSfd5mkkmGM), this method will convert the first occurrence of that text to an 
-	 * embedded iframe.
-	 * @return
-	 */
-	public static String fixEmbeddedYouTube(String html){
-		int startYouTubeLinkIndex = html.indexOf("www.youtube.com/embed");
-		while (startYouTubeLinkIndex > -1){
-			int endYoutubeLinkIndex = html.indexOf("<", startYouTubeLinkIndex);
-			StringBuilder sb = new StringBuilder();
-			sb.append(html.substring(0, startYouTubeLinkIndex));
-			sb.append("<iframe width=\"300\" height=\"169\" src=\"https://" + html.substring(startYouTubeLinkIndex, endYoutubeLinkIndex) + "\" frameborder=\"0\" allowfullscreen=\"true\"></iframe>");
-			int t = sb.length();
-			sb.append(html.substring(endYoutubeLinkIndex));
-			html = sb.toString();
-			//search after t (for the next embed)
-			startYouTubeLinkIndex = html.indexOf("www.youtube.com/embed", t); 
-		}
-		return html;
-	}
-
 	@Override
     public String mayStop() {
         view.clear();

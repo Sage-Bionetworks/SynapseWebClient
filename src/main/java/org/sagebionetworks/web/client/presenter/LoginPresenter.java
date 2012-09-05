@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -21,7 +22,6 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -38,15 +38,17 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
 	private CookieProvider cookies;
+	private GWTWrapper gwtWrapper;
 	
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies){
+	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper){
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator = nodeModelCreator;
 		this.cookies = cookies;
+		this.gwtWrapper = gwtWrapper;
 		view.setPresenter(this);
 	} 
 
@@ -98,7 +100,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		}
 	}
 
-	private void showView(final LoginPlace place) {
+	public void showView(final LoginPlace place) {
 		String token = place.toToken();
 		if (LoginPlace.FASTPASS_TOKEN.equals(token)) {
 			//fastpass!
@@ -239,7 +241,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				public void onSuccess(String result) {
 					if (result != null && result.length()>0)
 						//send user to "http://support.sagebase.org/fastpass/finish_signover?company=sagebase&fastpass="+URL.encodeQueryString(result)
-						Window.Location.replace("http://support.sagebase.org/fastpass/finish_signover?company=sagebase&fastpass="+URL.encodeQueryString(result));
+						gwtWrapper.replaceThisWindowWith(DisplayUtils.FASTPASS_SIGNOVER_URL + gwtWrapper.encodeQueryString(result));
 					else
 						//can't go on, just fail
 						view.showErrorMessage(DisplayConstants.ERROR_NO_FASTPASS);
