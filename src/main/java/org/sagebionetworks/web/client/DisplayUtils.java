@@ -81,8 +81,14 @@ import com.google.gwt.user.client.ui.Widget;
 public class DisplayUtils {
 
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
-	public static final String BCC_FEED_URL = "https://sagebionetworks.jira.com/wiki/createrssfeed.action?types=page&types=blogpost&spaces=BCC&title=BCC+RSS+Test+Feed&labelString%3D&excludedSpaceKeys%3D&sort=created&maxResults=10&timeSpan=99&showContent=true&confirm=Create+RSS+Feed&os_username=synapse-service&os_password=abc123";
+	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
+	public static final String BCC_CONTENT_PAGE_ID = "24084517";
+	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 
+	public static final String FASTPASS_LOGIN_COOKIE_VALUE = "fastpass-logging-in";
+	public static final String FASTPASS_SIGNOVER_URL = "http://support.sagebase.org/fastpass/finish_signover?company=sagebase&fastpass=";
+	public static final String WIKI_CONTENT_URL = "https://sagebionetworks.jira.com/wiki/rest/prototype/1/content/";
+	
 	public static final String SUPPORT_URL = "support.sagebase.org";
 	
 	private static final String ALERT_CONTAINER_ID = "alertContainer";
@@ -979,6 +985,37 @@ public class DisplayUtils {
 			version = versionable.getVersionNumber().toString(); 			
 		}
 		return version;
+	}
+	
+	/**
+	 * links in the wiki pages that reference other wiki pages don't include the domain.  this method adds the domain.
+	 * @param html
+	 * @return
+	 */
+	public static String fixWikiLinks(String html) {
+		//adjust all wiki links so that they include the wiki domain
+		return html.replaceAll("=\"/wiki", "=\""+DisplayUtils.WIKI_URL);
+	}
+	
+	/**
+	 * if you have plain text in the form www.youtube.com/embed/<videoid> (for example, www.youtube.com/embed/xSfd5mkkmGM), this method will convert the first occurrence of that text to an 
+	 * embedded iframe.
+	 * @return
+	 */
+	public static String fixEmbeddedYouTube(String html){
+		int startYouTubeLinkIndex = html.indexOf("www.youtube.com/embed");
+		while (startYouTubeLinkIndex > -1){
+			int endYoutubeLinkIndex = html.indexOf("<", startYouTubeLinkIndex);
+			StringBuilder sb = new StringBuilder();
+			sb.append(html.substring(0, startYouTubeLinkIndex));
+			sb.append("<iframe width=\"300\" height=\"169\" src=\"https://" + html.substring(startYouTubeLinkIndex, endYoutubeLinkIndex) + "\" frameborder=\"0\" allowfullscreen=\"true\"></iframe>");
+			int t = sb.length();
+			sb.append(html.substring(endYoutubeLinkIndex));
+			html = sb.toString();
+			//search after t (for the next embed)
+			startYouTubeLinkIndex = html.indexOf("www.youtube.com/embed", t); 
+		}
+		return html;
 	}
 
 }

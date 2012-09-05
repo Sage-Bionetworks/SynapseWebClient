@@ -13,9 +13,9 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -31,9 +31,7 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 	@UiField
 	SimplePanel applyForChallenge;
 	@UiField
-	Anchor supportLink;
-//	@UiField
-//	SimplePanel challengeFeedPanel;
+	SimplePanel bccContent;
 	
 	private Presenter presenter;
 	private IconsImageBundle icons;
@@ -86,19 +84,6 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 		megaButton.add(applyForChallengeLink);
 		applyForChallenge.clear();
 		applyForChallenge.add(megaButton);
-		
-		headerWidget.getSupportHRef(new AsyncCallback<String>() {
-			
-			@Override
-			public void onSuccess(String result) {
-				supportLink.setHref(result);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				//should never enter this code.  if the fastpass request fails, it should still return the standard support site url
-			}
-		});
 	}
 
 	@Override
@@ -121,10 +106,10 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 
 	@Override
 	public void showChallengeInfo(String html){
-//		HTMLPanel panel = new HTMLPanel(html);
-//		DisplayUtils.sendAllLinksToNewWindow(panel);
-//		challengeFeedPanel.clear();
-//		challengeFeedPanel.add(panel);
+		HTMLPanel panel = new HTMLPanel(html);
+		DisplayUtils.sendAllLinksToNewWindow(panel);
+		bccContent.clear();
+		bccContent.add(panel);
 	}
 
 	@Override

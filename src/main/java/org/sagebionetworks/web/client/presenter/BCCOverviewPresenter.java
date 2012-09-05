@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.Iterator;
-
-import org.sagebionetworks.repo.model.RSSEntry;
-import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.BCCSignupAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.place.BCCOverview;
@@ -15,7 +12,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.BCCCallback;
 import org.sagebionetworks.web.client.view.BCCOverviewView;
 import org.sagebionetworks.web.shared.BCCSignupProfile;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -61,35 +57,18 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		this.view.showOverView();
 		
 
-//		rssService.getFeedData(DisplayConstants.BCC_FEED_URL, 1, false, new AsyncCallback<String>() {
-//			@Override
-//			public void onSuccess(String result) {
-//				try {
-//					view.showChallengeInfo(getHtml(result));
-//				} catch (RestServiceException e) {
-//					onFailure(e);
-//				}
-//			}
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
-//			}
-//		});
+		rssService.getWikiPageContent(DisplayUtils.BCC_CONTENT_PAGE_ID, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.showChallengeInfo(DisplayUtils.fixWikiLinks(DisplayUtils.fixEmbeddedYouTube(result)));
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+			}
+		});
 	}
 	
-
-	public String getHtml(String rssFeedJson) throws RestServiceException {
-		RSSFeed feed = nodeModelCreator.createEntity(rssFeedJson, RSSFeed.class);
-		StringBuilder htmlResponse = new StringBuilder();
-		for (Iterator iterator = feed.getEntries().iterator(); iterator.hasNext();) {
-			RSSEntry entry = (RSSEntry) iterator.next();
-			htmlResponse.append("<h1><a href=\"" + entry.getLink() + "\">" + entry.getTitle() + "</a></h1>\n");
-			htmlResponse.append("<p class=\"clear small-italic notopmargin nobottommargin\">" + entry.getDate() + "</p>\n");
-			htmlResponse.append(entry.getContent());
-		}
-		return htmlResponse.toString();
-	}
-
 	@Override
     public String mayStop() {
         view.clear();
