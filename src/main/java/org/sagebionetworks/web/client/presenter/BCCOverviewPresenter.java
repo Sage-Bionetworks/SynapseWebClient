@@ -57,7 +57,7 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		this.view.showOverView();
 		
 
-		rssService.getPageContent(DisplayUtils.BCC_CONTENT_PAGE_URL, new AsyncCallback<String>() {
+		rssService.getWikiPageContent(DisplayUtils.BCC_CONTENT_PAGE_ID, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				view.showChallengeInfo(fixHtml(result));
@@ -71,12 +71,8 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 	
 
 	public String fixHtml(String html) {
-		//cut out everything between the confluence wiki start and end body page delimiters (could look for body and /body, but we don't want this extra space anyway).
-		String startEndPageDelimiter = "<p>&nbsp;</p>";
-		int firstPIndex = html.indexOf(startEndPageDelimiter) + startEndPageDelimiter.length();
-		int lastPIndex = html.lastIndexOf(startEndPageDelimiter);
 		//adjust all wiki links so that they include the wiki domain
-		html = html.substring(firstPIndex, lastPIndex).replaceAll("=\"/wiki", "=\""+DisplayUtils.WIKI_URL);
+		html = html.replaceAll("=\"/wiki", "=\""+DisplayUtils.WIKI_URL);
 		return fixEmbeddedYouTube(html);
 	}
 	

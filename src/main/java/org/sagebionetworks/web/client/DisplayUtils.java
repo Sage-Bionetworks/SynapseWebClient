@@ -81,9 +81,11 @@ public class DisplayUtils {
 
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
-	public static final String BCC_CONTENT_PAGE_URL = "https://sagebionetworks.jira.com/wiki/plugins/viewsource/viewpagesrc.action?pageId=24084517";
-	public static final String BCC_SUMMARY_CONTENT_PAGE_URL = "https://sagebionetworks.jira.com/wiki/plugins/viewstorage/viewpagestorage.action?pageId=24084489";
+	public static final String BCC_CONTENT_PAGE_ID = "24084517";
+	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 
+	public static final String WIKI_CONTENT_URL = "https://sagebionetworks.jira.com/wiki/rest/prototype/1/content/";
+	
 	public static final String SUPPORT_URL = "support.sagebase.org";
 	
 	private static final String ALERT_CONTAINER_ID = "alertContainer";
