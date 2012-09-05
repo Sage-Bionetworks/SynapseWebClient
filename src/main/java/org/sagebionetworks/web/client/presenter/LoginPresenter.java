@@ -101,9 +101,33 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private void showView(final LoginPlace place) {
 		String token = place.toToken();
 		if (LoginPlace.FASTPASS_TOKEN.equals(token)) {
-			//fastpass! do normal login, but after all is done, redirect back to the support site
-			cookies.setCookie(DisplayUtils.FASTPASS_LOGIN_COOKIE_VALUE, Boolean.TRUE.toString());
-			token = DisplayUtils.DEFAULT_PLACE_TOKEN;
+			//fastpass!
+			
+			//is the user already logged in?  
+			UserSessionData currentUser = authenticationController.getLoggedInUser();
+			if(currentUser != null){
+				//the user might be logged in.  verify the session token
+				authenticationController.loginUser(currentUser.getSessionToken(), new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String result) {
+						//success, go to support the support site
+						gotoSupport();
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						//not really logged in. 
+						authenticationController.logoutUser();
+						showView(place);
+					}
+				});
+				return;
+			}
+			else { 
+				//not logged in. do normal login, but after all is done, redirect back to the support site
+				cookies.setCookie(DisplayUtils.FASTPASS_LOGIN_COOKIE_VALUE, Boolean.TRUE.toString());
+				token = DisplayUtils.DEFAULT_PLACE_TOKEN;
+			}
+			
 		}
 		
 		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {
