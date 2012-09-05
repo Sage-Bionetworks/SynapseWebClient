@@ -2,20 +2,18 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class LoginPresenterTest {
 	
@@ -25,6 +23,7 @@ public class LoginPresenterTest {
 	UserAccountServiceAsync mockUserAccountServiceAsync;
 	GlobalApplicationState mockGlobalApplicationState;
 	NodeModelCreator mockNodeModelCreator;
+	CookieProvider mockCookieProvier;
 	
 	@Before
 	public void setup(){
@@ -33,7 +32,8 @@ public class LoginPresenterTest {
 		mockUserAccountServiceAsync = mock(UserAccountServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockUserAccountServiceAsync, mockGlobalApplicationState, mockNodeModelCreator);
+		mockCookieProvier = mock(CookieProvider.class);
+		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockUserAccountServiceAsync, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier);
 		
 		verify(mockView).setPresenter(loginPresenter);
 	}	

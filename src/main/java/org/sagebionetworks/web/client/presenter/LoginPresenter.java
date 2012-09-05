@@ -2,21 +2,26 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -32,14 +37,16 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
+	private CookieProvider cookies;
 	
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator){
+	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies){
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator = nodeModelCreator;
+		this.cookies = cookies;
 		view.setPresenter(this);
 	} 
 
@@ -93,6 +100,12 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 
 	private void showView(final LoginPlace place) {
 		String token = place.toToken();
+		if (LoginPlace.FASTPASS_TOKEN.equals(token)) {
+			//fastpass! do normal login, but after all is done, redirect back to the support site
+			cookies.setCookie(DisplayUtils.FASTPASS_LOGIN_COOKIE_VALUE, Boolean.TRUE.toString());
+			token = DisplayUtils.DEFAULT_PLACE_TOKEN;
+		}
+		
 		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {
 			UserSessionData currentUser = authenticationController.getLoggedInUser(); 
 			boolean isSso = false;
@@ -177,10 +190,17 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	 * Private Methods
 	 */
 	private void forwardToPlaceAfterLogin(Place forwardPlace) {
-		if(forwardPlace == null) {
-			forwardPlace = new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
+		String isFastPassLogin = cookies.getCookie(DisplayUtils.FASTPASS_LOGIN_COOKIE_VALUE);
+		if (isFastPassLogin != null && Boolean.valueOf(isFastPassLogin)){
+			cookies.removeCookie(DisplayUtils.FASTPASS_LOGIN_COOKIE_VALUE);
+			gotoSupport();
 		}
-		bus.fireEvent(new PlaceChangeEvent(forwardPlace));
+		else {
+			if(forwardPlace == null) {
+				forwardPlace = new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
+			}
+			bus.fireEvent(new PlaceChangeEvent(forwardPlace));	
+		}
 	}
 
 	@Override
@@ -188,4 +208,27 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
+	public void gotoSupport() {
+		try {
+			userService.getFastPassSupportUrl(new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					if (result != null && result.length()>0)
+						//send user to "http://support.sagebase.org/fastpass/finish_signover?company=sagebase&fastpass="+URL.encodeQueryString(result)
+						Window.Location.replace("http://support.sagebase.org/fastpass/finish_signover?company=sagebase&fastpass="+URL.encodeQueryString(result));
+					else
+						//can't go on, just fail
+						view.showErrorMessage(DisplayConstants.ERROR_NO_FASTPASS);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(DisplayConstants.ERROR_NO_FASTPASS + caught.getMessage());
+				}
+			});
+		} catch (RestServiceException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_NO_FASTPASS + e.getMessage());
+
+		}
+	}
 }

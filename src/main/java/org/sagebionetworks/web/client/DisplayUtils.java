@@ -85,6 +85,7 @@ public class DisplayUtils {
 	public static final String BCC_CONTENT_PAGE_ID = "24084517";
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 
+	public static final String FASTPASS_LOGIN_COOKIE_VALUE = "fastpass-logging-in";
 	public static final String WIKI_CONTENT_URL = "https://sagebionetworks.jira.com/wiki/rest/prototype/1/content/";
 	
 	public static final String SUPPORT_URL = "support.sagebase.org";
