@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
-import com.extjs.gxt.ui.client.data.BaseModelData;
-import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -20,7 +20,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void setEntityBundle(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly);
+	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly);
 	
 	/**
 	 * Sets the RStudio URL for the view
@@ -41,17 +41,43 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 
 		boolean isLoggedIn();
 
-//		String getRstudioUrl();
-//
-//		void saveRStudioUrlBase(String value);
-//
-//		String getRstudioUrlBase();
-
 		void loadShortcuts(int offset, int limit, AsyncCallback<PaginatedResults<EntityHeader>> asyncCallback);
 
 		String createEntityLink(String id, String version, String display);
 		
 		ImageResource getIconForType(String typeString);
+		
+		boolean isAnonymous();
+		
+		/**
+		 * 
+		 * @return
+		 * @exception if anonymous
+		 */
+		String getJiraFlagUrl();
+		
+		/**
+		 * 
+		 * @return
+		 * @exception if anonymous
+		 */
+		String getJiraRestrictionUrl();
+		
+		boolean hasAdministrativeAccess();
+		
+		boolean includeRestrictionWidget();
+		
+		boolean isRestrictedData();		
+				
+		Callback accessRequirementCallback();
+		
+		Callback getDataLockDownCallback();
+		
+		boolean hasFulfilledAccessRequirements();
+		
+		String accessRequirementText();
+		
+		boolean isTermsOfUseAccessRequirement();
 
 	}
 

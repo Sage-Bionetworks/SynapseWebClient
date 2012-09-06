@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED;
 import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.NONE;
@@ -83,10 +84,6 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		view.setPresenter(this);
 		this.entityId = entity.getId();
 		refresh(null);
-	}
-	
-	interface Callback {
-		void invoke();
 	}
 	
 	public void unmetAccessRequirementsCallback(AccessRequirementsTransport result, Callback callback) {

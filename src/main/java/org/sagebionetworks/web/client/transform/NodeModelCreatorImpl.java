@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.transform;
 
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -160,6 +162,8 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 			UserEntityPermissions permissions = null;
 			EntityPath path = null;
 			PaginatedResults<EntityHeader> referencedBy = null;
+			VariableContentPaginatedResults<AccessRequirement> accessRequirements = null;
+			VariableContentPaginatedResults<AccessRequirement> unmetAccessRequirements = null;
 			// entity?
 			if(transport.getEntityJson() != null){
 				entity = factory.createEntity(transport.getEntityJson());
@@ -181,8 +185,20 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 				referencedBy =  new PaginatedResults<EntityHeader>(EntityHeader.class, factory);
 				referencedBy.initializeFromJSONObject(jsonObjectAdapter.createNew(transport.getEntityReferencedByJson()));
 			}			
+			// accessRequirements?
+			if(transport.getAccessRequirementsJson() != null){
+				accessRequirements =  new VariableContentPaginatedResults<AccessRequirement>();
+				accessRequirements.initializeFromJSONObject(jsonObjectAdapter.createNew(transport.getAccessRequirementsJson()));
+			}			
+			// accessRequirements?
+			if(transport.getUnmetAccessRequirementsJson() != null){
+				unmetAccessRequirements =  new VariableContentPaginatedResults<AccessRequirement>();
+				unmetAccessRequirements.initializeFromJSONObject(jsonObjectAdapter.createNew(transport.getUnmetAccessRequirementsJson()));
+			}			
 			// put it all together.
-			EntityBundle eb =  new EntityBundle(entity, annotations, permissions, path, referencedBy);
+			EntityBundle eb =  new EntityBundle(entity, annotations, 
+					permissions, path, referencedBy,
+					accessRequirements, unmetAccessRequirements);
 			// Set the child count when there.
 			eb.setChildCount(transport.getChildCount());
 			return eb;

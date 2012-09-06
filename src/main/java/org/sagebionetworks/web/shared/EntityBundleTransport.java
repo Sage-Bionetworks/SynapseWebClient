@@ -15,15 +15,17 @@ public class EntityBundleTransport implements IsSerializable {
 	/**
 	 * Masks for requesting what should be included in the bundle.s
 	 */
-	public static int ENTITY 		      	= EntityBundle.ENTITY;
-	public static int ANNOTATIONS	      	= EntityBundle.ANNOTATIONS;
-	public static int PERMISSIONS	     	= EntityBundle.PERMISSIONS;
-	public static int ENTITY_PATH	      	= EntityBundle.ENTITY_PATH;
-	public static int ENTITY_REFERENCEDBY 	= EntityBundle.ENTITY_REFERENCEDBY;
-	public static int CHILD_COUNT			= EntityBundle.CHILD_COUNT;
-	public static int ACL					= EntityBundle.ACL;
-	public static int USERS					= EntityBundle.USERS;
-	public static int GROUPS				= EntityBundle.GROUPS;
+	public static int ENTITY 		      		= EntityBundle.ENTITY;
+	public static int ANNOTATIONS	      		= EntityBundle.ANNOTATIONS;
+	public static int PERMISSIONS	     		= EntityBundle.PERMISSIONS;
+	public static int ENTITY_PATH	      		= EntityBundle.ENTITY_PATH;
+	public static int ENTITY_REFERENCEDBY 		= EntityBundle.ENTITY_REFERENCEDBY;
+	public static int CHILD_COUNT				= EntityBundle.CHILD_COUNT;
+	public static int ACL						= EntityBundle.ACL;
+	public static int USERS						= EntityBundle.USERS;
+	public static int GROUPS					= EntityBundle.GROUPS;
+	public static int ACCESS_REQUIREMENTS		= EntityBundle.ACCESS_REQUIREMENTS;
+	public static int UNMET_ACCESS_REQUIREMENTS	= EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 	
 	public static String HELLO = ":)";
 
@@ -36,6 +38,8 @@ public class EntityBundleTransport implements IsSerializable {
 	private String aclJson;
 	private String usersJson;
 	private String groupsJson;
+	private String accessRequirementsJson;
+	private String unmetAccessRequirementsJson;
 	
 	public Long getChildCount() {
 		return childCount;
@@ -92,12 +96,28 @@ public class EntityBundleTransport implements IsSerializable {
 	public void setGroupsJson(String groupsJson) {
 		this.groupsJson = groupsJson;
 	}
+	
+	
+	public String getAccessRequirementsJson() {
+		return accessRequirementsJson;
+	}
+	public void setAccessRequirementsJson(String accessRequirementsJson) {
+		this.accessRequirementsJson = accessRequirementsJson;
+	}
+	public String getUnmetAccessRequirementsJson() {
+		return unmetAccessRequirementsJson;
+	}
+	public void setUnmetAccessRequirementsJson(String unmetAccessRequirementsJson) {
+		this.unmetAccessRequirementsJson = unmetAccessRequirementsJson;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((groupsJson == null) ? 0 : groupsJson.hashCode());
+		result = prime
+				* result
+				+ ((accessRequirementsJson == null) ? 0
+						: accessRequirementsJson.hashCode());
 		result = prime * result + ((aclJson == null) ? 0 : aclJson.hashCode());
 		result = prime * result
 				+ ((annotationsJson == null) ? 0 : annotationsJson.hashCode());
@@ -112,7 +132,13 @@ public class EntityBundleTransport implements IsSerializable {
 				+ ((entityReferencedByJson == null) ? 0
 						: entityReferencedByJson.hashCode());
 		result = prime * result
+				+ ((groupsJson == null) ? 0 : groupsJson.hashCode());
+		result = prime * result
 				+ ((permissionsJson == null) ? 0 : permissionsJson.hashCode());
+		result = prime
+				* result
+				+ ((unmetAccessRequirementsJson == null) ? 0
+						: unmetAccessRequirementsJson.hashCode());
 		result = prime * result
 				+ ((usersJson == null) ? 0 : usersJson.hashCode());
 		return result;
@@ -126,10 +152,10 @@ public class EntityBundleTransport implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		EntityBundleTransport other = (EntityBundleTransport) obj;
-		if (groupsJson == null) {
-			if (other.groupsJson != null)
+		if (accessRequirementsJson == null) {
+			if (other.accessRequirementsJson != null)
 				return false;
-		} else if (!groupsJson.equals(other.groupsJson))
+		} else if (!accessRequirementsJson.equals(other.accessRequirementsJson))
 			return false;
 		if (aclJson == null) {
 			if (other.aclJson != null)
@@ -161,10 +187,21 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!entityReferencedByJson.equals(other.entityReferencedByJson))
 			return false;
+		if (groupsJson == null) {
+			if (other.groupsJson != null)
+				return false;
+		} else if (!groupsJson.equals(other.groupsJson))
+			return false;
 		if (permissionsJson == null) {
 			if (other.permissionsJson != null)
 				return false;
 		} else if (!permissionsJson.equals(other.permissionsJson))
+			return false;
+		if (unmetAccessRequirementsJson == null) {
+			if (other.unmetAccessRequirementsJson != null)
+				return false;
+		} else if (!unmetAccessRequirementsJson
+				.equals(other.unmetAccessRequirementsJson))
 			return false;
 		if (usersJson == null) {
 			if (other.usersJson != null)
@@ -180,8 +217,10 @@ public class EntityBundleTransport implements IsSerializable {
 				+ permissionsJson + ", entityPathJson=" + entityPathJson
 				+ ", entityReferencedByJson=" + entityReferencedByJson
 				+ ", childCount=" + childCount + ", aclJson=" + aclJson
-				+ ", usersJson=" + usersJson + ", GroupsJson=" + groupsJson
-				+ "]";
+				+ ", usersJson=" + usersJson + ", groupsJson=" + groupsJson
+				+ ", accessRequirementsJson=" + accessRequirementsJson
+				+ ", unmetAccessRequirementsJson="
+				+ unmetAccessRequirementsJson + "]";
 	}
 	
 	

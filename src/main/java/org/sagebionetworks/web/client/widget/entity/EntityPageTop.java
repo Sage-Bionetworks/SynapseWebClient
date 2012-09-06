@@ -1,7 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Arrays;
+
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.GenericData;
+import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.PhenotypeData;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -14,16 +25,15 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -82,27 +92,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     public void setBundle(EntityBundle bundle, boolean readOnly) {
     	this.bundle = bundle;
     	this.readOnly = readOnly;
-//    	if(bundle != null){
-//    		// get current user profile
-//    		synapseClient.getUserProfile(new AsyncCallback<String>() {
-//    			@Override
-//    			public void onSuccess(String userProfileJson) {
-//    				try {
-//    					UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
-//   						rStudioUrl = profile.getRStudioUrl();    						    					
-//    					view.setRStudioUrlReady();
-//    				} catch (RestServiceException e) {
-//						onFailure(e);
-//					}    				
-//    			}
-//    			@Override
-//    			public void onFailure(Throwable caught) {
-//    				// error retrieving user profile
-//    				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());    					    				
-//    			}
-//    		});
-//
-//    	}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -146,59 +135,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		}
 		return false;
 	}
-
-//	@Override
-//	public String getRstudioUrlBase() {
-//		return rStudioUrl;
-//	}
-//	
-//	@Override
-//	public String getRstudioUrl() {		
-//		String url = getRstudioUrlBase(); 
-//		UserData userData = authenticationController.getLoggedInUser();
-//		if(url != null && userData != null) {
-//			url += "#synapse:" + userData.getToken() + ";get:" + bundle.getEntity().getId();			
-//		} 
-//		return url;
-//	}
-//	
-//	@Override
-//	public void saveRStudioUrlBase(final String value) {
-//		rStudioUrl = value;
-//		
-//		// get current user profile		
-//		synapseClient.getUserProfile(new AsyncCallback<String>() {
-//			@Override
-//			public void onSuccess(String userProfileJson) {
-//				try {
-//					UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
-//					profile.setRStudioUrl(value);		
-//					JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-//					profile.writeToJSONObject(adapter);
-//					// save update user profile
-//					synapseClient.updateUserProfile(adapter.toJSONString(), new AsyncCallback<Void>() {
-//						@Override
-//						public void onSuccess(Void result) {
-//							view.showInfo(DisplayConstants.LABEL_UPDATED, DisplayConstants.TEXT_USER_PROFILE_UPDATED);
-//						}
-//						@Override
-//						public void onFailure(Throwable caught) {
-//							view.showErrorMessage(DisplayConstants.ERROR_USER_PROFILE_SAVE);
-//						}
-//					});					
-//				} catch (JSONObjectAdapterException e) {
-//					onFailure(e);
-//				} catch (RestServiceException e) {
-//					onFailure(e);
-//				}
-//			}
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				view.showErrorMessage(DisplayConstants.ERROR_USER_PROFILE_SAVE);
-//			}
-//		});
-//		
-//	}
 	
 	@Override 
 	public boolean isLoggedIn() {
@@ -248,7 +184,116 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private void sendDetailsToView(boolean isAdmin, boolean canEdit) {
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		view.setEntityBundle(bundle, entityTypeDisplay, isAdmin, canEdit, readOnly);
+		UserSessionData sessionData = authenticationController.getLoggedInUser();
+		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
+		view.setEntityBundle(bundle, userProfile, entityTypeDisplay, isAdmin, canEdit, readOnly);
 	}
+	
+	private UserProfile getUserProfile() {
+		UserSessionData sessionData = authenticationController.getLoggedInUser();
+		return (sessionData==null ? null : sessionData.getProfile());
+		
+	}
+
+	@Override
+	public boolean isAnonymous() {
+		return getUserProfile()==null;
+	}
+
+	@Override
+	public String getJiraFlagUrl() {
+		UserProfile userProfile = getUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		return JiraURLHelper.createFlagIssue(userProfile.getUserName(), userProfile.getDisplayName(), bundle.getEntity().getId());
+	}
+
+	@Override
+	public String getJiraRestrictionUrl() {
+		UserProfile userProfile = getUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		return JiraURLHelper.createAccessRestrictionIssue(userProfile.getUserName(), userProfile.getDisplayName(), bundle.getEntity().getId());
+	}
+
+	@Override
+	public boolean hasAdministrativeAccess() {
+		return bundle.getPermissions().getCanChangePermissions();
+	}
+
+	@Override
+	public boolean isRestrictedData() {
+		return bundle.getAccessRequirements().getTotalNumberOfResults()>0L;
+	}
+
+	@Override
+	public boolean hasFulfilledAccessRequirements() {
+		return bundle.getUnmetAccessRequirements().getTotalNumberOfResults()==0L;
+	}
+
+	private static final String[] dataObjectEntityTypes = {
+		Data.class.getName(),
+		GenericData.class.getName(),
+		GenotypeData.class.getName(),
+		PhenotypeData.class.getName()
+	};
+	
+	@Override
+	public boolean includeRestrictionWidget() {
+		// restriction widget is to be included iff Entity is a data object
+		return Arrays.asList(dataObjectEntityTypes).contains(
+				bundle.getEntity().getEntityType()
+		);
+	}
+
+	@Override
+	public String accessRequirementText() {
+		if (!isRestrictedData()) throw new IllegalStateException("There is no access requirement.");
+		AccessRequirement ar = bundle.getAccessRequirements().getResults().get(0);
+		if (ar instanceof TermsOfUseAccessRequirement) {
+			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
+		} else if (ar instanceof ACTAccessRequirement) {
+			return ((ACTAccessRequirement)ar).getActContactInfo();			
+		} else {
+			throw new IllegalStateException("Unexpected access requirement type "+ar.getClass());
+		}
+	}
+	
+	private AccessRequirement getAccessRequirement() {
+		return bundle.getAccessRequirements().getResults().get(0);
+	}
+
+	@Override
+	public boolean isTermsOfUseAccessRequirement() {
+		if (!isRestrictedData()) throw new IllegalStateException("There is no access requirement.");
+		AccessRequirement ar = getAccessRequirement();
+		if (ar instanceof TermsOfUseAccessRequirement) {
+			return true;		
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public Callback accessRequirementCallback() {
+		if (!isTermsOfUseAccessRequirement()) throw new IllegalStateException("not a TOU Access Requirement");
+		AccessRequirement ar = getAccessRequirement();
+		TermsOfUseAccessRequirement tou = (TermsOfUseAccessRequirement)ar;
+		return new Callback() {
+			@Override
+			public void invoke() {
+				// TODO Auto-generated method stub
+			}
+		};
+	}
+
+	@Override
+	public Callback getDataLockDownCallback() {
+		return new Callback() {
+			@Override
+			public void invoke() {
+				// TODO Auto-generated method stub
+			}
+		};
+	}
+
 
 }

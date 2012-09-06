@@ -59,22 +59,6 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.showOverView();
-		
-
-//		rssService.getFeedData(DisplayConstants.BCC_FEED_URL, 1, false, new AsyncCallback<String>() {
-//			@Override
-//			public void onSuccess(String result) {
-//				try {
-//					view.showChallengeInfo(getHtml(result));
-//				} catch (RestServiceException e) {
-//					onFailure(e);
-//				}
-//			}
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
-//			}
-//		});
 	}
 	
 

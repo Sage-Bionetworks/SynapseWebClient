@@ -3,9 +3,11 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Summary;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
@@ -18,6 +20,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
@@ -142,7 +145,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 	
 	@Override
-	public void setEntityBundle(EntityBundle bundle, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, boolean readOnly) {
+	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, boolean readOnly) {
 		this.readOnly = readOnly;
 		
 		if(colLeftContainer == null) {
@@ -193,10 +196,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// Custom layouts for certain entities
 		if(bundle.getEntity() instanceof Summary) {
-		    renderSnapshotEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+		    renderSnapshotEntity(bundle, userProfile, entityTypeDisplay, canEdit, readOnly, widgetMargin);
 		} else {
 			// default entity view
-			renderDefaultEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+			renderDefaultEntity(bundle, userProfile, entityTypeDisplay, canEdit, readOnly, widgetMargin);
 		}
 		
 		colLeftContainer.layout(true);
@@ -205,10 +208,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 
-	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
+	private void renderDefaultEntity(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Title
-		colLeftContainer.add(EntityViewUtils.createTitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils), widgetMargin);
+		colLeftContainer.add(EntityViewUtils.createTitleWidget(bundle, createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils), widgetMargin);
+		// Restrictions
+		//colLeftContainer.add(EntityViewUtils.createRestrictionsWidget(bundle, userProfile, iconsImageBundle), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);	    
 		// Child Browser
@@ -237,13 +242,51 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ** FULL WIDTH **
 		// none.
 	}
+	
+	private Widget createRestrictionWidget() {
+		if (!presenter.includeRestrictionWidget()) return null;
+		boolean isAnonymous = presenter.isAnonymous();
+		boolean hasAdministrativeAccess = false;
+		boolean hasFulfilledAccessRequirements = false;
+		String jiraFlagLink = null;
+		String jiraRestrictionLink = null;
+		if (!isAnonymous) {
+			hasAdministrativeAccess = presenter.hasAdministrativeAccess();
+			jiraFlagLink = presenter.getJiraFlagUrl();
+			jiraRestrictionLink = presenter.getJiraRestrictionUrl();
+		}
+		boolean isRestrictedData = presenter.isRestrictedData();
+		String accessRequirementText = null;
+		boolean isTermsOfUseAccessRequirement = false;
+		Callback accessRequirementCallback = null;
+		Callback lockdownCallback = presenter.getDataLockDownCallback();
+		if (isRestrictedData) {
+			accessRequirementText = presenter.accessRequirementText();
+			isTermsOfUseAccessRequirement = presenter.isTermsOfUseAccessRequirement();
+			accessRequirementCallback = presenter.accessRequirementCallback();
+			if (!isAnonymous) hasFulfilledAccessRequirements = presenter.hasFulfilledAccessRequirements();
+		}
+		return EntityViewUtils.createRestrictionsWidget(
+				jiraFlagLink, 
+				jiraRestrictionLink,
+				isAnonymous, 
+				hasAdministrativeAccess,
+				isTermsOfUseAccessRequirement,
+				accessRequirementText,
+				accessRequirementCallback,
+				lockdownCallback,
+				isRestrictedData, 
+				hasFulfilledAccessRequirements,
+				iconsImageBundle,
+				synapseJSNIUtils);
+	}
 
 
-	private void renderSnapshotEntity(EntityBundle bundle,
+	private void renderSnapshotEntity(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Title
-		colLeftContainer.add(EntityViewUtils.createTitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils), widgetMargin);
+		colLeftContainer.add(EntityViewUtils.createTitleWidget(bundle, createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);	    
 
@@ -510,62 +553,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.layout();
 		return lc;
 	}
-	
-	
-//	private Widget createRstudioWidget(Entity entity) {
-//		final LayoutContainer lc = new LayoutContainer();
-//		lc.setAutoWidth(true);
-//		lc.setAutoHeight(true);
-//
-//		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>RStudio</h3>")));  	        	    	    	 
-//	    
-//	    showRstudio = new SplitButton("&nbsp;&nbsp;Load in RStudio Server");
-//	    showRstudio.setIcon(AbstractImagePrototype.create(iconsImageBundle.rstudio24()));
-//	    Menu menu = new Menu();  
-//	    MenuItem item = new MenuItem("Edit RStudio Server URL");
-//		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-//			@Override
-//			public void componentSelected(MenuEvent ce) {
-//				showRStudioUrlEdit();
-//			}
-//		});
-//	    menu.add(item);  
-//	    showRstudio.setMenu(menu);  
-//	  
-//	    showRstudio.setHeight(36);	  
-//	    if(!presenter.isLoggedIn()) {
-//	    	showRstudio.disable();
-//	    	showRstudio.setText("&nbsp;&nbsp;Please Login to Load in RStudio");
-//	    }
-//	    
-//	    final Html label = new Html(SafeHtmlUtils.fromSafeConstant("<a href=\"http://rstudio.org/\" class=\"link\">RStudio&trade;</a> is a free and open source integrated development environment (IDE) for R. " +
-//	    		"You can run it on your desktop (Windows, Mac, or Linux) or even over the web using RStudio Server.<br/></br>" +
-//	    		"If you do not have a copy of RStudio Server setup, you can create one by <a href=\"http://rstudio.org/download/server\" class=\"link\">following these directions</a>.").asString());
-//	    	    
-//	    showRstudio.addSelectionListener(new SelectionListener<ButtonEvent>() {
-//			@Override
-//			public void componentSelected(ButtonEvent ce) {
-//				String url = presenter.getRstudioUrl();
-//				if(url == null) {
-//					showRStudioUrlEdit();
-//				} else {			
-//					Window.open(url, "_blank", "");
-//				}
-//			}
-//		});	    
-//	    // only enable if we have the URL 
-//	    if(!rStudioUrlReady) {
-//	    	showRstudio.disable();
-//	    }
-//	    
-//	    lc.add(showRstudio);
-//	    lc.add(label, new MarginData(5, 0, 0, 0));
-//		
-//	    lc.layout();
-//	    return lc;  		
-//	}
-	
-		
+			
 	private Widget createDescriptionWidget(EntityBundle bundle, String entityTypeDisplay) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);

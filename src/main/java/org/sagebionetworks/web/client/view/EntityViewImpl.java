@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -36,7 +37,8 @@ public class EntityViewImpl extends Composite implements EntityView {
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
 	private Footer footerWidget;
-	
+	private UserProfile userProfile;
+		
 	@Inject
 	public EntityViewImpl(
 			EntityViewImplUiBinder binder,
@@ -69,7 +71,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
-
+	
 	@Override
 	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
 		entityPageTop.clearState();

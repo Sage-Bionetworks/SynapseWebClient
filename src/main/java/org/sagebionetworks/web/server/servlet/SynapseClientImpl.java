@@ -173,11 +173,27 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		try {			
 			Synapse synapseClient = createSynapseClient();			
-			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);			
+			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);
+			// TODO migrate this to the Synapse client
+			retrieveAccessRequirements(entityId, partsMask, eb, synapseClient);
 			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	
+	private void retrieveAccessRequirements(String entityId, int partsMask, EntityBundle eb, Synapse synapseClient) throws SynapseException {
+		if ((partsMask & EntityBundle.ACCESS_REQUIREMENTS) !=0) {
+			VariableContentPaginatedResults<AccessRequirement> accessRequirements = 
+				synapseClient.getAccessRequirements(entityId);
+				eb.setAccessRequirements(accessRequirements);
+		}
+		if ((partsMask & EntityBundle.UNMET_ACCESS_REQUIREMENTS) !=0) {
+			VariableContentPaginatedResults<AccessRequirement> unmetAccessRequirements = 
+				synapseClient.getUnmetAccessReqAccessRequirements(entityId);
+				eb.setUnmetAccessRequirements(unmetAccessRequirements);
+		}
+		
 	}
 
 	@Override
@@ -186,6 +202,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {			
 			Synapse synapseClient = createSynapseClient();			
 			EntityBundle eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
+			// TODO migrate this to the Synapse client
+			retrieveAccessRequirements(entityId, partsMask, eb, synapseClient);
 			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -313,6 +331,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if ((EntityBundleTransport.GROUPS & partsMask) > 0) {
 				PaginatedResults<UserGroup> g = eb.getGroups();
 				ebt.setGroupsJson(EntityFactory.createJSONStringForEntity(g));
+			}
+			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask)!=0) {
+				ebt.setAccessRequirementsJson(EntityFactory.createJSONStringForEntity(eb.getAccessRequirements()));
+			}
+			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask)!=0) {
+				ebt.setUnmetAccessRequirementsJson(EntityFactory.createJSONStringForEntity(eb.getUnmetAccessRequirements()));
 			}
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
