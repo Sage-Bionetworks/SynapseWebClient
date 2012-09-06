@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.EntityMetadata;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.dom.client.Document;

@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget;
+package org.sagebionetworks.web.client.widget.entity;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
