@@ -16,13 +16,20 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
-public class EntityViewUtils {
+public class TitleWidget extends Composite {
 
-	public static Widget createTitleWidget(EntityBundle bundle, String entityTypeDisplay, IconsImageBundle iconsImageBundle, boolean canEdit, boolean readOnly, SynapseJSNIUtils synapseJSNIUtils) {
-		LayoutContainer lc = new LayoutContainer();
+
+	private LayoutContainer lc;
+	private EntityMetadata entityMetadata;
+
+	public TitleWidget(EntityBundle bundle, String entityTypeDisplay,
+			IconsImageBundle iconsImageBundle, boolean canEdit,
+			boolean readOnly, SynapseJSNIUtils synapseJSNIUtils) {
+		lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
@@ -54,20 +61,21 @@ public class EntityViewUtils {
 
 
 	    lc.layout();
-		return lc;
+	    initWidget(lc);
 	}
 
-	/*
-	 * Private Methods
-	 */
+	public void createVersionsList() {
+		Document doc = Document.get();
+		entityMetadata.addToPreviousVersions(new Anchor("3"),
+				doc.createTextNode(""));
+		entityMetadata.addToPreviousVersions(new Anchor("2"),
+				doc.createTextNode(" | "));
+		entityMetadata.addToPreviousVersions(new Anchor("1"),
+				doc.createTextNode(" | "));
+	}
 
-	/**
-	 * Basic meta data about this entity
-	 * @param entity
-	 * @return
-	 */
-	private static Widget createMetadata(Entity entity, IconsImageBundle iconsImageBundle) {
-		EntityMetadata entityMetadata = new EntityMetadata();
+	private Widget createMetadata(Entity entity, IconsImageBundle iconsImageBundle) {
+		entityMetadata = new EntityMetadata();
 		entityMetadata.setCreateName(entity.getCreatedBy());
 		entityMetadata.setCreateDate(String.valueOf(entity.getCreatedOn()));
 		entityMetadata.setModifyName(entity.getModifiedBy());
@@ -86,13 +94,9 @@ public class EntityViewUtils {
 				sb.append(vb.getVersionComment());
 			}
 			entityMetadata.setVersionInfo(sb.toString());
-
-			Document doc = Document.get();
-			entityMetadata.addToPreviousVersions(new Anchor("3"), doc.createTextNode(""));
-			entityMetadata.addToPreviousVersions(new Anchor("2"), doc.createTextNode(" | "));
-			entityMetadata.addToPreviousVersions(new Anchor("1"), doc.createTextNode(" | "));
 		}
 		return entityMetadata;
 	}
+
 
 }
