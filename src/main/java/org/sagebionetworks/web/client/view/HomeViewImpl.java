@@ -101,21 +101,26 @@ public class HomeViewImpl extends Composite implements HomeView {
 				
 				public void onSuccess(String showBCCSignup) {
 					if (showBCCSignup==null || !showBCCSignup.equalsIgnoreCase("true")) return;
-					Panel sp = new SimplePanel();
-					sp.add(new HTML(SafeHtmlUtils.fromSafeConstant(
-							"<div class=\"span-6 inner-6 view notopmargin\">" +
-							"<h5><a class=\"link\" href=\"#BCCOverview:0\">Sage / DREAM Breast Cancer Prognosis Challenge</a></h5>"+
-	                    "<p>The goal of the breast cancer prognosis challenge is to assess the accuracy of computational models "+
-					    "designed to predict breast cancer survival based on clinical information about the patient's tumor as "+
-					    "well as genome-wide molecular profiling data including gene expression and copy number profiles.</p>"+
-	                	"<a class=\"button_readmore\"  href=\"#BCCOverview:0\"></a></div>")));
-					bccSignup.clear();
-					bccSignup.add(sp);
+					//now, pull the content
+					presenter.loadBccOverviewDescription();
 				}
 				public void onFailure(Throwable t) {
 					// do nothing
 				} // "span-6 inner-6 view notopmargin"
 		});
+	}
+	
+	@Override
+	public void showBccOverview(String description){
+		Panel sp = new SimplePanel();
+		
+		sp.add(new HTML(SafeHtmlUtils.fromSafeConstant(
+				"<div class=\"span-6 inner-6 view notopmargin\">" +
+				"<h5><a class=\"link\" href=\"#BCCOverview:0\">Sage / DREAM Breast Cancer Prognosis Challenge</a></h5>"+
+				description+
+				"<a class=\"button_readmore\" href=\"#BCCOverview:0\"></a></div>")));
+		bccSignup.clear();
+		bccSignup.add(sp);
 	}
 
 	@Override

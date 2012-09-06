@@ -23,4 +23,10 @@ public interface RssServiceAsync {
 	 */
 	void getFeedData(String url, Integer limit, boolean summariesOnly,	AsyncCallback<String> callback);
 	
+	/**
+	 * return the content from the wiki
+	 * @param urlString
+	 * @param callback
+	 */
+	void getWikiPageContent(String pageId, AsyncCallback<String> callback);
 }

@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -40,6 +42,22 @@ public class DisplayUtilsTest {
 			String icon = DisplayUtils.getAttachmentIcon(fileName);
 			assertEquals(expectedIcon, icon);
 		}
+	}
+	
+	@Test
+	public void testFixWikiLinks(){
+		String testHref = "Hello <a href=\"/wiki/HelloWorld.html\">World</a>";
+		String expectedHref = "Hello <a href=\"https://sagebionetworks.jira.com/wiki/HelloWorld.html\">World</a>";
+		String actualHref = DisplayUtils.fixWikiLinks(testHref);
+		Assert.assertEquals(actualHref, expectedHref);
+	}
+	
+	@Test
+	public void testFixEmbeddedYouTube(){
+		String testYouTube = "Hello video:<p> www.youtube.com/embed/xSfd5mkkmGM </p>";
+		String expectedYouTube = "Hello video:<p> <iframe width=\"300\" height=\"169\" src=\"https://www.youtube.com/embed/xSfd5mkkmGM \" frameborder=\"0\" allowfullscreen=\"true\"></iframe></p>";
+		String actualYouTube = DisplayUtils.fixEmbeddedYouTube(testYouTube);
+		Assert.assertEquals(actualYouTube, expectedYouTube);
 	}
 
 }
