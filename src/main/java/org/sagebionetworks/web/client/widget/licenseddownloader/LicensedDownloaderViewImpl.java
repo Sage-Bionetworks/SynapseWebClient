@@ -53,7 +53,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	private LayoutContainer downloadContentContainer;
 	private IconsImageBundle icons;
 	private SageImageBundle sageImageBundle;
-
+	private int downloadWindowWidth;
 
 	/*
 	 * Constructors
@@ -197,7 +197,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 			String displayString = "Download";  // TODO : add display to LocationData
 			for(int i=0; i<locations.size(); i++) {
 				LocationData dl = locations.get(i);
-				sb.appendHtmlConstant("<a href=\"" + dl.getPath() + "\" target=\"new\">")
+				sb.appendHtmlConstant("<a href=\"" + dl.getPath() + "\" target=\"_blank\">")
 				.appendEscaped(displayString)
 				.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
 				if(md5 != null) {
@@ -208,7 +208,11 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 				sb.appendHtmlConstant("<br/>");				
 			}
 			safeDownloadHtml = sb.toSafeHtml();
-
+			if (md5 == null)
+				downloadWindowWidth = 300;
+			else
+				downloadWindowWidth = 600;
+			
 			// replace the view content if this is after initialization
 			if(downloadContentContainer != null) {
 				safeDownloadHtml = sb.toSafeHtml();
@@ -389,7 +393,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 
 	protected void createDownloadWindow() {
 		downloadWindow = new Window();
-		downloadWindow.setSize(600, 200);
+		downloadWindow.setSize(downloadWindowWidth, 200);
 		downloadWindow.setPlain(true);
 		downloadWindow.setModal(false);
 		downloadWindow.setBlinkModal(true);
