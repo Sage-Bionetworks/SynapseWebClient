@@ -129,7 +129,7 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 			throw new IllegalArgumentException("Could not read from the source: " + urlString, e);
 		}
 		
-		return fixImageLinks(parseContent(xml), pageId);
+		return parseContent(xml);
 	}
 	
 	public static String parseContent(String xml){
@@ -152,16 +152,6 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 			throw new IllegalArgumentException("Could not read from the source data: " + xml, e);
 		}
 		return pageContent;
-	}
-	
-	public static String fixImageLinks(String pageContent, String pageId) {
-		//fix embedded links
-		String newContent = pageContent.replaceAll("<ac:image><ri:attachment ri:filename=\"", "<img src=\"/wiki/download/attachments/" + pageId + "/");
-		//fix links
-		newContent = newContent.replaceAll("<ac:image><ri:url ri:value=", "<img src=");
-		//remove all ac:image end tags
-		newContent = newContent.replaceAll("</ac:image>", "");
-		return newContent;
 	}
 }
 
