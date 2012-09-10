@@ -129,7 +129,7 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 			throw new IllegalArgumentException("Could not read from the source: " + urlString, e);
 		}
 		
-		return parseContent(xml);
+		return fixImageLinks(parseContent(xml), pageId);
 	}
 	
 	public static String parseContent(String xml){
@@ -142,6 +142,7 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 				Document doc = db.parse(is);
 	
 				pageContent = ((Element)doc.getElementsByTagName("content").item(0)).getElementsByTagName("body").item(0).getFirstChild().getNodeValue();
+				
 			}
 		} catch (ParserConfigurationException e) {
 			throw new IllegalArgumentException("Could not parse the source data: " + xml, e);
@@ -152,6 +153,15 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		}
 		return pageContent;
 	}
-
+	
+	public static String fixImageLinks(String pageContent, String pageId) {
+		//fix embedded links
+		String newContent = pageContent.replaceAll("<ac:image><ri:attachment ri:filename=\"", "<img src=\"/wiki/download/attachments/" + pageId + "/");
+		//fix links
+		newContent = newContent.replaceAll("<ac:image><ri:url ri:value=", "<img src=");
+		//remove all ac:image end tags
+		newContent = newContent.replaceAll("</ac:image>", "");
+		return newContent;
+	}
 }
 
