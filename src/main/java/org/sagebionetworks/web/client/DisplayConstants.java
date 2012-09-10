@@ -198,10 +198,13 @@ public class DisplayConstants {
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
 	public static final String LABEL_UPLOAD_TO_SYNAPSE = "To Synapse";
 	public static final String LABEL_TO_EXTERNAL = "Link External Location";
+	public static final String TEXT_LINK_FILE = "Link File";
+	public static final String TEXT_LINK_SUCCESS = "Link successfully updated in Synapse";
+	public static final String TEXT_LINK_FAILED = "An error occurred while creating the link. Please check the URL and try again.";
 	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
 	public static final String TEXT_ATTACHMENT_SUCCESS = "Attachment Uploaded to Synapse";
 	public static final String TEXT_PROFILE_PICTURE_SUCCESS = "Profile Photo Uploaded to Synapse";
-	public static final String ERROR_UPLOAD = "An error occured during upload. Please try again.";
+	public static final String ERROR_UPLOAD = "An error occurred during upload. Please try again.";
 	public static final String LABEL_UPLOADING = "Uploading...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
 	public static final String LABEL_WHERE_SAVE_LINK = "Where would you like to save a Link to this page?";

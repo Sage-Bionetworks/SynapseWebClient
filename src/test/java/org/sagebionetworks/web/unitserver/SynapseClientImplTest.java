@@ -26,10 +26,14 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
+import org.sagebionetworks.repo.model.LayerTypeNames;
+import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -377,5 +381,27 @@ public class SynapseClientImplTest {
 		when(mockSynapse.createUserProfileAttachmentPresignedUrl(testId, testToken)).thenReturn(testPresignedUrl);
 		String presignedUrl = synapseClient.createUserProfileAttachmentPresignedUrl(testId, testToken);
 		assertEquals(presignedUrl, EntityFactory.createJSONStringForEntity(testPresignedUrl));
+	}
+	
+	@Test
+	public void testUpdateLocationable() throws Exception {
+		//verify call is directly calling the synapse client provider
+		String testUrl = "http://mytesturl/something.jpg";
+		List<LocationData> locations = new ArrayList<LocationData>();
+		LocationData externalLocation = new LocationData();
+		externalLocation.setPath(testUrl);
+		externalLocation.setType(LocationTypeNames.external);
+		locations.add(externalLocation);
+
+		Data layer = new Data();
+		layer.setType(LayerTypeNames.M);
+		layer.setLocations(locations);
+
+		String testId = "myTestId";
+		when(mockSynapse.updateExternalLocationableToSynapse(layer, testUrl)).thenReturn(layer);
+		when(mockSynapse.getEntityById(testId)).thenReturn(layer);
+		EntityWrapper returnedLayer = synapseClient.updateExternalLocationable(testId, testUrl);
+		
+		assertEquals(returnedLayer.getEntityJson(), EntityFactory.createJSONStringForEntity(layer));
 	}
 }
