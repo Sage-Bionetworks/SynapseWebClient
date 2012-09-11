@@ -29,6 +29,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -46,6 +47,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
 
+	private UserSessionData cachedUserSessionData = null;
 	@UiField
 	HorizontalPanel commandBar;
 	
@@ -82,13 +84,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		searchBoxPanel.clear();		
 		searchBoxPanel.add(searchBox.asWidget());
 		searchBoxPanel.setVisible(false);
-		commandBar.addStyleName("sf-j-menu");
+		commandBar.addStyleName("last sf-j-menu");
 	}
 	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		setUser(presenter.getUser());		
+		refresh();
 	}
 
 	@Override
@@ -101,7 +103,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void refresh() {
-		setUser(presenter.getUser());		
+		UserSessionData userSessionData = presenter.getUser();
+		if (cachedUserSessionData == null || !cachedUserSessionData.equals(userSessionData)){
+			cachedUserSessionData = userSessionData;
+			setUser(cachedUserSessionData);
+		}		
 	}
 
 	@Override
@@ -118,7 +124,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		//initialize buttons
 		if(userAnchor == null) {
 			userAnchor = new Anchor();
-			userAnchor.addStyleName("supportLink");
+			userAnchor.addStyleName("headerUsernameLink");
 			userAnchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -130,6 +136,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			userCommands = new HorizontalPanel();
         	userCommands.addStyleName("span-2 inner-2 view header-inner-commands-container");
    		 	Image settings = new Image(iconsImageBundle.settings16());
+   		 	settings.addStyleName("imageButton");
+		 	
    		 	settings.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -139,10 +147,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
    		 	
 	 		Map<String, String> optionsMap = new TreeMap<String, String>();
 			optionsMap.put("title", DisplayConstants.TEXT_USER_SETTINGS);
-			optionsMap.put("data-placement", "right");
+			optionsMap.put("data-placement", "bottom");
+			optionsMap.put("data-animation", "false");
 			DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, optionsMap);
 		 	
    		 	Image logout = new Image(iconsImageBundle.logoutGrey16());
+   		 	logout.addStyleName("imageButton");
 		 	logout.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -151,7 +161,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
 		 	optionsMap = new TreeMap<String, String>();
 			optionsMap.put("title", DisplayConstants.LABEL_LOGOUT_TEXT);
-			optionsMap.put("data-placement", "right");
+			optionsMap.put("data-placement", "bottom");
+			optionsMap.put("data-animation", "false");
 			DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, optionsMap);
 		 	
 		 	userCommands.add(settings);
@@ -167,7 +178,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			
 		if(loginButton == null) {
 			loginButton = new Anchor(DisplayConstants.BUTTON_LOGIN);
-			loginButton.addStyleName("supportLink");
+			loginButton.addStyleName("headerLink");
 			loginButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -178,7 +189,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		if (registerButton == null)
 		{
 			registerButton = new Anchor(DisplayConstants.BUTTON_REGISTER);
-			registerButton.addStyleName("supportLink");
+			registerButton.addStyleName("headerLink");
 			registerButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -188,7 +199,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 		if (supportLink == null) {
 			supportLink = new Anchor(DisplayConstants.LINK_COMMUNITY_FORUM, "", "_blank");
-			supportLink.addStyleName("supportLink");
+			supportLink.addStyleName("headerLink");
 			commandBar.add(supportLink);
 		}
 		presenter.getSupportHRef(new AsyncCallback<String>() {
@@ -203,18 +214,21 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				//should never enter this code.  if the fastpass request fails, it should still return the standard support site url
 			}
 		});
+		
 		if(userData != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 			UserProfile profile = userData.getProfile();
 			userAnchor.setText(profile.getDisplayName());
 			commandBar.remove(loginButton);
 			commandBar.remove(registerButton);
+			userNameWrapper.clear();
 			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
 				Image profilePicture = new Image();
 				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(baseProfileAttachmentUrl, profile.getOwnerId(), profile.getPic().getPreviewId(), null));
 				profilePicture.setWidth("20px");
 				profilePicture.setHeight("20px");
 				profilePicture.addStyleName("margin:auto; display:block;");
+				profilePicture.addStyleName("imageButton");
 				profilePicture.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
