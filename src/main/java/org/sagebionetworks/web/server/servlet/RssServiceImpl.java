@@ -1,19 +1,34 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RssService;
+import org.sagebionetworks.web.server.HttpUtils;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.sun.syndication.feed.synd.SyndContent;
@@ -104,5 +119,39 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		}
 	}
 	
+	@Override
+	public String getWikiPageContent(String pageId){
+		String urlString = DisplayUtils.WIKI_CONTENT_URL + pageId;
+		String xml = "";
+		try {
+			xml = HttpUtils.httpGet(urlString, new HashMap<String, String>());
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Could not read from the source: " + urlString, e);
+		}
+		
+		return parseContent(xml);
+	}
 	
+	public static String parseContent(String xml){
+		String pageContent = "";
+		try {
+			if (xml.trim().length() > 0){
+				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+				DocumentBuilder db = dbf.newDocumentBuilder();
+				InputStream is = new ByteArrayInputStream(xml.getBytes());
+				Document doc = db.parse(is);
+	
+				pageContent = ((Element)doc.getElementsByTagName("content").item(0)).getElementsByTagName("body").item(0).getFirstChild().getNodeValue();
+				
+			}
+		} catch (ParserConfigurationException e) {
+			throw new IllegalArgumentException("Could not parse the source data: " + xml, e);
+		} catch (SAXException e) {
+			throw new IllegalArgumentException("Could not parse the source data: " + xml, e);
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Could not read from the source data: " + xml, e);
+		}
+		return pageContent;
+	}
 }
+

@@ -28,6 +28,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -672,11 +673,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public EntityWrapper updateAcl(EntityWrapper aclEW) throws RestServiceException {
+		return updateAcl(aclEW, false);
+	}
+	
+	@Override
+	public EntityWrapper updateAcl(EntityWrapper aclEW, boolean recursive) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
 			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
 			AccessControlList acl = jsonEntityFactory.createEntity(aclEW.getEntityJson(), AccessControlList.class);
-			acl = synapseClient.updateACL(acl);
+			acl = synapseClient.updateACL(acl, recursive);
 			JSONObjectAdapter aclJson = acl
 					.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(aclJson.toJSONString(), aclJson
@@ -815,5 +821,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		} 
 	}
-	
+	@Override
+	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			Entity locationable = synapseClient.getEntityById(entityId);
+			if(!(locationable instanceof Locationable)) {
+				throw new RuntimeException("Upload failed. Entity id: " + locationable.getId() + " is not Locationable.");
+			}						
+			Locationable result = synapseClient.updateExternalLocationableToSynapse((Locationable)locationable, externalUrl);
+			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
 }
