@@ -97,7 +97,7 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		tab = new TabItem(DisplayConstants.LABEL_TO_EXTERNAL);
 		tab.addStyleName("pad-text");		
 		tab.add(createExternalPanel(showCancel));
-		tab.disable();
+		
 		tabPanel.add(tab);
 		tabPanel.recalculate();
 		
@@ -118,8 +118,8 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 			formPanel.setMethod(Method.POST);
 			formPanel.setButtonAlign(HorizontalAlignment.RIGHT);		
 			formPanel.setHeight(100);
-			formPanel.setAutoWidth(true);
-
+			formPanel.setLabelWidth(50);
+			
 			fileUploadField = new FileUploadField();
 			fileUploadField.setAllowBlank(false);
 			fileUploadField.setName("uploadedfile");
@@ -215,9 +215,11 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		formPanel.setFrame(false);
 		formPanel.setButtonAlign(HorizontalAlignment.RIGHT);
 		formPanel.setHeight(100);
-		
+		formPanel.setLabelWidth(110);
+		formPanel.setFieldWidth(230);
 		final TextField<String> pathField = new TextField<String>();
-		pathField.setFieldLabel("External Path or URL");				
+		pathField.setFieldLabel("External Path or URL");
+		
 		formPanel.add(pathField);
 		
 		Button btn = new Button("Save");

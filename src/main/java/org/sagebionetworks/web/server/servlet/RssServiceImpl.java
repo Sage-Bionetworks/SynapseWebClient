@@ -142,6 +142,7 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 				Document doc = db.parse(is);
 	
 				pageContent = ((Element)doc.getElementsByTagName("content").item(0)).getElementsByTagName("body").item(0).getFirstChild().getNodeValue();
+				
 			}
 		} catch (ParserConfigurationException e) {
 			throw new IllegalArgumentException("Could not parse the source data: " + xml, e);
@@ -152,6 +153,5 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		}
 		return pageContent;
 	}
-
 }
 
