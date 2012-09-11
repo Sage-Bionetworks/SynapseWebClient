@@ -8,7 +8,7 @@
 	<g:HTMLPanel>
 
 		<div class="span-24 notopmargin">
-			<div class="span-16 logo">
+			<div class="span-13 logo">
 				<a href="#">
 					<g:Image resource="{sageImages.sageLogoAndTitle}" />
 				</a>

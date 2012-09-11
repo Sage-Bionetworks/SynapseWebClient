@@ -124,6 +124,9 @@ public interface IconsImageBundle extends ClientBundle {
 		
 	@Source("images/icons/lock-unlock-16.png")
 	ImageResource lockUnlocked16();	
+
+	@Source("images/icons/door-open-out-grey-16.png")
+	ImageResource logoutGrey16();	
 	
 	@Source("images/icons/magnifier-zoom-16.png")
 	ImageResource magnify16();		
@@ -175,7 +178,10 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/rstudio-36.png")
 	ImageResource rstudio36();
-
+	
+	@Source("images/icons/grey_wrench-screwdriver-16.png")
+	ImageResource settings16();	
+	
 	@Source("images/icons/table-insert-column-16.png")
 	ImageResource tableInsertColumn16();
 	
