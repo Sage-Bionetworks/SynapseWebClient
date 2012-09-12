@@ -17,8 +17,26 @@
 }
 
 .sf-j-menu td {
-	padding: 4px 0px 4px 10px;
+	padding: 5px 0px 4px 15px;
 	vertical-align: middle !important;
+}
+
+.header-inner-commands-container {
+	border-radius: 0.2em;
+}
+
+
+.header-inner-commands-container td {
+	padding: 3px 0px 3px 7px;
+}
+
+.header-username-picture-container {
+	border: solid #ccc;
+	border-width:0.1em;
+	border-radius:0.4em;
+}
+.header-username-picture-container td {
+	padding: 2px 4px 2px 3px;
 }
 
 
@@ -70,8 +88,16 @@
 	font-size: 11px;
 }
 
-.supportLink { font-weight: bold; color: #6e6e6e !important; }
+/* header links. transition from grey to black on hover, don't underline */
+.headerLink { font-weight: bold; color: #6e6e6e; padding: 0px 2px 0px 4px;
+  -o-transition:.2s;
+  -ms-transition:.2s;
+  -moz-transition:.2s;
+  -webkit-transition:.2s;
+  transition:.2s; }
+.headerLink:hover { color: #BC3226; text-decoration:none; }
 
+.headerUsernameLink { font-weight: bold; color: #6e6e6e !important; padding: 0px 2px 0px 0px; text-align: left;}
 
 /* Removes annoying FireFox dotted border */
 :focus {
