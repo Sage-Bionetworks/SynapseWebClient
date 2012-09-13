@@ -29,4 +29,11 @@ public interface RssServiceAsync {
 	 * @param callback
 	 */
 	void getWikiPageContent(String pageId, AsyncCallback<String> callback);
+	
+	/**
+	 * return the source content from the wiki
+	 * @param urlString
+	 * @param callback
+	 */
+	void getWikiPageSourceContent(String pageId, AsyncCallback<String> callback);
 }
