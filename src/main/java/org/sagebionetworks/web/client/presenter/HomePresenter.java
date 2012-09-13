@@ -75,6 +75,25 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		} 
 		view.refresh();
 		
+		loadNewsFeed();
+		loadSupportFeed();
+
+	}
+	
+	public void loadBccOverviewDescription() {
+		rssService.getWikiPageContent(DisplayUtils.BCC_SUMMARY_CONTENT_PAGE_ID, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.showBccOverview(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				//don't show the bcc overview
+			}
+		});
+	}
+	
+	public void loadNewsFeed(){
 		rssService.getFeedData(DisplayUtils.NEWS_FEED_URL, 4, true, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -91,17 +110,22 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 	
-	public void loadBccOverviewDescription() {
-		rssService.getWikiPageContent(DisplayUtils.BCC_SUMMARY_CONTENT_PAGE_ID, new AsyncCallback<String>() {
+	public void loadSupportFeed(){
+		rssService.getFeedData(DisplayUtils.SUPPORT_FEED_URL, 5, false, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				view.showBccOverview(result);
+				try {
+					view.showSupportFeed(getSupportFeedHtml(result));
+				} catch (RestServiceException e) {
+					onFailure(e);
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				//don't show the bcc overview
+				view.showSupportFeed("<p>"+DisplayConstants.SUPPORT_FEED_UNAVAILABLE_TEXT+"</p>");
 			}
 		});
+
 	}
 	
 	public String getHtml(String rssFeedJson) throws RestServiceException {
@@ -124,6 +148,26 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		return htmlResponse.toString();
 	}
 
+	public String getSupportFeedHtml(String rssFeedJson) throws RestServiceException {
+		RSSFeed feed = nodeModelCreator.createEntity(rssFeedJson, RSSFeed.class);
+		StringBuilder htmlResponse = new StringBuilder();
+		htmlResponse.append("<div class=\"span-12 last notopmargin\"> <ul class=\"list question-list\">");
+		for (int i = 0; i < feed.getEntries().size(); i++) {
+			RSSEntry entry = feed.getEntries().get(i);
+			htmlResponse.append("<li style=\"padding-top: 0px; padding-bottom: 3px\"><h5 style=\"margin-bottom: 0px;\"><a href=\"");
+            //all of the rss links are null from Get Satisfaction.  Just point each item to the main page, showing the recent activity
+			//htmlResponse.append(entry.getLink());
+			htmlResponse.append(DisplayUtils.SUPPORT_RECENT_ACTIVITY_URL);
+            htmlResponse.append("\" class=\"service-tipsy north link\">");
+            htmlResponse.append(entry.getTitle());
+            htmlResponse.append("</a></h5><p class=\"clear small-italic\" style=\"margin-bottom: 0px;\">");
+            htmlResponse.append(entry.getAuthor());
+            htmlResponse.append("</p></li>");
+		}
+		htmlResponse.append("</ul></div>");
+		return htmlResponse.toString();
+	}
+	
 	@Override
     public String mayStop() {
         view.clear();

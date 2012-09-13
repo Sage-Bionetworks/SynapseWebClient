@@ -72,6 +72,7 @@ public class DisplayConstants {
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
 	
 	public static final String NEWS_UNAVAILABLE_TEXT = "The Synapse news service is currently unavailable.";
+	public static final String SUPPORT_FEED_UNAVAILABLE_TEXT = "The Synapse support feed service is currently unavailable.";
 	
 	/*
 	 * Buttons, titles and labels
