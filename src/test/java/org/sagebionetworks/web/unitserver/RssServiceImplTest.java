@@ -95,4 +95,20 @@ public class RssServiceImplTest {
 		Assert.assertTrue(content.length() > 0);
 	}
 	
+	@Test
+	public void testEmptyWikiSource() throws RestServiceException{
+		String source = service.trimWikiSourceHtml("");
+		Assert.assertTrue(source.length() == 0);
+		source = service.trimWikiSourceHtml(null);
+		Assert.assertTrue(source.length() == 0);
+	}
+	
+	@Test
+	public void testWikiSource(){
+		String testSourceContent = "<!DOCTYPE html><html>    <head>        <title>View Source</title>        <link type=\"text/css\" rel=\"stylesheet\" href=\"/wiki/s/en_GB/4005/6b369ed7e36635cc083008aa53c04924ccc64d8e.2/43/_/download/superbatch/css/batch.css\" media=\"all\"><!--[if lt IE 9]><link type=\"text/css\" rel=\"stylesheet\" href=\"/wiki/s/en_GB/4005/6b369ed7e36635cc083008aa53c04924ccc64d8e.2/43/_/download/superbatch/css/batch.css?conditionalComment=lt+IE+9\" media=\"all\"><![endif]--><!--[if IE 9]><link type=\"text/css\" rel=\"stylesheet\" href=\"/wiki/s/en_GB/4005/6b369ed7e36635cc083008aa53c04924ccc64d8e.2/43/_/download/superbatch/css/batch.css?conditionalComment=IE+9\" media=\"all\"><![endif]--><!--[if lte IE 9]><link type=\"text/css\" rel=\"stylesheet\" href=\"/wiki/s/en_GB/4005/6b369ed7e36635cc083008aa53c04924ccc64d8e.2/43/_/download/superbatch/css/batch.css?conditionalComment=lte+IE+9\" media=\"all\"><![endif]--><link type=\"text/css\" rel=\"stylesheet\" href=\"/wiki/s/en_GB/4005/6b369ed7e36635cc083008aa53c04924ccc64d8e.2/43/_/download/superbatch/css/batch.css?media=print\" media=\"print\"><link type=\"text/css\" rel=\"stylesheet\" href=\"/wiki/s/en_GB/4005/6b369ed7e36635cc083008aa53c04924ccc64d8e.2/62f4f3557eda409b4338e82af65179bb/_/download/contextbatch/css/plugin.viewsource/batch.css\" media=\"all\"><link type=\"text/css\" rel=\"stylesheet\" href=\"/wiki/s/en_GB/4005/6b369ed7e36635cc083008aa53c04924ccc64d8e.2/cc08421bd0303098e82038e043b1547f/_/download/contextbatch/css/page/batch.css\" media=\"all\"><link type=\"text/css\" rel=\"stylesheet\" href=\"/wiki/s/en_GB/4005/6b369ed7e36635cc083008aa53c04924ccc64d8e.2/9ca488864d767244f3959778bc7f5496/_/download/contextbatch/css/editor-content/batch.css\" media=\"all\"><link type=\"text/css\" rel=\"stylesheet\" href=\"/wiki/s/en_GB/4005/6b369ed7e36635cc083008aa53c04924ccc64d8e.2/1/_/styles/colors.css?spaceKey=SWC\" media=\"all\"><link type=\"text/css\" rel=\"stylesheet\" href=\"/wiki/s/en_GB/4005/6b369ed7e36635cc083008aa53c04924ccc64d8e.2/5.0-OD-6/_/download/resources/com.atlassian.studio.confluence:studio/default-theme.css\" media=\"all\">    </head>    <body class=\"mceContentBody wiki-content fullsize\">        <p>&nbsp;</p>         <p class=\"p1\">The goal of the breast cancer prognosis challenge is to assess the accuracy of computational models designed to predict breast cancer survival based on clinical information about the patient's tumor as well as genome-wide molecular profiling data including gene expression and copy number profiles.</p>        <p>&nbsp;</p>    </body></html>";
+		String trimmedContent = service.trimWikiSourceHtml(testSourceContent);
+		//verify that the trimmed content is less than the source, but not empty
+		Assert.assertTrue(trimmedContent.length() < testSourceContent.length() && trimmedContent.length() > 0);
+	}
+	
 }

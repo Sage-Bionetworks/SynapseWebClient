@@ -57,7 +57,7 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		this.view.showOverView();
 		
 
-		rssService.getWikiPageContent(DisplayUtils.BCC_CONTENT_PAGE_ID, new AsyncCallback<String>() {
+		rssService.getWikiPageSourceContent(DisplayUtils.BCC_CONTENT_PAGE_ID, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				view.showChallengeInfo(DisplayUtils.fixWikiLinks(DisplayUtils.fixEmbeddedYouTube(result)));
