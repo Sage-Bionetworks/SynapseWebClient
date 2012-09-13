@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -130,6 +131,32 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		}
 		
 		return parseContent(xml);
+	}
+	
+	@Override
+	public String getWikiPageSourceContent(String pageId) {
+		String sourceHtml = "";
+		try {
+			Map<String, String> params = new HashMap<String, String>();
+			params.put("pageId", pageId);
+			sourceHtml = HttpUtils.httpGet(DisplayUtils.WIKI_PAGE_SOURCE_CONTENT_URL, params);
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Could not read from the source: " + DisplayUtils.WIKI_PAGE_SOURCE_CONTENT_URL + " for pageId " + pageId, e);
+		}
+		
+		return trimWikiSourceHtml(sourceHtml);
+	
+	}
+	
+	public static String trimWikiSourceHtml(String sourceHtml) {
+		String returnHtml = "";
+		if (sourceHtml != null) {
+			int startIndex = sourceHtml.indexOf(DisplayUtils.WIKI_SOURCE_DELIMITER);
+			int endIndex = sourceHtml.lastIndexOf(DisplayUtils.WIKI_SOURCE_DELIMITER);
+			if (startIndex > -1 && endIndex > -1)
+				returnHtml = sourceHtml.substring(startIndex, endIndex);
+		}
+		return returnHtml;
 	}
 	
 	public static String parseContent(String xml){

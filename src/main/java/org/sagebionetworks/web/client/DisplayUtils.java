@@ -88,6 +88,8 @@ public class DisplayUtils {
 	public static final String FASTPASS_LOGIN_COOKIE_VALUE = "fastpass-logging-in";
 	public static final String FASTPASS_SIGNOVER_URL = "http://support.sagebase.org/fastpass/finish_signover?company=sagebase&fastpass=";
 	public static final String WIKI_CONTENT_URL = "https://sagebionetworks.jira.com/wiki/rest/prototype/1/content/";
+	public static final String WIKI_PAGE_SOURCE_CONTENT_URL = "https://sagebionetworks.jira.com/wiki/plugins/viewsource/viewpagesrc.action";
+	public static final String WIKI_SOURCE_DELIMITER = "<p>&nbsp;</p>";
 	
 	public static final String SUPPORT_URL = "support.sagebase.org";
 	
