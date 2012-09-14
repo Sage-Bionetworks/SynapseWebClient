@@ -112,8 +112,50 @@
 						<a class="button_readmore" href="#Synapse:syn150935"></a>
 					</div>								
 				</div>
+				<!-- Access tutorial -->
+				<div class="span-12 notopmargin last">
+					<div class="span-12 notopmargin">
+						<h3>Data Privacy Levels</h3>
+					</div>
+					<div class="span-12 inner-12 view notopmargin">
+						<div class="span-12 notopmargin last">
+							<div class="span-4 last">
+								<div class="span-4 notopmargin">
+									<div class="left red-shield"></div>
+								    	<h5 class="left service-tipsy north" style="margin-right: 5px; margin-left: 7px;">Controlled Access</h5>
+								</div>
+								<div class="span-4 notopmargin">
+									<div class="left yellow-shield"></div>
+								    	<h5 class="left service-tipsy north" style="margin-right: 5px; margin-left: 7px;">Restricted Access</h5>
+								</div>
+								<div class="span-4 notopmargin">
+									<div class="left green-shield"></div>
+										<h5 class="left service-tipsy north" style="margin-right: 5px; margin-left: 7px;">Open Access</h5>
+								</div>
+							</div>
+							<div class="span-7 notopmargin last" style="width: 290px;">
+								<h4><a href="https://sagebionetworks.jira.com/wiki/display/SWC/Rules+for+Sharing+and+Using+Human+Data+in+Synapse" target="_blank" class="service-tipsy north link">Learn the Rules for Sharing And Using Human Data</a></h4>
+								<p>There are times where human data can only be shared with certain restrictions.  Learn what the rules are and how to apply and comply with data privacy levels.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				
+			</div>
 
-				<div class="span-12 notopmargin main-service last">
+			<div class="span-24 separator"></div>
+			
+			<div class="span-24 notopmargin from_portfolio">
+				
+				<!-- Support site feed! -->
+				<div class="span-12 notopmargin">
+					<div class="span-12">
+						<h3>Recent Support Topics</h3>
+					</div>
+					<g:SimplePanel ui:field="supportFeed" />
+				</div>
+				<div class="span-12 main-service last">
 					<div class="span-12 notopmargin why last">
 						<h3>Top Synapse Contributors</h3>
 						<p>Synapse users who are actively contributing data</p>
@@ -154,10 +196,11 @@
 						</div>
 					</div>
 				</div>
-			</div>
-
+			
+			</div>				
+			
 			<div class="span-24 separator"></div>
-
+			
 			<div class="span-24 notopmargin main-service">
 				<div class="span-24">
 					<h3>News</h3>
