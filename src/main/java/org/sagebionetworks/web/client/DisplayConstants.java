@@ -296,6 +296,7 @@ public class DisplayConstants {
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
 
 	// constants used in GovernanceDialogHelper
+	public static final String MORE = "More...";
 	public static final String FLAG_DIALOG_PREFIX = 
 		"<p>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team";
 	public static final String FLAG_DIALOG_ANONYMOUS_SUFFIX = ".  You must log in order to contact the ACT.</p>";
@@ -306,6 +307,7 @@ public class DisplayConstants {
 	public static final String BUTTON_TEXT_RESTRICT_DATA = "Add Restrictions";
 	public static final String BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT = "Request Access";
 	public static final String BUTTON_TEXT_ACCEPT_TERMS_OF_USE = "Accept Terms of Use";
+	public static final String BUTTON_TEXT_LOGIN = "Login";
 	public static final String FLAG_DIALOG_TITLE = "Flag Data";
 	public static String UNRESTRICTED_DATA_DIALOG_TITLE = "Unrestricted Data";
 	public static String RESTRICTED_DATA_DIALOG_TITLE = "Restricted Data";

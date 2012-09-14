@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.licenseddownloader;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.FileDownload;
@@ -11,12 +12,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	
-	public enum APPROVAL_REQUIRED {
-		NONE,
-		LICENSE_ACCEPTANCE,
-		ACT_APPROVAL
-	}
-
 	/**
 	 * Set the presenter.
 	 * @param presenter

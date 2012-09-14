@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -72,7 +73,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		
 		boolean includeRestrictionWidget();
 		
-		boolean isRestrictedData();		
+		public APPROVAL_REQUIRED getRestrictionLevel();		
 				
 		Callback accessRequirementCallback();
 		
@@ -83,6 +84,8 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		String accessRequirementText();
 		
 		boolean isTermsOfUseAccessRequirement();
+
+		Callback getLoginCallback();
 
 	}
 

@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Summary;
@@ -20,6 +19,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
@@ -256,15 +256,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			jiraFlagLink = presenter.getJiraFlagUrl();
 			jiraRestrictionLink = presenter.getJiraRestrictionUrl();
 		}
-		boolean isRestrictedData = presenter.isRestrictedData();
+		APPROVAL_REQUIRED restrictionLevel = presenter.getRestrictionLevel();
 		String accessRequirementText = null;
-		boolean isTermsOfUseAccessRequirement = false;
 		Callback accessRequirementCallback = null;
 		Callback lockdownCallback = presenter.getDataLockDownCallback();
-		if (isRestrictedData) {
+		Callback loginCallback = presenter.getLoginCallback();
+		if (restrictionLevel!=APPROVAL_REQUIRED.NONE) {
 			accessRequirementText = presenter.accessRequirementText();
-			isTermsOfUseAccessRequirement = presenter.isTermsOfUseAccessRequirement();
-			if (isTermsOfUseAccessRequirement) {
+			if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
 				accessRequirementCallback = presenter.accessRequirementCallback();
 			} else {
 				// get the Jira link for ACT approval
@@ -280,11 +279,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				requestAccessLink,
 				isAnonymous, 
 				hasAdministrativeAccess,
-				isTermsOfUseAccessRequirement,
 				accessRequirementText,
 				accessRequirementCallback,
 				lockdownCallback,
-				isRestrictedData, 
+				loginCallback,
+				restrictionLevel, 
 				hasFulfilledAccessRequirements,
 				iconsImageBundle,
 				synapseJSNIUtils);

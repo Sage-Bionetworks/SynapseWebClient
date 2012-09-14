@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
@@ -78,11 +79,11 @@ public class EntityViewUtils {
 			final String jiraRequestAccessLink,
 			final boolean isAnonymous, 
 			final boolean hasAdministrativeAccess,
-			final boolean isTermsOfUseAccessRequirement,
 			final String accessRequirementText,
 			final Callback accessRequirementCallback,
 			final Callback lockdownCallback,
-			final boolean isRestrictedData, 
+			final Callback loginCallback,
+			final APPROVAL_REQUIRED restrictionLevel, 
 			final boolean hasFulfilledAccessRequirements,
 			IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
@@ -94,29 +95,42 @@ public class EntityViewUtils {
 		td.setVerticalAlign(VerticalAlignment.MIDDLE);
 		lc.setLayout(new ColumnLayout());
 		
-		String dataRestrictionType = isRestrictedData ? "<span  class=\"colored\">Restricted Data:</span>" : "Data Restrictions: None";
-
+		String dataRestrictionType = null; // isRestrictedData ? "<span  class=\"colored\">Restricted Data:</span>" : "Data Restrictions: None";
+		switch (restrictionLevel) {
+		case NONE:
+			dataRestrictionType = "<span  style=\"color:#009900\">Data Access: Open</span>";
+			break;
+		case LICENSE_ACCEPTANCE:
+			dataRestrictionType = "<span  style=\"color:#999900\">Data Access: Restricted</span>";
+			break;
+		case ACT_APPROVAL:
+			dataRestrictionType = "<span  style=\"color:#990000\">Data Access: Controlled</span>";
+			break;
+		default:
+			throw new IllegalArgumentException(restrictionLevel.toString());
+		}
+		
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant(dataRestrictionType);
 		lc.add(new HTML(shb.toSafeHtml()), td);  
 		SafeHtmlBuilder shb2 = new SafeHtmlBuilder();
-		shb2.appendHtmlConstant("<a style=\"padding:10px;\">About...</a>");
+		shb2.appendHtmlConstant("<a style=\"padding:35px;\">"+DisplayConstants.MORE+"</a>");
 		//lc.add(new HTML(shb2.toSafeHtml()), td);  
 		Anchor aboutLink = new Anchor(shb2.toSafeHtml());
 		lc.add(aboutLink, td);
 		aboutLink.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				if (isRestrictedData) {
+				if (restrictionLevel!=APPROVAL_REQUIRED.NONE) {
 					if (isAnonymous) {
 						// show the tou, but can't agree since not logged in
-						GovernanceDialogHelper.showAnonymousAccessRequirement(accessRequirementText, true);
+						GovernanceDialogHelper.showAnonymousAccessRequirement(accessRequirementText, loginCallback, true);
 					} else {
 						if (hasFulfilledAccessRequirements) {
 							// review the ar; can flag
 							GovernanceDialogHelper.showFulfilledAccessRequirement(accessRequirementText, jiraFlagLink);
 						} else {
-							if (isTermsOfUseAccessRequirement) {
+							if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
 								// present TOU for signing
 								GovernanceDialogHelper.showTermsOfUseAccessRequirement(accessRequirementText, accessRequirementCallback, jiraFlagLink);
 							} else {
@@ -147,7 +161,7 @@ public class EntityViewUtils {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (isAnonymous) {
-					GovernanceDialogHelper.showAnonymousFlagDialog();
+					GovernanceDialogHelper.showAnonymousFlagDialog(loginCallback);
 				} else {
 					GovernanceDialogHelper.showLoggedInFlagDialog(jiraFlagLink);
 				}

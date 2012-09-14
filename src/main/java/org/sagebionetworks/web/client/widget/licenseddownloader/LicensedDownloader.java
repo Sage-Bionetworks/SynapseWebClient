@@ -1,9 +1,5 @@
 package org.sagebionetworks.web.client.widget.licenseddownloader;
 
-import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.ACT_APPROVAL;
-import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.LICENSE_ACCEPTANCE;
-import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.NONE;
-
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
@@ -11,12 +7,10 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
@@ -26,19 +20,17 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TermsOfUseHelper;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
-import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.FileDownload;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -244,14 +236,14 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		if (agreement != null && accessRequirement!=null) {
 			view.setLicenseHtml(agreement.getLicenseHtml());
 			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
-				this.setRequireApproval(LICENSE_ACCEPTANCE);
+				this.setRequireApproval(APPROVAL_REQUIRED.LICENSE_ACCEPTANCE);
 			} else if (accessRequirement instanceof ACTAccessRequirement) {
-				this.setRequireApproval(ACT_APPROVAL);
+				this.setRequireApproval(APPROVAL_REQUIRED.ACT_APPROVAL);
 			} else {
 				throw new IllegalArgumentException(ar.getClass().toString());
 			}
 		} else {
-			this.setRequireApproval(NONE);
+			this.setRequireApproval(APPROVAL_REQUIRED.NONE);
 		}
 	}
 	

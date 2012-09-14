@@ -48,12 +48,20 @@ public class GovernanceDialogHelper {
 	}
 	
 	// for an anonymous user attempting to 'flag' a data object
-	public static void showAnonymousFlagDialog() {
+	public static void showAnonymousFlagDialog(final Callback loginCallback) {
         final Dialog dialog = new Dialog();
         configureDialog(dialog);
         dialog.addText(DisplayConstants.FLAG_DIALOG_PREFIX+DisplayConstants.FLAG_DIALOG_ANONYMOUS_SUFFIX);
         dialog.setHeading(DisplayConstants.FLAG_DIALOG_TITLE); 
-        dialog.setButtons(Dialog.CLOSE);
+        dialog.okText = DisplayConstants.BUTTON_TEXT_LOGIN;
+        dialog.setButtons(Dialog.OKCANCEL);
+        Button okButton = dialog.getButtonById(Dialog.OK);
+        okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				loginCallback.invoke();
+			}
+        });       
         dialog.setHideOnButtonClick(true);		
 		dialog.show();		
 	}
@@ -258,7 +266,7 @@ public class GovernanceDialogHelper {
 	}
 	
 	// for a data object having access requirements, when the user is not logged in
-	public static void showAnonymousAccessRequirement(String arText, boolean includeFlag) {
+	public static void showAnonymousAccessRequirement(String arText, final Callback loginCallback, boolean includeFlag) {
         final Dialog dialog = new Dialog();
         configureDialog(dialog);
         ContentPanel panel = createTextPanel(dialog);
@@ -274,7 +282,16 @@ public class GovernanceDialogHelper {
        		panel.addText(sb.toString());
        	}
         dialog.setHeading(DisplayConstants.RESTRICTED_DATA_DIALOG_TITLE); 
-        dialog.setButtons(Dialog.CLOSE);
+        dialog.setButtons(Dialog.OKCANCEL);
+        dialog.okText = DisplayConstants.BUTTON_TEXT_LOGIN;
+        dialog.setButtons(Dialog.OKCANCEL);
+        Button okButton = dialog.getButtonById(Dialog.OK);
+        okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				loginCallback.invoke();
+			}
+        });       
         dialog.setHideOnButtonClick(true);		
 		dialog.show();		
 	}

@@ -28,9 +28,11 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TermsOfUseHelper;
@@ -257,8 +259,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public boolean isRestrictedData() {
-		return bundle.getAccessRequirements().getTotalNumberOfResults()>0L;
+	public APPROVAL_REQUIRED getRestrictionLevel() {
+		if (bundle.getAccessRequirements().getTotalNumberOfResults()==0L) return APPROVAL_REQUIRED.NONE;
+		if (isTermsOfUseAccessRequirement()) return APPROVAL_REQUIRED.LICENSE_ACCEPTANCE;
+		return APPROVAL_REQUIRED.ACT_APPROVAL;
 	}
 
 	@Override
@@ -285,7 +289,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public String accessRequirementText() {
-		if (!isRestrictedData()) throw new IllegalStateException("There is no access requirement.");
+		if (bundle.getAccessRequirements().getResults().size()==0) throw new IllegalStateException("There is no access requirement.");
 		AccessRequirement ar = bundle.getAccessRequirements().getResults().get(0);
 		if (ar instanceof TermsOfUseAccessRequirement) {
 			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
@@ -302,7 +306,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public boolean isTermsOfUseAccessRequirement() {
-		if (!isRestrictedData()) throw new IllegalStateException("There is no access requirement.");
+		if (bundle.getAccessRequirements().getResults().size()==0) throw new IllegalStateException("There is no access requirement.");
 		AccessRequirement ar = getAccessRequirement();
 		if (ar instanceof TermsOfUseAccessRequirement) {
 			return true;		
@@ -364,6 +368,15 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 						view.showInfo("Error", caught.getMessage());
 					}
 				});
+			}
+		};
+	}
+	
+	@Override
+	public Callback getLoginCallback() {
+		return new Callback() {
+			public void invoke() {		
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			}
 		};
 	}

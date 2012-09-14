@@ -30,9 +30,12 @@ public class JiraURLHelper {
 	private static final int ACCESS_RESTRCTION_ISSUE_TYPE = 11;
 	private static final int ACCESS_REQUEST_ISSUE_TYPE = 12;
 	private static final String FLAG_ISSUE_SUMMARY = "Request for ACT to review data";
+	private static final String DEFAULT_FLAG_DESCRIPTION = "I believe the data is posted improperly because...";
+	private static final String DEFAULT_RESTRICTION_DESCRIPTION = "I believe the data should be restricted because...";
 	private static final String ACCESS_RESTRCTION_ISSUE_SUMMARY = "Request for ACT to add data restriction";
 	private static final String ACCESS_REQUEST_ISSUE_SUMMARY = "Request for ACT to grant access to data";
 	private static final String DEFAULT_ISSUE_REPORTER = "synapse-jira-service";
+	private static final String ISSUE_FIELD_DESCRIPTION = "description";
 	private static final String ISSUE_FIELD_PRINCIPAL_ID = "customfield_10740";
 	private static final String ISSUE_FIELD_USER_DISPLAY_NAME = "customfield_10741";
 	private static final String ISSUE_FIELD_DATA_OBJECT_ID = "customfield_10742";
@@ -45,6 +48,7 @@ public class JiraURLHelper {
 			int issueType, // required
 			String summary, // required
 			String reporter, // required
+			String description, // optional
 			String principalId, // optional
 			String userDisplayName, // optional
 			String userEmailAddress, // optional
@@ -59,6 +63,7 @@ public class JiraURLHelper {
 		sb.append("&summary="+summary);
 		sb.append("&reporter="+reporter);
 		sb.append("&priority="+MAJOR_PRIORITY);
+		if (description!=null) sb.append("&"+ISSUE_FIELD_DESCRIPTION+"="+description);
 		if (principalId!=null) sb.append("&"+ISSUE_FIELD_PRINCIPAL_ID+"="+principalId);
 		if (userDisplayName!=null) sb.append("&"+ISSUE_FIELD_USER_DISPLAY_NAME+"="+userDisplayName);
 		if (userEmailAddress!=null) sb.append("&"+ISSUE_FIELD_USER_EMAIL+"="+userEmailAddress);
@@ -80,6 +85,7 @@ public class JiraURLHelper {
 				FLAG_ISSUE_TYPE, 
 				FLAG_ISSUE_SUMMARY, 
 				DEFAULT_ISSUE_REPORTER, 
+				DEFAULT_FLAG_DESCRIPTION,
 				null, 
 				userDisplayName, 
 				userEmailAddress,
@@ -94,6 +100,7 @@ public class JiraURLHelper {
 				ACCESS_RESTRCTION_ISSUE_TYPE, 
 				ACCESS_RESTRCTION_ISSUE_SUMMARY, 
 				DEFAULT_ISSUE_REPORTER, 
+				DEFAULT_RESTRICTION_DESCRIPTION,
 				null, 
 				userDisplayName, 
 				userEmailAddress,
@@ -110,6 +117,7 @@ public class JiraURLHelper {
 				ACCESS_REQUEST_ISSUE_TYPE, 
 				ACCESS_REQUEST_ISSUE_SUMMARY, 
 				DEFAULT_ISSUE_REPORTER, 
+				null,
 				principalId, 
 				userDisplayName, 
 				userEmailAddress,
