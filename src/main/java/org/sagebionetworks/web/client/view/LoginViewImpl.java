@@ -95,6 +95,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void showLogout(boolean isSsoLogout) {
 		clear();
+		headerWidget.refresh();
 		
 		ContentPanel cp = new ContentPanel();
 		cp.setWidth(385);
