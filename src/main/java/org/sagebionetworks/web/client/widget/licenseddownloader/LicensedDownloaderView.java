@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.licenseddownloader;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.FileDownload;
 
@@ -35,22 +36,10 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	public void setLicenseHtml(String licenseHtml);	
 	
 	/**
-	 * Set the citation text to display
-	 * @param citationHtml
-	 */
-	public void setCitationHtml(String citationHtml);
-		
-	/**
 	 * Show the License Box window
 	 */
 	public void showWindow();
 	
-	
-	/**
-	 * Hide the License Box window
-	 */
-	public void hideWindow();
-		
 	/**
 	 * Shows loading in the contents window
 	 */
@@ -81,6 +70,10 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 		public void setLicenseAccepted();
 		
 		public boolean isDownloadAllowed();
+
+		Callback getTermsOfUseCallback();
+
+		public String getRequestAccessLink();
 
 	}
 

@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.licenseddownloader;
 
+import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.ACT_APPROVAL;
+import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.LICENSE_ACCEPTANCE;
+import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.NONE;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
-import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.LocationData;
@@ -16,22 +19,27 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TermsOfUseHelper;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED;
-import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.NONE;
-import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.LICENSE_ACCEPTANCE;
-import static org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView.APPROVAL_REQUIRED.ACT_APPROVAL;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.FileDownload;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -53,14 +61,20 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	private AccessRequirement accessRequirement;
 	private String entityId;
-	private String userPrincipalId;
+	private UserProfile userProfile;
 	
+	private HandlerManager handlerManager = new HandlerManager(this);
+	
+	private StackConfigServiceAsync stackConfigService;
+	private JiraURLHelper jiraUrlHelper;
+
 	@Inject
 	public LicensedDownloader(LicensedDownloaderView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseClientAsync synapseClient,
+			StackConfigServiceAsync stackConfigService,
 			NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -68,12 +82,31 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.stackConfigService = stackConfigService;
+		stackConfigService.getJiraGovernanceProjectId(new AsyncCallback<Integer>(){
+			@Override
+			public void onFailure(Throwable caught) {
+				// no op
+			}
+			@Override
+			public void onSuccess(Integer result) {
+				jiraUrlHelper = new JiraURLHelper(result);
+			}});
 		view.setPresenter(this);		
 	}
 
+	// this method could be public but it's only used privately (when a ToU agreement
+	// is created) so for now it's private
+	private void fireEntityUpdatedEvent() {
+		handlerManager.fireEvent(new EntityUpdatedEvent());
+	}
+	
 	/*
 	 * Public methods
-	 */		
+	 */
+	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {		
+		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
+	}
 
 	/**
 	 * Use with your own download button/link. 
@@ -94,8 +127,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			loadDownloadLocations(entity);		
 			ars = nodeModelCreator.initializeEntity(result.getAccessRequirementsString(), ars);
 			
-			UserProfile userProfile = nodeModelCreator.createEntity(result.getUserProfileString(), UserProfile.class);
-			userPrincipalId = userProfile.getOwnerId();
+			userProfile = nodeModelCreator.createEntity(result.getUserProfileString(), UserProfile.class);
 		} catch (RestServiceException e) {
 			throw new RuntimeException(e);
 		}
@@ -207,16 +239,9 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.view.showWindow();
 	}
 	
-	public void hideWindow() {
-		this.view.hideWindow();
-	}
-	
 	public void setLicenseAgreement(LicenseAgreement agreement, AccessRequirement ar) {
 		accessRequirement = ar;
 		if (agreement != null && accessRequirement!=null) {
-			if (agreement.getCitationHtml() != null) {
-				view.setCitationHtml(agreement.getCitationHtml());
-			}
 			view.setLicenseHtml(agreement.getLicenseHtml());
 			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
 				this.setRequireApproval(LICENSE_ACCEPTANCE);
@@ -248,30 +273,45 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	}
 	
 	@Override
-	public void setLicenseAccepted() {		
-		TermsOfUseAccessApproval agreement = new TermsOfUseAccessApproval();
-		agreement.setAccessorId(userPrincipalId);
-		agreement.setRequirementId(accessRequirement.getId());
-		JSONObjectAdapter approvalJson = null;
-		try {
-			approvalJson = agreement.writeToJSONObject(jsonObjectAdapter.createNew());
-		} catch (JSONObjectAdapterException e) {
-			view.showInfo("Error", e.getMessage());
-			return;
-		}
-		EntityWrapper ew = new EntityWrapper(approvalJson.toJSONString(), agreement.getClass().getName(), null);
-		synapseClient.createAccessApproval(ew, new AsyncCallback<EntityWrapper>(){
+	public Callback getTermsOfUseCallback() {
+		return new Callback() {public void invoke() {setLicenseAccepted();}};
+	}
+	
+	@Override
+	public void setLicenseAccepted() {	
+		Callback onSuccess = new Callback() {
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				refresh(new Callback() {
-					public void invoke() {showWindow();}
-				});
+			public void invoke() {
+				fireEntityUpdatedEvent();
+//				refresh(new Callback() {
+//					public void invoke() {showWindow();}
+//					
+//				});
 			}
+		};
+		CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
 			@Override
-			public void onFailure(Throwable caught) {
-				view.showInfo("Error", caught.getMessage());
-			}			
-		});
+			public void invoke(Throwable t) {
+				view.showInfo("Error", t.getMessage());
+			}
+		};
+		TermsOfUseHelper.signTermsOfUse(
+				userProfile.getOwnerId(), 
+				accessRequirement.getId(), 
+				onSuccess, 
+				onFailure, 
+				synapseClient, 
+				jsonObjectAdapter);
+	}
+	
+	@Override
+	public String getRequestAccessLink() {
+		return jiraUrlHelper.createRequestAccessIssue(
+				userProfile.getOwnerId(), 
+				userProfile.getDisplayName(), 
+				userProfile.getUserName(), 
+				entityId, 
+				accessRequirement.getId().toString());
 	}
 
 }

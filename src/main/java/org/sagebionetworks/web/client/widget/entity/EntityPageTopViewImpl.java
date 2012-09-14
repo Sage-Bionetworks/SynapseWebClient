@@ -250,6 +250,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		boolean hasFulfilledAccessRequirements = false;
 		String jiraFlagLink = null;
 		String jiraRestrictionLink = null;
+		String requestAccessLink = null;
 		if (!isAnonymous) {
 			hasAdministrativeAccess = presenter.hasAdministrativeAccess();
 			jiraFlagLink = presenter.getJiraFlagUrl();
@@ -263,12 +264,20 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if (isRestrictedData) {
 			accessRequirementText = presenter.accessRequirementText();
 			isTermsOfUseAccessRequirement = presenter.isTermsOfUseAccessRequirement();
-			accessRequirementCallback = presenter.accessRequirementCallback();
+			if (isTermsOfUseAccessRequirement) {
+				accessRequirementCallback = presenter.accessRequirementCallback();
+			} else {
+				// get the Jira link for ACT approval
+				if (!isAnonymous) {
+					requestAccessLink = presenter.getJiraRequestAccessUrl();
+				}
+			}
 			if (!isAnonymous) hasFulfilledAccessRequirements = presenter.hasFulfilledAccessRequirements();
 		}
 		return EntityViewUtils.createRestrictionsWidget(
 				jiraFlagLink, 
 				jiraRestrictionLink,
+				requestAccessLink,
 				isAnonymous, 
 				hasAdministrativeAccess,
 				isTermsOfUseAccessRequirement,

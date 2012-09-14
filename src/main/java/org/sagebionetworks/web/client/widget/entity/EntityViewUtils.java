@@ -75,12 +75,13 @@ public class EntityViewUtils {
 	public static Widget createRestrictionsWidget(
 			final String jiraFlagLink, 
 			final String jiraRestrictionsLink,
+			final String jiraRequestAccessLink,
 			final boolean isAnonymous, 
 			final boolean hasAdministrativeAccess,
 			final boolean isTermsOfUseAccessRequirement,
 			final String accessRequirementText,
-			final Callback lockdownCallback,
 			final Callback accessRequirementCallback,
+			final Callback lockdownCallback,
 			final boolean isRestrictedData, 
 			final boolean hasFulfilledAccessRequirements,
 			IconsImageBundle iconsImageBundle,
@@ -109,7 +110,7 @@ public class EntityViewUtils {
 				if (isRestrictedData) {
 					if (isAnonymous) {
 						// show the tou, but can't agree since not logged in
-						GovernanceDialogHelper.showAnonymousAccessRequirement(accessRequirementText);
+						GovernanceDialogHelper.showAnonymousAccessRequirement(accessRequirementText, true);
 					} else {
 						if (hasFulfilledAccessRequirements) {
 							// review the ar; can flag
@@ -120,7 +121,7 @@ public class EntityViewUtils {
 								GovernanceDialogHelper.showTermsOfUseAccessRequirement(accessRequirementText, accessRequirementCallback, jiraFlagLink);
 							} else {
 								// present ar (but can't sign)
-								GovernanceDialogHelper.showACTAccessRequirement(accessRequirementText, jiraFlagLink);
+								GovernanceDialogHelper.showACTAccessRequirement(accessRequirementText, jiraFlagLink, jiraRequestAccessLink);
 							}
 						}
 					}

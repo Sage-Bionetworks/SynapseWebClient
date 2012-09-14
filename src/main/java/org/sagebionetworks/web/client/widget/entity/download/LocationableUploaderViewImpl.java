@@ -34,10 +34,12 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 	private IconsImageBundle iconsImageBundle;
 	private TabPanel tabPanel;
 	private FormPanel formPanel;
-	private Button uploadBtn;
+	private Button uploadRestrictedBtn;
+	private Button uploadUnrestrictedBtn;
 	private Button cancelBtn;
 	private ProgressBar progressBar;
-	private SelectionListener<ButtonEvent> uploadListener;
+	private SelectionListener<ButtonEvent> uploadRestrictedListener;
+	private SelectionListener<ButtonEvent> uploadUnrestrictedListener;
 	private SelectionListener<ButtonEvent> cancelListener;
 	private Listener<FormEvent> submitListener;	
 	private FileUploadField fileUploadField;
@@ -134,6 +136,8 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 					fileUploadField.setValue(fileName);
 				}
 			});
+			formPanel.addText(DisplayConstants.FILE_DOWNLOAD_NOTE);
+			formPanel.addText("<br/>");
 			formPanel.add(fileUploadField);			
 		} else {		
 			formPanel.reset();
@@ -147,7 +151,8 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		progressBar.updateText(DisplayConstants.LABEL_UPLOADING);					
 						
 		// buttons
-		configureUploadButton();		
+		configureUploadRestrictedButton();		
+		configureUploadUnrestrictedButton();		
 		configureCancelButton();		
 		
 		// submit listener
@@ -170,15 +175,38 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		return formPanel;
 	}
 
-	private void configureUploadButton() {
-		if(uploadBtn == null) {
-			uploadBtn = new Button("Upload");
-			formPanel.addButton(uploadBtn);
+	private void configureUploadRestrictedButton() {
+		if(uploadRestrictedBtn == null) {
+			uploadRestrictedBtn = new Button("Upload Restricted");
+			formPanel.addButton(uploadRestrictedBtn);
 		}				
-		if(uploadListener != null) {
-			uploadBtn.removeSelectionListener(uploadListener);
+		if(uploadRestrictedListener != null) {
+			uploadRestrictedBtn.removeSelectionListener(uploadRestrictedListener);
 		}
-		uploadListener = new SelectionListener<ButtonEvent>() {
+		uploadRestrictedListener = new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				if (!formPanel.isValid()) {
+					return;
+				}		
+				formPanel.add(progressBar);
+				formPanel.layout(true);
+				// TODO add the restricted upload
+				formPanel.submit();
+			}
+		};
+		uploadRestrictedBtn.addSelectionListener(uploadRestrictedListener);
+	}
+
+	private void configureUploadUnrestrictedButton() {
+		if(uploadUnrestrictedBtn == null) {
+			uploadUnrestrictedBtn = new Button("Upload Unrestricted");
+			formPanel.addButton(uploadUnrestrictedBtn);
+		}				
+		if(uploadUnrestrictedListener != null) {
+			uploadUnrestrictedBtn.removeSelectionListener(uploadUnrestrictedListener);
+		}
+		uploadUnrestrictedListener = new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				if (!formPanel.isValid()) {
@@ -189,7 +217,7 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 				formPanel.submit();
 			}
 		};
-		uploadBtn.addSelectionListener(uploadListener);
+		uploadUnrestrictedBtn.addSelectionListener(uploadUnrestrictedListener);
 	}
 
 	private void configureCancelButton() {

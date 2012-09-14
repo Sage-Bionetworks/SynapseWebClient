@@ -7,6 +7,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.GovernanceDialogHelper;
 import org.sagebionetworks.web.shared.FileDownload;
 
 import com.extjs.gxt.ui.client.Style;
@@ -41,15 +43,9 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 
 	private Presenter presenter;
 	private APPROVAL_REQUIRED approvalRequired;	
-	private boolean showCitation;
-	private String citationText;	
-	private SafeHtml licenseTextHtml;
+	private String licenseTextHtml;
 	private SafeHtml safeDownloadHtml;
-	private Window eulaWindow;
 	private Window downloadWindow;
-	final CheckBox acceptLicenseCheckBox = new CheckBox();
-	private Button acceptLicenseButton;
-	private LayoutContainer licenseTextContainer;
 	private LayoutContainer downloadContentContainer;
 	private IconsImageBundle icons;
 	private SageImageBundle sageImageBundle;
@@ -80,29 +76,25 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	 */
 	@Override
 	public void showWindow() {
+		if (!presenter.isDownloadAllowed()) return;
+		
 		switch (approvalRequired) {
 		case LICENSE_ACCEPTANCE:
 			// show License window
-			createEulaWindow();
-			// clear out selections if window has already been shown
-			if(acceptLicenseCheckBox != null) {
-				acceptLicenseCheckBox.setValue(false);
-				acceptLicenseButton.disable();
-			}
-			eulaWindow.show();		
+			Callback termsOfUseCallback = presenter.getTermsOfUseCallback();
+			GovernanceDialogHelper.showTermsOfUseAccessRequirement(
+					licenseTextHtml, termsOfUseCallback, null);
 			break;
 		case ACT_APPROVAL:
-			// TODO show information dialog
 			// show License window
-			createEulaWindow();
-			eulaWindow.show();		
+			
+			GovernanceDialogHelper.showACTAccessRequirement(
+					licenseTextHtml, null, presenter.getRequestAccessLink());
 			break;
 		case NONE:
 			// show download window
-			if (presenter.isDownloadAllowed()) {
-				createDownloadWindow();
-				downloadWindow.show();
-			}
+			createDownloadWindow();
+			downloadWindow.show();
 			break;
 		default:
 			throw new IllegalStateException(approvalRequired.toString());
@@ -110,16 +102,6 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	
 	}
 
-	@Override
-	public void hideWindow() {
-		if(eulaWindow != null && eulaWindow.isVisible()) {
-			eulaWindow.hide();			
-		}
-		if(downloadWindow != null && downloadWindow.isVisible()) {
-			downloadWindow.hide();
-		}
-	}
-	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -145,18 +127,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 
 	@Override
 	public void setLicenseHtml(String licenseHtml) {
-		licenseTextHtml = SafeHtmlUtils.fromSafeConstant(licenseHtml);
-		
-		// replace the view content if this is after initialization
-		if(licenseTextContainer != null) {
-			refillLicenseTextContainer();
-		}
-	}
-	
-	@Override
-	public void setCitationHtml(String citationHtml) {
-		showCitation = true;
-		citationText = citationHtml;		
+		this.licenseTextHtml = licenseHtml;
 	}
 	
 	@Deprecated
@@ -222,8 +193,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	@Override
 	public void clear() {
 		// defaults
-		citationText = "";
-		licenseTextHtml = SafeHtmlUtils.fromSafeConstant("");
+		licenseTextHtml = "";
 		safeDownloadHtml = SafeHtmlUtils.fromSafeConstant("");		
 	}
 
@@ -276,116 +246,6 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	/*
 	 * Protected Methods
 	 */	
-	protected void createEulaWindow() {
-		int windowHeight = showCitation ? 510 : 410;		
-		eulaWindow = new Window();
-		eulaWindow.setSize(500, windowHeight);
-		eulaWindow.setPlain(true);
-		eulaWindow.setModal(true);
-		eulaWindow.setBlinkModal(true);
-		String title = "";
-		if (approvalRequired.equals(APPROVAL_REQUIRED.LICENSE_ACCEPTANCE)) {
-			eulaWindow.setHeading("License Acceptance Required");
-			title = "End-User License Agreement<br/>";
-		} else if (approvalRequired.equals(APPROVAL_REQUIRED.ACT_APPROVAL)) {
-			eulaWindow.setHeading("Access and Compliance Team Approval Required");
-			title = "Instructions<br/>";
-		} else {
-			throw new RuntimeException("Unexpected APPROVAL_REQUIRED: "+approvalRequired);
-		}
-		eulaWindow.setLayout(new FitLayout());
-		eulaWindow.setResizable(false);		
-		
-		RowData standardPadding = new RowData();
-		int horizontal = 15;
-		int horizontalDelta = 10;
-		int bottom = 0;
-		int vertical = 10;
-		int verticalDelta = 5;
-		standardPadding.setMargins(new Margins(vertical+verticalDelta, horizontal, bottom, horizontal));
-		RowData h1Padding = new RowData();
-		h1Padding.setMargins(new Margins(vertical, horizontal, bottom, horizontal));
-		RowData h2Padding = new RowData();
-		h2Padding.setMargins(new Margins(vertical, horizontal, bottom, horizontal+horizontalDelta));
-		
-		ContentPanel panel = new ContentPanel();		
-		panel.setLayoutData(new RowLayout(Orientation.VERTICAL));		
-		panel.setBorders(false);
-		panel.setBodyBorder(false);
-		panel.setHeaderVisible(false);		
-		panel.setBodyStyle("backgroundColor: #e8e8e8");
-
-		Label topTxtLabel = new Label(title);
-		topTxtLabel.setStyleAttribute("font-weight", "bold");
-		panel.add(topTxtLabel, standardPadding);
-		
-//		Label top2TxtLabel = new Label("&nbsp;&nbsp;Please read the following License Agreement.");
-//		panel.add(top2TxtLabel, standardPadding);
-		
-		licenseTextContainer = new LayoutContainer();
-		licenseTextContainer.setHeight(200);
-		licenseTextContainer.addStyleName("pad-text");
-		licenseTextContainer.setStyleAttribute("backgroundColor", "white");
-		licenseTextContainer.setBorders(true);
-		licenseTextContainer.setScrollMode(Style.Scroll.AUTOY);
-		refillLicenseTextContainer();
-		panel.add(licenseTextContainer, standardPadding);
-
-
-		if(showCitation) {
-			Label useCitationLabel = new Label("Please use the following citation");
-			panel.add(useCitationLabel);
-			Text citationTxtLabel = new Text(citationText);
-			panel.add(citationTxtLabel);
-		}
-		
-		acceptLicenseCheckBox.setBoxLabel("I accept the terms in the license agreement");
-		acceptLicenseCheckBox.addListener(Events.OnClick, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				if(acceptLicenseCheckBox.getValue()) {
-					acceptLicenseButton.enable();
-				} else {
-					acceptLicenseButton.disable();
-				}
-			}
-		});
-		
-		
-		acceptLicenseButton = new Button("Accept", new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				eulaWindow.hide();
-				presenter.setLicenseAccepted();
-			}
-		});
-		acceptLicenseButton.disable();
-		Button cancelLicenseButton = new Button("Cancel", new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				eulaWindow.hide();
-			}
-		});
-
-		panel.layout(true);
-		if (approvalRequired.equals(APPROVAL_REQUIRED.LICENSE_ACCEPTANCE)) {
-			panel.add(acceptLicenseCheckBox, standardPadding);
-			eulaWindow.addButton(acceptLicenseButton);
-			eulaWindow.addButton(cancelLicenseButton);
-		} else if (approvalRequired.equals(APPROVAL_REQUIRED.ACT_APPROVAL)) {
-			Button okLicenseButton = new Button("OK", new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					eulaWindow.hide();
-				}
-			});
-			eulaWindow.addButton(okLicenseButton);
-		} else {
-			throw new RuntimeException("Unexpected APPROVAL_REQUIRED: "+approvalRequired);
-		}
-		eulaWindow.add(panel);
-		eulaWindow.layout(true);
-	}
 
 	protected void createDownloadWindow() {
 		downloadWindow = new Window();
@@ -439,11 +299,4 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 			downloadContentContainer.layout(true);
 		}
 	}
-
-	private void refillLicenseTextContainer() {
-		licenseTextContainer.removeAll();
-		licenseTextContainer.add(new HTML(licenseTextHtml));
-		licenseTextContainer.layout(true);
-	}
-
 }

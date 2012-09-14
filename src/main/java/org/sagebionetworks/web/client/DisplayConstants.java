@@ -294,5 +294,41 @@ public class DisplayConstants {
 	public static final String ID_BTN_SHARE = "id_btn_share";
 	public static final String ID_BTN_ADD = "id_btn_add";
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
+
+	// constants used in GovernanceDialogHelper
+	public static final String FLAG_DIALOG_PREFIX = 
+		"<p>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team";
+	public static final String FLAG_DIALOG_ANONYMOUS_SUFFIX = ".  You must log in order to contact the ACT.</p>";
+	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX = " by clicking below.</p>";
+	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_1 = " by clicking <a href=\"";
+	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2 = "\" target=\"_blank\" class=\"link\">here</a>.</p>";
+	public static final String BUTTON_TEXT_CONTACT_ACT = "Contact ACT";
+	public static final String BUTTON_TEXT_RESTRICT_DATA = "Add Restrictions";
+	public static final String BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT = "Request Access";
+	public static final String BUTTON_TEXT_ACCEPT_TERMS_OF_USE = "Accept Terms of Use";
+	public static final String FLAG_DIALOG_TITLE = "Flag Data";
+	public static String UNRESTRICTED_DATA_DIALOG_TITLE = "Unrestricted Data";
+	public static String RESTRICTED_DATA_DIALOG_TITLE = "Restricted Data";
+	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to this data is restricted.";
+	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
+	
+	public static String RESTRICTION_DIALOG_TEXT_1 = "<p>This data is currently accessible to all registered Synapse users.  ";
+	public static String RESTRICTION_DIALOG_TEXT_2 = "You are responsible to ensure your data is shared in compliance with the "+
+	"<a href=\"#Governance:0\"  target=\"_blank\" class=\"link\">Synapse guidelines</a>"+
+	" and all applicable laws. ";
+	public static String RESTRICTION_DIALOG_TEXT_3 = "To add data add restrictions, contact the Access and Compliance Team, by clicking below.</p>";
+	public static String RESTRICTION_DIALOG_TEXT_4 = "<p class=\"strong\">NOTE:  If you continue, data access to all registered Synapse users will be temporarily restricted pending review by the ACT.</p>";
+	
+	public static final String TOU_RESTRICTION_HEADER = "In order to access this data you must be a registered Synapse user and agree to the following terms:";
+	public static final String TOU_PROMPT = "Access to the data requires that you agree to the following terms and conditions:";
+	public static final String ACT_PROMPT = "Access to the data requires that you fulfill the following requirements:";
+	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">You have access to this data under the following terms:</p>";
+	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.";
+	public static final String FILE_DOWNLOAD_NOTE = 
+			"You are responsible to ensure your data is shared in compliance with the "+
+			"<a href=\"#Governance:0\" target=\"_blank\" class=\"link\">Synapse guidelines/a>"+
+			" and all applicable laws. If this data requires restrictions for user access, select \"Upload Restricted\", below. "+
+			"If the data may be accessed by registered Synapse users without restrictions, select \"Upload Unrestricted\", below.";	
+
 }
 

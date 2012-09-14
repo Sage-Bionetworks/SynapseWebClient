@@ -21,5 +21,10 @@ public class StackConfigServiceImpl extends RemoteServiceServlet implements Stac
 	public String getBCCSignupEnabled() {
 		return StackConfiguration.getBCCSignupEnabled();
 	}
+	
+	@Override
+	public Integer getJiraGovernanceProjectId() {
+		return StackConfiguration.getJiraGovernanceProjectId();
+	}
 
 }

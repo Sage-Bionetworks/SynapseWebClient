@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.licenseddownloader;
 
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -25,9 +23,9 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -37,8 +35,8 @@ import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
@@ -103,8 +101,12 @@ public class LicensedDownloaderTest {
 		JSONEntityFactory factory = new JSONEntityFactoryImpl(adapterFactory);
 		NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(factory, adapterFactory.createNew());
 		
+		StackConfigServiceAsync configService = mock(StackConfigServiceAsync.class);
+
+		AsyncMockStubber.callSuccessWith("10830").when(configService).getJiraGovernanceProjectId(any(AsyncCallback.class));
+
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
-				jsonObjectAdapterProvider, mockSynapseClient, nodeModelCreator);
+				jsonObjectAdapterProvider, mockSynapseClient, configService, nodeModelCreator);
 		
 		verify(mockView).setPresenter(licensedDownloader);
 		
@@ -225,7 +227,6 @@ public class LicensedDownloaderTest {
 		String citationHtml = "citation";
 		licenseAgreement.setCitationHtml(citationHtml);
 		licensedDownloader.setLicenseAgreement(licenseAgreement, accessRequirement);
-		verify(mockView).setCitationHtml(citationHtml);
 		verify(mockView).setLicenseHtml(licenseAgreement.getLicenseHtml());		
 	}
 	

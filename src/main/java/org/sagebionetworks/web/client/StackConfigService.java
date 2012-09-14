@@ -15,4 +15,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 public interface StackConfigService extends RemoteService {	
 
 	String getBCCSignupEnabled();
+	
+	Integer getJiraGovernanceProjectId();
 }

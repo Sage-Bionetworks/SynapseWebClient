@@ -63,6 +63,11 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		 */
 		String getJiraRestrictionUrl();
 		
+		/**
+		 * 
+		 */
+		String getJiraRequestAccessUrl();
+		
 		boolean hasAdministrativeAccess();
 		
 		boolean includeRestrictionWidget();

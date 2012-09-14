@@ -104,6 +104,13 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		}
 		// Configure the button
 		licensedDownloader.configureHeadless(entity);
+		// this allows the menu to respond to the user signing a Terms of Use agreement in the licensed downloader
+		licensedDownloader.addEntityUpdatedHandler(new EntityUpdatedHandler() {			
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		});
 
 
 		// edit button

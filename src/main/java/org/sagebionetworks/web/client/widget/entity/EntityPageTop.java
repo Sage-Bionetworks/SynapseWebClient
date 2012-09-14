@@ -6,10 +6,12 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.GenericData;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PhenotypeData;
+import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -21,6 +23,7 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -29,8 +32,11 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TermsOfUseHelper;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.event.shared.EventBus;
@@ -57,6 +63,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private String entityTypeDisplay; 
 	private EventBus bus;
 	private String rStudioUrl;
+	private StackConfigServiceAsync stackConfigService;
+	private JiraURLHelper jiraURLHelper;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service,
@@ -68,6 +76,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			JSONObjectAdapter jsonObjectAdapter,
 			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle,
+			StackConfigServiceAsync stackConfigService,
 			EventBus bus) {
 		this.view = view;
 		this.nodeService = service;
@@ -80,6 +89,16 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.entityTypeProvider = entityTypeProvider;
 		this.iconsImageBundle = iconsImageBundle;
 		this.bus = bus;
+		this.stackConfigService = stackConfigService;
+		stackConfigService.getJiraGovernanceProjectId(new AsyncCallback<Integer>(){
+			@Override
+			public void onFailure(Throwable caught) {
+				// no op
+			}
+			@Override
+			public void onSuccess(Integer result) {
+				jiraURLHelper = new JiraURLHelper(result);
+			}});
 		view.setPresenter(this);
 	}	
 
@@ -204,14 +223,32 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public String getJiraFlagUrl() {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
-		return JiraURLHelper.createFlagIssue(userProfile.getUserName(), userProfile.getDisplayName(), bundle.getEntity().getId());
+		return jiraURLHelper.createFlagIssue(
+				userProfile.getUserName(), 
+				userProfile.getDisplayName(), 
+				bundle.getEntity().getId());
 	}
 
 	@Override
 	public String getJiraRestrictionUrl() {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
-		return JiraURLHelper.createAccessRestrictionIssue(userProfile.getUserName(), userProfile.getDisplayName(), bundle.getEntity().getId());
+		return jiraURLHelper.createAccessRestrictionIssue(
+				userProfile.getUserName(), 
+				userProfile.getDisplayName(), 
+				bundle.getEntity().getId());
+	}
+
+	@Override
+	public String getJiraRequestAccessUrl() {
+		UserProfile userProfile = getUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		return jiraURLHelper.createRequestAccessIssue(
+				userProfile.getOwnerId(), 
+				userProfile.getDisplayName(), 
+				userProfile.getUserName(), 
+				bundle.getEntity().getId(), 
+				getAccessRequirement().getId().toString());
 	}
 
 	@Override
@@ -233,7 +270,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		Data.class.getName(),
 		GenericData.class.getName(),
 		GenotypeData.class.getName(),
-		PhenotypeData.class.getName()
+		PhenotypeData.class.getName(),
+		RObject.class.getName(),
+		ExpressionData.class.getName()
 	};
 	
 	@Override
@@ -280,7 +319,28 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return new Callback() {
 			@Override
 			public void invoke() {
-				// TODO Auto-generated method stub
+				// create the self-signed access approval, then update this object
+				String principalId = getUserProfile().getOwnerId();
+				AccessRequirement ar = getAccessRequirement();
+				Callback onSuccess = new Callback() {
+					@Override
+					public void invoke() {
+						fireEntityUpdatedEvent();
+					}
+				};
+				CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
+					@Override
+					public void invoke(Throwable t) {
+						view.showInfo("Error", t.getMessage());
+					}
+				};
+				TermsOfUseHelper.signTermsOfUse(
+						principalId, 
+						ar.getId(), 
+						onSuccess, 
+						onFailure, 
+						synapseClient, 
+						jsonObjectAdapter);
 			}
 		};
 	}
@@ -290,7 +350,20 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return new Callback() {
 			@Override
 			public void invoke() {
-				// TODO Auto-generated method stub
+				// TODO this would be the tier 3 requirement
+				EntityWrapper aaEW = null;
+				// TODO we actually need a different method to create the tier 3 requirement
+				// since a user doesn't have authority to do so
+				synapseClient.createAccessRequirement(aaEW, new AsyncCallback<EntityWrapper>(){
+					@Override
+					public void onSuccess(EntityWrapper result) {
+						fireEntityUpdatedEvent();
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showInfo("Error", caught.getMessage());
+					}
+				});
 			}
 		};
 	}
