@@ -9,6 +9,7 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
@@ -29,7 +30,7 @@ public interface SynapseClientAsync {
 
 	void getEntityPath(String entityId, AsyncCallback<EntityWrapper> callback);
 
-	void search(String searchQueryJson, AsyncCallback<EntityWrapper> callback);
+	RequestBuilder search(String searchQueryJson, AsyncCallback<EntityWrapper> callback);
 
 	void junk(SerializableWhitelist l,
 			AsyncCallback<SerializableWhitelist> callback);

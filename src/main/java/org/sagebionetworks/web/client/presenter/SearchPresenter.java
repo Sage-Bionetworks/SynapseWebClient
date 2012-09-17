@@ -32,6 +32,8 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -297,7 +299,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		try {
 			currentSearch.writeToJSONObject(adapter);
-			synapseClient.search(adapter.toJSONString(), new AsyncCallback<EntityWrapper>() {			
+			RequestBuilder rb = synapseClient.search(adapter.toJSONString(), new AsyncCallback<EntityWrapper>() {			
 				@Override
 				public void onSuccess(EntityWrapper result) {
 					currentResult = new SearchResults();		
@@ -317,6 +319,12 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 					}
 				}
 			});
+			rb.setTimeoutMillis(20000);
+			try {
+				rb.send();
+			} catch (RequestException e) {
+				
+			}
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 		}
