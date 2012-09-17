@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfilePanel;
 
@@ -11,16 +13,17 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.HTML;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.HTML;
 
 public class GovernanceDialogHelper {
+
 	
 	private static RowData standardPadding;
 	static {
@@ -47,10 +50,15 @@ public class GovernanceDialogHelper {
 	        dialog.setResizable(false);		
 	}
 	
+	private static ImageResource flagIcon(IconsImageBundle iconsImageBundle) {
+		return iconsImageBundle.flagSmall16();
+	}
+	
 	// for an anonymous user attempting to 'flag' a data object
-	public static void showAnonymousFlagDialog(final Callback loginCallback) {
+	public static void showAnonymousFlagDialog(final Callback loginCallback, IconsImageBundle iconsImageBundle) {
         final Dialog dialog = new Dialog();
         configureDialog(dialog);
+        dialog.setIcon(AbstractImagePrototype.create(flagIcon(iconsImageBundle)));
         dialog.addText(DisplayConstants.FLAG_DIALOG_PREFIX+DisplayConstants.FLAG_DIALOG_ANONYMOUS_SUFFIX);
         dialog.setHeading(DisplayConstants.FLAG_DIALOG_TITLE); 
         dialog.okText = DisplayConstants.BUTTON_TEXT_LOGIN;
@@ -67,9 +75,10 @@ public class GovernanceDialogHelper {
 	}
 	
 	// for a logged-in user trying to 'flag' a data object
-	public static void showLoggedInFlagDialog(final String jiraFlagLink) {
+	public static void showLoggedInFlagDialog(final String jiraFlagLink, IconsImageBundle iconsImageBundle) {
         final Dialog dialog = new Dialog();
         configureDialog(dialog);
+        dialog.setIcon(AbstractImagePrototype.create(flagIcon(iconsImageBundle)));
     	StringBuilder sb = new StringBuilder(DisplayConstants.FLAG_DIALOG_PREFIX);
     	sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX);
     	dialog.addText(sb.toString());
@@ -91,71 +100,6 @@ public class GovernanceDialogHelper {
 	}
 	
 		
-	// for a user having admin access to a data object which does not currently have access restrictions
-	public static void showImposeRestrictionsDialog(final String jiraRestrictionsLink, final Callback lockdownCallback) {
-        final Dialog dialog = new Dialog();
-        configureDialog(dialog);
-    	StringBuilder sb = new StringBuilder();
-       	sb.append(DisplayConstants.RESTRICTION_DIALOG_TEXT_1);
-       	sb.append(DisplayConstants.RESTRICTION_DIALOG_TEXT_2);
-       	sb.append(DisplayConstants.RESTRICTION_DIALOG_TEXT_3);
-       	sb.append(DisplayConstants.RESTRICTION_DIALOG_TEXT_4);
-    	dialog.addText(sb.toString());
-        dialog.setHeading(DisplayConstants.UNRESTRICTED_DATA_DIALOG_TITLE); 
-        dialog.okText = DisplayConstants.BUTTON_TEXT_CONTACT_ACT;
-        dialog.setButtons(Dialog.OKCANCEL);
-        Button okButton = dialog.getButtonById(Dialog.OK);
-        okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				// lock down data object
-				lockdownCallback.invoke();
-				// open jira page to make 'flag' issue
-				Window.open(jiraRestrictionsLink, "_blank", "");
-			}
-        });
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();			
-	}
-	
-	// for a user lacking admin access to a data object which does not currently have access restrictions
-	public static void showUnrestrictedDataDialog(final String jiraFlagLink) {
-        final Dialog dialog = new Dialog();
-        configureDialog(dialog);
-    	StringBuilder sb = new StringBuilder();
-       	sb.append(DisplayConstants.RESTRICTION_DIALOG_TEXT_1);
-       	sb.append(DisplayConstants.FLAG_DIALOG_PREFIX);
-       	sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX);
-    	dialog.addText(sb.toString());
-        dialog.setHeading(DisplayConstants.UNRESTRICTED_DATA_DIALOG_TITLE); 
-        dialog.okText = DisplayConstants.BUTTON_TEXT_CONTACT_ACT;
-        dialog.setButtons(Dialog.OKCANCEL);
-        Button okButton = dialog.getButtonById(Dialog.OK);
-        okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				// open jira page to make 'flag' issue
-				Window.open(jiraFlagLink, "_blank", "");
-			}
-        });
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();		
-	}
-	
-	// for an anonymous user reviewing a data object which does not have access restrictions
-	public static void showAnonymousUnrestrictedDataDialog() {
-        final Dialog dialog = new Dialog();
-        configureDialog(dialog);
-    	StringBuilder sb = new StringBuilder();
-       	sb.append(DisplayConstants.RESTRICTION_DIALOG_TEXT_1);
-       	sb.append(DisplayConstants.FLAG_DIALOG_PREFIX);
-       	sb.append(DisplayConstants.FLAG_DIALOG_ANONYMOUS_SUFFIX);
-    	dialog.addText(sb.toString());
-        dialog.setHeading(DisplayConstants.UNRESTRICTED_DATA_DIALOG_TITLE); 
-        dialog.setButtons(Dialog.CLOSE);
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();		
-	}
 	
 	private static ContentPanel createTextPanel(Dialog dialog) {
 		ContentPanel panel = new ContentPanel();		
@@ -186,114 +130,147 @@ public class GovernanceDialogHelper {
 		return licenseTextContainer;
 	}
 	
-	// for a data object having a terms-of-use access requirement which the user has not signed
-	// note: jiraFlagLink is optional
-	public static void showTermsOfUseAccessRequirement(String touText, final Callback callback, final String jiraFlagLink) {
-        final Dialog dialog = new Dialog();
+	private static ImageResource restrictionLevelIcon(APPROVAL_REQUIRED restrictionLevel, IconsImageBundle iconsImageBundle) {
+		switch (restrictionLevel) {
+		case NONE:
+			return iconsImageBundle.flagSmall16(); // TODO use correct icon here
+		case LICENSE_ACCEPTANCE:
+			return iconsImageBundle.flagSmall16(); // TODO use correct icon here
+		case ACT_APPROVAL:
+			return iconsImageBundle.flagSmall16(); // TODO use correct icon here
+		default:
+			throw new IllegalArgumentException(restrictionLevel.toString());
+		}
+	}
+	
+	public static void showAccessRequirement(
+			APPROVAL_REQUIRED restrictionLevel, 
+			boolean isAnonymous, 
+			boolean hasAdministrativeAccess,
+			boolean accessApproved, 
+			IconsImageBundle iconsImageBundle,
+			String arText,
+			final Callback imposeRestrictionsCallback,
+			final Callback touAcceptanceCallback,
+			final Callback requestACTCallback,
+			final Callback loginCallback,
+			final String jiraFlagLink) {
+		if (restrictionLevel!=APPROVAL_REQUIRED.NONE && isAnonymous && accessApproved) 
+			throw new IllegalArgumentException("restrictionLevel!=APPROVAL_REQUIRED.NONE && isAnonymous && accessApproved");
+		boolean imposeRestrictionsAllowed = (restrictionLevel==APPROVAL_REQUIRED.NONE && hasAdministrativeAccess);
+		final Dialog dialog = new Dialog();
         configureDialog(dialog);
         ContentPanel panel = createTextPanel(dialog);
-       	panel.addText("<p>"+DisplayConstants.TOU_RESTRICTION_HEADER+"</p>");
-       	panel.add(createLicenseTextContainer(touText), standardPadding);
-      	if (jiraFlagLink!=null) {
-        	StringBuilder sb = new StringBuilder();
-      		sb.append(DisplayConstants.FLAG_DIALOG_PREFIX);
-       		sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_1);
-       		sb.append(jiraFlagLink);
-       		sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2);
+ 		// title and icon are based on restriction level, e.g. "Data Access: Restricted"
+        dialog.setIcon(AbstractImagePrototype.create(restrictionLevelIcon(restrictionLevel, iconsImageBundle)));
+        dialog.setHeading("Data Access: "+EntityViewUtils.restrictionDescriptor(restrictionLevel)); 
+		// next comes the restriction descriptor, e.g. "Access to the data is Restricted." (Bold)
+      	panel.addText("<p class=\"strong\">Access to the data is "+EntityViewUtils.restrictionDescriptor(restrictionLevel)+".</p>");
+      	if (restrictionLevel==APPROVAL_REQUIRED.NONE) {
+      		panel.addText("<p>"+DisplayConstants.UNRESTRICTED_DESCRIPTION+"</p>");
+      	} else {
+         	// next, if you are approved, comes "You have access to this data under the following..."
+    		// or if you are not approved, "In order to Access..."
+     		if (accessApproved) {
+      			panel.addText(DisplayConstants.RESTRICTION_FULFILLED_STATEMENT);
+      		} else {
+      			if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
+          			panel.addText(DisplayConstants.TOU_PROMPT);
+     			} else { //restrictionLevel==APPROVAL_REQUIRED.ACT_APPROVAL
+          			panel.addText(DisplayConstants.ACT_PROMPT);
+     			}
+      		}
+    		// next comes the Terms of Use or ACT info, in its own box
+           	panel.add(createLicenseTextContainer(arText), standardPadding);
+    		// if not logged in there's an extra line "Note:  You must log in to access restricted data."
+           	if (isAnonymous) {
+           		panel.addText(DisplayConstants.RESTRICTED_DATA_LOGIN_WARNING);
+           	}
+      	}
+		// next there's a prompt with a link to the Governance page
+      	if (imposeRestrictionsAllowed) {
+           	StringBuilder sb = new StringBuilder();
+        	sb.append("<p>"+DisplayConstants.ADMIN_GOVERNANCE_REFERENCE);
+        	sb.append(DisplayConstants.RESTRICTION_DIALOG_TEXT_3);
+        	sb.append(DisplayConstants.RESTRICTION_DIALOG_TEXT_4);
+        	sb.append("</p>");
         	panel.addText(sb.toString());
-       	}
-    	dialog.setHeading(DisplayConstants.RESTRICTED_DATA_DIALOG_TITLE); 
-        dialog.okText = DisplayConstants.BUTTON_TEXT_ACCEPT_TERMS_OF_USE;
-        dialog.setButtons(Dialog.OKCANCEL);
-        Button touButton = dialog.getButtonById(Dialog.OK);
-        touButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				callback.invoke();
-			}
-        });
+     	} else {
+          	panel.addText("<p>"+DisplayConstants.GOVERNANCE_REFERENCE+"</p>");
+     	}
+		// finally there the Flag notice and hyperlink
+      	// (but not for a user having admin access to their own dataaset
+      	if (isAnonymous) {
+            panel.addText(DisplayConstants.FLAG_DIALOG_PREFIX+
+            		DisplayConstants.FLAG_DIALOG_ANONYMOUS_SUFFIX);
+      	} else if (!imposeRestrictionsAllowed) {
+           	StringBuilder sb = new StringBuilder();
+           	sb.append(DisplayConstants.FLAG_DIALOG_PREFIX);
+            sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_1);
+            sb.append(jiraFlagLink);
+            sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2);
+        	panel.addText(sb.toString());
+      	}
+		// buttons:
+     	if (isAnonymous) {
+      		// login or cancel
+            dialog.okText = DisplayConstants.BUTTON_TEXT_LOGIN;
+            dialog.setButtons(Dialog.OKCANCEL);
+            Button okButton = dialog.getButtonById(Dialog.OK);
+            okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+    			@Override
+    			public void componentSelected(ButtonEvent ce) {loginCallback.invoke();}
+            });       
+     	} else {
+      		if (restrictionLevel==APPROVAL_REQUIRED.NONE) {
+      			if (hasAdministrativeAccess) {
+      				// button to contact act, cancel
+      				// Note:  "contact act" should become "Add Restriction"
+      		        dialog.okText = DisplayConstants.BUTTON_TEXT_RESTRICT_DATA;
+      		        dialog.setButtons(Dialog.OKCANCEL);
+      		        Button okButton = dialog.getButtonById(Dialog.OK);
+      		        okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+      					@Override
+      					public void componentSelected(ButtonEvent ce) {
+      						imposeRestrictionsCallback.invoke();
+      					}
+      		        });
+      			} else {
+        			// just a close button
+      		        dialog.setButtons(Dialog.CLOSE);
+     			}
+    		} else {
+     			if (accessApproved) {
+     				// just a close button
+     		        dialog.setButtons(Dialog.CLOSE);
+     			} else {
+	     			if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
+	     				// agree to TOU, cancel
+	     		        dialog.okText = DisplayConstants.BUTTON_TEXT_ACCEPT_TERMS_OF_USE;
+	     		        dialog.setButtons(Dialog.OKCANCEL);
+	     		        Button touButton = dialog.getButtonById(Dialog.OK);
+	     		        touButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+	     					@Override
+	     					public void componentSelected(ButtonEvent ce) {
+	     						touAcceptanceCallback.invoke();
+	     					}
+	     		        });
+	     			} else { //ACT_APPROVAL
+	     				// request access, cancel
+	     		        dialog.okText = DisplayConstants.BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT;
+	     		        dialog.setButtons(Dialog.OKCANCEL);
+	     		        Button touButton = dialog.getButtonById(Dialog.OK);
+	     		        touButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+	     					@Override
+	     					public void componentSelected(ButtonEvent ce) {
+	     						requestACTCallback.invoke();
+	     					}
+	     		        });
+	     			}
+     			}
+      		}
+      	}
         dialog.setHideOnButtonClick(true);		
 		dialog.show();		
 	}
-	
-	// for a data object having an ACT (tier 3) access requirement for which the user has not been approved
-	public static void showACTAccessRequirement(String arText, final String jiraFlagLink, final String requestAccessLink) {
-        final Dialog dialog = new Dialog();
-        configureDialog(dialog);
-        ContentPanel panel = createTextPanel(dialog);
-        panel.addText("<p>"+DisplayConstants.RESTRICTED_DATA_DIALOG_PROMPT+"</p>");
-       	panel.add(createLicenseTextContainer(arText), standardPadding);
-       	if (jiraFlagLink!=null) {
-           StringBuilder sb = new StringBuilder();
-           sb.append(DisplayConstants.FLAG_DIALOG_PREFIX);
-           sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_1);
-           sb.append(jiraFlagLink);
-           sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2);
-           panel.addText(sb.toString());
-       	}
-        dialog.setHeading(DisplayConstants.RESTRICTED_DATA_DIALOG_TITLE); 
-        dialog.okText = DisplayConstants.BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT;
-        dialog.setButtons(Dialog.OKCANCEL);
-        Button okButton = dialog.getButtonById(Dialog.OK);
-        okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				// open jira page to make 'flag' issue
-				Window.open(requestAccessLink, "_blank", "");
-			}
-        });
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();		
-	}
-	
-	// for a data object having access requirement(s) which the user has fulfilled
-	public static void showFulfilledAccessRequirement(String arText, final String jiraFlagLink) {
-        final Dialog dialog = new Dialog();
-        configureDialog(dialog);
-        ContentPanel panel = createTextPanel(dialog);
-       	panel.addText("<p>"+DisplayConstants.RESTRICTION_FULFILLED_STATEMENT+"</p>");
-       	panel.add(createLicenseTextContainer(arText), standardPadding);
-       	StringBuilder sb = new StringBuilder();
-       	sb.append(DisplayConstants.FLAG_DIALOG_PREFIX);
-        sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_1);
-        sb.append(jiraFlagLink);
-        sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2);
-    	panel.addText(sb.toString());
-        dialog.setHeading(DisplayConstants.RESTRICTION_FULFILLED_DATA_DIALOG_TITLE); 
-        dialog.setButtons(Dialog.CLOSE);
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();		
-	}
-	
-	// for a data object having access requirements, when the user is not logged in
-	public static void showAnonymousAccessRequirement(String arText, final Callback loginCallback, boolean includeFlag) {
-        final Dialog dialog = new Dialog();
-        configureDialog(dialog);
-        ContentPanel panel = createTextPanel(dialog);
-       	panel.addText("<p>"+DisplayConstants.RESTRICTED_DATA_DIALOG_PROMPT+"</p>");
-       	panel.addText("<p>"+DisplayConstants.ACT_PROMPT+"</p>");
-       	panel.add(createLicenseTextContainer(arText), standardPadding);
-       	panel.addText(DisplayConstants.RESTRICTED_DATA_LOGIN_WARNING);
-       	panel.addText("<p/>");
-       	if (includeFlag) {
-       		StringBuilder sb = new StringBuilder();
-       		sb.append(DisplayConstants.FLAG_DIALOG_PREFIX);
-       		sb.append(DisplayConstants.FLAG_DIALOG_ANONYMOUS_SUFFIX);
-       		panel.addText(sb.toString());
-       	}
-        dialog.setHeading(DisplayConstants.RESTRICTED_DATA_DIALOG_TITLE); 
-        dialog.setButtons(Dialog.OKCANCEL);
-        dialog.okText = DisplayConstants.BUTTON_TEXT_LOGIN;
-        dialog.setButtons(Dialog.OKCANCEL);
-        Button okButton = dialog.getButtonById(Dialog.OK);
-        okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				loginCallback.invoke();
-			}
-        });       
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();		
-	}
-
 }

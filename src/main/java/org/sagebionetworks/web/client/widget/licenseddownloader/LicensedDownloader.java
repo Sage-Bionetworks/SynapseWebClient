@@ -23,7 +23,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.utils.TermsOfUseHelper;
+import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
@@ -32,6 +32,7 @@ import org.sagebionetworks.web.shared.LicenseAgreement;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -287,7 +288,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 				view.showInfo("Error", t.getMessage());
 			}
 		};
-		TermsOfUseHelper.signTermsOfUse(
+		GovernanceServiceHelper.signTermsOfUse(
 				userProfile.getOwnerId(), 
 				accessRequirement.getId(), 
 				onSuccess, 
@@ -297,13 +298,19 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	}
 	
 	@Override
-	public String getRequestAccessLink() {
-		return jiraUrlHelper.createRequestAccessIssue(
+	public Callback getRequestAccessCallback() {
+		final String jiraLink = jiraUrlHelper.createRequestAccessIssue(
 				userProfile.getOwnerId(), 
 				userProfile.getDisplayName(), 
 				userProfile.getUserName(), 
 				entityId, 
 				accessRequirement.getId().toString());
+		
+		return new Callback() {
+			@Override
+			public void invoke() {
+				Window.open(jiraLink, "_blank", "");
+			}};
 	}
 
 }

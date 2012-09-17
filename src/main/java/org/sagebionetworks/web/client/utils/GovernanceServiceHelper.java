@@ -6,9 +6,10 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.shared.EntityWrapper;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class TermsOfUseHelper {
+public class GovernanceServiceHelper {
 	public static void signTermsOfUse(
 			final String principalId,
 			final Long accessRequirementId,
@@ -38,5 +39,23 @@ public class TermsOfUseHelper {
 				onFailure.invoke(caught);
 			}			
 		});
+	}
+	
+	/**
+	 * Lock down access to the given data object, then open a link to request customized access restrictions
+	 * @param principalId
+	 * @param accessRequirementId
+	 * @param onSuccess
+	 * @param onFailure
+	 * @param synapseClient
+	 * @param jsonObjectAdapter
+	 */
+	public static void lockDownData(
+			final SynapseClientAsync synapseClient,
+			final JSONObjectAdapter jsonObjectAdapter,
+			final String jiraRestrictionLink
+			) {
+			// TODO call the service that locks down the dataset
+			Window.open(jiraRestrictionLink, "_blank", "");
 	}
 }

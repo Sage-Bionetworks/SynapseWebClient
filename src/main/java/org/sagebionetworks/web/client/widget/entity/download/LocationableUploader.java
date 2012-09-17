@@ -1,9 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -11,11 +15,15 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -28,15 +36,40 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	private HandlerManager handlerManager = new HandlerManager(this);
 	private Entity entity;
 	private EntityTypeProvider entityTypeProvider;
+	private JSONObjectAdapter jsonObjectAdapter;
+
+	private SynapseClientAsync synapseClient;
+	private StackConfigServiceAsync stackConfigService;
+	private JiraURLHelper jiraURLHelper;
 	
 	@Inject
-	public LocationableUploader(LocationableUploaderView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider) {
+	public LocationableUploader(
+			LocationableUploaderView view, 
+			NodeServiceAsync nodeService, 
+			NodeModelCreator nodeModelCreator, 
+			AuthenticationController authenticationController, 
+			EntityTypeProvider entityTypeProvider,
+			SynapseClientAsync synapseClient,
+			StackConfigServiceAsync stackConfigService,
+			JSONObjectAdapter jsonObjectAdapter
+			) {
 		this.view = view;
 		this.nodeService = nodeService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
-		
+		this.synapseClient = synapseClient;
+		this.stackConfigService = stackConfigService;
+		stackConfigService.getJiraGovernanceProjectId(new AsyncCallback<Integer>(){
+			@Override
+			public void onFailure(Throwable caught) {
+				// no op
+			}
+			@Override
+			public void onSuccess(Integer result) {
+				jiraURLHelper = new JiraURLHelper(result);
+			}});
+		this.jsonObjectAdapter=jsonObjectAdapter;
 		view.setPresenter(this);		
 	}		
 		
@@ -101,6 +134,27 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		}
 		
 	}
+
+	
+	@Override
+	public Callback getImposeRestrictionsCallback() {
+		return new Callback() {
+
+			@Override
+			public void invoke() {
+				UserProfile userProfile = authenticationController.getLoggedInUser().getProfile();
+				if (userProfile==null) throw new NullPointerException("User profile cannot be null.");
+				final String jiraRestrictionLink = jiraURLHelper.createAccessRestrictionIssue(
+						userProfile.getUserName(), userProfile.getDisplayName(), entity.getId());
+				GovernanceServiceHelper.lockDownData(
+						synapseClient, 
+						jsonObjectAdapter, 
+						jiraRestrictionLink);
+			}
+			
+		};
+	}
+
 	
 	
 	/*

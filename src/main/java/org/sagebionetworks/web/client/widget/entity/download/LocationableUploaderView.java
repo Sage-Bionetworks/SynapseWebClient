@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -27,6 +28,9 @@ public interface LocationableUploaderView extends IsWidget, SynapseWidgetView {
 
 		void handleSubmitResult(String resultHtml);
 
+		//String getJiraRestrictionsLink();
+		
+		Callback getImposeRestrictionsCallback();
 	}
 
 

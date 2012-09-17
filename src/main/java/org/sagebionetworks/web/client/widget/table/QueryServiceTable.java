@@ -109,7 +109,7 @@ public class QueryServiceTable implements QueryServiceTableView.Presenter {
         			@Override
         			public void onFailure(Throwable caught) {
         				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
-        					view.showMessage("An error occured. Please try reloading the page.");
+        					view.showMessage("An error occurred. Please try reloading the page.");
         				}
         				callback.onFailure(caught);
         			}

@@ -108,7 +108,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 				@Override
 				public void onFailure(Throwable caught) {
 					view.requestPasswordEmailFailed();
-					view.showErrorMessage("An error occured. Please try reloading the page.");					
+					view.showErrorMessage("An error occurred. Please try reloading the page.");					
 				}
 			});
 		} else {	

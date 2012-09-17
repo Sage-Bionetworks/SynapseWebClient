@@ -35,7 +35,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.utils.TermsOfUseHelper;
+import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -43,6 +43,7 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -231,8 +232,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				bundle.getEntity().getId());
 	}
 
-	@Override
-	public String getJiraRestrictionUrl() {
+	private String getJiraRestrictionUrl() {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		return jiraURLHelper.createAccessRestrictionIssue(
@@ -338,7 +338,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 						view.showInfo("Error", t.getMessage());
 					}
 				};
-				TermsOfUseHelper.signTermsOfUse(
+				GovernanceServiceHelper.signTermsOfUse(
 						principalId, 
 						ar.getId(), 
 						onSuccess, 
@@ -349,8 +349,16 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		};
 	}
 
+	
+	/**
+  						// lock down data object
+      						lockdownCallback.invoke();
+      						// open jira page to make 'flag' issue
+      						Window.open(jiraRestrictionLink, "_blank", "");
+    
+	 */
 	@Override
-	public Callback getDataLockDownCallback() {
+	public Callback getImposeRestrictionsCallback() {
 		return new Callback() {
 			@Override
 			public void invoke() {
@@ -361,6 +369,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				synapseClient.createAccessRequirement(aaEW, new AsyncCallback<EntityWrapper>(){
 					@Override
 					public void onSuccess(EntityWrapper result) {
+						Window.open(getJiraRestrictionUrl(), "_blank", "");
 						fireEntityUpdatedEvent();
 					}
 					@Override

@@ -247,7 +247,7 @@ public class AnnotationEditorViewImpl extends LayoutContainer implements Annotat
 
 	@Override
 	public void showDeleteAnnotationFail() {		
-		showErrorMessage("A problem occured deleting the annotation.");
+		showErrorMessage("A problem occurred deleting the annotation.");
 	}
 	
 

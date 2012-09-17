@@ -59,13 +59,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		
 		/**
 		 * 
-		 * @return
-		 * @exception if anonymous
-		 */
-		String getJiraRestrictionUrl();
-		
-		/**
-		 * 
 		 */
 		String getJiraRequestAccessUrl();
 		
@@ -77,7 +70,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 				
 		Callback accessRequirementCallback();
 		
-		Callback getDataLockDownCallback();
+		Callback getImposeRestrictionsCallback();
 		
 		boolean hasFulfilledAccessRequirements();
 		

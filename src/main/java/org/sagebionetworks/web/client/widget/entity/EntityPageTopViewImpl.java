@@ -70,6 +70,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
@@ -249,39 +250,43 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		boolean hasAdministrativeAccess = false;
 		boolean hasFulfilledAccessRequirements = false;
 		String jiraFlagLink = null;
-		String jiraRestrictionLink = null;
 		String requestAccessLink = null;
 		if (!isAnonymous) {
 			hasAdministrativeAccess = presenter.hasAdministrativeAccess();
 			jiraFlagLink = presenter.getJiraFlagUrl();
-			jiraRestrictionLink = presenter.getJiraRestrictionUrl();
 		}
 		APPROVAL_REQUIRED restrictionLevel = presenter.getRestrictionLevel();
 		String accessRequirementText = null;
-		Callback accessRequirementCallback = null;
-		Callback lockdownCallback = presenter.getDataLockDownCallback();
+		Callback touAcceptanceCallback = null;
+		Callback requestACTCallback = null;
+		Callback imposeRestrictionsCallback = presenter.getImposeRestrictionsCallback();
 		Callback loginCallback = presenter.getLoginCallback();
 		if (restrictionLevel!=APPROVAL_REQUIRED.NONE) {
 			accessRequirementText = presenter.accessRequirementText();
 			if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
-				accessRequirementCallback = presenter.accessRequirementCallback();
+				touAcceptanceCallback = presenter.accessRequirementCallback();
 			} else {
 				// get the Jira link for ACT approval
 				if (!isAnonymous) {
-					requestAccessLink = presenter.getJiraRequestAccessUrl();
+					requestACTCallback = new Callback() {
+						@Override
+						public void invoke() {
+							Window.open(presenter.getJiraRequestAccessUrl(), "_blank", "");
+							
+						}
+					};
 				}
 			}
 			if (!isAnonymous) hasFulfilledAccessRequirements = presenter.hasFulfilledAccessRequirements();
 		}
 		return EntityViewUtils.createRestrictionsWidget(
 				jiraFlagLink, 
-				jiraRestrictionLink,
-				requestAccessLink,
 				isAnonymous, 
 				hasAdministrativeAccess,
 				accessRequirementText,
-				accessRequirementCallback,
-				lockdownCallback,
+				touAcceptanceCallback,
+				requestACTCallback,
+				imposeRestrictionsCallback,
 				loginCallback,
 				restrictionLevel, 
 				hasFulfilledAccessRequirements,

@@ -4,6 +4,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.GovernanceDialogHelper;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -191,8 +193,9 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 				}		
 				formPanel.add(progressBar);
 				formPanel.layout(true);
-				// TODO add the restricted upload
 				formPanel.submit();
+				Callback imposeRestrictionsCallback = presenter.getImposeRestrictionsCallback();
+				imposeRestrictionsCallback.invoke();
 			}
 		};
 		uploadRestrictedBtn.addSelectionListener(uploadRestrictedListener);

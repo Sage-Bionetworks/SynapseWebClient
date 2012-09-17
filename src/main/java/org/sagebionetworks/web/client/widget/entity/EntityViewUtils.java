@@ -72,20 +72,32 @@ public class EntityViewUtils {
 	    lc.layout();
 		return lc;
 	}
+	
+	public static String restrictionDescriptor(APPROVAL_REQUIRED restrictionLevel) {
+		switch (restrictionLevel) {
+		case NONE:
+			return "Open";
+		case LICENSE_ACCEPTANCE:
+			return "Restricted";
+		case ACT_APPROVAL:
+			return "Controlled";
+		default:
+			throw new IllegalArgumentException(restrictionLevel.toString());
+		}
+	}
 
 	public static Widget createRestrictionsWidget(
 			final String jiraFlagLink, 
-			final String jiraRestrictionsLink,
-			final String jiraRequestAccessLink,
 			final boolean isAnonymous, 
 			final boolean hasAdministrativeAccess,
 			final String accessRequirementText,
-			final Callback accessRequirementCallback,
-			final Callback lockdownCallback,
+			final Callback touAcceptanceCallback,
+			final Callback requestACTCallback,
+			final Callback imposeRestrictionsCallback,
 			final Callback loginCallback,
 			final APPROVAL_REQUIRED restrictionLevel, 
 			final boolean hasFulfilledAccessRequirements,
-			IconsImageBundle iconsImageBundle,
+			final IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
 		LayoutContainer lc = new HorizontalPanel();
 		lc.setStyleAttribute("font-size", "80%");
@@ -95,64 +107,47 @@ public class EntityViewUtils {
 		td.setVerticalAlign(VerticalAlignment.MIDDLE);
 		lc.setLayout(new ColumnLayout());
 		
-		String dataRestrictionType = null; // isRestrictedData ? "<span  class=\"colored\">Restricted Data:</span>" : "Data Restrictions: None";
+		String colorCode = null;
 		switch (restrictionLevel) {
 		case NONE:
-			dataRestrictionType = "<span  style=\"color:#009900\">Data Access: Open</span>";
+			colorCode = "#009900";
 			break;
 		case LICENSE_ACCEPTANCE:
-			dataRestrictionType = "<span  style=\"color:#999900\">Data Access: Restricted</span>";
+			colorCode = "#B8860B";
 			break;
 		case ACT_APPROVAL:
-			dataRestrictionType = "<span  style=\"color:#990000\">Data Access: Controlled</span>";
+			colorCode = "#990000";
 			break;
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}
+//		String dataRestrictionType = "Data Access: <span  style=\"color:"+colorCode+"\">"+restrictionDescriptor(restrictionLevel)+"</span>";
+		String dataRestrictionType = "Data Access: "+restrictionDescriptor(restrictionLevel);
 		
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(dataRestrictionType);
-		lc.add(new HTML(shb.toSafeHtml()), td);  
-		SafeHtmlBuilder shb2 = new SafeHtmlBuilder();
-		shb2.appendHtmlConstant("<a style=\"padding:35px;\">"+DisplayConstants.MORE+"</a>");
-		//lc.add(new HTML(shb2.toSafeHtml()), td);  
-		Anchor aboutLink = new Anchor(shb2.toSafeHtml());
+		if (restrictionLevel==APPROVAL_REQUIRED.NONE && hasAdministrativeAccess) {
+			shb.appendHtmlConstant("dataRestrictionType (<a style=\"padding-right:30px;\">modify</a>)");
+		} else {
+			shb.appendHtmlConstant("<a style=\"padding-right:30px;\">"+dataRestrictionType+"</a>");			
+		}
+		Anchor aboutLink = new Anchor(shb.toSafeHtml());
 		lc.add(aboutLink, td);
 		aboutLink.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				if (restrictionLevel!=APPROVAL_REQUIRED.NONE) {
-					if (isAnonymous) {
-						// show the tou, but can't agree since not logged in
-						GovernanceDialogHelper.showAnonymousAccessRequirement(accessRequirementText, loginCallback, true);
-					} else {
-						if (hasFulfilledAccessRequirements) {
-							// review the ar; can flag
-							GovernanceDialogHelper.showFulfilledAccessRequirement(accessRequirementText, jiraFlagLink);
-						} else {
-							if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
-								// present TOU for signing
-								GovernanceDialogHelper.showTermsOfUseAccessRequirement(accessRequirementText, accessRequirementCallback, jiraFlagLink);
-							} else {
-								// present ar (but can't sign)
-								GovernanceDialogHelper.showACTAccessRequirement(accessRequirementText, jiraFlagLink, jiraRequestAccessLink);
-							}
-						}
-					}
-				} else {
-					if (isAnonymous) {
-						// unrestricted and anonymous:  can flag, but need to log in to do so
-						GovernanceDialogHelper.showAnonymousUnrestrictedDataDialog();
-					} else {
-						if (hasAdministrativeAccess) {
-							// unrestricted and admin -> can impose restrictions
-							GovernanceDialogHelper.showImposeRestrictionsDialog(jiraRestrictionsLink, lockdownCallback);
-						} else {
-							// unrestricted and non-admin -> can flag
-							GovernanceDialogHelper.showUnrestrictedDataDialog(jiraFlagLink);
-						}
-					}
-				}
+				GovernanceDialogHelper.showAccessRequirement(
+						restrictionLevel,
+						isAnonymous,
+						hasAdministrativeAccess,
+						hasFulfilledAccessRequirements,
+						iconsImageBundle,
+						accessRequirementText,
+						imposeRestrictionsCallback,
+						touAcceptanceCallback,
+						requestACTCallback,
+						loginCallback,
+						jiraFlagLink);
+
 			}
 		});
 		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")), td);	
@@ -161,9 +156,9 @@ public class EntityViewUtils {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (isAnonymous) {
-					GovernanceDialogHelper.showAnonymousFlagDialog(loginCallback);
+					GovernanceDialogHelper.showAnonymousFlagDialog(loginCallback, iconsImageBundle);
 				} else {
-					GovernanceDialogHelper.showLoggedInFlagDialog(jiraFlagLink);
+					GovernanceDialogHelper.showLoggedInFlagDialog(jiraFlagLink, iconsImageBundle);
 				}
 			}
 		});		

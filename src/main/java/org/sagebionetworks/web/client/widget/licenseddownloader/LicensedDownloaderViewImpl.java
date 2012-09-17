@@ -72,28 +72,25 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	public void showWindow() {
 		if (!presenter.isDownloadAllowed()) return;
 		
-		switch (approvalRequired) {
-		case LICENSE_ACCEPTANCE:
-			// show License window
-			Callback termsOfUseCallback = presenter.getTermsOfUseCallback();
-			GovernanceDialogHelper.showTermsOfUseAccessRequirement(
-					licenseTextHtml, termsOfUseCallback, null);
-			break;
-		case ACT_APPROVAL:
-			// show License window
-			
-			GovernanceDialogHelper.showACTAccessRequirement(
-					licenseTextHtml, null, presenter.getRequestAccessLink());
-			break;
-		case NONE:
-			// show download window
+		if (approvalRequired==APPROVAL_REQUIRED.NONE) {
 			createDownloadWindow();
 			downloadWindow.show();
-			break;
-		default:
-			throw new IllegalStateException(approvalRequired.toString());
+		} else {
+			Callback termsOfUseCallback = presenter.getTermsOfUseCallback();
+			GovernanceDialogHelper.showAccessRequirement(
+					approvalRequired, 
+					false/*isAnonymous*/, 
+					false/*hasAdministrativeAccess*/,
+					false/*accessApproved*/, 
+					icons, 
+					licenseTextHtml, 
+					null/*imposeRestrictionsCallback*/, 
+					termsOfUseCallback, 
+					presenter.getRequestAccessCallback(), 
+					null/*loginCallback*/, 
+					null/*jiraFlagLink*/);
 		}
-	
+		
 	}
 
 	@Override

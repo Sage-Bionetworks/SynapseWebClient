@@ -156,7 +156,7 @@ public class QueryServiceTableTest {
 		// now trigger a failure
 		Throwable exception = new Throwable("Total failure");
 		recorder.playOnFailure(0, exception);
-		verify(mockView).showMessage("An error occured. Please try reloading the page.");
+		verify(mockView).showMessage("An error occurred. Please try reloading the page.");
 	}
 	
 	@Test

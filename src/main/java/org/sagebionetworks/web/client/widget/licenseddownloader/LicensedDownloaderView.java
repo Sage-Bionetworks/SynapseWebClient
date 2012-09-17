@@ -66,9 +66,9 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 		
 		public boolean isDownloadAllowed();
 
-		Callback getTermsOfUseCallback();
+		public Callback getTermsOfUseCallback();
 
-		public String getRequestAccessLink();
+		public Callback getRequestAccessCallback();
 
 	}
 
