@@ -306,6 +306,48 @@ a.shortBtn {
   background-image: url(/images/icons/list-trigger.gif);
 }
 
+.red-shield {
+	background-image: url(images/icons/shield-red-16.png);
+	width: 16px;
+	height: 16px;
+	margin-top: 4px;
+}
+
+.yellow-shield {
+	background-image: url(images/icons/shield-yellow-16.png);
+	width: 16px;
+	height: 16px;
+	margin-top: 4px;
+}
+
+.green-shield {
+	background-image: url(images/icons/shield-green-16.png);
+	width: 16px;
+	height: 16px;
+	margin-top: 4px;
+}
+
+.red-shield-arrow {
+	background-image: url(images/icons/shield-red-16-arrow.png);
+	width: 16px;
+	height: 16px;
+	margin-top: 4px;
+}
+
+.yellow-shield-arrow {
+	background-image: url(images/icons/shield-yellow-arrow-16.png);
+	width: 16px;
+	height: 16px;
+	margin-top: 4px;
+}
+
+.green-shield-arrow {
+	background-image: url(images/icons/shield-green-arrow-16.png);
+	width: 16px;
+	height: 16px;
+	margin-top: 4px;
+}
+
 .image-loading {
 	 background: white url(images/ui-anim_basic_16x16.gif) no-repeat center center;
 }
