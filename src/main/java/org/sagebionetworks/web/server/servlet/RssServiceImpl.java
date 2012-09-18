@@ -1,11 +1,8 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
@@ -14,7 +11,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
+import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,6 +27,7 @@ import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RssService;
 import org.sagebionetworks.web.server.HttpUtils;
@@ -42,14 +47,89 @@ import com.sun.syndication.io.XmlReader;
 public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 	private static final long serialVersionUID = 1L;
 	
-		
+	// Cache all known responses!
+	private Map<String, String> cache = new ConcurrentHashMap<String, String>();
+	private static final String KEY_DELIMITER = ";";
+	private static final String KEY_FEED_PREFIX = "FEED=";
+	private static final String KEY_WIKI_PREFIX = "WIKI=";
+	private static final String KEY_WIKI_SOURCE_PREFIX = "WIKI_SOURCE=";
+	
+	private static Logger logger = Logger.getLogger(RssServiceImpl.class.getName());
+	
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		//update the cache now, and every 5 minutes
+		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		ScheduledFuture<?> scheduleHandle = scheduler.scheduleAtFixedRate(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					updateCache();
+				} catch (Throwable e) {
+					logger.throwing(RssServiceImpl.class.getName(), "updateCache()", e);
+				}
+			}
+		}, 0, 5, TimeUnit.MINUTES);
+	}
+	
+	private void updateCache() throws RestServiceException{
+		//initialize all of the feeds/pages that our app supports
+		logger.info("updating cache");
+		cache.put(KEY_WIKI_SOURCE_PREFIX + DisplayUtils.BCC_CONTENT_PAGE_ID, initWikiPageSourceContent(DisplayUtils.BCC_CONTENT_PAGE_ID));
+		cache.put(KEY_WIKI_PREFIX + DisplayUtils.BCC_SUMMARY_CONTENT_PAGE_ID, initWikiPageContent(DisplayUtils.BCC_SUMMARY_CONTENT_PAGE_ID));
+		cache.put(KEY_FEED_PREFIX + DisplayUtils.NEWS_FEED_URL + KEY_DELIMITER + 4 + KEY_DELIMITER + true, initFeedData(DisplayUtils.NEWS_FEED_URL, 4, true));
+		cache.put(KEY_FEED_PREFIX + DisplayUtils.SUPPORT_FEED_URL + KEY_DELIMITER + 5 + KEY_DELIMITER + false, initFeedData(DisplayUtils.SUPPORT_FEED_URL, 5, false));
+		logger.info("finished cache update");
+	}
+	
 	@Override
 	public String getAllFeedData(String feedUrl) throws RestServiceException {
+		//read from the cache
 		return getFeedData(feedUrl, null, false);
 	}
 	
 	@Override
 	public String getFeedData(String feedUrl, Integer limit, boolean summariesOnly) throws RestServiceException {
+		//read from the cache
+		String key = KEY_FEED_PREFIX + feedUrl + KEY_DELIMITER + limit + KEY_DELIMITER + summariesOnly;
+		String returnValue = cache.get(key);
+		if (returnValue == null)
+			throw new IllegalArgumentException(DisplayConstants.ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE + key);
+		return returnValue;
+	}	
+	
+	@Override
+	public String getWikiPageContent(String pageId){
+		//read from the cache
+		String key = KEY_WIKI_PREFIX + pageId;
+		String returnValue = cache.get(key);
+		if (returnValue == null)
+			throw new IllegalArgumentException(DisplayConstants.ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE + key);
+		return returnValue;
+	}
+	
+	@Override
+	public String getWikiPageSourceContent(String pageId) {
+		//read from the cache
+		String key = KEY_WIKI_SOURCE_PREFIX + pageId;
+		String returnValue = cache.get(key);
+		if (returnValue == null)
+			throw new IllegalArgumentException(DisplayConstants.ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE + key);
+		return returnValue;
+	}
+	
+	@Override
+	public String getUncachedWikiPageSourceContent(String pageId) {
+		return initWikiPageSourceContent(pageId);
+	}
+	
+	protected String initAllFeedData(String feedUrl) throws RestServiceException {
+		return initFeedData(feedUrl, null, false);
+	}
+
+	protected String initFeedData(String feedUrl, Integer limit, boolean summariesOnly) throws RestServiceException {
 		String jsonResponse = "";
 		try {
 			URL feedSource = new URL(feedUrl);
@@ -67,8 +147,6 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 	}
 	
 	public static String getFeed(SyndFeed feed, Integer limit, boolean summariesOnly) {
-		//Create a cache (check latest post. if hasn't changed, return cached html. if changed, set the latest post for the feed and calculate the new html response)? 
-		//Most of the requests are going to be the same from the client. The question is how frequent is the feed updated.
 		RSSFeed jsonFeed = new RSSFeed();
 		jsonFeed.setAuthor(feed.getAuthor());
 		jsonFeed.setDescription(feed.getDescription());
@@ -120,8 +198,7 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		}
 	}
 	
-	@Override
-	public String getWikiPageContent(String pageId){
+	protected String initWikiPageContent(String pageId){
 		String urlString = DisplayUtils.WIKI_CONTENT_URL + pageId;
 		String xml = "";
 		try {
@@ -129,12 +206,10 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not read from the source: " + urlString, e);
 		}
-		
 		return parseContent(xml);
 	}
 	
-	@Override
-	public String getWikiPageSourceContent(String pageId) {
+	protected String initWikiPageSourceContent(String pageId) {
 		String sourceHtml = "";
 		try {
 			Map<String, String> params = new HashMap<String, String>();
@@ -145,7 +220,6 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		}
 		
 		return trimWikiSourceHtml(sourceHtml);
-	
 	}
 	
 	public static String trimWikiSourceHtml(String sourceHtml) {
@@ -179,6 +253,6 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 			throw new IllegalArgumentException("Could not read from the source data: " + xml, e);
 		}
 		return pageContent;
-	}
+	}	
 }
 
