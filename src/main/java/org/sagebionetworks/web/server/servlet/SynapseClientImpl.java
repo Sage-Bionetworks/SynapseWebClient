@@ -672,11 +672,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public EntityWrapper updateAcl(EntityWrapper aclEW) throws RestServiceException {
+		return updateAcl(aclEW, false);
+	}
+	
+	@Override
+	public EntityWrapper updateAcl(EntityWrapper aclEW, boolean recursive) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
 			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
 			AccessControlList acl = jsonEntityFactory.createEntity(aclEW.getEntityJson(), AccessControlList.class);
-			acl = synapseClient.updateACL(acl);
+			acl = synapseClient.updateACL(acl, recursive);
 			JSONObjectAdapter aclJson = acl
 					.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(aclJson.toJSONString(), aclJson

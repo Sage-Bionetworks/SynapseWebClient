@@ -11,7 +11,8 @@ public class LoginPlace extends Place {
 	
 	public static final String LOGOUT_TOKEN = "logout";
 	public static final String LOGIN_TOKEN = DisplayUtils.DEFAULT_PLACE_TOKEN;
-
+	public static final String FASTPASS_TOKEN = "fastpassing";
+	
 	public LoginPlace(String token) {
 		this.token = token;
 	}

@@ -18,7 +18,6 @@ import org.sagebionetworks.web.shared.users.AclPrincipal;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -26,9 +25,12 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
+import com.extjs.gxt.ui.client.widget.Dialog;
+import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
@@ -46,10 +48,13 @@ import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -60,11 +65,12 @@ import com.google.inject.Inject;
 
 public class AccessControlListEditorViewImpl extends LayoutContainer implements AccessControlListEditorView {
  
+	private static final String STYLE_VERTICAL_ALIGN_MIDDLE = "vertical-align:middle !important;";
 	private static final String PRINCIPAL_COLUMN_ID = "principalData";
 	private static final String ACCESS_COLUMN_ID = "accessData";
 	private static final String REMOVE_COLUMN_ID = "removeData";
-	private static final int FIELD_WIDTH = 360;
-	
+	private static final int FIELD_WIDTH = 380;
+	private static final int BUTTON_PADDING = 3;
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private UrlCache urlCache;
@@ -110,35 +116,35 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}	
 	
 	@Override
-	public void buildWindow(boolean isInherited, final boolean canEnableInheritance) {		
+	public void buildWindow(boolean isInherited, boolean canEnableInheritance) {		
 		this.removeAll(true);
-		
-		// setup view
-		this.setLayout(new FlowLayout(10));			
-		Label permissionsLabel = isInherited ? new Label(
-				DisplayConstants.LABEL_SHARING_PANEL_INHERITED + ":")
-				: new Label(DisplayConstants.LABEL_SHARING_PANEL_EXISTING + ":");
-		permissionsLabel.setStyleAttribute("font-weight", "bold");
-		permissionsLabel.setStyleAttribute("font-size", "105%");
-		add(permissionsLabel, new MarginData(15, 0, 0, 0));
+		this.setLayout(new FlowLayout(10));
 
 		// show existing permissions
 		permissionsStore = new ListStore<PermissionsTableEntry>();
-		createPermissionsGrid(permissionsStore);	
+		createPermissionsGrid(permissionsStore);
+		
+		// create panel to hold ACL management buttons
+		HorizontalPanel buttonPanel = new HorizontalPanel();
+		TableData tableData = new TableData();
+		tableData.setPadding(BUTTON_PADDING);
+		
 		if(isInherited) { 
 			permissionsGrid.disable();
-			Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);			
-			add(readOnly);			
+			Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
+			readOnly.setWidth(450);
+			add(readOnly, new MarginData(15, 0, 0, 0));			
 			
+			// 'Create ACL' button
 			Button createAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, AbstractImagePrototype.create(iconsImageBundle.addSquare16()));
+			createAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT));
 			createAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
-					presenter.createAcl();					
+					presenter.createAcl();
 				}
 			});
-			add(createAclButton, new MarginData(30, 0, 0, 0));
-			add(new Label(DisplayUtils.getIconHtml(iconsImageBundle.warning16()) + " " + DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT), new MarginData(5, 0, 0, 0));
+			buttonPanel.add(createAclButton, tableData);
 		} else {
 			// show add people view
 			FormPanel form2 = new FormPanel();  
@@ -208,18 +214,50 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			form2.add(fieldSet);			
 			add(form2);
 			
+			// 'Delete ACL' button
 			Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
+			deleteAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT));
 			deleteAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
-					presenter.deleteAcl();					
+					MessageBox.confirm(DisplayConstants.LABEL_ARE_YOU_SURE, DisplayConstants.CONFIRM_DELETE_ACL, new Listener<MessageBoxEvent>() {					
+						@Override
+						public void handleEvent(MessageBoxEvent be) { 												
+							Button btn = be.getButtonClicked();
+							if(Dialog.YES.equals(btn.getItemId())) {
+								presenter.deleteAcl();										
+							}
+						}
+					});									
 				}
 			});
-			add(deleteAclButton, new MarginData(5, 0, 0, 0));
+			buttonPanel.add(deleteAclButton, tableData);
 			deleteAclButton.setEnabled(canEnableInheritance);
-			add(new Label(DisplayUtils.getIconHtml(iconsImageBundle.warning16()) + " " + DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT), new MarginData(5, 0, 0, 0));
-
+			
+			/* DEV NOTE: Disabled 8/30 to retool presentation. Should emphasize
+			 * deletion of child ACLs.
+			 */			
+//			// 'Apply ACL to children' button
+//			Button applyAclToChildrenButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_APPLY_ACL_TO_CHILDREN, AbstractImagePrototype.create(iconsImageBundle.arrowCurve16()));
+//			applyAclToChildrenButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_APPLY_ACL_TO_CHILDREN_TEXT));
+//			applyAclToChildrenButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+//				@Override
+//				public void componentSelected(ButtonEvent ce) {
+//					MessageBox.confirm(DisplayConstants.LABEL_ARE_YOU_SURE, DisplayConstants.CONFIRM_APPLY_ACL_TO_CHILDREN, new Listener<MessageBoxEvent>() {					
+//						@Override
+//						public void handleEvent(MessageBoxEvent be) { 												
+//							Button btn = be.getButtonClicked();
+//							if(Dialog.YES.equals(btn.getItemId())) {
+//								presenter.applyAclToChildren();									
+//							}
+//						}
+//					});					
+//				}
+//			});
+//			buttonPanel.add(applyAclToChildrenButton, tableData);
+//			applyAclToChildrenButton.setEnabled(!isInherited);			
 		}
+		this.add(buttonPanel, new MarginData(10, 0, 0, 0));
 		this.layout(true);		
 	}
 	
@@ -277,7 +315,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		column.setId(ACCESS_COLUMN_ID);  
 		column.setHeader("Access");  
 		column.setWidth(110);  
-		column.setRenderer(buttonRenderer);  
+		column.setRenderer(buttonRenderer);
+		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
 		configs.add(column);  
 				   
 		column = new ColumnConfig();  
@@ -285,6 +324,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		column.setHeader("");
 		column.setWidth(25);  
 		column.setRenderer(removeRenderer);  
+		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
 		configs.add(column);  
 				   				   			   
 		columnModel = new ColumnModel(configs);  				  				 
@@ -292,7 +332,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		permissionsGrid.setAutoExpandColumn(PRINCIPAL_COLUMN_ID);  
 		permissionsGrid.setBorders(true);		
 		permissionsGrid.setWidth(520);
-		permissionsGrid.setHeight(150);
+		permissionsGrid.setHeight(180);
 		
 		add(permissionsGrid, new MarginData(5, 0, 0, 0));
 		
@@ -328,23 +368,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 
 		
 		return menu;
-	}  
-
-	private Menu createNewAccessMenu() {
-		Menu menu = new Menu();		
-		MenuItem item = null; 
-			
-		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_VIEW));			
-		menu.add(item);
-
-		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_EDIT));			
-		menu.add(item);
-
-		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER));			
-		menu.add(item);
-
-		return menu;
-	}  
+	}
 
 	private GridCellRenderer<PermissionsTableEntry> createPeopleRenderer() {
 		GridCellRenderer<PermissionsTableEntry> personRenderer = new GridCellRenderer<PermissionsTableEntry>() {
@@ -354,15 +378,19 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					ListStore<PermissionsTableEntry> store,
 					Grid<PermissionsTableEntry> grid) {
 				PermissionsTableEntry entry = store.getAt(rowIndex);
-				String iconHtml = "";
+				AclPrincipal principal = entry.getAclEntry().getPrincipal();
+				String principalHtml = DisplayUtils.getUserNameEmailHtml(principal);
 				
-				// Default to generic user or group avatar
-				if(entry.getAclEntry().getPrincipal().isIndividual()) {
-					iconHtml = DisplayUtils.getIconHtml(iconsImageBundle.userBusiness16());
+				String iconHtml = "";
+				if (principal.getPicUrl() != null) {
+					// Principal has a profile picture
+					iconHtml = DisplayUtils.getThumbnailPicHtml(principal.getPicUrl());
 				} else {
-					iconHtml = DisplayUtils.getIconHtml(iconsImageBundle.users16());	
-				}				
-				return iconHtml + "&nbsp;&nbsp;" + model.get(property);
+					// Default to generic user or group avatar
+					ImageResource icon = principal.isIndividual() ? iconsImageBundle.userBusinessGrey40() : iconsImageBundle.usersGrey40();
+					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
+				}
+				return iconHtml + "&nbsp;&nbsp;" + principalHtml;
 			}
 			
 		};
@@ -390,7 +418,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			          }  
 			        }  
 			      });  
-			    }  
+			    }
 			    if(entry.getAclEntry().getPrincipal().isOwner()) {
 				    Button b = new Button(DisplayConstants.MENU_PERMISSION_LEVEL_IS_OWNER);
 				    b.setWidth(grid.getColumnModel().getColumnWidth(colIndex) - 15);
@@ -399,7 +427,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			    } else {
 				    Button b = new Button((String) model.get(property));  
 				    b.setWidth(grid.getColumnModel().getColumnWidth(colIndex) - 25);  
-				    b.setToolTip("Click to change permissions");				  
+				    b.setToolTip("Click to change");				  
 				    b.setMenu(createEditAccessMenu(entry.getAclEntry()));
 				    return b;
 			    }
