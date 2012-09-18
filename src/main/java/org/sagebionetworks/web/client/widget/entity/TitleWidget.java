@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -12,15 +13,13 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
 
-public class TitleWidget extends Composite {
+public class TitleWidget {
 
 
 	private LayoutContainer lc;
@@ -61,17 +60,37 @@ public class TitleWidget extends Composite {
 
 
 	    lc.layout();
-	    initWidget(lc);
 	}
 
-	public void createVersionsList() {
-		Document doc = Document.get();
-		entityMetadata.addToPreviousVersions(new Anchor("3"),
-				doc.createTextNode(""));
-		entityMetadata.addToPreviousVersions(new Anchor("2"),
-				doc.createTextNode(" | "));
-		entityMetadata.addToPreviousVersions(new Anchor("1"),
-				doc.createTextNode(" | "));
+	public Widget asWidget() {
+		return lc;
+	}
+
+	public void setVersions(Versionable entity, TreeMap<Long, String> latestVersions) {
+		for (Entry<Long, String> entry : latestVersions.entrySet()) {
+			if (!entity.getVersionNumber().equals(entry.getKey())) {
+				StringBuilder target = new StringBuilder("Synapse:");
+				target.append(entity.getId());
+				target.append("/version/");
+				target.append(entry.getKey());
+
+				StringBuilder label = new StringBuilder();
+				label.append(entry.getValue().toString());
+				label.append(" [");
+				label.append(entry.getKey().toString());
+				label.append("]");
+				Hyperlink anchor = new Hyperlink(label.toString(),
+						target.toString());
+				anchor.setStyleName("link");
+
+				entityMetadata.addToPreviousVersions(anchor);
+			}
+		}
+	}
+
+	public void clear() {
+		lc.clearState();
+		lc.removeAll();
 	}
 
 	private Widget createMetadata(Entity entity, IconsImageBundle iconsImageBundle) {
@@ -80,14 +99,16 @@ public class TitleWidget extends Composite {
 		entityMetadata.setCreateDate(String.valueOf(entity.getCreatedOn()));
 		entityMetadata.setModifyName(entity.getModifiedBy());
 		entityMetadata.setModifyDate(String.valueOf(entity.getModifiedOn()));
+		entityMetadata.setVersionsVisible(false);
 
 		if (entity instanceof Versionable) {
+			entityMetadata.setVersionsVisible(true);
 			Versionable vb = (Versionable) entity;
 			StringBuilder sb = new StringBuilder();
 			sb.append(vb.getVersionLabel());
-			sb.append(" (");
+			sb.append(" [");
 			sb.append(vb.getVersionNumber());
-			sb.append(")");
+			sb.append("]");
 
 			if (vb.getVersionComment() != null) {
 				sb.append(" - ");
@@ -97,6 +118,5 @@ public class TitleWidget extends Composite {
 		}
 		return entityMetadata;
 	}
-
 
 }

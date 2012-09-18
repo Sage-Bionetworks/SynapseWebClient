@@ -2,12 +2,14 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Summary;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
@@ -116,6 +118,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private boolean rStudioUrlReady = false;
 	private SplitButton showRstudio;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private TitleWidget titleWidget;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -230,7 +233,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void clear() {
 		actionMenu.clearState();
-		// TODO : add other widgets here
+		if (colLeftContainer != null)
+			colLeftContainer.removeAll();
+		if (colRightContainer != null)
+			colRightContainer.removeAll();
+		if (fullWidthContainer != null)
+			fullWidthContainer.removeAll();
+		if (titleWidget != null) {
+			titleWidget.clear();
+			titleWidget = null;
+		}
 	}
 
 	@Override
@@ -261,8 +273,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Title
-		TitleWidget titleWidget = new TitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
-		colLeftContainer.add(titleWidget, widgetMargin);
+		titleWidget = new TitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
 		// Child Browser
@@ -295,10 +307,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	private void renderSnapshotEntity(EntityBundle bundle,
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
-		// ** LEFT **
-		// Title
-		TitleWidget titleWidget = new TitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
-		colLeftContainer.add(titleWidget, widgetMargin);
+		titleWidget = new TitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
 
@@ -660,6 +670,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         lc.add(attachmentsPanel.asWidget());
 		lc.layout();
 		return lc;
+	}
+
+
+	@Override
+	public void setEntityVersions(Versionable entity, TreeMap<Long, String> versions) {
+		if (titleWidget != null) {
+			titleWidget.setVersions(entity, versions);
+		}
 	}
 
 }

@@ -1,13 +1,20 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.extjs.gxt.ui.client.Style.Direction;
+import com.extjs.gxt.ui.client.Style.Scroll;
+import com.extjs.gxt.ui.client.fx.FxConfig;
+import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.extjs.gxt.ui.client.widget.layout.TableData;
+import com.extjs.gxt.ui.client.widget.layout.VBoxLayout;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
-import com.google.gwt.dom.client.Text;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class EntityMetadata extends Composite {
@@ -29,16 +36,33 @@ public class EntityMetadata extends Composite {
 	@UiField
 	SpanElement modifyDate;
 	@UiField
+	HTMLPanel versions;
+	@UiField
 	SpanElement version;
 
 	@UiField
-	SpanElement previousVersions;
+	VerticalPanel previousVersions;
 
 	@UiField
-	Anchor allVersions;
+	InlineLabel allVersions;
 
 	public EntityMetadata() {
 		initWidget(uiBinder.createAndBindUi(this));
+		allVersions.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (previousVersions.isVisible()) {
+					previousVersions.el().slideOut(Direction.UP, FxConfig.NONE);
+					allVersions.setText("show all versions");
+				} else {
+					previousVersions.setVisible(true);
+					previousVersions.el().slideIn(Direction.DOWN, FxConfig.NONE);
+					allVersions.setText("hide all versions");
+				}
+			}
+		});
+		previousVersions.setLayout(new VBoxLayout());
+		previousVersions.setScrollMode(Scroll.AUTOY);
 	}
 
 	public void setCreateName(String text) {
@@ -61,13 +85,15 @@ public class EntityMetadata extends Composite {
 		version.setInnerText(text);
 	}
 
-	public void setAllVersionHref(String href) {
-		allVersions.setHref(href);
+	public void addToPreviousVersions(Widget widget) {
+		TableData data = new TableData();
+		data.setStyle("padding-left:50px");
+		previousVersions.add(widget, data);
+		previousVersions.layout(true);
 	}
 
-	public void addToPreviousVersions(Widget widget, Text delim) {
-		previousVersions.appendChild(delim);
-		panel.add(widget, previousVersions);
+	public void setVersionsVisible(boolean visible) {
+		versions.setVisible(visible);
 	}
 
 }
