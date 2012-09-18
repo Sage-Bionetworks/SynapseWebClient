@@ -30,7 +30,7 @@ public interface SynapseClientAsync {
 
 	void getEntityPath(String entityId, AsyncCallback<EntityWrapper> callback);
 
-	RequestBuilder search(String searchQueryJson, AsyncCallback<EntityWrapper> callback);
+	void search(String searchQueryJson, AsyncCallback<EntityWrapper> callback);
 
 	void junk(SerializableWhitelist l,
 			AsyncCallback<SerializableWhitelist> callback);

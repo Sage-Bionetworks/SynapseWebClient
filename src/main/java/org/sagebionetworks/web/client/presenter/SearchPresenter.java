@@ -299,7 +299,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		try {
 			currentSearch.writeToJSONObject(adapter);
-			RequestBuilder rb = synapseClient.search(adapter.toJSONString(), new AsyncCallback<EntityWrapper>() {			
+			synapseClient.search(adapter.toJSONString(), new AsyncCallback<EntityWrapper>() {			
 				@Override
 				public void onSuccess(EntityWrapper result) {
 					currentResult = new SearchResults();		
@@ -319,12 +319,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 					}
 				}
 			});
-			rb.setTimeoutMillis(20000);
-			try {
-				rb.send();
-			} catch (RequestException e) {
-				
-			}
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 		}
