@@ -17,7 +17,7 @@ public interface HomeView extends IsWidget, SynapseView {
 	public void refresh();
 	
 	public void showNews(String html);
-	
+	public void showSupportFeed(String html);
 	public void showBccOverview(String description);
 	
 	public interface Presenter extends SynapsePresenter {
