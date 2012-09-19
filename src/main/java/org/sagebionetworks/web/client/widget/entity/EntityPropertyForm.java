@@ -236,7 +236,7 @@ public class EntityPropertyForm extends FormPanel {
 		nameField = (TextField<String>) formFactory.createField(model.getName());
 		nameField.setAllowBlank(false);
 		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
-		nameField.getMessages().setRegexText("Entity names may only contain letters, numbers, '_' and '.'");
+		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 		descriptionField = formFactory.createTextAreaField(model.getDescription());
 
 		// Create the list of fields
