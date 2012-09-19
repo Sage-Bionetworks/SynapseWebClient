@@ -12,4 +12,5 @@ public interface RssService extends RemoteService {
 	public String getFeedData(String url, Integer limit, boolean summariesOnly) throws RestServiceException;
 	public String getWikiPageContent(String pageId);
 	public String getWikiPageSourceContent(String pageId);
+	public String getUncachedWikiPageSourceContent(String pageId);
 }

@@ -54,7 +54,7 @@ public class WikiPresenter extends AbstractActivity implements WikiView.Presente
 	
 	@Override
 	public void loadSourceContent(String pageId) {
-		rssService.getWikiPageSourceContent(pageId, new AsyncCallback<String>() {
+		rssService.getUncachedWikiPageSourceContent(pageId, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				view.showPage(DisplayUtils.fixWikiLinks(DisplayUtils.fixEmbeddedYouTube(result)));

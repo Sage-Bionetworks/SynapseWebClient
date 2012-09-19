@@ -36,4 +36,12 @@ public interface RssServiceAsync {
 	 * @param callback
 	 */
 	void getWikiPageSourceContent(String pageId, AsyncCallback<String> callback);
+	
+	/**
+	 * return the source content from the wiki. 
+	 * WARNING: caching is not set up for this page, load time could be high.
+	 * @param urlString
+	 * @param callback
+	 */
+	void getUncachedWikiPageSourceContent(String pageId, AsyncCallback<String> callback);
 }
