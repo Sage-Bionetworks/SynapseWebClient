@@ -17,7 +17,9 @@ public class WebConstants {
 	 * compatibility across services and clients.
 	 * 
 	 */
-	public static final String VALID_ENTITY_NAME_REGEX = "^[a-z,A-Z,0-9,_,.]+";
+	public static final String VALID_ENTITY_NAME_REGEX = "^[a-z,A-Z,0-9,_,., ,\\-,\\+,(,)]+";
+	
+	public static final String INVALID_ENTITY_NAME_MESSAGE = "Entity names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	
 	/**
 	 * Regex defining a valid annotation name. Characters are selected to ensure
