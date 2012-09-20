@@ -9,7 +9,7 @@ public class SupportFeedCacheProvider implements CacheProvider {
 	}
 
 	@Override
-	public String getCacheValue() {
+	public String getValueToCache() {
 	 	return RssFeedUtils.getFeedData(DisplayUtils.SUPPORT_FEED_URL, 5, false);
 	}
 

@@ -26,7 +26,7 @@ public class RssServiceImplTest {
 				return testCacheProvider1Id;
 			}
 			@Override
-			public String getCacheValue() {
+			public String getValueToCache() {
 				return testCacheProvider1Value;
 			}
 		};

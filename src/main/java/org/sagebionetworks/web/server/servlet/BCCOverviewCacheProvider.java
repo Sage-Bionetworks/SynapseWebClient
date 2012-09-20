@@ -9,7 +9,7 @@ public class BCCOverviewCacheProvider implements CacheProvider {
 	}
 
 	@Override
-	public String getCacheValue() {
+	public String getValueToCache() {
 	 	return RssFeedUtils.getWikiPageSourceContent(DisplayUtils.BCC_CONTENT_PAGE_ID);
 	}
 

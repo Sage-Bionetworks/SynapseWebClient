@@ -83,7 +83,7 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		//go through all cache providers, and update the content
 		for (Iterator it = registeredCacheProviders.iterator(); it.hasNext();) {
 			CacheProvider cacheProvider = (CacheProvider) it.next();
-			cache.put(cacheProvider.getCacheProviderId(), cacheProvider.getCacheValue());
+			cache.put(cacheProvider.getCacheProviderId(), cacheProvider.getValueToCache());
 		}
 		logger.info("finished cache update");
 	}
