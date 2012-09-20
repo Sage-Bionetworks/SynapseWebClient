@@ -3,10 +3,12 @@ package org.sagebionetworks.web.unitclient.widget.header;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -45,6 +47,8 @@ public class HeaderTest {
 	@Test
 	public void testSupportLinkClicked() throws RestServiceException{
 		//getFastPassSupportUrl is called when opening the support site
+		when(mockAuthenticationController.getLoggedInUser()).thenReturn(new UserSessionData());
+		
 		header.getSupportHRef(new AsyncCallback<String>() {
 			
 			@Override

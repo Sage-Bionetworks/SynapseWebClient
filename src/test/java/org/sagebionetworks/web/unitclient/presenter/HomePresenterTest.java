@@ -83,7 +83,7 @@ public class HomePresenterTest {
 	@Test
 	public void testBccLoad() {
 		String result = "challenge description";
-		AsyncMockStubber.callSuccessWith(result).when(mockRssService).getWikiPageContent(anyString(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(result).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));		
 		homePresenter.loadBccOverviewDescription();
 		verify(mockView).showBccOverview(result);
 	}	
@@ -92,7 +92,7 @@ public class HomePresenterTest {
 	public void testNewsFeed() throws RestServiceException {
 		//when news is loaded, the view should be updated with the service result
 		String exampleNewsFeedResult = "news feed";
-		AsyncMockStubber.callSuccessWith(exampleNewsFeedResult).when(mockRssService).getFeedData(anyString(), anyInt(), anyBoolean(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(exampleNewsFeedResult).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));		
 		when(mockNodeModelCreator.createEntity(anyString(), eq(RSSFeed.class))).thenReturn(testFeed);
 		homePresenter.loadNewsFeed();
 		verify(mockView).showNews(anyString());
@@ -102,7 +102,7 @@ public class HomePresenterTest {
 	public void testSupportFeed() throws RestServiceException {
 		//when support feed is loaded, the view should be updated with the service result
 		String exampleSupportFeedResult = "support feed";
-		AsyncMockStubber.callSuccessWith(exampleSupportFeedResult).when(mockRssService).getFeedData(anyString(), anyInt(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(exampleSupportFeedResult).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(anyString(), eq(RSSFeed.class))).thenReturn(testFeed);
 		homePresenter.loadSupportFeed();
 		verify(mockView).showSupportFeed(anyString());

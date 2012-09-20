@@ -47,14 +47,14 @@ public class WikiPresenter extends AbstractActivity implements WikiView.Presente
 		this.place = place;
 		this.view.setPresenter(this);
 		
-		String pageId = place.toToken();
-		//the token is the source page url to read
-		loadSourceContent(pageId);
+		String cacheProviderId = place.toToken();
+		//the token is the source page cached content provider id to pull from
+		loadSourceContent(cacheProviderId);
 	}
 	
 	@Override
-	public void loadSourceContent(String pageId) {
-		rssService.getUncachedWikiPageSourceContent(pageId, new AsyncCallback<String>() {
+	public void loadSourceContent(String cacheProviderId) {
+		rssService.getCachedContent(cacheProviderId, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				view.showPage(DisplayUtils.fixWikiLinks(DisplayUtils.fixEmbeddedYouTube(result)));

@@ -81,7 +81,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void loadBccOverviewDescription() {
-		rssService.getWikiPageContent(DisplayUtils.BCC_SUMMARY_CONTENT_PAGE_ID, new AsyncCallback<String>() {
+		rssService.getCachedContent(DisplayUtils.BCC_SUMMARY_PROVIDER_ID, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				view.showBccOverview(result);
@@ -94,7 +94,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void loadNewsFeed(){
-		rssService.getFeedData(DisplayUtils.NEWS_FEED_URL, 4, true, new AsyncCallback<String>() {
+		rssService.getCachedContent(DisplayUtils.NEWS_FEED_PROVIDER_ID, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
@@ -111,7 +111,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void loadSupportFeed(){
-		rssService.getFeedData(DisplayUtils.SUPPORT_FEED_URL, 5, false, new AsyncCallback<String>() {
+		rssService.getCachedContent(DisplayUtils.SUPPORT_FEED_PROVIDER_ID, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {

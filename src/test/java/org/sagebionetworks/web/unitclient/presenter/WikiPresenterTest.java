@@ -54,7 +54,7 @@ public class WikiPresenterTest {
 	public void testSetWikiContent() throws RestServiceException {
 		//when content is loaded, the view should be updated with the service result
 		String exampleNewsFeedResult = "wiki content";
-		AsyncMockStubber.callSuccessWith(exampleNewsFeedResult).when(mockRssService).getUncachedWikiPageSourceContent(anyString(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(exampleNewsFeedResult).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));		
 		loginPresenter.loadSourceContent("12345");
 		verify(mockView).showPage(anyString());
 	}
