@@ -86,7 +86,15 @@ public class DisplayUtils {
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
 	public static final String BCC_CONTENT_PAGE_ID = "24084517";
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
+	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
+	
+	public static final String BCC_OVERVIEW_CONTENT_PROVIDER_ID = "bccOverviewContent";
+	public static final String BCC_SUMMARY_PROVIDER_ID = "bccSummaryContent";
+	public static final String DATA_ACCESS_LEVELS_PROVIDER_ID = "dataAccessLevelsContent";
+	public static final String NEWS_FEED_PROVIDER_ID = "newsFeed";
+	public static final String SUPPORT_FEED_PROVIDER_ID = "supportFeed";
 
+	
 	public static final String FASTPASS_LOGIN_COOKIE_VALUE = "fastpass-logging-in";
 	public static final String FASTPASS_SIGNOVER_URL = "http://support.sagebase.org/fastpass/finish_signover?company=sagebase&fastpass=";
 	public static final String WIKI_CONTENT_URL = "https://sagebionetworks.jira.com/wiki/rest/prototype/1/content/";
@@ -1021,5 +1029,6 @@ public class DisplayUtils {
 		}
 		return html;
 	}
+
 
 }
