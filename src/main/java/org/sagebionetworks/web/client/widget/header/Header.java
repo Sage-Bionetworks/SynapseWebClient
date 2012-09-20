@@ -72,21 +72,26 @@ public class Header implements HeaderView.Presenter {
 	@Override
 	public void getSupportHRef(final AsyncCallback<String> callback) {
 		try {
-			userAccountService.getFastPassSupportUrl(new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					if (result != null && result.length()>0)
-						callback.onSuccess("http://support.sagebase.org/sagebase?fastpass="+URL.encodeQueryString(result));
-					else
+			if (getUser() == null){
+				callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
+			}
+			else {
+				userAccountService.getFastPassSupportUrl(new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String result) {
+						if (result != null && result.length()>0)
+							callback.onSuccess("http://support.sagebase.org/sagebase?fastpass="+URL.encodeQueryString(result));
+						else
+							callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						//failed, just go
 						callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					//failed, just go
-					callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
-				}
-			});
+					}
+				});
+			}
 		} catch (RestServiceException e) {
 			//if it fails, go to the support site without the fastpass url?
 			callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);

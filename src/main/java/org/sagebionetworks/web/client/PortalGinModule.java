@@ -40,6 +40,8 @@ import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.view.SearchViewImpl;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.view.SettingsViewImpl;
+import org.sagebionetworks.web.client.view.WikiView;
+import org.sagebionetworks.web.client.view.WikiViewImpl;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
 import org.sagebionetworks.web.client.view.table.ColumnFactoryImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
@@ -245,6 +247,11 @@ public class PortalGinModule extends AbstractGinModule {
 		// SearchView
 		bind(SearchViewImpl.class).in(Singleton.class);
 		bind(SearchView.class).to(SearchViewImpl.class);
+
+		// WikiView
+		bind(WikiViewImpl.class).in(Singleton.class);
+		bind(WikiView.class).to(WikiViewImpl.class);	
+
 		
 		/*
 		 * Widgets
