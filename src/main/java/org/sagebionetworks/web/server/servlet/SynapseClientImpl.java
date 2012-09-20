@@ -332,6 +332,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
+		synapseClient.setSearchEndpoint(urlProvider.getSearchServiceUrl());
 		return synapseClient;
 	}
 
