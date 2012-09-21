@@ -291,9 +291,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				PaginatedResults<EntityHeader> rb = eb.getReferencedBy();
 				ebt.setEntityReferencedByJson(EntityFactory.createJSONStringForEntity(rb));
 			}
-			if ((EntityBundleTransport.CHILD_COUNT & partsMask) > 0) {
-				Long cc = eb.getChildCount();
-				ebt.setChildCount(cc);
+			if ((EntityBundleTransport.HAS_CHILDREN & partsMask) > 0) {
+				Boolean hasChildren = eb.getHasChildren();
+				ebt.setHashChildren(hasChildren);
 			}
 			if ((EntityBundleTransport.ACL & partsMask) > 0) {
 				AccessControlList acl = eb.getAccessControlList();
