@@ -96,8 +96,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		return view.asWidget();
 	}
 
-	@Override
-	public void loadUserUpdateable() {
+	private void loadProjectsUserCanUpdate(final List<EntityHeader> eheaders) {
 		if(!authenticationController.isLoggedIn()) return;		
 		UserSessionData user = authenticationController.getLoggedInUser(); 
 		SearchQuery query = createUpdateQuery(user.getProfile().getOwnerId());
@@ -113,13 +112,13 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 					try {
 						results = nodeModelCreator.createEntity(result, SearchResults.class);
 						// convert results to EntityHeaders
-						List<EntityHeader> eheaders = new ArrayList<EntityHeader>();
 						for(Hit hit : results.getHits()) {
 							EntityHeader eh = new EntityHeader();
 							eh.setId(hit.getId());
 							eh.setName(hit.getName());
 							eh.setType("project");
-							eheaders.add(eh);
+							if (!eheaders.contains(eh))
+								eheaders.add(eh);
 						}						
 						view.setUpdatableEntities(eheaders);
 					} catch (RestServiceException e) {
@@ -178,7 +177,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	}
 
 	@Override
-	public void createdOnlyFilter() {
+	public void loadUserUpdateable() {
+		//first, load the projects that the user created
 		if(authenticationController.isLoggedIn()) {
 			view.showLoading();
 			List<WhereCondition> where = new ArrayList<WhereCondition>();
@@ -195,8 +195,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 							onFailure(e);
 						}
 					}
-					// send to view
-					view.setCreatedEntities(headers);
+					//load projects that the user can update 
+					loadProjectsUserCanUpdate(headers);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
