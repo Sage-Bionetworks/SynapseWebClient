@@ -159,11 +159,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	@Override
-	public void addAccess(Long principal, PermissionLevel permissionLevel) {
-		if (principal.equals(uep.getOwnerPrincipalId()))
-			showErrorMessage("Owner permissions cannot be modified. Please select a different user or group.");
-		else
-			setAccess(principal, permissionLevel);
+	public void addAccess(Long principal, PermissionLevel permissionLevel) {		
+		setAccess(principal, permissionLevel);
 	}
 	
 	@Override
@@ -172,6 +169,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	private void setAccess(Long principalId, PermissionLevel permissionLevel) {
+		if (uep != null && uep.getOwnerPrincipalId().equals(principalId))
+			showErrorMessage("Owner permissions cannot be modified. Please select a different user or group.");
 		try {
 			if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
 			if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
