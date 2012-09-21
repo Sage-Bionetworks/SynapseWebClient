@@ -195,8 +195,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 							onFailure(e);
 						}
 					}
-					view.setUpdatableEntities(headers);
-					//then load projects that the user can update 
+					//load projects that the user can update 
 					loadProjectsUserCanUpdate(headers);
 				}
 				@Override
