@@ -128,9 +128,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					} 						
+					//just show whatever projects that we found (maybe zero)
+					view.setUpdatableEntities(eheaders);
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
@@ -200,7 +199,9 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());				
+					//failed to load projects that the user created
+					//try updatable
+					loadProjectsUserCanUpdate(new ArrayList<EntityHeader>());
 				}
 			});
 		}

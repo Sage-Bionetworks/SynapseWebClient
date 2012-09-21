@@ -50,5 +50,10 @@ public interface UserAccountServiceAsync {
 	void getTermsOfUse(AsyncCallback<String> callback);
 
 	void setRegistrationUserPassword(String registrationToken, String newPassword, AsyncCallback<Void> callback);
-
+	
+	/**
+	 * This needs to be replaced with a Synapse Java Client call
+	 * return the StorageUsageSummaryList json for the current user
+	 */
+	void getStorageUsage(AsyncCallback<String> callback);
 }
