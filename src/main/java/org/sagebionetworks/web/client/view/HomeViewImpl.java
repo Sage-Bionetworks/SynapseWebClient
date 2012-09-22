@@ -42,6 +42,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	SimplePanel projectPanel;
 	@UiField
 	SimplePanel newsFeed;
+	@UiField
+	SimplePanel supportFeed;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -84,6 +86,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 		DisplayUtils.sendAllLinksToNewWindow(panel);
 		newsFeed.clear();
 		newsFeed.add(panel);
+	}
+	
+	@Override
+	public void showSupportFeed(String html){
+		HTMLPanel panel = new HTMLPanel(html);
+		DisplayUtils.sendAllLinksToNewWindow(panel);
+		supportFeed.clear();
+		supportFeed.add(panel);
 	}
 	
 	@Override
