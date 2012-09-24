@@ -8,7 +8,7 @@
 	 Added by: <span ui:field="createName"></span> on: <span ui:field="createDate"></span><br/>
 	 Modified by: <span ui:field="modifyName"></span> on: <span ui:field="modifyDate"></span><br/>
 	 <g:HTMLPanel ui:field="versions">
-	 Version: <span ui:field="version"></span> (<g:InlineLabel ui:field="allVersions" text="more versions" styleName="link" />)<br />
+	 Version: <span ui:field="version"></span> (<g:InlineLabel ui:field="allVersions" text="show all versions" styleName="link" />)<br />
    <gxt:VerticalPanel ui:field="previousVersions" visible="false" width="100%" autoHeight="true" />
 	 </g:HTMLPanel>
 	</g:HTMLPanel>

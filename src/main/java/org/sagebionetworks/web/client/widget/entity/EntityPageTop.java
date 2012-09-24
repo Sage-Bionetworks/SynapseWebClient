@@ -184,14 +184,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	private void sendVersionInfoToView() {
-		Entity entity = bundle.getEntity();
+		final Entity entity = bundle.getEntity();
 		if (entity instanceof Versionable) {
 			synapseClient.getEntityVersions(entity.getId(),
 					new AsyncCallback<String>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							// TODO ????
+							view.setEntityVersions((Versionable)entity, null);
 						}
 
 						@Override

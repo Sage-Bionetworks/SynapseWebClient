@@ -17,6 +17,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TitleWidget {
@@ -67,6 +68,12 @@ public class TitleWidget {
 	}
 
 	public void setVersions(Versionable entity, TreeMap<Long, String> latestVersions) {
+		if (latestVersions == null) {
+			InlineLabel notFound = new InlineLabel(DisplayConstants.ERROR_VERSIONS_NOT_FOUND);
+			entityMetadata.addToPreviousVersions(notFound);
+			return;
+		}
+
 		for (Entry<Long, String> entry : latestVersions.entrySet()) {
 			if (!entity.getVersionNumber().equals(entry.getKey())) {
 				StringBuilder target = new StringBuilder("Synapse:");

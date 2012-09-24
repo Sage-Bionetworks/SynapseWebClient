@@ -269,6 +269,7 @@ public class DisplayConstants {
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
+	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
 	
 	/*
 	 * Element ids for Selenium
