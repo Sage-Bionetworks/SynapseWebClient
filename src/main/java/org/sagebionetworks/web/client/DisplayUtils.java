@@ -54,6 +54,7 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -107,6 +108,7 @@ public class DisplayUtils {
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
+	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
 	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
 	public static final String WAIT_FOR_URL = "waitForUrl";
@@ -946,5 +948,16 @@ public class DisplayUtils {
 		}
 		return version;
 	}
+	
+	
+	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
+	public static native JavaScriptObject newWindow(String url, String name, String features)/*-{
+    	var window = $wnd.open(url, name, features);
+    	return window;
+		}-*/;
+
+	public static native void setWindowTarget(JavaScriptObject window, String target)/*-{
+    	window.location = target;
+		}-*/;
 
 }

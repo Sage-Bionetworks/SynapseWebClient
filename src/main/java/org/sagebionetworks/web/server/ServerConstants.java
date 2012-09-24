@@ -89,6 +89,4 @@ public class ServerConstants {
 	 */
 	public static final String KEY_FILTER_ENUMERATION_CONFIG_XML_FILE = "org.sagebionetworks.fileter.enumeration.xml.resource";
 
-	
-	
 }

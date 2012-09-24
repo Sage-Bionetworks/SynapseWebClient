@@ -295,15 +295,20 @@ public class DisplayConstants {
 	public static final String ID_BTN_ADD = "id_btn_add";
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
 
-	// constants used in GovernanceDialogHelper
-//	public static final String MORE = "More...";
+	// constants used in GovernanceDialogHelper	
+	public static final String OPEN = "Open";
+	public static final String RESTRICTED = "Restricted";
+	public static final String CONTROLLED = "Controlled";
+	public static final String MODIFY = "modify";
+	public static final String INFO = "info";
+	public static final String GAIN_ACCESS = "gain access";
 	public static final String FLAG_DIALOG_PREFIX = 
-		"<p>If you think this data is posted inappropriately or should have different access conditions, please ";
-	public static final String FLAG_DIALOG_ANONYMOUS_SUFFIX = "log in to alert the Synapse Access and Compliance Team (ACT).</p>";
-	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX = "alert the Synapse Access and Compliance Team (ACT) by clicking below.</p>";
+		"If you think this data is posted inappropriately or should have different access conditions, please ";
+	public static final String FLAG_DIALOG_ANONYMOUS_SUFFIX = "<span class=\"strong\">log in</span> to alert the Synapse Access and Compliance Team (ACT).";
+	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX = "alert the Synapse Access and Compliance Team (ACT) by clicking below.";
 	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_1 = "alert the Synapse Access and Compliance Team (ACT) by clicking <a href=\"";
-	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2 = "\" target=\"_blank\" class=\"link\">here</a>.</p>";
-	public static final String BUTTON_TEXT_CONTACT_ACT = "Contact ACT";
+	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2 = "\" target=\"_blank\" class=\"link\">here</a>.";
+	public static final String BUTTON_TEXT_FLAG_DATA = "Flag Data";
 	public static final String BUTTON_TEXT_RESTRICT_DATA = "Add Restrictions";
 	public static final String BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT = "Request Access";
 	public static final String BUTTON_TEXT_ACCEPT_TERMS_OF_USE = "Accept Terms of Use";
@@ -314,10 +319,11 @@ public class DisplayConstants {
 	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to this data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
 	
-	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"https://sagebionetworks.jira.com/wiki/x/RwBDAQ\"  target=\"_blank\" class=\"link\">Synapse guidelines</a>";
-	
+	//public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"https://sagebionetworks.jira.com/wiki/x/RwBDAQ\"  target=\"_blank\" class=\"link\">Synapse guidelines</a>";
+	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
-	public static String GOVERNANCE_REFERENCE = "To learn more about data governance, read the "+SYNAPSE_GUIDELINES_LINK+".";
+	public static String GOVERNANCE_REFERENCE = "For more information on data access conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
+	
 	public static String ADMIN_GOVERNANCE_REFERENCE = "You are responsible to ensure your data is shared in compliance with the "+
 	SYNAPSE_GUIDELINES_LINK+" and all applicable laws. ";
 	public static String RESTRICTION_DIALOG_TEXT_3 = "To add data restrictions, contact the Access and Compliance Team (ACT), by clicking below.</p>";
@@ -329,9 +335,14 @@ public class DisplayConstants {
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to this data under the following terms:</p>";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
 	public static final String FILE_DOWNLOAD_NOTE = 
-			"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
-			" and all applicable laws. If this data requires restrictions for user access, select \"Upload Restricted\", below. "+
-			"If the data may be accessed by registered Synapse users without restrictions, select \"Upload Unrestricted\", below.";	
+		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
+		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
+		"without restrictions select \"Open\", below.  Otherwise select \"Restricted / Controlled\".";
+
+	public static final String EXTERNAL_LINK_NOTE = 
+		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
+		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
+		"without restrictions select \"save unrestricted\", below.  Otherwise select \"save restricted\".";
 
 }
 

@@ -1,22 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Arrays;
-
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.ExpressionData;
-import org.sagebionetworks.repo.model.GenericData;
-import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.PhenotypeData;
-import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntitySchemaCache;
@@ -38,12 +31,13 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -270,21 +264,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return bundle.getUnmetAccessRequirements().getTotalNumberOfResults()==0L;
 	}
 
-	private static final String[] dataObjectEntityTypes = {
-		Data.class.getName(),
-		GenericData.class.getName(),
-		GenotypeData.class.getName(),
-		PhenotypeData.class.getName(),
-		RObject.class.getName(),
-		ExpressionData.class.getName()
-	};
-	
 	@Override
 	public boolean includeRestrictionWidget() {
-		// restriction widget is to be included iff Entity is a data object
-		return Arrays.asList(dataObjectEntityTypes).contains(
-				bundle.getEntity().getEntityType()
-		);
+		return (bundle.getEntity() instanceof Locationable);
 	}
 
 	@Override
@@ -350,28 +332,32 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	
-	/**
-  						// lock down data object
-      						lockdownCallback.invoke();
-      						// open jira page to make 'flag' issue
-      						Window.open(jiraRestrictionLink, "_blank", "");
-    
-	 */
 	@Override
 	public Callback getImposeRestrictionsCallback() {
 		return new Callback() {
 			@Override
 			public void invoke() {
-				// TODO this would be the tier 3 requirement
-				EntityWrapper aaEW = null;
-				// TODO we actually need a different method to create the tier 3 requirement
-				// since a user doesn't have authority to do so
-				synapseClient.createAccessRequirement(aaEW, new AsyncCallback<EntityWrapper>(){
+				// ideally this would be done _after_ successfully creating the access requirement, but in practice
+				// there are problems opening the window in a separate thread
+				// Window.open(getJiraRestrictionUrl(), "_blank", "");
+				AccessRequirement ar = EntityUtil.createLockDownDataAccessRequirement(bundle.getEntity().getId());
+				JSONObjectAdapter arJson = null;
+				try {
+					arJson = ar.writeToJSONObject(jsonObjectAdapter.createNew());
+				} catch (JSONObjectAdapterException e) {
+					view.showInfo("Error", e.getMessage());
+					return;
+				}
+				String arClassName = ar.getClass().getName();
+				EntityWrapper ew = new EntityWrapper(arJson.toJSONString(), arClassName, null);
+				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
+				final JavaScriptObject window = DisplayUtils.newWindow("", "", "");
+				synapseClient.createAccessRequirement(ew, new AsyncCallback<EntityWrapper>(){
 					@Override
 					public void onSuccess(EntityWrapper result) {
-						Window.open(getJiraRestrictionUrl(), "_blank", "");
 						fireEntityUpdatedEvent();
-					}
+						DisplayUtils.setWindowTarget(window, getJiraRestrictionUrl());
+				}
 					@Override
 					public void onFailure(Throwable caught) {
 						view.showInfo("Error", caught.getMessage());
@@ -389,6 +375,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		};
 	}
+
 
 
 }

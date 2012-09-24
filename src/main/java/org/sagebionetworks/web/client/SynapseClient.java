@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;

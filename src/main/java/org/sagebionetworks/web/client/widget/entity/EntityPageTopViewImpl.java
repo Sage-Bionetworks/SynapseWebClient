@@ -250,7 +250,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		boolean hasAdministrativeAccess = false;
 		boolean hasFulfilledAccessRequirements = false;
 		String jiraFlagLink = null;
-		String requestAccessLink = null;
 		if (!isAnonymous) {
 			hasAdministrativeAccess = presenter.hasAdministrativeAccess();
 			jiraFlagLink = presenter.getJiraFlagUrl();

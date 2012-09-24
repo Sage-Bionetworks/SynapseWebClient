@@ -83,7 +83,7 @@ public class GovernanceDialogHelper {
     	sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX);
     	dialog.addText(sb.toString());
         dialog.setHeading(DisplayConstants.FLAG_DIALOG_TITLE); 
-        dialog.okText = DisplayConstants.BUTTON_TEXT_CONTACT_ACT;
+        dialog.okText = DisplayConstants.BUTTON_TEXT_FLAG_DATA;
         dialog.setButtons(Dialog.OKCANCEL);
         Button okButton = dialog.getButtonById(Dialog.OK);
         okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
@@ -130,14 +130,14 @@ public class GovernanceDialogHelper {
 		return licenseTextContainer;
 	}
 	
-	private static ImageResource restrictionLevelIcon(APPROVAL_REQUIRED restrictionLevel, IconsImageBundle iconsImageBundle) {
+	public static ImageResource restrictionLevelIcon(APPROVAL_REQUIRED restrictionLevel, IconsImageBundle iconsImageBundle) {
 		switch (restrictionLevel) {
 		case NONE:
-			return iconsImageBundle.flagSmall16(); // TODO use correct icon here
+			return iconsImageBundle.sheildGreen16();
 		case LICENSE_ACCEPTANCE:
-			return iconsImageBundle.flagSmall16(); // TODO use correct icon here
+			return iconsImageBundle.sheildYellow16();
 		case ACT_APPROVAL:
-			return iconsImageBundle.flagSmall16(); // TODO use correct icon here
+			return iconsImageBundle.sheildRed16();
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}
@@ -188,29 +188,27 @@ public class GovernanceDialogHelper {
            	}
       	}
 		// next there's a prompt with a link to the Governance page
+       	StringBuilder sb = new StringBuilder("<p>");
       	if (imposeRestrictionsAllowed) {
-           	StringBuilder sb = new StringBuilder();
-        	sb.append("<p>"+DisplayConstants.ADMIN_GOVERNANCE_REFERENCE);
+        	sb.append(DisplayConstants.ADMIN_GOVERNANCE_REFERENCE);
         	sb.append(DisplayConstants.RESTRICTION_DIALOG_TEXT_3);
         	sb.append(DisplayConstants.RESTRICTION_DIALOG_TEXT_4);
-        	sb.append("</p>");
-        	panel.addText(sb.toString());
      	} else {
-          	panel.addText("<p>"+DisplayConstants.GOVERNANCE_REFERENCE+"</p>");
+     		sb.append(DisplayConstants.GOVERNANCE_REFERENCE+" ");
      	}
 		// finally there the Flag notice and hyperlink
       	// (but not for a user having admin access to their own dataaset
       	if (isAnonymous) {
-            panel.addText(DisplayConstants.FLAG_DIALOG_PREFIX+
-            		DisplayConstants.FLAG_DIALOG_ANONYMOUS_SUFFIX);
+      		sb.append(DisplayConstants.FLAG_DIALOG_PREFIX);
+      		sb.append(DisplayConstants.FLAG_DIALOG_ANONYMOUS_SUFFIX);
       	} else if (!imposeRestrictionsAllowed) {
-           	StringBuilder sb = new StringBuilder();
            	sb.append(DisplayConstants.FLAG_DIALOG_PREFIX);
             sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_1);
             sb.append(jiraFlagLink);
             sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2);
-        	panel.addText(sb.toString());
       	}
+      	sb.append("</p>");
+    	panel.addText(sb.toString());
 		// buttons:
      	if (isAnonymous) {
       		// login or cancel

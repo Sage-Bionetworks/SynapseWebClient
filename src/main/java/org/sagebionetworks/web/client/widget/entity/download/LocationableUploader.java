@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -23,6 +24,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -34,7 +36,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager = new HandlerManager(this);
-	private Entity entity;
+	private EntityBundle entityBundle;
 	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
 
@@ -73,8 +75,8 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		view.setPresenter(this);		
 	}		
 		
-	public Widget asWidget(Entity entity, boolean showCancel) {
-		this.entity = entity;
+	public Widget asWidget(EntityBundle entityBundle, boolean showCancel) {
+		this.entityBundle = entityBundle;
 		this.view.createUploadForm(showCancel);
 		return this.view.asWidget();
 	}
@@ -85,7 +87,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		view.clear();
 		// remove handlers
 		handlerManager = new HandlerManager(this);		
-		this.entity = null;		
+		this.entityBundle = null;		
 	}
 
 	@Override
@@ -94,8 +96,10 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	}
 
 	@Override
-	public String getUploadActionUrl() {
-		return GWT.getModuleBaseURL() + "upload" + "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + entity.getId();
+	public String getUploadActionUrl(boolean isRestricted) {
+		return GWT.getModuleBaseURL() + "upload" + "?" + 
+			DisplayUtils.ENTITY_PARAM_KEY + "=" + entityBundle.getEntity().getId() + "&" +
+			DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
 	}
 
 	@Override
@@ -122,7 +126,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	}
 
 	@Override
-	public void handleSubmitResult(String resultHtml) {
+	public void handleSubmitResult(String resultHtml, boolean isNewlyRestricted) {
 		if(resultHtml == null) resultHtml = "";
 		// response from server 
 		if(!resultHtml.contains(DisplayUtils.UPLOAD_SUCCESS)) {
@@ -130,34 +134,24 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 			handlerManager.fireEvent(new CancelEvent());
 		} else {
 			view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+			if (isNewlyRestricted) {
+				view.openNewTab(getJiraRestrictionLink());
+			}
 			handlerManager.fireEvent(new EntityUpdatedEvent());
 		}
-		
 	}
-
 	
 	@Override
-	public Callback getImposeRestrictionsCallback() {
-		return new Callback() {
-
-			@Override
-			public void invoke() {
-				UserProfile userProfile = authenticationController.getLoggedInUser().getProfile();
-				if (userProfile==null) throw new NullPointerException("User profile cannot be null.");
-				final String jiraRestrictionLink = jiraURLHelper.createAccessRestrictionIssue(
-						userProfile.getUserName(), userProfile.getDisplayName(), entity.getId());
-				GovernanceServiceHelper.lockDownData(
-						synapseClient, 
-						jsonObjectAdapter, 
-						jiraRestrictionLink);
-			}
-			
-		};
+	public boolean isRestricted() {
+		return entityBundle.getAccessRequirements().getResults().size() > 0;
 	}
-
 	
 	
-	/*
-	 * Private Methods
-	 */
+	@Override
+	public String getJiraRestrictionLink() {
+		UserProfile userProfile = authenticationController.getLoggedInUser().getProfile();
+		if (userProfile==null) throw new NullPointerException("User profile cannot be null.");
+		return jiraURLHelper.createAccessRestrictionIssue(
+				userProfile.getUserName(), userProfile.getDisplayName(), entityBundle.getEntity().getId());
+	}
 }

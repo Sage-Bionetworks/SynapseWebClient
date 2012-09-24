@@ -276,10 +276,6 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			@Override
 			public void invoke() {
 				fireEntityUpdatedEvent();
-//				refresh(new Callback() {
-//					public void invoke() {showWindow();}
-//					
-//				});
 			}
 		};
 		CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {

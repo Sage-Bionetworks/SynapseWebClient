@@ -15,22 +15,32 @@ public interface LocationableUploaderView extends IsWidget, SynapseWidgetView {
 
 	public void createUploadForm(boolean showCancel);
 	
+	public void openNewTab(String url);
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 
-		String getUploadActionUrl();
+		String getUploadActionUrl(boolean isRestricted);
 
 		void setExternalLocation(String path);
 		
 		public void closeButtonSelected();
 
-		void handleSubmitResult(String resultHtml);
-
-		//String getJiraRestrictionsLink();
+		/**
+		 * 
+		 * @param resultHtml
+		 */
+		void handleSubmitResult(String resultHtml, boolean isNewlyRestricted);
 		
-		Callback getImposeRestrictionsCallback();
+		/**
+		 * returns true iff the dataset is currently (initially) restricted
+		 * @return
+		 */
+		boolean isRestricted();
+
+		String getJiraRestrictionLink();
 	}
 
 

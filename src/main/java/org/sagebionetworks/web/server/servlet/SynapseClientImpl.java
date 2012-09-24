@@ -788,13 +788,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		Synapse synapseClient = createSynapseClient();
 		try {
 			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			AccessRequirement ar = jsonEntityFactory.createEntity(arEW.getEntityJson(), AccessRequirement.class);
+			@SuppressWarnings("unchecked")
+			AccessRequirement ar = jsonEntityFactory.createEntity(arEW.getEntityJson(), 
+					(Class<AccessRequirement>)Class.forName(arEW.getEntityClassName()));
 			AccessRequirement result = synapseClient.createAccessRequirement(ar);
 			JSONObjectAdapter arJson = result.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(arJson.toJSONString(), arJson.getClass().getName(), null);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} catch (ClassNotFoundException e) {
 			throw new UnknownErrorException(e.getMessage());
 		} 
 	}

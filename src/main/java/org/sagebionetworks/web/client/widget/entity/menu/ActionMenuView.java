@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.EntityType;
 
@@ -26,7 +27,7 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 	 * @param isAdministrator 
 	 * @param readOnly 
 	 */
-	public void createMenu(Entity entity, EntityType entityType, boolean isAdministrator, boolean canEdit, boolean readOnly);
+	public void createMenu(EntityBundle entityBundle, EntityType entityType, boolean isAdministrator, boolean canEdit, boolean readOnly);
 		
 	/**
 	 * Presenter interface
