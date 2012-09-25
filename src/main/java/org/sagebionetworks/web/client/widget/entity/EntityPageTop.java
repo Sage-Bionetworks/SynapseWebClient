@@ -59,8 +59,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private boolean readOnly;
 	private String entityTypeDisplay; 
 	private EventBus bus;
-	private String rStudioUrl;
-	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraURLHelper;
 	
 	@Inject
@@ -73,7 +71,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			JSONObjectAdapter jsonObjectAdapter,
 			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle,
-			StackConfigServiceAsync stackConfigService,
+			JiraURLHelper jiraURLHelper,
 			EventBus bus) {
 		this.view = view;
 		this.nodeService = service;
@@ -86,16 +84,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.entityTypeProvider = entityTypeProvider;
 		this.iconsImageBundle = iconsImageBundle;
 		this.bus = bus;
-		this.stackConfigService = stackConfigService;
-		stackConfigService.getJiraGovernanceProjectId(new AsyncCallback<Integer>(){
-			@Override
-			public void onFailure(Throwable caught) {
-				// no op
-			}
-			@Override
-			public void onSuccess(Integer result) {
-				jiraURLHelper = new JiraURLHelper(result);
-			}});
+		this.jiraURLHelper = jiraURLHelper;
 		view.setPresenter(this);
 	}	
 
@@ -254,14 +243,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public APPROVAL_REQUIRED getRestrictionLevel() {
-		if (bundle.getAccessRequirements().getTotalNumberOfResults()==0L) return APPROVAL_REQUIRED.NONE;
+		if (bundle.getAccessRequirements().size()==0L) return APPROVAL_REQUIRED.NONE;
 		if (isTermsOfUseAccessRequirement()) return APPROVAL_REQUIRED.LICENSE_ACCEPTANCE;
 		return APPROVAL_REQUIRED.ACT_APPROVAL;
 	}
 
 	@Override
 	public boolean hasFulfilledAccessRequirements() {
-		return bundle.getUnmetAccessRequirements().getTotalNumberOfResults()==0L;
+		return bundle.getUnmetAccessRequirements().size()==0L;
 	}
 
 	@Override
@@ -271,8 +260,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public String accessRequirementText() {
-		if (bundle.getAccessRequirements().getResults().size()==0) throw new IllegalStateException("There is no access requirement.");
-		AccessRequirement ar = bundle.getAccessRequirements().getResults().get(0);
+		if (bundle.getAccessRequirements().size()==0) throw new IllegalStateException("There is no access requirement.");
+		AccessRequirement ar = bundle.getAccessRequirements().get(0);
 		if (ar instanceof TermsOfUseAccessRequirement) {
 			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
 		} else if (ar instanceof ACTAccessRequirement) {
@@ -283,12 +272,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 	
 	private AccessRequirement getAccessRequirement() {
-		return bundle.getAccessRequirements().getResults().get(0);
+		return bundle.getAccessRequirements().get(0);
 	}
 
 	@Override
 	public boolean isTermsOfUseAccessRequirement() {
-		if (bundle.getAccessRequirements().getResults().size()==0) throw new IllegalStateException("There is no access requirement.");
+		if (bundle.getAccessRequirements().size()==0) throw new IllegalStateException("There is no access requirement.");
 		AccessRequirement ar = getAccessRequirement();
 		if (ar instanceof TermsOfUseAccessRequirement) {
 			return true;		

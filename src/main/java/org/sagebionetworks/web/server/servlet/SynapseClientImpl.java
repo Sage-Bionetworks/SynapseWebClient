@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -38,6 +39,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -174,36 +176,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {			
 			Synapse synapseClient = createSynapseClient();			
 			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);
-			// TODO migrate this to the Synapse client
-			retrieveAccessRequirements(entityId, partsMask, eb, synapseClient);
 			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 	
-	private void retrieveAccessRequirements(String entityId, int partsMask, EntityBundle eb, Synapse synapseClient) throws SynapseException {
-		if ((partsMask & EntityBundle.ACCESS_REQUIREMENTS) !=0) {
-			VariableContentPaginatedResults<AccessRequirement> accessRequirements = 
-				synapseClient.getAccessRequirements(entityId);
-				eb.setAccessRequirements(accessRequirements);
-		}
-		if ((partsMask & EntityBundle.UNMET_ACCESS_REQUIREMENTS) !=0) {
-			VariableContentPaginatedResults<AccessRequirement> unmetAccessRequirements = 
-				synapseClient.getUnmetAccessReqAccessRequirements(entityId);
-				eb.setUnmetAccessRequirements(unmetAccessRequirements);
-		}
-		
-	}
-
 	@Override
 	public EntityBundleTransport getEntityBundleForVersion(String entityId,
 			Long versionNumber, int partsMask) throws RestServiceException {
 		try {			
 			Synapse synapseClient = createSynapseClient();			
 			EntityBundle eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
-			// TODO migrate this to the Synapse client
-			retrieveAccessRequirements(entityId, partsMask, eb, synapseClient);
 			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -333,15 +317,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				ebt.setGroupsJson(EntityFactory.createJSONStringForEntity(g));
 			}
 			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask)!=0) {
-				ebt.setAccessRequirementsJson(EntityFactory.createJSONStringForEntity(eb.getAccessRequirements()));
+				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
 			}
 			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask)!=0) {
-				ebt.setUnmetAccessRequirementsJson(EntityFactory.createJSONStringForEntity(eb.getUnmetAccessRequirements()));
+				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb.getUnmetAccessRequirements()));
 			}
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
+		} catch (JSONException e) {
+			throw new UnknownErrorException(e.getMessage());			
 		}
 		return ebt;
+	}
+	
+	private static String createJSONStringFromArray(List<? extends JSONEntity> list) throws JSONException {
+		JSONStringer stringer = new JSONStringer();
+		stringer.array();
+		for (JSONEntity e : list) stringer.value(e);
+		stringer.endArray();
+		return stringer.toString();
 	}
 
 	/**

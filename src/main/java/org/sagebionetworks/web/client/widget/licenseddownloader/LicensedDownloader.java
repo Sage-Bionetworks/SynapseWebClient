@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -60,6 +61,10 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraUrlHelper;
+	
+	// for testing
+	public void setUserProfile(UserProfile userProfile) {this.userProfile=userProfile;}
+	public void setAccessRequirement(AccessRequirement accessRequirement) {this.accessRequirement=accessRequirement;}
 
 	@Inject
 	public LicensedDownloader(LicensedDownloaderView view,
@@ -67,7 +72,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			GlobalApplicationState globalApplicationState,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseClientAsync synapseClient,
-			StackConfigServiceAsync stackConfigService,
+			JiraURLHelper jiraUrlHelper,
 			NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -75,16 +80,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.stackConfigService = stackConfigService;
-		stackConfigService.getJiraGovernanceProjectId(new AsyncCallback<Integer>(){
-			@Override
-			public void onFailure(Throwable caught) {
-				// no op
-			}
-			@Override
-			public void onSuccess(Integer result) {
-				jiraUrlHelper = new JiraURLHelper(result);
-			}});
+		this.jiraUrlHelper=jiraUrlHelper;
 		view.setPresenter(this);		
 	}
 
@@ -106,27 +102,20 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * @param entity
 	 * @param showDownloadLocations
 	 */
-	public void configureHeadless(Entity entity) {
+	public void configureHeadless(EntityBundle entityBundle, UserProfile userProfile) {
 		view.setPresenter(this);
-		this.entityId = entity.getId();
-		refresh(null);
+		this.entityId = entityBundle.getEntity().getId();
+		extractBundle(entityBundle, userProfile);
 	}
 	
-	public void unmetAccessRequirementsCallback(AccessRequirementsTransport result, Callback callback) {
-		Entity entity = null;
-		VariableContentPaginatedResults<AccessRequirement> ars = new VariableContentPaginatedResults<AccessRequirement>();
-		try {
-			entity = nodeModelCreator.createEntity(result.getEntityString(), result.getEntityClassAsString());
-			loadDownloadLocations(entity);		
-			ars = nodeModelCreator.initializeEntity(result.getAccessRequirementsString(), ars);
-			
-			userProfile = nodeModelCreator.createEntity(result.getUserProfileString(), UserProfile.class);
-		} catch (RestServiceException e) {
-			throw new RuntimeException(e);
-		}
+	private void extractBundle(EntityBundle entityBundle, UserProfile userProfile) {
+		Entity entity = entityBundle.getEntity();
+		loadDownloadLocations(entity);		
+		List<AccessRequirement> ars = entityBundle.getUnmetAccessRequirements();
+		userProfile = userProfile;
 		// first, clear license agreement.  then, if there is an agreement required, set it below
 		setLicenseAgreement(null, null);
-		for (AccessRequirement ar : ars.getResults()) {
+		for (AccessRequirement ar : ars) {
 			if (ar instanceof TermsOfUseAccessRequirement) {
 				// for tier 2 requirements, set license agreement
 				String touContent = ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
@@ -146,30 +135,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		} else {
 			view.showInfo("Error", ar.getClass().toString());
 			}
-		}
-		if (callback!=null) callback.invoke();		
-	}
-	
-	/**
-	 * Check for unmet access requirements and refresh accordingly
-	 *
-	 * @param callback an optional step to call after successful completion, or null if none
-	 */
-	public void refresh(final Callback callback) {
-		synapseClient.getUnmetAccessRequirements(entityId, new AsyncCallback<AccessRequirementsTransport>(){
-
-			@Override
-			public void onSuccess(AccessRequirementsTransport result) {
-				unmetAccessRequirementsCallback(result, callback);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showInfo("Error", caught.getMessage());
-			}
-
-			
-		});
+		}		
 	}
 	
 	/**
@@ -178,8 +144,8 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * @param showDownloadLocations
 	 * @return
 	 */
-	public Widget asWidget(Entity entity) {
-		configureHeadless(entity);
+	public Widget asWidget(EntityBundle entityBundle, UserProfile userProfile) {
+		configureHeadless(entityBundle, userProfile);
 		
 		return view.asWidget();
 	}	
@@ -275,7 +241,15 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		Callback onSuccess = new Callback() {
 			@Override
 			public void invoke() {
+				view.showWindow();
 				fireEntityUpdatedEvent();
+//				refresh(new Callback() {
+//					@Override
+//					public void invoke() {
+//						view.showWindow();
+//						fireEntityUpdatedEvent();
+//					}
+//				});
 			}
 		};
 		CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {

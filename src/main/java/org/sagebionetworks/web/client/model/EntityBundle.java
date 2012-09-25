@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.model;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
@@ -24,14 +26,14 @@ public class EntityBundle {
 	private EntityPath path;
 	private PaginatedResults<EntityHeader> referencedBy;
 	private Long childCount;
-	private VariableContentPaginatedResults<AccessRequirement> accessRequirements;
-	private VariableContentPaginatedResults<AccessRequirement> unmetAccessRequirements;
+	private List<AccessRequirement> accessRequirements;
+	private List<AccessRequirement> unmetAccessRequirements;
 	
 	public EntityBundle(Entity entity, Annotations annotations,
 			UserEntityPermissions permissions, EntityPath path, 
 			PaginatedResults<EntityHeader> referencedBy,
-			VariableContentPaginatedResults<AccessRequirement> accessRequirements,
-		VariableContentPaginatedResults<AccessRequirement> unmetAccessRequirements
+			List<AccessRequirement> accessRequirements,
+		List<AccessRequirement> unmetAccessRequirements
 	) {
 		super();
 		this.entity = entity;
@@ -79,18 +81,18 @@ public class EntityBundle {
 	public void setReferencedBy(PaginatedResults<EntityHeader> referencedBy) {
 		this.referencedBy = referencedBy;
 	}
-	public VariableContentPaginatedResults<AccessRequirement> getAccessRequirements() {
+	public List<AccessRequirement> getAccessRequirements() {
 		return accessRequirements;
 	}
 	public void setAccessRequirements(
-			VariableContentPaginatedResults<AccessRequirement> accessRequirements) {
+			List<AccessRequirement> accessRequirements) {
 		this.accessRequirements = accessRequirements;
 	}
-	public VariableContentPaginatedResults<AccessRequirement> getUnmetAccessRequirements() {
+	public List<AccessRequirement> getUnmetAccessRequirements() {
 		return unmetAccessRequirements;
 	}
 	public void setUnmetAccessRequirements(
-			VariableContentPaginatedResults<AccessRequirement> unmetAccessRequirements) {
+			List<AccessRequirement> unmetAccessRequirements) {
 		this.unmetAccessRequirements = unmetAccessRequirements;
 	}
 	@Override

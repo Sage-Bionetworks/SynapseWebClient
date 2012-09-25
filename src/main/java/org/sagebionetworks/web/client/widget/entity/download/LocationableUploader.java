@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
@@ -41,7 +42,6 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	private JSONObjectAdapter jsonObjectAdapter;
 
 	private SynapseClientAsync synapseClient;
-	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraURLHelper;
 	
 	@Inject
@@ -52,7 +52,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 			AuthenticationController authenticationController, 
 			EntityTypeProvider entityTypeProvider,
 			SynapseClientAsync synapseClient,
-			StackConfigServiceAsync stackConfigService,
+			JiraURLHelper jiraURLHelper,
 			JSONObjectAdapter jsonObjectAdapter
 			) {
 		this.view = view;
@@ -61,16 +61,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
 		this.synapseClient = synapseClient;
-		this.stackConfigService = stackConfigService;
-		stackConfigService.getJiraGovernanceProjectId(new AsyncCallback<Integer>(){
-			@Override
-			public void onFailure(Throwable caught) {
-				// no op
-			}
-			@Override
-			public void onSuccess(Integer result) {
-				jiraURLHelper = new JiraURLHelper(result);
-			}});
+		this.jiraURLHelper = jiraURLHelper;
 		this.jsonObjectAdapter=jsonObjectAdapter;
 		view.setPresenter(this);		
 	}		
@@ -143,7 +134,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	
 	@Override
 	public boolean isRestricted() {
-		return entityBundle.getAccessRequirements().getResults().size() > 0;
+		return entityBundle.getAccessRequirements().size() > 0;
 	}
 	
 	

@@ -198,7 +198,7 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 			// put it all together.
 			EntityBundle eb =  new EntityBundle(entity, annotations, 
 					permissions, path, referencedBy,
-					accessRequirements, unmetAccessRequirements);
+					accessRequirements.getResults(), unmetAccessRequirements.getResults());
 			// Set the child count when there.
 			eb.setChildCount(transport.getChildCount());
 			return eb;

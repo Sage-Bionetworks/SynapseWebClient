@@ -72,7 +72,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
-		view.createMenu(bundle, entityType, isAdministrator, canEdit, readOnly);
+		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, readOnly);
 		return view.asWidget();
 	}
 

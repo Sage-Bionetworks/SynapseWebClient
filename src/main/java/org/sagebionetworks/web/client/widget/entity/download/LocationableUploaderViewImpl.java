@@ -148,7 +148,6 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		tabItem.add(lf);
 	}
 	
-	// TODO make sure not to recreate this unnecessarily or inappropriately
 	private void addRadioButtonsToTab(TabItem tabItem) {
 		FormPanel radioButtonPanel = new FormPanel();
 		radioButtonPanel.setHeaderVisible(false);

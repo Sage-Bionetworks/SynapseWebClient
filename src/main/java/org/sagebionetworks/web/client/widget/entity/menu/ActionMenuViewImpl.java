@@ -5,6 +5,8 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
@@ -16,6 +18,7 @@ import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
@@ -71,7 +74,10 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			IconsImageBundle iconsImageBundle, 
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
-			LocationableUploader locationableUploader, MyEntitiesBrowser myEntitiesBrowser, LicensedDownloader licensedDownloader, EntityTypeProvider typeProvider) {
+			LocationableUploader locationableUploader, 
+			MyEntitiesBrowser myEntitiesBrowser, 
+			LicensedDownloader licensedDownloader, 
+			EntityTypeProvider typeProvider) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.locationableUploader = locationableUploader;
@@ -85,13 +91,21 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	}
 
 	@Override
-	public void createMenu(EntityBundle entityBundle, EntityType entityType, boolean isAdministrator,
-			boolean canEdit, boolean readOnly) {
+	public void createMenu(
+			EntityBundle entityBundle, 
+			EntityType entityType, 
+			AuthenticationController authenticationController,
+			boolean isAdministrator,
+			boolean canEdit, 
+			boolean readOnly) {
 		this.readOnly = readOnly;
 		Entity entity = entityBundle.getEntity();
-		
+
+		UserSessionData sessionData = authenticationController.getLoggedInUser();
+		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
+
 		if(downloadButton == null){
-			downloadButton = licensedDownloader.asWidget(entity);
+			downloadButton = licensedDownloader.asWidget(entityBundle, userProfile);
 			downloadButton.setHeight("25px");
 			add(downloadButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));	
@@ -105,7 +119,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				dlButton.disable(); 
 		}
 		// Configure the button
-		licensedDownloader.configureHeadless(entity);
+		licensedDownloader.configureHeadless(entityBundle, userProfile);
 		// this allows the menu to respond to the user signing a Terms of Use agreement in the licensed downloader
 		licensedDownloader.addEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override

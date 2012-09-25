@@ -13,6 +13,4 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface StackConfigServiceAsync {
 
 	void getBCCSignupEnabled(AsyncCallback<String> callback);
-	
-	void getJiraGovernanceProjectId(AsyncCallback<Integer> callback);
 }

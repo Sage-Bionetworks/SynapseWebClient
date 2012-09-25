@@ -43,6 +43,9 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.widget.entity.JiraGovernanceConstants;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -78,6 +81,7 @@ public class LicensedDownloaderTest {
 	EntityWrapper StudyEntityWrapper;
 	EntityWrapper layerEntityWrapper;
 	EntityWrapper pathEntityWrapper;
+	JiraURLHelper jiraURLHelper;
 	
 	@SuppressWarnings("unchecked")
 	@Before
@@ -101,12 +105,12 @@ public class LicensedDownloaderTest {
 		JSONEntityFactory factory = new JSONEntityFactoryImpl(adapterFactory);
 		NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(factory, adapterFactory.createNew());
 		
-		StackConfigServiceAsync configService = mock(StackConfigServiceAsync.class);
+		JiraGovernanceConstants gc = mock(JiraGovernanceConstants.class);
 
-		AsyncMockStubber.callSuccessWith("10830").when(configService).getJiraGovernanceProjectId(any(AsyncCallback.class));
+		jiraURLHelper  = new JiraURLHelperImpl(gc);
 
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
-				jsonObjectAdapterProvider, mockSynapseClient, configService, nodeModelCreator);
+				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, nodeModelCreator);
 		
 		verify(mockView).setPresenter(licensedDownloader);
 		
@@ -155,11 +159,15 @@ public class LicensedDownloaderTest {
 		user1.setProfile(profile);
 		user1.setSessionToken("token");
 		user1.setIsSSO(false);
+
+		licensedDownloader.setUserProfile(profile);
+
 		
 		licenseAgreement = new LicenseAgreement();		
 		licenseAgreement.setLicenseHtml("some agreement");
 		
 		accessRequirement = new TermsOfUseAccessRequirement();
+		licensedDownloader.setAccessRequirement(accessRequirement);
 
 		// create a DownloadLocation model for this test
 		LocationData downloadLocation = new LocationData();				

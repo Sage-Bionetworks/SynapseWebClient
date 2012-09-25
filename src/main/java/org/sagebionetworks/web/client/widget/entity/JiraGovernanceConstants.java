@@ -4,6 +4,8 @@ import com.google.gwt.i18n.client.Constants;
 
 public interface JiraGovernanceConstants extends Constants {
 	
+	int jiraProjectId();
+	
 	String confluenceEndpoint();
 	
 	int flagIssueType();
