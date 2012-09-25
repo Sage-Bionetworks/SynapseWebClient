@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.web.client.DisplayConstants;
+
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.fx.FxConfig;
@@ -48,16 +50,17 @@ public class EntityMetadata extends Composite {
 
 	public EntityMetadata() {
 		initWidget(uiBinder.createAndBindUi(this));
+		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
 		allVersions.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (previousVersions.isVisible()) {
 					previousVersions.el().slideOut(Direction.UP, FxConfig.NONE);
-					allVersions.setText("show all versions");
+					allVersions.setText(DisplayConstants.SHOW_VERSIONS);
 				} else {
 					previousVersions.setVisible(true);
 					previousVersions.el().slideIn(Direction.DOWN, FxConfig.NONE);
-					allVersions.setText("hide all versions");
+					allVersions.setText(DisplayConstants.HIDE_VERSIONS);
 				}
 			}
 		});
@@ -87,7 +90,7 @@ public class EntityMetadata extends Composite {
 
 	public void addToPreviousVersions(Widget widget) {
 		TableData data = new TableData();
-		data.setStyle("padding-left:50px");
+		data.setStyle("padding-left:10px");
 		previousVersions.add(widget, data);
 		previousVersions.layout(true);
 	}
