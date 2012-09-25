@@ -255,7 +255,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	@Override
 	public void clearStorageUsageUI() {
-		storageUsageWidget.setHtml("Unable to determine the current usage at this time.");
+		storageUsageWidget.setHtml(DisplayConstants.STORAGE_USAGE_FAILED_TEXT);
 	}
 	
 	public static String getFriendlySize(double size) {
