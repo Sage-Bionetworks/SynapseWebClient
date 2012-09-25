@@ -68,7 +68,7 @@ public class TitleWidget {
 	}
 
 	public void setVersions(Versionable entity, TreeMap<Long, String> latestVersions) {
-		if (latestVersions == null) {
+		if (latestVersions == null || latestVersions.size() == 0) {
 			InlineLabel notFound = new InlineLabel(DisplayConstants.ERROR_VERSIONS_NOT_FOUND);
 			entityMetadata.addToPreviousVersions(notFound);
 			return;
