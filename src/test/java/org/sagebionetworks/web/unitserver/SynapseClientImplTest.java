@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.CHILD_COUNT;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
@@ -157,14 +157,14 @@ public class SynapseClientImplTest {
 		bene.setId("syn999");
 		when(mockSynapse.getEntityBenefactor(anyString())).thenReturn(bene);
 		
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | CHILD_COUNT;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN;
 		int emptyMask = 0;
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(entity);
 		bundle.setAnnotations(annos);
 		bundle.setPermissions(eup);
 		bundle.setPath(path);
-		bundle.setChildCount(0L);
+		bundle.setHasChildren(false);
 		when(mockSynapse.getEntityBundle(anyString(),Matchers.eq(mask))).thenReturn(bundle);
 		
 		EntityBundle emptyBundle = new EntityBundle();
@@ -176,7 +176,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetEntityBundleAll() throws RestServiceException{
 		// Make sure we can get all parts of the bundel
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | CHILD_COUNT;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN;
 		EntityBundleTransport bundle = synapseClient.getEntityBundle(entityId, mask);
 		assertNotNull(bundle);
 		// We should have all of the strings
@@ -184,7 +184,7 @@ public class SynapseClientImplTest {
 		assertNotNull(bundle.getAnnotationsJson());
 		assertNotNull(bundle.getEntityPathJson());
 		assertNotNull(bundle.getPermissionsJson());
-		assertNotNull(bundle.getChildCount());
+		assertNotNull(bundle.getHasChildren());
 	}
 	
 	@Test
@@ -198,7 +198,7 @@ public class SynapseClientImplTest {
 		assertNull(bundle.getAnnotationsJson());
 		assertNull(bundle.getEntityPathJson());
 		assertNull(bundle.getPermissionsJson());
-		assertNull(bundle.getChildCount());
+		assertNull(bundle.getHasChildren());
 	}
 	
 	@Test (expected=IllegalArgumentException.class)

@@ -844,9 +844,9 @@ public class DisplayUtils {
 	public static boolean hasChildrenOrPreview(EntityBundle bundle){
 		if(bundle == null) return true;
 		if(bundle.getEntity() == null) return true;
-		Long count = bundle.getChildCount();
-		if(count == null) return true;
-		return count > 0;
+		Boolean hasChildern = bundle.getHasChildren();
+		if(hasChildern == null) return true;
+		return hasChildern;
 	}
 
 	public static ArrayList<EntityType> orderForDisplay(List<EntityType> children) {
