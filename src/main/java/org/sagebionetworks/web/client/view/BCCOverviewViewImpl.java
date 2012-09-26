@@ -30,8 +30,8 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 	SimplePanel footer;
 	@UiField
 	SimplePanel applyForChallenge;
-//	@UiField
-//	SimplePanel challengeFeedPanel;
+	@UiField
+	SimplePanel bccContent;
 	
 	private Presenter presenter;
 	private IconsImageBundle icons;
@@ -47,10 +47,8 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-
 		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());		
-				
+		footer.add(footerWidget.asWidget());
 	}
 
 
@@ -108,10 +106,10 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 
 	@Override
 	public void showChallengeInfo(String html){
-//		HTMLPanel panel = new HTMLPanel(html);
-//		DisplayUtils.sendAllLinksToNewWindow(panel);
-//		challengeFeedPanel.clear();
-//		challengeFeedPanel.add(panel);
+		HTMLPanel panel = new HTMLPanel(html);
+		DisplayUtils.sendAllLinksToNewWindow(panel);
+		bccContent.clear();
+		bccContent.add(panel);
 	}
 
 	@Override

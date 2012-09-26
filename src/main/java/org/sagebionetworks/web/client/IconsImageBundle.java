@@ -136,6 +136,9 @@ public interface IconsImageBundle extends ClientBundle {
 		
 	@Source("images/icons/lock-unlock-16.png")
 	ImageResource lockUnlocked16();	
+
+	@Source("images/icons/door-open-out-grey-16.png")
+	ImageResource logoutGrey16();	
 	
 	@Source("images/icons/magnifier-zoom-16.png")
 	ImageResource magnify16();		
@@ -187,7 +190,10 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/rstudio-36.png")
 	ImageResource rstudio36();
-
+	
+	@Source("images/icons/grey_wrench-screwdriver-16.png")
+	ImageResource settings16();	
+	
 	@Source("images/icons/table-insert-column-16.png")
 	ImageResource tableInsertColumn16();
 	
@@ -196,6 +202,9 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/user-business-16.png")
 	ImageResource userBusiness16();
+	
+	@Source("images/icons/user-business-grey-40.png")
+	ImageResource userBusinessGrey40();
 
 	@Source("images/icons/user-16.png")
 	ImageResource user16();
@@ -205,6 +214,9 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/users-16.png")
 	ImageResource users16();
+	
+	@Source("images/icons/users-grey-40.png")
+	ImageResource usersGrey40();
 	
 	@Source("images/icons/exclamation-16.png")
 	ImageResource warning16();	

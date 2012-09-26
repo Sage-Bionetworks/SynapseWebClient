@@ -20,7 +20,7 @@ public class EntityBundleTransport implements IsSerializable {
 	public static int PERMISSIONS	     		= EntityBundle.PERMISSIONS;
 	public static int ENTITY_PATH	      		= EntityBundle.ENTITY_PATH;
 	public static int ENTITY_REFERENCEDBY 		= EntityBundle.ENTITY_REFERENCEDBY;
-	public static int CHILD_COUNT				= EntityBundle.CHILD_COUNT;
+	public static int HAS_CHILDREN			= EntityBundle.HAS_CHILDREN;
 	public static int ACL						= EntityBundle.ACL;
 	public static int USERS						= EntityBundle.USERS;
 	public static int GROUPS					= EntityBundle.GROUPS;
@@ -34,18 +34,18 @@ public class EntityBundleTransport implements IsSerializable {
 	private String permissionsJson;
 	private String entityPathJson;
 	private String entityReferencedByJson;
-	private Long childCount;
+	private Boolean hasChildren;
 	private String aclJson;
 	private String usersJson;
 	private String groupsJson;
 	private String accessRequirementsJson;
 	private String unmetAccessRequirementsJson;
 	
-	public Long getChildCount() {
-		return childCount;
+	public Boolean getHasChildren() {
+		return hasChildren;
 	}
-	public void setChildCount(Long childCount) {
-		this.childCount = childCount;
+	public void setHashChildren(Boolean hasChildren) {
+		this.hasChildren = hasChildren;
 	}
 	public String getEntityJson() {
 		return entityJson;
@@ -122,8 +122,6 @@ public class EntityBundleTransport implements IsSerializable {
 		result = prime * result
 				+ ((annotationsJson == null) ? 0 : annotationsJson.hashCode());
 		result = prime * result
-				+ ((childCount == null) ? 0 : childCount.hashCode());
-		result = prime * result
 				+ ((entityJson == null) ? 0 : entityJson.hashCode());
 		result = prime * result
 				+ ((entityPathJson == null) ? 0 : entityPathJson.hashCode());
@@ -133,6 +131,8 @@ public class EntityBundleTransport implements IsSerializable {
 						: entityReferencedByJson.hashCode());
 		result = prime * result
 				+ ((groupsJson == null) ? 0 : groupsJson.hashCode());
+		result = prime * result
+				+ ((hasChildren == null) ? 0 : hasChildren.hashCode());
 		result = prime * result
 				+ ((permissionsJson == null) ? 0 : permissionsJson.hashCode());
 		result = prime
@@ -167,11 +167,6 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!annotationsJson.equals(other.annotationsJson))
 			return false;
-		if (childCount == null) {
-			if (other.childCount != null)
-				return false;
-		} else if (!childCount.equals(other.childCount))
-			return false;
 		if (entityJson == null) {
 			if (other.entityJson != null)
 				return false;
@@ -191,6 +186,11 @@ public class EntityBundleTransport implements IsSerializable {
 			if (other.groupsJson != null)
 				return false;
 		} else if (!groupsJson.equals(other.groupsJson))
+			return false;
+		if (hasChildren == null) {
+			if (other.hasChildren != null)
+				return false;
+		} else if (!hasChildren.equals(other.hasChildren))
 			return false;
 		if (permissionsJson == null) {
 			if (other.permissionsJson != null)
@@ -216,12 +216,11 @@ public class EntityBundleTransport implements IsSerializable {
 				+ ", annotationsJson=" + annotationsJson + ", permissionsJson="
 				+ permissionsJson + ", entityPathJson=" + entityPathJson
 				+ ", entityReferencedByJson=" + entityReferencedByJson
-				+ ", childCount=" + childCount + ", aclJson=" + aclJson
+				+ ", hasChildren=" + hasChildren + ", aclJson=" + aclJson
 				+ ", usersJson=" + usersJson + ", groupsJson=" + groupsJson
 				+ ", accessRequirementsJson=" + accessRequirementsJson
 				+ ", unmetAccessRequirementsJson="
 				+ unmetAccessRequirementsJson + "]";
 	}
-	
 	
 }

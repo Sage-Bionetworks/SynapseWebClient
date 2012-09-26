@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
+import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -60,6 +61,8 @@ public interface PortalGinInjector extends Ginjector {
 	public SearchPresenter getSearchPresenter();
 	
 	public BCCSignup getBCCSignup();
+	
+	public WikiPresenter getWikiPresenter();
 	
 	public EventBus getEventBus();
 	

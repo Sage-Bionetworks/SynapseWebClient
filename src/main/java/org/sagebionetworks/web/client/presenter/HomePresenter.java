@@ -75,7 +75,26 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		} 
 		view.refresh();
 		
-		rssService.getFeedData(DisplayUtils.NEWS_FEED_URL, 4, true, new AsyncCallback<String>() {
+		loadNewsFeed();
+		loadSupportFeed();
+
+	}
+	
+	public void loadBccOverviewDescription() {
+		rssService.getCachedContent(DisplayUtils.BCC_SUMMARY_PROVIDER_ID, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.showBccOverview(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				//don't show the bcc overview
+			}
+		});
+	}
+	
+	public void loadNewsFeed(){
+		rssService.getCachedContent(DisplayUtils.NEWS_FEED_PROVIDER_ID, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
@@ -91,6 +110,24 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 	
+	public void loadSupportFeed(){
+		rssService.getCachedContent(DisplayUtils.SUPPORT_FEED_PROVIDER_ID, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				try {
+					view.showSupportFeed(getSupportFeedHtml(result));
+				} catch (RestServiceException e) {
+					onFailure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showSupportFeed("<p>"+DisplayConstants.SUPPORT_FEED_UNAVAILABLE_TEXT+"</p>");
+			}
+		});
+
+	}
+	
 	public String getHtml(String rssFeedJson) throws RestServiceException {
 		RSSFeed feed = nodeModelCreator.createEntity(rssFeedJson, RSSFeed.class);
 		StringBuilder htmlResponse = new StringBuilder();
@@ -99,7 +136,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			RSSEntry entry = feed.getEntries().get(i);
 			//every 4, set as the last (if we support more than 4)
 			String lastString = (i+1)%4==0 ? "last" : "";
-			htmlResponse.append("<div class=\"span-6 serv "+lastString+"\"><div class=\"icon-white-big left icon161-white\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
+			htmlResponse.append("<div class=\"span-6 serv "+lastString+"\"><div class=\"icon-white-big left icon161-white\" style=\"background-color: rgb(122, 122, 122);\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
             htmlResponse.append(entry.getLink());
             htmlResponse.append("\" class=\"service-tipsy north link\">");
             htmlResponse.append(entry.getTitle());
@@ -111,6 +148,26 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		return htmlResponse.toString();
 	}
 
+	public String getSupportFeedHtml(String rssFeedJson) throws RestServiceException {
+		RSSFeed feed = nodeModelCreator.createEntity(rssFeedJson, RSSFeed.class);
+		StringBuilder htmlResponse = new StringBuilder();
+		htmlResponse.append("<div class=\"span-12 last notopmargin\"> <ul class=\"list question-list\">");
+		for (int i = 0; i < feed.getEntries().size(); i++) {
+			RSSEntry entry = feed.getEntries().get(i);
+			htmlResponse.append("<li style=\"padding-top: 0px; padding-bottom: 3px\"><h5 style=\"margin-bottom: 0px;\"><a href=\"");
+            //all of the rss links are null from Get Satisfaction.  Just point each item to the main page, showing the recent activity
+			//htmlResponse.append(entry.getLink());
+			htmlResponse.append(DisplayUtils.SUPPORT_RECENT_ACTIVITY_URL);
+            htmlResponse.append("\" class=\"service-tipsy north link\">");
+            htmlResponse.append(entry.getTitle());
+            htmlResponse.append("</a></h5><p class=\"clear small-italic\" style=\"margin-bottom: 0px;\">");
+            htmlResponse.append(entry.getAuthor());
+            htmlResponse.append("</p></li>");
+		}
+		htmlResponse.append("</ul></div>");
+		return htmlResponse.toString();
+	}
+	
 	@Override
     public String mayStop() {
         view.clear();
@@ -126,4 +183,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public void showBCCSignup(AsyncCallback<String> callback) {
 		stackConfigService.getBCCSignupEnabled(callback);
 	}
+	
+	
 }

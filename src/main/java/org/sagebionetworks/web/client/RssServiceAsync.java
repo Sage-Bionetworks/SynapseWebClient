@@ -7,20 +7,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface RssServiceAsync {
 	
 	/**
-	 * Return all feed data (as an html string)
-	 * @param url
+	 * Return the cached external data (that must have an associated registered CacheProvider)
+	 * @param cacheproviderId
 	 * @param callback
 	 * @throws RestServiceException
 	 */
-	void getAllFeedData(String url,	AsyncCallback<String> callback);
-	
-	/**
-	 * Return the top n items from the feed (or max available if less than the given limit) in html.  Will give back only the short descriptions if summariesOnly is true.
-	 * @param url
-	 * @param limit
-	 * @param callback
-	 * @throws RestServiceException
-	 */
-	void getFeedData(String url, Integer limit, boolean summariesOnly,	AsyncCallback<String> callback);
-	
+	void getCachedContent(String cacheproviderId, AsyncCallback<String> callback);
 }

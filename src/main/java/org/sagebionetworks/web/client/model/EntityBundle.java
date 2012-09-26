@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -25,9 +24,9 @@ public class EntityBundle {
 	private UserEntityPermissions permissions;
 	private EntityPath path;
 	private PaginatedResults<EntityHeader> referencedBy;
-	private Long childCount;
 	private List<AccessRequirement> accessRequirements;
 	private List<AccessRequirement> unmetAccessRequirements;
+	private Boolean hasChildren;
 	
 	public EntityBundle(Entity entity, Annotations annotations,
 			UserEntityPermissions permissions, EntityPath path, 
@@ -60,11 +59,11 @@ public class EntityBundle {
 		return referencedBy;
 	}
 	
-	public Long getChildCount() {
-		return childCount;
+	public Boolean getHasChildren() {
+		return hasChildren;
 	}
-	public void setChildCount(Long childCount) {
-		this.childCount = childCount;
+	public void setChildCount(Boolean hasChildren) {
+		this.hasChildren = hasChildren;
 	}
 	public void setEntity(Entity entity) {
 		this.entity = entity;
@@ -95,6 +94,7 @@ public class EntityBundle {
 			List<AccessRequirement> unmetAccessRequirements) {
 		this.unmetAccessRequirements = unmetAccessRequirements;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -105,9 +105,9 @@ public class EntityBundle {
 						.hashCode());
 		result = prime * result
 				+ ((annotations == null) ? 0 : annotations.hashCode());
-		result = prime * result
-				+ ((childCount == null) ? 0 : childCount.hashCode());
 		result = prime * result + ((entity == null) ? 0 : entity.hashCode());
+		result = prime * result
+				+ ((hasChildren == null) ? 0 : hasChildren.hashCode());
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
 		result = prime * result
 				+ ((permissions == null) ? 0 : permissions.hashCode());
@@ -138,15 +138,15 @@ public class EntityBundle {
 				return false;
 		} else if (!annotations.equals(other.annotations))
 			return false;
-		if (childCount == null) {
-			if (other.childCount != null)
-				return false;
-		} else if (!childCount.equals(other.childCount))
-			return false;
 		if (entity == null) {
 			if (other.entity != null)
 				return false;
 		} else if (!entity.equals(other.entity))
+			return false;
+		if (hasChildren == null) {
+			if (other.hasChildren != null)
+				return false;
+		} else if (!hasChildren.equals(other.hasChildren))
 			return false;
 		if (path == null) {
 			if (other.path != null)
@@ -175,9 +175,10 @@ public class EntityBundle {
 	public String toString() {
 		return "EntityBundle [entity=" + entity + ", annotations="
 				+ annotations + ", permissions=" + permissions + ", path="
-				+ path + ", referencedBy=" + referencedBy + ", childCount="
-				+ childCount + ", accessRequirements=" + accessRequirements
-				+ ", unmetAccessRequirements=" + unmetAccessRequirements + "]";
+				+ path + ", referencedBy=" + referencedBy
+				+ ", accessRequirements=" + accessRequirements
+				+ ", unmetAccessRequirements=" + unmetAccessRequirements
+				+ ", hasChildren=" + hasChildren + "]";
 	}
 
 }

@@ -1,13 +1,17 @@
 package org.sagebionetworks.web.client.transform;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityClassHelper;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -162,8 +166,8 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 			UserEntityPermissions permissions = null;
 			EntityPath path = null;
 			PaginatedResults<EntityHeader> referencedBy = null;
-			VariableContentPaginatedResults<AccessRequirement> accessRequirements = null;
-			VariableContentPaginatedResults<AccessRequirement> unmetAccessRequirements = null;
+			List<AccessRequirement> accessRequirements = null;
+			List<AccessRequirement> unmetAccessRequirements = null;
 			// entity?
 			if(transport.getEntityJson() != null){
 				entity = factory.createEntity(transport.getEntityJson());
@@ -187,20 +191,31 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 			}			
 			// accessRequirements?
 			if(transport.getAccessRequirementsJson() != null){
-				accessRequirements =  new VariableContentPaginatedResults<AccessRequirement>();
-				accessRequirements.initializeFromJSONObject(jsonObjectAdapter.createNew(transport.getAccessRequirementsJson()));
+				accessRequirements =  new ArrayList<AccessRequirement>();
+				JSONArrayAdapter aa = jsonObjectAdapter.createNewArray(transport.getAccessRequirementsJson());
+				for (int i=0; i<aa.length(); i++) {
+					JSONObjectAdapter joa = aa.getJSONObject(i);
+					accessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
+				}
 			}			
-			// accessRequirements?
+			// unmetAccessRequirements?
 			if(transport.getUnmetAccessRequirementsJson() != null){
-				unmetAccessRequirements =  new VariableContentPaginatedResults<AccessRequirement>();
-				unmetAccessRequirements.initializeFromJSONObject(jsonObjectAdapter.createNew(transport.getUnmetAccessRequirementsJson()));
+				unmetAccessRequirements =  new ArrayList<AccessRequirement>();
+				JSONArrayAdapter aa = jsonObjectAdapter.createNewArray(transport.getUnmetAccessRequirementsJson());
+				for (int i=0; i<aa.length(); i++) {
+					JSONObjectAdapter joa = aa.getJSONObject(i);
+					unmetAccessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
+				}
 			}			
 			// put it all together.
 			EntityBundle eb =  new EntityBundle(entity, annotations, 
 					permissions, path, referencedBy,
-					accessRequirements.getResults(), unmetAccessRequirements.getResults());
+					accessRequirements, unmetAccessRequirements);
 			// Set the child count when there.
-			eb.setChildCount(transport.getChildCount());
+			if(transport.getHasChildren() != null){
+				eb.setChildCount(transport.getHasChildren());
+			}
+
 			return eb;
 		}catch (JSONObjectAdapterException e){
 			throw new UnknownErrorException(e.getMessage());

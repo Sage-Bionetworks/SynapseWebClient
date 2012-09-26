@@ -2,11 +2,15 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
@@ -84,11 +88,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
-	
+
 	private static final String REFERENCES_KEY_ID = "id";
 	private static final String REFERENCES_KEY_NAME = "name";
 	private static final String REFERENCES_KEY_TYPE = "type";
-	
+
 	@UiField
 	SimplePanel colLeftPanel;
 	@UiField
@@ -99,14 +103,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel breadcrumbsPanel;
 	@UiField
 	SimplePanel actionMenuPanel;
-	
+
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
-	private PreviewDisclosurePanel previewDisclosurePanel;	
+	private PreviewDisclosurePanel previewDisclosurePanel;
 	private ActionMenu actionMenu;
 	private EntityChildBrowser entityChildBrowser;
-	private Breadcrumb breadcrumb;	
+	private Breadcrumb breadcrumb;
 	private PropertyWidget propertyWidget;
 	private LayoutContainer colLeftContainer;
 	private LayoutContainer colRightContainer;
@@ -114,18 +118,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private EntityTypeProvider entityTypeProvider;
 	private Attachments attachmentsPanel;
 	private SnapshotWidget snapshotWidget;
-	private boolean readOnly = false;	
+	private boolean readOnly = false;
 	private boolean rStudioUrlReady = false;
 	private SplitButton showRstudio;
 	private SynapseJSNIUtils synapseJSNIUtils;
-			
+	private TitleWidget titleWidget;
+
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
 			AccessMenuButton accessMenuButton,
 			PreviewDisclosurePanel previewDisclosurePanel,
 			ActionMenu actionMenu,
-			EntityChildBrowser entityChildBrowser, Breadcrumb breadcrumb, 
+			EntityChildBrowser entityChildBrowser, Breadcrumb breadcrumb,
 			PropertyWidget propertyWidget,EntityTypeProvider entityTypeProvider,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			SynapseJSNIUtils synapseJSNIUtils) {
@@ -140,83 +145,141 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.attachmentsPanel = attachmentsPanel;
 		this.snapshotWidget = snapshotWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		
+
 		initWidget(uiBinder.createAndBindUi(this));
 	}
-	
-	
+
+
 	@Override
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, boolean readOnly) {
 		this.readOnly = readOnly;
-		
-		if(colLeftContainer == null) {
-			colLeftContainer = new LayoutContainer();
-			colLeftContainer.setAutoHeight(true);
-			colLeftContainer.setAutoWidth(true);
-			colLeftPanel.clear();
-			colLeftPanel.add(colLeftContainer);
-		}
-		if(colRightContainer == null) {
-			colRightContainer = new LayoutContainer();
-			colRightContainer.setAutoHeight(true);
-			colRightContainer.setAutoWidth(true);
-			colRightPanel.clear();
-			colRightPanel.add(colRightContainer);
-		}
-		if(fullWidthContainer == null) {
-			fullWidthContainer = new LayoutContainer();
-			fullWidthContainer.setAutoHeight(true);
-			fullWidthContainer.setAutoWidth(true);
-			fullWidthPanel.clear();
-			fullWidthPanel.add(fullWidthContainer);
-		}
-		
+
+		colLeftContainer = initContainerAndPanel(colLeftContainer, colLeftPanel);
+		colRightContainer = initContainerAndPanel(colRightContainer, colRightPanel);
+		fullWidthContainer = initContainerAndPanel(fullWidthContainer, fullWidthPanel);
+
 		colLeftContainer.removeAll();
 		colRightContainer.removeAll();
 		fullWidthContainer.removeAll();
-		
+
 		// add breadcrumbs
 		breadcrumbsPanel.clear();
 		breadcrumbsPanel.add(breadcrumb.asWidget(bundle.getPath()));
 
-		//setup action menu
-		actionMenuPanel.clear();		
-		actionMenu.addEntityUpdatedHandler(new EntityUpdatedHandler() {			
+		// setup action menu
+		actionMenuPanel.clear();
+		actionMenu.addEntityUpdatedHandler(new EntityUpdatedHandler() {
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				presenter.fireEntityUpdatedEvent();
 			}
-		});		
-		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator, canEdit, readOnly));	
-		
+		});
+		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator,
+				canEdit, readOnly));
+
 		MarginData widgetMargin = new MarginData(0, 0, 20, 0);
-		
-		
-		// standard top
-		
-		
+
 		// Custom layouts for certain entities
 		if(bundle.getEntity() instanceof Summary) {
 		    renderSnapshotEntity(bundle, userProfile, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+		} else if (bundle.getEntity() instanceof Folder) {
+			renderFolderEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+		} else if (bundle.getEntity() instanceof Project) {
+			renderProjectEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
 		} else {
 			// default entity view
-			renderDefaultEntity(bundle, userProfile, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+			renderDefaultEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
 		}
-		
+
 		colLeftContainer.layout(true);
 		colRightContainer.layout(true);
-		fullWidthContainer.layout(true);		
+		fullWidthContainer.layout(true);
 	}
 
+	private LayoutContainer initContainerAndPanel(LayoutContainer container,
+			SimplePanel panel) {
+		if(container == null) {
+			container = new LayoutContainer();
+			container.setAutoHeight(true);
+			container.setAutoWidth(true);
+			panel.clear();
+			panel.add(container);
+		}
+		return container;
+	}
 
-	private void renderDefaultEntity(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
+	@Override
+	public Widget asWidget() {
+		return this;
+	}
+
+	@Override
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+
+	@Override
+	public void showLoading() {
+		// TODO
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void clear() {
+		actionMenu.clearState();
+		if (colLeftContainer != null)
+			colLeftContainer.removeAll();
+		if (colRightContainer != null)
+			colRightContainer.removeAll();
+		if (fullWidthContainer != null)
+			fullWidthContainer.removeAll();
+		if (titleWidget != null) {
+			titleWidget.clear();
+			titleWidget = null;
+		}
+	}
+
+	@Override
+	public void setRStudioUrlReady() {
+		// allow button to be used now
+		if(showRstudio != null) {
+			showRstudio.enable();
+		}
+	}
+
+	/*
+	 * Private Methods
+	 */
+	private void renderFolderEntity(EntityBundle bundle,
+			String entityTypeDisplay, boolean canEdit, boolean readOnly2,
+			MarginData widgetMargin) {
+		// TODO: make this actually render folders differently
+		renderDefaultEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+	}
+
+	private void renderProjectEntity(EntityBundle bundle,
+			String entityTypeDisplay, boolean canEdit, boolean readOnly2,
+			MarginData widgetMargin) {
+		// TODO: make this actually render projects differently
+		renderDefaultEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+	}
+
+	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Title
-		colLeftContainer.add(EntityViewUtils.createTitleWidget(bundle, createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils), widgetMargin);
-		// Restrictions
-		//colLeftContainer.add(EntityViewUtils.createRestrictionsWidget(bundle, userProfile, iconsImageBundle), widgetMargin);
+		titleWidget = new TitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
 		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);	    
+		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
 		// Child Browser
 		if(DisplayUtils.hasChildrenOrPreview(bundle)){
 			colLeftContainer.add(createEntityChildBrowserWidget(bundle.getEntity()), widgetMargin);
@@ -239,7 +302,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colRightContainer.add(createReferencesWidget(bundle.getEntity(), bundle.getReferencedBy()), widgetMargin);
 		// Create R Client widget
 		colRightContainer.add(createRClientWidget(bundle.getEntity()), widgetMargin);
-		
+
 		// ** FULL WIDTH **
 		// none.
 	}
@@ -296,11 +359,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	private void renderSnapshotEntity(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
-		// ** LEFT **
-		// Title
-		colLeftContainer.add(EntityViewUtils.createTitleWidget(bundle, createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils), widgetMargin);
+
+		titleWidget = new TitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
 		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);	    
+		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
 
 		// ** RIGHT **
 		// Annotation Editor widget
@@ -312,77 +375,32 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Snapshot entity
 		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);
 		fullWidthContainer.add(snapshotWidget.asWidget());
-		
-	} 
 
-
-
-	@Override
-	public Widget asWidget() {
-		return this;
-	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
 	}
 
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void showLoading() {
-		// TODO
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void clear() {
-		actionMenu.clearState();
-		// TODO : add other widgets here
-	}
-
-	@Override
-	public void setRStudioUrlReady() {
-		// allow button to be used now
-		if(showRstudio != null) {
-			showRstudio.enable();
-		}
-	}
-	
-	/*
-	 * Private Methods
-	 */
-		
-	private Widget createRClientWidget(Entity entity) {			  
+	private Widget createRClientWidget(Entity entity) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		lc.add(new Html(SafeHtmlUtils.fromSafeConstant("<h3>Synapse R Client</h3>").asString()));  
+		lc.add(new Html(SafeHtmlUtils.fromSafeConstant("<h3>Synapse R Client</h3>").asString()));
 
 	    // setup install code widgets
 		SafeHtml rClientLoad = DisplayUtils.getRClientEntityLoad(entity.getId());
 	    Html loadEntityCode = new Html(rClientLoad.asString());
-	    loadEntityCode.setStyleName(DisplayUtils.STYLE_CODE_CONTENT);		
-		
+	    loadEntityCode.setStyleName(DisplayUtils.STYLE_CODE_CONTENT);
+
 		final LayoutContainer container = new LayoutContainer();
 	    String rSnipet = "# " + DisplayConstants.LABEL_R_CLIENT_INSTALL
 		+ "<br/>" + DisplayUtils.R_CLIENT_DOWNLOAD_CODE;
-		container.addText(rSnipet);	    		
+		container.addText(rSnipet);
 	    container.setStyleName(DisplayUtils.STYLE_CODE_CONTENT);
 	    container.setVisible(false);
-	    
-	    
+
+
 		Button getRClientButton = new Button(DisplayConstants.BUTTON_SHOW_R_CLIENT_INSTALL,
 				new SelectionListener<ButtonEvent>() {
 					public void componentSelected(ButtonEvent ce) {
-						if (container.isVisible()) {							
+						if (container.isVisible()) {
 							container.el().slideOut(Direction.UP, FxConfig.NONE);
 						} else {
 							container.setVisible(true);
@@ -392,46 +410,46 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 				});
 		getRClientButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.cog16()));
-		
+
 		VerticalPanel vp = new VerticalPanel();
 		vp.add(getRClientButton);
 		vp.add(container);
-		
+
 		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<p>The Synapse R Client allows you to interact with the Synapse system programmatically.</p>")));
 		lc.add(loadEntityCode);
 		lc.add(vp);
-		
+
 		lc.layout();
-	    return lc;  
-	}	
-	
-	private Widget createReferencesWidget(Entity entity, PaginatedResults<EntityHeader> referencedBy) {			  
+	    return lc;
+	}
+
+	private Widget createReferencesWidget(Entity entity, PaginatedResults<EntityHeader> referencedBy) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant("<h3>Others Using this ").appendEscaped(entityTypeProvider.getEntityDispalyName(entity)).appendHtmlConstant("</h3>");
-		lc.add(new HTML(shb.toSafeHtml()));	    
+		lc.add(new HTML(shb.toSafeHtml()));
 
-	    
-	    if(referencedBy.getTotalNumberOfResults() > 0) {	    
+
+	    if(referencedBy.getTotalNumberOfResults() > 0) {
 		    List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		    			
+
 		    // ref by column
-			ColumnConfig colConfig = new ColumnConfig(REFERENCES_KEY_ID, "Referenced By", 200);			
-			columns.add(colConfig);		
+			ColumnConfig colConfig = new ColumnConfig(REFERENCES_KEY_ID, "Referenced By", 200);
+			columns.add(colConfig);
 			GridCellRenderer<BaseModelData> cellRenderer = configureReferencedByGridCellRenderer();
 			colConfig.setRenderer(cellRenderer);
 			colConfig.setSortable(false);
-			
+
 		    ColumnModel cm = new ColumnModel(columns);
-		    
+
 		    // TODO : eventually remove this block
-		    if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {					
+		    if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {
 				lc.add(new HTML(DisplayConstants.DEMO_ANALYSIS));
 				return lc;
 			}
-	
+
 		    // CREATE TABLE
 		    // add table of references
 	        RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
@@ -443,18 +461,18 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 						@Override
 						public void onSuccess(PaginatedResults<EntityHeader> result) {
 							List<BaseModelData> dataList = new ArrayList<BaseModelData>();
-							for(EntityHeader header : result.getResults()) {			
+							for(EntityHeader header : result.getResults()) {
 								BaseModelData model = new BaseModelData();
 								model.set(REFERENCES_KEY_ID, header.getId());
 								model.set(REFERENCES_KEY_NAME, header.getName());
 								model.set(REFERENCES_KEY_TYPE, header.getType());
-								
+
 								dataList.add(model);
 							}
 							PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(dataList);
 							loadResultData.setTotalLength((int) result.getTotalNumberOfResults());
 							//loadResultData.setOffset(result.get);
-							
+
 							callback.onSuccess(loadResultData);
 						}
 						@Override
@@ -464,47 +482,47 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					});
 	            }
 	        };
-			
+
 	        // create a paging loader from the proxy
 	        BasePagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(proxy);
 	        loader.setRemoteSort(false);
 	        loader.setReuseLoadConfig(true);
 	        loader.setLimit(200);
-	        loader.setOffset(0);            
-	                
+	        loader.setOffset(0);
+
 	        // add initial data to the store
 			ListStore<BaseModelData> store = new ListStore<BaseModelData>(loader);
-				
+
 			Grid<BaseModelData> grid = new Grid<BaseModelData>(store, cm);
 			grid.setLayoutData(new FitLayout());
-			grid.setStateful(false);		
+			grid.setStateful(false);
 			grid.setLoadMask(true);
-			grid.getView().setForceFit(true);		
+			grid.getView().setForceFit(true);
 			grid.setAutoWidth(false);
 			grid.setStyleAttribute("borderTop", "none");
 			grid.setBorders(false);
 			grid.setStripeRows(true);
 			grid.setHeight(200);
-			
+
 			ContentPanel cp = new ContentPanel();
 			cp.setLayout(new FitLayout());
 			cp.setBodyBorder(true);
 			cp.setButtonAlign(HorizontalAlignment.CENTER);
 			cp.setHeaderVisible(false);
 			cp.setHeight(200);
-	
-			// create bottom paging toolbar				
-		    PagingToolBar toolBar = new PagingToolBar(10);        
+
+			// create bottom paging toolbar
+		    PagingToolBar toolBar = new PagingToolBar(10);
 	        toolBar.bind(loader);
 	        toolBar.setSpacing(2);
 	        toolBar.insert(new SeparatorToolItem(), toolBar.getItemCount() - 2);
-	        
+
 	    	cp.setBottomComponent(toolBar);
-	    	
+
 			cp.add(grid);
-			
+
 			lc.add(cp);
-			
+
 			// load initial data
 			loader.load();
 
@@ -514,9 +532,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    	lc.add(new HTML(shbNoRef.toSafeHtml()));
 	    }
 	    lc.layout();
-	    return lc;  
-	}	
-	
+	    return lc;
+	}
+
 	private GridCellRenderer<BaseModelData> configureReferencedByGridCellRenderer() {
 		// configure cell renderer
 		GridCellRenderer<BaseModelData> cellRenderer = new GridCellRenderer<BaseModelData>() {
@@ -532,26 +550,26 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		};
 		return cellRenderer;
-	}			
+	}
 
-	
-	private Widget createActivityFeedWidget(Entity entity) {			  
+
+	private Widget createActivityFeedWidget(Entity entity) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Activity Feed</h3>")));  
-	    
-		if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {			
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Activity Feed</h3>")));
+
+		if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {
 			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.DEMO_COMMENTS)));
 		} else {
 			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_ACTIVITY + "</div>")));
 		}
-				
+
 		lc.layout();
-	    return lc;  
-	}	
-	
+	    return lc;
+	}
+
 	private Widget createEntityChildBrowserWidget(Entity entity) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
@@ -565,28 +583,29 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.layout();
 		return lc;
 	}
-			
+
+
 	private Widget createDescriptionWidget(EntityBundle bundle, String entityTypeDisplay) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Description</h3>")));	
 
-		
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Description</h3>")));
+
+
 		// Add the description body
 	    String description = bundle.getEntity().getDescription();
 	    SafeHtml descriptionSafeHtml = null;
 	    if(description == null || "".equals(description)) {
-	    	descriptionSafeHtml = SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>");	    	
+	    	descriptionSafeHtml = SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>");
 	    } else {
 	    	// escape user content, but convert new lines to <br>
 	    	SafeHtmlBuilder shb = new SafeHtmlBuilder();
     		shb.appendEscapedLines(description);
     		descriptionSafeHtml = shb.toSafeHtml();
 	    }
-	    lc.add(new HTML(descriptionSafeHtml));	    
-		
+	    lc.add(new HTML(descriptionSafeHtml));
+
 		lc.layout();
 		return lc;
 	}
@@ -595,8 +614,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Properties &amp; Annotations</h3>")));  
-	    
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Properties &amp; Annotations</h3>")));
+
 	    // Create the property body
 	    // the headers for properties.
 	    propertyWidget.setEntityBundle(bundle);
@@ -604,7 +623,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    lc.layout();
 		return lc;
 	}
-	
+
 	/**
 	 * Create the attachment preview.
 	 * @param entity
@@ -639,12 +658,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			// We could not use the second approach because we do not know the dimensions of the image (we just know its width<=160 and height<=160).
 			// That left the third option...a table that causes people to go blind!
 			bodyBuilder.appendHtmlConstant(DisplayUtils.IMAGE_CENTERING_TABLE_START)
-			.appendHtmlConstant("<a class=\"item-preview spec-border-ie\" href=\"" 
-					+ DisplayUtils.createAttachmentUrl(baseURl, entity.getId(), data.getTokenId(), data.getName()) 
+			.appendHtmlConstant("<a class=\"item-preview spec-border-ie\" href=\""
+					+ DisplayUtils.createAttachmentUrl(baseURl, entity.getId(), data.getTokenId(), data.getName())
 					+ "\" target=\"_blank\" name=\""
 					+ SafeHtmlUtils.fromString(data.getName()).asString()
 					+ "\">")
-			.appendHtmlConstant("<img style=\"margin:auto; display:block;\" src=\"" 
+			.appendHtmlConstant("<img style=\"margin:auto; display:block;\" src=\""
 					+ DisplayUtils.createAttachmentUrl(baseURl, entity.getId(), data.getPreviewId(), null)
 					+ "\" />")
 			.appendHtmlConstant("</a>")
@@ -657,28 +676,28 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.layout();
 		return lc;
 	}
-	
+
 	private Widget createAttachmentsWidget(EntityBundle bundle, boolean canEdit, boolean readOnly) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-        LayoutContainer c = new LayoutContainer();  
-        HBoxLayout layout = new HBoxLayout();  
-        layout.setPadding(new Padding(5));  
-        layout.setHBoxLayoutAlign(HBoxLayoutAlign.TOP);  
-        c.setLayout(layout);  
-  
-        c.add(new Html("<h3>Attachments</h3>"), new HBoxLayoutData(new Margins(0, 5, 0, 0)));  
-        HBoxLayoutData flex = new HBoxLayoutData(new Margins(0, 5, 0, 0));  
-        flex.setFlex(1);  
-        
+        LayoutContainer c = new LayoutContainer();
+        HBoxLayout layout = new HBoxLayout();
+        layout.setPadding(new Padding(5));
+        layout.setHBoxLayoutAlign(HBoxLayoutAlign.TOP);
+        c.setLayout(layout);
+
+        c.add(new Html("<h3>Attachments</h3>"), new HBoxLayoutData(new Margins(0, 5, 0, 0)));
+        HBoxLayoutData flex = new HBoxLayoutData(new Margins(0, 5, 0, 0));
+        flex.setFlex(1);
+
         String baseURl = GWT.getModuleBaseURL()+"attachment";
         final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId();
 
         if(canEdit && !readOnly) {
 	        Anchor addBtn = new Anchor();
 	        addBtn.setHTML(DisplayUtils.getIconHtml(iconsImageBundle.add16()));
-	        addBtn.addClickHandler(new ClickHandler() {			
+	        addBtn.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle,DisplayConstants.ATTACHMENT_DIALOG_WINDOW_TITLE, DisplayConstants.ATTACHMENT_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
@@ -707,22 +726,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 
-//	private void showRStudioUrlEdit() {
-//		final MessageBox box = MessageBox.prompt("Set RStudio Server URL", "RStudio Server URL:");
-//		String existingUrl = presenter.getRstudioUrlBase();
-//		if(existingUrl == null) {
-//			existingUrl = DisplayUtils.DEFAULT_RSTUDIO_URL;
-//		}
-//		box.getTextBox().setValue(existingUrl);
-//		box.addCallback(new Listener<MessageBoxEvent>() {
-//			public void handleEvent(MessageBoxEvent be) {
-//				if (be.getButtonClicked().getText().equals("Cancel")) // .isCanceled() does not give correct result
-//					return;
-//				if (be.getValue() != null && !be.getValue().equals("")) {
-//					presenter.saveRStudioUrlBase(be.getValue());
-//					showRstudio.fireEvent(Events.Select);
-//				}
-//			}
-//		});
-//	}	
+
+	@Override
+	public void setEntityVersions(Versionable entity, TreeMap<Long, String> versions) {
+		if (titleWidget != null) {
+			titleWidget.setVersions(entity, versions);
+		}
+	}
+
 }

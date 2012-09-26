@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -26,6 +27,11 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Window;
+import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -39,6 +45,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	private HandlerManager handlerManager = new HandlerManager(this);
 	private EntityBundle entityBundle;
 	private EntityTypeProvider entityTypeProvider;
+	private GlobalApplicationState globalApplicationState;
 	private JSONObjectAdapter jsonObjectAdapter;
 
 	private SynapseClientAsync synapseClient;
@@ -55,6 +62,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 			JiraURLHelper jiraURLHelper,
 			JSONObjectAdapter jsonObjectAdapter
 			) {
+	
 		this.view = view;
 		this.nodeService = nodeService;
 		this.nodeModelCreator = nodeModelCreator;
@@ -63,6 +71,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		this.synapseClient = synapseClient;
 		this.jiraURLHelper = jiraURLHelper;
 		this.jsonObjectAdapter=jsonObjectAdapter;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);		
 	}		
 		
@@ -95,7 +104,24 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 
 	@Override
 	public void setExternalLocation(String path) {
-		// TODO : store 
+		//validate path
+		
+		synapseClient.updateExternalLocationable(entityBundle.getEntity().getId(), path, new AsyncCallback<EntityWrapper>() {
+			
+			public void onSuccess(EntityWrapper result) {
+				try {
+					Entity entity = nodeModelCreator.createEntity(result, entityBundle.getEntity().getClass());
+				} catch (RestServiceException e) {
+					onFailure(null);					
+				}
+				view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+				entityUpdated();
+			};
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+			}
+		} ); 
 		
 	}
 
@@ -116,6 +142,10 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		handlerManager.fireEvent(new CancelEvent());
 	}
 
+	public void entityUpdated() {
+			handlerManager.fireEvent(new EntityUpdatedEvent());
+	}
+	
 	@Override
 	public void handleSubmitResult(String resultHtml, boolean isNewlyRestricted) {
 		if(resultHtml == null) resultHtml = "";

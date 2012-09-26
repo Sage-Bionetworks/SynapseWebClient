@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.safehtml.shared.SafeHtml;
 
 public class DisplayConstants {
 	
@@ -13,6 +12,7 @@ public class DisplayConstants {
 	public static final String MSKCC_DATASET_DEMO_ID = "4494";
 	public static final String TURN_DEMO_ON_TOKEN = "d";
 	public static final String TURN_DEMO_OFF_TOKEN = "nd";
+	
 	/*
 	 * Demo strings
 	 */
@@ -20,11 +20,6 @@ public class DisplayConstants {
 	public static final String DEMO_ANALYSIS = "<div class=\"scrollable\"><table width=\"100%\" class=\"detail\"><tr><th class=\"analysis\">Analysis</th><th class=\"project\">Project</th><th class=\"last_modified\">Last Modified</th></tr>							<tr>								<td class=\"analysis\"><a href=\"network_overview.html\">Network Generation</a></td>								<td class=\"project\"><a href=\"project_details.html\">Federation Warburg</a></td>								<td class=\"last_modified\">12-Apr-2011</td>							</tr>							<tr class=\"gray\">								<td class=\"analysis\"><a href=\"network_overview.html\">Network Survey</a></td>								<td class=\"project\"><a href=\"project_details.html\">Federation Warburg</a></td>								<td class=\"last_modified\">23-Mar-2011</td>							</tr>							<tr>								<td class=\"analysis\"><a href=\"network_overview.html\">Interactome</a></td>								<td class=\"project\"><a href=\"project_details.html\">Federation Warburg</a></td>								<td class=\"last_modified\">04-Mar-2011</td>							</tr>							<tr class=\"gray\">								<td class=\"analysis\"><a href=\"network_overview_metageo.html\">GSE 21034</a></td>								<td class=\"project\"><a href=\"project_details_metageo.html\">MetaGEO</a></td>								<td class=\"last_modified\">2-Apr-2011</td>							</tr> <tr> <td class=\"analysis\"><a href=\"analysis_predictor.html\">Biomarker Prediction</a></td> <td class=\"project\"><a href=\"project_details_predictor.html\">Predictive Modeling</a></td> <td class=\"last_modified\">07-Jul-2011</td> </tr>						</table></div>";
 	public static final String DEMO_OVERVIEW = "Genetic and epigenetic alterations have been identified that lead to transcriptional Annotation of prostate cancer genomes provides a foundation for discoveries that can impact disease understanding and treatment. Concordant assessment of DNA copy number, mRNA expression, and focused exon resequencing in the 218 prostate cancer tumors represented in this dataset haveidentified the nuclear receptor coactivator NCOA2 as an oncogene in approximately 11% of tumors. Additionally, the androgen-driven TMPRSS2-ERG fusion was associated with a previously unrecognized, prostate-specific deletion at chromosome 3p14 that implicates FOXP1, RYBP, and SHQ1 as potential cooperative tumor suppressors. DNA copy-number data from primary tumors revealed that copy-number alterations robustly define clusters of low- and high-risk disease beyond that achieved by Gleason score.";
 
-
-
-	
-	
-	
 	/*
 	 * Dimensions
 	 */
@@ -66,9 +61,10 @@ public class DisplayConstants {
 	
 	public static final String LOGOUT_TEXT = "You have been logged out of Synapse.";
 	public static final String LOGOUT_SSO_TEXT = "To prevent others from accessing your account in this browser, you should log out of your Google account as well.<br/><a href=\"http://www.google.com/accounts/Logout?continue=http://www.google.com/\">Logout of your Google account by clicking here</a>"; // <br/><br/><a href=\"https://www.google.com/accounts/Logout\">Logout of your Google account by clicking here</a>
-	public static final String PERMISSIONS_INHERITED_TEXT = "Pemissions not editable as they are being inherited by this resource's parent. (ex: A layer inheriting a dataset's permissions)";
-	public static final String PERMISSIONS_CREATE_NEW_ACL_TEXT = "By creating local sharing settings you ignore the permissions that are inherited from its parent.";
-	public static final String PERMISSIONS_DELETE_ACL_TEXT = "By deleting local sharing settings you inherit sharing settings from the parent.";
+	public static final String PERMISSIONS_INHERITED_TEXT = "Sharing settings are being inherited from the parent resource and cannot be modified.";
+	public static final String PERMISSIONS_CREATE_NEW_ACL_TEXT = "Sharing settings from the parent resource will be overridden.";
+	public static final String PERMISSIONS_DELETE_ACL_TEXT = "Sharing settings will be inherited from the parent resource.";
+	public static final String PERMISSIONS_APPLY_ACL_TO_CHILDREN_TEXT = "Sharing settings of all child resources will be overwritten.";
 	
 	public static final String PASSWORD_RESET_FAILED_TEXT = "Password reset failed. Please try again.";
 	public static final String PASSWORD_SET_FAILED_TEXT = "Password change failed. Please try again.";
@@ -76,6 +72,7 @@ public class DisplayConstants {
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
 	
 	public static final String NEWS_UNAVAILABLE_TEXT = "The Synapse news service is currently unavailable.";
+	public static final String SUPPORT_FEED_UNAVAILABLE_TEXT = "The Synapse support feed service is currently unavailable.";
 	
 	/*
 	 * Buttons, titles and labels
@@ -85,10 +82,13 @@ public class DisplayConstants {
 	public static final String BUTTON_SEE_TERMS_OF_USE = "See Terms of Use";
 	public static final String BUTTON_FOLLOW_DATASET = "Follow this Dataset";
 	public static final String TITLE_SHARING_PANEL = "Sharing Settings";
-	public static final String LABEL_SHARING_PANEL_EXISTING = "Permissions";
-	public static final String LABEL_SHARING_PANEL_INHERITED = "Inherited Permissions";
+	public static final String LABEL_SHARING_PANEL_EXISTING = "Sharing Settings";
+	public static final String LABEL_SHARING_PANEL_INHERITED = "Inherited Sharing Settings";
 	public static final String BUTTON_PERMISSIONS_CREATE_NEW_ACL = "Create Local Sharing Settings";
 	public static final String BUTTON_PERMISSIONS_DELETE_ACL = "Delete Local Sharing Settings";
+	public static final String CONFIRM_DELETE_ACL = "Deleting local sharing settings will cause inheritance from parent. Proceed?";
+	public static final String BUTTON_PERMISSIONS_APPLY_ACL_TO_CHILDREN = "Apply Local Sharing Settings to Children";
+	public static final String CONFIRM_APPLY_ACL_TO_CHILDREN = PERMISSIONS_APPLY_ACL_TO_CHILDREN_TEXT + " Proceed?";
 	public static final String MENU_PERMISSION_LEVEL_IS_OWNER = "Is Owner";
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT = "Can edit";
@@ -177,12 +177,14 @@ public class DisplayConstants {
 	public static final String LABEL_DELETE = "Delete";
 	public static final String LABEL_CREATE = "Create";
 	public static final String LABEL_MOVE = "Move";
+	public static final String LABEL_ARE_YOU_SURE = "Are you sure?";
 	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. Please try again.";
 	public static final String ERROR_ENTITY_MOVE_FAILURE = "Move failed. Please try again.";
 	public static final String PROMPT_SURE_DELETE = "Are you sure you want to delete this";
 	public static final String LABEL_NO_PREVIEW_DATA = "A Preview has not been created.";
 	public static final String LABEL_CONTAINS_NO_CHILDREN = "This object contains no children.";
 	public static final String BUTTON_REGISTER = "Register";
+	public static final String LINK_COMMUNITY_FORUM = "Support";
 	public static final String BUTTON_LOGIN = "Login";
 	public static final String LABEL_WELCOME = "Welcome";
 	public static final String BUTTON_LOGOUT = "Logout";
@@ -197,6 +199,9 @@ public class DisplayConstants {
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
 	public static final String LABEL_UPLOAD_TO_SYNAPSE = "To Synapse";
 	public static final String LABEL_TO_EXTERNAL = "Link External Location";
+	public static final String TEXT_LINK_FILE = "Link File";
+	public static final String TEXT_LINK_SUCCESS = "Link successfully updated in Synapse";
+	public static final String TEXT_LINK_FAILED = "An error occurred while creating the link. Please check the URL and try again.";
 	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
 	public static final String TEXT_ATTACHMENT_SUCCESS = "Attachment Uploaded to Synapse";
 	public static final String TEXT_PROFILE_PICTURE_SUCCESS = "Profile Photo Uploaded to Synapse";
@@ -264,6 +269,11 @@ public class DisplayConstants {
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 	public static final String FLAG = "flag";
 	public static final String FLAG_TOOL_TIP = "Flag this data object for review by ACT";
+	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
+	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
+	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
+	public static final String SHOW_VERSIONS = "show all versions";
+	public static final String HIDE_VERSIONS = "hide all versions";
 
 	/*
 	 * Element ids for Selenium
@@ -319,7 +329,6 @@ public class DisplayConstants {
 	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to this data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
 	
-	//public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"https://sagebionetworks.jira.com/wiki/x/RwBDAQ\"  target=\"_blank\" class=\"link\">Synapse guidelines</a>";
 	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
 	public static String GOVERNANCE_REFERENCE = "For more information on data access conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";

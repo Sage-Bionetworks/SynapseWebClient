@@ -4,13 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.CHILD_COUNT;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
@@ -29,10 +26,14 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
+import org.sagebionetworks.repo.model.LayerTypeNames;
+import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -149,19 +150,21 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getACL(anyString())).thenReturn(acl);
 		when(mockSynapse.createACL((AccessControlList)any())).thenReturn(acl);
 		when(mockSynapse.updateACL((AccessControlList)any())).thenReturn(acl);
+		when(mockSynapse.updateACL((AccessControlList)any(), eq(true))).thenReturn(acl);
+		when(mockSynapse.updateACL((AccessControlList)any(), eq(false))).thenReturn(acl);
 
 		EntityHeader bene = new EntityHeader();
 		bene.setId("syn999");
 		when(mockSynapse.getEntityBenefactor(anyString())).thenReturn(bene);
 		
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | CHILD_COUNT;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN;
 		int emptyMask = 0;
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(entity);
 		bundle.setAnnotations(annos);
 		bundle.setPermissions(eup);
 		bundle.setPath(path);
-		bundle.setChildCount(0L);
+		bundle.setHasChildren(false);
 		when(mockSynapse.getEntityBundle(anyString(),Matchers.eq(mask))).thenReturn(bundle);
 		
 		EntityBundle emptyBundle = new EntityBundle();
@@ -173,7 +176,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetEntityBundleAll() throws RestServiceException{
 		// Make sure we can get all parts of the bundel
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | CHILD_COUNT;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN;
 		EntityBundleTransport bundle = synapseClient.getEntityBundle(entityId, mask);
 		assertNotNull(bundle);
 		// We should have all of the strings
@@ -181,7 +184,7 @@ public class SynapseClientImplTest {
 		assertNotNull(bundle.getAnnotationsJson());
 		assertNotNull(bundle.getEntityPathJson());
 		assertNotNull(bundle.getPermissionsJson());
-		assertNotNull(bundle.getChildCount());
+		assertNotNull(bundle.getHasChildren());
 	}
 	
 	@Test
@@ -195,7 +198,7 @@ public class SynapseClientImplTest {
 		assertNull(bundle.getAnnotationsJson());
 		assertNull(bundle.getEntityPathJson());
 		assertNull(bundle.getPermissionsJson());
-		assertNull(bundle.getChildCount());
+		assertNull(bundle.getHasChildren());
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
@@ -216,7 +219,7 @@ public class SynapseClientImplTest {
 		example.setDescription("some description");
 		example.setEntityType(ExampleEntity.class.getName());
 		String json = EntityFactory.createJSONStringForEntity(example);
-		System.out.println(json);
+		// System.out.println(json);
 		// Now make sure this can be read back
 		ExampleEntity clone = (ExampleEntity) synapseClient.parseEntityFromJson(json);
 		assertEquals(example, clone);
@@ -315,6 +318,16 @@ public class SynapseClientImplTest {
 		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
 		assertEquals(acl, clone);
 	}
+	
+	@Test
+	public void testUpdateAclRecursive() throws Exception {
+		EntityWrapper in = new EntityWrapper();
+		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
+		EntityWrapper ew = synapseClient.updateAcl(in, true);
+		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		assertEquals(acl, clone);
+		verify(mockSynapse).updateACL(any(AccessControlList.class), eq(true));
+	}
 
 	@Test
 	public void testDeleteAcl() throws Exception {
@@ -368,5 +381,27 @@ public class SynapseClientImplTest {
 		when(mockSynapse.createUserProfileAttachmentPresignedUrl(testId, testToken)).thenReturn(testPresignedUrl);
 		String presignedUrl = synapseClient.createUserProfileAttachmentPresignedUrl(testId, testToken);
 		assertEquals(presignedUrl, EntityFactory.createJSONStringForEntity(testPresignedUrl));
+	}
+	
+	@Test
+	public void testUpdateLocationable() throws Exception {
+		//verify call is directly calling the synapse client provider
+		String testUrl = "http://mytesturl/something.jpg";
+		List<LocationData> locations = new ArrayList<LocationData>();
+		LocationData externalLocation = new LocationData();
+		externalLocation.setPath(testUrl);
+		externalLocation.setType(LocationTypeNames.external);
+		locations.add(externalLocation);
+
+		Data layer = new Data();
+		layer.setType(LayerTypeNames.M);
+		layer.setLocations(locations);
+
+		String testId = "myTestId";
+		when(mockSynapse.updateExternalLocationableToSynapse(layer, testUrl)).thenReturn(layer);
+		when(mockSynapse.getEntityById(testId)).thenReturn(layer);
+		EntityWrapper returnedLayer = synapseClient.updateExternalLocationable(testId, testUrl);
+		
+		assertEquals(returnedLayer.getEntityJson(), EntityFactory.createJSONStringForEntity(layer));
 	}
 }

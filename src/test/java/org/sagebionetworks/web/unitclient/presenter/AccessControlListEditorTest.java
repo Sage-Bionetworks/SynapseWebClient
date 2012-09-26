@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -131,7 +130,6 @@ public class AccessControlListEditorTest {
 		verify(mockSynapseClient).createAcl(eq(expectedEntityWrapper), any(AsyncCallback.class));
 	}
 	
-	@Ignore
 	@Test
 	public void addAccessTest() throws Exception {
 		final EntityBundleTransport ebt = createEBT();
@@ -158,6 +156,7 @@ public class AccessControlListEditorTest {
 			}
 		}
 		assertTrue(foundIt);
+		verify(mockSynapseClient).updateAcl(any(EntityWrapper.class), eq(false), Matchers.<AsyncCallback<EntityWrapper>>any());
 	}
 	
 	@Test
@@ -241,7 +240,6 @@ public class AccessControlListEditorTest {
 	}
 	
 	@Test
-	@Ignore
 	public void deleteAclTest() throws Exception {
 		final EntityBundleTransport ebt = createEBT();
 		AccessControlList acl = AccessControlListEditor.newACLforEntity(ACL_ID, PRINCIPAL_ID);
@@ -259,6 +257,26 @@ public class AccessControlListEditorTest {
 		acle.deleteAcl();
 		
 		verify(mockSynapseClient).deleteAcl(eq(ACL_ID), Matchers.<AsyncCallback<EntityWrapper>>any());
+	}
+	
+	@Test
+	public void updateAclRecursiveTest() throws Exception {
+		final EntityBundleTransport ebt = createEBT();
+		AccessControlList acl = AccessControlListEditor.newACLforEntity(ACL_ID, PRINCIPAL_ID);
+		EntityWrapper expectedEntityWrapper = new EntityWrapper(acl.writeToJSONObject(adapterFactory.createNew()).toJSONString(), AccessControlList.class.getName(), null);
+		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(mockSynapseClient).createAcl(any(EntityWrapper.class), any(AsyncCallback.class));		
+			
+		when(mockNodeModelCreator.createEntity(anyString(), eq(AccessControlList.class))).thenReturn(acl);
+		when(mockNodeModelCreator.createEntity(anyString(), eq(UserEntityPermissions.class))).thenReturn(permissions);
+		when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(UserGroup.class))).thenReturn(pgGpsJson);
+		
+		AccessControlListEditor acle = createACLEWithMocks();
+		acle.setResource(ACL_ID);
+		acle.asWidget();
+		acle.applyAclToChildren();
+		
+		verify(mockSynapseClient).updateAcl(any(EntityWrapper.class), eq(true), Matchers.<AsyncCallback<EntityWrapper>>any());
 	}
 	
 	// tests of utility functions

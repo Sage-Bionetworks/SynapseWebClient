@@ -5,10 +5,6 @@ import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.web.server.ServerConstants;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * Provides the rest API service URL
@@ -22,6 +18,7 @@ public class ServiceUrlProvider {
 	private String repositoryServiceUrl = StackConfiguration.getRepositoryServiceEndpoint();
 	private String authServicePrivateUrl = StackConfiguration.getAuthenticationServicePrivateEndpoint();
 	private String authServicePublicUrl = StackConfiguration.getAuthenticationServicePublicEndpoint();
+	private String searchServiceUrl = StackConfiguration.getSearchServiceEndpoint();
 	private String portalBaseUrl = StackConfiguration.getPortalEndpoint();
 	private String linkedInUrl = "http://api.linkedin.com/v1/people/";
 	
@@ -41,6 +38,14 @@ public class ServiceUrlProvider {
 			}
 		}
 		return repositoryServiceUrl;
+	}
+
+	public String getSearchServiceUrl() {
+		return searchServiceUrl;
+	}
+
+	public void setSearchServiceUrl(String searchServiceUrl) {
+		this.searchServiceUrl = searchServiceUrl;
 	}
 
 	/**

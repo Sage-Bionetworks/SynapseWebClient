@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Step;
 import org.sagebionetworks.web.client.place.StepsHome;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 
@@ -42,6 +43,6 @@ import com.google.gwt.place.shared.WithTokenizers;
 		ComingSoon.Tokenizer.class, PhenoEdit.Tokenizer.class,
 		Lookup.Tokenizer.class, Synapse.Tokenizer.class,
 		Search.Tokenizer.class, Settings.Tokenizer.class,
-		BCCOverview.Tokenizer.class, Governance.Tokenizer.class})
+		BCCOverview.Tokenizer.class, Governance.Tokenizer.class,WikiPlace.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

@@ -1,13 +1,19 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Comparator;
+import java.util.TreeMap;
+
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.ObjectSchema;
+import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -16,7 +22,6 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -43,24 +48,23 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter  {
-		
+
 	private EntityPageTopView view;
 	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private EntitySchemaCache schemaCache;	
+	private EntitySchemaCache schemaCache;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
-	
+
 	private EntityBundle bundle;
 	private boolean readOnly;
-	private String entityTypeDisplay; 
+	private String entityTypeDisplay;
 	private EventBus bus;
 	private JiraURLHelper jiraURLHelper;
-	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service,
 			SynapseClientAsync synapseClient,
@@ -86,12 +90,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.bus = bus;
 		this.jiraURLHelper = jiraURLHelper;
 		view.setPresenter(this);
-	}	
+	}
 
     /**
      * Update the bundle attached to this EntityPageTop. Consider calling refresh()
      * to notify an attached view.
-     * 
+     *
      * @param bundle
      */
     public void setBundle(EntityBundle bundle, boolean readOnly) {
@@ -103,33 +107,34 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public void clearState() {
 		view.clear();
 		// remove handlers
-		this.bundle = null;		
+		this.bundle = null;
 	}
-    
+
 	@Override
 	public Widget asWidget() {
 		if(bundle != null) {
 			return asWidget(bundle);
-		} 
+		}
 		return null;
-	}	
-	
+	}
+
 	public Widget asWidget(EntityBundle bundle) {
 		view.setPresenter(this);
 		return view.asWidget();
 	}
-	
+
 	@Override
 	public void refresh() {
 		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit());
-	}	
+		sendVersionInfoToView();
+	}
 
 	@Override
 	public void fireEntityUpdatedEvent() {
 		bus.fireEvent(new EntityUpdatedEvent());
 	}
-	
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {		
+
+	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		bus.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
 
@@ -140,34 +145,35 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		}
 		return false;
 	}
-	
+
 	@Override 
+
 	public boolean isLoggedIn() {
 		return authenticationController.getLoggedInUser() != null;
 	}
-	
+
 	@Override
 	public String createEntityLink(String id, String version, String display) {
-		return DisplayUtils.createEntityLink(id, version, display);		
+		return DisplayUtils.createEntityLink(id, version, display);
 	}
-	
+
 	@Override
-	public ImageResource getIconForType(String typeString) {		
-		EntityType type = entityTypeProvider.getEntityTypeForString(typeString);		
+	public ImageResource getIconForType(String typeString) {
+		EntityType type = entityTypeProvider.getEntityTypeForString(typeString);
 		// try class name as some references are short names, some class names
-		if(type == null) 
+		if(type == null)
 			type = entityTypeProvider.getEntityTypeForClassName(typeString);
 		if(type == null) {
 			return DisplayUtils.getSynapseIconForEntity(null, IconSize.PX16, iconsImageBundle);
 		}
 		return DisplayUtils.getSynapseIconForEntityType(type, IconSize.PX16, iconsImageBundle);
-	}	
+	}
 
 	@Override
 	public void loadShortcuts(int offset, int limit, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
 		PaginatedResults<EntityHeader> references = null;
 		if(offset == 0) {
-			 callback.onSuccess(bundle.getReferencedBy());			 
+			 callback.onSuccess(bundle.getReferencedBy());
 		} else {
 			synapseClient.getEntityReferencedBy(bundle.getEntity().getId(), new AsyncCallback<String>() {
 				@Override
@@ -180,9 +186,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 					callback.onFailure(caught);
 				}
 			});
-		}		
-	}	
-	
+		}
+	}
+
 	/*
 	 * Private Methods
 	 */
@@ -365,6 +371,54 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		};
 	}
 
+	private void sendVersionInfoToView() {
+		final Entity entity = bundle.getEntity();
+		if (entity instanceof Versionable) {
+			synapseClient.getEntityVersions(entity.getId(),
+					new AsyncCallback<String>() {
 
+						@Override
+						public void onFailure(Throwable caught) {
+							view.setEntityVersions((Versionable)entity, null);
+						}
+
+						@Override
+						public void onSuccess(String result) {
+							setEntityVersions(result);
+						}
+
+					});
+		}
+	}
+
+	private void setEntityVersions(String jsonVersions) {
+		TreeMap<Long, String> versions = new TreeMap<Long, String>(new ReverseLong());
+		JSONObjectAdapter joa;
+		try {
+			joa = this.jsonObjectAdapter.createNew(jsonVersions);
+			int numResults = joa.getInt("totalNumberOfResults");
+
+			JSONArrayAdapter jsonArray = joa.getJSONArray("results");
+			for (int i = 0; i < numResults; i++) {
+				JSONObjectAdapter jsonObject = jsonArray.getJSONObject(i);
+				long number = jsonObject.getInt("versionNumber");
+				String label = jsonObject.getString("versionLabel");
+				versions.put(number, label);
+			}
+		} catch (JSONObjectAdapterException e) {
+		}
+		Versionable vb = (Versionable)bundle.getEntity();
+
+		view.setEntityVersions(vb, versions);
+	}
+
+	static class ReverseLong implements Comparator<Long> {
+
+		@Override
+		public int compare(Long o1, Long o2) {
+			return o1 > o2 ? -1 :
+					o1 < o2 ? +1 : 0;
+		}
+    }
 
 }

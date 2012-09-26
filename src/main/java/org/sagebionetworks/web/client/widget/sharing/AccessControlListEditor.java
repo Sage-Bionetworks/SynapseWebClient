@@ -16,6 +16,8 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -35,6 +37,7 @@ import com.google.inject.Inject;
 
 public class AccessControlListEditor implements AccessControlListEditorView.Presenter {
 	
+	private static final String LOCAL_ACL_CREATION_ERROR = "Creation of local sharing settings failed. Please try again.";
 	private AccessControlListEditorView view;
 	private NodeModelCreator nodeModelCreator;
 	private SynapseClientAsync synapseClient;
@@ -98,7 +101,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				public void onFailure(Throwable throwable) {
 					throwable.printStackTrace();
 					
-					showErrorMessage("Creation of local sharing settings failed. Please try again.");
+					showErrorMessage(LOCAL_ACL_CREATION_ERROR);
 				}
 			});
 			
@@ -122,9 +125,14 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			UserProfile profile, ResourceAccess ra) {
 		AclPrincipal p = new AclPrincipal();
 		p.setDisplayName(profile.getDisplayName());
+		p.setEmail(profile.getEmail());
 		p.setIndividual(true);
 		p.setPrincipalId(ra.getPrincipalId());
 		p.setOwner(ownerPrincipalId.equals(ra.getPrincipalId()));
+		if (profile.getPic() != null) 
+			p.setPicUrl(DisplayUtils.createUserProfileAttachmentUrl(
+				DisplayUtilsGWT.BASE_PROFILE_ATTACHMENT_URL, profile.getOwnerId(), 
+				profile.getPic().getPreviewId(), null));
 		return p;
 	}
 
@@ -144,7 +152,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		try {
 			acl = newACLforEntity(this.entityId, uep.getOwnerPrincipalId());
 		} catch (Exception e) {
-			showErrorMessage("Creation of local sharing settings failed. Please try again.");
+			showErrorMessage(LOCAL_ACL_CREATION_ERROR);
 			return;
 		}
 		createACLInSynapse();
@@ -177,10 +185,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
 			}
 		} catch (Exception e) {
-			showErrorMessage("Creation of local sharing settings failed. Please try again.");
+			showErrorMessage(LOCAL_ACL_CREATION_ERROR);
 			return;
 		}
-		updateACLInSynapse();
+		updateACLInSynapse(false);
 	}
 	
 	// clone the current ACL, copying over the entries but skipping the given one
@@ -198,10 +206,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				acl.getResourceAccess().remove(ra);
 			}
 		} catch (Exception e) {
-			showErrorMessage("Creation of local sharing settings failed. Please try again.");
+			showErrorMessage(LOCAL_ACL_CREATION_ERROR);
 			return;
 		}
-		updateACLInSynapse();
+		updateACLInSynapse(false);
 	}
 
 
@@ -230,10 +238,22 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				showErrorMessage("Creation of local sharing settings failed. Please try again.");
+				showErrorMessage(LOCAL_ACL_CREATION_ERROR);
 			}
 
 		});
+	}
+	
+	@Override
+	public void applyAclToChildren() {
+		try {
+			if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
+			if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
+		} catch (Exception e) {
+			showErrorMessage(LOCAL_ACL_CREATION_ERROR);
+			return;
+		}
+		updateACLInSynapse(true);
 	}
 	
 	/*
@@ -251,7 +271,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
 			aclEntityWrapper = new EntityWrapper(aclJson.toJSONString(), AccessControlList.class.getName(), null);
 		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
+			view.showErrorMessage(LOCAL_ACL_CREATION_ERROR);
 			return;
 		}
 		synapseClient.createAcl(aclEntityWrapper, new AsyncCallback<EntityWrapper>(){
@@ -277,21 +297,21 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				showErrorMessage("Creation of local sharing settings failed. Please try again.");
+				showErrorMessage(LOCAL_ACL_CREATION_ERROR);
 			}
 		});
 	}
 	
 	
-	private void updateACLInSynapse() {
+	private void updateACLInSynapse(boolean recursive) {
 		EntityWrapper aclEntityWrapper = null;
 		try {
 			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
 			aclEntityWrapper = new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName(), null);
 		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage("Creation of local sharing settings failed. Please try again.");
+			view.showErrorMessage(LOCAL_ACL_CREATION_ERROR);
 		}
-		synapseClient.updateAcl(aclEntityWrapper, new AsyncCallback<EntityWrapper>(){
+		synapseClient.updateAcl(aclEntityWrapper, recursive, new AsyncCallback<EntityWrapper>(){
 	
 				@Override
 				public void onSuccess(EntityWrapper result) {
@@ -314,7 +334,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					showErrorMessage("Creation of local sharing settings failed. Please try again.");
+					showErrorMessage(LOCAL_ACL_CREATION_ERROR);
 				}
 			});
 	}

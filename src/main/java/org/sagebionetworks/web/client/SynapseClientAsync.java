@@ -7,6 +7,7 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
@@ -65,6 +66,8 @@ public interface SynapseClientAsync {
 	
 	public void updateAcl(EntityWrapper acl, AsyncCallback<EntityWrapper> callback);
 	
+	public void updateAcl(EntityWrapper acl, boolean recursive, AsyncCallback<EntityWrapper> callback);
+	
 	public void deleteAcl(String ownerEntityId, AsyncCallback<EntityWrapper> callback);
 
 	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
@@ -79,6 +82,6 @@ public interface SynapseClientAsync {
 
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
 
-
+	public void updateExternalLocationable(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback);
 
 }
