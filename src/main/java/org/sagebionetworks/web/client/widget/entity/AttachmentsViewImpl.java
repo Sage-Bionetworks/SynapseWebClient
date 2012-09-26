@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -30,11 +31,14 @@ import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -196,29 +200,23 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 					return html;
 				}
 
-				Button button = new Button();
-				SelectionListener<ButtonEvent> listener;
-
-				AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle
-						.deleteButton16());
-
-				listener = new SelectionListener<ButtonEvent>() {
-
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						deleteAttachmentAt(rowIndex);
-					}
-				};
-				button.addSelectionListener(listener);
-				button.setIcon(img);
 				HorizontalPanel panel = new HorizontalPanel();
 				FlowPanel wrap = new FlowPanel();
 				wrap.add(html);
 				wrap.setWidth(ATTACHMENT_COLUMN_WIDTH);
 				panel.add(wrap);
 
+				AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle.deleteButtonGrey16());
+				Anchor button = DisplayUtils.createIconLink(img, new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						deleteAttachmentAt(rowIndex);
+					}
+				});
+
 				TableData td = new TableData();
 				td.setHorizontalAlign(HorizontalAlignment.RIGHT);
+				td.setVerticalAlign(VerticalAlignment.MIDDLE);
 				panel.add(button, td);
 				panel.setAutoWidth(true);
 				return panel;
