@@ -95,6 +95,10 @@ public class EntityMetadata extends Composite {
 		previousVersions.layout(true);
 	}
 
+	public void clearPreviousVersions() {
+		previousVersions.removeAll();
+	}
+
 	public void setVersionsVisible(boolean visible) {
 		versions.setVisible(visible);
 	}
