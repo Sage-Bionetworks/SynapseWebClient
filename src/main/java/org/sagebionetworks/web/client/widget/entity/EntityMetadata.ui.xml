@@ -7,7 +7,9 @@
     .limited-height {
 	     max-height: 10.5em;
 	     border: 2px inset lightgrey;
-	     margin-left: 38px;
+	     margin: 0 0 20px 38px;
+	     padding-right: 30px;
+	     float:left;
     }
   </ui:style>
 
