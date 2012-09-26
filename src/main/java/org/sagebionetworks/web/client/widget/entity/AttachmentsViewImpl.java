@@ -41,7 +41,7 @@ import com.google.inject.Inject;
 
 public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsView {
 	
-	private static final String ATTACHMENT_COLUMN_WIDTH = "220px";
+	private static final String ATTACHMENT_COLUMN_WIDTH = "210px";
 	private static final String LINK_KEY = "link";
 	private static final String ATTACHMENT_DATA_TOKEN_KEY = "attachmentDataKey";
 	private static final String TOOLTIP_TEXT_KEY = "tooltip";
@@ -103,7 +103,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	public void configure(String baseUrl, String entityId,
 			List<AttachmentData> attachments) {		
 		gridStore.removeAll();
-		if(attachments == null){
+		if(attachments == null || attachments.size() == 0){
 			addNoAttachmentRow();
 		} else {
 			populateStore(baseUrl, entityId, attachments);			
@@ -190,6 +190,10 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 				String tooltip = (String)model.get(TOOLTIP_TEXT_KEY);
 				if(tooltip != null) {
 				    html.setToolTip(tooltip);
+				}
+
+				if (model.get(TOOLTIP_TEXT_KEY) == null) {
+					return html;
 				}
 
 				Button button = new Button();
