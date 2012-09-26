@@ -99,7 +99,6 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 		grid.setTrackMouseOver(false);
 		grid.setShadow(false);		
 		
-		//configureContextMenu();
 		this.add(grid);
 	}
 	
@@ -112,7 +111,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 		} else {
 			populateStore(baseUrl, entityId, attachments);			
 		}
-		//configureContextMenu();
+
 		
 		if(isRendered())
 			grid.reconfigure(gridStore, columnModel);
@@ -266,39 +265,6 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	/*
 	 * Private Methods
 	 */
-	private void configureContextMenu() {
-		if(grid == null) return;
-		
-		if(!isEmpty) {
-			Menu contextMenu = new Menu();
-	
-			MenuItem remove = new MenuItem();
-			remove.setText(DisplayConstants.LABEL_DELETE);
-			remove.setIcon(AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
-			remove.addSelectionListener(new SelectionListener<MenuEvent>() {
-				public void componentSelected(MenuEvent ce) {
-					final BaseModelData model = grid.getSelectionModel().getSelectedItem();
-					if (model != null) {
-						MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + model.get(ATTACHMENT_DATA_NAME_KEY), DisplayConstants.PROMPT_SURE_DELETE + " " + model.get(ATTACHMENT_DATA_NAME_KEY) +"?", new Listener<MessageBoxEvent>() {					
-							@Override
-							public void handleEvent(MessageBoxEvent be) { 												
-								Button btn = be.getButtonClicked();
-								if(Dialog.YES.equals(btn.getItemId())) {
-									presenter.deleteAttachment((String)model.get(ATTACHMENT_DATA_TOKEN_KEY));								
-								}
-							}
-						});					
-					}
-				}
-			});
-			contextMenu.add(remove);
-	
-			grid.setContextMenu(contextMenu);
-		} else {
-			grid.setContextMenu(null);
-		}
-	}
-
 	public void deleteAttachmentAt(int rowIndex) {
 		final BaseModelData model = grid.getStore().getAt(rowIndex);
 		if (model != null) {
@@ -333,7 +299,6 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 			if(foundIdx != null) {
 				gridStore.remove(foundIdx);
 				if(gridStore.getCount() == 0) {
-					configureContextMenu();
 					addNoAttachmentRow();
 				}
 				grid.reconfigure(gridStore, columnModel);
