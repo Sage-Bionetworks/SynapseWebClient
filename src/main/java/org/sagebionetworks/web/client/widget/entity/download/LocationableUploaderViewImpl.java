@@ -226,7 +226,7 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		formPanel.addListener(Events.Submit, submitListener);
 		formPanel.setAction(presenter.getUploadActionUrl(restrictedModeChosen()==RADIO_SELECTED.RESTRICTED_RADIO_SELECTED));
 		fileUploadField.clearState(); // doesn't successfully clear previous selection
-		//fileUploadField.clear(); // this just breaks everything!
+		if(formPanel.isRendered()) formPanel.reset(); // clear file choice from fileUploadField
 
 		uploadBtn.removeAllListeners();
 		SelectionListener<ButtonEvent> uploadListener = new SelectionListener<ButtonEvent>() {
