@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
-import org.sagebionetworks.web.client.ontology.AdapterModelData;
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
 import com.extjs.gxt.ui.client.data.JsonPagingLoadResultReader;
 import com.extjs.gxt.ui.client.data.LoadEvent;
@@ -13,6 +12,7 @@ import com.extjs.gxt.ui.client.data.ScriptTagProxy;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
+import com.extjs.gxt.ui.client.widget.form.ListModelPropertyEditor;
 
 public class UserGroupSearchBox {
 	
@@ -39,10 +39,10 @@ public class UserGroupSearchBox {
 	 * @param url
 	 * @return
 	 */
-	public static ComboBox<AdapterModelData> createUserGroupSearchSuggestBox(String repositoryUrl) {
+	public static ComboBox<ModelData> createUserGroupSearchSuggestBox(String repositoryUrl) {
 		String url = repositoryUrl + USER_GROUP_HEADER_URL;
-		ScriptTagProxy<PagingLoadResult<AdapterModelData>> proxy = 
-				new ScriptTagProxy<PagingLoadResult<AdapterModelData>>(url);
+		ScriptTagProxy<PagingLoadResult<ModelData>> proxy = 
+				new ScriptTagProxy<PagingLoadResult<ModelData>>(url);
 		
 		// Maps the model to our UserGroupHeader JSON format.
 		ModelType type = new ModelType();
@@ -55,15 +55,16 @@ public class UserGroupSearchBox {
 		type.addField(KEY_EMAIL, KEY_EMAIL);
 
 		// The paginated reader
-		JsonPagingLoadResultReader<PagingLoadResult<AdapterModelData>> reader = 
-				new JsonPagingLoadResultReader<PagingLoadResult<AdapterModelData>>(type);
+		JsonPagingLoadResultReader<PagingLoadResult<ModelData>> reader = 
+				new JsonPagingLoadResultReader<PagingLoadResult<ModelData>>(type);
 		
 		// the paging loader.
-		PagingLoader<PagingLoadResult<AdapterModelData>> loader = 
-				new BasePagingLoader<PagingLoadResult<AdapterModelData>>(proxy, reader);
+		PagingLoader<PagingLoadResult<ModelData>> loader = 
+				new BasePagingLoader<PagingLoadResult<ModelData>>(proxy, reader);
 
 		// Map the offset and query to the prefix
 		loader.addListener(Loader.BeforeLoad, new Listener<LoadEvent>() {
+			@Override
 			public void handleEvent(LoadEvent be) {
 				be.<ModelData> getConfig().set(KEY_START,	be.<ModelData> getConfig().get(KEY_OFFSET));
 				be.<ModelData> getConfig().set(KEY_LIMIT,	be.<ModelData> getConfig().get(KEY_LIMIT));
@@ -71,10 +72,42 @@ public class UserGroupSearchBox {
 			}
 		});
 		
-		ListStore<AdapterModelData> store = new ListStore<AdapterModelData>(loader);
+		ListStore<ModelData> store = new ListStore<ModelData>(loader);
 
-		ComboBox<AdapterModelData> combo = new ComboBox<AdapterModelData>();
-		combo.setDisplayField(KEY_DISPLAY_NAME);
+		ComboBox<ModelData> combo = new ComboBox<ModelData>();
+		
+		combo.setPropertyEditor(new ListModelPropertyEditor<ModelData>() {
+			@Override
+			public String getStringValue(ModelData value) {
+				// Example output:
+				// dev usr  |  dev....1@sagebase.org  |  syn114085
+				
+				StringBuilder sb = new StringBuilder();
+				sb.append(value.get(KEY_DISPLAY_NAME).toString());
+				String email = value.get(KEY_EMAIL);
+				if (email != null)
+					sb.append("  |  " + email);
+				sb.append("  |  syn" + value.get(KEY_PRINCIPAL_ID));				
+				return sb.toString();
+			}
+			
+			@Override
+			public ModelData convertStringValue(String entry) {
+				// Extract Principal ID from entry String
+				String[] split = entry.split("syn");
+				String id = split[split.length - 1].trim();
+				
+				// Search for matching ModelData
+				for (ModelData md : models) {
+					String key = md.get(displayProperty);
+					if (id.equals(key)) {
+						return md;
+					}
+			    }
+			    return null;
+			}
+		});
+		combo.setDisplayField(KEY_PRINCIPAL_ID);
 		combo.setItemSelector("div.search-item");
 		combo.setTemplate(getTemplate());
 		combo.setStore(store);

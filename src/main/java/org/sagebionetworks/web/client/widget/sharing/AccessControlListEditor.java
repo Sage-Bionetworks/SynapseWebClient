@@ -169,25 +169,27 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	private void setAccess(Long principalId, PermissionLevel permissionLevel) {
-		if (uep != null && uep.getOwnerPrincipalId().equals(principalId))
+		if (uep != null && uep.getOwnerPrincipalId().equals(principalId)) {
 			showErrorMessage("Owner permissions cannot be modified. Please select a different user or group.");
-		try {
-			if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
-			if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
-			ResourceAccess ra = findPrincipal(principalId, acl);
-			if (ra==null) {
-				ra = new ResourceAccess();
-				ra.setPrincipalId(principalId);
-				ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
-				acl.getResourceAccess().add(ra);
-			} else {
-				ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
+		} else {
+			try {
+				if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
+				if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
+				ResourceAccess ra = findPrincipal(principalId, acl);
+				if (ra==null) {
+					ra = new ResourceAccess();
+					ra.setPrincipalId(principalId);
+					ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
+					acl.getResourceAccess().add(ra);
+				} else {
+					ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
+				}
+			} catch (Exception e) {
+				showErrorMessage(LOCAL_ACL_CREATION_ERROR);
+				return;
 			}
-		} catch (Exception e) {
-			showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-			return;
+			updateACLInSynapse(false);
 		}
-		updateACLInSynapse(false);
 	}
 	
 	// clone the current ACL, copying over the entries but skipping the given one
