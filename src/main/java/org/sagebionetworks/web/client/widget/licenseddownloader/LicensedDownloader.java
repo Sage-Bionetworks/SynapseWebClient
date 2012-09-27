@@ -9,7 +9,6 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -27,14 +26,11 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
-import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.FileDownload;
 import org.sagebionetworks.web.shared.LicenseAgreement;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -112,7 +108,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		Entity entity = entityBundle.getEntity();
 		loadDownloadLocations(entity);		
 		List<AccessRequirement> ars = entityBundle.getUnmetAccessRequirements();
-		userProfile = userProfile;
+		this.userProfile = userProfile;
 		// first, clear license agreement.  then, if there is an agreement required, set it below
 		setLicenseAgreement(null, null);
 		for (AccessRequirement ar : ars) {
@@ -241,15 +237,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		Callback onSuccess = new Callback() {
 			@Override
 			public void invoke() {
-				view.showWindow();
 				fireEntityUpdatedEvent();
-//				refresh(new Callback() {
-//					@Override
-//					public void invoke() {
-//						view.showWindow();
-//						fireEntityUpdatedEvent();
-//					}
-//				});
 			}
 		};
 		CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {

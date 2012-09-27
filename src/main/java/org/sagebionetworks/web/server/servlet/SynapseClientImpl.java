@@ -33,18 +33,20 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
-import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -324,20 +326,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb.getUnmetAccessRequirements()));
 			}
 		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		} catch (JSONException e) {
 			throw new UnknownErrorException(e.getMessage());			
 		}
 		return ebt;
 	}
 	
-	private static String createJSONStringFromArray(List<? extends JSONEntity> list) throws JSONException {
-		JSONStringer stringer = new JSONStringer();
-		stringer.array();
-		for (JSONEntity e : list) stringer.value(e);
-		stringer.endArray();
-		return stringer.toString();
+	public static String createJSONStringFromArray(List<? extends JSONEntity> list) throws JSONObjectAdapterException {
+		JSONArrayAdapter aa = new JSONArrayAdapterImpl();
+		for (int i=0; i<list.size(); i++) {
+			JSONObjectAdapter oa = new JSONObjectAdapterImpl();
+			list.get(i).writeToJSONObject(oa);
+			aa.put(i, oa);
+		}
+		return aa.toJSONString();
 	}
+	
 
 	/**
 	 * The synapse client is stateful so we must create a new one for each

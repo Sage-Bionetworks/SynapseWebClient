@@ -276,7 +276,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Title
-		titleWidget = new TitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		titleWidget = new TitleWidget(bundle, createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
 		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
@@ -360,7 +360,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderSnapshotEntity(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 
-		titleWidget = new TitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		titleWidget = new TitleWidget(bundle, createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
 		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);

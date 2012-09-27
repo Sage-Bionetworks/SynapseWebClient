@@ -351,7 +351,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 					window.setBlinkModal(true);
 					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
 					window.setLayout(new FitLayout());			
-					window.add(locationableUploader.asWidget(entityBundle, true), new MarginData(5));
+					window.add(locationableUploader.asWidget(entityBundle), new MarginData(5));
 					window.show();
 				}
 			});			

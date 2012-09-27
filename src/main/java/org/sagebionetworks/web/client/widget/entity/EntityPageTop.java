@@ -332,19 +332,13 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return new Callback() {
 			@Override
 			public void invoke() {
-				// ideally this would be done _after_ successfully creating the access requirement, but in practice
-				// there are problems opening the window in a separate thread
-				// Window.open(getJiraRestrictionUrl(), "_blank", "");
-				AccessRequirement ar = EntityUtil.createLockDownDataAccessRequirement(bundle.getEntity().getId());
-				JSONObjectAdapter arJson = null;
+				EntityWrapper ew = null;
 				try {
-					arJson = ar.writeToJSONObject(jsonObjectAdapter.createNew());
+					ew = EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(bundle.getEntity().getId(), jsonObjectAdapter);
 				} catch (JSONObjectAdapterException e) {
 					view.showInfo("Error", e.getMessage());
 					return;
 				}
-				String arClassName = ar.getClass().getName();
-				EntityWrapper ew = new EntityWrapper(arJson.toJSONString(), arClassName, null);
 				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 				final JavaScriptObject window = DisplayUtils.newWindow("", "", "");
 				synapseClient.createAccessRequirement(ew, new AsyncCallback<EntityWrapper>(){

@@ -13,9 +13,9 @@ public interface LocationableUploaderView extends IsWidget, SynapseWidgetView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void createUploadForm(boolean showCancel);
+	public void createUploadForm();
 	
-	public void openNewTab(String url);
+	public void openNewBrowserTab(String url);
 	
 	/**
 	 * Presenter interface
@@ -24,7 +24,7 @@ public interface LocationableUploaderView extends IsWidget, SynapseWidgetView {
 
 		String getUploadActionUrl(boolean isRestricted);
 
-		void setExternalLocation(String path);
+		void setExternalLocation(String path, boolean isNewlyRestricted);
 		
 		public void closeButtonSelected();
 

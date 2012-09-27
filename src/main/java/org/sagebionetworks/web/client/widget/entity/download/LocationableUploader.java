@@ -3,10 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
-import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.CancelEvent;
@@ -17,16 +17,10 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.Window;
+import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -75,9 +69,9 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		view.setPresenter(this);		
 	}		
 		
-	public Widget asWidget(EntityBundle entityBundle, boolean showCancel) {
+	public Widget asWidget(EntityBundle entityBundle) {
 		this.entityBundle = entityBundle;
-		this.view.createUploadForm(showCancel);
+		this.view.createUploadForm();
 		return this.view.asWidget();
 	}
 		
@@ -103,19 +97,39 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	}
 
 	@Override
-	public void setExternalLocation(String path) {
-		//validate path
+	public void setExternalLocation(String path, final boolean isNewlyRestricted) {
+		String entityId = entityBundle.getEntity().getId();
 		
-		synapseClient.updateExternalLocationable(entityBundle.getEntity().getId(), path, new AsyncCallback<EntityWrapper>() {
+		synapseClient.updateExternalLocationable(entityId, path, new AsyncCallback<EntityWrapper>() {
 			
 			public void onSuccess(EntityWrapper result) {
 				try {
 					Entity entity = nodeModelCreator.createEntity(result, entityBundle.getEntity().getClass());
+					if (isNewlyRestricted) {
+						EntityWrapper arEW = null;
+						try {
+							arEW=EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(entity.getId(), jsonObjectAdapter);
+						} catch (JSONObjectAdapterException caught) {
+							view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);							
+						}
+						synapseClient.createAccessRequirement(arEW, new AsyncCallback<EntityWrapper>(){
+							@Override
+							public void onSuccess(EntityWrapper result) {
+								view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+								entityUpdated();
+							}
+							@Override
+							public void onFailure(Throwable caught) {
+								view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+							}
+						});
+					} else {
+						view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+						entityUpdated();						
+					}
 				} catch (RestServiceException e) {
 					onFailure(null);					
 				}
-				view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
-				entityUpdated();
 			};
 			@Override
 			public void onFailure(Throwable caught) {
@@ -156,7 +170,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		} else {
 			view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE, DisplayConstants.TEXT_UPLOAD_SUCCESS);
 			if (isNewlyRestricted) {
-				view.openNewTab(getJiraRestrictionLink());
+				view.openNewBrowserTab(getJiraRestrictionLink());
 			}
 			handlerManager.fireEvent(new EntityUpdatedEvent());
 		}
