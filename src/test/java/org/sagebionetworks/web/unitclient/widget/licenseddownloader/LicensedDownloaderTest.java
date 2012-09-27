@@ -251,12 +251,6 @@ public class LicensedDownloaderTest {
 		resetMocks();		
 	
 		licensedDownloader.setLicenseAccepted();		
-		
-		AccessRequirementsTransport result = new AccessRequirementsTransport();
-		// TODO populate result so that the following can be tested
-		//licensedDownloader.unmetAccessRequirementsCallback(result, null);
-		// verify(mockView).setApprovalRequired(APPROVAL_REQUIRED.NONE);
-		
 	}
 	
 	/*
