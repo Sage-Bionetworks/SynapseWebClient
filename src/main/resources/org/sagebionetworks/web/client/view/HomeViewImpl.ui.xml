@@ -158,17 +158,14 @@
 				<div class="span-12 main-service last">
 					<div class="span-12 notopmargin why last">
 						<h3>Top Synapse Contributors</h3>
-						<p>Synapse users who are actively contributing data</p>
-						<div class="span-12 last serv">
-							<a href="#Synapse:syn308572">
-								<div class="big-rounded-icon-white left">
-									<div class="icon-white-big">
-										<img src="static/images/people/lyon_gholson.jpg" />
-									</div>
+						<div class="span-12 notopmargin last serv">
+							<div class="big-rounded-icon-white left">
+								<div class="icon-white-big">
+									<img src="static/images/people/weiyi_tai-hsien.jpg" />
 								</div>
-								<h5>Gholson Lyon</h5>
-								<p class="notopmargin small-italic">This dataset contains targeted exome sequencing data from a family with Ogden Syndrome.</p>
-							</a>
+							</div>
+							<h5><a class="link" href="#Profile:317809">Wei-Yi Cheng</a> and <a class="link" href="#Profile:323618">Tai-Hsien Ou Yang</a></h5>
+							<p class="notopmargin small-italic">The “Attractor Metagenes” team topped the September 1 Leaderboard in the Sage Bionetworks/DREAM Breast Cancer Prognosis Challenge.</p>
 						</div>
 						<div class="span-12 last serv">
 							<a href="#Synapse:syn160764">
@@ -180,20 +177,7 @@
 								<h5>Carlos Caldas</h5>
 								<p class="notopmargin small-italic">This dataset contains phenotype, expression and CNV data from ~1500 individuals with breast cancer.</p>
 							</a>
-						</div>
-						<div class="span-12 last serv">
-							<a href="#Synapse:syn4494">
-								<div class="big-rounded-icon-white left">
-									<div class="icon-white-big">
-										<img src="static/images/people/charles.jpg" />
-									</div>
-								</div>
-								<h5>Charles Sawyers et al, MSKCC</h5>
-								<p class="notopmargin small-italic">DNA copy number, mRNA expression profiles, candidate
-									gene resequencing, and clinical traits from 218 prostate
-									tumors.</p>
-							</a>
-						</div>
+						</div>					
 					</div>
 				</div>
 			
