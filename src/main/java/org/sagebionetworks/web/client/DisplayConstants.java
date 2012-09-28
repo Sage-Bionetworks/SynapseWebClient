@@ -74,6 +74,8 @@ public class DisplayConstants {
 	public static final String NEWS_UNAVAILABLE_TEXT = "The Synapse news service is currently unavailable.";
 	public static final String SUPPORT_FEED_UNAVAILABLE_TEXT = "The Synapse support feed service is currently unavailable.";
 	
+	public static final String STORAGE_USAGE_FAILED_TEXT = "Unable to determine the current usage at this time.";
+	
 	/*
 	 * Buttons, titles and labels
 	 */
@@ -270,7 +272,9 @@ public class DisplayConstants {
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
 	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
-	
+	public static final String SHOW_VERSIONS = "show all versions";
+	public static final String HIDE_VERSIONS = "hide all versions";
+
 	/*
 	 * Element ids for Selenium
 	 */

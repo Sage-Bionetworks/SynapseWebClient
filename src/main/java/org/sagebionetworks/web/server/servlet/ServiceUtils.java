@@ -30,6 +30,8 @@ public class ServiceUtils {
 	public static final String REPOSVC_SUFFIX_PATH_ACL = "acl"; 	
 	public static final String REPOSVC_SUFFIX_PATH_TYPE = "type";
 	public static final String REPOSVC_SUFFIX_PATH_BENEFACTOR = "benefactor"; 
+	public static final String REPOSVC_STORAGE_SUMMARY = "storageSummary";
+	
 	
 	public static final String AUTHSVC_SET_REGISTRATION_USER_PASSWORD_PATH = "registeringUserPassword";
 	public static final String AUTHSVC_SEND_PASSWORD_CHANGE_PATH = "userPasswordEmail";
@@ -38,6 +40,7 @@ public class ServiceUtils {
 	public static final String AUTHSVC_INITIATE_SESSION_PATH = "session";
 	public static final String AUTHSVC_CREATE_USER_PATH = "user";
 	public static final String AUTHSVC_GET_USER_PATH = "user";
+	
 	@Deprecated
 	public static final String AUTHSVC_UPDATE_USER_PATH = "user";
 	public static final String AUTHSVC_TERMINATE_SESSION_PATH = "session";

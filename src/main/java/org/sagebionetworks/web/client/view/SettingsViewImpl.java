@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FieldSet;
@@ -24,6 +25,7 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -49,6 +51,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel setupPasswordButtonPanel;
 	@UiField
 	SimplePanel breadcrumbsPanel;
+	@UiField
+	SimplePanel storageUsagePanel;
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -60,6 +64,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	private HTML changePasswordLabel;
 	private Breadcrumb breadcrumb;
 	private Footer footerWidget;
+
+	private Html storageUsageWidget;
+	
+	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
 	@Inject
 	public SettingsViewImpl(SettingsViewImplUiBinder binder,
@@ -115,6 +123,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		
 		setupPasswordButtonPanel.clear();
 		setupPasswordButtonPanel.add(createPasswordButton);
+
+		storageUsageWidget = new Html();
+		storageUsagePanel.add(storageUsageWidget);
 	}
 
 	@Override
@@ -242,6 +253,38 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void showLoading() {
 	}
 
+	@Override
+	public void clearStorageUsageUI() {
+		storageUsageWidget.setHtml(DisplayConstants.STORAGE_USAGE_FAILED_TEXT);
+	}
+	
+	public static String getFriendlySize(double size) {
+		NumberFormat df = NumberFormat.getDecimalFormat();
+		if(size >= TB) {
+            return df.format(size/TB) + " Terabytes";
+        }
+		if(size >= GB) {
+            return df.format(size/GB) + " Gigabytes";
+        }
+		if(size >= MB) {
+            return df.format(size/MB) + " Megabytes";
+        }
+		if(size >= KB) {
+            return df.format(size/KB) + " Kilobytes";
+        }
+        return df.format(size) + " Bytes";
+    }
+	
+	@Override
+	public void updateStorageUsage(Long grandTotal) {
+		if (grandTotal == null){
+			clearStorageUsageUI();
+		}
+		else {
+			storageUsageWidget.setHtml("<h4>You are currently using " + getFriendlySize(grandTotal.doubleValue()) + "</h4>");
+		}
+	}
+	
 
 	@Override
 	public void showInfo(String title, String message) {
@@ -253,6 +296,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void clear() {
 		changePasswordPanel.clear();
 		setupPasswordButtonPanel.clear();
+		storageUsagePanel.clear();
 	}
 
 }
