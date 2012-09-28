@@ -116,6 +116,8 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 							@Override
 							public void onSuccess(EntityWrapper result) {
 								view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+								// open Jira issue
+								view.openNewBrowserTab(getJiraRestrictionLink());
 								entityUpdated();
 							}
 							@Override
