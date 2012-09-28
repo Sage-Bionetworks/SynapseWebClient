@@ -135,9 +135,9 @@ public class GovernanceDialogHelper {
 		case NONE:
 			return iconsImageBundle.sheildGreen16();
 		case LICENSE_ACCEPTANCE:
-			return iconsImageBundle.sheildYellow16();
+			return iconsImageBundle.shieldYellow16();
 		case ACT_APPROVAL:
-			return iconsImageBundle.sheildRed16();
+			return iconsImageBundle.shieldRed16();
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}

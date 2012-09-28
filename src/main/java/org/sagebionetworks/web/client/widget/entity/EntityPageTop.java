@@ -195,9 +195,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private void sendDetailsToView(boolean isAdmin, boolean canEdit) {
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		UserSessionData sessionData = authenticationController.getLoggedInUser();
-		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
-		view.setEntityBundle(bundle, userProfile, entityTypeDisplay, isAdmin, canEdit, readOnly);
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, readOnly);
 	}
 	
 	private UserProfile getUserProfile() {

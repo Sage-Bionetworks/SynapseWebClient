@@ -105,10 +105,10 @@ public interface IconsImageBundle extends ClientBundle {
 	ImageResource sheildGreen16();
 
 	@Source("images/icons/shield-red-16.png")
-	ImageResource sheildRed16();
+	ImageResource shieldRed16();
 
 	@Source("images/icons/shield-yellow-16.png")
-	ImageResource sheildYellow16();
+	ImageResource shieldYellow16();
 
 	@Source("images/icons/flag-small-16.png")
 	ImageResource flagSmall16();
