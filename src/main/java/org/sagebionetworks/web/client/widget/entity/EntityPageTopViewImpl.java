@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Summary;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
@@ -22,6 +23,8 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
@@ -71,6 +74,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
@@ -147,8 +151,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, String entityTypeDisplay,
-			boolean isAdministrator, boolean canEdit, boolean readOnly) {
+	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, boolean readOnly) {
 		this.readOnly = readOnly;
 
 		colLeftContainer = initContainerAndPanel(colLeftContainer, colLeftPanel);
@@ -165,12 +168,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// setup action menu
 		actionMenuPanel.clear();
-		actionMenu.addEntityUpdatedHandler(new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.fireEntityUpdatedEvent();
-			}
-		});
 		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator,
 				canEdit, readOnly));
 
@@ -178,7 +175,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// Custom layouts for certain entities
 		if(bundle.getEntity() instanceof Summary) {
-		    renderSnapshotEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+		    renderSnapshotEntity(bundle, userProfile, entityTypeDisplay, canEdit, readOnly, widgetMargin);
 		} else if (bundle.getEntity() instanceof Folder) {
 			renderFolderEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
 		} else if (bundle.getEntity() instanceof Project) {
@@ -211,8 +208,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
+	public void setPresenter(Presenter p) {
+		presenter = p;
+		actionMenu.addEntityUpdatedHandler(new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		});
 	}
 
 	@Override
@@ -273,7 +276,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Title
-		titleWidget = new TitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		titleWidget = new TitleWidget(bundle, createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
 		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
@@ -303,11 +306,61 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ** FULL WIDTH **
 		// none.
 	}
+	
+	private Widget createRestrictionWidget() {
+		if (!presenter.includeRestrictionWidget()) return null;
+		boolean isAnonymous = presenter.isAnonymous();
+		boolean hasAdministrativeAccess = false;
+		boolean hasFulfilledAccessRequirements = false;
+		String jiraFlagLink = null;
+		if (!isAnonymous) {
+			hasAdministrativeAccess = presenter.hasAdministrativeAccess();
+			jiraFlagLink = presenter.getJiraFlagUrl();
+		}
+		APPROVAL_REQUIRED restrictionLevel = presenter.getRestrictionLevel();
+		String accessRequirementText = null;
+		Callback touAcceptanceCallback = null;
+		Callback requestACTCallback = null;
+		Callback imposeRestrictionsCallback = presenter.getImposeRestrictionsCallback();
+		Callback loginCallback = presenter.getLoginCallback();
+		if (restrictionLevel!=APPROVAL_REQUIRED.NONE) {
+			accessRequirementText = presenter.accessRequirementText();
+			if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
+				touAcceptanceCallback = presenter.accessRequirementCallback();
+			} else {
+				// get the Jira link for ACT approval
+				if (!isAnonymous) {
+					requestACTCallback = new Callback() {
+						@Override
+						public void invoke() {
+							Window.open(presenter.getJiraRequestAccessUrl(), "_blank", "");
+							
+						}
+					};
+				}
+			}
+			if (!isAnonymous) hasFulfilledAccessRequirements = presenter.hasFulfilledAccessRequirements();
+		}
+		return EntityViewUtils.createRestrictionsWidget(
+				jiraFlagLink, 
+				isAnonymous, 
+				hasAdministrativeAccess,
+				accessRequirementText,
+				touAcceptanceCallback,
+				requestACTCallback,
+				imposeRestrictionsCallback,
+				loginCallback,
+				restrictionLevel, 
+				hasFulfilledAccessRequirements,
+				iconsImageBundle,
+				synapseJSNIUtils);
+	}
 
 
-	private void renderSnapshotEntity(EntityBundle bundle,
+	private void renderSnapshotEntity(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
-		titleWidget = new TitleWidget(bundle, entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+
+		titleWidget = new TitleWidget(bundle, createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
 		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
@@ -530,6 +583,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.layout();
 		return lc;
 	}
+
 
 	private Widget createDescriptionWidget(EntityBundle bundle, String entityTypeDisplay) {
 		LayoutContainer lc = new LayoutContainer();

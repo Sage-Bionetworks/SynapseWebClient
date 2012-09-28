@@ -7,6 +7,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.anyString;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -22,8 +23,10 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.server.servlet.FileUpload;
@@ -91,6 +94,7 @@ public class FileUploadTest {
 		when(mockRequest.getContentLength()).thenReturn(1);
 		when(mockRequest.getCharacterEncoding()).thenReturn("UTF-8");
 		when(mockRequest.getParameter(DisplayUtils.ENTITY_PARAM_KEY)).thenReturn(entityId);
+		when(mockRequest.getParameter(DisplayUtils.IS_RESTRICTED_PARAM_KEY)).thenReturn("true");
 		hasNext = true;
 		
 		// setup response
@@ -118,7 +122,9 @@ public class FileUploadTest {
 		when(mockStream.openStream()).thenReturn(new ByteArrayInputStream(new byte[1024]));
 		//when(mockFileItemIterator.next()).thenReturn(mockStream);		
 		when(mockSynapse.uploadLocationableToSynapse(eq(entity), any(File.class))).thenReturn(entity);
-
+		VariableContentPaginatedResults<AccessRequirement> currentARs = new VariableContentPaginatedResults<AccessRequirement>();
+		currentARs.setTotalNumberOfResults(0L);
+		when(mockSynapse.getAccessRequirements(anyString())).thenReturn(currentARs);
 		// setup fileupload
 		servlet.setServiceUrlProvider(new ServiceUrlProvider());
 		servlet.setSynapseProvider(mockSynapseProvider);

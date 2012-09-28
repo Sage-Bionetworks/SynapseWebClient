@@ -16,9 +16,12 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.shared.EntityUtil;
 
 import com.google.common.io.Files;
 import com.google.inject.Inject;
@@ -85,10 +88,30 @@ public class FileUpload extends HttpServlet {
         try{ 
 			FileItemIterator fileItemIterator = upload.getItemIterator(request);
 
-            while (fileItemIterator.hasNext()) {
+			String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
+			String makeAttachment=null;
+			Synapse synapseClient=null;
+			Entity locationable=null;
+			if (entityId!=null) {
+	            TokenProvider tokenProvider = new TokenProvider() {					
+					@Override
+					public String getSessionToken() {
+						return UserDataProvider.getThreadLocalUserToken(request);
+					}
+				};
+				makeAttachment = request.getParameter(DisplayUtils.MAKE_ATTACHMENT_PARAM_KEY);
+				synapseClient = ServiceUtils.createSynapseClient(synapseProvider, urlProvider, tokenProvider.getSessionToken());						
+			}
+			
+			String restrictedParam = request.getParameter(DisplayUtils.IS_RESTRICTED_PARAM_KEY);
+			if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
+			boolean isRestricted = Boolean.parseBoolean(restrictedParam);
+			
+			boolean uploadedAny = false;
+
+			while (fileItemIterator.hasNext()) {
                 FileItemStream item = fileItemIterator.next();
 
-                String name = item.getFieldName();
                 InputStream stream = item.openStream();
 
 
@@ -103,32 +126,23 @@ public class FileUpload extends HttpServlet {
 				ServiceUtils.writeToFile(file, stream, Long.MAX_VALUE); // TODO : check file size and restrict to a limit?      
 				
 				try{	                
-	                TokenProvider tokenProvider = new TokenProvider() {					
-						@Override
-						public String getSessionToken() {
-							return UserDataProvider.getThreadLocalUserToken(request);
-						}
-					};
-	                
 					// get Entity and store file in location
-					String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
 					if(entityId != null) {					
-						String makeAttachment = request.getParameter(DisplayUtils.MAKE_ATTACHMENT_PARAM_KEY);
-						Synapse synapseClient = ServiceUtils.createSynapseClient(synapseProvider, urlProvider, tokenProvider.getSessionToken());						
-						Entity locationable = synapseClient.getEntityById(entityId);
+						locationable = synapseClient.getEntityById(entityId);
+						if(!(locationable instanceof Locationable)) {
+							throw new RuntimeException("Upload failed. Entity id: " + locationable.getId() + " is not Locationable.");
+						}						
 						if("true".equals(makeAttachment)) {
 							// TODO : create Attachment entity, and set locationable
 							// locationable = new attachment entity
 						}
-						if(!(locationable instanceof Locationable)) {
-							throw new RuntimeException("Upload failed. Entity id: " + locationable.getId() + " is not Locationable.");
-						}						
 						Locationable uploaded = synapseClient.uploadLocationableToSynapse((Locationable)locationable, file);
 						logger.info("Uploaded file " + item.getName() + " ("+ file.getName() +") to Synapse id: " + uploaded.getId());
 						OutputStream os = response.getOutputStream();						
 						PrintStream printStream = new PrintStream(os);
 						printStream.print(DisplayUtils.UPLOAD_SUCCESS);
 						printStream.close();
+						uploadedAny = true; // uploaded at least one file
 					} else {
 						throw new IllegalArgumentException("entityId is a required parameter");
 					}					
@@ -136,9 +150,19 @@ public class FileUpload extends HttpServlet {
 					// Unconditionally delete the temp file.
 					file.delete();
 				}
-            }
-        }
-        catch(Exception e){
+            } // end while
+			
+			
+			// now lock down restricted data
+			if (isRestricted && entityId!=null && uploadedAny) {
+				// we only proceed if there aren't currently any access restrictions
+				VariableContentPaginatedResults<AccessRequirement> currentARs = synapseClient.getAccessRequirements(entityId);
+				if (currentARs.getTotalNumberOfResults()==0L) {
+					AccessRequirement ar = EntityUtil.createLockDownDataAccessRequirement(entityId);
+					synapseClient.createAccessRequirement(ar);
+				}
+			}
+        } catch(Exception e){
             throw new RuntimeException(e);
         }
 

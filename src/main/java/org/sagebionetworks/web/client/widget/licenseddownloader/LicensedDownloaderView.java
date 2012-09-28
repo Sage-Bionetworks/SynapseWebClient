@@ -3,6 +3,9 @@ package org.sagebionetworks.web.client.widget.licenseddownloader;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.FileDownload;
 
@@ -10,12 +13,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	
-	public enum APPROVAL_REQUIRED {
-		NONE,
-		LICENSE_ACCEPTANCE,
-		ACT_APPROVAL
-	}
-
 	/**
 	 * Set the presenter.
 	 * @param presenter
@@ -35,22 +32,10 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	public void setLicenseHtml(String licenseHtml);	
 	
 	/**
-	 * Set the citation text to display
-	 * @param citationHtml
-	 */
-	public void setCitationHtml(String citationHtml);
-		
-	/**
 	 * Show the License Box window
 	 */
 	public void showWindow();
 	
-	
-	/**
-	 * Hide the License Box window
-	 */
-	public void hideWindow();
-		
 	/**
 	 * Shows loading in the contents window
 	 */
@@ -81,6 +66,14 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 		public void setLicenseAccepted();
 		
 		public boolean isDownloadAllowed();
+
+		public Callback getTermsOfUseCallback();
+
+		public Callback getRequestAccessCallback();
+
+		void clearHandlers();
+
+		void addEntityUpdatedHandler(EntityUpdatedHandler handler);
 
 	}
 

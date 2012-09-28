@@ -4,3 +4,4 @@ target
 /.project
 /.settings
 /.gwt
+.DS_Store

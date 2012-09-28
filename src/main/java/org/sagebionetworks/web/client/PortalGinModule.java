@@ -68,6 +68,8 @@ import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidgetViewImpl;
@@ -176,6 +178,8 @@ public class PortalGinModule extends AbstractGinModule {
 	
 		// Adapter factoyr
 		bind(AdapterFactory.class).to(GwtAdapterFactory.class);
+		
+		bind(JiraURLHelper.class).to(JiraURLHelperImpl.class);
 		
 		/*
 		 * Vanilla Implementation binding
