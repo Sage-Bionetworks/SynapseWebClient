@@ -53,7 +53,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private String entityId;
 	private UserProfile userProfile;
 	
-	private HandlerManager handlerManager = new HandlerManager(this);
+	private HandlerManager handlerManager;
 	
 	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraUrlHelper;
@@ -78,6 +78,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.jiraUrlHelper=jiraUrlHelper;
 		view.setPresenter(this);		
+		clearHandlers();
 	}
 
 	// this method could be public but it's only used privately (when a ToU agreement
@@ -89,6 +90,12 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	/*
 	 * Public methods
 	 */
+	@Override
+	public void clearHandlers() {
+		handlerManager = new HandlerManager(this);
+	}
+
+	@Override
 	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {		
 		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
 	}

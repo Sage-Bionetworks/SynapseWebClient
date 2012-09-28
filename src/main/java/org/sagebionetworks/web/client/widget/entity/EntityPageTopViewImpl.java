@@ -168,12 +168,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// setup action menu
 		actionMenuPanel.clear();
-		actionMenu.addEntityUpdatedHandler(new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.fireEntityUpdatedEvent();
-			}
-		});
 		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator,
 				canEdit, readOnly));
 
@@ -214,8 +208,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
+	public void setPresenter(Presenter p) {
+		presenter = p;
+		actionMenu.addEntityUpdatedHandler(new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		});
 	}
 
 	@Override

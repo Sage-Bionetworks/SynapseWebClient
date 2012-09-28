@@ -41,6 +41,8 @@ public interface LocationableUploaderView extends IsWidget, SynapseWidgetView {
 		boolean isRestricted();
 
 		String getJiraRestrictionLink();
+
+		void clearHandlers();
 	}
 
 

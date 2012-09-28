@@ -36,7 +36,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
-	private HandlerManager handlerManager = new HandlerManager(this);
+	private HandlerManager handlerManager;
 	private EntityBundle entityBundle;
 	private EntityTypeProvider entityTypeProvider;
 	private GlobalApplicationState globalApplicationState;
@@ -67,6 +67,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		this.jsonObjectAdapter=jsonObjectAdapter;
 		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);		
+		clearHandlers();
 	}		
 		
 	public Widget asWidget(EntityBundle entityBundle) {
@@ -146,9 +147,13 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	public void addCancelHandler(CancelHandler handler) {
 		handlerManager.addHandler(CancelEvent.getType(), handler);
 	}
+	
+	@Override
+	public void clearHandlers() {
+		handlerManager = new HandlerManager(this);
+	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void addPersistSuccessHandler(EntityUpdatedHandler handler) {
 		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
@@ -159,7 +164,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	}
 
 	public void entityUpdated() {
-			handlerManager.fireEvent(new EntityUpdatedEvent());
+		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 	
 	@Override

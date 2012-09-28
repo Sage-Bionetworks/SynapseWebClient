@@ -121,6 +121,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		// Configure the button
 		licensedDownloader.configureHeadless(entityBundle, userProfile);
 		// this allows the menu to respond to the user signing a Terms of Use agreement in the licensed downloader
+		licensedDownloader.clearHandlers();
 		licensedDownloader.addEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
@@ -328,6 +329,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			MenuItem item = new MenuItem(DisplayConstants.TEXT_UPLOAD_FILE);
 			item.setIcon(AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 			final Window window = new Window();  
+			locationableUploader.clearHandlers();
 			locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
 				@Override
 				public void onPersistSuccess(EntityUpdatedEvent event) {

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.licenseddownloader;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
@@ -69,6 +70,10 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 		public Callback getTermsOfUseCallback();
 
 		public Callback getRequestAccessCallback();
+
+		void clearHandlers();
+
+		void addEntityUpdatedHandler(EntityUpdatedHandler handler);
 
 	}
 

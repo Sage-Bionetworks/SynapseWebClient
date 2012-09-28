@@ -51,6 +51,8 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 	private Button uploadBtn;
 	private Button cancelBtn;
 	private ProgressBar progressBar;
+	// external link panel
+	private Button saveExternalLinkButton;
 	
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	private JavaScriptObject window;
@@ -104,6 +106,24 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 	public void createUploadForm() {
 		initializeControls();
 		
+		createTabPanel();
+	}
+	
+	@Override
+	public void openNewBrowserTab(String url) {
+		// open url using window previously created
+		if (window==null) return;
+		DisplayUtils.setWindowTarget(window, url);
+		// only use it once
+		window = null;
+	}
+
+	/*
+	 * Private Methods
+	 */
+	
+	private void createTabPanel() {
+		
 		this.removeAll();
 		setLayout(new FitLayout());
 		
@@ -134,19 +154,6 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 	}
 
 	
-	@Override
-	public void openNewBrowserTab(String url) {
-		// open url using window previously created
-		if (window==null) return;
-		DisplayUtils.setWindowTarget(window, url);
-		// only use it once
-		window = null;
-	}
-
-	/*
-	 * Private Methods
-	 */
-	
 	private void initializeOpenRadio(Radio openRadio, String radioGroup, Listener<BaseEvent> listener) {
 		openRadio.removeAllListeners();
 		openRadio.addListener(Events.OnClick, listener);
@@ -167,11 +174,13 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 	
 	private void openSelected() {
 		uploadBtn.setEnabled(true);
+		saveExternalLinkButton.setEnabled(true);
 		formPanel.setAction(presenter.getUploadActionUrl(/*isRestricted*/false));		
 	}
 	
 	private void restrictedSelected() {
 		uploadBtn.setEnabled(true);
+		saveExternalLinkButton.setEnabled(true);
 		formPanel.setAction(presenter.getUploadActionUrl(/*isRestricted*/true));		
 	}
 	
@@ -248,9 +257,7 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		};
 		uploadBtn.addSelectionListener(uploadListener);	
 		// don't want to enable the upload button until a radio button is selected
-		if (!isInitiallyRestricted) {
-			uploadBtn.setEnabled(false);
-		}
+		uploadBtn.setEnabled(isInitiallyRestricted);
 	
 		cancelBtn.removeAllListeners();
 		SelectionListener<ButtonEvent> cancelListener = new SelectionListener<ButtonEvent>() {
@@ -260,7 +267,8 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 			}
 		};
 		cancelBtn.addSelectionListener(cancelListener);
-	}
+
+}
 
 	private static void addWarningToTab(TabItem tabItem) {
 		Label lf = new Label(DisplayConstants.FILE_DOWNLOAD_NOTE);
@@ -399,29 +407,36 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 	}
 
 	private Widget createExternalPanel() {
-		final FormPanel formPanel = new FormPanel();
-		formPanel.setHeaderVisible(false);
-		formPanel.setFrame(false);
-		formPanel.setButtonAlign(HorizontalAlignment.RIGHT);
-		formPanel.setLabelWidth(110);
-		formPanel.setFieldWidth(230);
+		final FormPanel externalLinkFormPanel = new FormPanel();
 		final TextField<String> pathField = new TextField<String>();
+		externalLinkFormPanel.setHeaderVisible(false);
+		externalLinkFormPanel.setFrame(false);
+		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.RIGHT);
+		externalLinkFormPanel.setLabelWidth(110);
+		externalLinkFormPanel.setFieldWidth(230);
 		pathField.setFieldLabel("External Path or URL");
 		
-		formPanel.add(pathField);
-		
-		Button btn = new Button("Save");
-		btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		externalLinkFormPanel.add(pathField);
+		saveExternalLinkButton = new Button("Save");
+		saveExternalLinkButton.removeAllListeners();
+		saveExternalLinkButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				if (!formPanel.isValid()) {
+				if (!externalLinkFormPanel.isValid()) {
 					return;
-				}				
+				}
+				// this is used in the 'handleEvent' listener, but must
+				// be created in the original thread.  for more, see
+				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
+				if (isNewlyRestricted()) {
+					window = DisplayUtils.newWindow("", "", "");
+				}
 				presenter.setExternalLocation(pathField.getValue(), isNewlyRestricted());
 			}
 		});
-		formPanel.addButton(btn);
+		saveExternalLinkButton.setEnabled(isInitiallyRestricted);
+		externalLinkFormPanel.addButton(saveExternalLinkButton);
 		
-		return formPanel;
+		return externalLinkFormPanel;
 	}
 }
