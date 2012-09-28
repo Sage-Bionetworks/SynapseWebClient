@@ -1,18 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.search.Hit;
-import org.sagebionetworks.repo.model.search.SearchResults;
-import org.sagebionetworks.repo.model.search.query.KeyValue;
-import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -22,7 +15,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -96,73 +88,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		return view.asWidget();
 	}
 
-	private void loadProjectsUserCanUpdate(final List<EntityHeader> eheaders) {
-		if(!authenticationController.isLoggedIn()) return;		
-		UserSessionData user = authenticationController.getLoggedInUser(); 
-		SearchQuery query = createUpdateQuery(user.getProfile().getOwnerId());
-		
-		view.showLoading();
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		try {
-			query.writeToJSONObject(adapter);
-			synapseClient.search(adapter.toJSONString(), new AsyncCallback<EntityWrapper>() {			
-				@Override
-				public void onSuccess(EntityWrapper result) {
-					SearchResults results = new SearchResults();		
-					try {
-						results = nodeModelCreator.createEntity(result, SearchResults.class);
-						// convert results to EntityHeaders
-						for(Hit hit : results.getHits()) {
-							EntityHeader eh = new EntityHeader();
-							eh.setId(hit.getId());
-							eh.setName(hit.getName());
-							eh.setType("project");
-							if (!eheaders.contains(eh))
-								eheaders.add(eh);
-						}						
-						view.setUpdatableEntities(eheaders);
-					} catch (RestServiceException e) {
-						onFailure(e);
-					}																	
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					} 						
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
-		}
-
-	}
-
-	private SearchQuery createUpdateQuery(String principalId) {
-		SearchQuery query = new SearchQuery();
-		
-		// BQ
-		List<KeyValue> bq = new ArrayList<KeyValue>();
-		KeyValue kv; 
-		kv = new KeyValue();
-		//kv.setKey("update_acl");
-		kv.setKey("acl");
-		kv.setValue(principalId);
-		bq.add(kv);
-		
-		kv = new KeyValue();
-		kv.setKey("node_type");
-		kv.setValue("project");
-		bq.add(kv);
-		query.setBooleanQuery(bq);
-		
-		// fields
-		query.setReturnFields(Arrays.asList(new String[] { "id", "name" }));
-		
-		return query;
-	}
-		
 	/**
 	 * Define custom handling for when an entity is clicked
 	 * @param handler
@@ -194,13 +119,15 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 						} catch (RestServiceException e) {
 							onFailure(e);
 						}
-					}
-					//load projects that the user can update 
-					loadProjectsUserCanUpdate(headers);
+					} 
+					//show whatever projects that we found (maybe zero)
+					view.setUpdatableEntities(headers);
+
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());				
+					//failed to load projects that the user created
+					view.setUpdatableEntities(new ArrayList<EntityHeader>());
 				}
 			});
 		}

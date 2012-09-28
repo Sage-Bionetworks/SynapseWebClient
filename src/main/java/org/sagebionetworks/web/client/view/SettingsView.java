@@ -39,6 +39,10 @@ public interface SettingsView extends IsWidget, SynapseView {
 	 */
 	public void requestPasswordEmailFailed();
 	
+	public void updateStorageUsage(Long grandTotal);
+
+	public void clearStorageUsageUI();
+	
 	public void refreshHeader();
 	
 	public interface Presenter extends SynapsePresenter {
