@@ -153,7 +153,7 @@ public class EntityEditorTest {
 		entity.setCreatedBy("ByGeorge!");
 		Annotations annos = new Annotations();
 		annos.addAnnotation("stringKey", "a big string");
-		return  new EntityBundle(entity, annos, null, null, null);
+		return  new EntityBundle(entity, annos, null, null, null, null, null);
 	}
 	
 

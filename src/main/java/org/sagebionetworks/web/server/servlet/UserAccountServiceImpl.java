@@ -128,7 +128,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			return;
 		}		
 		
-		throw new RestClientException("An error occured. Please try again.");
+		throw new RestClientException("An error occurred. Please try again.");
 		
 //		if (response.getStatusCode() != HttpStatus.CREATED && response.getStatusCode() != HttpStatus.OK) {
 //			throw new RestClientException("Status code:" + response.getStatusCode().value());
@@ -169,7 +169,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}		
 	
 		
-		throw new RestClientException("An error occured. Please try again.");		
+		throw new RestClientException("An error occurred. Please try again.");		
 	}
 
 	@Override
@@ -214,7 +214,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 				return; // this is expected
 			}
 			
-			throw new RestClientException("An error occured. Please try again.");
+			throw new RestClientException("An error occurred. Please try again.");
 	}
 
 	@Override
@@ -261,7 +261,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			return; // this is expected
 		}
 		
-		throw new RestClientException("An error occured. Please try again.");
+		throw new RestClientException("An error occurred. Please try again.");
 	}
 
 	/**

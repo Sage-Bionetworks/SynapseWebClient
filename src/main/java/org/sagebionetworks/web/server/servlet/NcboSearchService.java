@@ -73,7 +73,7 @@ public class NcboSearchService extends HttpServlet {
 				}
 				HttpUtils.respondJSON(response, returnObj, jsonpCallback);
 			} catch (Exception e) {
-				HttpUtils.respondError(response, "An error occured accessing the NCBO search service");
+				HttpUtils.respondError(response, "An error occurred accessing the NCBO search service");
 			}
 		}		
 	}

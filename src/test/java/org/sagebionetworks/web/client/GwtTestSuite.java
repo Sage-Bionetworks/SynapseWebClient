@@ -1,17 +1,16 @@
 package org.sagebionetworks.web.client;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
@@ -21,24 +20,24 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.RegisterConstants;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
+import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.junit.client.GWTTestCase;
 
 /**
@@ -280,7 +279,7 @@ public class GwtTestSuite extends GWTTestCase {
 	}
 	
 	@Test
-	public void testEntityBundleTranslation() throws JSONObjectAdapterException, RestServiceException{
+	public void testEntityBundleTranslation() throws Exception{
 		// The entity
 		ExampleEntity entity = new ExampleEntity();
 		initilaizedJSONEntityFromSchema(entity);
@@ -303,6 +302,12 @@ public class GwtTestSuite extends GWTTestCase {
 		header.setName("RomperRuuuu");
 		path.getPath().add(header);
 		
+		List<AccessRequirement> ars = new ArrayList<AccessRequirement>();
+		TermsOfUseAccessRequirement ar = new TermsOfUseAccessRequirement();
+		ar.setEntityType(TermsOfUseAccessRequirement.class.getName());
+		ar.setTermsOfUse("foo");
+		ars.add(ar);
+		
 		JSONEntityFactoryImpl factory = new JSONEntityFactoryImpl(new GwtAdapterFactory());
 		// the is our transport object
 		EntityBundleTransport transport = new EntityBundleTransport();
@@ -310,6 +315,9 @@ public class GwtTestSuite extends GWTTestCase {
 		transport.setAnnotationsJson(factory.createJsonStringForEntity(annos));
 		transport.setPermissionsJson(factory.createJsonStringForEntity(uep));
 		transport.setEntityPathJson(factory.createJsonStringForEntity(path));
+	
+		transport.setAccessRequirementsJson(entityListToString(ars));
+		transport.setUnmetAccessRequirementsJson(entityListToString(ars));
 		
 		// Now make sure we can translate it
 		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(factory, new JSONObjectGwt());
@@ -319,6 +327,18 @@ public class GwtTestSuite extends GWTTestCase {
 		assertEquals(annos, results.getAnnotations());
 		assertEquals(path, results.getPath());
 		assertEquals(uep, results.getPermissions());
+		assertEquals(ars, results.getAccessRequirements());
+		assertEquals(ars, results.getUnmetAccessRequirements());
+	}
+	
+	public static String entityListToString(List<? extends JSONEntity> list) throws JSONObjectAdapterException {		
+		JSONArrayAdapter aa = JSONObjectGwt.createNewAdapter().createNewArray();
+		for (int i=0; i<list.size(); i++) {
+			JSONObjectAdapter oa = JSONObjectGwt.createNewAdapter();
+			list.get(i).writeToJSONObject(oa);
+			aa.put(i, oa);
+		}
+		return aa.toJSONString();
 	}
 	
 
