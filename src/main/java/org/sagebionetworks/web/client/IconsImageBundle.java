@@ -101,6 +101,18 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/flag-16.png")
 	ImageResource flag16();
 
+	@Source("images/icons/shield-green-16.png")
+	ImageResource sheildGreen16();
+
+	@Source("images/icons/shield-red-16.png")
+	ImageResource shieldRed16();
+
+	@Source("images/icons/shield-yellow-16.png")
+	ImageResource shieldYellow16();
+
+	@Source("images/icons/flag-small-16.png")
+	ImageResource flagSmall16();
+
 	@Source("images/icons/globe-green-16.png")
 	ImageResource globe16();	
 	

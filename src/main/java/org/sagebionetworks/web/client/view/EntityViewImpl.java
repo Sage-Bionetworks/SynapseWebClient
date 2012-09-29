@@ -36,7 +36,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
 	private Footer footerWidget;
-	
+		
 	@Inject
 	public EntityViewImpl(
 			EntityViewImplUiBinder binder,
@@ -57,10 +57,21 @@ public class EntityViewImpl extends Composite implements EntityView {
 		//headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 	}
 
-
+	
+	private EntityUpdatedHandler handler = null;
+	
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
+		if (handler==null) {
+			handler = new EntityUpdatedHandler() {			
+				@Override
+				public void onPersistSuccess(EntityUpdatedEvent event) {
+					presenter.refresh();
+				}
+			};
+			entityPageTop.addEntityUpdatedHandler(handler);
+		}
 		header.clear();
 		header.add(headerWidget.asWidget());
 		footer.clear();
@@ -74,12 +85,6 @@ public class EntityViewImpl extends Composite implements EntityView {
 	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
 		entityPageTop.clearState();
 		entityPageTop.setBundle(bundle, readOnly);
-		entityPageTop.addEntityUpdatedHandler(new EntityUpdatedHandler() {			
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.refresh();
-			}
-		});
 		entityPageTopPanel.setWidget(entityPageTop.asWidget());
 		entityPageTop.refresh();
 	}

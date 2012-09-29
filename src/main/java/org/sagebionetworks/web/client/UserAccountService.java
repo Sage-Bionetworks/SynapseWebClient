@@ -37,4 +37,6 @@ public interface UserAccountService extends RemoteService {
 	public String getTermsOfUse();
 	
 	public void setRegistrationUserPassword(String registrationToken, String newPassword);
+	
+	public String getStorageUsage();
 }

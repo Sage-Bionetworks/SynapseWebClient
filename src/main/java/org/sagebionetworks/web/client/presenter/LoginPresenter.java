@@ -151,7 +151,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						});			
 				}
 				public void onFailure(Throwable throwable) {
-					view.showErrorMessage("An error occured. Please try logging in again.");
+					view.showErrorMessage("An error occurred. Please try logging in again.");
 					view.showLogin(openIdActionUrl, openIdReturnUrl);
 				}
 			});
@@ -181,12 +181,12 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 											});		
 								}
 								public void onFailure(Throwable t) {
-									view.showErrorMessage("An error occured. Please try logging in again.");
+									view.showErrorMessage("An error occurred. Please try logging in again.");
 									view.showLogin(openIdActionUrl, openIdReturnUrl);									
 								}
 							});
 						} else {
-							view.showErrorMessage("An error occured. Please try logging in again.");
+							view.showErrorMessage("An error occurred. Please try logging in again.");
 							view.showLogin(openIdActionUrl, openIdReturnUrl);
 						}
 					}

@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -27,18 +27,21 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
+	private NodeModelCreator nodeModelCreator;
 	
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
 			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
-			CookieProvider cookieProvider) {
+			CookieProvider cookieProvider,
+			NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.cookieProvider = cookieProvider;
+		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}
 
@@ -108,7 +111,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 				@Override
 				public void onFailure(Throwable caught) {
 					view.requestPasswordEmailFailed();
-					view.showErrorMessage("An error occured. Please try reloading the page.");					
+					view.showErrorMessage("An error occurred. Please try reloading the page.");					
 				}
 			});
 		} else {	
@@ -116,6 +119,26 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			view.showInfo("Error", "Please Login Again.");
 			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}		
+	}
+	
+	private void updateUserStorage() {
+		userService.getStorageUsage(new AsyncCallback<String>(){
+			@Override
+			public void onSuccess(String storageUsageSummaryListJson) {
+				try {
+					StorageUsageSummaryList storageUsageSummaryList = nodeModelCreator.createEntity(storageUsageSummaryListJson, StorageUsageSummaryList.class);
+					view.updateStorageUsage(storageUsageSummaryList.getGrandTotal());
+				} catch (RestServiceException e) {
+					onFailure(e);
+				}    				
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				//couldn't figure out the usage, update the view to indicate that the test was inconclusive
+				view.clearStorageUsageUI();
+			}
+		});
 	}
 	
 	
@@ -133,6 +156,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	private void showView(Settings place) {
 		//String token = place.toToken();
 		//Support other tokens?
+		updateUserStorage();
 	}
 }
 

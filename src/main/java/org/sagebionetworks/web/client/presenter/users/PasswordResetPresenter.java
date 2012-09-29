@@ -107,7 +107,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("An error occured in sending your request. Please retry.");
+				view.showErrorMessage("An error occurred in sending your request. Please retry.");
 			}
 		});
 		

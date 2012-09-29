@@ -33,6 +33,7 @@ import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -105,6 +106,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private String baseProfileAttachmentUrl = DisplayUtilsGWT.BASE_PROFILE_ATTACHMENT_URL;
 
 	private Footer footerWidget;
+	
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,

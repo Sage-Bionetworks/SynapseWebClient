@@ -128,7 +128,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			return;
 		}		
 		
-		throw new RestClientException("An error occured. Please try again.");
+		throw new RestClientException("An error occurred. Please try again.");
 		
 //		if (response.getStatusCode() != HttpStatus.CREATED && response.getStatusCode() != HttpStatus.OK) {
 //			throw new RestClientException("Status code:" + response.getStatusCode().value());
@@ -169,7 +169,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}		
 	
 		
-		throw new RestClientException("An error occured. Please try again.");		
+		throw new RestClientException("An error occurred. Please try again.");		
 	}
 
 	@Override
@@ -214,7 +214,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 				return; // this is expected
 			}
 			
-			throw new RestClientException("An error occured. Please try again.");
+			throw new RestClientException("An error occurred. Please try again.");
 	}
 
 	@Override
@@ -261,7 +261,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			return; // this is expected
 		}
 		
-		throw new RestClientException("An error occured. Please try again.");
+		throw new RestClientException("An error occurred. Please try again.");
 	}
 
 	/**
@@ -433,6 +433,34 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}		
 	}
 
+	@Override
+	public String getStorageUsage() {
+		// First make sure the service is ready to go.
+		validateService();
+		String storageUsageSummaryListJson = "";
+		// Build up the path
+		String url = urlProvider.getRepositoryServiceUrl() + "/" + ServiceUtils.REPOSVC_STORAGE_SUMMARY;
+		
+		// Setup the header
+		HttpHeaders headers = new HttpHeaders();
+		// If the user data is stored in a cookie, then fetch it and the session token to the header.
+		UserDataProvider.addUserDataToHeader(this.getThreadLocalRequest(), headers);
+		HttpEntity<String> entity = new HttpEntity<String>("", headers);
+		HttpMethod method = HttpMethod.GET;
+		
+		// Make the actual call.
+		ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
+
+		if (response.getStatusCode() == HttpStatus.OK) {
+			storageUsageSummaryListJson = response.getBody();
+		} else {
+			throw new RestClientException("Status code:" + response.getStatusCode().value());
+		}
+		
+		return storageUsageSummaryListJson;
+	}
+
+	
 	@Override
 	public String getPrivateAuthServiceUrl() {
 		return urlProvider.getPrivateAuthBaseUrl();

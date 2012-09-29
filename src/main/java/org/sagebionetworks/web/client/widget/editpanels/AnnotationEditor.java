@@ -216,7 +216,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 			public void onFailure(Throwable caught) {
 				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 				if(operation == PersistOperation.CREATE) {
-					view.showAddAnnotationFail("An error occured creating the new Annotation.");
+					view.showAddAnnotationFail("An error occurred creating the new Annotation.");
 				} else if (operation == PersistOperation.DELETE) {
 					view.showDeleteAnnotationFail();
 				} else {

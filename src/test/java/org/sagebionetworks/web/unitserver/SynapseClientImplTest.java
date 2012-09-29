@@ -4,14 +4,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +33,7 @@ import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -35,6 +44,7 @@ import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
@@ -157,7 +167,14 @@ public class SynapseClientImplTest {
 		bene.setId("syn999");
 		when(mockSynapse.getEntityBenefactor(anyString())).thenReturn(bene);
 		
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN;
+		List<AccessRequirement> accessRequirements= new ArrayList<AccessRequirement>();
+		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
+		accessRequirements.add(accessRequirement);
+		accessRequirement.setEntityType(TermsOfUseAccessRequirement.class.getName());
+		accessRequirement.setEntityIds(Arrays.asList(new String[]{"101"}));
+		
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | 
+		HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
 		int emptyMask = 0;
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(entity);
@@ -165,6 +182,8 @@ public class SynapseClientImplTest {
 		bundle.setPermissions(eup);
 		bundle.setPath(path);
 		bundle.setHasChildren(false);
+		bundle.setAccessRequirements(accessRequirements);
+		bundle.setUnmetAccessRequirements(accessRequirements);
 		when(mockSynapse.getEntityBundle(anyString(),Matchers.eq(mask))).thenReturn(bundle);
 		
 		EntityBundle emptyBundle = new EntityBundle();
@@ -176,7 +195,8 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetEntityBundleAll() throws RestServiceException{
 		// Make sure we can get all parts of the bundel
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN
+		| ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
 		EntityBundleTransport bundle = synapseClient.getEntityBundle(entityId, mask);
 		assertNotNull(bundle);
 		// We should have all of the strings
@@ -185,6 +205,8 @@ public class SynapseClientImplTest {
 		assertNotNull(bundle.getEntityPathJson());
 		assertNotNull(bundle.getPermissionsJson());
 		assertNotNull(bundle.getHasChildren());
+		assertNotNull(bundle.getAccessRequirementsJson());
+		assertNotNull(bundle.getUnmetAccessRequirementsJson());
 	}
 	
 	@Test
@@ -199,6 +221,8 @@ public class SynapseClientImplTest {
 		assertNull(bundle.getEntityPathJson());
 		assertNull(bundle.getPermissionsJson());
 		assertNull(bundle.getHasChildren());
+		assertNull(bundle.getAccessRequirementsJson());
+		assertNull(bundle.getUnmetAccessRequirementsJson());
 	}
 	
 	@Test (expected=IllegalArgumentException.class)

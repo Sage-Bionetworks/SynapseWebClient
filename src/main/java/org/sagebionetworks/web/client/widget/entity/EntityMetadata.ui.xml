@@ -1,0 +1,22 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
+	xmlns:gxt="urn:import:com.extjs.gxt.ui.client.widget">
+  <ui:style>
+    .limited-height {
+	     max-height: 10.5em;
+	     border: 2px inset lightgrey;
+	     margin-left: 38px;
+    }
+  </ui:style>
+
+	<g:HTMLPanel ui:field="panel">
+	 Added by: <span ui:field="createName"></span> on: <span ui:field="createDate"></span><br/>
+	 Modified by: <span ui:field="modifyName"></span> on: <span ui:field="modifyDate"></span><br/>
+	 <g:HTMLPanel ui:field="versions">
+	 Version: <span ui:field="version"></span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
+   <gxt:VerticalPanel ui:field="previousVersions" styleName="{style.limited-height}" visible="false" autoHeight="true" />
+	 </g:HTMLPanel>
+	</g:HTMLPanel>
+</ui:UiBinder>
