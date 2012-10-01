@@ -1042,4 +1042,11 @@ public class DisplayUtils {
 		return html;
 	}
 
+	public static Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
+		Anchor anchor = new Anchor();
+		anchor.setHTML(icon.getHTML());
+		anchor.addClickHandler(clickHandler);
+		return anchor;
+	}
+
 }
