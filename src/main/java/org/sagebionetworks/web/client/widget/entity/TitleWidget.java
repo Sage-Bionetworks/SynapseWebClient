@@ -44,11 +44,11 @@ public class TitleWidget {
 		.appendHtmlConstant("</h2>");
 		lc.add(new HTML(shb.toSafeHtml()));
 
-	    // Metadata
-	    lc.add(createMetadata(bundle.getEntity(), iconsImageBundle));
 	    // the headers for description and property
+
 	    if (restrictionsWidget!=null) lc.add(restrictionsWidget);  
-		if(canEdit && readOnly) {
+
+	    if(canEdit && readOnly) {
 			HTML roContainer = new HTML("<h4 class=\"colored\"> " + DisplayConstants.READ_ONLY + " " +AbstractImagePrototype.create(iconsImageBundle.help16()).getHTML() + "</h4>");
 			roContainer.setWidth("100px");
 
@@ -59,6 +59,8 @@ public class TitleWidget {
 			lc.add(roContainer);
 		}
 
+	    // Metadata
+	    lc.add(createMetadata(bundle.getEntity(), iconsImageBundle));
 
 	    lc.layout();
 	}
@@ -88,13 +90,11 @@ public class TitleWidget {
 			}
 
 			if (!entity.getVersionNumber().equals(entry.getKey())) {
-				StringBuilder target = new StringBuilder("Synapse:");
-				target.append(entity.getId());
-				target.append("/version/");
-				target.append(entry.getKey());
+				String historyTokenNoHash = DisplayUtils.
+				   getSynapseHistoryTokenNoHash(entity.getId(),
+				                                (first ? null : entry.getKey()));
 
-				Hyperlink anchor = new Hyperlink(label.toString(),
-						target.toString());
+				Hyperlink anchor = new Hyperlink(label.toString(), historyTokenNoHash);
 				anchor.setStyleName("link");
 
 				entityMetadata.addToPreviousVersions(anchor);
