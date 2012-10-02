@@ -5,11 +5,9 @@
 	xmlns:gxt="urn:import:com.extjs.gxt.ui.client.widget">
   <ui:style>
     .limited-height {
-	     max-height: 10.5em;
+	     max-height: 12.5em;
 	     min-width: 160px;
-	     border: 2px inset lightgrey;
-	     margin: 0 0 20px 38px;
-	     float:left;
+	     border: 1px solid lightgrey;
 	     overflow-y: auto;
     }
   </ui:style>
