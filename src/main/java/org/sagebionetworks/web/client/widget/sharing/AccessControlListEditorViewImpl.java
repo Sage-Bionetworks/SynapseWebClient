@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.UrlCache;
-import org.sagebionetworks.web.client.ontology.AdapterModelData;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclPrincipal;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -164,7 +163,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			fieldSet.setLayout(layout);
 			
 			// user/group combobox
-			final ComboBox<AdapterModelData> peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl());
+			final ComboBox<ModelData> peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl());
 			peopleCombo.setEmptyText("Enter a user or group name...");
 			peopleCombo.setFieldLabel("User/Group");
 			peopleCombo.setForceSelection(true);
