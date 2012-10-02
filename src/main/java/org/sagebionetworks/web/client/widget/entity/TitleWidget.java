@@ -90,8 +90,10 @@ public class TitleWidget {
 			if (!entity.getVersionNumber().equals(entry.getKey())) {
 				StringBuilder target = new StringBuilder("Synapse:");
 				target.append(entity.getId());
-				target.append("/version/");
-				target.append(entry.getKey());
+				if (!first) {
+					target.append("/version/");
+					target.append(entry.getKey());
+				}
 
 				Hyperlink anchor = new Hyperlink(label.toString(),
 						target.toString());
