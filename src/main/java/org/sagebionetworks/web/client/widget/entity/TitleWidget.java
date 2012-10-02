@@ -69,30 +69,42 @@ public class TitleWidget {
 
 	public void setVersions(Versionable entity, TreeMap<Long, String> latestVersions) {
 		entityMetadata.clearPreviousVersions();
-		if (latestVersions == null || latestVersions.size() < 2) {
+		if (latestVersions == null || latestVersions.size() < 1) {
 			InlineLabel notFound = new InlineLabel(DisplayConstants.ERROR_VERSIONS_NOT_FOUND);
 			entityMetadata.addToPreviousVersions(notFound);
 			return;
 		}
 
+		boolean first = true;
 		for (Entry<Long, String> entry : latestVersions.entrySet()) {
+			StringBuilder label = new StringBuilder();
+			label.append(entry.getValue().toString());
+			label.append(" [");
+			label.append(entry.getKey().toString());
+			label.append("]");
+
+			if (first) {
+				label.append(" (latest)");
+			}
+
 			if (!entity.getVersionNumber().equals(entry.getKey())) {
 				StringBuilder target = new StringBuilder("Synapse:");
 				target.append(entity.getId());
 				target.append("/version/");
 				target.append(entry.getKey());
 
-				StringBuilder label = new StringBuilder();
-				label.append(entry.getValue().toString());
-				label.append(" [");
-				label.append(entry.getKey().toString());
-				label.append("]");
 				Hyperlink anchor = new Hyperlink(label.toString(),
 						target.toString());
 				anchor.setStyleName("link");
 
 				entityMetadata.addToPreviousVersions(anchor);
+			} else {
+				InlineLabel widget = new InlineLabel(label.toString());
+				widget.addStyleName(entityMetadata.getStyle().currentVersion());
+				entityMetadata.addToPreviousVersions(widget);
 			}
+			first = false;
+
 		}
 	}
 

@@ -12,6 +12,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -25,6 +26,14 @@ public class EntityMetadata extends Composite {
 
 	private static EntityMetadataUiBinder uiBinder = GWT
 			.create(EntityMetadataUiBinder.class);
+
+	interface Style extends CssResource {
+		String limitedHeight();
+		String currentVersion();
+	}
+
+	@UiField
+	Style style;
 
 	@UiField
 	HTMLPanel panel;
@@ -101,6 +110,10 @@ public class EntityMetadata extends Composite {
 
 	public void setVersionsVisible(boolean visible) {
 		versions.setVisible(visible);
+	}
+
+	public Style getStyle() {
+		return style;
 	}
 
 }

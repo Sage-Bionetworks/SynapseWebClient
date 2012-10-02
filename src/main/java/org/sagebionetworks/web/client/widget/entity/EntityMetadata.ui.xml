@@ -3,12 +3,17 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:gxt="urn:import:com.extjs.gxt.ui.client.widget">
-  <ui:style>
-    .limited-height {
-	     max-height: 12.5em;
+  <ui:style type='org.sagebionetworks.web.client.widget.entity.EntityMetadata.Style'>
+    .limitedHeight {
+	     max-height: 13.5em;
 	     min-width: 160px;
 	     border: 1px solid lightgrey;
 	     overflow-y: auto;
+    }
+
+    .currentVersion {
+       font-weight: bold;
+       color: #393939;
     }
   </ui:style>
 
@@ -17,7 +22,7 @@
 	 Modified by: <span ui:field="modifyName"></span> on: <span ui:field="modifyDate"></span><br/>
 	 <g:HTMLPanel ui:field="versions">
 	 Version: <span ui:field="version"></span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
-   <gxt:VerticalPanel ui:field="previousVersions" styleName="{style.limited-height}" visible="false" autoHeight="true" />
+   <gxt:VerticalPanel ui:field="previousVersions" styleName="{style.limitedHeight}" visible="false" autoHeight="true" />
 	 </g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder>
