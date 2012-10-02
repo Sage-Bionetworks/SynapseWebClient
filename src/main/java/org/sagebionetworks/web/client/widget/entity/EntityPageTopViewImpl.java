@@ -590,8 +590,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Description</h3>")));
-
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3 style=\"clear: left;\">Description</h3>")));
 
 		// Add the description body
 	    String description = bundle.getEntity().getDescription();
