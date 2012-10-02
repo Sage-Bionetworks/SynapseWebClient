@@ -87,15 +87,11 @@ public class TitleWidget {
 			}
 
 			if (!entity.getVersionNumber().equals(entry.getKey())) {
-				StringBuilder target = new StringBuilder("Synapse:");
-				target.append(entity.getId());
-				if (!first) {
-					target.append("/version/");
-					target.append(entry.getKey());
-				}
+				String historyTokenNoHash = DisplayUtils.
+				   getSynapseHistoryTokenNoHash(entity.getId(),
+				                                (first ? null : entry.getKey()));
 
-				Hyperlink anchor = new Hyperlink(label.toString(),
-						target.toString());
+				Hyperlink anchor = new Hyperlink(label.toString(), historyTokenNoHash);
 				anchor.setStyleName("link");
 
 				entityMetadata.addToPreviousVersions(anchor);
