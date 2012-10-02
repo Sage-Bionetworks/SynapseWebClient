@@ -454,6 +454,23 @@ a.shortBtn {
 	margin-left: 10px;
 }
 
+ol.entity-description { 
+	list-style-type: decimal;
+	padding-left: 17px;
+}
+ul.entity-description { 
+	list-style-type: square;
+	padding-left: 17px;
+}
+strong.entity-description { font-weight: bold; }
+em.entity-description { font-style: italic; }
+a.entity-description, a.entity-description:hover, a.entity-description:visited { color:#BC3226;}
+blockquote.entity-description {
+	margin: 1em 3em;
+	padding: .5em 1em;
+	border-left: 5px solid #fce27c;
+	background-color: #f6ebc1; }
+
 h1, h2, h3, h4, h5, h6 {
 	word-wrap: break-word;
 }

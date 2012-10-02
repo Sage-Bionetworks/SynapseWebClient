@@ -59,6 +59,10 @@
 			<url>https://repository.apache.org/content/repositories/releases/
 			</url>
 		</repository>
+	    <repository>
+	        <id>scala-tools</id>
+	        <url>http://scala-tools.org/repo-releases</url>
+	    </repository>
 	</repositories>
 
 	<pluginRepositories>
@@ -406,7 +410,14 @@
 			<artifactId>oauth</artifactId>
 			<version>20100527</version>
 		</dependency>
-		            
+
+		<!-- Markdown -->
+		<dependency>
+			<groupId>org.markdownj</groupId>
+			<artifactId>markdownj</artifactId>
+			<version>0.3.0-1.0.2b4</version>
+		</dependency>
+				            
 		<!-- Test only dependencies -->
 		<dependency>
 			<groupId>com.sun.grizzly</groupId>

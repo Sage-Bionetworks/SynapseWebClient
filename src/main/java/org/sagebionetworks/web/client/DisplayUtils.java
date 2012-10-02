@@ -62,6 +62,8 @@ import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -1030,5 +1032,45 @@ public class DisplayUtils {
 		return html;
 	}
 
-
+	/**
+	 * adds the given css classname to entities supported by the markdown. also detects Synapse IDs, and creates links out of them
+	 * @param panel
+	 */
+	public static String fixEntityDescriptionHtml(String html, String cssClassName){
+		String[] elementTypes = new String[]{"a", "ol", "ul", "strong", "em", "blockquote"};
+		if (html == null) return "";
+		//first, replace all \n with <br>
+		String retHtml = html.replaceAll("\n", " <br>\n");
+		for (int i = 0; i < elementTypes.length; i++) {
+			String elementTagName = elementTypes[i];
+			retHtml = retHtml.replaceAll("<"+elementTagName, "<"+elementTagName+" class=\""+cssClassName+"\"");
+		}
+		return addSynapseLinks(retHtml);
+	}
+	
+	public static String addSynapseLinks(String html) {
+		//space (zero or one), "syn", a number (one or more times), space (one or more).  search globally, and ignore case 
+		RegExp regExp = RegExp.compile("(\\s?syn\\d+\\s+)", "gi");
+		StringBuilder sb = new StringBuilder();
+		int previousFoundIndex = 0;
+		for (MatchResult result = regExp.exec(html); result != null; result = regExp.exec(html)) {
+		    sb.append(html.substring(previousFoundIndex, result.getIndex()));
+		    sb.append(getSynAnchorHtml(result.getGroup(1)));
+		    previousFoundIndex = result.getIndex() + result.getGroup(1).length();
+		}
+		if (previousFoundIndex < html.length()-1)
+			//substring, go from the previously found index to length-1 (the last character)
+			sb.append(html.substring(previousFoundIndex, html.length()));
+		return sb.toString();
+	}
+	
+	private static String getSynAnchorHtml(String synId){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<a class=\"link\" href=\"#Synapse:");
+	    sb.append(synId.toLowerCase().trim());
+	    sb.append("\">");
+	    sb.append(synId);
+	    sb.append("</a>");
+	    return sb.toString();
+	}
 }

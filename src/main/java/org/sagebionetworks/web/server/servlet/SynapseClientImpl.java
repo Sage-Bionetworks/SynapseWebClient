@@ -59,6 +59,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
+import com.petebevin.markdown.MarkdownProcessor;
 
 @SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -72,6 +73,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
+	MarkdownProcessor markdownProcessor = new MarkdownProcessor();
 	
 	/**
 	 * Injected with Gin
@@ -838,5 +840,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		} 
+	}
+	
+	@Override
+	public String markdown2Html(String markdown) {
+		return markdownProcessor.markdown(markdown);
 	}
 }
