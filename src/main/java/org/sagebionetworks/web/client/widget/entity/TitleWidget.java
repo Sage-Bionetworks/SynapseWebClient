@@ -44,10 +44,7 @@ public class TitleWidget {
 		.appendHtmlConstant("</h2>");
 		lc.add(new HTML(shb.toSafeHtml()));
 
-	    // Metadata
-	    lc.add(createMetadata(bundle.getEntity(), iconsImageBundle));
 	    // the headers for description and property
-
 		if(canEdit && readOnly) {
 			HTML roContainer = new HTML("<h4 class=\"colored\"> " + DisplayConstants.READ_ONLY + " " +AbstractImagePrototype.create(iconsImageBundle.help16()).getHTML() + "</h4>");
 			roContainer.setWidth("100px");
@@ -59,6 +56,8 @@ public class TitleWidget {
 			lc.add(roContainer);
 		}
 
+	    // Metadata
+	    lc.add(createMetadata(bundle.getEntity(), iconsImageBundle));
 
 	    lc.layout();
 	}
