@@ -26,7 +26,7 @@ public class TitleWidget {
 	private LayoutContainer lc;
 	private EntityMetadata entityMetadata;
 
-	public TitleWidget(EntityBundle bundle, String entityTypeDisplay,
+	public TitleWidget(EntityBundle bundle, Widget restrictionsWidget, String entityTypeDisplay,
 			IconsImageBundle iconsImageBundle, boolean canEdit,
 			boolean readOnly, SynapseJSNIUtils synapseJSNIUtils) {
 		lc = new LayoutContainer();
@@ -47,7 +47,7 @@ public class TitleWidget {
 	    // Metadata
 	    lc.add(createMetadata(bundle.getEntity(), iconsImageBundle));
 	    // the headers for description and property
-
+	    if (restrictionsWidget!=null) lc.add(restrictionsWidget);  
 		if(canEdit && readOnly) {
 			HTML roContainer = new HTML("<h4 class=\"colored\"> " + DisplayConstants.READ_ONLY + " " +AbstractImagePrototype.create(iconsImageBundle.help16()).getHTML() + "</h4>");
 			roContainer.setWidth("100px");

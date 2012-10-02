@@ -139,7 +139,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 									@Override
 									public void onFailure(Throwable caught) {
 										view.userUpdateFailed();
-										view.showErrorMessage("An error occured. Please try reloading the page.");
+										view.showErrorMessage("An error occurred. Please try reloading the page.");
 									}
 								});
 							} catch (JSONObjectAdapterException e) {
@@ -179,7 +179,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("An error occured. Please try reloading the page.");					
+				view.showErrorMessage("An error occurred. Please try reloading the page.");					
 			}
 		});
 	}
@@ -227,7 +227,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage("An error occured. Please try reloading the page.");									
+					view.showErrorMessage("An error occurred. Please try reloading the page.");									
 				}
 			});
 		}
@@ -293,7 +293,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if(!requestToken.equals("") && !verifier.equals("")) {
 					updateProfileWithLinkedIn(requestToken, verifier);
 				} else {
-					view.showErrorMessage("An error occured. Please try reloading the page.");
+					view.showErrorMessage("An error occurred. Please try reloading the page.");
 				}
 			}
 			else {

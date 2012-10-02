@@ -108,7 +108,7 @@ public class SimpleSearchService extends HttpServlet {
 				searchResults.writeToJSONObject(adapter);
 				HttpUtils.respondJSONString(response, adapter.toJSONString(), jsonpCallback);				
 			} catch (Exception e) {
-				HttpUtils.respondError(response, "An error occured accessing the simple search service");
+				HttpUtils.respondError(response, "An error occurred accessing the simple search service");
 			}
 		}		
 	}

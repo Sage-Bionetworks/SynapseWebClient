@@ -5,6 +5,8 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
@@ -15,6 +17,8 @@ import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
@@ -70,7 +74,10 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			IconsImageBundle iconsImageBundle, 
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
-			LocationableUploader locationableUploader, MyEntitiesBrowser myEntitiesBrowser, LicensedDownloader licensedDownloader, EntityTypeProvider typeProvider) {
+			LocationableUploader locationableUploader, 
+			MyEntitiesBrowser myEntitiesBrowser, 
+			LicensedDownloader licensedDownloader, 
+			EntityTypeProvider typeProvider) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.locationableUploader = locationableUploader;
@@ -84,12 +91,21 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	}
 
 	@Override
-	public void createMenu(Entity entity, EntityType entityType, boolean isAdministrator,
-			boolean canEdit, boolean readOnly) {
+	public void createMenu(
+			EntityBundle entityBundle, 
+			EntityType entityType, 
+			AuthenticationController authenticationController,
+			boolean isAdministrator,
+			boolean canEdit, 
+			boolean readOnly) {
 		this.readOnly = readOnly;
-		
+		Entity entity = entityBundle.getEntity();
+
+		UserSessionData sessionData = authenticationController.getLoggedInUser();
+		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
+
 		if(downloadButton == null){
-			downloadButton = licensedDownloader.asWidget(entity);
+			downloadButton = licensedDownloader.asWidget(entityBundle, userProfile);
 			downloadButton.setHeight("25px");
 			add(downloadButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));	
@@ -103,7 +119,15 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				dlButton.disable(); 
 		}
 		// Configure the button
-		licensedDownloader.configureHeadless(entity);
+		licensedDownloader.configureHeadless(entityBundle, userProfile);
+		// this allows the menu to respond to the user signing a Terms of Use agreement in the licensed downloader
+		licensedDownloader.clearHandlers();
+		licensedDownloader.addEntityUpdatedHandler(new EntityUpdatedHandler() {			
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		});
 
 
 		// edit button
@@ -147,7 +171,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			toolsButton.setHeight(25);
 			this.add(toolsButton);	
 		}							
-		configureToolsMenu(entity, entityType, isAdministrator, canEdit);
+		configureToolsMenu(entityBundle, entityType, isAdministrator, canEdit);
 	}
 	
 	@Override
@@ -257,7 +281,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		return item;
 	}
 	
-	private void configureToolsMenu(Entity entity, EntityType entityType, boolean isAdministrator, boolean canEdit) {
+	private void configureToolsMenu(EntityBundle entityBundle, EntityType entityType, boolean isAdministrator, boolean canEdit) {
 		toolsButton.enable();
 		
 		boolean authenticated = presenter.isUserLoggedIn();
@@ -268,9 +292,11 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		// create drop down menu
 		Menu menu = new Menu();		
 		
+		Entity entity = entityBundle.getEntity();
+		
 		// upload
 		if(canEdit) {
-			addUploadItem(menu, entity, entityType);
+			addUploadItem(menu, entityBundle, entityType);
 		}
 		// create link
 		if(authenticated) {
@@ -298,11 +324,12 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	 * @param entity 
 	 * @param entityType 
 	 */
-	private void addUploadItem(Menu menu, final Entity entity, EntityType entityType) {
-		if(entity instanceof Locationable) {
+	private void addUploadItem(Menu menu, final EntityBundle entityBundle, EntityType entityType) {
+		if(entityBundle.getEntity() instanceof Locationable) {
 			MenuItem item = new MenuItem(DisplayConstants.TEXT_UPLOAD_FILE);
 			item.setIcon(AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 			final Window window = new Window();  
+			locationableUploader.clearHandlers();
 			locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
 				@Override
 				public void onPersistSuccess(EntityUpdatedEvent event) {
@@ -320,13 +347,13 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				@Override
 				public void componentSelected(MenuEvent ce) {
 					window.removeAll();
-					window.setSize(400, 170);
+					window.setSize(400, 320);
 					window.setPlain(true);
 					window.setModal(true);		
 					window.setBlinkModal(true);
 					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
 					window.setLayout(new FitLayout());			
-					window.add(locationableUploader.asWidget(entity, true), new MarginData(5));
+					window.add(locationableUploader.asWidget(entityBundle), new MarginData(5));
 					window.show();
 				}
 			});			

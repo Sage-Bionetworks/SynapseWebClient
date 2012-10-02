@@ -134,15 +134,15 @@ public class DisplayConstants {
 	public static final String LABEL_SEARCHING = "Searching...";
 	public static final String LABEL_FOUND_FORWARDING = "Found. Forwarding now.";
 	public static final String LABEL_ENTITY_NOT_FOUND = "Sorry, that Synapse Id could not be located.";
-	public static final String ERROR_GETTING_PERMISSIONS_TEXT = "READ ONLY MODE. Reason: An error occured in retrieving your level of access.";
+	public static final String ERROR_GETTING_PERMISSIONS_TEXT = "READ ONLY MODE. Reason: An error occurred in retrieving your level of access.";
 	public static final String ERROR_FAILED_PERSIST_AGREEMENT_TEXT = "Your license acceptance was not saved. You will need to sign it again in the future.";	
 	public static final String ERROR_USER_ALREADY_EXISTS = "There was a problem creating your account: The email address provided is already in use. If you have forgotten your password, please use the \"Forgot Password\" button from the login page.";
-	public static final String ERROR_UNABLE_TO_LOAD = "An error occured trying to load.";
-	public static final String ERROR_GENERIC = "An error occured. Please try again.";
+	public static final String ERROR_UNABLE_TO_LOAD = "An error occurred trying to load.";
+	public static final String ERROR_GENERIC = "An error occurred. Please try again.";
 	public static final String ERROR_INCOMPATIBLE_CLIENT_VERSION = "Your client version is incompatible with the repository. Please try reloading the page.";
-	public static final String ERROR_GENERIC_RELOAD = "An error occured. Please try reloading the page.";
+	public static final String ERROR_GENERIC_RELOAD = "An error occurred. Please try reloading the page.";
 	public static final String ERROR_SAVE_MESSAGE = "An error occuring attempting to save. Please try again.";
-	public static final String ERROR_BAD_REQUEST_MESSAGE = "An unknown communication error occured. Please reload the page.";
+	public static final String ERROR_BAD_REQUEST_MESSAGE = "An unknown communication error occurred. Please reload the page.";
 	public static final String ERROR_DUPLICATE_ENTITY_MESSAGE = "An entity with this name already exists. Please enter a different name.";
 	public static final String ERROR_INVALID_ENTITY_NAME = "Name contains contains an invalid character";
 	public static final String ERROR_TITLE_LOGIN_REQUIRED = "Login Required";
@@ -269,6 +269,8 @@ public class DisplayConstants {
 	public static final String READ_ONLY = "READ ONLY";	
 	public static final String SHOW_LIST_EDITOR = "Show List Editor";
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
+	public static final String FLAG = "flag";
+	public static final String FLAG_TOOL_TIP = "Flag this data object for review by ACT";
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
 	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
@@ -304,5 +306,54 @@ public class DisplayConstants {
 	public static final String ID_BTN_SHARE = "id_btn_share";
 	public static final String ID_BTN_ADD = "id_btn_add";
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
+
+	// constants used in GovernanceDialogHelper	
+	public static final String OPEN = "Open";
+	public static final String RESTRICTED = "Restricted";
+	public static final String CONTROLLED = "Controlled";
+	public static final String MODIFY = "modify";
+	public static final String INFO = "info";
+	public static final String GAIN_ACCESS = "gain access";
+	public static final String FLAG_DIALOG_PREFIX = 
+		"If you think this data is posted inappropriately or should have different access conditions, please ";
+	public static final String FLAG_DIALOG_ANONYMOUS_SUFFIX = "<span class=\"strong\">log in</span> to alert the Synapse Access and Compliance Team (ACT).";
+	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX = "alert the Synapse Access and Compliance Team (ACT) by clicking below.";
+	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_1 = "alert the Synapse Access and Compliance Team (ACT) by clicking <a href=\"";
+	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2 = "\" target=\"_blank\" class=\"link\">here</a>.";
+	public static final String BUTTON_TEXT_FLAG_DATA = "Flag Data";
+	public static final String BUTTON_TEXT_RESTRICT_DATA = "Add Restrictions";
+	public static final String BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT = "Request Access";
+	public static final String BUTTON_TEXT_ACCEPT_TERMS_OF_USE = "Accept Terms of Use";
+	public static final String BUTTON_TEXT_LOGIN = "Login";
+	public static final String FLAG_DIALOG_TITLE = "Flag Data";
+	public static String UNRESTRICTED_DATA_DIALOG_TITLE = "Unrestricted Data";
+	public static String RESTRICTED_DATA_DIALOG_TITLE = "Restricted Data";
+	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to this data is restricted.";
+	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
+	
+	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
+	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
+	public static String GOVERNANCE_REFERENCE = "For more information on data access conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
+	
+	public static String ADMIN_GOVERNANCE_REFERENCE = "You are responsible to ensure your data is shared in compliance with the "+
+	SYNAPSE_GUIDELINES_LINK+" and all applicable laws. ";
+	public static String RESTRICTION_DIALOG_TEXT_3 = "To add data restrictions, contact the Access and Compliance Team (ACT), by clicking below.</p>";
+	public static String RESTRICTION_DIALOG_TEXT_4 = "<p class=\"strong\">NOTE:  If you continue, data access to all registered Synapse users will be temporarily restricted pending review by the ACT.</p>";
+	
+	public static final String TOU_RESTRICTION_HEADER = "In order to access this data you must be a registered Synapse user and agree to the following terms:";
+	public static final String TOU_PROMPT = "Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:";
+	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
+	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to this data under the following terms:</p>";
+	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
+	public static final String FILE_DOWNLOAD_NOTE = 
+		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
+		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
+		"without restrictions select \"Open\", below.  Otherwise select \"Restricted / Controlled\".";
+
+	public static final String EXTERNAL_LINK_NOTE = 
+		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
+		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
+		"without restrictions select \"save unrestricted\", below.  Otherwise select \"save restricted\".";
+
 }
 
