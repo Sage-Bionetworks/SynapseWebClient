@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -375,19 +376,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	/*
 	 * Private methods
 	 */
-	private EntityGroupRecordDisplay getUnauthDisplay() {
+	private EntityGroupRecordDisplay getEmptyDisplay() {
 		return new EntityGroupRecordDisplay(
 				"",
-				SafeHtmlUtils.fromSafeConstant(DisplayConstants.TITLE_UNAUTHORIZED),
-				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
-	}
-
-	private EntityGroupRecordDisplay getNotFoundDisplay(String id, Long version) {
-		String msg = "Not Found: " + id;
-		if(version != null) msg += ", Version " + version;
-		return new EntityGroupRecordDisplay(
-				null,
-				SafeHtmlUtils.fromSafeConstant(msg),
+				SafeHtmlUtils.EMPTY_SAFE_HTML,
 				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
 	}
 
@@ -527,16 +519,17 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				EntityGroupRecordDisplay errorDisplay = null;
-				if(caught instanceof UnauthorizedException) {
-					errorDisplay = getUnauthDisplay();
-					errorDisplay.setEntityId(ref.getTargetId());
+				EntityGroupRecordDisplay errorDisplay = getEmptyDisplay();
+				errorDisplay.setEntityId(ref.getTargetId());
+				errorDisplay.setVersion(SafeHtmlUtils.fromSafeConstant(ref.getTargetVersionNumber().toString()));
+				String msg = ref.getTargetId();
+				if(ref.getTargetVersionNumber() != null) msg += ", Version " + ref.getTargetVersionNumber();
+				if(caught instanceof UnauthorizedException || caught instanceof ForbiddenException) {
+					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.TITLE_UNAUTHORIZED + ": " + msg));
 				} else if (caught instanceof NotFoundException) {
-					errorDisplay = getNotFoundDisplay(ref.getTargetId(), ref.getTargetVersionNumber());
-					errorDisplay.setEntityId(ref.getTargetId());
+					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.NOT_FOUND + ": " + msg));
 				} else {
-					errorDisplay = getGenericErrorDisplay(ref.getTargetId(), ref.getTargetVersionNumber());
-					errorDisplay.setEntityId(ref.getTargetId());
+					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.ERROR_LOADING + ": " + msg));
 				}
 				view.setEntityGroupRecordDisplay(groupIndex, rowIndex, errorDisplay);
 			}
