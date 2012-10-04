@@ -274,6 +274,8 @@ public class DisplayConstants {
 	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
 	public static final String SHOW_VERSIONS = "show all versions";
 	public static final String HIDE_VERSIONS = "hide all versions";
+	public static final String NOT_FOUND = "Not Found";
+	public static final String ERROR_LOADING = "Error Loading";
 
 	/*
 	 * Element ids for Selenium
