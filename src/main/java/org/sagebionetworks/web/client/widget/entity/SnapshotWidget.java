@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityGroup;
+import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Summary;
-import org.sagebionetworks.repo.model.EntityGroup;
-import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
@@ -376,9 +377,27 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	 */
 	private EntityGroupRecordDisplay getUnauthDisplay() {
 		return new EntityGroupRecordDisplay(
-				null,
+				"",
 				SafeHtmlUtils.fromSafeConstant(DisplayConstants.TITLE_UNAUTHORIZED),
-				null, null, null, null, null, null, null);
+				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
+	}
+
+	private EntityGroupRecordDisplay getNotFoundDisplay(String id, Long version) {
+		String msg = "Not Found: " + id;
+		if(version != null) msg += ", Version " + version;
+		return new EntityGroupRecordDisplay(
+				null,
+				SafeHtmlUtils.fromSafeConstant(msg),
+				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
+	}
+
+	private EntityGroupRecordDisplay getGenericErrorDisplay(String id, Long version) {
+		String msg = "Error Loading: " + id;
+		if(version != null) msg += ", Version " + version;
+		return new EntityGroupRecordDisplay(
+				null,
+				SafeHtmlUtils.fromSafeConstant(msg),
+				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
 	}
 
 	private void updateSnapshot(final AsyncCallback<String> callback) {
@@ -508,13 +527,18 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 
 			@Override
 			public void onFailure(Throwable caught) {
+				EntityGroupRecordDisplay errorDisplay = null;
 				if(caught instanceof UnauthorizedException) {
-				EntityGroupRecordDisplay unauthDisplay = getUnauthDisplay();
-				unauthDisplay.setEntityId(ref.getTargetId());
-				view.setEntityGroupRecordDisplay(groupIndex, rowIndex, unauthDisplay);
+					errorDisplay = getUnauthDisplay();
+					errorDisplay.setEntityId(ref.getTargetId());
+				} else if (caught instanceof NotFoundException) {
+					errorDisplay = getNotFoundDisplay(ref.getTargetId(), ref.getTargetVersionNumber());
+					errorDisplay.setEntityId(ref.getTargetId());
 				} else {
-					view.showErrorMessage(DisplayConstants.ERROR_FAILED_PERSIST);					
+					errorDisplay = getGenericErrorDisplay(ref.getTargetId(), ref.getTargetVersionNumber());
+					errorDisplay.setEntityId(ref.getTargetId());
 				}
+				view.setEntityGroupRecordDisplay(groupIndex, rowIndex, errorDisplay);
 			}
 		};
 		if(ref.getTargetVersionNumber() != null) {
