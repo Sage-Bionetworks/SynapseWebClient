@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.SelectAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.VisualAttachmentsListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -51,6 +52,7 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -223,7 +225,7 @@ public class EntityPropertyForm extends FormPanel {
 		// Name is the first
 		formPanel.add(nameField, basicFormData);
 		// followed by description.
-		FormData descriptionData = new FormData("-20 120%");
+		FormData descriptionData = new FormData("-20 85%");
         descriptionData.setMargins(margins);
 		formPanel.add(descriptionField, descriptionData);
 		final Anchor formatLink = new Anchor(DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
@@ -254,7 +256,7 @@ public class EntityPropertyForm extends FormPanel {
 		//and now the description toolbar
 		Button previewButton = new Button(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT);
 		Button addImageButton = new Button(DisplayConstants.ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT);
-		addImageButton.setEnabled(attachments.size() > 0);
+		addImageButton.setEnabled(attachments != null && VisualAttachmentsListViewImpl.getVisualAttachments(attachments).size() > 0);
 		
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setTableWidth("150px");
@@ -348,10 +350,12 @@ public class EntityPropertyForm extends FormPanel {
 	    	    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>"));
 	    		}
 	    		else{
-	    			panel = new HTMLPanel("<div style=\"margin: 20px\">" + DisplayUtils.fixEntityDescriptionHtml(result, DisplayConstants.ENTITY_DESCRIPTION_CSS_CLASSNAME) + "</div>");
+	    			panel = new HTMLPanel(DisplayUtils.postProcessEntityDescriptionHtml(result, DisplayConstants.ENTITY_DESCRIPTION_CSS_CLASSNAME));
 	    		}
-	    		
-	    		window.add(new ScrollPanel(panel));
+	    		FlowPanel f = new FlowPanel();
+	    		f.setStyleName("entity-description-preview-wrapper");
+	    		f.add(panel);
+	    		window.add(new ScrollPanel(f));
 				window.show();
 			}
 			@Override

@@ -1052,19 +1052,18 @@ public class DisplayUtils {
 	}
 
 	/**
-	 * adds the given css classname to entities supported by the markdown. also detects Synapse IDs, and creates links out of them
+	 * During the rendering process, the markdown is converted to html, then postprocessed.  This is the postprocessing step.
+	 * It adds the given css classname to entities supported by the markdown. also detects Synapse IDs, and creates links out of them
 	 * @param panel
 	 */
-	public static String fixEntityDescriptionHtml(String html, String cssClassName){
+	public static String postProcessEntityDescriptionHtml(String html, String cssClassName){
 		String[] elementTypes = new String[]{"a", "ol", "ul", "strong", "em", "blockquote"};
 		if (html == null) return "";
-		//first, replace all \n with <br>
-		String retHtml = html.replaceAll("\n", " <br>\n");
 		for (int i = 0; i < elementTypes.length; i++) {
 			String elementTagName = elementTypes[i];
-			retHtml = retHtml.replaceAll("<"+elementTagName, "<"+elementTagName+" class=\""+cssClassName+"\"");
+			html = html.replaceAll("<"+elementTagName, "<"+elementTagName+" class=\""+cssClassName+"\"");
 		}
-		return addSynapseLinks(retHtml);
+		return addSynapseLinks(html);
 	}
 	
 	public static String addSynapseLinks(String html) {

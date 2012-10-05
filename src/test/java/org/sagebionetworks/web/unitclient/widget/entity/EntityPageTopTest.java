@@ -12,12 +12,14 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
@@ -28,31 +30,37 @@ public class EntityPageTopTest {
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
+	GlobalApplicationState mockGlobalApplicationState;
 	EntityPageTopView mockView;
 	EntitySchemaCache mockSchemaCache;
 	JSONObjectAdapter mockJsonObjectAdapter;
 	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	EventBus mockEventBus;
+	JiraURLHelper mockJiraURLHelper;
 	
 	EntityPageTop pageTop;
 	@Before
 	public void before() throws JSONObjectAdapterException{
-		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
+		mockAuthenticationController = mock(AuthenticationController.class);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
+		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityPageTopView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
 		mockJsonObjectAdapter = mock(JSONObjectAdapter.class);
 		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockEventBus = mock(EventBus.class);
+		mockJiraURLHelper = mock(JiraURLHelper.class);
 		pageTop = new EntityPageTop(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController,
-			mockSchemaCache,
-			mockJsonObjectAdapter,
-			mockEntityTypeProvider,
-			mockIconsImageBundle,
-			mockEventBus);
+				mockGlobalApplicationState,
+				mockSchemaCache,
+				mockJsonObjectAdapter,
+				mockEntityTypeProvider,
+				mockIconsImageBundle,
+				mockJiraURLHelper,
+				mockEventBus);
 	}
 		
 	@Test

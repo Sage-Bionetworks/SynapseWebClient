@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -51,6 +52,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
+	private GlobalApplicationState globalApplicationState;
 	private EntitySchemaCache schemaCache;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityTypeProvider entityTypeProvider;
@@ -66,6 +68,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState,
 			EntitySchemaCache schemaCache,
 			JSONObjectAdapter jsonObjectAdapter,
 			EntityTypeProvider entityTypeProvider,
@@ -76,6 +79,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
+		this.globalApplicationState = globalApplicationState;
 		this.schemaCache = schemaCache;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.entityTypeProvider = entityTypeProvider;

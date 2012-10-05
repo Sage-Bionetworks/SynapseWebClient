@@ -84,16 +84,8 @@ public class VisualAttachmentsListViewImpl extends LayoutContainer implements Vi
 	public void configure(String baseUrl, String entityId,
 			List<AttachmentData> attachments) {		
 		gridStore.removeAll();
-		List<AttachmentData> visualAttachments = new ArrayList<AttachmentData>();
-		for (Iterator iterator = attachments.iterator(); iterator
-				.hasNext();) {
-			AttachmentData data = (AttachmentData) iterator.next();
-			// Ignore all attachments without a preview.
-			if(data.getPreviewId() != null) 
-				visualAttachments.add(data);
-			
-		}
-		if(visualAttachments == null){
+		List<AttachmentData> visualAttachments = getVisualAttachments(attachments);
+		if(visualAttachments == null || visualAttachments.size() == 0){
 			addNoAttachmentRow();
 		} else {
 			populateStore(baseUrl, entityId, visualAttachments);			
@@ -103,14 +95,24 @@ public class VisualAttachmentsListViewImpl extends LayoutContainer implements Vi
 			grid.reconfigure(gridStore, columnModel);
 		this.layout(true);		
 	}
-
+	public static List<AttachmentData> getVisualAttachments(List<AttachmentData> attachments){
+		List<AttachmentData> visualAttachments = new ArrayList<AttachmentData>();
+		for (Iterator iterator = attachments.iterator(); iterator
+				.hasNext();) {
+			AttachmentData data = (AttachmentData) iterator.next();
+			// Ignore all attachments without a preview.
+			if(data.getPreviewId() != null) 
+				visualAttachments.add(data);
+		}
+		return visualAttachments;
+	}
+	
 	private void addNoAttachmentRow() {
 		BaseModelData model = new BaseModelData();
 		model.set(ATTACHMENT_DATA_NAME_KEY, DisplayConstants.TEXT_NO_ATTACHMENTS);
 		model.set(TOOLTIP_TEXT_KEY, null);
 		gridStore.add(model);		
 	}
-
 	
 	private void populateStore(String baseUrl, String entityId,
 			List<AttachmentData> attachments) {		

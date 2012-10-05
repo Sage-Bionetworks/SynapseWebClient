@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -600,7 +599,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
     		presenter.getHtmlFromMarkdown(description, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
-					HTMLPanel panel = new HTMLPanel(DisplayUtils.fixEntityDescriptionHtml(result, DisplayConstants.ENTITY_DESCRIPTION_CSS_CLASSNAME));
+					HTMLPanel panel = new HTMLPanel(DisplayUtils.postProcessEntityDescriptionHtml(result, DisplayConstants.ENTITY_DESCRIPTION_CSS_CLASSNAME));
 					lc.add(panel);
 					lc.layout();
 				}
