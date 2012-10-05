@@ -9,6 +9,7 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -154,5 +155,10 @@ public interface SynapseClient extends RemoteService {
 			throws RestServiceException;
 	
 	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl) throws RestServiceException;
-	
+	/**
+	 * convenience method for converting markdown to html
+	 * @param markdown
+	 * @return
+	 */
+	public String markdown2Html(String markdown);
 }

@@ -22,9 +22,9 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	
+
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly);
-	
+
 	/**
 	 * Sets the RStudio URL for the view
 	 * @param rStudioUrl
@@ -49,7 +49,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		String createEntityLink(String id, String version, String display);
 
 		ImageResource getIconForType(String typeString);
-		
+				
 		boolean isAnonymous();
 		
 		/**
@@ -82,6 +82,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 
 		Callback getLoginCallback();
 
+		void getHtmlFromMarkdown(String description, AsyncCallback<String> asyncCallback);
 	}
 
 	public void setEntityVersions(Versionable entity, TreeMap<Long, String> latestVersions);

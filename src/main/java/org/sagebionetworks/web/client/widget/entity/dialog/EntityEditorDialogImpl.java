@@ -1,12 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
+import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 import org.sagebionetworks.web.client.widget.entity.FormFieldFactory;
 
@@ -29,12 +32,13 @@ public class EntityEditorDialogImpl implements EntityEditorDialog{
 	
 	FormFieldFactory formFactory;
 	IconsImageBundle icons;
-	
+	private SynapseClientAsync synapseClient;
 
 	@Inject
-	public EntityEditorDialogImpl(FormFieldFactory formFactory, IconsImageBundle icons){
+	public EntityEditorDialogImpl(FormFieldFactory formFactory, IconsImageBundle icons, SynapseClientAsync synapseClient){
 		this.formFactory = formFactory;
 		this.icons = icons;
+		this.synapseClient = synapseClient;
 	}
 
 	/**
@@ -43,7 +47,7 @@ public class EntityEditorDialogImpl implements EntityEditorDialog{
 	 * @param annos
 	 * @param callback
 	 */
-	public void showEditEntityDialog(final String windowTitle, final JSONObjectAdapter newAdapter,
+	public void showEditEntityDialog(final String windowTitle, final String entityId, final List<AttachmentData> attachments, final JSONObjectAdapter newAdapter,
 			ObjectSchema schema, final Annotations newAnnos, Set<String> filter, final Callback callback){
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
@@ -59,8 +63,8 @@ public class EntityEditorDialogImpl implements EntityEditorDialog{
 	    window.setHideOnButtonClick(true);
 	    
 	    // Create the property from
-	    EntityPropertyForm editor = new EntityPropertyForm(formFactory, icons);
-	    editor.setDataCopies(newAdapter, schema, newAnnos, filter);
+	    EntityPropertyForm editor = new EntityPropertyForm(formFactory, icons, synapseClient);
+	    editor.setDataCopies(newAdapter, schema, newAnnos, filter, entityId, attachments);
 	    window.add(editor, new FitData(0));
 	    // List for the button selection
 	    Button saveButton = window.getButtonById(Dialog.OK);	    

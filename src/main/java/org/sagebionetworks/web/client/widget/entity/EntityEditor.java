@@ -80,9 +80,9 @@ public class EntityEditor {
 		title.append("Edit ");
 	    }
 	    title.append(DisplayUtils.getEntityTypeDisplay(schema));
-
+	    
 	    // Show the edit dialog.
-	    editorDialog.showEditEntityDialog(title.toString(), newAdapter, schema, newAnnos, filter, new EntityEditorDialog.Callback(){
+	    editorDialog.showEditEntityDialog(title.toString(), entity.getId(), entity.getAttachments(), newAdapter, schema, newAnnos, filter, new EntityEditorDialog.Callback(){
 
 			@Override
 			public void saveEntity(JSONObjectAdapter newAdapter, Annotations newAnnos) {

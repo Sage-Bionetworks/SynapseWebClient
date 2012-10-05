@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -28,7 +27,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -50,11 +48,9 @@ import com.google.inject.Inject;
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter  {
 
 	private EntityPageTopView view;
-	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
-	private GlobalApplicationState globalApplicationState;
 	private EntitySchemaCache schemaCache;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityTypeProvider entityTypeProvider;
@@ -66,11 +62,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EventBus bus;
 	private JiraURLHelper jiraURLHelper;
 	@Inject
-	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service,
+	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
 			EntitySchemaCache schemaCache,
 			JSONObjectAdapter jsonObjectAdapter,
 			EntityTypeProvider entityTypeProvider,
@@ -78,11 +73,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			JiraURLHelper jiraURLHelper,
 			EventBus bus) {
 		this.view = view;
-		this.nodeService = service;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
 		this.schemaCache = schemaCache;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.entityTypeProvider = entityTypeProvider;
@@ -189,6 +182,20 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		}
 	}
 
+	@Override
+	public void getHtmlFromMarkdown(String markdown, final AsyncCallback<String> asyncCallback) {
+		synapseClient.markdown2Html(markdown, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				asyncCallback.onSuccess(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				asyncCallback.onFailure(caught);
+			}
+		});
+	}
+	
 	/*
 	 * Private Methods
 	 */
