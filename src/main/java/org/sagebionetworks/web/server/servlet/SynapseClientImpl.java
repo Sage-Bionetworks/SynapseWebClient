@@ -312,14 +312,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				}
 				ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
 			}
-			if ((EntityBundleTransport.USERS & partsMask) > 0) {
-				PaginatedResults<UserProfile> u = eb.getUsers();
-				ebt.setUsersJson(EntityFactory.createJSONStringForEntity(u));
-			}
-			if ((EntityBundleTransport.GROUPS & partsMask) > 0) {
-				PaginatedResults<UserGroup> g = eb.getGroups();
-				ebt.setGroupsJson(EntityFactory.createJSONStringForEntity(g));
-			}
 			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask)!=0) {
 				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
 			}
