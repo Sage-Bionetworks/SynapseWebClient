@@ -39,6 +39,7 @@ import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.resources.client.ImageResource;
@@ -187,8 +188,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public void getHtmlFromMarkdown(String markdown, final AsyncCallback<String> asyncCallback) {
-		synapseClient.markdown2Html(markdown, new AsyncCallback<String>() {
+	public void getHtmlFromMarkdown(String markdown, String attachmentBaseUrl, final AsyncCallback<String> asyncCallback) {
+		synapseClient.markdown2Html(markdown, attachmentBaseUrl, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				asyncCallback.onSuccess(result);

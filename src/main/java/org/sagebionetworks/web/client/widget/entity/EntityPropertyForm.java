@@ -259,7 +259,7 @@ public class EntityPropertyForm extends FormPanel {
 		addImageButton.setEnabled(attachments != null && VisualAttachmentsListViewImpl.getVisualAttachments(attachments).size() > 0);
 		
 		HorizontalPanel hp = new HorizontalPanel();
-		hp.setTableWidth("150px");
+		hp.setTableWidth("180px");
 		hp.add(previewButton);
 		hp.add(addImageButton);
 		
@@ -286,19 +286,27 @@ public class EntityPropertyForm extends FormPanel {
 						StringBuilder sb = new StringBuilder();
 						sb.append("![");
 						sb.append(safeName.asString());
+						//put in everything we need in the url
 						sb.append("](");
-						sb.append(DisplayUtils.createAttachmentUrl(baseURl, entityId, data.getPreviewId(), null));
+						sb.append(DisplayConstants.ENTITY_DESCRIPTION_ATTACHMENT_PREFIX);
+						sb.append(entityId);
+						sb.append("/tokenId/");
+						sb.append(data.getTokenId());
+						sb.append("/previewTokenId/");
+						sb.append(data.getPreviewId());
 						sb.append(" \"");
 						sb.append(safeName.asString());
 						sb.append("\")");
 						TextArea descriptionTextArea = (TextArea)descriptionField;
 						String currentValue = descriptionTextArea.getValue();
+						if (currentValue == null)
+							currentValue = "";
 						int cursorPos = descriptionTextArea.getCursorPos();
 						if (cursorPos < 0)
 							cursorPos = 0;
 						else if (cursorPos > currentValue.length())
 							cursorPos = currentValue.length();
-						descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + sb.toString() + currentValue.substring(cursorPos, currentValue.length()));
+						descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + sb.toString() + currentValue.substring(cursorPos));
 					}
 				});
 					
@@ -342,7 +350,8 @@ public class EntityPropertyForm extends FormPanel {
 	    window.setHideOnButtonClick(true);
 	    
 	    //get the html for the markdown
-	    synapseClient.markdown2Html(descriptionMarkdown, new AsyncCallback<String>() {
+	    String baseUrl = GWT.getModuleBaseURL()+"attachment";
+	    synapseClient.markdown2Html(descriptionMarkdown, baseUrl, new AsyncCallback<String>() {
 	    	@Override
 			public void onSuccess(String result) {
 	    		HTMLPanel panel;
@@ -350,7 +359,8 @@ public class EntityPropertyForm extends FormPanel {
 	    	    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>"));
 	    		}
 	    		else{
-	    			panel = new HTMLPanel(DisplayUtils.postProcessEntityDescriptionHtml(result, DisplayConstants.ENTITY_DESCRIPTION_CSS_CLASSNAME));
+	    			
+	    			panel = new HTMLPanel(result);
 	    		}
 	    		FlowPanel f = new FlowPanel();
 	    		f.setStyleName("entity-description-preview-wrapper");

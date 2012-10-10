@@ -82,7 +82,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 
 		Callback getLoginCallback();
 
-		void getHtmlFromMarkdown(String description, AsyncCallback<String> asyncCallback);
+		void getHtmlFromMarkdown(String description, String attachmentBaseUrl, AsyncCallback<String> asyncCallback);
 	}
 
 	public void setEntityVersions(Versionable entity, TreeMap<Long, String> latestVersions);

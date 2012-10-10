@@ -55,6 +55,7 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -1049,46 +1050,5 @@ public class DisplayUtils {
 		anchor.setHTML(icon.getHTML());
 		anchor.addClickHandler(clickHandler);
 		return anchor;
-	}
-
-	/**
-	 * During the rendering process, the markdown is converted to html, then postprocessed.  This is the postprocessing step.
-	 * It adds the given css classname to entities supported by the markdown. also detects Synapse IDs, and creates links out of them
-	 * @param panel
-	 */
-	public static String postProcessEntityDescriptionHtml(String html, String cssClassName){
-		String[] elementTypes = new String[]{"a", "ol", "ul", "strong", "em", "blockquote"};
-		if (html == null) return "";
-		for (int i = 0; i < elementTypes.length; i++) {
-			String elementTagName = elementTypes[i];
-			html = html.replaceAll("<"+elementTagName, "<"+elementTagName+" class=\""+cssClassName+"\"");
-		}
-		return addSynapseLinks(html);
-	}
-	
-	public static String addSynapseLinks(String html) {
-		//space (zero or one), "syn", a number (one or more times), space (one or more).  search globally, and ignore case 
-		RegExp regExp = RegExp.compile("(\\s?syn\\d+\\s+)", "gi");
-		StringBuilder sb = new StringBuilder();
-		int previousFoundIndex = 0;
-		for (MatchResult result = regExp.exec(html); result != null; result = regExp.exec(html)) {
-		    sb.append(html.substring(previousFoundIndex, result.getIndex()));
-		    sb.append(getSynAnchorHtml(result.getGroup(1)));
-		    previousFoundIndex = result.getIndex() + result.getGroup(1).length();
-		}
-		if (previousFoundIndex < html.length()-1)
-			//substring, go from the previously found index to length-1 (the last character)
-			sb.append(html.substring(previousFoundIndex, html.length()));
-		return sb.toString();
-	}
-	
-	private static String getSynAnchorHtml(String synId){
-		StringBuilder sb = new StringBuilder();
-		sb.append("<a class=\"link\" href=\"#Synapse:");
-	    sb.append(synId.toLowerCase().trim());
-	    sb.append("\">");
-	    sb.append(synId);
-	    sb.append("</a>");
-	    return sb.toString();
 	}
 }

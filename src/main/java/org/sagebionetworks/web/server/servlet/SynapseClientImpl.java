@@ -7,14 +7,21 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attribute;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -48,6 +55,8 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
@@ -868,7 +877,84 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String markdown2Html(String markdown) {
-		return markdownProcessor.markdown(markdown);
+	public String markdown2Html(String markdown, String attachmentUrl) {
+		String html = markdownProcessor.markdown(markdown);
+		return processMarkdownHtml(html, attachmentUrl);
 	}
+	
+	/**
+	 * This adds the given css classname to entities supported by the markdown, detects Synapse IDs (and creates links out of them), 
+	 * @param panel
+	 */
+	public static String processMarkdownHtml(String html, String attachmentUrl) {
+		if (html == null) return "";
+		
+		//using jsoup, since it's already in this project!
+		Document doc = Jsoup.parse(html);
+		applyCssClass(doc, DisplayConstants.MARKDOWN_CSS_CLASSNAME);
+		resolveAttachmentImages(doc, attachmentUrl);
+//		addSynapseLinks(doc);
+		return doc.html();
+	}
+	
+	public static void applyCssClass(Document doc, String cssClass) {
+		String[] elementTypes = new String[]{"a", "ol", "ul", "strong", "em", "blockquote"};
+		for (int i = 0; i < elementTypes.length; i++) {
+			String elementTagName = elementTypes[i];
+			Elements elements = doc.getElementsByTag(elementTagName);
+			elements.addClass(cssClass);
+		}
+	}
+	
+	public static void resolveAttachmentImages(Document doc, String attachmentUrl) {
+		Elements images = doc.select("img");
+		for (Iterator iterator = images.iterator(); iterator.hasNext();) {
+			Element img = (Element) iterator.next();
+			String src = img.attr("src");
+			if (src.startsWith(DisplayConstants.ENTITY_DESCRIPTION_ATTACHMENT_PREFIX)){
+		    	String[] tokens = src.split("/");
+		    	if (tokens.length > 5) {
+			        String entityId = tokens[2];
+				    String tokenId = tokens[4] +"/"+ tokens[5];
+				    img.attr("src", DisplayUtils.createAttachmentUrl(attachmentUrl, entityId, tokenId, tokenId));
+		    	}
+			}
+		}
+	}
+
+//	public static void addSynapseLinks(Document doc) {
+//		// in this case, I still need a regular expression to find the synapse ids.
+//		// find all elements whose text contains a synapse id pattern
+//		String regEx = "\\W*(syn\\d+)\\W*";
+//		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
+//		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
+//		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
+//			Element element = (Element) iterator.next();
+//			String oldText = element.html();
+//			// find it in the text
+//			Matcher matcher = pattern.matcher(oldText);
+//			StringBuilder sb = new StringBuilder();
+//			int previousFoundIndex = 0;
+//			while (matcher.find() && matcher.groupCount() == 1) {
+//				sb.append(oldText.substring(previousFoundIndex, matcher.start(1)));
+//				sb.append(getSynAnchorHtml(matcher.group(1))); //the actual synapse Id group (not the non-word characters that might surround it)
+//				previousFoundIndex = matcher.end(1);
+//			}
+//			if (previousFoundIndex < oldText.length() - 1)
+//				// substring, go from the previously found index to the end
+//				sb.append(oldText.substring(previousFoundIndex));
+//			element.html(sb.toString());
+//		}
+//	}
+//	
+//	
+//	private static String getSynAnchorHtml(String synId){
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("<a target=\"_blank\" class=\"link\" href=\"#Synapse:");
+//	    sb.append(synId.toLowerCase().trim());
+//	    sb.append("\">");
+//	    sb.append(synId);
+//	    sb.append("</a>");
+//	    return sb.toString();
+//	}
 }

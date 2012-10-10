@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,22 +60,4 @@ public class DisplayUtilsTest {
 		String actualYouTube = DisplayUtils.fixEmbeddedYouTube(testYouTube);
 		Assert.assertEquals(actualYouTube, expectedYouTube);
 	}
-
-	@Test
-	public void testDetectEntityLinks(){
-		String testString = "synapse123 SYn1234\nsyn567 syntax syn3 <a href=\"#Synapse:syn555\">syn555</a> syn";
-		String expectedResult = "synapse123<a class=\"link\" href=\"#Synapse:syn1234\"> SYn1234\n</a><a class=\"link\" href=\"#Synapse:syn567\">syn567 </a>syntax<a class=\"link\" href=\"#Synapse:syn3\"> syn3 </a><a href=\"#Synapse:syn555\">syn555</a> syn";
-		String actualResult = DisplayUtils.addSynapseLinks(testString);
-		Assert.assertEquals(actualResult, expectedResult);
-	}
-
-
-	@Test
-	public void testFixCSSClass(){
-		String testString = "<ul><li>Abacus<ul><li>answer</li></ul></li><li>Bubbles<ol><li>bunk</li><li>bupkis<ul><li>BELITTLER</li></ul></li><li>burper</li></ol></li><li>Cunning</li></ul><blockquote> <p>Email-style angle brackets are used for blockquotes.</p></blockquote> <p><code>&lt;code&gt;</code> spans are delimited by backticks.</p><p>An <a href=\"http://url.com/\" title=\"Title\">example</a></p>";
-		String expectedResult = "<ul class=\"myclass\"><li>Abacus<ul class=\"myclass\"><li>answer</li></ul></li><li>Bubbles<ol class=\"myclass\"><li>bunk</li><li>bupkis<ul class=\"myclass\"><li>BELITTLER</li></ul></li><li>burper</li></ol></li><li>Cunning</li></ul><blockquote class=\"myclass\"> <p>Email-style angle brackets are used for blockquotes.</p></blockquote> <p><code>&lt;code&gt;</code> spans are delimited by backticks.</p><p>An <a class=\"myclass\" href=\"http://url.com/\" title=\"Title\">example</a></p>";
-		String actualResult = DisplayUtils.postProcessEntityDescriptionHtml(testString, "myclass");
-		Assert.assertEquals(actualResult, expectedResult);
-	}
-
 }

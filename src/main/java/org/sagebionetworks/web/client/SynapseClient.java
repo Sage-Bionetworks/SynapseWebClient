@@ -160,5 +160,5 @@ public interface SynapseClient extends RemoteService {
 	 * @param markdown
 	 * @return
 	 */
-	public String markdown2Html(String markdown);
+	public String markdown2Html(String markdown, String attachmentUrl);
 }

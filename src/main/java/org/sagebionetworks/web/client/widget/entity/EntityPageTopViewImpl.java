@@ -596,10 +596,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    } else {
 	    	//(in resolving the markdown, it escapes any user html)
 	    	//now resolve the markdown
-    		presenter.getHtmlFromMarkdown(description, new AsyncCallback<String>() {
+	    	String attachmentBaseUrl = GWT.getModuleBaseURL()+"attachment";
+    		presenter.getHtmlFromMarkdown(description, attachmentBaseUrl, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
-					HTMLPanel panel = new HTMLPanel(DisplayUtils.postProcessEntityDescriptionHtml(result, DisplayConstants.ENTITY_DESCRIPTION_CSS_CLASSNAME));
+					HTMLPanel panel = new HTMLPanel(result);
 					lc.add(panel);
 					lc.layout();
 				}

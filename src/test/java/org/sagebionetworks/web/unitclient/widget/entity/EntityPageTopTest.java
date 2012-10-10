@@ -67,7 +67,7 @@ public class EntityPageTopTest {
 	public void testMarkdownToHtmlWiring(){
 		final String testHtml = "<h1>HTML Returns</h1>";
 		final String testMarkdown = "HTML Returns\n----------";
-		AsyncMockStubber.callSuccessWith(testHtml).when(mockSynapseClient).markdown2Html(any(String.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testHtml).when(mockSynapseClient).markdown2Html(any(String.class), any(String.class), any(AsyncCallback.class));
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -78,9 +78,9 @@ public class EntityPageTopTest {
 				throw new IllegalArgumentException(caught);
 			}
 		};
-		pageTop.getHtmlFromMarkdown(testMarkdown, callback);
+		pageTop.getHtmlFromMarkdown(testMarkdown, "", callback);
 		
-		verify(mockSynapseClient).markdown2Html(any(String.class), any(AsyncCallback.class));
+		verify(mockSynapseClient).markdown2Html(any(String.class), any(String.class), any(AsyncCallback.class));
 	}
 	
 	}

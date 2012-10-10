@@ -84,5 +84,5 @@ public interface SynapseClientAsync {
 
 	public void updateExternalLocationable(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback);
 
-	public void markdown2Html(String markdown, AsyncCallback<String> callback);
+	public void markdown2Html(String markdown, String attachmentUrl, AsyncCallback<String> callback);
 }
