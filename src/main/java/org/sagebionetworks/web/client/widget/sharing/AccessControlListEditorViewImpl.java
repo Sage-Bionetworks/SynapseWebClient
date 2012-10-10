@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.UrlCache;
@@ -379,9 +380,15 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				String principalHtml = DisplayUtils.getUserNameEmailHtml(principal);
 				
 				String iconHtml = "";
-				if (principal.getPic() != null && principal.getPic().getUrl() != null) {
+				if (principal.getPic() != null) {
 					// Principal has a profile picture
-					iconHtml = DisplayUtils.getThumbnailPicHtml(principal.getPic().getUrl());
+					String url = DisplayUtils.createUserProfileAttachmentUrl(
+							DisplayUtilsGWT.BASE_PROFILE_ATTACHMENT_URL, 
+							principal.getOwnerId(), 
+							principal.getPic().getPreviewId(), 
+							null
+					);
+					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
 				} else {
 					// Default to generic user or group avatar
 					ImageResource icon = principal.getIsIndividual() ? iconsImageBundle.userBusinessGrey40() : iconsImageBundle.usersGrey40();
