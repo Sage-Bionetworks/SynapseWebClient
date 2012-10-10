@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
@@ -736,7 +737,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 
 	@Override
-	public void setEntityVersions(Versionable entity, TreeMap<Long, String> versions) {
+	public void setEntityVersions(Versionable entity, PaginatedResults<VersionInfo> versions) {
 		if (titleWidget != null) {
 			titleWidget.setVersions(entity, versions);
 		}

@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Comparator;
-import java.util.TreeMap;
-
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
@@ -11,9 +8,9 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.ObjectSchema;
-import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -389,41 +386,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 						@Override
 						public void onSuccess(String result) {
-							setEntityVersions(result);
+							PaginatedResults<VersionInfo> versions = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
+							view.setEntityVersions((Versionable)entity, versions);
 						}
 
 					});
 		}
 	}
-
-	private void setEntityVersions(String jsonVersions) {
-		TreeMap<Long, String> versions = new TreeMap<Long, String>(new ReverseLong());
-		JSONObjectAdapter joa;
-		try {
-			joa = this.jsonObjectAdapter.createNew(jsonVersions);
-			int numResults = joa.getInt("totalNumberOfResults");
-
-			JSONArrayAdapter jsonArray = joa.getJSONArray("results");
-			for (int i = 0; i < numResults; i++) {
-				JSONObjectAdapter jsonObject = jsonArray.getJSONObject(i);
-				long number = jsonObject.getInt("versionNumber");
-				String label = jsonObject.getString("versionLabel");
-				versions.put(number, label);
-			}
-		} catch (JSONObjectAdapterException e) {
-		}
-		Versionable vb = (Versionable)bundle.getEntity();
-
-		view.setEntityVersions(vb, versions);
-	}
-
-	static class ReverseLong implements Comparator<Long> {
-
-		@Override
-		public int compare(Long o1, Long o2) {
-			return o1 > o2 ? -1 :
-					o1 < o2 ? +1 : 0;
-		}
-    }
 
 }

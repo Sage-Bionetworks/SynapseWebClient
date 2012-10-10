@@ -4,6 +4,7 @@ import java.util.TreeMap;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
@@ -30,6 +31,8 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	 * @param rStudioUrl
 	 */
 	public void setRStudioUrlReady();
+
+	public void setEntityVersions(Versionable entity, PaginatedResults<VersionInfo> versions);
 
 	/**
 	 * Presenter interface
@@ -84,8 +87,5 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 
 		void getHtmlFromMarkdown(String description, String attachmentBaseUrl, AsyncCallback<String> asyncCallback);
 	}
-
-	public void setEntityVersions(Versionable entity, TreeMap<Long, String> latestVersions);
-
 
 }

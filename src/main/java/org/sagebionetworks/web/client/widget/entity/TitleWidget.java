@@ -5,12 +5,14 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -69,30 +71,35 @@ public class TitleWidget {
 		return lc;
 	}
 
-	public void setVersions(Versionable entity, TreeMap<Long, String> latestVersions) {
+	public void setVersions(Versionable entity, PaginatedResults<VersionInfo> versions) {
 		entityMetadata.clearPreviousVersions();
-		if (latestVersions == null || latestVersions.size() < 1) {
+		if (versions == null || versions.getResults().size() < 1) {
 			InlineLabel notFound = new InlineLabel(DisplayConstants.ERROR_VERSIONS_NOT_FOUND);
 			entityMetadata.addToPreviousVersions(notFound);
 			return;
 		}
 
 		boolean first = true;
-		for (Entry<Long, String> entry : latestVersions.entrySet()) {
+		for (VersionInfo version : versions.getResults()) {
 			StringBuilder label = new StringBuilder();
-			label.append(entry.getValue().toString());
+			label.append(version.getVersionLabel());
 			label.append(" [");
-			label.append(entry.getKey().toString());
+			label.append(version.getVersionNumber());
 			label.append("]");
+
+			if (version.getVersionComment() != null) {
+				label.append(" - ");
+				label.append(version.getVersionComment());
+			}
 
 			if (first) {
 				label.append(" (latest)");
 			}
 
-			if (!entity.getVersionNumber().equals(entry.getKey())) {
+			if (!entity.getVersionNumber().equals(version.getVersionNumber())) {
 				String historyTokenNoHash = DisplayUtils.
 				   getSynapseHistoryTokenNoHash(entity.getId(),
-				                                (first ? null : entry.getKey()));
+				                                (first ? null : version.getVersionNumber()));
 
 				Hyperlink anchor = new Hyperlink(label.toString(), historyTokenNoHash);
 				anchor.setStyleName("link");
