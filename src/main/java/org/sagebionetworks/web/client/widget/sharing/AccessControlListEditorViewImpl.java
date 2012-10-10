@@ -191,7 +191,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			fieldSet.add(permissionLevelCombo);
 			
 			// share button and listener
-			Button shareButton = new Button("Share");
+			Button shareButton = new Button("Add");
 			shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
@@ -234,12 +234,13 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			deleteAclButton.setEnabled(canEnableInheritance);
 		}
 		
-		Label blank = new Label("");
+
 		
 		// Unsaved changes label
-		Label unsavedChangesLabel = new Label(DisplayUtils.getIconHtml(iconsImageBundle.warning16()) + " " + DisplayConstants.PERMISSIONS_UNSAVED_CHANGES);
-	   	hPanel.setHorizontalAlign(HorizontalAlignment.RIGHT);
-		hPanel.add(unsavedChanges ? unsavedChangesLabel : blank, tdRight);
+//		Label blank = new Label("");
+//		Label unsavedChangesLabel = new Label(DisplayUtils.getIconHtml(iconsImageBundle.warning16()) + " " + DisplayConstants.PERMISSIONS_UNSAVED_CHANGES);
+//	   	hPanel.setHorizontalAlign(HorizontalAlignment.RIGHT);
+//		hPanel.add(unsavedChanges ? unsavedChangesLabel : blank, tdRight);
 		
 		this.add(hPanel, new MarginData(10, 0, 0, 0));
 		this.layout(true);

@@ -237,12 +237,11 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				window.add(accessControlListEditor.asWidget(), new FitData(4));			    
 			    
 				// configure buttons
-				window.okText = "Apply";
-				window.cancelText = "Close";
+				window.okText = "Save";
+				window.cancelText = "Cancel";
 			    window.setButtons(Dialog.OKCANCEL);
 			    window.setButtonAlign(HorizontalAlignment.RIGHT);
 			    window.setHideOnButtonClick(false);
-				window.setClosable(false);
 				window.setResizable(false);
 				
 				// "Apply" button
@@ -255,6 +254,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 						if (accessControlListEditor.hasUnsavedChanges()) {
 							accessControlListEditor.pushChangesToSynapse(false);
 						}
+						window.hide();
 					}
 			    });
 				
@@ -263,20 +263,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
-						// confirm close action if there are unsaved changes
-						if (accessControlListEditor.hasUnsavedChanges()) {
-							MessageBox.confirm(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.CONFIRM_DISCARD_ACL_CHANGES, new Listener<MessageBoxEvent>() {					
-								@Override
-								public void handleEvent(MessageBoxEvent be) { 												
-									Button btn = be.getButtonClicked();
-									if (Dialog.YES.equals(btn.getItemId())) {
-										window.hide();									
-									}
-								}
-							});
-						} else {
-							window.hide();
-						}
+						window.hide();
 					}
 			    });
 				
