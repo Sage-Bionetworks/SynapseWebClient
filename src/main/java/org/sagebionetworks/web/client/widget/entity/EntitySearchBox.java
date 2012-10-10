@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -90,12 +91,12 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	@Override
 	public void entitySelected(final String entityId, final String name) {
 		if(handler != null) {
-			List<EntityHeader> versions = null;
+			List<VersionInfo> versions = null;
 			if(retrieveVersions) {
-				synapseClient.getEntityVersions(entityId, new AsyncCallback<String>() {
+				synapseClient.getEntityVersions(entityId, 1, 20, new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String result) {
-						PaginatedResults<EntityHeader> versions = nodeModelCreator.createPaginatedResults(result, EntityHeader.class);
+						PaginatedResults<VersionInfo> versions = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
 						handler.onSelected(entityId, name, versions.getResults());
 					}
 					@Override
@@ -110,7 +111,7 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	}
 
 	public interface EntitySelectedHandler {
-		public void onSelected(String entityId, String name, List<EntityHeader> versions);
+		public void onSelected(String entityId, String name, List<VersionInfo> versions);
 	}
 
 	@Override

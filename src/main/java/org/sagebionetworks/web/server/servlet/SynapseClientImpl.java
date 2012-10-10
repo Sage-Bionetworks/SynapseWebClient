@@ -34,6 +34,7 @@ import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -198,11 +199,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String getEntityVersions(String entityId)
+	public String getEntityVersions(String entityId, int offset, int limit)
 			throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<EntityHeader> versions = synapseClient.getEntityVersions(entityId);
+			PaginatedResults<VersionInfo> versions = synapseClient.getEntityVersions(entityId, offset, limit);
 			JSONObjectAdapter entityJson = versions.writeToJSONObject(adapterFactory.createNew());
 			return entityJson.toJSONString();
 		} catch (SynapseException e) {
