@@ -21,7 +21,7 @@ public interface SynapseClientAsync {
 	
 	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundleTransport> callback);
 
-	void getEntityVersions(String entityId, AsyncCallback<String> callback);
+	void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<String> callback);
 
 	void updateEntity(String entityJson, AsyncCallback<EntityWrapper> callback);
 
