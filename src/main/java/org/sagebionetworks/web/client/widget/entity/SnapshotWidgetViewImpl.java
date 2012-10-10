@@ -7,6 +7,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityGroup;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Summary;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -332,7 +333,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			right.add(entitySearchBox.asWidget(725));
 			EntitySelectedHandler entitySelectedHandler = new EntitySelectedHandler() {				
 				@Override
-				public void onSelected(String entityId, String name, List<EntityHeader> versions) {
+				public void onSelected(String entityId, String name, List<VersionInfo> versions) {
 					addEntityToGroupWidget.clear();
 					final EntityHeader eh = new EntityHeader();
 					eh.setId(entityId);
@@ -738,7 +739,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			this.layout(true);			
 		}
 		
-		private void configureForm(List<EntityGroupDisplay> groups, EntityHeader entityHeader, List<EntityHeader> versions, final ClickHandler addButtonHandler) {
+		private void configureForm(List<EntityGroupDisplay> groups, EntityHeader entityHeader, List<VersionInfo> versions, final ClickHandler addButtonHandler) {
 			this.clear();
 			
 			// fill columns with form fields		     
@@ -749,8 +750,8 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			
 			if(versions != null) {				
 				List<String> versionStrs = new ArrayList<String>();
-				for(EntityHeader header : versions) {
-					versionStrs.add(header.getVersionNumber().toString());
+				for(VersionInfo version : versions) {
+					versionStrs.add(version.getVersionNumber().toString());
 				}
 				versionBox.add(versionStrs);
 				versionBox.setSimpleValue(versionBox.getStore().getAt(0).getValue()); // select first

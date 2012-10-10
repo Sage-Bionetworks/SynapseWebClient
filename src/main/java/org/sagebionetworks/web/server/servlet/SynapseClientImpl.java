@@ -199,11 +199,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String getEntityVersions(String entityId)
+	public String getEntityVersions(String entityId, int offset, int limit)
 			throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<VersionInfo> versions = synapseClient.getEntityVersions(entityId, 1, 20);
+			PaginatedResults<VersionInfo> versions = synapseClient.getEntityVersions(entityId, offset, limit);
 			JSONObjectAdapter entityJson = versions.writeToJSONObject(adapterFactory.createNew());
 			return entityJson.toJSONString();
 		} catch (SynapseException e) {

@@ -19,7 +19,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber);
 		
-	public String getEntityVersions(String entityId) throws RestServiceException;
+	public String getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
 	
 	public void deleteEntity(String entityId) throws RestServiceException;
 
