@@ -20,7 +20,7 @@ public class EntityBundleTransport implements IsSerializable {
 	public static int PERMISSIONS	     		= EntityBundle.PERMISSIONS;
 	public static int ENTITY_PATH	      		= EntityBundle.ENTITY_PATH;
 	public static int ENTITY_REFERENCEDBY 		= EntityBundle.ENTITY_REFERENCEDBY;
-	public static int HAS_CHILDREN			= EntityBundle.HAS_CHILDREN;
+	public static int HAS_CHILDREN				= EntityBundle.HAS_CHILDREN;
 	public static int ACL						= EntityBundle.ACL;
 	public static int USERS						= EntityBundle.USERS;
 	public static int GROUPS					= EntityBundle.GROUPS;

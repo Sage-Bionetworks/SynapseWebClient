@@ -14,7 +14,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -32,6 +31,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -598,7 +598,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
-
+	
+	@Override
+	public EntityWrapper getUserGroupHeadersById(List<String> ids)
+			throws RestServiceException {
+		try {
+			Synapse synapseClient = createSynapseClient();
+			UserGroupHeaderResponsePage response = synapseClient.getUserGroupHeadersByIds(ids);
+			JSONObjectAdapter responseJSON = response
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(responseJSON.toJSONString(), responseJSON
+					.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e); 
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 	@Override
 	public void updateUserProfile(String userProfileJson)
 			throws RestServiceException {
