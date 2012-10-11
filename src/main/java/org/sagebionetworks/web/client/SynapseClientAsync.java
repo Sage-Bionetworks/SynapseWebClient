@@ -7,8 +7,6 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
@@ -55,6 +53,8 @@ public interface SynapseClientAsync {
 	void getUserProfile(AsyncCallback<String> callback);
 	
 	void getUserProfile(String userId, AsyncCallback<String> callback);
+	
+	void getUserGroupHeadersById(List<String> ids, AsyncCallback<EntityWrapper> headers);
 	
 	void updateUserProfile(String userProfileJson, AsyncCallback<Void> callback);
 	

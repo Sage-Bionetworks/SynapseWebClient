@@ -225,23 +225,48 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				final Window window = new Window();  
-				window.setSize(550, 465);
+				final Dialog window = new Dialog();
+				
+				// configure layout
+				window.setSize(560, 465);
 				window.setPlain(true);
 				window.setModal(true);
 				window.setBlinkModal(true);
 				window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
 				window.setLayout(new FitLayout());
-				window.add(accessControlListEditor.asWidget(), new FitData(4));
-				Button closeButton = new Button("Close");
-				closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				window.add(accessControlListEditor.asWidget(), new FitData(4));			    
+			    
+				// configure buttons
+				window.okText = "Save";
+				window.cancelText = "Cancel";
+			    window.setButtons(Dialog.OKCANCEL);
+			    window.setButtonAlign(HorizontalAlignment.RIGHT);
+			    window.setHideOnButtonClick(false);
+				window.setResizable(false);
+				
+				// "Apply" button
+				// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
+				Button applyButton = window.getButtonById(Dialog.OK);
+				applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						// confirm close action if there are unsaved changes
+						if (accessControlListEditor.hasUnsavedChanges()) {
+							accessControlListEditor.pushChangesToSynapse(false);
+						}
+						window.hide();
+					}
+			    });
+				
+				// "Close" button				
+				Button closeButton = window.getButtonById(Dialog.CANCEL);
+			    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
 						window.hide();
 					}
-				});
-				window.setButtonAlign(HorizontalAlignment.RIGHT);
-				window.addButton(closeButton);
+			    });
+				
 				window.show();
 			}
 		});		
