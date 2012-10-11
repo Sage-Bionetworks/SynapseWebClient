@@ -101,7 +101,7 @@ public class SynapseClientImplTest {
 	private static NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(jsonEntityFactory, jsonObjectAdapter);
 
 	@Before
-	public void before() throws SynapseException{
+	public void before() throws SynapseException, JSONObjectAdapterException{
 		mockSynapse = Mockito.mock(Synapse.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
@@ -160,7 +160,7 @@ public class SynapseClientImplTest {
 		ra.setPrincipalId(101L);
 		ra.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER));
 		acl.setResourceAccess(ras);
-		when(mockSynapse.getACL(anyString())).thenReturn(acl);
+		when(mockSynapse.getACL(anyString())).thenReturn(acl);	
 		when(mockSynapse.createACL((AccessControlList)any())).thenReturn(acl);
 		when(mockSynapse.updateACL((AccessControlList)any())).thenReturn(acl);
 		when(mockSynapse.updateACL((AccessControlList)any(), eq(true))).thenReturn(acl);
@@ -327,7 +327,7 @@ public class SynapseClientImplTest {
 		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
 		assertEquals(acl, clone);
 	}
-
+	
 	@Test
 	public void testCreateAcl() throws Exception {
 		EntityWrapper in = new EntityWrapper();

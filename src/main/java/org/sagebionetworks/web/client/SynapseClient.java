@@ -113,6 +113,15 @@ public interface SynapseClient extends RemoteService {
 	public String getUserProfile(String userId) throws RestServiceException;
 	
 	/**
+	 * Batch get headers for users/groups matching a list of Synapse IDs.
+	 * 
+	 * @param ids
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public EntityWrapper getUserGroupHeadersById(List<String> ids) throws RestServiceException;
+
+	/**
 	 * Updates the user's profile json object 
 	 * @param userProfileJson json object of the user's profile
 	 * @throws RestServiceException

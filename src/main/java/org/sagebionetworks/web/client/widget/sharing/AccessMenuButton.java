@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.shared.NodeType;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -21,10 +22,10 @@ public class AccessMenuButton implements AccessMenuButtonView.Presenter {
 		view.setPresenter(this);
 	}	
 	
-	public void createAccessButton(AccessLevel level, NodeType type, String id) {
+	public void createAccessButton(AccessLevel level, NodeType type, Entity entity) {
 		nodeType = type;
-		nodeId = id;
-		accessControlListEditor.setResource(id);		
+		nodeId = entity.getId();
+		accessControlListEditor.setResource(entity);		
 		view.createAccessMenu(level, accessControlListEditor);
 	}
 

@@ -40,6 +40,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -324,14 +325,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				}
 				ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
 			}
-			if ((EntityBundleTransport.USERS & partsMask) > 0) {
-				PaginatedResults<UserProfile> u = eb.getUsers();
-				ebt.setUsersJson(EntityFactory.createJSONStringForEntity(u));
-			}
-			if ((EntityBundleTransport.GROUPS & partsMask) > 0) {
-				PaginatedResults<UserGroup> g = eb.getGroups();
-				ebt.setGroupsJson(EntityFactory.createJSONStringForEntity(g));
-			}
 			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask)!=0) {
 				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
 			}
@@ -610,7 +603,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
-
+	
+	@Override
+	public EntityWrapper getUserGroupHeadersById(List<String> ids)
+			throws RestServiceException {
+		try {
+			Synapse synapseClient = createSynapseClient();
+			UserGroupHeaderResponsePage response = synapseClient.getUserGroupHeadersByIds(ids);
+			JSONObjectAdapter responseJSON = response
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(responseJSON.toJSONString(), responseJSON
+					.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e); 
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 	@Override
 	public void updateUserProfile(String userProfileJson)
 			throws RestServiceException {
@@ -882,7 +892,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String markdown2Html(String markdown, String attachmentUrl) {
 		String html = markdownProcessor.markdown(markdown);
 		return processMarkdownHtml(html, attachmentUrl);
-	}
+}
 	
 	/**
 	 * This adds the given css classname to entities supported by the markdown, detects Synapse IDs (and creates links out of them), 

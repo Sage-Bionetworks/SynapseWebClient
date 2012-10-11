@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -46,8 +47,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.sagebionetworks.web.shared.users.AclPrincipal;
-
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
@@ -230,11 +229,11 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Returns a properly aligned name and e-mail address for a given AclPrincipal
+	 * Returns a properly aligned name and e-mail address for a given UserGroupHeader
 	 * @param principal
 	 * @return
 	 */
-	public static String getUserNameEmailHtml(AclPrincipal principal) {
+	public static String getUserNameEmailHtml(UserGroupHeader principal) {
 		if (principal == null) return "";
 		String name = principal.getDisplayName() == null ? "" : principal.getDisplayName();
 		String email = principal.getEmail() == null ? "" : principal.getEmail();
