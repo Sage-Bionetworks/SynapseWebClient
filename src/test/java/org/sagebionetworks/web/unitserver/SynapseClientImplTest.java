@@ -432,16 +432,16 @@ public class SynapseClientImplTest {
 		assertEquals(returnedLayer.getEntityJson(), EntityFactory.createJSONStringForEntity(layer));
 	}
 	
-//	
-//	@Test
-//	public void testDetectEntityLinks(){
-//		String testString = "<html> <head></head> <body> synapse123 SYn1234\nsyn567 syntax syn3 <a href=\"#Synapse:syn555\">syn555</a> syn</body></html>";
-//		String expectedResult = "synapse123<a class=\"link\" href=\"#Synapse:syn1234\"> SYn1234\n</a><a class=\"link\" href=\"#Synapse:syn567\">syn567 </a>syntax<a class=\"link\" href=\"#Synapse:syn3\"> syn3 </a><a href=\"#Synapse:syn555\">syn555</a> syn";
-//		Document htmlDoc = Jsoup.parse(testString);
-//		SynapseClientImpl.addSynapseLinks(htmlDoc);
-//		String actualResult = htmlDoc.html();
-//		assertEquals(expectedResult, actualResult);
-//	}
+	
+	@Test
+	public void testDetectEntityLinks(){
+		String testString = "<html> <head></head> <body> synapse123 SYn1234\nsyn567 syntax syn3 <a href=\"#Synapse:syn555\">syn555</a> syn</body></html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a target=\"_blank\" class=\"link\" href=\"#Synapse:syn1234\">SYn1234</a> <a target=\"_blank\" class=\"link\" href=\"#Synapse:syn567\">syn567</a> syntax <a target=\"_blank\" class=\"link\" href=\"#Synapse:syn3\">syn3</a></span>\n  <a href=\"#Synapse:syn555\"><span><a target=\"_blank\" class=\"link\" href=\"#Synapse:syn555\">syn555</a></span></a>\n  <span> syn</span>\n </body>\n</html>";
+		Document htmlDoc = Jsoup.parse(testString);
+		SynapseClientImpl.addSynapseLinks(htmlDoc);
+		String actualResult = htmlDoc.html();
+		assertEquals(expectedResult, actualResult);
+	}
 
 	@Test
 	public void testFixCSSClass(){

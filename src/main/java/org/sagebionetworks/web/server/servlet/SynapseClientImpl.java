@@ -18,9 +18,10 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -894,7 +895,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		Document doc = Jsoup.parse(html);
 		applyCssClass(doc, DisplayConstants.MARKDOWN_CSS_CLASSNAME);
 		resolveAttachmentImages(doc, attachmentUrl);
-//		addSynapseLinks(doc);
+		addSynapseLinks(doc);
 		return doc.html();
 	}
 	
@@ -923,39 +924,48 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-//	public static void addSynapseLinks(Document doc) {
-//		// in this case, I still need a regular expression to find the synapse ids.
-//		// find all elements whose text contains a synapse id pattern
-//		String regEx = "\\W*(syn\\d+)\\W*";
-//		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
-//		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
-//		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
-//			Element element = (Element) iterator.next();
-//			String oldText = element.html();
-//			// find it in the text
-//			Matcher matcher = pattern.matcher(oldText);
-//			StringBuilder sb = new StringBuilder();
-//			int previousFoundIndex = 0;
-//			while (matcher.find() && matcher.groupCount() == 1) {
-//				sb.append(oldText.substring(previousFoundIndex, matcher.start(1)));
-//				sb.append(getSynAnchorHtml(matcher.group(1))); //the actual synapse Id group (not the non-word characters that might surround it)
-//				previousFoundIndex = matcher.end(1);
-//			}
-//			if (previousFoundIndex < oldText.length() - 1)
-//				// substring, go from the previously found index to the end
-//				sb.append(oldText.substring(previousFoundIndex));
-//			element.html(sb.toString());
-//		}
-//	}
-//	
-//	
-//	private static String getSynAnchorHtml(String synId){
-//		StringBuilder sb = new StringBuilder();
-//		sb.append("<a target=\"_blank\" class=\"link\" href=\"#Synapse:");
-//	    sb.append(synId.toLowerCase().trim());
-//	    sb.append("\">");
-//	    sb.append(synId);
-//	    sb.append("</a>");
-//	    return sb.toString();
-//	}
+	public static void addSynapseLinks(Document doc) {
+		// in this case, I still need a regular expression to find the synapse ids.
+		// find all elements whose text contains a synapse id pattern
+		// replace the TextNode element children with Elements, whose html contain a link to relevant synapse entity.
+		String regEx = "\\W*(syn\\d+)\\W*";
+		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
+		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
+		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
+			Element element = (Element) iterator.next();
+			//only process the TextNode children (ignore others)
+			for (Iterator iterator2 = element.childNodes().iterator(); iterator2.hasNext();) {
+				Node childNode = (Node) iterator2.next();
+				if (childNode instanceof TextNode) {
+					String oldText = ((TextNode) childNode).text();
+					// find it in the text
+					Matcher matcher = pattern.matcher(oldText);
+					StringBuilder sb = new StringBuilder();
+					int previousFoundIndex = 0;
+					while (matcher.find() && matcher.groupCount() == 1) {
+						sb.append(oldText.substring(previousFoundIndex, matcher.start(1)));
+						sb.append(getSynAnchorHtml(matcher.group(1))); //the actual synapse Id group (not the non-word characters that might surround it)
+						previousFoundIndex = matcher.end(1);
+					}
+					if (previousFoundIndex < oldText.length() - 1)
+						// substring, go from the previously found index to the end
+						sb.append(oldText.substring(previousFoundIndex));
+					Element newElement = doc.createElement("span"); //wrap new html in a span, since it needs a container!
+					newElement.html(sb.toString());
+					childNode.replaceWith(newElement);		
+				}
+			}
+		}
+	}
+	
+	
+	private static String getSynAnchorHtml(String synId){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<a target=\"_blank\" class=\"link\" href=\"#Synapse:");
+	    sb.append(synId.toLowerCase().trim());
+	    sb.append("\">");
+	    sb.append(synId);
+	    sb.append("</a>");
+	    return sb.toString();
+	}
 }
