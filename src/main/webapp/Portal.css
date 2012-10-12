@@ -464,6 +464,8 @@ ul.from-markdown {
 }
 strong.from-markdown { font-weight: bold; }
 em.from-markdown { font-style: italic; }
+a.auto-detected-synapse-link, a.auto-detected-synapse-link:hover, a.auto-detected-synapse-link:visited { color:#BC3226;}
+a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited { color:#BC3226;}
 a.from-markdown, a.from-markdown:hover, a.from-markdown:visited { color:#BC3226;}
 blockquote.from-markdown {
 	margin: 1em 3em;

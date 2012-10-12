@@ -286,14 +286,13 @@ public class DisplayConstants {
 	public static final String ERROR_LOADING = "Error Loading";
 	public static final String ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
 																		"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br></code></pre><br>" +
-																		"<h3>Links</h3><p>Inline:<pre><code>An [example](http://url.com/)</code></pre><pre><code>An [example][id]. Then, anywhere else in the description, define the link:<br>  [id]: http://example.com/<br></code></pre><br>" +
-																		"<h3>Images</h3><p>To insert an image attachment into the description (at the current cursor position), click the Insert Attachment button.</p><p>Inline:</p><pre><code>![alt text](/path/img.jpg)</code></pre></p><br>" +
-																		"<h3>Headers</h3><p>Setext-style:<pre><code>Header 1<br>========<br>Header 2<br>--------<br></code></pre></p><p>atx-style (closing #'s are optional):<pre><code># Header 1 #<br>## Header 2 ##<br>###### Header 6<br></code></pre></p><br>" +
+																		"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>An [example][id]. Then, anywhere else in the description, define the link:<br>  [id]: http://example.com/<br></code></pre><br>" +
+																		"<h3>Images</h3><p>From Attachments:<pre><code>Click the Insert Attachment button to insert at the current cursor position</code></pre></p><p>Other Sources:<pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
+																		"<h3>Headers</h3><p><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre></p><br>" +
 																		"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
 																		"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
 																		"<h3>Code Spans</h3><pre><code>`&lt;code&gt;` spans are delimited<br>by backticks.<br>You can include literal backticks<br>like `` `this` ``.<br></code></pre><br>" +
-																		"<h3>Horizontal Rules</h3><p>Three or more dashes or asterisks:<pre><code>---<br>* * *<br>- - - - <br></code></pre></p><br>" +
-																		"<h3>Manual Line Breaks</h3><p>End a line with two or more spaces:<pre><code>Roses are red,   <br>Violets are blue.<br></code></pre></p><br></div>";
+																		"<h3>Horizontal Rules</h3><p>Three or more dashes or asterisks:<pre><code>---<br>* * *<br>- - - - <br></code></pre></p><br></div>";
 	public static final String ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT = "Preview";
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
 	public static final String ENTITY_DESCRIPTION_HIDE_TIPS_TEXT = "Hide formatting tips";

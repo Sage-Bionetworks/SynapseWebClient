@@ -890,9 +890,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public String markdown2Html(String markdown, String attachmentUrl) {
+		//before processing, replace all '\n' with '  \n' so that all newlines are correctly interpreted as manual breaks!
+		if (markdown != null) {
+			markdown = markdown.replace("\n", "  \n");
+		}
 		String html = markdownProcessor.markdown(markdown);
 		return processMarkdownHtml(html, attachmentUrl);
-}
+	}
 	
 	/**
 	 * This adds the given css classname to entities supported by the markdown, detects Synapse IDs (and creates links out of them), 
@@ -903,9 +907,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		
 		//using jsoup, since it's already in this project!
 		Document doc = Jsoup.parse(html);
+		sendAllLinksToNewWindow(doc);
 		applyCssClass(doc, DisplayConstants.MARKDOWN_CSS_CLASSNAME);
 		resolveAttachmentImages(doc, attachmentUrl);
 		addSynapseLinks(doc);
+		addUrlLinks(doc);
 		return doc.html();
 	}
 	
@@ -916,6 +922,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			Elements elements = doc.getElementsByTag(elementTagName);
 			elements.addClass(cssClass);
 		}
+	}
+	public static void sendAllLinksToNewWindow(Document doc) {
+		Elements elements = doc.getElementsByTag("a");
+		elements.attr("target", "_blank");
 	}
 	
 	public static void resolveAttachmentImages(Document doc, String attachmentUrl) {
@@ -968,10 +978,50 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	public static void addUrlLinks(Document doc) {
+		String regEx = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"; //from http://stackoverflow.com/questions/163360/regular-expresion-to-match-urls-java
+		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
+		Pattern pattern = Pattern.compile(regEx);
+		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
+			Element element = (Element) iterator.next();
+			//only process the TextNode children (ignore others)
+			for (Iterator iterator2 = element.childNodes().iterator(); iterator2.hasNext();) {
+				Node childNode = (Node) iterator2.next();
+				if (childNode instanceof TextNode) {
+					String oldText = ((TextNode) childNode).text();
+					// find it in the text
+					Matcher matcher = pattern.matcher(oldText);
+					StringBuilder sb = new StringBuilder();
+					int previousFoundIndex = 0;
+					while (matcher.find()) {
+						sb.append(oldText.substring(previousFoundIndex, matcher.start()));
+						sb.append(getUrlHtml(matcher.group()));
+						previousFoundIndex = matcher.end();
+					}
+					if (previousFoundIndex < oldText.length() - 1)
+						// substring, go from the previously found index to the end
+						sb.append(oldText.substring(previousFoundIndex));
+					Element newElement = doc.createElement("span"); //wrap new html in a span, since it needs a container!
+					newElement.html(sb.toString());
+					childNode.replaceWith(newElement);		
+				}
+			}
+		}
+	}
+	
+	private static String getUrlHtml(String url){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<a target=\"_blank\" class=\"auto-detected-url\" href=\"");
+	    sb.append(url.trim());
+	    sb.append("\">");
+	    sb.append(url);
+	    sb.append("</a>");
+	    return sb.toString();
+	}
 	
 	private static String getSynAnchorHtml(String synId){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<a target=\"_blank\" class=\"link\" href=\"#Synapse:");
+		sb.append("<a target=\"_blank\" class=\"auto-detected-synapse-link\" href=\"#Synapse:");
 	    sb.append(synId.toLowerCase().trim());
 	    sb.append("\">");
 	    sb.append(synId);

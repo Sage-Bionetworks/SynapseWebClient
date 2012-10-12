@@ -436,9 +436,19 @@ public class SynapseClientImplTest {
 	@Test
 	public void testDetectEntityLinks(){
 		String testString = "<html> <head></head> <body> synapse123 SYn1234\nsyn567 syntax syn3 <a href=\"#Synapse:syn555\">syn555</a> syn</body></html>";
-		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a target=\"_blank\" class=\"link\" href=\"#Synapse:syn1234\">SYn1234</a> <a target=\"_blank\" class=\"link\" href=\"#Synapse:syn567\">syn567</a> syntax <a target=\"_blank\" class=\"link\" href=\"#Synapse:syn3\">syn3</a></span>\n  <a href=\"#Synapse:syn555\"><span><a target=\"_blank\" class=\"link\" href=\"#Synapse:syn555\">syn555</a></span></a>\n  <span> syn</span>\n </body>\n</html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a target=\"_blank\" class=\"auto-detected-synapse-link\" href=\"#Synapse:syn1234\">SYn1234</a> <a target=\"_blank\" class=\"auto-detected-synapse-link\" href=\"#Synapse:syn567\">syn567</a> syntax <a target=\"_blank\" class=\"auto-detected-synapse-link\" href=\"#Synapse:syn3\">syn3</a></span>\n  <a href=\"#Synapse:syn555\"><span><a target=\"_blank\" class=\"auto-detected-synapse-link\" href=\"#Synapse:syn555\">syn555</a></span></a>\n  <span> syn</span>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
 		SynapseClientImpl.addSynapseLinks(htmlDoc);
+		String actualResult = htmlDoc.html();
+		assertEquals(expectedResult, actualResult);
+	}
+	
+	@Test
+	public void testDetectUrlLinks(){
+		String testString = "<html> <head></head> <body> http://mytest.com http:// http <a href=\"#Synapse:syn555\">syn555 http://somewhereelse.org</a> syn</body></html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> <a target=\"_blank\" class=\"auto-detected-url\" href=\"http://mytest.com\">http://mytest.com</a> http:// http </span>\n  <a href=\"#Synapse:syn555\"><span>syn555 <a target=\"_blank\" class=\"auto-detected-url\" href=\"http://somewhereelse.org\">http://somewhereelse.org</a></span></a>\n  <span> syn</span>\n </body>\n</html>";
+		Document htmlDoc = Jsoup.parse(testString);
+		SynapseClientImpl.addUrlLinks(htmlDoc);
 		String actualResult = htmlDoc.html();
 		assertEquals(expectedResult, actualResult);
 	}
