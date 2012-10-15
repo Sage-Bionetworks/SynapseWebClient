@@ -986,7 +986,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	public static void addYouTubeVideos(Document doc) {
 		// using a regular expression to find our special YouTube video embedding notation, replace with an embedded version of the video!
-		String regEx = "\\W*(\\[youtube=(\\w*)\\])\\W*";
+		String regEx = "\\W*(\\{youtube=(\\w*)\\})\\W*";
 		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
 		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
 		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {

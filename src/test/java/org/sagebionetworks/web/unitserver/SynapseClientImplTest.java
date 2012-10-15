@@ -457,7 +457,7 @@ public class SynapseClientImplTest {
 
 	@Test
 	public void testYouTubeVideos(){
-		String testString = "<html> <head></head> <body> [youtube=60MQ3AG1c8o] </body></html>";
+		String testString = "<html> <head></head> <body> {youtube=60MQ3AG1c8o} </body></html>";
 		String expectedResult = "<html> \n <head></head> \n <body>\n  <span><iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/60MQ3AG1c8o\" frameborder=\"0\" allowfullscreen=\"\"></iframe></span>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
 		SynapseClientImpl.addYouTubeVideos(htmlDoc);

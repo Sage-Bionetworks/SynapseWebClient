@@ -294,7 +294,7 @@ public class DisplayConstants {
 																		"<h3>Code Spans</h3><pre><code>`&lt;code&gt;` spans are delimited<br>by backticks.<br>You can include literal backticks<br>like `` `this` ``.<br></code></pre><br>" +
 																		"<h3>Horizontal Rules</h3>Three or more dashes or asterisks:<pre><code>---<br>* * *<br>- - - - <br></code></pre><br>" +
 																		"<h3>Symbols</h3><pre><code>&amp;copy; = copyright sign<br>&amp;mdash; = wide dash<br>&amp;amp; = ampersand<br>&amp;trade; = trademark TM<br>&amp;reg; = reserved mark R</code></pre><br>"+
-																		"<h3>Synapse Website Specific Markdown</h3><p>Embed YouTube Videos:<pre><code>[youtube=&ltvideo-id&gt]</code></pre></p><br></div>";
+																		"<h3>Synapse Website Specific Markdown</h3><p>Embed YouTube Videos:<pre><code>{youtube=&ltvideo-id&gt}</code></pre><br>Replace <strong class=\"from-markdown\">&ltvideo-id&gt</strong> with <strong class=\"from-markdown\">foobar123</strong> when embedding the video http://www.youtube.com/watch?v=<strong class=\"from-markdown\">foobar123</strong></p><br></div>";
 
 	public static final String ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT = "Preview";
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
