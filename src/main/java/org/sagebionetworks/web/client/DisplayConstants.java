@@ -287,16 +287,19 @@ public class DisplayConstants {
 	public static final String ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
 																		"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br></code></pre><br>" +
 																		"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>An [example][id]. Then, anywhere else in the description, define the link:<br>  [id]: http://example.com/<br></code></pre><br>" +
-																		"<h3>Images</h3><p>From Attachments:<pre><code>Click the Insert Attachment button to insert at the current cursor position</code></pre></p><p>Other Sources:<pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
-																		"<h3>Headers</h3><p><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre></p><br>" +
+																		"<h3>Images</h3>From Attachments:<pre><code>Click the Insert Attachment button to insert at the current cursor position</code></pre></p><p>Other Sources:<pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
+																		"<h3>Headers</h3><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre><br>" +
 																		"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
 																		"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
 																		"<h3>Code Spans</h3><pre><code>`&lt;code&gt;` spans are delimited<br>by backticks.<br>You can include literal backticks<br>like `` `this` ``.<br></code></pre><br>" +
-																		"<h3>Horizontal Rules</h3><p>Three or more dashes or asterisks:<pre><code>---<br>* * *<br>- - - - <br></code></pre></p><br></div>";
+																		"<h3>Horizontal Rules</h3>Three or more dashes or asterisks:<pre><code>---<br>* * *<br>- - - - <br></code></pre><br>" +
+																		"<h3>Symbols</h3><pre><code>&amp;copy; = copyright sign<br>&amp;mdash; = wide dash<br>&amp;amp; = ampersand<br>&amp;trade; = trademark TM<br>&amp;reg; = reserved mark R</code></pre><br>"+
+																		"<h3>Synapse Website Specific Markdown</h3><p>Embed YouTube Videos:<pre><code>[youtube=&ltvideo-id&gt]</code></pre></p><br></div>";
+
 	public static final String ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT = "Preview";
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
-	public static final String ENTITY_DESCRIPTION_HIDE_TIPS_TEXT = "Hide formatting tips";
-	public static final String ENTITY_DESCRIPTION_SHOW_TIPS_TEXT = "Would you like to format the description?";
+	public static final String ENTITY_DESCRIPTION_HIDE_TIPS_TEXT = "Hide Formatting Guide";
+	public static final String ENTITY_DESCRIPTION_SHOW_TIPS_TEXT = "Formatting Guide";
 	public static final String MARKDOWN_CSS_CLASSNAME = "from-markdown";
 	public static final String ENTITY_DESCRIPTION_ATTACHMENT_PREFIX = "Attachment/entity/";
 	/*

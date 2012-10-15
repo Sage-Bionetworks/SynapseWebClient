@@ -72,6 +72,8 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
+import com.petebevin.markdown.MarkdownProcessor;
+
 /**
  * Test for the SynapseClientImpl
  * @author John
@@ -454,6 +456,16 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
+	public void testYouTubeVideos(){
+		String testString = "<html> <head></head> <body> [youtube=60MQ3AG1c8o] </body></html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span><iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/60MQ3AG1c8o\" frameborder=\"0\" allowfullscreen=\"\"></iframe></span>\n </body>\n</html>";
+		Document htmlDoc = Jsoup.parse(testString);
+		SynapseClientImpl.addYouTubeVideos(htmlDoc);
+		String actualResult = htmlDoc.html();
+		assertEquals(expectedResult, actualResult);
+	}
+	
+	@Test
 	public void testFixCSSClass(){
 		String testString = "<ul><li>Abacus<ul><li>answer</li></ul></li><li>Bubbles<ol><li>bunk</li><li>bupkis<ul><li>BELITTLER</li></ul></li><li>burper</li></ol></li><li>Cunning</li></ul><blockquote> <p>Email-style angle brackets are used for blockquotes.</p></blockquote> <p><code>&lt;code&gt;</code> spans are delimited by backticks.</p><p>An <a href=\"http://url.com/\" title=\"Title\">example</a></p>";
 		String expectedResult = "<html>\n <head></head>\n <body>\n  <ul class=\" myclass\">\n   <li>Abacus\n    <ul class=\" myclass\">\n     <li>answer</li>\n    </ul></li>\n   <li>Bubbles\n    <ol class=\" myclass\">\n     <li>bunk</li>\n     <li>bupkis\n      <ul class=\" myclass\">\n       <li>BELITTLER</li>\n      </ul></li>\n     <li>burper</li>\n    </ol></li>\n   <li>Cunning</li>\n  </ul>\n  <blockquote class=\" myclass\"> \n   <p>Email-style angle brackets are used for blockquotes.</p>\n  </blockquote> \n  <p><code>&lt;code&gt;</code> spans are delimited by backticks.</p>\n  <p>An <a href=\"http://url.com/\" title=\"Title\" class=\" myclass\">example</a></p>\n </body>\n</html>";
@@ -484,5 +496,17 @@ public class SynapseClientImplTest {
 		String actualResult = htmlDoc.html();
 		assertEquals(expectedResult, actualResult);
 	}
+	
+	@Test
+	public void testMarkdown2HtmlEscapeControlCharacters(){
+		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
+		String testString = "& ==> &amp;\" ==> &quot;> ==> &gt;< ==> &lt;' =";
+		String expectedResult = "<html>\n <head></head>\n <body>\n  <p>&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt;&lt; ==&gt; &lt;' =</p> \n </body>\n</html>";
+		
+		String actualResult = SynapseClientImpl.markdown2Html(testString, "http://mySynapse/attachment", new MarkdownProcessor());
+		assertEquals(expectedResult, actualResult);
+	}
+	
+	
 	
 }

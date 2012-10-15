@@ -87,12 +87,15 @@ public class EntityPropertyForm extends FormPanel {
 	String entityId;
 	List<AttachmentData> attachments;
 	SynapseClientAsync synapseClient;
+	SafeHtml showFormattingTipsSafeHTML, hideFormattingTipsSafeHTML;
 	
 	@Inject
 	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, SynapseClientAsync synapseClient) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseClient = synapseClient;
+		showFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
+		hideFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_HIDE_TIPS_TEXT);
 	}
 
 	@Override
@@ -228,7 +231,7 @@ public class EntityPropertyForm extends FormPanel {
 		FormData descriptionData = new FormData("-20 85%");
         descriptionData.setMargins(margins);
 		formPanel.add(descriptionField, descriptionData);
-		final Anchor formatLink = new Anchor(DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
+		final Anchor formatLink = new Anchor(showFormattingTipsSafeHTML);
 		formatLink.setStyleName("link");
 		FormData formatLinkFormData = new FormData("-100");
 		formatLinkFormData.setMargins(new Margins(10,10,0,90));
@@ -238,11 +241,11 @@ public class EntityPropertyForm extends FormPanel {
 			public void onClick(ClickEvent event) {
 				if (descriptionFormatInfoContainer.isVisible()) {
 					descriptionFormatInfoContainer.el().slideOut(Direction.UP, FxConfig.NONE);
-					formatLink.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
+					formatLink.setHTML(showFormattingTipsSafeHTML);
 				} else {
 					descriptionFormatInfoContainer.setVisible(true);
 					descriptionFormatInfoContainer.el().slideIn(Direction.DOWN, FxConfig.NONE);
-					formatLink.setText(DisplayConstants.ENTITY_DESCRIPTION_HIDE_TIPS_TEXT);
+					formatLink.setHTML(hideFormattingTipsSafeHTML);
 				}
 			}
 		});
