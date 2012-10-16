@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +8,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 public class DisplayUtilsTest {
@@ -59,5 +60,4 @@ public class DisplayUtilsTest {
 		String actualYouTube = DisplayUtils.fixEmbeddedYouTube(testYouTube);
 		Assert.assertEquals(actualYouTube, expectedYouTube);
 	}
-
 }

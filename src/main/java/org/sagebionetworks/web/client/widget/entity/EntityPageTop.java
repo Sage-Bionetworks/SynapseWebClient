@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -40,6 +39,7 @@ import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.resources.client.ImageResource;
@@ -50,7 +50,6 @@ import com.google.inject.Inject;
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter  {
 
 	private EntityPageTopView view;
-	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -66,7 +65,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EventBus bus;
 	private JiraURLHelper jiraURLHelper;
 	@Inject
-	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service,
+	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
@@ -78,7 +77,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			JiraURLHelper jiraURLHelper,
 			EventBus bus) {
 		this.view = view;
-		this.nodeService = service;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
@@ -189,6 +187,20 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		}
 	}
 
+	@Override
+	public void getHtmlFromMarkdown(String markdown, String attachmentBaseUrl, final AsyncCallback<String> asyncCallback) {
+		synapseClient.markdown2Html(markdown, attachmentBaseUrl, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				asyncCallback.onSuccess(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				asyncCallback.onFailure(caught);
+			}
+		});
+	}
+	
 	/*
 	 * Private Methods
 	 */
