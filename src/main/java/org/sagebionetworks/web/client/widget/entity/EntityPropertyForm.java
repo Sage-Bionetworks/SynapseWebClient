@@ -12,6 +12,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.MarkdownUtils;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
@@ -288,7 +289,7 @@ public class EntityPropertyForm extends FormPanel {
 							cursorPos = 0;
 						else if (cursorPos > currentValue.length())
 							cursorPos = currentValue.length();
-						String attachmentLinkMarkdown = DisplayUtils.getAttachmentLinkMarkdown(safeName.asString(), entityId, data.getTokenId(), data.getPreviewId(), safeName.asString());
+						String attachmentLinkMarkdown = MarkdownUtils.getAttachmentLinkMarkdown(safeName.asString(), entityId, data.getTokenId(), data.getPreviewId(), safeName.asString());
 						descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + attachmentLinkMarkdown + currentValue.substring(cursorPos));
 					}
 				});

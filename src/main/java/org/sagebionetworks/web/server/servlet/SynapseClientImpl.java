@@ -7,22 +7,13 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.select.Elements;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -58,8 +49,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.MarkdownUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
@@ -890,193 +880,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public String markdown2Html(String markdown, String attachmentUrl) {
-		return markdown2Html(markdown, attachmentUrl, markdownProcessor);
-	}
-	
-	/**
-	 * This converts the given markdown to html using the given markdown processor.
-	 * It also post processes the output html, including:
-	 * *sending all links to a new window.
-	 * *applying the markdown css classname to entities supported by the markdown.
-	 * *auto detects Synapse IDs (and creates links out of them)
-	 * *auto detects generic urls (and creates links out of them)
-	 * *convert special youtube video embedded notation to real iframes 
-	 * @param panel
-	 */
-	public static String markdown2Html(String markdown, String attachmentUrl, MarkdownProcessor markdownProcessor) {
-		if (markdown == null) return "";
-		//before processing, replace all '\n' with '  \n' so that all newlines are correctly interpreted as manual breaks!
-		if (markdown != null) {
-			markdown = markdown.replace("\n", "  \n");
-		}
-		String html = markdownProcessor.markdown(markdown);
-		//using jsoup, since it's already in this project!
-		Document doc = Jsoup.parse(html);
-		sendAllLinksToNewWindow(doc);
-		Elements anchors = doc.getElementsByTag("a");
-		anchors.addClass("link");
-		applyCssClass(doc, DisplayConstants.MARKDOWN_CSS_CLASSNAME);
-		resolveAttachmentImages(doc, attachmentUrl);
-		addSynapseLinks(doc);
-		addUrlLinks(doc);
-		addYouTubeVideos(doc);
-		return doc.html();
-	}
-	
-	public static void applyCssClass(Document doc, String cssClass) {
-		String[] elementTypes = new String[]{"a", "ol", "ul", "strong", "em", "blockquote"};
-		for (int i = 0; i < elementTypes.length; i++) {
-			String elementTagName = elementTypes[i];
-			Elements elements = doc.getElementsByTag(elementTagName);
-			elements.addClass(cssClass);
-		}
-	}
-	
-	public static void sendAllLinksToNewWindow(Document doc) {
-		Elements elements = doc.getElementsByTag("a");
-		elements.attr("target", "_blank");
-	}
-	
-	public static void resolveAttachmentImages(Document doc, String attachmentUrl) {
-		Elements images = doc.select("img");
-		for (Iterator iterator = images.iterator(); iterator.hasNext();) {
-			Element img = (Element) iterator.next();
-			String src = img.attr("src");
-			if (src.startsWith(DisplayConstants.ENTITY_DESCRIPTION_ATTACHMENT_PREFIX)){
-		    	String[] tokens = src.split("/");
-		    	if (tokens.length > 5) {
-			        String entityId = tokens[2];
-				    String tokenId = tokens[4] +"/"+ tokens[5];
-				    img.attr("src", DisplayUtils.createAttachmentUrl(attachmentUrl, entityId, tokenId, tokenId));
-		    	}
-			}
-		}
-	}
-
-	public static void addSynapseLinks(Document doc) {
-		// in this case, I still need a regular expression to find the synapse ids.
-		// find all elements whose text contains a synapse id pattern (but not anchors)
-		// replace the TextNode element children with Elements, whose html contain a link to relevant synapse entity.
-		// regular expression: look for non-word characters (0 or more), followed by "syn" and a number, followed by more non-word characters (0 or more).
-		// capture the synapse id in a group (the paranthesis).
-		String regEx = "\\W*(syn\\d+)\\W*";
-		Elements elements = doc.select("*:matchesOwn(" + regEx + "):not(a)");  	// selector is case insensitive
-		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
-		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
-			Element element = (Element) iterator.next();
-			//only process the TextNode children (ignore others)
-			for (Iterator iterator2 = element.childNodes().iterator(); iterator2.hasNext();) {
-				Node childNode = (Node) iterator2.next();
-				if (childNode instanceof TextNode) {
-					String oldText = ((TextNode) childNode).text();
-					// find it in the text
-					Matcher matcher = pattern.matcher(oldText);
-					StringBuilder sb = new StringBuilder();
-					int previousFoundIndex = 0;
-					while (matcher.find() && matcher.groupCount() == 1) {
-						sb.append(oldText.substring(previousFoundIndex, matcher.start(1)));
-						sb.append(getSynAnchorHtml(matcher.group(1))); //the actual synapse Id group (not the non-word characters that might surround it)
-						previousFoundIndex = matcher.end(1);
-					}
-					if (previousFoundIndex < oldText.length() - 1)
-						// substring, go from the previously found index to the end
-						sb.append(oldText.substring(previousFoundIndex));
-					Element newElement = doc.createElement("span"); //wrap new html in a span, since it needs a container!
-					newElement.html(sb.toString());
-					childNode.replaceWith(newElement);		
-				}
-			}
-		}
-	}
-	
-	public static void addYouTubeVideos(Document doc) {
-		// using a regular expression to find our special YouTube video embedding notation, replace with an embedded version of the video!
-		String regEx = "\\W*(\\{youtube=(\\w*)\\})\\W*";
-		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
-		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
-		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
-			Element element = (Element) iterator.next();
-			//only process the TextNode children (ignore others)
-			for (Iterator iterator2 = element.childNodes().iterator(); iterator2.hasNext();) {
-				Node childNode = (Node) iterator2.next();
-				if (childNode instanceof TextNode) {
-					String oldText = ((TextNode) childNode).text();
-					// find it in the text
-					Matcher matcher = pattern.matcher(oldText);
-					StringBuilder sb = new StringBuilder();
-					int previousFoundIndex = 0;
-					while (matcher.find() && matcher.groupCount() == 2) {
-						sb.append(getYouTubeHTML(matcher.group(2)));
-						previousFoundIndex = matcher.end(1);
-					}
-					if (previousFoundIndex < oldText.length() - 1)
-						// substring, go from the previously found index to the end
-						sb.append(oldText.substring(previousFoundIndex));
-					Element newElement = doc.createElement("span"); //wrap new html in a span, since it needs a container!
-					newElement.html(sb.toString());
-					childNode.replaceWith(newElement);		
-				}
-			}
-		}
-	}
-	
-	
-	public static void addUrlLinks(Document doc) {
-		String regEx = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"; //from http://stackoverflow.com/questions/163360/regular-expresion-to-match-urls-java
-		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
-		Pattern pattern = Pattern.compile(regEx);
-		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
-			Element element = (Element) iterator.next();
-			//only process the TextNode children (ignore others)
-			for (Iterator iterator2 = element.childNodes().iterator(); iterator2.hasNext();) {
-				Node childNode = (Node) iterator2.next();
-				if (childNode instanceof TextNode) {
-					String oldText = ((TextNode) childNode).text();
-					// find it in the text
-					Matcher matcher = pattern.matcher(oldText);
-					StringBuilder sb = new StringBuilder();
-					int previousFoundIndex = 0;
-					while (matcher.find()) {
-						sb.append(oldText.substring(previousFoundIndex, matcher.start()));
-						sb.append(getUrlHtml(matcher.group()));
-						previousFoundIndex = matcher.end();
-					}
-					if (previousFoundIndex < oldText.length() - 1)
-						// substring, go from the previously found index to the end
-						sb.append(oldText.substring(previousFoundIndex));
-					Element newElement = doc.createElement("span"); //wrap new html in a span, since it needs a container!
-					newElement.html(sb.toString());
-					childNode.replaceWith(newElement);		
-				}
-			}
-		}
-	}
-	
-	private static String getUrlHtml(String url){
-		StringBuilder sb = new StringBuilder();
-		sb.append("<a target=\"_blank\" class=\"link auto-detected-url\" href=\"");
-	    sb.append(url.trim());
-	    sb.append("\">");
-	    sb.append(url);
-	    sb.append("</a>");
-	    return sb.toString();
-	}
-	
-	private static String getSynAnchorHtml(String synId){
-		StringBuilder sb = new StringBuilder();
-		sb.append("<a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#Synapse:");
-	    sb.append(synId.toLowerCase().trim());
-	    sb.append("\">");
-	    sb.append(synId);
-	    sb.append("</a>");
-	    return sb.toString();
-	}
-	private static String getYouTubeHTML(String videoId){
-		
-		StringBuilder sb = new StringBuilder();
-		sb.append("<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/");
-		sb.append(videoId);
-		sb.append("\" frameborder=\"0\" allowfullscreen></iframe>");
-	    return sb.toString();
+		return MarkdownUtils.markdown2Html(markdown, attachmentUrl, markdownProcessor);
 	}
 }
