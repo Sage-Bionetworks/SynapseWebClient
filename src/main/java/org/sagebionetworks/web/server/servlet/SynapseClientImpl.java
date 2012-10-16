@@ -913,6 +913,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		//using jsoup, since it's already in this project!
 		Document doc = Jsoup.parse(html);
 		sendAllLinksToNewWindow(doc);
+		Elements anchors = doc.getElementsByTag("a");
+		anchors.addClass("link");
 		applyCssClass(doc, DisplayConstants.MARKDOWN_CSS_CLASSNAME);
 		resolveAttachmentImages(doc, attachmentUrl);
 		addSynapseLinks(doc);
@@ -929,6 +931,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			elements.addClass(cssClass);
 		}
 	}
+	
 	public static void sendAllLinksToNewWindow(Document doc) {
 		Elements elements = doc.getElementsByTag("a");
 		elements.attr("target", "_blank");
@@ -952,10 +955,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	public static void addSynapseLinks(Document doc) {
 		// in this case, I still need a regular expression to find the synapse ids.
-		// find all elements whose text contains a synapse id pattern
+		// find all elements whose text contains a synapse id pattern (but not anchors)
 		// replace the TextNode element children with Elements, whose html contain a link to relevant synapse entity.
+		// regular expression: look for non-word characters (0 or more), followed by "syn" and a number, followed by more non-word characters (0 or more).
+		// capture the synapse id in a group (the paranthesis).
 		String regEx = "\\W*(syn\\d+)\\W*";
-		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
+		Elements elements = doc.select("*:matchesOwn(" + regEx + "):not(a)");  	// selector is case insensitive
 		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
 		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
 			Element element = (Element) iterator.next();
@@ -1049,7 +1054,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	private static String getUrlHtml(String url){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<a target=\"_blank\" class=\"auto-detected-url\" href=\"");
+		sb.append("<a target=\"_blank\" class=\"link auto-detected-url\" href=\"");
 	    sb.append(url.trim());
 	    sb.append("\">");
 	    sb.append(url);
@@ -1059,7 +1064,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	private static String getSynAnchorHtml(String synId){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<a target=\"_blank\" class=\"auto-detected-synapse-link\" href=\"#Synapse:");
+		sb.append("<a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#Synapse:");
 	    sb.append(synId.toLowerCase().trim());
 	    sb.append("\">");
 	    sb.append(synId);

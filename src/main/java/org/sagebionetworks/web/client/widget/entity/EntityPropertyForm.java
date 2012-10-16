@@ -12,7 +12,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
@@ -30,7 +29,6 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -39,7 +37,6 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.AnchorLayout;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.VBoxLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
@@ -49,13 +46,9 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.inject.Inject;
 
 /**
@@ -86,14 +79,14 @@ public class EntityPropertyForm extends FormPanel {
 	VerticalPanel descriptionFormatInfoContainer;
 	String entityId;
 	List<AttachmentData> attachments;
-	SynapseClientAsync synapseClient;
+	Previewable previewGenerator;
 	SafeHtml showFormattingTipsSafeHTML, hideFormattingTipsSafeHTML;
 	
 	@Inject
-	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, SynapseClientAsync synapseClient) {
+	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, Previewable previewGenerator) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
-		this.synapseClient = synapseClient;
+		this.previewGenerator = previewGenerator;
 		showFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
 		hideFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_HIDE_TIPS_TEXT);
 	}
@@ -270,7 +263,7 @@ public class EntityPropertyForm extends FormPanel {
 		previewButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				showPreviewWindow(synapseClient, ((TextArea)descriptionField).getValue());
+				previewGenerator.showPreview(((TextArea)descriptionField).getValue());
 			}
 	    });
 		final String baseURl = GWT.getModuleBaseURL()+"attachment";
@@ -280,26 +273,12 @@ public class EntityPropertyForm extends FormPanel {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				//pop up a list of attachments, and have the user pick one.
-				SelectAttachmentDialog.showSelectAttachmentDialog(baseURl,  entityId, attachments, synapseClient, "Select Attachment", "Insert", new SelectAttachmentDialog.Callback() {
+				SelectAttachmentDialog.showSelectAttachmentDialog(baseURl,  entityId, attachments, "Select Attachment", "Insert", new SelectAttachmentDialog.Callback() {
 					
 					@Override
 					public void onSelectAttachment(AttachmentData data) {
 						//insert the markdown into the description for the image attachment
 						SafeHtml safeName = SafeHtmlUtils.fromString(data.getName());
-						StringBuilder sb = new StringBuilder();
-						sb.append("![");
-						sb.append(safeName.asString());
-						//put in everything we need in the url
-						sb.append("](");
-						sb.append(DisplayConstants.ENTITY_DESCRIPTION_ATTACHMENT_PREFIX);
-						sb.append(entityId);
-						sb.append("/tokenId/");
-						sb.append(data.getTokenId());
-						sb.append("/previewTokenId/");
-						sb.append(data.getPreviewId());
-						sb.append(" \"");
-						sb.append(safeName.asString());
-						sb.append("\")");
 						TextArea descriptionTextArea = (TextArea)descriptionField;
 						String currentValue = descriptionTextArea.getValue();
 						if (currentValue == null)
@@ -309,7 +288,8 @@ public class EntityPropertyForm extends FormPanel {
 							cursorPos = 0;
 						else if (cursorPos > currentValue.length())
 							cursorPos = currentValue.length();
-						descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + sb.toString() + currentValue.substring(cursorPos));
+						String attachmentLinkMarkdown = DisplayUtils.getAttachmentLinkMarkdown(safeName.asString(), entityId, data.getTokenId(), data.getPreviewId(), safeName.asString());
+						descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + attachmentLinkMarkdown + currentValue.substring(cursorPos));
 					}
 				});
 					
@@ -332,50 +312,6 @@ public class EntityPropertyForm extends FormPanel {
 		this.propPanel.add(formPanel);
 		this.annoPanel.add(annotationFormPanel);
 		this.layout();
-	}
-	
-	/**
-	 * Show the edit entity dialog.
-	 * @param entity
-	 * @param annos
-	 * @param callback
-	 */
-	public static void showPreviewWindow(SynapseClientAsync synapseClient, String descriptionMarkdown){
-		final Dialog window = new Dialog();
-		window.setMaximizable(false);
-	    window.setSize(650, 500);
-	    window.setPlain(true);  
-	    window.setModal(true);  
-	    window.setBlinkModal(true);  
-	    window.setHeading("Preview Description");
-	    window.setLayout(new FitLayout());
-	    window.setButtons(Dialog.OK);
-	    window.setHideOnButtonClick(true);
-	    
-	    //get the html for the markdown
-	    String baseUrl = GWT.getModuleBaseURL()+"attachment";
-	    synapseClient.markdown2Html(descriptionMarkdown, baseUrl, new AsyncCallback<String>() {
-	    	@Override
-			public void onSuccess(String result) {
-	    		HTMLPanel panel;
-	    		if(result == null || "".equals(result)) {
-	    	    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>"));
-	    		}
-	    		else{
-	    			
-	    			panel = new HTMLPanel(result);
-	    		}
-	    		FlowPanel f = new FlowPanel();
-	    		f.setStyleName("entity-description-preview-wrapper");
-	    		f.add(panel);
-	    		window.add(new ScrollPanel(f));
-				window.show();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				//preview failed
-			}
-		});
 	}
 	
 	

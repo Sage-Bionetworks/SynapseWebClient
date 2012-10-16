@@ -58,6 +58,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -437,8 +438,8 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testDetectEntityLinks(){
-		String testString = "<html> <head></head> <body> synapse123 SYn1234\nsyn567 syntax syn3 <a href=\"#Synapse:syn555\">syn555</a> syn</body></html>";
-		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a target=\"_blank\" class=\"auto-detected-synapse-link\" href=\"#Synapse:syn1234\">SYn1234</a> <a target=\"_blank\" class=\"auto-detected-synapse-link\" href=\"#Synapse:syn567\">syn567</a> syntax <a target=\"_blank\" class=\"auto-detected-synapse-link\" href=\"#Synapse:syn3\">syn3</a></span>\n  <a href=\"#Synapse:syn555\"><span><a target=\"_blank\" class=\"auto-detected-synapse-link\" href=\"#Synapse:syn555\">syn555</a></span></a>\n  <span> syn</span>\n </body>\n</html>";
+		String testString = "<html> <head></head> <body> synapse123 SYn1234\nsyn567 syntax syn3 <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a> syn</body></html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#Synapse:syn1234\">SYn1234</a> <a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#Synapse:syn567\">syn567</a> syntax <a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#Synapse:syn3\">syn3</a></span>\n  <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a>\n  <span> syn</span>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
 		SynapseClientImpl.addSynapseLinks(htmlDoc);
 		String actualResult = htmlDoc.html();
@@ -448,7 +449,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testDetectUrlLinks(){
 		String testString = "<html> <head></head> <body> http://mytest.com http:// http <a href=\"#Synapse:syn555\">syn555 http://somewhereelse.org</a> syn</body></html>";
-		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> <a target=\"_blank\" class=\"auto-detected-url\" href=\"http://mytest.com\">http://mytest.com</a> http:// http </span>\n  <a href=\"#Synapse:syn555\"><span>syn555 <a target=\"_blank\" class=\"auto-detected-url\" href=\"http://somewhereelse.org\">http://somewhereelse.org</a></span></a>\n  <span> syn</span>\n </body>\n</html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> <a target=\"_blank\" class=\"link auto-detected-url\" href=\"http://mytest.com\">http://mytest.com</a> http:// http </span>\n  <a href=\"#Synapse:syn555\"><span>syn555 <a target=\"_blank\" class=\"link auto-detected-url\" href=\"http://somewhereelse.org\">http://somewhereelse.org</a></span></a>\n  <span> syn</span>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
 		SynapseClientImpl.addUrlLinks(htmlDoc);
 		String actualResult = htmlDoc.html();
@@ -477,23 +478,13 @@ public class SynapseClientImplTest {
 
 	@Test
 	public void testImageAttachmentLinks(){
-		StringBuilder sb = new StringBuilder();
 		String entityId = "entityId123";
 		String tokenId = "tokenId123";
 		String previewTokenId = "previewTokenId123";
-		sb.append(DisplayConstants.ENTITY_DESCRIPTION_ATTACHMENT_PREFIX);
-		sb.append(entityId);
-		sb.append("/tokenId/");
-		sb.append(tokenId);
-		sb.append("/previewTokenId/");
-		sb.append(previewTokenId);
-		
-		String testString = "<p><img src=\""+sb.toString()+"\" alt=\"Jay640x640.jpg\" title=\"Jay640x640.jpg\" /></p><p><img src=\"http://www.richmondeye.com/images/visiontest/visiontest.gif\" alt=\"alt text\" /></p>";
-		String expectedResult = "<html>\n <head></head>\n <body>\n  <p><img src=\"http://mySynapse/attachment?entityId=entityId123&amp;tokenId=tokenId123/previewTokenId&amp;waitForUrl=true\" alt=\"Jay640x640.jpg\" title=\"Jay640x640.jpg\" /></p>\n  <p><img src=\"http://www.richmondeye.com/images/visiontest/visiontest.gif\" alt=\"alt text\" /></p>\n </body>\n</html>";
-		
-		Document htmlDoc = Jsoup.parse(testString);
-		SynapseClientImpl.resolveAttachmentImages(htmlDoc, "http://mySynapse/attachment");
-		String actualResult = htmlDoc.html();
+		String attachmentName = "my attachment image";
+		String attachmentMd = DisplayUtils.getAttachmentLinkMarkdown(attachmentName, entityId, tokenId, previewTokenId, attachmentName);
+		String actualResult = SynapseClientImpl.markdown2Html(attachmentMd, "http://mySynapse/attachment", new MarkdownProcessor());
+		String expectedResult = "<html>\n <head></head>\n <body>\n  <p><img src=\"http://mySynapse/attachment?entityId=entityId123&amp;tokenId=tokenId123/previewTokenId&amp;waitForUrl=true\" alt=\"my attachment image\" title=\"my attachment image\" /></p> \n </body>\n</html>";
 		assertEquals(expectedResult, actualResult);
 	}
 	
