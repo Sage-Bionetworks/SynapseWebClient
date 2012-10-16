@@ -46,6 +46,7 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter  {
 
@@ -134,10 +135,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		bus.fireEvent(new EntityUpdatedEvent());
 	}
 
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		bus.addHandler(EntityUpdatedEvent.getType(), handler);
+	public HandlerRegistration addEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		return bus.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
-
+	
 	@Override
 	public boolean isLocationable() {
 		if(bundle.getEntity() instanceof Locationable) {
