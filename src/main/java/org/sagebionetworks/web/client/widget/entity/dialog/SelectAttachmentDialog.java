@@ -30,7 +30,7 @@ public class SelectAttachmentDialog {
 	 * 
 	 * @param callback
 	 */
-	public static void showSelectAttachmentDialog(String baseUrl, String entityId, List<AttachmentData> attachments, SynapseClientAsync synapseClient, String windowTitle, String buttonText, final Callback callback ) {
+	public static void showSelectAttachmentDialog(String baseUrl, String entityId, List<AttachmentData> attachments, String windowTitle, String buttonText, final Callback callback ) {
 		final Dialog dialog = new Dialog();
 		dialog.setMaximizable(false);
 		dialog.setSize(400, 175);
@@ -43,7 +43,7 @@ public class SelectAttachmentDialog {
 		dialog.setLayout(new FitLayout());
 		dialog.setBorders(false);
 		
-		final VisualAttachmentsList attachmentList = new VisualAttachmentsList(new VisualAttachmentsListViewImpl(), synapseClient);
+		final VisualAttachmentsList attachmentList = new VisualAttachmentsList(new VisualAttachmentsListViewImpl());
 		attachmentList.configure(baseUrl, entityId, attachments);
 		Button okButton = dialog.getButtonById("ok");
 		okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			

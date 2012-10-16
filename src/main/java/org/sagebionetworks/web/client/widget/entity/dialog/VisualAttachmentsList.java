@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -17,7 +16,7 @@ public class VisualAttachmentsList implements VisualAttachmentsListView.Presente
 	private List<AttachmentData> attachments;
 	
 	@Inject
-	public VisualAttachmentsList(VisualAttachmentsListView view, SynapseClientAsync synapseClient){
+	public VisualAttachmentsList(VisualAttachmentsListView view){
 		this.view = view;
 	}
 

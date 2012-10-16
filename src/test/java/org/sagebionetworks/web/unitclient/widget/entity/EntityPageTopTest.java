@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.EntitySchemaCache;
@@ -75,7 +75,7 @@ public class EntityPageTopTest {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				throw new IllegalArgumentException(caught);
+				fail("unexpected failure in test: " + caught.getMessage());
 			}
 		};
 		pageTop.getHtmlFromMarkdown(testMarkdown, "", callback);
