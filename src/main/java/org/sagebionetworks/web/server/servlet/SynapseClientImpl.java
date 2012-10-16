@@ -49,10 +49,10 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.MarkdownUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
+import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
@@ -880,6 +880,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public String markdown2Html(String markdown, String attachmentUrl) {
-		return MarkdownUtils.markdown2Html(markdown, attachmentUrl, markdownProcessor);
+		return ServerMarkdownUtils.markdown2Html(markdown, attachmentUrl, markdownProcessor);
 	}
 }
