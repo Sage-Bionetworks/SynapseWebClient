@@ -30,6 +30,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -347,6 +348,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		ResponseEntity<String> response;
 		try {
 			response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
+		} catch(HttpClientErrorException ex) {
+			if (ex.getStatusCode() == HttpStatus.BAD_REQUEST)
+				throw new BadRequestException(ex.getResponseBodyAsString());
+			else if (ex.getMessage().toLowerCase().contains("no content-type found"))
+				return;
+			else throw ex;
 		} catch (RestClientException ex) {
 			if (ex.getMessage().toLowerCase().contains("no content-type found"))
 				return;

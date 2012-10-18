@@ -2,6 +2,10 @@ package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyVararg;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,15 +21,23 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.server.RestTemplateProvider;
 import org.sagebionetworks.web.server.RestTemplateProviderImpl;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
+import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.users.UserRegistration;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import com.sun.grizzly.http.SelectorThread;
 
@@ -159,6 +171,19 @@ public class UserAccountServiceImplTest {
 		String userDataJson = service.initiateSession(user1.getEmail(), user1password, false);
 		UserSessionData userData = EntityFactory.createEntityFromJSONString(userDataJson, UserSessionData.class);
 		Assert.assertNotNull(userData.getSessionToken());
+	}
+	
+	@Test(expected=BadRequestException.class)
+	public void testCreateDuplicateUser() throws Exception {
+		UserAccountServiceImpl testService = new UserAccountServiceImpl();
+		ServiceUrlProvider mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
+		testService.setServiceUrlProvider(mockUrlProvider);
+		RestTemplateProvider mockTemplateProvider = Mockito.mock(RestTemplateProvider.class);
+		testService.setRestTemplate(mockTemplateProvider);
+		RestTemplate mockRestTemplate = Mockito.mock(RestTemplate.class);
+		when(mockTemplateProvider.getTemplate()).thenReturn(mockRestTemplate);
+		when(mockRestTemplate.exchange(anyString(), any(HttpMethod.class),any(HttpEntity.class),any(Class.class),anyVararg())).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+		testService.createUser(user1);
 	}
 	
 	@Ignore
