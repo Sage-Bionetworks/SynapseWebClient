@@ -239,7 +239,6 @@ public class FileAttachmentServlet extends HttpServlet {
 		Synapse client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		client.setSearchEndpoint(urlProvider.getSearchServiceUrl());
 		client.setSessionToken(sessionToken);
 		return client;
 	}
