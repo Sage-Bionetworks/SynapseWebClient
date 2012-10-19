@@ -566,7 +566,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
-		synapseClient.setSearchEndpoint(urlProvider.getSearchServiceUrl());
 		return synapseClient;
 	}
 }
