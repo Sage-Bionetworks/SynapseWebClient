@@ -456,9 +456,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	private ColumnModel setupColumnModel() {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY, VERSION_KEY_COMMENT};
-		String[] names = {"label",           "age",              "by",               "comment"};	// 
-		int[] widths = {100, 200, 100, 250};
+		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY};
+		String[] names = {"label"          , "comment"          ,  "age"            , "by"              };
+		int[] widths =	 {100              , 250                , 200               , 100               };
 
 		if (keys.length != names.length || names.length != widths.length)
 			throw new IllegalArgumentException("All configuration arrays must be the same length.");
