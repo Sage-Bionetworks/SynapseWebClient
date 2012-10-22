@@ -4,15 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.shared.users.AclUtils;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -26,6 +30,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -56,7 +61,7 @@ public class EntityViewUtils {
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}
 	}
-
+	
 	public static Widget createRestrictionsWidget(
 			final String jiraFlagLink, 
 			final boolean isAnonymous, 
@@ -86,11 +91,17 @@ public class EntityViewUtils {
 		SimplePanel shieldPanel = new SimplePanel();
 		shieldPanel.setStyleName("left "+shieldStyleName);
 		lc.add(shieldPanel, td);
-		
+		//add tooltip
+		DisplayUtils.addTooltip(synapseJSNIUtils, shieldPanel, DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP, TOOLTIP_POSITION.BOTTOM);
 		{
 			SafeHtmlBuilder shb = new SafeHtmlBuilder();
 			shb.appendHtmlConstant("<span class=\"strong\" style=\"margin-right: 10px; margin-left: 7px;\">"+dataRestrictionType+"</span>");
-			lc.add(new HTML(shb.toSafeHtml()), td);
+			
+			//add tooltip
+			HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
+			htmlPanel.addStyleName("inline-block");
+			DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP, TOOLTIP_POSITION.BOTTOM);
+			lc.add(htmlPanel, td);
 		}
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		String infoHyperlinkText = DisplayConstants.INFO;
@@ -139,10 +150,7 @@ public class EntityViewUtils {
 			}
 		});		
 		lc.add(flagLink, td);
-		Map<String,String> optionsMap = new HashMap<String,String>();
-		optionsMap.put("title", DisplayConstants.FLAG_TOOL_TIP);
-		optionsMap.put("data-placement", "right");
-		DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, optionsMap);
+		DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, DisplayConstants.FLAG_TOOL_TIP, TOOLTIP_POSITION.RIGHT);
 	    
 	    lc.layout();
 		return lc;

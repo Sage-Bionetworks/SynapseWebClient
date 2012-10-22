@@ -26,6 +26,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
@@ -56,12 +57,15 @@ public class AccessControlListEditorTest {
 	private SynapseClientAsync mockSynapseClient;
 	private AuthenticationController mockAuthenticationController;
 	private AccessControlListEditorView mockACLEView;
+	private UserAccountServiceAsync mockUserAccountService;
 	
 	// Test Synapse objects
 	private static final long OWNER_ID = 1L;
 	private static final long ADMIN_ID = 2L;
 	private static final long USER_ID = 3L;
 	private static final long USER2_ID = 4L;
+	private static final String TEST_PUBLIC_PRINCIPAL_ID = "789";
+	private static final String TEST_AUTHENTICATED_PRINCIPAL_ID = "123";
 	private static final String OWNER_NAME = "Owner";
 	private static final String ENTITY_ID = "syn101";
 	private static final String INHERITED_ACL_ID = "syn202";
@@ -72,7 +76,14 @@ public class AccessControlListEditorTest {
 	private static Project project;
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
 	private static EntityWrapper userGroupHeaderRPWrapper;
-	
+	private static AsyncCallback<EntityWrapper> changesPushedCallback = new AsyncCallback<EntityWrapper>() {
+		@Override
+		public void onSuccess(EntityWrapper result) {
+		}
+		@Override
+		public void onFailure(Throwable caught) {
+		}
+	};
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
@@ -89,6 +100,9 @@ public class AccessControlListEditorTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(AccessControlListEditorView.class);
+		mockUserAccountService = mock(UserAccountServiceAsync.class);
+		AsyncMockStubber.callSuccessWith(TEST_PUBLIC_PRINCIPAL_ID +","+ TEST_AUTHENTICATED_PRINCIPAL_ID).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
+
 		when(mockAuthenticationController.getLoggedInUser().getProfile().getOwnerId()).thenReturn(new Long(ADMIN_ID).toString());
 		AsyncMockStubber.callSuccessWith(userGroupHeaderRPWrapper).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<List<String>>any(), any(AsyncCallback.class));
 
@@ -97,7 +111,8 @@ public class AccessControlListEditorTest {
 				mockSynapseClient,
 				nodeModelCreator,
 				mockAuthenticationController,
-				new JSONObjectAdapterImpl()
+				new JSONObjectAdapterImpl(),
+				mockUserAccountService
 		);
 		acle.setResource(project);
 	}
@@ -199,7 +214,7 @@ public class AccessControlListEditorTest {
 		// create
 		acle.asWidget();
 		acle.createAcl();
-		acle.pushChangesToSynapse(false);
+		acle.pushChangesToSynapse(false,changesPushedCallback);
 		
 		verify(mockSynapseClient).createAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
@@ -207,6 +222,7 @@ public class AccessControlListEditorTest {
 		assertEquals("Created ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView).setPublicPrincipalId(anyLong());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -231,7 +247,7 @@ public class AccessControlListEditorTest {
 		// update
 		acle.asWidget();
 		acle.setAccess(USER_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(false);
+		acle.pushChangesToSynapse(false,changesPushedCallback);
 		
 		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
 		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
@@ -240,6 +256,7 @@ public class AccessControlListEditorTest {
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView).setPublicPrincipalId(anyLong());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -264,7 +281,7 @@ public class AccessControlListEditorTest {
 		// update
 		acle.asWidget();
 		acle.setAccess(USER_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(false);
+		acle.pushChangesToSynapse(false,changesPushedCallback);
 		
 		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
 		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
@@ -308,7 +325,7 @@ public class AccessControlListEditorTest {
 		// update
 		acle.asWidget();
 		acle.removeAccess(USER_ID);
-		acle.pushChangesToSynapse(false);
+		acle.pushChangesToSynapse(false, changesPushedCallback);
 		
 		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
 		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
@@ -337,7 +354,7 @@ public class AccessControlListEditorTest {
 		// update
 		acle.asWidget();
 		acle.deleteAcl();
-		acle.pushChangesToSynapse(false);
+		acle.pushChangesToSynapse(false, changesPushedCallback);
 		
 		verify(mockSynapseClient).deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
 		verify(mockACLEView, never()).showErrorMessage(anyString());
@@ -366,7 +383,7 @@ public class AccessControlListEditorTest {
 		// update
 		acle.asWidget();
 		acle.setAccess(USER_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(true);
+		acle.pushChangesToSynapse(true,changesPushedCallback);
 		
 		verify(mockSynapseClient).updateAcl(captor.capture(), eq(true), any(AsyncCallback.class));
 		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
@@ -386,7 +403,7 @@ public class AccessControlListEditorTest {
 		// update
 		acle.asWidget();
 		acle.setAccess(OWNER_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(false);
+		acle.pushChangesToSynapse(false,changesPushedCallback);
 		
 		verify(mockACLEView, times(2)).showErrorMessage(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
@@ -401,7 +418,7 @@ public class AccessControlListEditorTest {
 		// update
 		acle.asWidget();
 		acle.setAccess(ADMIN_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(false);
+		acle.pushChangesToSynapse(false,changesPushedCallback);
 		
 		verify(mockACLEView, times(2)).showErrorMessage(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
@@ -415,7 +432,7 @@ public class AccessControlListEditorTest {
 		
 		// attempt to push changes when none have been made
 		acle.asWidget();
-		acle.pushChangesToSynapse(false);
+		acle.pushChangesToSynapse(false,changesPushedCallback);
 
 		verify(mockACLEView).showErrorMessage(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
@@ -430,7 +447,7 @@ public class AccessControlListEditorTest {
 		// attempt to remove permissions for user not on ACL
 		acle.asWidget();
 		acle.removeAccess(USER2_ID);
-		acle.pushChangesToSynapse(false);
+		acle.pushChangesToSynapse(false,changesPushedCallback);
 
 		verify(mockACLEView, times(2)).showErrorMessage(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());

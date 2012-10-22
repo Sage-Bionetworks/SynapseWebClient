@@ -39,7 +39,6 @@ import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.resources.client.ImageResource;
@@ -59,12 +58,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
-
+	
 	private EntityBundle bundle;
 	private boolean readOnly;
 	private String entityTypeDisplay;
 	private EventBus bus;
 	private JiraURLHelper jiraURLHelper;
+	private String publicAndAuthenticatedAclPrincipalIds;
+	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
@@ -190,16 +191,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void getHtmlFromMarkdown(String markdown, String attachmentBaseUrl, final AsyncCallback<String> asyncCallback) {
-		synapseClient.markdown2Html(markdown, attachmentBaseUrl, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				asyncCallback.onSuccess(result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				asyncCallback.onFailure(caught);
-			}
-		});
+		synapseClient.markdown2Html(markdown, attachmentBaseUrl, asyncCallback);
 	}
 	
 	/*
@@ -375,7 +367,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		};
 	}
-
+	
 	private void sendVersionInfoToView() {
 		final Entity entity = bundle.getEntity();
 		if (entity instanceof Versionable) {
@@ -416,7 +408,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 		view.setEntityVersions(vb, versions);
 	}
-
+	
 	static class ReverseLong implements Comparator<Long> {
 
 		@Override
