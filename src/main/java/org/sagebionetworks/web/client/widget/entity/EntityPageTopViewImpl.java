@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -36,13 +35,18 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BaseModelData;
+import com.extjs.gxt.ui.client.data.BasePagingLoadConfig;
 import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
+import com.extjs.gxt.ui.client.data.PagingLoader;
 import com.extjs.gxt.ui.client.data.RpcProxy;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.GridEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.store.ListStore;
@@ -88,8 +92,18 @@ import com.google.inject.Inject;
 
 public class EntityPageTopViewImpl extends Composite implements EntityPageTopView {
 
+	private static final int VERSION_LIMIT = 30;
+
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
+
+	protected static final String VERSION_KEY_ID = "id";
+	protected static final String VERSION_KEY_NUMBER = "number";
+	protected static final String VERSION_KEY_LABEL = "label";
+	protected static final String VERSION_KEY_COMMENT = "comment";
+	protected static final String VERSION_KEY_MOD_ON = "modifiedOn";
+	protected static final String VERSION_KEY_MOD_BY = "modifiedBy";
+
 
 	private static final String REFERENCES_KEY_ID = "id";
 	private static final String REFERENCES_KEY_NAME = "name";
@@ -427,6 +441,136 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    return lc;
 	}
 
+	private GridCellRenderer<BaseModelData> configureVersionsGridCellRenderer() {
+		GridCellRenderer<BaseModelData> cellRenderer = new GridCellRenderer<BaseModelData>() {
+			@Override
+			public String render(BaseModelData model, String property,
+					ColumnData config, int rowIndex, int colIndex,
+					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
+				if (model.get(property) != null)
+					return model.get(property).toString();
+				else
+					return null;
+			}
+		};
+		return cellRenderer;
+	}
+	private ColumnModel setupColumnModel() {
+		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
+		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY, VERSION_KEY_COMMENT};
+		String[] names = {"label",           "age",              "by",               "comment"};	// 
+		int[] widths = {100, 200, 100, 250};
+
+		if (keys.length != names.length || names.length != widths.length)
+			throw new IllegalArgumentException("All configuration arrays must be the same length.");
+
+		GridCellRenderer<BaseModelData> cellRenderer = configureVersionsGridCellRenderer();
+
+		for (int i = 0; i < keys.length; i++) {
+			ColumnConfig colConfig = new ColumnConfig(keys[i], names[i], widths[i]);
+			colConfig.setRenderer(cellRenderer);
+			colConfig.setSortable(false);
+			colConfig.setResizable(false);
+			colConfig.setMenuDisabled(true);
+			columns.add(colConfig);
+		}
+		return new ColumnModel(columns);
+	}
+
+	@Override
+	public void setEntityVersions(final Versionable entity) {
+		if (titleWidget != null) {
+			RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
+
+				@Override
+				protected void load(
+						Object loadConfig,
+						final AsyncCallback<PagingLoadResult<BaseModelData>> callback) {
+					final int offset = ((PagingLoadConfig) loadConfig)
+							.getOffset();
+					int limit = ((PagingLoadConfig) loadConfig).getLimit();
+					presenter.loadVersions(entity.getId(), offset, limit,
+							new AsyncCallback<PaginatedResults<VersionInfo>>() {
+								@Override
+								public void onSuccess(
+										PaginatedResults<VersionInfo> result) {
+									List<BaseModelData> dataList = new ArrayList<BaseModelData>();
+									for (VersionInfo version : result
+											.getResults()) {
+										BaseModelData model = new BaseModelData();
+										model.set(EntityMetadata.VERSION_KEY_ID, version.getId());
+										model.set(EntityMetadata.VERSION_KEY_NUMBER, version.getVersionNumber());
+										model.set(EntityMetadata.VERSION_KEY_LABEL, version.getVersionLabel());
+										model.set(EntityMetadata.VERSION_KEY_COMMENT, version.getVersionComment());
+										model.set(EntityMetadata.VERSION_KEY_MOD_ON, version.getModifiedOn());
+										model.set(EntityMetadata.VERSION_KEY_MOD_BY, version.getModifiedByPrincipalId());
+										dataList.add(model);
+									}
+									PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(
+											dataList);
+									loadResultData.setTotalLength((int) result
+											.getTotalNumberOfResults());
+									loadResultData.setOffset(offset);
+									callback.onSuccess(loadResultData);
+								}
+
+								@Override
+								public void onFailure(Throwable caught) {
+									callback.onFailure(caught);
+								}
+							});
+				}
+
+			};
+			final BasePagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(
+					proxy);
+			loader.setRemoteSort(false);
+			loader.setReuseLoadConfig(true);
+
+			// add initial data to the store
+			ListStore<BaseModelData> store = new ListStore<BaseModelData>(
+					loader);
+
+			Grid<BaseModelData> grid = new Grid<BaseModelData>(store, setupColumnModel());
+			grid.getView().setForceFit(true);
+			grid.getView().setEmptyText("Sorry, no versions were found.");
+			grid.setLayoutData(new FitLayout());
+			grid.setStateful(false);
+			grid.setLoadMask(true);
+			grid.setAutoWidth(true);
+			grid.setBorders(false);
+			grid.setStripeRows(true);
+			grid.setHeight(200);
+			grid.addListener(Events.Attach,
+					new Listener<GridEvent<ModelData>>() {
+						public void handleEvent(GridEvent<ModelData> be) {
+							BasePagingLoadConfig config = new BasePagingLoadConfig();
+							config.setLimit(VERSION_LIMIT);
+							config.setOffset(0);
+							loader.load(config);
+						}
+					});
+
+			ContentPanel cp = new ContentPanel();
+			cp.setLayout(new FitLayout());
+			cp.setBodyBorder(true);
+			cp.setButtonAlign(HorizontalAlignment.CENTER);
+			cp.setHeaderVisible(false);
+			cp.setHeight(200);
+
+			// create bottom paging toolbar
+			PagingToolBar toolBar = new PagingToolBar(VERSION_LIMIT);
+			toolBar.bind(loader);
+			toolBar.setSpacing(2);
+			toolBar.insert(new SeparatorToolItem(), toolBar.getItemCount() - 2);
+
+			cp.setBottomComponent(toolBar);
+
+			cp.add(grid);
+			titleWidget.setVersions(cp);
+		}
+	}
+
 	private Widget createReferencesWidget(Entity entity, PaginatedResults<EntityHeader> referencedBy) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
@@ -733,14 +877,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         lc.add(attachmentsPanel.asWidget());
 		lc.layout();
 		return lc;
-	}
-
-
-	@Override
-	public void setEntityVersions(Versionable entity, PaginatedResults<VersionInfo> versions) {
-		if (titleWidget != null) {
-			titleWidget.setVersions(entity, versions);
-		}
 	}
 
 }

@@ -36,7 +36,10 @@ import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
-import com.google.gwt.core.client.GWT;
+import com.extjs.gxt.ui.client.data.BaseModelData;
+import com.extjs.gxt.ui.client.data.PagingLoadConfig;
+import com.extjs.gxt.ui.client.data.PagingLoadResult;
+import com.extjs.gxt.ui.client.data.RpcProxy;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.resources.client.ImageResource;
@@ -183,6 +186,25 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 			});
 		}
+	}
+
+	@Override
+	public void loadVersions(String id, int offset, int limit,
+				final AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback) {
+		// TODO: If we ever change the offset api to actually take 0 as a valid offset, then we need to remove "+1"
+		synapseClient.getEntityVersions(id, offset+1, limit, new AsyncCallback<String>(){
+			@Override
+			public void onSuccess(String result) {
+				PaginatedResults<VersionInfo> paginatedResults = nodeModelCreator
+						.createPaginatedResults(result,
+								VersionInfo.class);
+				asyncCallback.onSuccess(paginatedResults);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				asyncCallback.onFailure(caught);
+			}
+		});
 	}
 
 	@Override
@@ -374,23 +396,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	private void sendVersionInfoToView() {
-		final Entity entity = bundle.getEntity();
+		Entity entity = bundle.getEntity();
 		if (entity instanceof Versionable) {
-			synapseClient.getEntityVersions(entity.getId(), 1, 20,
-					new AsyncCallback<String>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							view.setEntityVersions((Versionable)entity, null);
-						}
-
-						@Override
-						public void onSuccess(String result) {
-							PaginatedResults<VersionInfo> versions = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
-							view.setEntityVersions((Versionable)entity, versions);
-						}
-
-					});
+			view.setEntityVersions((Versionable)entity);
 		}
 	}
 
