@@ -446,10 +446,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			public String render(BaseModelData model, String property,
 					ColumnData config, int rowIndex, int colIndex,
 					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
-				if (model.get(property) != null)
+
+				if         (property.equals(VERSION_KEY_MOD_BY)) {
 					return model.get(property).toString();
-				else
+
+				} else if (property.equals(VERSION_KEY_MOD_ON)) {
+					return model.get(property).toString();
+
+				} else if (model.get(property) != null) {
+					return model.get(property).toString();
+
+				} else {
 					return null;
+				}
 			}
 		};
 		return cellRenderer;
