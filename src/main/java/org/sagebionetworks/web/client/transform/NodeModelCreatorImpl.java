@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.transform;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.BatchResults;
@@ -206,7 +207,7 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 					JSONObjectAdapter joa = aa.getJSONObject(i);
 					unmetAccessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
 				}
-			}			
+			}
 			// put it all together.
 			EntityBundle eb =  new EntityBundle(entity, annotations, 
 					permissions, path, referencedBy,

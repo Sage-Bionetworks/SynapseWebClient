@@ -89,6 +89,19 @@ public class DisplayConstants {
 	public static final String LABEL_SHARING_PANEL_INHERITED = "Inherited Sharing Settings";
 	public static final String BUTTON_PERMISSIONS_CREATE_NEW_ACL = "Create Local Sharing Settings";
 	public static final String BUTTON_PERMISSIONS_DELETE_ACL = "Delete Local Sharing Settings";
+	public static final String BUTTON_MAKE_PUBLIC_ACL = "Make Public";
+	public static final String BUTTON_REVOKE_PUBLIC_ACL = "Make Private";
+	public static final String BUTTON_MAKE_PUBLIC_ACL_TOOLTIP = "Click to allow access to anyone on the internet";
+	public static final String BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP = "Click to restrict access to only those people you select above";
+	public static final String PUBLIC_ACL_TITLE = "Public on the web";
+	public static final String PUBLIC_ACL_DESCRIPTION = "Anyone on the internet can access, no login required";
+	public static final String PUBLIC_ACL_ENTITY_PAGE = "Public";
+	public static final String PRIVATE_ACL_ENTITY_PAGE = "Private";
+	public static final String PRIVATE_ACL_DESCRIPTION = "Restricted to those people selected in the Share Settings window";
+	
+	public static final String AUTHENTICATED_USERS_ACL_TITLE = "Anyone logged in";
+	public static final String AUTHENTICATED_USERS_ACL_DESCRIPTION = "Anyone who is logged in can access";
+	
 	public static final String CONFIRM_DELETE_ACL = "Deleting local sharing settings will cause inheritance from parent. Proceed?";
 	public static final String BUTTON_PERMISSIONS_APPLY_ACL_TO_CHILDREN = "Apply Local Sharing Settings to Children";
 	public static final String CONFIRM_APPLY_ACL_TO_CHILDREN = PERMISSIONS_APPLY_ACL_TO_CHILDREN_TEXT + " Proceed?";
@@ -276,7 +289,8 @@ public class DisplayConstants {
 	public static final String SHOW_LIST_EDITOR = "Show List Editor";
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 	public static final String FLAG = "flag";
-	public static final String FLAG_TOOL_TIP = "Flag this data object for review by ACT";
+	public static final String FLAG_TOOL_TIP = "Flag this data for review by the Synapse Access and Compliance Team";
+	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Shows if there are any data access restrictions due to human data privacy rules";
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
 	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";

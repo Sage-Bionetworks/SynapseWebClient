@@ -13,7 +13,9 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -59,6 +61,7 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -78,17 +81,20 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Grid<PermissionsTableEntry> permissionsGrid;
 	private Map<PermissionLevel, String> permissionDisplay;
 	private SageImageBundle sageImageBundle;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	private ListStore<PermissionsTableEntry> permissionsStore;
 	private ColumnModel columnModel;
-	
+	private Long publicPrincipalId, authenticatedPrincipalId;
+	private Boolean isPubliclyVisible;
+	private Button publicButton;
 	
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
-			SageImageBundle sageImageBundle, UrlCache urlCache) {
+			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
-		
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
@@ -109,12 +115,51 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	public void addAclEntry(AclEntry aclEntry) {
 		if (permissionsStore == null || columnModel == null || permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
-		if (aclEntry.isOwner()) 
-			permissionsStore.insert(new PermissionsTableEntry(aclEntry), 0); // insert owner first
+		if (!aclEntry.getPrincipal().getIsIndividual())
+			permissionsStore.insert(new PermissionsTableEntry(aclEntry), 0); // insert groups first
+		else if (aclEntry.isOwner()) {
+			//owner should be the first (after groups, if present)
+			int insertIndex = 0;
+			for (; insertIndex < permissionsStore.getCount(); insertIndex++) {
+				UserGroupHeader item = permissionsStore.getAt(insertIndex).getAclEntry().getPrincipal();
+				if (item.getIsIndividual())
+					break;
+			}
+			permissionsStore.insert(new PermissionsTableEntry(aclEntry), insertIndex); // insert owner
+		}
 		else
 			permissionsStore.add(new PermissionsTableEntry(aclEntry));
 		permissionsGrid.reconfigure(permissionsStore, columnModel);
-	}	
+	}
+	
+	@Override
+	public void setPublicPrincipalId(Long id) {
+		publicPrincipalId = id;
+	}
+	@Override
+	public void setAuthenticatedPrincipalId(Long id) {
+		authenticatedPrincipalId = id;
+	}
+	@Override
+	public void setIsPubliclyVisible(Boolean isPubliclyVisible) {
+		this.isPubliclyVisible = isPubliclyVisible;
+		if (publicButton != null) {
+			if (isPubliclyVisible) {
+				//already publicly visible, button removes access to public
+				publicButton.setText(DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL);
+				publicButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.lockGrey16()));
+				//TODO: use bootstrap tooltip instead.  can't get it working with the Button (and all other tooltips on dialog are standard).
+				publicButton.setToolTip(new ToolTipConfig(DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP));
+//				DisplayUtils.addTooltip(this.synapseJSNIUtils, publicButtonWrapper, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP, TOOLTIP_POSITION.BOTTOM);
+			}
+			else {
+				publicButton.setText(DisplayConstants.BUTTON_MAKE_PUBLIC_ACL);
+				publicButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.globe16()));
+				publicButton.setToolTip(new ToolTipConfig(DisplayConstants.BUTTON_MAKE_PUBLIC_ACL, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL_TOOLTIP));
+//				DisplayUtils.addTooltip(this.synapseJSNIUtils, publicButtonWrapper, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL_TOOLTIP, TOOLTIP_POSITION.BOTTOM);
+			}
+		}
+	}
 	
 	@Override
 	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges) {		
@@ -218,6 +263,28 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 
 			fieldSet.add(shareButton);
 			form2.add(fieldSet);
+			
+
+			//Make Public button
+			publicButton = new Button();
+			publicButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					//add the ability for PUBLIC to see this entity
+					if (isPubliclyVisible) {
+						if (publicPrincipalId != null){
+							presenter.removeAccess(publicPrincipalId);
+						}
+					}
+					else {
+						if (publicPrincipalId != null) {
+							presenter.setAccess(publicPrincipalId, PermissionLevel.CAN_VIEW);
+						}
+					}
+					
+				}
+			});
+			form2.add(publicButton, tdLeft);
 			add(form2);
 			
 			// 'Delete ACL' button
@@ -229,12 +296,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					presenter.deleteAcl();					
 				}
 			});
+			
 			hPanel.setHorizontalAlign(HorizontalAlignment.LEFT);
+			//delete button takes up the rest of the line space
 			hPanel.add(deleteAclButton, tdLeft);
 			deleteAclButton.setEnabled(canEnableInheritance);
 		}
-		
-
 		
 		// Unsaved changes label
 //		Label blank = new Label("");
@@ -378,7 +445,16 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					Grid<PermissionsTableEntry> grid) {
 				PermissionsTableEntry entry = store.getAt(rowIndex);
 				UserGroupHeader principal = entry.getAclEntry().getPrincipal();
-				String principalHtml = DisplayUtils.getUserNameEmailHtml(principal);
+				String principalHtml;
+				boolean isThePublicGroup = principal != null && principal.getOwnerId().equals(publicPrincipalId.toString());
+				boolean isTheAuthenticatedUsersGroup = principal != null && principal.getOwnerId().equals(authenticatedPrincipalId.toString());
+				
+				if (isThePublicGroup)
+					principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.PUBLIC_ACL_TITLE, DisplayConstants.PUBLIC_ACL_DESCRIPTION);
+				else if (isTheAuthenticatedUsersGroup)
+					principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.AUTHENTICATED_USERS_ACL_TITLE, DisplayConstants.AUTHENTICATED_USERS_ACL_DESCRIPTION);
+				else
+					principalHtml = DisplayUtils.getUserNameEmailHtml(principal);
 				
 				String iconHtml = "";
 				if (principal.getPic() != null) {
@@ -390,6 +466,9 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 							null
 					);
 					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
+				} else if (principal.getOwnerId().equals(publicPrincipalId.toString())){
+					ImageResource icon = iconsImageBundle.globe32();
+					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
 				} else {
 					// Default to generic user or group avatar
 					ImageResource icon = principal.getIsIndividual() ? iconsImageBundle.userBusinessGrey40() : iconsImageBundle.usersGrey40();

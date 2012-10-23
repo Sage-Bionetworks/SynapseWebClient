@@ -477,6 +477,22 @@ blockquote.from-markdown {
     padding: 20px;
 }
 
+.public-acl-image {
+	background-image: url(images/icons/globe-green-16.png);
+	width: 16px;
+	height: 16px;
+}
+
+.private-acl-image {
+	background-image: url(images/icons/lock-grey-16.png);
+	width: 16px;
+	height: 16px;
+}
+
+.inline-block {
+	display:inline-block;
+}
+
 h1, h2, h3, h4, h5, h6 {
 	word-wrap: break-word;
 }
