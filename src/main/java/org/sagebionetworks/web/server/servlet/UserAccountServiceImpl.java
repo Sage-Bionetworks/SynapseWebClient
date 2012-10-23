@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.AuthorizationConstants.DEFAULT_GROUPS;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;
@@ -556,10 +557,14 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	@Override
 	public String getPublicAndAuthenticatedGroupPrincipalIds() {
 		validateService();
+		Synapse synapseClient = createSynapseClient();
+		return getPublicAndAuthenticatedPrincipalIds(synapseClient);		
+	}
+	
+	public static String getPublicAndAuthenticatedPrincipalIds(Synapse synapseClient) {
 		String publicPrincipalId = "";
 		String authenticatedPrincipalId = "";
 		try {
-			Synapse synapseClient = createSynapseClient();
 			PaginatedResults<UserGroup> allGroups = synapseClient.getGroups(0, Integer.MAX_VALUE);
 			
 			for (Iterator iterator = allGroups.getResults().iterator(); iterator.hasNext();) {
@@ -574,7 +579,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		} catch (Exception e) {
 			throw new RestClientException(e.getMessage());
 		}
-		return publicPrincipalId + "," + authenticatedPrincipalId;		
+		return publicPrincipalId + "," + authenticatedPrincipalId;	
 	}
 	
 	/**

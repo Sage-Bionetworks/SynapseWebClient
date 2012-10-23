@@ -45,8 +45,10 @@ public class TitleWidget {
 		.appendHtmlConstant("</h2>");
 		lc.add(new HTML(shb.toSafeHtml()));
 
+	    if (shareSettingsWidget!=null) lc.add(shareSettingsWidget);
+
 	    // the headers for description and property
-		if (restrictionsWidget!=null) lc.add(restrictionsWidget);  
+	    if (restrictionsWidget!=null) lc.add(restrictionsWidget);  
 
 	    if(canEdit && readOnly) {
 			HTML roContainer = new HTML("<h4 class=\"colored\"> " + DisplayConstants.READ_ONLY + " " +AbstractImagePrototype.create(iconsImageBundle.help16()).getHTML() + "</h4>");
@@ -58,8 +60,6 @@ public class TitleWidget {
 
 	    // Metadata
 	    lc.add(createMetadata(bundle.getEntity(), iconsImageBundle));
-	    
-	    if (shareSettingsWidget!=null) lc.add(shareSettingsWidget);
 	    
 	    lc.layout();
 	}

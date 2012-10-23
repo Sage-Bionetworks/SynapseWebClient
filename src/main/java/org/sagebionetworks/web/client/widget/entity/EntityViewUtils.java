@@ -75,35 +75,28 @@ public class EntityViewUtils {
 			final boolean hasFulfilledAccessRequirements,
 			final IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
+		
+		final SimplePanel div = new SimplePanel();
+		String shieldStyleName = shieldStyleName(restrictionLevel);
+		String description = restrictionDescriptor(restrictionLevel);
+		String tooltip = DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP;
+		
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">"+DisplayConstants.DATA_ACCESS_RESTRICTIONS_TEXT+"</span><div class=\"" + shieldStyleName+ "\" style=\"display:inline-block; position:absolute\"></div>");
+		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 20px;\">"+description+"</span>");
+		
+		//form the html
+		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
+		htmlPanel.addStyleName("inline-block");
+		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.RIGHT);
+		div.add(htmlPanel);
+		
 		LayoutContainer lc = new HorizontalPanel();
-		lc.setStyleAttribute("font-size", "80%");
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		TableData td = new TableData();
-		td.setVerticalAlign(VerticalAlignment.BOTTOM);
-		lc.setLayout(new ColumnLayout());
 		
-		String shieldStyleName = shieldStyleName(restrictionLevel);
-
-		String dataRestrictionType = "Data Access: "+restrictionDescriptor(restrictionLevel);
-		
-		
-		SimplePanel shieldPanel = new SimplePanel();
-		shieldPanel.setStyleName("left "+shieldStyleName);
-		lc.add(shieldPanel, td);
-		//add tooltip
-		DisplayUtils.addTooltip(synapseJSNIUtils, shieldPanel, DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP, TOOLTIP_POSITION.BOTTOM);
-		{
-			SafeHtmlBuilder shb = new SafeHtmlBuilder();
-			shb.appendHtmlConstant("<span class=\"strong\" style=\"margin-right: 10px; margin-left: 7px;\">"+dataRestrictionType+"</span>");
-			
-			//add tooltip
-			HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-			htmlPanel.addStyleName("inline-block");
-			DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP, TOOLTIP_POSITION.BOTTOM);
-			lc.add(htmlPanel, td);
-		}
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		lc.add(div);
+		shb = new SafeHtmlBuilder();
 		String infoHyperlinkText = DisplayConstants.INFO;
 		if (restrictionLevel==APPROVAL_REQUIRED.NONE) { // OPEN data
 			if (hasAdministrativeAccess) {
@@ -118,7 +111,7 @@ public class EntityViewUtils {
 		}
 		shb.appendHtmlConstant("<span style=\"padding-right:30px;\"> (<a class=\"link\">"+infoHyperlinkText+"</a>)</span>");
 		Anchor aboutLink = new Anchor(shb.toSafeHtml());
-		lc.add(aboutLink, td);
+		lc.add(aboutLink);
 		aboutLink.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -149,7 +142,7 @@ public class EntityViewUtils {
 				}
 			}
 		});		
-		lc.add(flagLink, td);
+		lc.add(flagLink);
 		DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, DisplayConstants.FLAG_TOOL_TIP, TOOLTIP_POSITION.RIGHT);
 	    
 	    lc.layout();

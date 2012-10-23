@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -200,7 +201,7 @@ public class AccessControlListEditorTest {
 	@Test
 	public void createAclTest() throws Exception {		
 		// create response ACL
-		EntityWrapper expectedEntityWrapper = new EntityWrapper(
+		final EntityWrapper expectedEntityWrapper = new EntityWrapper(
 				localACL.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
 				AccessControlList.class.getName(), 
 				null
@@ -214,7 +215,18 @@ public class AccessControlListEditorTest {
 		// create
 		acle.asWidget();
 		acle.createAcl();
-		acle.pushChangesToSynapse(false,changesPushedCallback);
+		//for one test case, also test for a successful callback
+		acle.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
+				@Override
+				public void onSuccess(EntityWrapper result) {
+					assertEquals(expectedEntityWrapper, result);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					Assert.fail();
+				}
+			});
+		
 		
 		verify(mockSynapseClient).createAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
