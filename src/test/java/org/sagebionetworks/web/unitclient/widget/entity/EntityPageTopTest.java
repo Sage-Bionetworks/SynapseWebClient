@@ -1,13 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.EntitySchemaCache;
@@ -20,6 +24,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
@@ -38,10 +43,11 @@ public class EntityPageTopTest {
 	IconsImageBundle mockIconsImageBundle;
 	EventBus mockEventBus;
 	JiraURLHelper mockJiraURLHelper;
-	
+
 	EntityPageTop pageTop;
+
 	@Before
-	public void before() throws JSONObjectAdapterException{
+	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
@@ -53,34 +59,81 @@ public class EntityPageTopTest {
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockEventBus = mock(EventBus.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
-		pageTop = new EntityPageTop(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController,
-				mockGlobalApplicationState,
-				mockSchemaCache,
-				mockJsonObjectAdapter,
-				mockEntityTypeProvider,
-				mockIconsImageBundle,
-				mockJiraURLHelper,
-				mockEventBus);
+		pageTop = new EntityPageTop(mockView, mockSynapseClient,
+				mockNodeModelCreator, mockAuthenticationController,
+				mockGlobalApplicationState, mockSchemaCache,
+				mockJsonObjectAdapter, mockEntityTypeProvider,
+				mockIconsImageBundle, mockJiraURLHelper, mockEventBus);
 	}
-		
+
 	@Test
-	public void testMarkdownToHtmlWiring(){
+	public void testMarkdownToHtmlWiring() {
 		final String testHtml = "<h1>HTML Returns</h1>";
 		final String testMarkdown = "HTML Returns\n----------";
-		AsyncMockStubber.callSuccessWith(testHtml).when(mockSynapseClient).markdown2Html(any(String.class), any(String.class), any(AsyncCallback.class));
+		AsyncMockStubber
+				.callSuccessWith(testHtml)
+				.when(mockSynapseClient)
+				.markdown2Html(any(String.class), any(String.class),
+						any(AsyncCallback.class));
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				assertEquals("unexpected markdown to html conversion", testHtml, result);
+				assertEquals("unexpected markdown to html conversion",
+						testHtml, result);
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				fail("unexpected failure in test: " + caught.getMessage());
 			}
 		};
 		pageTop.getHtmlFromMarkdown(testMarkdown, "", callback);
-		
-		verify(mockSynapseClient).markdown2Html(any(String.class), any(String.class), any(AsyncCallback.class));
+
+		verify(mockSynapseClient).markdown2Html(any(String.class),
+				any(String.class), any(AsyncCallback.class));
 	}
-	
+
+	@Test
+	public void testLoadVersions() throws Exception {
+		AsyncMockStubber
+				.callSuccessWith("")
+				.when(mockSynapseClient)
+				.getEntityVersions(anyString(), anyInt(), anyInt(),
+						any(AsyncCallback.class));
+		AsyncCallback<PaginatedResults<VersionInfo>> callback = new AsyncCallback<PaginatedResults<VersionInfo>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				fail("unexpected failure in test: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(PaginatedResults<VersionInfo> result) {
+				assertEquals(null, result);
+			}
+		};
+
+		pageTop.loadVersions("synEMPTY", 0, 1, callback);
 	}
+
+	@Test
+	public void testLoadVersionsFail() throws Exception {
+		AsyncMockStubber
+				.callFailureWith(new IllegalArgumentException())
+				.when(mockSynapseClient)
+				.getEntityVersions(anyString(), anyInt(), anyInt(),
+						any(AsyncCallback.class));
+		AsyncCallback<PaginatedResults<VersionInfo>> callback = new AsyncCallback<PaginatedResults<VersionInfo>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				assertTrue(caught instanceof IllegalArgumentException);
+			}
+
+			@Override
+			public void onSuccess(PaginatedResults<VersionInfo> result) {
+				fail("Called onSuccess on a failure");
+			}
+		};
+
+		pageTop.loadVersions("synEMPTY", 0, 1, callback);
+	}
+}

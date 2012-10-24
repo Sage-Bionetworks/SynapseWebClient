@@ -466,7 +466,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private ColumnModel setupColumnModel() {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
 		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY};
-		String[] names = {"label"          , "comment"          ,  "age"            , "by"              };
+		String[] names = {"Label"          , "Comment"          ,  "Age"            , "By"              };
 		int[] widths =	 {100              , 250                , 200               , 100               };
 
 		if (keys.length != names.length || names.length != widths.length)
