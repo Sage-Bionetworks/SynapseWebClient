@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -13,12 +12,11 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 
+import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TitleWidget {
@@ -68,45 +66,6 @@ public class TitleWidget {
 		return lc;
 	}
 
-	public void setVersions(Versionable entity, TreeMap<Long, String> latestVersions) {
-		entityMetadata.clearPreviousVersions();
-		if (latestVersions == null || latestVersions.size() < 1) {
-			InlineLabel notFound = new InlineLabel(DisplayConstants.ERROR_VERSIONS_NOT_FOUND);
-			entityMetadata.addToPreviousVersions(notFound);
-			return;
-		}
-
-		boolean first = true;
-		for (Entry<Long, String> entry : latestVersions.entrySet()) {
-			StringBuilder label = new StringBuilder();
-			label.append(entry.getValue().toString());
-			label.append(" [");
-			label.append(entry.getKey().toString());
-			label.append("]");
-
-			if (first) {
-				label.append(" (latest)");
-			}
-
-			if (!entity.getVersionNumber().equals(entry.getKey())) {
-				String historyTokenNoHash = DisplayUtils.
-				   getSynapseHistoryTokenNoHash(entity.getId(),
-				                                (first ? null : entry.getKey()));
-
-				Hyperlink anchor = new Hyperlink(label.toString(), historyTokenNoHash);
-				anchor.setStyleName("link");
-
-				entityMetadata.addToPreviousVersions(anchor);
-			} else {
-				InlineLabel widget = new InlineLabel(label.toString());
-				widget.addStyleName(entityMetadata.getStyle().currentVersion());
-				entityMetadata.addToPreviousVersions(widget);
-			}
-			first = false;
-
-		}
-	}
-
 	public void clear() {
 		lc.clearState();
 		lc.removeAll();
@@ -136,6 +95,11 @@ public class TitleWidget {
 			entityMetadata.setVersionInfo(sb.toString());
 		}
 		return entityMetadata;
+	}
+
+	public void setVersions(ContentPanel panel) {
+		entityMetadata.clearPreviousVersions();
+		entityMetadata.setPreviousVersions(panel);
 	}
 
 }

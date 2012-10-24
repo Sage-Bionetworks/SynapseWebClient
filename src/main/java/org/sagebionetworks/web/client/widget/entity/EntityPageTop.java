@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -58,7 +59,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
-	
+
 	private EntityBundle bundle;
 	private boolean readOnly;
 	private String entityTypeDisplay;
@@ -171,7 +172,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void loadShortcuts(int offset, int limit, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
-		PaginatedResults<EntityHeader> references = null;
 		if(offset == 0) {
 			 callback.onSuccess(bundle.getReferencedBy());
 		} else {
@@ -190,9 +190,28 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
+	public void loadVersions(String id, int offset, int limit,
+				final AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback) {
+		// TODO: If we ever change the offset api to actually take 0 as a valid offset, then we need to remove "+1"
+		synapseClient.getEntityVersions(id, offset+1, limit, new AsyncCallback<String>(){
+			@Override
+			public void onSuccess(String result) {
+				PaginatedResults<VersionInfo> paginatedResults = nodeModelCreator
+						.createPaginatedResults(result,
+								VersionInfo.class);
+				asyncCallback.onSuccess(paginatedResults);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				asyncCallback.onFailure(caught);
+			}
+		});
+	}
+
+	@Override
 	public void getHtmlFromMarkdown(String markdown, String attachmentBaseUrl, final AsyncCallback<String> asyncCallback) {
 		synapseClient.markdown2Html(markdown, attachmentBaseUrl, asyncCallback);
-	}
+			}
 	
 	/*
 	 * Private Methods
@@ -367,55 +386,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		};
 	}
-	
+
 	private void sendVersionInfoToView() {
-		final Entity entity = bundle.getEntity();
+		Entity entity = bundle.getEntity();
 		if (entity instanceof Versionable) {
-			synapseClient.getEntityVersions(entity.getId(), 1, 20,
-					new AsyncCallback<String>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							view.setEntityVersions((Versionable)entity, null);
-						}
-
-						@Override
-						public void onSuccess(String result) {
-							setEntityVersions(result);
-						}
-
-					});
+			view.setEntityVersions((Versionable)entity);
 		}
 	}
-
-	private void setEntityVersions(String jsonVersions) {
-		TreeMap<Long, String> versions = new TreeMap<Long, String>(new ReverseLong());
-		JSONObjectAdapter joa;
-		try {
-			joa = this.jsonObjectAdapter.createNew(jsonVersions);
-			int numResults = joa.getInt("totalNumberOfResults");
-
-			JSONArrayAdapter jsonArray = joa.getJSONArray("results");
-			for (int i = 0; i < numResults; i++) {
-				JSONObjectAdapter jsonObject = jsonArray.getJSONObject(i);
-				long number = jsonObject.getInt("versionNumber");
-				String label = jsonObject.getString("versionLabel");
-				versions.put(number, label);
-			}
-		} catch (JSONObjectAdapterException e) {
-		}
-		Versionable vb = (Versionable)bundle.getEntity();
-
-		view.setEntityVersions(vb, versions);
-	}
-	
-	static class ReverseLong implements Comparator<Long> {
-
-		@Override
-		public int compare(Long o1, Long o2) {
-			return o1 > o2 ? -1 :
-					o1 < o2 ? +1 : 0;
-		}
-    }
 
 }
