@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Comparator;
-import java.util.TreeMap;
-
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
@@ -11,9 +8,9 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.ObjectSchema;
-import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -39,7 +36,6 @@ import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.resources.client.ImageResource;
@@ -170,7 +166,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void loadShortcuts(int offset, int limit, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
-		PaginatedResults<EntityHeader> references = null;
 		if(offset == 0) {
 			 callback.onSuccess(bundle.getReferencedBy());
 		} else {
@@ -186,6 +181,25 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 			});
 		}
+	}
+
+	@Override
+	public void loadVersions(String id, int offset, int limit,
+				final AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback) {
+		// TODO: If we ever change the offset api to actually take 0 as a valid offset, then we need to remove "+1"
+		synapseClient.getEntityVersions(id, offset+1, limit, new AsyncCallback<String>(){
+			@Override
+			public void onSuccess(String result) {
+				PaginatedResults<VersionInfo> paginatedResults = nodeModelCreator
+						.createPaginatedResults(result,
+								VersionInfo.class);
+				asyncCallback.onSuccess(paginatedResults);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				asyncCallback.onFailure(caught);
+			}
+		});
 	}
 
 	@Override
@@ -377,53 +391,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	private void sendVersionInfoToView() {
-		final Entity entity = bundle.getEntity();
+		Entity entity = bundle.getEntity();
 		if (entity instanceof Versionable) {
-			synapseClient.getEntityVersions(entity.getId(), 1, 20,
-					new AsyncCallback<String>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							view.setEntityVersions((Versionable)entity, null);
-						}
-
-						@Override
-						public void onSuccess(String result) {
-							setEntityVersions(result);
-						}
-
-					});
+			view.setEntityVersions((Versionable)entity);
 		}
 	}
-
-	private void setEntityVersions(String jsonVersions) {
-		TreeMap<Long, String> versions = new TreeMap<Long, String>(new ReverseLong());
-		JSONObjectAdapter joa;
-		try {
-			joa = this.jsonObjectAdapter.createNew(jsonVersions);
-			int numResults = joa.getInt("totalNumberOfResults");
-
-			JSONArrayAdapter jsonArray = joa.getJSONArray("results");
-			for (int i = 0; i < numResults; i++) {
-				JSONObjectAdapter jsonObject = jsonArray.getJSONObject(i);
-				long number = jsonObject.getInt("versionNumber");
-				String label = jsonObject.getString("versionLabel");
-				versions.put(number, label);
-			}
-		} catch (JSONObjectAdapterException e) {
-		}
-		Versionable vb = (Versionable)bundle.getEntity();
-
-		view.setEntityVersions(vb, versions);
-	}
-
-	static class ReverseLong implements Comparator<Long> {
-
-		@Override
-		public int compare(Long o1, Long o2) {
-			return o1 > o2 ? -1 :
-					o1 < o2 ? +1 : 0;
-		}
-    }
 
 }
