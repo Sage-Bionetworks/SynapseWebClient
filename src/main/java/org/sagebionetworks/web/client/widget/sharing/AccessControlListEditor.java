@@ -119,6 +119,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		});
 		return view.asWidget();
 	}
+	private void initViewPrincipalIds(){
+		view.setPublicPrincipalId(publicAclPrincipalId);
+		view.setAuthenticatedPrincipalId(authenticatedAclPrincipalId);
+	}
 	
 	/**
 	 * Refresh the ACLEditor by fetching from Synapse
@@ -135,8 +139,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 						if (principalIds.length ==2){
 							publicAclPrincipalId = Long.parseLong(principalIds[0]);
 							authenticatedAclPrincipalId = Long.parseLong(principalIds[1]);
-							view.setPublicPrincipalId(publicAclPrincipalId);
-							view.setAuthenticatedPrincipalId(authenticatedAclPrincipalId);
+							initViewPrincipalIds();
 						}
 					}
 				}
@@ -147,8 +150,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			});
 		}
 		else {
-			view.setPublicPrincipalId(publicAclPrincipalId);
-			view.setAuthenticatedPrincipalId(authenticatedAclPrincipalId);
+			initViewPrincipalIds();
 		}
 			
 		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
@@ -450,6 +452,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			// Do not modify Repo
 			throw new IllegalStateException("Cannot modify an inherited ACL.");
 		}
+	}
+	
+	/**
+	 * @return the uep associated with the entity
+	 */
+	public UserEntityPermissions getUserEntityPermissions() {
+		return uep;
 	}
 	
 	private String getCurrentUserId() {
