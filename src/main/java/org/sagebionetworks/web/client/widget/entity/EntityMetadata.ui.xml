@@ -5,9 +5,7 @@
 	xmlns:gxt="urn:import:com.extjs.gxt.ui.client.widget">
   <ui:style type='org.sagebionetworks.web.client.widget.entity.EntityMetadata.Style'>
     .limitedHeight {
-	     max-height: 13.5em;
 	     min-width: 160px;
-	     border: 1px solid lightgrey;
 	     overflow-y: auto;
     }
 
