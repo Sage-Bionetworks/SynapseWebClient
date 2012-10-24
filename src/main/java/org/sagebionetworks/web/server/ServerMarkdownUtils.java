@@ -84,7 +84,7 @@ public class ServerMarkdownUtils {
 		// regular expression: look for non-word characters (0 or more), followed by "syn" and a number, followed by more non-word characters (0 or more).
 		// capture the synapse id in a group (the paranthesis).
 		String regEx = "\\W*(syn\\d+)\\W*";
-		Elements elements = doc.select("*:matchesOwn(" + regEx + "):not(a)");  	// selector is case insensitive
+		Elements elements = doc.select("*:matchesOwn(" + regEx + "):not(a,code)");  	// selector is case insensitive
 		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
 		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
 			Element element = (Element) iterator.next();
@@ -146,7 +146,7 @@ public class ServerMarkdownUtils {
 
 	public static void addUrlLinks(Document doc) {
 		String regEx = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"; //from http://stackoverflow.com/questions/163360/regular-expresion-to-match-urls-java
-		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
+		Elements elements = doc.select("*:matchesOwn(" + regEx + "):not(code)");  	// selector is case insensitive
 		Pattern pattern = Pattern.compile(regEx);
 		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
 			Element element = (Element) iterator.next();
