@@ -290,8 +290,8 @@ public class DisplayConstants {
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 	public static final String FLAG = "flag";
 	public static final String FLAG_TOOL_TIP = "Click here to learn more about flagging this data for review by the Synapse Access and Compliance Team";
-	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Data use restrictions:";
-	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Data use restrictions are set by human privacy regulations or contractual obligations on sharing of human data";
+	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Data use conditions:";
+	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Data use conditions are set by human privacy regulations or contractual obligations";
 	
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";

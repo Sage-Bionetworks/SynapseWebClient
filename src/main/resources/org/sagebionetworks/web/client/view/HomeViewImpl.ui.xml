@@ -55,10 +55,10 @@
 						<li>
 							Create
 							<span style="font-weight: bold;">Public</span>
-							<g:Image resource='{icons.users16}' />
+							<g:Image resource='{icons.globe16}' />
 							or
 							<span style="font-weight: bold;">Private</span>
-							<g:Image resource='{icons.lock16}' />
+							<g:Image resource='{icons.lockGrey16}' />
 							projects to share your work
 						</li>
 					</ul>
@@ -115,7 +115,7 @@
 				<!-- Access tutorial -->
 				<div class="span-12 notopmargin last">
 					<div class="span-12 notopmargin">
-						<h3>Data Access Levels</h3>
+						<h3>Data Use Conditions</h3>
 					</div>
 					<div class="span-12 inner-12 view notopmargin">
 						<div class="span-12 notopmargin last">
