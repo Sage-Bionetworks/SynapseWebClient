@@ -55,10 +55,10 @@
 						<li>
 							Create
 							<span style="font-weight: bold;">Public</span>
-							<g:Image resource='{icons.users16}' />
+							<g:Image resource='{icons.globe16}' />
 							or
 							<span style="font-weight: bold;">Private</span>
-							<g:Image resource='{icons.lock16}' />
+							<g:Image resource='{icons.lockGrey16}' />
 							projects to share your work
 						</li>
 					</ul>
@@ -66,17 +66,16 @@
 				
 				<!-- TOP COLUMN 3 -->
 				<div class="span-8 notopmargin last">
+					<h4>Getting Started</h4>
+					<p>For more information about using Synapse, see the <a class="link" href="https://sagebionetworks.jira.com/wiki/x/R4B3AQ" target="_blank">Getting Started Guide</a>.</p>
 					<h4>We&apos;re in Beta</h4>
 					<p>Synapse is currently in Beta development. This site has been
 						developed to demonstrate our vision for the technology and solicit
-						feedback from the community. The ability to create accounts and
-						download Sage-hosted data is operational now.</p>
-					<p class="small-italic">
-						Interested in working with Sage to start a pilot project on
+						feedback from the community.  Interested in working with Sage to start a pilot project on
 						Synapse? Please let us know at
-						<a class="link" href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a>
-					</p>
+						<a class="link" href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a></p>
 				</div>
+
 			</div>
 
 			<!-- SEARCH BOX -->
@@ -115,7 +114,7 @@
 				<!-- Access tutorial -->
 				<div class="span-12 notopmargin last">
 					<div class="span-12 notopmargin">
-						<h3>Data Access Levels</h3>
+						<h3>Data Use Conditions</h3>
 					</div>
 					<div class="span-12 inner-12 view notopmargin">
 						<div class="span-12 notopmargin last">
@@ -165,7 +164,7 @@
 								</div>
 							</div>
 							<h5><a class="link" href="#Profile:317809">Wei-Yi Cheng</a> and <a class="link" href="#Profile:323618">Tai-Hsien Ou Yang</a></h5>
-							<p class="notopmargin small-italic">The “Attractor Metagenes” team topped the September 1 Leaderboard in the Sage Bionetworks/DREAM Breast Cancer Prognosis Challenge.</p>
+							<p class="notopmargin small-italic">The “Attractor Metagenes” team topped the October 1 Leaderboard in the Sage Bionetworks/DREAM Breast Cancer Prognosis Challenge.</p>
 						</div>
 						<div class="span-12 last serv">
 							<a href="#Synapse:syn160764">

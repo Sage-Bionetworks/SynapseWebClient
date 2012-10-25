@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Comparator;
+import java.util.TreeMap;
+
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
@@ -11,6 +14,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.ObjectSchema;
+import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -61,6 +65,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private String entityTypeDisplay;
 	private EventBus bus;
 	private JiraURLHelper jiraURLHelper;
+	private String publicAndAuthenticatedAclPrincipalIds;
+	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
@@ -204,17 +210,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void getHtmlFromMarkdown(String markdown, String attachmentBaseUrl, final AsyncCallback<String> asyncCallback) {
-		synapseClient.markdown2Html(markdown, attachmentBaseUrl, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				asyncCallback.onSuccess(result);
+		synapseClient.markdown2Html(markdown, attachmentBaseUrl, asyncCallback);
 			}
-			@Override
-			public void onFailure(Throwable caught) {
-				asyncCallback.onFailure(caught);
-			}
-		});
-	}
 	
 	/*
 	 * Private Methods

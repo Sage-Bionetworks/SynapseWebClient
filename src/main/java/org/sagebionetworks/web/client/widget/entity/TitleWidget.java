@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -24,7 +25,7 @@ public class TitleWidget {
 	private LayoutContainer lc;
 	private EntityMetadata entityMetadata;
 
-	public TitleWidget(EntityBundle bundle, Widget restrictionsWidget, String entityTypeDisplay,
+	public TitleWidget(EntityBundle bundle, Widget shareSettingsWidget, Widget restrictionsWidget, String entityTypeDisplay,
 			IconsImageBundle iconsImageBundle, boolean canEdit,
 			boolean readOnly, SynapseJSNIUtils synapseJSNIUtils) {
 		lc = new LayoutContainer();
@@ -42,24 +43,22 @@ public class TitleWidget {
 		.appendHtmlConstant("</h2>");
 		lc.add(new HTML(shb.toSafeHtml()));
 
-	    // the headers for description and property
+	    if (shareSettingsWidget!=null) lc.add(shareSettingsWidget);
 
+	    // the headers for description and property
 	    if (restrictionsWidget!=null) lc.add(restrictionsWidget);  
 
 	    if(canEdit && readOnly) {
 			HTML roContainer = new HTML("<h4 class=\"colored\"> " + DisplayConstants.READ_ONLY + " " +AbstractImagePrototype.create(iconsImageBundle.help16()).getHTML() + "</h4>");
 			roContainer.setWidth("100px");
 
-			Map<String, String> optionsMap = new TreeMap<String, String>();
-			optionsMap.put("title", DisplayConstants.WHY_VERSION_READ_ONLY_MODE);
-			optionsMap.put("data-placement", "right");
-			DisplayUtils.addTooltip(synapseJSNIUtils, roContainer, optionsMap);
+			DisplayUtils.addTooltip(synapseJSNIUtils, roContainer, DisplayConstants.WHY_VERSION_READ_ONLY_MODE, TOOLTIP_POSITION.RIGHT);
 			lc.add(roContainer);
 		}
 
 	    // Metadata
 	    lc.add(createMetadata(bundle.getEntity(), iconsImageBundle));
-
+	    
 	    lc.layout();
 	}
 

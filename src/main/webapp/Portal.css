@@ -340,21 +340,18 @@ a.shortBtn {
 	background-image: url(images/icons/shield-red-16.png);
 	width: 16px;
 	height: 16px;
-	margin-top: 4px;
 }
 
 .yellow-shield {
 	background-image: url(images/icons/shield-yellow-16.png);
 	width: 16px;
 	height: 16px;
-	margin-top: 4px;
 }
 
 .green-shield {
 	background-image: url(images/icons/shield-green-16.png);
 	width: 16px;
 	height: 16px;
-	margin-top: 4px;
 }
 
 .image-loading {
@@ -475,6 +472,22 @@ blockquote.from-markdown {
 .entity-description-preview-wrapper {
     background: none repeat scroll 0 0 #FFFFFF;
     padding: 20px;
+}
+
+.public-acl-image {
+	background-image: url(images/icons/globe-green-16.png);
+	width: 16px;
+	height: 16px;
+}
+
+.private-acl-image {
+	background-image: url(images/icons/lock-grey-16.png);
+	width: 16px;
+	height: 16px;
+}
+
+.inline-block {
+	display:inline-block;
 }
 
 h1, h2, h3, h4, h5, h6 {

@@ -2,7 +2,10 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Folder;
@@ -25,12 +28,14 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.users.AclUtils;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -291,7 +296,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Title
-		titleWidget = new TitleWidget(bundle, createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()), createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
 		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
@@ -324,6 +329,25 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// none.
 	}
 
+	private Widget createShareSettingsWidget(boolean isPublic) {
+		final SimplePanel lc = new SimplePanel();
+		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
+		String description = isPublic ? DisplayConstants.PUBLIC_ACL_ENTITY_PAGE : DisplayConstants.PRIVATE_ACL_ENTITY_PAGE;
+		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
+		
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">Sharing:</span><div class=\"" + styleName+ "\" style=\"display:inline-block; position:absolute\"></div>");
+		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 20px;\">"+description+"</span>");
+		
+		//form the html
+		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
+		htmlPanel.addStyleName("inline-block");
+		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.RIGHT);
+		lc.add(htmlPanel);
+		
+		return lc;
+	}
+	
 	private Widget createRestrictionWidget() {
 		if (!presenter.includeRestrictionWidget()) return null;
 		boolean isAnonymous = presenter.isAnonymous();
@@ -377,7 +401,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderSnapshotEntity(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 
-		titleWidget = new TitleWidget(bundle, createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()),createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
 		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);

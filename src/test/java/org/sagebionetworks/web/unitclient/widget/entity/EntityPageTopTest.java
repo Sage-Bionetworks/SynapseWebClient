@@ -51,6 +51,7 @@ public class EntityPageTopTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
+		
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityPageTopView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);

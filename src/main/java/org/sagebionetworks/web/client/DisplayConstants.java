@@ -89,6 +89,19 @@ public class DisplayConstants {
 	public static final String LABEL_SHARING_PANEL_INHERITED = "Inherited Sharing Settings";
 	public static final String BUTTON_PERMISSIONS_CREATE_NEW_ACL = "Create Local Sharing Settings";
 	public static final String BUTTON_PERMISSIONS_DELETE_ACL = "Delete Local Sharing Settings";
+	public static final String BUTTON_MAKE_PUBLIC_ACL = "Make Public";
+	public static final String BUTTON_REVOKE_PUBLIC_ACL = "Make Private";
+	public static final String BUTTON_MAKE_PUBLIC_ACL_TOOLTIP = "Click to allow access to anyone on the internet";
+	public static final String BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP = "Click to restrict access to only those people you select above";
+	public static final String PUBLIC_ACL_TITLE = "Public on the web";
+	public static final String PUBLIC_ACL_DESCRIPTION = "Anyone on the internet can access, no login required";
+	public static final String PUBLIC_ACL_ENTITY_PAGE = "Public";
+	public static final String PRIVATE_ACL_ENTITY_PAGE = "Private";
+	public static final String PRIVATE_ACL_DESCRIPTION = "Restricted to those people selected in the Share Settings window";
+	
+	public static final String AUTHENTICATED_USERS_ACL_TITLE = "Anyone logged in";
+	public static final String AUTHENTICATED_USERS_ACL_DESCRIPTION = "Anyone who is logged in can access";
+	
 	public static final String CONFIRM_DELETE_ACL = "Deleting local sharing settings will cause inheritance from parent. Proceed?";
 	public static final String BUTTON_PERMISSIONS_APPLY_ACL_TO_CHILDREN = "Apply Local Sharing Settings to Children";
 	public static final String CONFIRM_APPLY_ACL_TO_CHILDREN = PERMISSIONS_APPLY_ACL_TO_CHILDREN_TEXT + " Proceed?";
@@ -276,7 +289,10 @@ public class DisplayConstants {
 	public static final String SHOW_LIST_EDITOR = "Show List Editor";
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 	public static final String FLAG = "flag";
-	public static final String FLAG_TOOL_TIP = "Flag this data object for review by ACT";
+	public static final String FLAG_TOOL_TIP = "Click here to learn more about flagging this data for review by the Synapse Access and Compliance Team";
+	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Data use conditions:";
+	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Data use conditions are set by human privacy regulations or contractual obligations";
+	
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
 	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
@@ -292,6 +308,7 @@ public class DisplayConstants {
 																		"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
 																		"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
 																		"<h3>Code Spans</h3><pre><code>`&lt;code&gt;` spans are delimited<br>by backticks.<br>You can include literal backticks<br>like `` `this` ``.<br></code></pre><br>" +
+																		"<h3>Preformatted Code Blocks</h3><pre><code>Indent every line of a code block by at least 4 spaces or 1 tab.<br><br>This is a normal paragraph.<br><br>    This is a preformatted<br>    code block.</code></pre><br>" +
 																		"<h3>Horizontal Rules</h3>Three or more dashes or asterisks:<pre><code>---<br>* * *<br>- - - - <br></code></pre><br>" +
 																		"<h3>Symbols</h3><pre><code>&amp;copy; = copyright sign<br>&amp;mdash; = wide dash<br>&amp;amp; = ampersand<br>&amp;trade; = trademark TM<br>&amp;reg; = reserved mark R</code></pre><br>"+
 																		"<h3>Synapse Website Specific Markdown</h3><p>Embed YouTube Videos:<pre><code>{youtube=&ltvideo-id&gt}</code></pre><br>Replace <strong class=\"from-markdown\">&ltvideo-id&gt</strong> with <strong class=\"from-markdown\">foobar123</strong> when embedding the video http://www.youtube.com/watch?v=<strong class=\"from-markdown\">foobar123</strong></p><br></div>";

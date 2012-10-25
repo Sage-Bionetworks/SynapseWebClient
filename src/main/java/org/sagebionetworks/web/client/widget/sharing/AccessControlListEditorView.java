@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.VoidCallback;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView {
@@ -28,6 +31,10 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 	 * @param entry
 	 */
 	public void addAclEntry(AclEntry entry);
+	
+	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
+	public void setPublicPrincipalId(Long id);
+	public void setAuthenticatedPrincipalId(Long id);
 	
 	/**
 	 * Set the view to a loading state while async loads
@@ -80,6 +87,6 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 		 * will be deleted in Synapse. These descendant entities will 
 		 * consequently inherit access permissions from this entity's ACL.
 		 */
-		void pushChangesToSynapse(boolean recursive);
+		void pushChangesToSynapse(boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback);
 	}
 }

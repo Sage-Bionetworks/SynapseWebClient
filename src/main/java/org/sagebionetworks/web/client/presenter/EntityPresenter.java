@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_REFERENCEDBY;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
 
