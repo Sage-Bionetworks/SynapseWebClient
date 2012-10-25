@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.event.FxEvent;
@@ -62,7 +64,9 @@ public class EntityMetadata extends Composite {
 	@UiField
 	HTMLPanel versions;
 	@UiField
-	SpanElement version;
+	SpanElement label;
+	@UiField
+	SpanElement comment;
 
 	@UiField
 	LayoutContainer previousVersions;
@@ -121,8 +125,17 @@ public class EntityMetadata extends Composite {
 		modifyDate.setInnerText(text);
 	}
 
-	public void setVersionInfo(String text) {
-		version.setInnerText(text);
+	public void setVersionInfo(Versionable vb) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(vb.getVersionLabel());
+
+		if (vb.getVersionComment() != null) {
+			sb.append(" - ");
+
+			comment.setTitle(vb.getVersionComment());
+			comment.setInnerText(DisplayUtils.stubStr(vb.getVersionComment(), 60));
+		}
+		label.setInnerText(sb.toString());
 	}
 
 	public void setPreviousVersions(ContentPanel versions) {

@@ -82,17 +82,7 @@ public class TitleWidget {
 		if (entity instanceof Versionable) {
 			entityMetadata.setVersionsVisible(true);
 			Versionable vb = (Versionable) entity;
-			StringBuilder sb = new StringBuilder();
-			sb.append(vb.getVersionLabel());
-			sb.append(" [");
-			sb.append(vb.getVersionNumber());
-			sb.append("]");
-
-			if (vb.getVersionComment() != null) {
-				sb.append(" - ");
-				sb.append(vb.getVersionComment());
-			}
-			entityMetadata.setVersionInfo(sb.toString());
+			entityMetadata.setVersionInfo(vb);
 		}
 		return entityMetadata;
 	}
