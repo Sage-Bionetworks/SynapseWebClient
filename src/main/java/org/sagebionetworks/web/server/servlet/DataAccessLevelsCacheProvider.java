@@ -10,7 +10,7 @@ public class DataAccessLevelsCacheProvider implements CacheProvider {
 
 	@Override
 	public String getValueToCache() {
-	 	return RssFeedUtils.getWikiPageContent(DisplayUtils.DATA_ACCESS_LEVELS_CONTENT_PAGE_ID);
+	 	return RssFeedUtils.getWikiPageSourceContent(DisplayUtils.DATA_ACCESS_LEVELS_CONTENT_PAGE_ID);
 	}
 
 }

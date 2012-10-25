@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
@@ -37,6 +38,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.shared.EntityType;
@@ -47,6 +49,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
@@ -54,7 +57,6 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -63,8 +65,6 @@ import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -239,6 +239,16 @@ public class DisplayUtils {
 		String email = principal.getEmail() == null ? "" : principal.getEmail();
 		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, email).asString();
 	}
+	
+	/**
+	 * Returns a properly aligned name and description for a special user or group
+	 * @param name of user or group
+	 * @return
+	 */
+	public static String getUserNameEmailHtml(String name, String description) {
+		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, description).asString();
+	}
+	
 	
 	/**
 	 * Returns html for a thumbnail image.
@@ -895,7 +905,7 @@ public class DisplayUtils {
 	private static int popoverCount= 0;
 
 	/**
-	 * Adds a twitter bootstrap tooltip to the given widget
+	 * Adds a twitter bootstrap tooltip to the given widget using the standard Synapse configuration
 	 *
 	 * CAUTION - If not used with a non-block level element like
 	 * an anchor, img, or span the results will probably not be
@@ -904,9 +914,18 @@ public class DisplayUtils {
 	 *
 	 * @param util the JSNIUtils class (or mock)
 	 * @param widget the widget to attach the tooltip to
-	 * @param optionsMap a map containing the options for the tooltip and the text
+	 * @param tooltipText text to display
+	 * @param pos where to position the tooltip relative to the widget
 	 */
-	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
+	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, String tooltipText, TOOLTIP_POSITION pos){
+		Map<String, String> optionsMap = new TreeMap<String, String>();
+		optionsMap.put("title", tooltipText);
+		optionsMap.put("data-placement", pos.toString().toLowerCase());
+		optionsMap.put("data-animation", "false");
+		addTooltip(util, widget, optionsMap);
+	}
+	
+	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
 
 		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId(); 

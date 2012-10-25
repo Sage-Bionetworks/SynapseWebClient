@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownload
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -45,6 +46,7 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -252,7 +254,16 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 					public void componentSelected(ButtonEvent ce) {
 						// confirm close action if there are unsaved changes
 						if (accessControlListEditor.hasUnsavedChanges()) {
-							accessControlListEditor.pushChangesToSynapse(false);
+							accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
+								@Override
+								public void onSuccess(EntityWrapper result) {
+									presenter.fireEntityUpdatedEvent();
+								}
+								@Override
+								public void onFailure(Throwable caught) {
+									//failure notification is handled by the acl editor view.
+								}
+							});
 						}
 						window.hide();
 					}

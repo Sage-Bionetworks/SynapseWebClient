@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.model;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
@@ -94,7 +95,7 @@ public class EntityBundle {
 			List<AccessRequirement> unmetAccessRequirements) {
 		this.unmetAccessRequirements = unmetAccessRequirements;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

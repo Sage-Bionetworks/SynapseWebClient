@@ -2,15 +2,16 @@ package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyVararg;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.*;
 
+import org.mockito.Matchers;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.oauth.OAuthException;
@@ -22,6 +23,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.repo.model.AuthorizationConstants;
+import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.server.RestTemplateProvider;
@@ -184,6 +189,42 @@ public class UserAccountServiceImplTest {
 		when(mockTemplateProvider.getTemplate()).thenReturn(mockRestTemplate);
 		when(mockRestTemplate.exchange(anyString(), any(HttpMethod.class),any(HttpEntity.class),any(Class.class),anyVararg())).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 		testService.createUser(user1);
+	}
+	
+	@Test
+	public void testPublicAuthGroupTest() throws Exception {
+		Synapse mockSynapse = Mockito.mock(Synapse.class);
+		//create a few groups, including one that looks like a public group and authenticated group
+		List<UserGroup> allGroups = new ArrayList<UserGroup>();
+		
+		String publicGroupId = "123";
+		UserGroup group = new UserGroup();
+		group.setIsIndividual(false);
+		group.setName(AuthorizationConstants.DEFAULT_GROUPS.PUBLIC.name());
+		group.setId(publicGroupId);
+		allGroups.add(group);
+		
+		String miscGroupId = "456";
+		group = new UserGroup();
+		group.setIsIndividual(false);
+		group.setName("random group");
+		group.setId(miscGroupId);
+		allGroups.add(group);
+		
+		String authGroupId = "789";
+		group = new UserGroup();
+		group.setIsIndividual(false);
+		group.setName(AuthorizationConstants.DEFAULT_GROUPS.AUTHENTICATED_USERS.name());
+		group.setId(authGroupId);
+		allGroups.add(group);
+		
+		PaginatedResults<UserGroup> results = new PaginatedResults<UserGroup>();
+		results.setResults(allGroups);
+		
+		when(mockSynapse.getGroups(anyInt(),anyInt())).thenReturn(results);
+		String actualResult =UserAccountServiceImpl.getPublicAndAuthenticatedPrincipalIds(mockSynapse);
+		String expectedResult = publicGroupId + "," + authGroupId;
+		Assert.assertEquals(expectedResult, actualResult);
 	}
 	
 	@Ignore

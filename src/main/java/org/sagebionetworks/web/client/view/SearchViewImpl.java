@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -570,10 +571,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				String stub = DisplayUtils.stubStr(constraint.getValue(), FACET_NAME_LENGTH_CHAR);
 				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
 				if (!stub.equalsIgnoreCase(constraint.getValue())) {
-					Map<String, String> optionsMap = new TreeMap<String, String>();
-					optionsMap.put("title", constraint.getValue());
-					optionsMap.put("data-placement", "right");
-					DisplayUtils.addTooltip(this.synapseJSNIUtils, a, optionsMap);
+					DisplayUtils.addTooltip(this.synapseJSNIUtils, a, constraint.getValue(), TOOLTIP_POSITION.RIGHT);
 				}
 				
 				a.addClickHandler(new ClickHandler() {				

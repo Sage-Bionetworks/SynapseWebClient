@@ -19,6 +19,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -50,10 +51,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private AccessControlListEditorView view;
 	private NodeModelCreator nodeModelCreator;
 	private SynapseClientAsync synapseClient;
+	private UserAccountServiceAsync userAccountService;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private AuthenticationController authenticationController;
 	private boolean unsavedChanges;
 	private boolean hasLocalACL_inRepo;
+	private Long publicAclPrincipalId = null;
+	private Long authenticatedAclPrincipalId = null;
 	
 	// Entity components
 	private Entity entity;
@@ -66,9 +70,11 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			SynapseClientAsync synapseClientAsync,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			UserAccountServiceAsync userAccountService) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
+		this.userAccountService = userAccountService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.authenticationController = authenticationController;
@@ -85,7 +91,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			uep = null;
 		}
 		this.entity = entity;
-		
 	}
 	
 	/**
@@ -114,6 +119,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		});
 		return view.asWidget();
 	}
+	private void initViewPrincipalIds(){
+		view.setPublicPrincipalId(publicAclPrincipalId);
+		view.setAuthenticatedPrincipalId(authenticatedAclPrincipalId);
+	}
 	
 	/**
 	 * Refresh the ACLEditor by fetching from Synapse
@@ -121,7 +130,29 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private void refresh(final VoidCallback callback) {
 		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
 		view.showLoading();
-		
+		if (publicAclPrincipalId == null){
+			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					if (result != null && result.length() > 0) {
+						String[] principalIds = result.split(",");
+						if (principalIds.length ==2){
+							publicAclPrincipalId = Long.parseLong(principalIds[0]);
+							authenticatedAclPrincipalId = Long.parseLong(principalIds[1]);
+							initViewPrincipalIds();
+						}
+					}
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					showErrorMessage("Could not find the public group: " + caught.getMessage());
+				}
+			});
+		}
+		else {
+			initViewPrincipalIds();
+		}
+			
 		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
 		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundleTransport>() {
 			@Override
@@ -166,8 +197,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		boolean canEnableInheritance = uep.getCanEnableInheritance();
 		view.buildWindow(isInherited, canEnableInheritance, unsavedChanges);
 		populateAclEntries();
+		updateIsPublicAccess();
 	}
 
+	private void updateIsPublicAccess(){
+		view.setIsPubliclyVisible(uep.getCanPublicRead());	
+	}
+	
 	private void populateAclEntries() {
 		for (final ResourceAccess ra : acl.getResourceAccess()) {
 			final String principalId = ra.getPrincipalId().toString();
@@ -231,6 +267,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
 			return;
 		}
+		if (principalId.equals(publicAclPrincipalId))
+			uep.setCanPublicRead(true);
+		
 		ResourceAccess toSet = null;
 		for (ResourceAccess ra : acl.getResourceAccess()) {
 			if (ra.getPrincipalId().equals(principalId))
@@ -275,6 +314,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
 			return;
 		}
+		if (principalIdToRemove.equals(publicAclPrincipalId))
+			uep.setCanPublicRead(false);
 		boolean foundUser = false;;
 		Set<ResourceAccess> newRAs = new HashSet<ResourceAccess>();
 		for (ResourceAccess ra : acl.getResourceAccess()) {
@@ -350,7 +391,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	@Override
-	public void pushChangesToSynapse(boolean recursive) {
+	public void pushChangesToSynapse(boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback) {
 		// TODO: Make recursive option for "Create"
 		if (!unsavedChanges) {
 			showErrorMessage("No changes have been made");
@@ -378,6 +419,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 					unsavedChanges = false;					
 					setViewDetails();
 					view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
+					changesPushedCallback.onSuccess(result);
 				} catch (RestServiceException e) {
 					view.showInfoError("Error", "Permissions were not saved to Synapse");
 					onFailure(e);
@@ -386,6 +428,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			@Override
 			public void onFailure(Throwable caught) {
 				showErrorMessage(DisplayConstants.ERROR_LOCAL_ACL_CREATION_FAILED);
+				changesPushedCallback.onFailure(caught);
 			}
 		};
 		
@@ -409,6 +452,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			// Do not modify Repo
 			throw new IllegalStateException("Cannot modify an inherited ACL.");
 		}
+	}
+	
+	/**
+	 * @return the uep associated with the entity
+	 */
+	public UserEntityPermissions getUserEntityPermissions() {
+		return uep;
 	}
 	
 	private String getCurrentUserId() {
