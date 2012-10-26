@@ -60,6 +60,7 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
@@ -161,6 +162,7 @@ public class DisplayUtils {
 	public static final String HOMESEARCH_BOX_STYLE_NAME = "homesearchbox";	
 	public static final String STYLE_SMALL_SEARCHBOX = "smallsearchbox";
 	public static final String STYLE_OTHER_SEARCHBOX = "othersearchbox";
+	public static final String STYLE_BREAK_WORD = "break-word";
 
 
 	/*
@@ -533,6 +535,7 @@ public class DisplayUtils {
 		DateTime dt = new DateTime(toFormat.getTime());
 		return ISODateTimeFormat.dateTime().print(dt);		
 	}
+	
 	
 	/**
 	 * Converts a date to just a date.
