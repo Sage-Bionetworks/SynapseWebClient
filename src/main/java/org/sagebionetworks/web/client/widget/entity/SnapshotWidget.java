@@ -42,7 +42,7 @@ import com.google.inject.Inject;
  */
 public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	
-	private static final int MAX_DESCRIPTION_CHARS = 300;
+	private static final int MAX_DESCRIPTION_CHARS = 165;
 	private AdapterFactory factory;
 	private SnapshotWidgetView view;
 	private Summary snapshot;
@@ -480,6 +480,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		
 		// desc
 		String description = referencedEntity.getDescription() == null ? "" : referencedEntity.getDescription();
+		description = description.replaceAll("\\n", " "); // keep to 3 lines by removing new lines
 		if(description.length() > MAX_DESCRIPTION_CHARS) 
 			description = description.substring(0, MAX_DESCRIPTION_CHARS) + " ...";
 		SafeHtml descSafe =  new SafeHtmlBuilder().appendEscapedLines(description).toSafeHtml();  
