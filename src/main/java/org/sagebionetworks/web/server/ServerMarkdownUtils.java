@@ -71,10 +71,29 @@ public class ServerMarkdownUtils {
 		    	if (tokens.length > 5) {
 			        String entityId = tokens[2];
 				    String tokenId = tokens[4] +"/"+ tokens[5];
-				    img.attr("src", DisplayUtils.createAttachmentUrl(attachmentUrl, entityId, tokenId, tokenId));
+				    img.attr("src", createAttachmentUrl(attachmentUrl, entityId, tokenId, tokenId,DisplayUtils.ENTITY_PARAM_KEY));
 		    	}
 			}
 		}
+	}
+
+	/**
+	 * Create the url to an attachment image.
+	 * @param baseURl
+	 * @param id
+	 * @param tokenId
+	 * @param fileName
+	 * @return
+	 */
+	public static String createAttachmentUrl(String baseURl, String id, String tokenId, String fileName, String paramKey){
+	        StringBuilder builder = new StringBuilder();
+	        builder.append(baseURl);
+	        builder.append("?"+paramKey+"=");
+	        builder.append(id);
+	        builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
+	        builder.append(tokenId);
+	        builder.append("&"+DisplayUtils.WAIT_FOR_URL+"=true");
+	        return builder.toString();
 	}
 
 	public static void addSynapseLinks(Document doc) {
