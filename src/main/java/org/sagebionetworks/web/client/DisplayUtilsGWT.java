@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client;
 
+import java.util.Date;
+
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 
 public class DisplayUtilsGWT {
 	
@@ -22,5 +26,10 @@ public class DisplayUtilsGWT {
 		SafeHtml profilePicture(String url);
 		
 	}
-	
+
+	private static DateTimeFormat smallDateFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm:ssaa");
+	public static String convertDateToSmallString(Date toFormat) {
+		return smallDateFormat.format(toFormat);
+	}
+
 }

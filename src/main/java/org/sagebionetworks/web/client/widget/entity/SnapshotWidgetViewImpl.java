@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.widget.WidgetMenu;
@@ -227,20 +228,32 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		} else {
 			name = new HTML(display.getName());
 		}
+		name.setWidth("212px");
+		name.addStyleName(DisplayUtils.STYLE_BREAK_WORD);
 		
 		// create download link
 		Widget downloadLink;
 		if(display.getDownloadUrl() != null && !"".equals(display.getDownloadUrl())) {
-			downloadLink = new Anchor(DisplayConstants.BUTTON_DOWNLOAD, display.getDownloadUrl());
-			downloadLink.setStyleName("link");
-			((Anchor)downloadLink).setTarget("_new");
+			Anchor link = new Anchor();
+			link.setHref(display.getDownloadUrl());
+			link.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.NavigateDown16())));
+			//DisplayConstants.BUTTON_DOWNLOAD
+			link.setStyleName("link");
+			link.setTarget("_new");
+			downloadLink = link;
 		} else {
 			downloadLink = new HTML("");
 		}
 		
+		// wrap description
+		HTML description = new HTML(display.getDescription());
+		description.setWidth("375px");
+		//description.setHeight("63px");
+		description.addStyleName(DisplayUtils.STYLE_BREAK_WORD);		
+		
 		// set row in table
 		groupDisplay.setRow(rowIndex, name, downloadLink,
-				display.getVersion(), display.getDescription(),
+				display.getVersion(), description,
 				display.getModifienOn(), display.getContact(),
 				display.getNote());
 		if(canEdit && showEdit && !readOnly) {
@@ -409,7 +422,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	
 	private class EntityGroupDisplay extends LayoutContainer {		
 		private static final String HEADER_NAME = "Name";
-		private static final String HEADER_DOWNLOAD = "Download";
+		private static final String HEADER_DOWNLOAD = " ";
 		private static final String HEADER_VERSION = "Version";
 		private static final String HEADER_DESC = "Description";
 		private static final String HEADER_DATE = "Date";
@@ -538,19 +551,22 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		}
 
 		public void setRow(int rowIndex, Widget nameLink, Widget downloadLink,
-				SafeHtml version, SafeHtml description, Date date,
+				SafeHtml version, HTML description, Date date,
 				SafeHtml createdBy, SafeHtml note) {			
 			table.setWidget(rowIndex, HEADER_NAME_IDX, nameLink);
 			table.setWidget(rowIndex, HEADER_DOWNLOAD_IDX, downloadLink);			
-			if(version != null) table.setHTML(rowIndex, HEADER_VERSION_IDX, version);
-			table.setHTML(rowIndex, HEADER_DESC_IDX, description);
-			table.setHTML(rowIndex, HEADER_DATE_IDX, date == null ? "" : String.valueOf(date));
+			if(version != null) table.setHTML(rowIndex, HEADER_VERSION_IDX, version);			
+			table.setWidget(rowIndex, HEADER_DESC_IDX, description);
+			table.setHTML(rowIndex, HEADER_DATE_IDX, date == null ? "" : DisplayUtilsGWT.convertDateToSmallString(date) + "</br>&nbsp;");
 			table.setHTML(rowIndex, HEADER_CREATEDBY_IDX, createdBy);
 			updateRowNote(rowIndex, note);
 		}
 		
 		public void updateRowNote(int rowIndex, SafeHtml note) {
-			table.setHTML(rowIndex, HEADER_NOTE_IDX, note);
+			HTML noteDiv = new HTML(note);
+			noteDiv.setWidth("100px");
+			noteDiv.addStyleName(DisplayUtils.STYLE_BREAK_WORD);			
+			table.setWidget(rowIndex, HEADER_NOTE_IDX, noteDiv);
 		}
 		
 		public void removeRow(int rowIndex) {
