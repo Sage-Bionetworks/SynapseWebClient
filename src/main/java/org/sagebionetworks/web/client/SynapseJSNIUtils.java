@@ -9,4 +9,6 @@ public interface SynapseJSNIUtils {
 	public void bindBootstrapTooltip(String id);
 
 	public void bindBootstrapPopover(String id);
+	
+	public void highlightCodeBlocks();
 }

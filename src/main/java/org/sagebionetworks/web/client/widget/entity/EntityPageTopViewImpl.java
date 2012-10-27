@@ -2,10 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
-import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Folder;
@@ -35,7 +32,6 @@ import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.users.AclUtils;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -209,7 +205,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colRightContainer.layout(true);
 		fullWidthContainer.layout(true);
 	}
-
+	
 	private LayoutContainer initContainerAndPanel(LayoutContainer container,
 			SimplePanel panel) {
 		if(container == null) {
@@ -785,6 +781,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					HTMLPanel panel = new HTMLPanel(result);
 					lc.add(panel);
 					lc.layout();
+					synapseJSNIUtils.highlightCodeBlocks();
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -792,8 +789,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				}
 			});
 	    }
+
+	    
    		return lc;
 	}
+	
 	private Widget createPropertyWidget(EntityBundle bundle) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
@@ -910,5 +910,4 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.layout();
 		return lc;
 	}
-
 }
