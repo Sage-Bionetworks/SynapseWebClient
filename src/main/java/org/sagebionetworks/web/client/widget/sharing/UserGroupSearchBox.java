@@ -87,14 +87,14 @@ public class UserGroupSearchBox {
 				String email = value.get(KEY_EMAIL);
 				if (email != null)
 					sb.append("  |  " + email);
-				sb.append("  |  syn" + value.get(KEY_PRINCIPAL_ID));				
+				sb.append("  |  " + value.get(KEY_PRINCIPAL_ID));				
 				return sb.toString();
 			}
 			
 			@Override
 			public ModelData convertStringValue(String entry) {
 				// Extract Principal ID from entry String
-				String[] split = entry.split("syn");
+				String[] split = entry.split("|  ");
 				String id = split[split.length - 1].trim();
 				
 				// Search for matching ModelData
