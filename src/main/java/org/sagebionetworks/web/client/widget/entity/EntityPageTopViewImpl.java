@@ -100,13 +100,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
 
-	protected static final String VERSION_KEY_ID = "id";
-	protected static final String VERSION_KEY_NUMBER = "number";
-	protected static final String VERSION_KEY_LABEL = "label";
-	protected static final String VERSION_KEY_COMMENT = "comment";
-	protected static final String VERSION_KEY_MOD_ON = "modifiedOn";
-	protected static final String VERSION_KEY_MOD_BY = "modifiedBy";
-
+	private static final String VERSION_KEY_ID = "id";
+	private static final String VERSION_KEY_NUMBER = "number";
+	private static final String VERSION_KEY_LABEL = "label";
+	private static final String VERSION_KEY_COMMENT = "comment";
+	private static final String VERSION_KEY_MOD_ON = "modifiedOn";
+	private static final String VERSION_KEY_MOD_BY = "modifiedBy";
 
 	private static final String REFERENCES_KEY_ID = "id";
 	private static final String REFERENCES_KEY_NAME = "name";
