@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
