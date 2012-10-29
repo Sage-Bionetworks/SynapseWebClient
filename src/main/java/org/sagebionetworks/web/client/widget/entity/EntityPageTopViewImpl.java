@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -74,6 +75,7 @@ import com.google.gwt.cell.client.widget.PreviewDisclosurePanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -86,24 +88,25 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityPageTopViewImpl extends Composite implements EntityPageTopView {
 
-	private static final int VERSION_LIMIT = 30;
+	private static final int VERSION_LIMIT = 100;
 
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
 
-	protected static final String VERSION_KEY_ID = "id";
-	protected static final String VERSION_KEY_NUMBER = "number";
-	protected static final String VERSION_KEY_LABEL = "label";
-	protected static final String VERSION_KEY_COMMENT = "comment";
-	protected static final String VERSION_KEY_MOD_ON = "modifiedOn";
-	protected static final String VERSION_KEY_MOD_BY = "modifiedBy";
-
+	private static final String VERSION_KEY_ID = "id";
+	private static final String VERSION_KEY_NUMBER = "number";
+	private static final String VERSION_KEY_LABEL = "label";
+	private static final String VERSION_KEY_COMMENT = "comment";
+	private static final String VERSION_KEY_MOD_ON = "modifiedOn";
+	private static final String VERSION_KEY_MOD_BY = "modifiedBy";
 
 	private static final String REFERENCES_KEY_ID = "id";
 	private static final String REFERENCES_KEY_NAME = "name";
@@ -139,6 +142,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private SplitButton showRstudio;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private TitleWidget titleWidget;
+
+	/**
+	 * This variable should ONLY be set by the load call in the VersionsRpcProxy
+	 * The previousVersions GridCellRenderer uses it to determine how to set the top
+	 * row link.
+	 */
+	private boolean previousVersionsHasNotPaged = true;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -460,22 +470,46 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    return lc;
 	}
 
-	private GridCellRenderer<BaseModelData> configureVersionsGridCellRenderer() {
+	private GridCellRenderer<BaseModelData> configureVersionsGridCellRenderer(final Versionable vb) {
 		GridCellRenderer<BaseModelData> cellRenderer = new GridCellRenderer<BaseModelData>() {
 			@Override
-			public String render(BaseModelData model, String property,
+			public Object render(BaseModelData model, String property,
 					ColumnData config, int rowIndex, int colIndex,
 					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
 
-				if         (property.equals(VERSION_KEY_MOD_BY)) {
-					return model.get(property).toString();
-
-				} else if (property.equals(VERSION_KEY_MOD_ON)) {
-					return model.get(property).toString();
-
+				if         (property.equals(VERSION_KEY_NUMBER)) {
+					if (vb.getVersionNumber().equals(model.get(property))) {
+						InlineLabel label = new InlineLabel("viewing");
+						label.getElement().setAttribute("style", "font-weight:bold;");
+						return label;
+					} else {
+						Hyperlink link = new Hyperlink();
+						if (previousVersionsHasNotPaged && rowIndex == 0) {
+							// This is so the user can easily get back to the non-readonly page
+							link.setTargetHistoryToken(DisplayUtils
+								.getSynapseHistoryTokenNoHash(vb.getId()));
+						} else {
+							link.setTargetHistoryToken(DisplayUtils
+									.getSynapseHistoryTokenNoHash(vb.getId(),
+											(Long) model.get(property)));
+						}
+						link.setText("view");
+						link.setStyleName("link");
+						return link;
+					}
+				} else if (property.equals(VERSION_KEY_COMMENT)) {
+					String comment;
+					if (null != model.get(property))
+						comment = model.get(property).toString();
+					else
+						return null;
+					// By default, overflow on a gridcell, results in eliding of the text.
+					// This label and setTitle makes it to so that hovering will show the full comment.
+					InlineLabel label = new InlineLabel(comment);
+					label.setTitle(comment);
+					return label;
 				} else if (model.get(property) != null) {
 					return model.get(property).toString();
-
 				} else {
 					return null;
 				}
@@ -483,18 +517,22 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		};
 		return cellRenderer;
 	}
-	private ColumnModel setupColumnModel() {
+	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY};
-		String[] names = {"Label"          , "Comment"          ,  "Age"            , "By"              };
-		int[] widths =	 {100              , 250                , 200               , 100               };
+		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY, VERSION_KEY_NUMBER};
+		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"     , ""                };
+		int[] widths =	 {100              , 230                , 100               , 100               , 70                };
+		int MOD_ON_INDEX = -1;
 
 		if (keys.length != names.length || names.length != widths.length)
 			throw new IllegalArgumentException("All configuration arrays must be the same length.");
 
-		GridCellRenderer<BaseModelData> cellRenderer = configureVersionsGridCellRenderer();
+		GridCellRenderer<BaseModelData> cellRenderer = configureVersionsGridCellRenderer(vb);
 
 		for (int i = 0; i < keys.length; i++) {
+			if (VERSION_KEY_MOD_ON.equals(keys[i]))
+				MOD_ON_INDEX = i;
+
 			ColumnConfig colConfig = new ColumnConfig(keys[i], names[i], widths[i]);
 			colConfig.setRenderer(cellRenderer);
 			colConfig.setSortable(false);
@@ -502,12 +540,28 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			colConfig.setMenuDisabled(true);
 			columns.add(colConfig);
 		}
+
+		columns.get(MOD_ON_INDEX).setDateTimeFormat(DateTimeFormat.getShortDateFormat());
+		columns.get(MOD_ON_INDEX).setRenderer(null);
 		return new ColumnModel(columns);
 	}
 
 	@Override
 	public void setEntityVersions(final Versionable entity) {
 		if (titleWidget != null) {
+			// create bottom paging toolbar
+			final PagingToolBar toolBar = new PagingToolBar(VERSION_LIMIT);
+			toolBar.setSpacing(2);
+			toolBar.insert(new SeparatorToolItem(), toolBar.getItemCount() - 2);
+
+			ContentPanel cp = new ContentPanel();
+			cp.setLayout(new FitLayout());
+			cp.setBodyBorder(true);
+			cp.setButtonAlign(HorizontalAlignment.CENTER);
+			cp.setHeaderVisible(false);
+			cp.setHeight(155);
+			cp.setBottomComponent(toolBar);
+
 			RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
 
 				@Override
@@ -517,6 +571,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					final int offset = ((PagingLoadConfig) loadConfig)
 							.getOffset();
 					int limit = ((PagingLoadConfig) loadConfig).getLimit();
+					previousVersionsHasNotPaged = (offset == 0);
 					presenter.loadVersions(entity.getId(), offset, limit,
 							new AsyncCallback<PaginatedResults<VersionInfo>>() {
 								@Override
@@ -531,13 +586,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 										model.set(EntityMetadata.VERSION_KEY_LABEL, version.getVersionLabel());
 										model.set(EntityMetadata.VERSION_KEY_COMMENT, version.getVersionComment());
 										model.set(EntityMetadata.VERSION_KEY_MOD_ON, version.getModifiedOn());
-										model.set(EntityMetadata.VERSION_KEY_MOD_BY, version.getModifiedByPrincipalId());
+										model.set(EntityMetadata.VERSION_KEY_MOD_BY, version.getModifiedBy());
 										dataList.add(model);
 									}
 									PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(
 											dataList);
 									loadResultData.setTotalLength((int) result
 											.getTotalNumberOfResults());
+									toolBar.setVisible(loadResultData.getTotalLength() > VERSION_LIMIT);
+
 									loadResultData.setOffset(offset);
 									callback.onSuccess(loadResultData);
 								}
@@ -554,12 +611,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					proxy);
 			loader.setRemoteSort(false);
 			loader.setReuseLoadConfig(true);
+			toolBar.bind(loader);
 
 			// add initial data to the store
 			ListStore<BaseModelData> store = new ListStore<BaseModelData>(
 					loader);
 
-			Grid<BaseModelData> grid = new Grid<BaseModelData>(store, setupColumnModel());
+			Grid<BaseModelData> grid = new Grid<BaseModelData>(store, setupColumnModel(entity));
 			grid.getView().setForceFit(true);
 			grid.getView().setEmptyText("Sorry, no versions were found.");
 			grid.setLayoutData(new FitLayout());
@@ -568,7 +626,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			grid.setAutoWidth(true);
 			grid.setBorders(false);
 			grid.setStripeRows(true);
-			grid.setHeight(200);
 			grid.addListener(Events.Attach,
 					new Listener<GridEvent<ModelData>>() {
 						public void handleEvent(GridEvent<ModelData> be) {
@@ -578,21 +635,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 							loader.load(config);
 						}
 					});
-
-			ContentPanel cp = new ContentPanel();
-			cp.setLayout(new FitLayout());
-			cp.setBodyBorder(true);
-			cp.setButtonAlign(HorizontalAlignment.CENTER);
-			cp.setHeaderVisible(false);
-			cp.setHeight(200);
-
-			// create bottom paging toolbar
-			PagingToolBar toolBar = new PagingToolBar(VERSION_LIMIT);
-			toolBar.bind(loader);
-			toolBar.setSpacing(2);
-			toolBar.insert(new SeparatorToolItem(), toolBar.getItemCount() - 2);
-
-			cp.setBottomComponent(toolBar);
 
 			cp.add(grid);
 			titleWidget.setVersions(cp);
