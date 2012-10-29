@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -82,17 +79,7 @@ public class TitleWidget {
 		if (entity instanceof Versionable) {
 			entityMetadata.setVersionsVisible(true);
 			Versionable vb = (Versionable) entity;
-			StringBuilder sb = new StringBuilder();
-			sb.append(vb.getVersionLabel());
-			sb.append(" [");
-			sb.append(vb.getVersionNumber());
-			sb.append("]");
-
-			if (vb.getVersionComment() != null) {
-				sb.append(" - ");
-				sb.append(vb.getVersionComment());
-			}
-			entityMetadata.setVersionInfo(sb.toString());
+			entityMetadata.setVersionInfo(vb);
 		}
 		return entityMetadata;
 	}
