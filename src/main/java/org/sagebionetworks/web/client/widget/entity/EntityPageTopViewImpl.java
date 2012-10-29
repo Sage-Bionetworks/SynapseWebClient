@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -141,6 +142,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private SplitButton showRstudio;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private TitleWidget titleWidget;
+
+	/**
+	 * This variable should ONLY be set by the load call in the VersionsRpcProxy
+	 * The previousVersions GridCellRenderer uses it to determine how to set the top
+	 * row link.
+	 */
+	private boolean previousVersionsHasNotPaged = true;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -471,22 +479,21 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 				if         (property.equals(VERSION_KEY_NUMBER)) {
 					if (vb.getVersionNumber().equals(model.get(property))) {
-						return "viewing";
+						InlineLabel label = new InlineLabel("viewing");
+						label.getElement().setAttribute("style", "font-weight:bold;");
+						return label;
 					} else {
 						Hyperlink link = new Hyperlink();
-						if (rowIndex == 0) {
+						if (previousVersionsHasNotPaged && rowIndex == 0) {
 							// This is so the user can easily get back to the non-readonly page
-							// strictly speaking this isn't actually a correct way to determine what
-							// the "most recent" version is (because of paging)
-							// TODO: make this actually determine the latest version
 							link.setTargetHistoryToken(DisplayUtils
 								.getSynapseHistoryTokenNoHash(vb.getId()));
 						} else {
-						link.setTargetHistoryToken(DisplayUtils
-								.getSynapseHistoryTokenNoHash(vb.getId(),
-										(Long) model.get(property)));
+							link.setTargetHistoryToken(DisplayUtils
+									.getSynapseHistoryTokenNoHash(vb.getId(),
+											(Long) model.get(property)));
 						}
-						link.setText("(view)");
+						link.setText("view");
 						link.setStyleName("link");
 						return link;
 					}
@@ -513,8 +520,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
 		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY, VERSION_KEY_NUMBER};
-		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"     , ""          };
-		int[] widths =	 {100              , 230                , 100               , 100               , 50              };
+		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"     , ""                };
+		int[] widths =	 {100              , 230                , 100               , 100               , 70                };
+		int MOD_ON_INDEX = -1;
 
 		if (keys.length != names.length || names.length != widths.length)
 			throw new IllegalArgumentException("All configuration arrays must be the same length.");
@@ -522,6 +530,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		GridCellRenderer<BaseModelData> cellRenderer = configureVersionsGridCellRenderer(vb);
 
 		for (int i = 0; i < keys.length; i++) {
+			if (VERSION_KEY_MOD_ON.equals(keys[i]))
+				MOD_ON_INDEX = i;
+
 			ColumnConfig colConfig = new ColumnConfig(keys[i], names[i], widths[i]);
 			colConfig.setRenderer(cellRenderer);
 			colConfig.setSortable(false);
@@ -529,8 +540,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			colConfig.setMenuDisabled(true);
 			columns.add(colConfig);
 		}
-		columns.get(2).setDateTimeFormat(DateTimeFormat.getShortDateFormat());
-		columns.get(2).setRenderer(null);
+
+		columns.get(MOD_ON_INDEX).setDateTimeFormat(DateTimeFormat.getShortDateFormat());
+		columns.get(MOD_ON_INDEX).setRenderer(null);
 		return new ColumnModel(columns);
 	}
 
@@ -559,6 +571,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					final int offset = ((PagingLoadConfig) loadConfig)
 							.getOffset();
 					int limit = ((PagingLoadConfig) loadConfig).getLimit();
+					previousVersionsHasNotPaged = (offset == 0);
 					presenter.loadVersions(entity.getId(), offset, limit,
 							new AsyncCallback<PaginatedResults<VersionInfo>>() {
 								@Override
