@@ -462,22 +462,42 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    return lc;
 	}
 
-	private GridCellRenderer<BaseModelData> configureVersionsGridCellRenderer() {
+	private GridCellRenderer<BaseModelData> configureVersionsGridCellRenderer(final Versionable vb) {
 		GridCellRenderer<BaseModelData> cellRenderer = new GridCellRenderer<BaseModelData>() {
 			@Override
 			public Object render(BaseModelData model, String property,
 					ColumnData config, int rowIndex, int colIndex,
 					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
 
-				if         (property.equals(VERSION_KEY_LABEL)) {
-					return model.get(property).toString();
-
+				if         (property.equals(VERSION_KEY_NUMBER)) {
+					if (vb.getVersionNumber().equals(model.get(property))) {
+						return "viewing";
+					} else {
+						Hyperlink link = new Hyperlink();
+						if (rowIndex == 0) {
+							// This is so the user can easily get back to the non-readonly page
+							// strictly speaking this isn't actually a correct way to determine what
+							// the "most recent" version is (because of paging)
+							// TODO: make this actually determine the latest version
+							link.setTargetHistoryToken(DisplayUtils
+								.getSynapseHistoryTokenNoHash(vb.getId()));
+						} else {
+						link.setTargetHistoryToken(DisplayUtils
+								.getSynapseHistoryTokenNoHash(vb.getId(),
+										(Long) model.get(property)));
+						}
+						link.setText("(view)");
+						link.setStyleName("link");
+						return link;
+					}
 				} else if (property.equals(VERSION_KEY_COMMENT)) {
 					String comment;
 					if (null != model.get(property))
 						comment = model.get(property).toString();
 					else
 						return null;
+					// By default, overflow on a gridcell, results in eliding of the text.
+					// This label and setTitle makes it to so that hovering will show the full comment.
 					InlineLabel label = new InlineLabel(comment);
 					label.setTitle(comment);
 					return label;
@@ -490,16 +510,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		};
 		return cellRenderer;
 	}
-	private ColumnModel setupColumnModel() {
+	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY};
-		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"     };
-		int[] widths =	 {100              , 280                , 100               , 100               };
+		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY, VERSION_KEY_NUMBER};
+		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"     , ""          };
+		int[] widths =	 {100              , 230                , 100               , 100               , 50              };
 
 		if (keys.length != names.length || names.length != widths.length)
 			throw new IllegalArgumentException("All configuration arrays must be the same length.");
 
-		GridCellRenderer<BaseModelData> cellRenderer = configureVersionsGridCellRenderer();
+		GridCellRenderer<BaseModelData> cellRenderer = configureVersionsGridCellRenderer(vb);
 
 		for (int i = 0; i < keys.length; i++) {
 			ColumnConfig colConfig = new ColumnConfig(keys[i], names[i], widths[i]);
@@ -584,7 +604,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			ListStore<BaseModelData> store = new ListStore<BaseModelData>(
 					loader);
 
-			Grid<BaseModelData> grid = new Grid<BaseModelData>(store, setupColumnModel());
+			Grid<BaseModelData> grid = new Grid<BaseModelData>(store, setupColumnModel(entity));
 			grid.getView().setForceFit(true);
 			grid.getView().setEmptyText("Sorry, no versions were found.");
 			grid.setLayoutData(new FitLayout());
