@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.model.EntityBundle;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.event.FxEvent;
@@ -20,6 +22,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -53,6 +56,12 @@ public class EntityMetadata extends Composite {
 	@UiField
 	HTMLPanel panel;
 
+	@UiField
+	Image entityIcon;
+	@UiField
+	SpanElement entityName;
+	@UiField
+	SpanElement entityId;
 	@UiField
 	SpanElement createName;
 	@UiField
@@ -108,6 +117,33 @@ public class EntityMetadata extends Composite {
 		previousVersions.setLayout(new FlowLayout(10));
 	}
 
+	public void setEntityBundle(EntityBundle bundle) {
+		Entity e = bundle.getEntity();
+		setEntityName(e.getName());
+		setEntityId(e.getId());
+
+		setCreateName(e.getCreatedBy());
+		setCreateDate(String.valueOf(e.getCreatedOn()));
+
+		setModifyName(e.getModifiedBy());
+		setModifyDate(String.valueOf(e.getModifiedOn()));
+
+		setVersionsVisible(false);
+		if (e instanceof Versionable) {
+			setVersionsVisible(true);
+			Versionable vb = (Versionable) e;
+			setVersionInfo(vb);
+		}
+
+	}
+
+	public void setEntityName(String text) {
+		entityName.setInnerText(text);
+	}
+
+	public void setEntityId(String text) {
+		entityId.setInnerText(text);
+	}
 
 	public void setCreateName(String text) {
 		createName.setInnerText(text);

@@ -141,7 +141,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private boolean rStudioUrlReady = false;
 	private SplitButton showRstudio;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private TitleWidget titleWidget;
+	private EntityMetadata entityMetadata;
 
 	/**
 	 * This variable should ONLY be set by the load call in the VersionsRpcProxy
@@ -268,10 +268,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			colRightContainer.removeAll();
 		if (fullWidthContainer != null)
 			fullWidthContainer.removeAll();
-		if (titleWidget != null) {
-			titleWidget.clear();
-			titleWidget = null;
-		}
+//		if (titleWidget != null) {
+//			titleWidget.clear();
+//			titleWidget = null;
+//		}
 	}
 
 	@Override
@@ -302,8 +302,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Title
-		titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()), createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
-		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
+		//titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()), createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		entityMetadata = new EntityMetadata();
+		entityMetadata.setEntityBundle(bundle);
+		colLeftContainer.add(entityMetadata, widgetMargin);
+
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
 		// Child Browser
@@ -407,8 +410,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderSnapshotEntity(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 
-		titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()),createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
-		colLeftContainer.add(titleWidget.asWidget(), widgetMargin);
+		//titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()),createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
+		entityMetadata = new EntityMetadata();
+		entityMetadata.setEntityBundle(bundle);
+		colLeftContainer.add(entityMetadata, widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
 
@@ -548,7 +553,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	@Override
 	public void setEntityVersions(final Versionable entity) {
-		if (titleWidget != null) {
+		if (entityMetadata != null) {
 			// create bottom paging toolbar
 			final PagingToolBar toolBar = new PagingToolBar(VERSION_LIMIT);
 			toolBar.setSpacing(2);
@@ -637,7 +642,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					});
 
 			cp.add(grid);
-			titleWidget.setVersions(cp);
+			entityMetadata.setPreviousVersions(cp);
 		}
 	}
 
