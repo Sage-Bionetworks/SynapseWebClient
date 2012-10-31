@@ -141,7 +141,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private boolean rStudioUrlReady = false;
 	private SplitButton showRstudio;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private EntityMetadata entityMetadata;
+	private EntityMetadataViewImpl entityMetadata;
 
 	/**
 	 * This variable should ONLY be set by the load call in the VersionsRpcProxy
@@ -303,7 +303,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ** LEFT **
 		// Title
 		//titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()), createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
-		entityMetadata = new EntityMetadata();
+		entityMetadata = new EntityMetadataViewImpl();
 		entityMetadata.setEntityBundle(bundle);
 		colLeftContainer.add(entityMetadata, widgetMargin);
 
@@ -411,7 +411,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 
 		//titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()),createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
-		entityMetadata = new EntityMetadata();
+		entityMetadata = new EntityMetadataViewImpl();
 		entityMetadata.setEntityBundle(bundle);
 		colLeftContainer.add(entityMetadata, widgetMargin);
 		// Description
@@ -586,12 +586,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 									for (VersionInfo version : result
 											.getResults()) {
 										BaseModelData model = new BaseModelData();
-										model.set(EntityMetadata.VERSION_KEY_ID, version.getId());
-										model.set(EntityMetadata.VERSION_KEY_NUMBER, version.getVersionNumber());
-										model.set(EntityMetadata.VERSION_KEY_LABEL, version.getVersionLabel());
-										model.set(EntityMetadata.VERSION_KEY_COMMENT, version.getVersionComment());
-										model.set(EntityMetadata.VERSION_KEY_MOD_ON, version.getModifiedOn());
-										model.set(EntityMetadata.VERSION_KEY_MOD_BY, version.getModifiedBy());
+										model.set(EntityMetadataViewImpl.VERSION_KEY_ID, version.getId());
+										model.set(EntityMetadataViewImpl.VERSION_KEY_NUMBER, version.getVersionNumber());
+										model.set(EntityMetadataViewImpl.VERSION_KEY_LABEL, version.getVersionLabel());
+										model.set(EntityMetadataViewImpl.VERSION_KEY_COMMENT, version.getVersionComment());
+										model.set(EntityMetadataViewImpl.VERSION_KEY_MOD_ON, version.getModifiedOn());
+										model.set(EntityMetadataViewImpl.VERSION_KEY_MOD_BY, version.getModifiedBy());
 										dataList.add(model);
 									}
 									PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(

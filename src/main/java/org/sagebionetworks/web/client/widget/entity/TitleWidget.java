@@ -20,7 +20,7 @@ public class TitleWidget {
 
 
 	private LayoutContainer lc;
-	private EntityMetadata entityMetadata;
+	private EntityMetadataViewImpl entityMetadata;
 
 	public TitleWidget(EntityBundle bundle, Widget shareSettingsWidget, Widget restrictionsWidget, String entityTypeDisplay,
 			IconsImageBundle iconsImageBundle, boolean canEdit,
@@ -69,7 +69,7 @@ public class TitleWidget {
 	}
 
 	private Widget createMetadata(Entity entity, IconsImageBundle iconsImageBundle) {
-		entityMetadata = new EntityMetadata();
+		entityMetadata = new EntityMetadataViewImpl();
 		entityMetadata.setCreateName(entity.getCreatedBy());
 		entityMetadata.setCreateDate(String.valueOf(entity.getCreatedOn()));
 		entityMetadata.setModifyName(entity.getModifiedBy());

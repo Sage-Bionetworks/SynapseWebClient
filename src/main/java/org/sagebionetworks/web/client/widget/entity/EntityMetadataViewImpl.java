@@ -26,8 +26,8 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class EntityMetadata extends Composite {
-	interface EntityMetadataUiBinder extends UiBinder<Widget, EntityMetadata> {
+public class EntityMetadataViewImpl extends Composite {
+	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
 
 	protected static final String VERSION_KEY_ID = "id";
@@ -42,8 +42,8 @@ public class EntityMetadata extends Composite {
 
 	protected static final String VERSION_KEY_MOD_BY = "modifiedBy";
 
-	private static EntityMetadataUiBinder uiBinder = GWT
-			.create(EntityMetadataUiBinder.class);
+	private static EntityMetadataViewImplUiBinder uiBinder = GWT
+			.create(EntityMetadataViewImplUiBinder.class);
 
 	interface Style extends CssResource {
 		String limitedHeight();
@@ -83,7 +83,7 @@ public class EntityMetadata extends Composite {
 	@UiField
 	InlineLabel allVersions;
 
-	public EntityMetadata() {
+	public EntityMetadataViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		final FxConfig config = new FxConfig(400);

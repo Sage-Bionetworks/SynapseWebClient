@@ -3,7 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:gxt="urn:import:com.extjs.gxt.ui.client.widget">
-  <ui:style type='org.sagebionetworks.web.client.widget.entity.EntityMetadata.Style'>
+  <ui:style type='org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl.Style'>
     .limitedHeight {
 	     min-width: 160px;
 	     overflow-y: auto;
