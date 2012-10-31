@@ -77,6 +77,7 @@ public class ServerMarkdownUtils {
 		}
 	}
 
+
 	/**
 	 * Create the url to an attachment image.
 	 * @param baseURl
