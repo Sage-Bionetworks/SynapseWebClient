@@ -60,7 +60,7 @@ public class EntityMetadataTest {
 		mockEventBus = mock(EventBus.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 
-		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, mockJsonObjectAdapter, mockEntityTypeProvider, mockJiraURLHelper, mockEventBus);
+		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, mockJsonObjectAdapter, mockGlobalApplicationState, mockEntityTypeProvider, mockJiraURLHelper, mockEventBus);
 	}
 
 	@Test

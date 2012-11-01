@@ -11,6 +11,9 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.Direction;
@@ -41,21 +44,22 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.resources.client.CssResource;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -199,6 +203,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setReadOnly(boolean readOnly) {
 		this.readOnly.setVisible(readOnly);
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 
 	public void setEntityName(String text) {
@@ -434,4 +443,70 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		return new ColumnModel(columns);
 	}
 
+	private Widget createShareSettingsWidget(boolean isPublic) {
+		final SimplePanel lc = new SimplePanel();
+		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
+		String description = isPublic ? DisplayConstants.PUBLIC_ACL_ENTITY_PAGE : DisplayConstants.PRIVATE_ACL_ENTITY_PAGE;
+		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
+		
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">Sharing:</span><div class=\"" + styleName+ "\" style=\"display:inline-block; position:absolute\"></div>");
+		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 20px;\">"+description+"</span>");
+		
+		//form the html
+		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
+		htmlPanel.addStyleName("inline-block");
+		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.RIGHT);
+		lc.add(htmlPanel);
+		
+		return lc;
+	}
+	private Widget createRestrictionWidget() {
+		if (!presenter.includeRestrictionWidget()) return null;
+		boolean isAnonymous = presenter.isAnonymous();
+		boolean hasAdministrativeAccess = false;
+		boolean hasFulfilledAccessRequirements = false;
+		String jiraFlagLink = null;
+		if (!isAnonymous) {
+			hasAdministrativeAccess = presenter.hasAdministrativeAccess();
+			jiraFlagLink = presenter.getJiraFlagUrl();
+		}
+		APPROVAL_REQUIRED restrictionLevel = presenter.getRestrictionLevel();
+		String accessRequirementText = null;
+		Callback touAcceptanceCallback = null;
+		Callback requestACTCallback = null;
+		Callback imposeRestrictionsCallback = presenter.getImposeRestrictionsCallback();
+		Callback loginCallback = presenter.getLoginCallback();
+		if (restrictionLevel!=APPROVAL_REQUIRED.NONE) {
+			accessRequirementText = presenter.accessRequirementText();
+			if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
+				touAcceptanceCallback = presenter.accessRequirementCallback();
+			} else {
+				// get the Jira link for ACT approval
+				if (!isAnonymous) {
+					requestACTCallback = new Callback() {
+						@Override
+						public void invoke() {
+							Window.open(presenter.getJiraRequestAccessUrl(), "_blank", "");
+
+						}
+					};
+				}
+			}
+			if (!isAnonymous) hasFulfilledAccessRequirements = presenter.hasFulfilledAccessRequirements();
+		}
+		return EntityViewUtils.createRestrictionsWidget(
+				jiraFlagLink, 
+				isAnonymous, 
+				hasAdministrativeAccess,
+				accessRequirementText,
+				touAcceptanceCallback,
+				requestACTCallback,
+				imposeRestrictionsCallback,
+				loginCallback,
+				restrictionLevel, 
+				hasFulfilledAccessRequirements,
+				icons,
+				synapseJSNIUtils);
+	}
 }

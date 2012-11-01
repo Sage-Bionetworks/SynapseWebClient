@@ -62,7 +62,7 @@ public class EntityPageTopTest {
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 		pageTop = new EntityPageTop(mockView, mockSynapseClient,
 				mockNodeModelCreator, mockAuthenticationController,
-				mockGlobalApplicationState, mockSchemaCache,
+				mockSchemaCache,
 				mockJsonObjectAdapter, mockEntityTypeProvider,
 				mockIconsImageBundle, mockJiraURLHelper, mockEventBus);
 	}

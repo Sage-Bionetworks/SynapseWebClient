@@ -48,38 +48,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		String createEntityLink(String id, String version, String display);
 
 		ImageResource getIconForType(String typeString);
-				
-		boolean isAnonymous();
-		
-		/**
-		 * 
-		 * @return
-		 * @exception if anonymous
-		 */
-		String getJiraFlagUrl();
-		
-		/**
-		 * 
-		 */
-		String getJiraRequestAccessUrl();
-		
-		boolean hasAdministrativeAccess();
-		
-		boolean includeRestrictionWidget();
-		
-		public APPROVAL_REQUIRED getRestrictionLevel();		
-				
-		Callback accessRequirementCallback();
-		
-		Callback getImposeRestrictionsCallback();
-		
-		boolean hasFulfilledAccessRequirements();
-		
-		String accessRequirementText();
-		
-		boolean isTermsOfUseAccessRequirement();
-
-		Callback getLoginCallback();
 
 		void getHtmlFromMarkdown(String description, String attachmentBaseUrl, AsyncCallback<String> asyncCallback);
 

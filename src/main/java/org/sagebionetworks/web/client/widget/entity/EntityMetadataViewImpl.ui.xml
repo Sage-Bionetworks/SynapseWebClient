@@ -29,7 +29,7 @@
 		Modified by <span ui:field="modifyName"></span> on <span ui:field="modifyDate"></span><br/>
 		<g:HTMLPanel ui:field="versions">
 		 Version: <span ui:field="label"></span><span ui:field="comment"></span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
-		 <gxt:VerticalPanel ui:field="previousVersions" styleName="{style.limitedHeight}" visible="false" autoHeight="true" />
+		 <gxt:LayoutContainer ui:field="previousVersions" styleName="{style.limitedHeight}" visible="false" autoHeight="true" />
     </g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder>

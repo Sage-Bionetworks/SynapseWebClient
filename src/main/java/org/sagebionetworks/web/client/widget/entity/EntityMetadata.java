@@ -1,15 +1,33 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
+import org.sagebionetworks.web.shared.EntityUtil;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,6 +43,9 @@ public class EntityMetadata implements Presenter {
 	private EntityTypeProvider entityTypeProvider;
 	private JiraURLHelper jiraURLHelper;
 	private EventBus bus;
+	private GlobalApplicationState globalApplicationState;
+
+	private EntityBundle bundle;
 
 	@Inject
 	public EntityMetadata(EntityMetadataView view,
@@ -32,6 +53,7 @@ public class EntityMetadata implements Presenter {
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			JSONObjectAdapter jsonObjectAdapter,
+			GlobalApplicationState globalApplicationState,
 			EntityTypeProvider entityTypeProvider, JiraURLHelper jiraURLHelper,
 			EventBus bus) {
 		this.view = view;
@@ -40,6 +62,7 @@ public class EntityMetadata implements Presenter {
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.globalApplicationState = globalApplicationState;
 		this.entityTypeProvider = entityTypeProvider;
 		this.jiraURLHelper = jiraURLHelper;
 		this.bus = bus;
@@ -72,8 +95,179 @@ public class EntityMetadata implements Presenter {
 	}
 
 	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
+		this.bundle = bundle;
 		view.setEntityBundle(bundle);
 		view.setReadOnly(bundle.getPermissions().getCanEdit() && readOnly);
+	}
+
+	private UserProfile getUserProfile() {
+		UserSessionData sessionData = authenticationController.getLoggedInUser();
+		return (sessionData==null ? null : sessionData.getProfile());
+		
+	}
+
+	@Override
+	public boolean isAnonymous() {
+		return getUserProfile()==null;
+	}
+
+	@Override
+	public String getJiraFlagUrl() {
+		UserProfile userProfile = getUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		return jiraURLHelper.createFlagIssue(
+				userProfile.getUserName(), 
+				userProfile.getDisplayName(), 
+				bundle.getEntity().getId());
+	}
+
+	private String getJiraRestrictionUrl() {
+		UserProfile userProfile = getUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		return jiraURLHelper.createAccessRestrictionIssue(
+				userProfile.getUserName(), 
+				userProfile.getDisplayName(), 
+				bundle.getEntity().getId());
+	}
+
+	@Override
+	public String getJiraRequestAccessUrl() {
+		UserProfile userProfile = getUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		return jiraURLHelper.createRequestAccessIssue(
+				userProfile.getOwnerId(), 
+				userProfile.getDisplayName(), 
+				userProfile.getUserName(), 
+				bundle.getEntity().getId(), 
+				getAccessRequirement().getId().toString());
+	}
+
+	@Override
+	public boolean hasAdministrativeAccess() {
+		return bundle.getPermissions().getCanChangePermissions();
+	}
+
+	@Override
+	public APPROVAL_REQUIRED getRestrictionLevel() {
+		if (bundle.getAccessRequirements().size()==0L) return APPROVAL_REQUIRED.NONE;
+		if (isTermsOfUseAccessRequirement()) return APPROVAL_REQUIRED.LICENSE_ACCEPTANCE;
+		return APPROVAL_REQUIRED.ACT_APPROVAL;
+	}
+
+	@Override
+	public boolean hasFulfilledAccessRequirements() {
+		return bundle.getUnmetAccessRequirements().size()==0L;
+	}
+
+	@Override
+	public boolean includeRestrictionWidget() {
+		return (bundle.getEntity() instanceof Locationable);
+	}
+
+	@Override
+	public String accessRequirementText() {
+		if (bundle.getAccessRequirements().size()==0) throw new IllegalStateException("There is no access requirement.");
+		AccessRequirement ar = bundle.getAccessRequirements().get(0);
+		if (ar instanceof TermsOfUseAccessRequirement) {
+			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
+		} else if (ar instanceof ACTAccessRequirement) {
+			return ((ACTAccessRequirement)ar).getActContactInfo();			
+		} else {
+			throw new IllegalStateException("Unexpected access requirement type "+ar.getClass());
+		}
+	}
+	
+	private AccessRequirement getAccessRequirement() {
+		return bundle.getAccessRequirements().get(0);
+	}
+
+	@Override
+	public boolean isTermsOfUseAccessRequirement() {
+		if (bundle.getAccessRequirements().size()==0) throw new IllegalStateException("There is no access requirement.");
+		AccessRequirement ar = getAccessRequirement();
+		if (ar instanceof TermsOfUseAccessRequirement) {
+			return true;		
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public Callback accessRequirementCallback() {
+		if (!isTermsOfUseAccessRequirement()) throw new IllegalStateException("not a TOU Access Requirement");
+		AccessRequirement ar = getAccessRequirement();
+		TermsOfUseAccessRequirement tou = (TermsOfUseAccessRequirement)ar;
+		return new Callback() {
+			@Override
+			public void invoke() {
+				// create the self-signed access approval, then update this object
+				String principalId = getUserProfile().getOwnerId();
+				AccessRequirement ar = getAccessRequirement();
+				Callback onSuccess = new Callback() {
+					@Override
+					public void invoke() {
+						fireEntityUpdatedEvent();
+					}
+				};
+				CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
+					@Override
+					public void invoke(Throwable t) {
+						view.showInfo("Error", t.getMessage());
+					}
+				};
+				GovernanceServiceHelper.signTermsOfUse(
+						principalId, 
+						ar.getId(), 
+						onSuccess, 
+						onFailure, 
+						synapseClient, 
+						jsonObjectAdapter);
+			}
+		};
+	}
+
+	@Override
+	public void fireEntityUpdatedEvent() {
+		bus.fireEvent(new EntityUpdatedEvent());
+	}
+
+	
+	@Override
+	public Callback getImposeRestrictionsCallback() {
+		return new Callback() {
+			@Override
+			public void invoke() {
+				EntityWrapper ew = null;
+				try {
+					ew = EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(bundle.getEntity().getId(), jsonObjectAdapter);
+				} catch (JSONObjectAdapterException e) {
+					view.showInfo("Error", e.getMessage());
+					return;
+				}
+				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
+				final JavaScriptObject window = DisplayUtils.newWindow("", "", "");
+				synapseClient.createAccessRequirement(ew, new AsyncCallback<EntityWrapper>(){
+					@Override
+					public void onSuccess(EntityWrapper result) {
+						fireEntityUpdatedEvent();
+						DisplayUtils.setWindowTarget(window, getJiraRestrictionUrl());
+				}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showInfo("Error", caught.getMessage());
+					}
+				});
+			}
+		};
+	}
+	
+	@Override
+	public Callback getLoginCallback() {
+		return new Callback() {
+			public void invoke() {		
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			}
+		};
 	}
 
 }
