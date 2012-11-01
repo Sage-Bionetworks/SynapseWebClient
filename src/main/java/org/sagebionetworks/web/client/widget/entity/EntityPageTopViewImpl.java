@@ -501,7 +501,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return cellRenderer;
 	}
 
-
 	private Widget createActivityFeedWidget(Entity entity) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);

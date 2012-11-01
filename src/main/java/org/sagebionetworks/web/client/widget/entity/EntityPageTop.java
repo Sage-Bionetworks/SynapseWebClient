@@ -5,12 +5,10 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.ObjectSchema;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -36,7 +34,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private EntitySchemaCache schemaCache;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
 
@@ -44,8 +41,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private boolean readOnly;
 	private String entityTypeDisplay;
 	private EventBus bus;
-	private JiraURLHelper jiraURLHelper;
-	private String publicAndAuthenticatedAclPrincipalIds;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -53,21 +48,17 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntitySchemaCache schemaCache,
-			JSONObjectAdapter jsonObjectAdapter,
 			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle,
-			JiraURLHelper jiraURLHelper,
 			EventBus bus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.schemaCache = schemaCache;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.entityTypeProvider = entityTypeProvider;
 		this.iconsImageBundle = iconsImageBundle;
 		this.bus = bus;
-		this.jiraURLHelper = jiraURLHelper;
 		view.setPresenter(this);
 	}
 
