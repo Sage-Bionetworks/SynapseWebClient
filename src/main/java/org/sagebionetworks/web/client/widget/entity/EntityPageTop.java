@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Comparator;
-import java.util.TreeMap;
-
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;

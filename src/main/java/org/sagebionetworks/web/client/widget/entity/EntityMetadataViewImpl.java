@@ -4,7 +4,10 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.event.FxEvent;
@@ -26,7 +29,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class EntityMetadataViewImpl extends Composite {
+public class EntityMetadataViewImpl extends Composite implements EntityMetadataView {
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
 
@@ -83,6 +86,10 @@ public class EntityMetadataViewImpl extends Composite {
 	@UiField
 	InlineLabel allVersions;
 
+	private Presenter presenter;
+	private IconsImageBundle iconsImageBundle;
+	private SynapseJSNIUtils synapseJSNIUtils;
+
 	public EntityMetadataViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
 
@@ -117,6 +124,7 @@ public class EntityMetadataViewImpl extends Composite {
 		previousVersions.setLayout(new FlowLayout(10));
 	}
 
+	@Override
 	public void setEntityBundle(EntityBundle bundle) {
 		Entity e = bundle.getEntity();
 		setEntityName(e.getName());
@@ -135,6 +143,11 @@ public class EntityMetadataViewImpl extends Composite {
 			setVersionInfo(vb);
 		}
 
+	}
+
+	@Override
+	public void setPresenter(Presenter p) {
+		presenter = p;
 	}
 
 	public void setEntityName(String text) {
