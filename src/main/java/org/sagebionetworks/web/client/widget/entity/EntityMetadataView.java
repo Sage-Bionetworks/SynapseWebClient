@@ -13,6 +13,8 @@ public interface EntityMetadataView extends IsWidget {
 
 	public void setEntityBundle(EntityBundle bundle);
 
+	public void setReadOnly(boolean readOnly);
+
 	public interface Presenter {
 
 		void loadVersions(String id, int offset, int limit,

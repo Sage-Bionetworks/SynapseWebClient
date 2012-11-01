@@ -41,6 +41,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -50,6 +51,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -58,8 +60,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityMetadataViewImpl extends Composite implements EntityMetadataView {
-	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
-	}
 
 	private static final String VERSION_KEY_ID = "id";
 	private static final String VERSION_KEY_NUMBER = "number";
@@ -69,6 +69,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static final String VERSION_KEY_MOD_BY = "modifiedBy";
 
 	private static final int VERSION_LIMIT = 100;
+
+	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
+	}
 
 	private static EntityMetadataViewImplUiBinder uiBinder = GWT
 			.create(EntityMetadataViewImplUiBinder.class);
@@ -83,6 +86,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@UiField
 	HTMLPanel panel;
+	@UiField
+	HTMLPanel versions;
+
+	@UiField
+	DivElement readOnly;
 
 	@UiField
 	Image entityIcon;
@@ -99,8 +107,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SpanElement modifyDate;
 	@UiField
-	HTMLPanel versions;
-	@UiField
 	SpanElement label;
 	@UiField
 	SpanElement comment;
@@ -111,8 +117,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	InlineLabel allVersions;
 
+	private HTML roHeading = null;
+
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
+
+	@UiField(provided = true)
+	final IconsImageBundle icons;
+
 	private SynapseJSNIUtils synapseJSNIUtils;
 
 	/**
@@ -125,8 +136,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
-		this.presenter = presenter;
-		this.iconsImageBundle = iconsImageBundle;
+		this.icons = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 
 		initWidget(uiBinder.createAndBindUi(this));
@@ -187,6 +197,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
+	}
+
+	@Override
+	public void setReadOnly(boolean readOnly) {
+		if (roHeading == null && this.readOnly != null)
+			roHeading = HTML.wrap(this.readOnly);
+		roHeading.setVisible(readOnly);
 	}
 
 	public void setEntityName(String text) {
@@ -344,6 +361,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		cp.add(grid);
 		setPreviousVersions(cp);
 	}
+
 	private GridCellRenderer<BaseModelData> configureVersionsGridCellRenderer(final Versionable vb) {
 		GridCellRenderer<BaseModelData> cellRenderer = new GridCellRenderer<BaseModelData>() {
 			@Override

@@ -3,6 +3,9 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:gxt="urn:import:com.extjs.gxt.ui.client.widget">
+
+  <ui:with field="icons" type="org.sagebionetworks.web.client.IconsImageBundle" />
+
   <ui:style type='org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl.Style'>
     .limitedHeight {
 	     min-width: 160px;
@@ -16,18 +19,17 @@
   </ui:style>
 
 	<g:HTMLPanel ui:field="panel">
-	<div>
 		<h2>
-			<g:Image ui:field="entityIcon" />&nbsp;<span ui:field="entityName"></span>&nbsp;(<span ui:field="entityId"></span>)
+		 <g:Image ui:field="entityIcon" />&nbsp;<span ui:field="entityName"></span>&nbsp;(<span ui:field="entityId"></span>)
 		</h2>
-	</div>
-	<div>
+		<div ui:field="readOnly">
+		  <h4 class="colored">READ ONLY <g:Image resource="{icons.help16}"/></h4>
+		</div>
 		Added by <span ui:field="createName"></span> on <span ui:field="createDate"></span><br/>
 		Modified by <span ui:field="modifyName"></span> on <span ui:field="modifyDate"></span><br/>
 		<g:HTMLPanel ui:field="versions">
 		 Version: <span ui:field="label"></span><span ui:field="comment"></span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
 		 <gxt:VerticalPanel ui:field="previousVersions" styleName="{style.limitedHeight}" visible="false" autoHeight="true" />
     </g:HTMLPanel>
-  </div>
 	</g:HTMLPanel>
 </ui:UiBinder>
