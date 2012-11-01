@@ -88,9 +88,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	HTMLPanel panel;
 	@UiField
 	HTMLPanel versions;
-
 	@UiField
-	DivElement readOnly;
+	HTMLPanel readOnly;
 
 	@UiField
 	Image entityIcon;
@@ -116,8 +115,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@UiField
 	InlineLabel allVersions;
-
-	private HTML roHeading = null;
 
 	private Presenter presenter;
 
@@ -201,9 +198,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setReadOnly(boolean readOnly) {
-		if (roHeading == null && this.readOnly != null)
-			roHeading = HTML.wrap(this.readOnly);
-		roHeading.setVisible(readOnly);
+		this.readOnly.setVisible(readOnly);
 	}
 
 	public void setEntityName(String text) {
