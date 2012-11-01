@@ -85,7 +85,6 @@ public class TitleWidget {
 	}
 
 	public void setVersions(ContentPanel panel) {
-		entityMetadata.clearPreviousVersions();
 		entityMetadata.setPreviousVersions(panel);
 	}
 

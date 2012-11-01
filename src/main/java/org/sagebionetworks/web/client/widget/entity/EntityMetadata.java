@@ -96,8 +96,7 @@ public class EntityMetadata implements Presenter {
 
 	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
 		this.bundle = bundle;
-		view.setEntityBundle(bundle);
-		view.setReadOnly(bundle.getPermissions().getCanEdit() && readOnly);
+		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit() && readOnly);
 	}
 
 	private UserProfile getUserProfile() {

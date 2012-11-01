@@ -13,9 +13,7 @@ public interface EntityMetadataView extends IsWidget {
 
 	public void setPresenter(Presenter p);
 
-	public void setEntityBundle(EntityBundle bundle);
-
-	public void setReadOnly(boolean readOnly);
+	public void setEntityBundle(EntityBundle bundle, boolean readOnly);
 
 	public void showInfo(String string, String message);
 

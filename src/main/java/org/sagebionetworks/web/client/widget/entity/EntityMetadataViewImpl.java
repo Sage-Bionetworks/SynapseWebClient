@@ -44,6 +44,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -94,6 +95,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	HTMLPanel versions;
 	@UiField
 	HTMLPanel readOnly;
+
+	@UiField
+	DivElement widgetContainer;
 
 	@UiField
 	Image entityIcon;
@@ -174,10 +178,19 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle) {
+	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
+		clear();
 		Entity e = bundle.getEntity();
 		setEntityName(e.getName());
 		setEntityId(e.getId());
+
+		this.readOnly.setVisible(readOnly);
+
+		Widget shareSettings = createShareSettingsWidget(bundle.getPermissions().getCanPublicRead());
+		if (shareSettings != null) panel.add(shareSettings, widgetContainer);
+
+		Widget restrictionsWidget = createRestrictionWidget();
+		if (restrictionsWidget != null) panel.add(restrictionsWidget, widgetContainer);
 
 		setCreateName(e.getCreatedBy());
 		setCreateDate(String.valueOf(e.getCreatedOn()));
@@ -190,19 +203,18 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			setVersionsVisible(true);
 			Versionable vb = (Versionable) e;
 			setVersionInfo(vb);
-			clearPreviousVersions();
 			setEntityVersions(vb);
 		}
+	}
+
+	private void clear() {
+		widgetContainer.setInnerHTML("");
+		previousVersions.removeAll();
 	}
 
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
-	}
-
-	@Override
-	public void setReadOnly(boolean readOnly) {
-		this.readOnly.setVisible(readOnly);
 	}
 
 	@Override
@@ -250,10 +262,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setPreviousVersions(ContentPanel versions) {
 		previousVersions.add(versions);
 		previousVersions.layout(true);
-	}
-
-	public void clearPreviousVersions() {
-		previousVersions.removeAll();
 	}
 
 	public void setVersionsVisible(boolean visible) {
@@ -448,17 +456,17 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
 		String description = isPublic ? DisplayConstants.PUBLIC_ACL_ENTITY_PAGE : DisplayConstants.PRIVATE_ACL_ENTITY_PAGE;
 		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
-		
+
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">Sharing:</span><div class=\"" + styleName+ "\" style=\"display:inline-block; position:absolute\"></div>");
 		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 20px;\">"+description+"</span>");
-		
+
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
 		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.RIGHT);
 		lc.add(htmlPanel);
-		
+
 		return lc;
 	}
 	private Widget createRestrictionWidget() {
@@ -496,15 +504,15 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			if (!isAnonymous) hasFulfilledAccessRequirements = presenter.hasFulfilledAccessRequirements();
 		}
 		return EntityViewUtils.createRestrictionsWidget(
-				jiraFlagLink, 
-				isAnonymous, 
+				jiraFlagLink,
+				isAnonymous,
 				hasAdministrativeAccess,
 				accessRequirementText,
 				touAcceptanceCallback,
 				requestACTCallback,
 				imposeRestrictionsCallback,
 				loginCallback,
-				restrictionLevel, 
+				restrictionLevel,
 				hasFulfilledAccessRequirements,
 				icons,
 				synapseJSNIUtils);
