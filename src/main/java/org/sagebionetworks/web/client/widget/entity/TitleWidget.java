@@ -69,7 +69,7 @@ public class TitleWidget {
 	}
 
 	private Widget createMetadata(Entity entity, IconsImageBundle iconsImageBundle) {
-		entityMetadata = new EntityMetadataViewImpl();
+		//entityMetadata = new EntityMetadataViewImpl();
 		entityMetadata.setCreateName(entity.getCreatedBy());
 		entityMetadata.setCreateDate(String.valueOf(entity.getCreatedOn()));
 		entityMetadata.setModifyName(entity.getModifiedBy());

@@ -30,8 +30,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	 */
 	public void setRStudioUrlReady();
 
-	public void setEntityVersions(Versionable entity);
-
 	/**
 	 * Presenter interface
 	 */
@@ -46,9 +44,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		boolean isLoggedIn();
 
 		void loadShortcuts(int offset, int limit, AsyncCallback<PaginatedResults<EntityHeader>> asyncCallback);
-
-		void loadVersions(String id, int offset, int limit,
-				AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback);
 
 		String createEntityLink(String id, String version, String display);
 

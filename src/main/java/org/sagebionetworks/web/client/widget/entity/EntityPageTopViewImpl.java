@@ -96,17 +96,8 @@ import com.google.inject.Inject;
 
 public class EntityPageTopViewImpl extends Composite implements EntityPageTopView {
 
-	private static final int VERSION_LIMIT = 100;
-
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
-
-	private static final String VERSION_KEY_ID = "id";
-	private static final String VERSION_KEY_NUMBER = "number";
-	private static final String VERSION_KEY_LABEL = "label";
-	private static final String VERSION_KEY_COMMENT = "comment";
-	private static final String VERSION_KEY_MOD_ON = "modifiedOn";
-	private static final String VERSION_KEY_MOD_BY = "modifiedBy";
 
 	private static final String REFERENCES_KEY_ID = "id";
 	private static final String REFERENCES_KEY_NAME = "name";
@@ -141,14 +132,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private boolean rStudioUrlReady = false;
 	private SplitButton showRstudio;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private EntityMetadataViewImpl entityMetadata;
-
-	/**
-	 * This variable should ONLY be set by the load call in the VersionsRpcProxy
-	 * The previousVersions GridCellRenderer uses it to determine how to set the top
-	 * row link.
-	 */
-	private boolean previousVersionsHasNotPaged = true;
+	private EntityMetadata entityMetadata;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -159,7 +143,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			EntityChildBrowser entityChildBrowser, Breadcrumb breadcrumb,
 			PropertyWidget propertyWidget,EntityTypeProvider entityTypeProvider,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.previewDisclosurePanel = previewDisclosurePanel;
@@ -170,6 +154,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.entityTypeProvider = entityTypeProvider;
 		this.attachmentsPanel = attachmentsPanel;
 		this.snapshotWidget = snapshotWidget;
+		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 
 		initWidget(uiBinder.createAndBindUi(this));
@@ -303,9 +288,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ** LEFT **
 		// Title
 		//titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()), createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
-		entityMetadata = new EntityMetadataViewImpl();
+		//entityMetadata = new EntityMetadataViewImpl();
 		entityMetadata.setEntityBundle(bundle);
-		colLeftContainer.add(entityMetadata, widgetMargin);
+		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
@@ -411,9 +396,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 
 		//titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()),createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
-		entityMetadata = new EntityMetadataViewImpl();
+		//entityMetadata = new EntityMetadataViewImpl();
 		entityMetadata.setEntityBundle(bundle);
-		colLeftContainer.add(entityMetadata, widgetMargin);
+		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
 
@@ -473,177 +458,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		lc.layout();
 	    return lc;
-	}
-
-	private GridCellRenderer<BaseModelData> configureVersionsGridCellRenderer(final Versionable vb) {
-		GridCellRenderer<BaseModelData> cellRenderer = new GridCellRenderer<BaseModelData>() {
-			@Override
-			public Object render(BaseModelData model, String property,
-					ColumnData config, int rowIndex, int colIndex,
-					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
-
-				if         (property.equals(VERSION_KEY_NUMBER)) {
-					if (vb.getVersionNumber().equals(model.get(property))) {
-						InlineLabel label = new InlineLabel("viewing");
-						label.getElement().setAttribute("style", "font-weight:bold;");
-						return label;
-					} else {
-						Hyperlink link = new Hyperlink();
-						if (previousVersionsHasNotPaged && rowIndex == 0) {
-							// This is so the user can easily get back to the non-readonly page
-							link.setTargetHistoryToken(DisplayUtils
-								.getSynapseHistoryTokenNoHash(vb.getId()));
-						} else {
-							link.setTargetHistoryToken(DisplayUtils
-									.getSynapseHistoryTokenNoHash(vb.getId(),
-											(Long) model.get(property)));
-						}
-						link.setText("view");
-						link.setStyleName("link");
-						return link;
-					}
-				} else if (property.equals(VERSION_KEY_COMMENT)) {
-					String comment;
-					if (null != model.get(property))
-						comment = model.get(property).toString();
-					else
-						return null;
-					// By default, overflow on a gridcell, results in eliding of the text.
-					// This label and setTitle makes it to so that hovering will show the full comment.
-					InlineLabel label = new InlineLabel(comment);
-					label.setTitle(comment);
-					return label;
-				} else if (model.get(property) != null) {
-					return model.get(property).toString();
-				} else {
-					return null;
-				}
-			}
-		};
-		return cellRenderer;
-	}
-	private ColumnModel setupColumnModel(Versionable vb) {
-		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY, VERSION_KEY_NUMBER};
-		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"     , ""                };
-		int[] widths =	 {100              , 230                , 100               , 100               , 70                };
-		int MOD_ON_INDEX = -1;
-
-		if (keys.length != names.length || names.length != widths.length)
-			throw new IllegalArgumentException("All configuration arrays must be the same length.");
-
-		GridCellRenderer<BaseModelData> cellRenderer = configureVersionsGridCellRenderer(vb);
-
-		for (int i = 0; i < keys.length; i++) {
-			if (VERSION_KEY_MOD_ON.equals(keys[i]))
-				MOD_ON_INDEX = i;
-
-			ColumnConfig colConfig = new ColumnConfig(keys[i], names[i], widths[i]);
-			colConfig.setRenderer(cellRenderer);
-			colConfig.setSortable(false);
-			colConfig.setResizable(false);
-			colConfig.setMenuDisabled(true);
-			columns.add(colConfig);
-		}
-
-		columns.get(MOD_ON_INDEX).setDateTimeFormat(DateTimeFormat.getShortDateFormat());
-		columns.get(MOD_ON_INDEX).setRenderer(null);
-		return new ColumnModel(columns);
-	}
-
-	@Override
-	public void setEntityVersions(final Versionable entity) {
-		if (entityMetadata != null) {
-			// create bottom paging toolbar
-			final PagingToolBar toolBar = new PagingToolBar(VERSION_LIMIT);
-			toolBar.setSpacing(2);
-			toolBar.insert(new SeparatorToolItem(), toolBar.getItemCount() - 2);
-
-			ContentPanel cp = new ContentPanel();
-			cp.setLayout(new FitLayout());
-			cp.setBodyBorder(true);
-			cp.setButtonAlign(HorizontalAlignment.CENTER);
-			cp.setHeaderVisible(false);
-			cp.setHeight(155);
-			cp.setBottomComponent(toolBar);
-
-			RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
-
-				@Override
-				protected void load(
-						Object loadConfig,
-						final AsyncCallback<PagingLoadResult<BaseModelData>> callback) {
-					final int offset = ((PagingLoadConfig) loadConfig)
-							.getOffset();
-					int limit = ((PagingLoadConfig) loadConfig).getLimit();
-					previousVersionsHasNotPaged = (offset == 0);
-					presenter.loadVersions(entity.getId(), offset, limit,
-							new AsyncCallback<PaginatedResults<VersionInfo>>() {
-								@Override
-								public void onSuccess(
-										PaginatedResults<VersionInfo> result) {
-									List<BaseModelData> dataList = new ArrayList<BaseModelData>();
-									for (VersionInfo version : result
-											.getResults()) {
-										BaseModelData model = new BaseModelData();
-										model.set(EntityMetadataViewImpl.VERSION_KEY_ID, version.getId());
-										model.set(EntityMetadataViewImpl.VERSION_KEY_NUMBER, version.getVersionNumber());
-										model.set(EntityMetadataViewImpl.VERSION_KEY_LABEL, version.getVersionLabel());
-										model.set(EntityMetadataViewImpl.VERSION_KEY_COMMENT, version.getVersionComment());
-										model.set(EntityMetadataViewImpl.VERSION_KEY_MOD_ON, version.getModifiedOn());
-										model.set(EntityMetadataViewImpl.VERSION_KEY_MOD_BY, version.getModifiedBy());
-										dataList.add(model);
-									}
-									PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(
-											dataList);
-									loadResultData.setTotalLength((int) result
-											.getTotalNumberOfResults());
-									toolBar.setVisible(loadResultData.getTotalLength() > VERSION_LIMIT);
-
-									loadResultData.setOffset(offset);
-									callback.onSuccess(loadResultData);
-								}
-
-								@Override
-								public void onFailure(Throwable caught) {
-									callback.onFailure(caught);
-								}
-							});
-				}
-
-			};
-			final BasePagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(
-					proxy);
-			loader.setRemoteSort(false);
-			loader.setReuseLoadConfig(true);
-			toolBar.bind(loader);
-
-			// add initial data to the store
-			ListStore<BaseModelData> store = new ListStore<BaseModelData>(
-					loader);
-
-			Grid<BaseModelData> grid = new Grid<BaseModelData>(store, setupColumnModel(entity));
-			grid.getView().setForceFit(true);
-			grid.getView().setEmptyText("Sorry, no versions were found.");
-			grid.setLayoutData(new FitLayout());
-			grid.setStateful(false);
-			grid.setLoadMask(true);
-			grid.setAutoWidth(true);
-			grid.setBorders(false);
-			grid.setStripeRows(true);
-			grid.addListener(Events.Attach,
-					new Listener<GridEvent<ModelData>>() {
-						public void handleEvent(GridEvent<ModelData> be) {
-							BasePagingLoadConfig config = new BasePagingLoadConfig();
-							config.setLimit(VERSION_LIMIT);
-							config.setOffset(0);
-							loader.load(config);
-						}
-					});
-
-			cp.add(grid);
-			entityMetadata.setPreviousVersions(cp);
-		}
 	}
 
 	private Widget createReferencesWidget(Entity entity, PaginatedResults<EntityHeader> referencedBy) {

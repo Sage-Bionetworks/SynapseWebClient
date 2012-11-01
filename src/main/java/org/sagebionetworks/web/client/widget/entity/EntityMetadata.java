@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
@@ -11,11 +12,12 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityMetadata implements Presenter {
 
-	private EntityMetadataViewImpl view;
+	private EntityMetadataView view;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -25,7 +27,7 @@ public class EntityMetadata implements Presenter {
 	private EventBus bus;
 
 	@Inject
-	public EntityMetadata(EntityMetadataViewImpl view,
+	public EntityMetadata(EntityMetadataView view,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
@@ -62,6 +64,14 @@ public class EntityMetadata implements Presenter {
 						asyncCallback.onFailure(caught);
 					}
 				});
+	}
+
+	public Widget asWidget() {
+		return view.asWidget();
+	}
+
+	public void setEntityBundle(EntityBundle bundle) {
+		view.setEntityBundle(bundle);
 	}
 
 }

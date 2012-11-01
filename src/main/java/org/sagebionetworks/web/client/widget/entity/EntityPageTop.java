@@ -124,7 +124,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	@Override
 	public void refresh() {
 		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit());
-		sendVersionInfoToView();
 	}
 
 	@Override
@@ -184,25 +183,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 			});
 		}
-	}
-
-	@Override
-	public void loadVersions(String id, int offset, int limit,
-				final AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback) {
-		// TODO: If we ever change the offset api to actually take 0 as a valid offset, then we need to remove "+1"
-		synapseClient.getEntityVersions(id, offset+1, limit, new AsyncCallback<String>(){
-			@Override
-			public void onSuccess(String result) {
-				PaginatedResults<VersionInfo> paginatedResults = nodeModelCreator
-						.createPaginatedResults(result,
-								VersionInfo.class);
-				asyncCallback.onSuccess(paginatedResults);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				asyncCallback.onFailure(caught);
-			}
-		});
 	}
 
 	@Override
@@ -382,13 +362,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			}
 		};
-	}
-
-	private void sendVersionInfoToView() {
-		Entity entity = bundle.getEntity();
-		if (entity instanceof Versionable) {
-			view.setEntityVersions((Versionable)entity);
-		}
 	}
 
 }

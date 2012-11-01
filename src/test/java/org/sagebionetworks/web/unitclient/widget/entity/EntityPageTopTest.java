@@ -94,47 +94,4 @@ public class EntityPageTopTest {
 				any(String.class), any(AsyncCallback.class));
 	}
 
-	@Test
-	public void testLoadVersions() throws Exception {
-		AsyncMockStubber
-				.callSuccessWith("")
-				.when(mockSynapseClient)
-				.getEntityVersions(anyString(), anyInt(), anyInt(),
-						any(AsyncCallback.class));
-		AsyncCallback<PaginatedResults<VersionInfo>> callback = new AsyncCallback<PaginatedResults<VersionInfo>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				fail("unexpected failure in test: " + caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(PaginatedResults<VersionInfo> result) {
-				assertEquals(null, result);
-			}
-		};
-
-		pageTop.loadVersions("synEMPTY", 0, 1, callback);
-	}
-
-	@Test
-	public void testLoadVersionsFail() throws Exception {
-		AsyncMockStubber
-				.callFailureWith(new IllegalArgumentException())
-				.when(mockSynapseClient)
-				.getEntityVersions(anyString(), anyInt(), anyInt(),
-						any(AsyncCallback.class));
-		AsyncCallback<PaginatedResults<VersionInfo>> callback = new AsyncCallback<PaginatedResults<VersionInfo>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				assertTrue(caught instanceof IllegalArgumentException);
-			}
-
-			@Override
-			public void onSuccess(PaginatedResults<VersionInfo> result) {
-				fail("Called onSuccess on a failure");
-			}
-		};
-
-		pageTop.loadVersions("synEMPTY", 0, 1, callback);
-	}
 }
