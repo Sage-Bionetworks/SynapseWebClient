@@ -1,15 +1,26 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
-import java.util.List;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.entity.Attachments;
 
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.util.Padding;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
+import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
+import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.ScrollPanel;
 
 /**
@@ -17,44 +28,68 @@ import com.google.gwt.user.client.ui.ScrollPanel;
  */
 public class SelectAttachmentDialog {
 	
-	public interface Callback {
-		/**
-		 * When the user selects ok this will be called.
-		 * 
-		 */
-		public void onSelectAttachment(AttachmentData result);
-	}
-
 	/**
 	 * Show the file attachment dialog
 	 * 
 	 * @param callback
 	 */
-	public static void showSelectAttachmentDialog(String baseUrl, String entityId, List<AttachmentData> attachments, String windowTitle, String buttonText, final Callback callback ) {
+	public static Dialog showSelectAttachmentDialog(String baseUrl, EntityBundle bundle, Attachments attachmentsWidget, String windowTitle, String buttonText, IconsImageBundle iconsImageBundle, final SageImageBundle sageImageBundle) {
 		final Dialog dialog = new Dialog();
 		dialog.setMaximizable(false);
-		dialog.setSize(400, 175);
+		dialog.setSize(285, 230);
 		dialog.setPlain(true);
 		dialog.setModal(true);
 		dialog.setBlinkModal(true);
-		dialog.setButtons(Dialog.OKCANCEL);
+		dialog.setButtons(Dialog.CANCEL);
 		dialog.setHideOnButtonClick(true);
 		dialog.setHeading(windowTitle);
 		dialog.setLayout(new FitLayout());
 		dialog.setBorders(false);
-		
-		final VisualAttachmentsList attachmentList = new VisualAttachmentsList(new VisualAttachmentsListViewImpl());
-		attachmentList.configure(baseUrl, entityId, attachments);
-		Button okButton = dialog.getButtonById("ok");
-		okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
+
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+        LayoutContainer c = new LayoutContainer();
+        HBoxLayout layout = new HBoxLayout();
+        layout.setPadding(new Padding(5));
+        layout.setHBoxLayoutAlign(HBoxLayoutAlign.TOP);
+        c.setLayout(layout);
+
+        HBoxLayoutData flex = new HBoxLayoutData(new Margins(0, 5, 0, 0));
+        flex.setFlex(1);
+
+        final String baseURl = GWT.getModuleBaseURL()+"attachment";
+        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId();
+
+        Anchor addBtn = new Anchor();
+        addBtn.setHTML(DisplayUtils.getIconHtml(iconsImageBundle.add16()));
+        addBtn.addClickHandler(new ClickHandler() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
-				callback.onSelectAttachment(attachmentList.getSelectedAttachment());
+			public void onClick(ClickEvent event) {
+				AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle,DisplayConstants.ATTACHMENT_DIALOG_WINDOW_TITLE, DisplayConstants.ATTACHMENT_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
+					@Override
+					public void onSaveAttachment(UploadResult result) {
+						if(result != null){
+							if(UploadStatus.SUCCESS == result.getUploadStatus()){
+								DisplayUtils.showInfo(DisplayConstants.TEXT_ATTACHMENT_SUCCESS, "");
+							}else{
+								DisplayUtils.showErrorMessage(DisplayConstants.ERRROR_ATTACHMENT_FAILED+result.getMessage());
+							}
+						}
+					}
+				});
 			}
 		});
-		ScrollPanel wrapper = new ScrollPanel(attachmentList.asWidget());
-		dialog.add(wrapper);
+        c.add(addBtn, new HBoxLayoutData(new Margins(0)));
+        lc.add(attachmentsWidget.asWidget());
+        lc.add(c);
+        lc.layout();
+		
+        ScrollPanel scrollWrapper = new ScrollPanel();
+        scrollWrapper.add(lc);
+        
+		dialog.add(scrollWrapper);
 		dialog.show();
-
+		return dialog;
 	}
 }

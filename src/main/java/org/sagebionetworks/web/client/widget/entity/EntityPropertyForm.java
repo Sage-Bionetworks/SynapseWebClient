@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -13,11 +14,14 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.MarkdownUtils;
+import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
+import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.SelectAttachmentDialog;
-import org.sagebionetworks.web.client.widget.entity.dialog.VisualAttachmentsListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -30,6 +34,7 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -71,6 +76,7 @@ public class EntityPropertyForm extends FormPanel {
 	ContentPanel propPanel;
 	VerticalPanel vp;
 	IconsImageBundle iconsImageBundle;
+	SageImageBundle sageImageBundle;
 	
 	JSONObjectAdapter adapter;
 	ObjectSchema schema;
@@ -78,15 +84,16 @@ public class EntityPropertyForm extends FormPanel {
 	Set<String> filter;
 	HTML descriptionFormatInfo;
 	VerticalPanel descriptionFormatInfoContainer;
-	String entityId;
-	List<AttachmentData> attachments;
+	EntityBundle bundle;
+	Attachments attachmentsWidget;
 	Previewable previewGenerator;
 	SafeHtml showFormattingTipsSafeHTML, hideFormattingTipsSafeHTML;
 	
 	@Inject
-	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, Previewable previewGenerator) {
+	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Previewable previewGenerator) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
+		this.sageImageBundle= sageImageBundle;
 		this.previewGenerator = previewGenerator;
 		showFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
 		hideFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_HIDE_TIPS_TEXT);
@@ -253,7 +260,7 @@ public class EntityPropertyForm extends FormPanel {
 		//and now the description toolbar
 		Button previewButton = new Button(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT);
 		Button addImageButton = new Button(DisplayConstants.ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT);
-		addImageButton.setEnabled(attachments != null && VisualAttachmentsListViewImpl.getVisualAttachments(attachments).size() > 0);
+		addImageButton.setEnabled(bundle.getEntity().getAttachments() != null && getVisualAttachments(bundle.getEntity().getAttachments()).size() > 0);
 		
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setTableWidth("180px");
@@ -274,12 +281,16 @@ public class EntityPropertyForm extends FormPanel {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				//pop up a list of attachments, and have the user pick one.
-				SelectAttachmentDialog.showSelectAttachmentDialog(baseURl,  entityId, attachments, "Select Attachment", "Insert", new SelectAttachmentDialog.Callback() {
-					
+				//what happens when they click on an attachment...
+		        attachmentsWidget.configure(baseURl, bundle.getEntity());
+		        attachmentsWidget.clearHandlers();
+		        
+				
+				final Dialog d = SelectAttachmentDialog.showSelectAttachmentDialog(baseURl, bundle, attachmentsWidget, "Select Attachment", "Insert",iconsImageBundle, sageImageBundle);
+				attachmentsWidget.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {
 					@Override
-					public void onSelectAttachment(AttachmentData data) {
-						//insert the markdown into the description for the image attachment
-						SafeHtml safeName = SafeHtmlUtils.fromString(data.getName());
+					public void onAttachmentSelected(AttachmentSelectedEvent event) {
+						SafeHtml safeName = SafeHtmlUtils.fromString(event.getName());
 						TextArea descriptionTextArea = (TextArea)descriptionField;
 						String currentValue = descriptionTextArea.getValue();
 						if (currentValue == null)
@@ -289,11 +300,11 @@ public class EntityPropertyForm extends FormPanel {
 							cursorPos = 0;
 						else if (cursorPos > currentValue.length())
 							cursorPos = currentValue.length();
-						String attachmentLinkMarkdown = MarkdownUtils.getAttachmentLinkMarkdown(safeName.asString(), entityId, data.getTokenId(), data.getPreviewId(), safeName.asString());
+						String attachmentLinkMarkdown = MarkdownUtils.getAttachmentLinkMarkdown(safeName.asString(), bundle.getEntity().getId(), event.getTokenId(), event.getPreviewTokenId(), safeName.asString());
 						descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + attachmentLinkMarkdown + currentValue.substring(cursorPos));
+						d.hide();
 					}
-				});
-					
+				});	
 			}
 	    });
 		formPanel.add(hp,formatLinkFormData);
@@ -314,7 +325,18 @@ public class EntityPropertyForm extends FormPanel {
 		this.annoPanel.add(annotationFormPanel);
 		this.layout();
 	}
-	
+
+	public static List<AttachmentData> getVisualAttachments(List<AttachmentData> attachments){
+		List<AttachmentData> visualAttachments = new ArrayList<AttachmentData>();
+		for (Iterator iterator = attachments.iterator(); iterator
+				.hasNext();) {
+			AttachmentData data = (AttachmentData) iterator.next();
+			// Ignore all attachments without a preview.
+			if(data.getPreviewId() != null) 
+				visualAttachments.add(data);
+		}
+		return visualAttachments;
+	}
 	
 	/**
 	 * Pass editable copies of all objects.
@@ -323,13 +345,13 @@ public class EntityPropertyForm extends FormPanel {
 	 * @param annos
 	 * @param filter
 	 */
-	public void setDataCopies(JSONObjectAdapter adapter, ObjectSchema schema, Annotations annos, Set<String> filter, String entityId, List<AttachmentData> attachments){
+	public void setDataCopies(JSONObjectAdapter adapter, ObjectSchema schema, Annotations annos, Set<String> filter, EntityBundle bundle, Attachments attachmentsWidget){
 		this.adapter = adapter;
 		this.schema = schema;
 		this.annos = annos;
 		this.filter = filter;
-		this.entityId = entityId;
-		this.attachments = attachments;
+		this.bundle = bundle;
+		this.attachmentsWidget = attachmentsWidget;
 		rebuildModel();
 	}
 	

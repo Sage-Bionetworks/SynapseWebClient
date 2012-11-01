@@ -11,12 +11,15 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
+import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -32,7 +35,8 @@ public class Attachments implements AttachmentsView.Presenter,
 	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EventBus bus;
-
+	private HandlerManager handlerManager;
+	
 	private Entity entity;
 
 	@Inject
@@ -54,17 +58,32 @@ public class Attachments implements AttachmentsView.Presenter,
 
 		view.setPresenter(this);
 	}
-
+	
 	public void configure(String baseUrl, Entity entity) {
 		this.entity = entity;
 		view.configure(baseUrl, entity.getId(), entity.getAttachments());
 	}
 
 	@Override
+	public void clearHandlers() {
+		handlerManager = new HandlerManager(this);
+	}
+
+	@Override
+	public void addAttachmentSelectedHandler(AttachmentSelectedHandler handler) {
+		handlerManager.addHandler(AttachmentSelectedEvent.getType(), handler);
+	}
+
+	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
+	
+	@Override
+	public void attachmentClicked(String attachmentName, String tokenId, String previewTokenId) {
+		handlerManager.fireEvent(new AttachmentSelectedEvent(attachmentName, tokenId, previewTokenId));
+	}
+	
 	@Override
 	public void deleteAttachment(final String tokenId) {
 		List<AttachmentData> attachments = entity.getAttachments();

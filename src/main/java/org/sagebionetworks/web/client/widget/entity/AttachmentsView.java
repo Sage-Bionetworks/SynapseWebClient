@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -26,6 +27,22 @@ public interface AttachmentsView extends IsWidget, SynapseWidgetView {
 		 */
 		void deleteAttachment(String tokenId);
 		
+		/**
+		 * Called by the view when an attachment is selected
+		 * @param tokenId
+		 */
+		void attachmentClicked(String attachmentName, String tokenId, String previewTokenId);
+		
+		/**
+		 * add a handler to be informed when an attachment is selected
+		 * @param handler
+		 */
+		void addAttachmentSelectedHandler(AttachmentSelectedHandler handler);
+		
+		/**
+		 * recommended to clear existing handlers before adding your own attachment selected handler
+		 */
+		void clearHandlers();
 	}
 
 	/**
