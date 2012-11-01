@@ -286,9 +286,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
-		// Title
-		//titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()), createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
-		//entityMetadata = new EntityMetadataViewImpl();
+		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 
@@ -395,8 +393,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderSnapshotEntity(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 
-		//titleWidget = new TitleWidget(bundle, createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()),createRestrictionWidget(), entityTypeDisplay, iconsImageBundle, canEdit, readOnly, synapseJSNIUtils);
-		//entityMetadata = new EntityMetadataViewImpl();
 		entityMetadata.setEntityBundle(bundle);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description

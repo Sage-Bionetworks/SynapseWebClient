@@ -35,6 +35,7 @@ public class EntityMetadata implements Presenter {
 			EntityTypeProvider entityTypeProvider, JiraURLHelper jiraURLHelper,
 			EventBus bus) {
 		this.view = view;
+		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;

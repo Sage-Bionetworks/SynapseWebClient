@@ -123,8 +123,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private boolean previousVersionsHasNotPaged = true;
 
 	@Inject
-	public EntityMetadataViewImpl(Presenter presenter,
-			IconsImageBundle iconsImageBundle, 
+	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
 		this.presenter = presenter;
 		this.iconsImageBundle = iconsImageBundle;
@@ -180,8 +179,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			setVersionsVisible(true);
 			Versionable vb = (Versionable) e;
 			setVersionInfo(vb);
+			clearPreviousVersions();
+			setEntityVersions(vb);
 		}
-
 	}
 
 	@Override
