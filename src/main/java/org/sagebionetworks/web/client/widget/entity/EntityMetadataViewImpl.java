@@ -141,6 +141,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	final private FxConfig config;
 
+	// Widget variables
+	private PagingToolBar vToolbar;
+	private Grid<BaseModelData> vGrid;
+
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
@@ -168,11 +172,38 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				setPreviousVersionsVisible(!previousVersions.el().isVisible());
 			}
 		});
+
+		vToolbar = new PagingToolBar(VERSION_LIMIT);
+		vToolbar.setSpacing(2);
+		vToolbar.insert(new SeparatorToolItem(), vToolbar.getItemCount() - 2);
+
+		vGrid = new Grid<BaseModelData>(new ListStore<BaseModelData>(),
+										new ColumnModel(new ArrayList<ColumnConfig>()));
+		vGrid.getView().setForceFit(true);
+		vGrid.getView().setEmptyText("Sorry, no versions were found.");
+		vGrid.setLayoutData(new FitLayout());
+		vGrid.setStateful(false);
+		vGrid.setLoadMask(true);
+		vGrid.setAutoWidth(true);
+		vGrid.setBorders(false);
+		vGrid.setStripeRows(true);
+
+		ContentPanel cp = new ContentPanel();
+		cp.setLayout(new FitLayout());
+		cp.setBodyBorder(true);
+		cp.setButtonAlign(HorizontalAlignment.CENTER);
+		cp.setHeaderVisible(false);
+		cp.setHeight(155);
+		cp.setBottomComponent(vToolbar);
+		cp.add(vGrid);
+
+		setPreviousVersions(cp);
+
 		previousVersions.setLayout(new FlowLayout(10));
 	}
 
 	private void setPreviousVersionsVisible(boolean setVisible) {
-		if (!allVersions.getElement().getPropertyBoolean("animating")) {
+		if (!allVersions.getElement().getPropertyBoolean("animating") && previousVersions.isRendered()) {
 			allVersions.getElement().setPropertyBoolean("animating", true);
 
 			boolean isCurrentlyVisible = previousVersions.el().isVisible();
@@ -227,7 +258,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private void clear() {
 		widgetContainer.setInnerHTML("");
-		previousVersions.removeAll();
 	}
 
 	@Override
@@ -292,17 +322,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	public void setEntityVersions(final Versionable entity) {
 		// create bottom paging toolbar
-		final PagingToolBar toolBar = new PagingToolBar(VERSION_LIMIT);
-		toolBar.setSpacing(2);
-		toolBar.insert(new SeparatorToolItem(), toolBar.getItemCount() - 2);
-
-		ContentPanel cp = new ContentPanel();
-		cp.setLayout(new FitLayout());
-		cp.setBodyBorder(true);
-		cp.setButtonAlign(HorizontalAlignment.CENTER);
-		cp.setHeaderVisible(false);
-		cp.setHeight(155);
-		cp.setBottomComponent(toolBar);
 
 		RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
 
@@ -345,7 +364,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 										dataList);
 								loadResultData.setTotalLength((int) result
 										.getTotalNumberOfResults());
-								toolBar.setVisible(loadResultData
+								vToolbar.setVisible(loadResultData
 										.getTotalLength() > VERSION_LIMIT);
 
 								loadResultData.setOffset(offset);
@@ -364,22 +383,14 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				proxy);
 		loader.setRemoteSort(false);
 		loader.setReuseLoadConfig(true);
-		toolBar.bind(loader);
+		vToolbar.bind(loader);
 
 		// add initial data to the store
 		ListStore<BaseModelData> store = new ListStore<BaseModelData>(loader);
+		vGrid.reconfigure(store, setupColumnModel(entity));
+		loader.load();
 
-		Grid<BaseModelData> grid = new Grid<BaseModelData>(store,
-				setupColumnModel(entity));
-		grid.getView().setForceFit(true);
-		grid.getView().setEmptyText("Sorry, no versions were found.");
-		grid.setLayoutData(new FitLayout());
-		grid.setStateful(false);
-		grid.setLoadMask(true);
-		grid.setAutoWidth(true);
-		grid.setBorders(false);
-		grid.setStripeRows(true);
-		grid.addListener(Events.Attach, new Listener<GridEvent<ModelData>>() {
+		vGrid.addListener(Events.Attach, new Listener<GridEvent<ModelData>>() {
 			public void handleEvent(GridEvent<ModelData> be) {
 				BasePagingLoadConfig config = new BasePagingLoadConfig();
 				config.setLimit(VERSION_LIMIT);
@@ -387,9 +398,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				loader.load(config);
 			}
 		});
-
-		cp.add(grid);
-		setPreviousVersions(cp);
 	}
 
 	private GridCellRenderer<BaseModelData> configureVersionsGridCellRenderer(final Versionable vb) {
