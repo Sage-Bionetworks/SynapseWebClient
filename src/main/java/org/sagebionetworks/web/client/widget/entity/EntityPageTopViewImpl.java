@@ -239,10 +239,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			colRightContainer.removeAll();
 		if (fullWidthContainer != null)
 			fullWidthContainer.removeAll();
-//		if (titleWidget != null) {
-//			titleWidget.clear();
-//			titleWidget = null;
-//		}
 	}
 
 	@Override

@@ -139,6 +139,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	 */
 	private boolean previousVersionsHasNotPaged = true;
 
+	final private FxConfig config;
+
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
@@ -147,7 +149,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		initWidget(uiBinder.createAndBindUi(this));
 
-		final FxConfig config = new FxConfig(400);
+		config = new FxConfig(400);
 		config.setEffectCompleteListener(new Listener<FxEvent>() {
 			@Override
 			public void handleEvent(FxEvent be) {
@@ -162,20 +164,29 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		allVersions.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (!allVersions.getElement().getPropertyBoolean("animating")) {
-					allVersions.getElement().setPropertyBoolean("animating", true);
-					if (previousVersions.el().isVisible()) {
-						allVersions.setText(DisplayConstants.SHOW_VERSIONS);
-						previousVersions.el().slideOut(Direction.UP, config);
-					} else {
-						previousVersions.setVisible(true);
-						allVersions.setText(DisplayConstants.HIDE_VERSIONS);
-						previousVersions.el().slideIn(Direction.DOWN, config);
-					}
-				}
+				// Toggle previousVersions
+				setPreviousVersionsVisible(!previousVersions.el().isVisible());
 			}
 		});
 		previousVersions.setLayout(new FlowLayout(10));
+	}
+
+	private void setPreviousVersionsVisible(boolean setVisible) {
+		if (!allVersions.getElement().getPropertyBoolean("animating")) {
+			allVersions.getElement().setPropertyBoolean("animating", true);
+
+			boolean isCurrentlyVisible = previousVersions.el().isVisible();
+
+			if (!setVisible && isCurrentlyVisible) {
+				allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+				previousVersions.el().slideOut(Direction.UP, config);
+
+			} else if (setVisible && !isCurrentlyVisible) {
+				previousVersions.setVisible(true);
+				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
+				previousVersions.el().slideIn(Direction.DOWN, config);
+			}
+		}
 	}
 
 	@Override
@@ -210,6 +221,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			Versionable vb = (Versionable) e;
 			setVersionInfo(vb);
 			setEntityVersions(vb);
+			setPreviousVersionsVisible(false);
 		}
 	}
 
