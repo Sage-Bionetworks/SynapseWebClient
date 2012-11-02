@@ -188,7 +188,12 @@ public class AccessControlListEditorTest {
 		// add the non-owner non-admin user
 		UserGroupHeader userHeader = new UserGroupHeader();
 		userHeader.setOwnerId(new Long(USER_ID).toString());
-		children.add(userHeader);		
+		children.add(userHeader);
+		
+		// add the public group
+		UserGroupHeader publicHeader = new UserGroupHeader();
+		publicHeader.setOwnerId(new Long(TEST_PUBLIC_PRINCIPAL_ID).toString());
+		children.add(publicHeader);
 		
 		ughrp.setChildren(children);
 		return ughrp;
