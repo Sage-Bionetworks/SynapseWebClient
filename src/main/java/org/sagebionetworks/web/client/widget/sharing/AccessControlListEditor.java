@@ -212,22 +212,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			if (header != null) {
 				view.addAclEntry(new AclEntry(header, ra.getAccessType(), isOwner));
 			} else {
-				// Header not found; fetch full UserProfile
-				synapseClient.getUserProfile(principalId, new AsyncCallback<String>(){
-					@Override
-					public void onSuccess(String userProfileJson) {
-						try {	
-							UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
-							UserGroupHeader header = convertProfileToHeader(profile);
-							userGroupHeaders.put(profile.getOwnerId(), header);
-							view.addAclEntry(new AclEntry(header, ra.getAccessType(), isOwner));
-						} catch (RestServiceException e) {
-							showErrorMessage("Could not find user " + principalId);
-						}
-					}
-					@Override
-					public void onFailure(Throwable caught) {}
-				});
+				showErrorMessage("Could not find user " + principalId);
 			}
 		}
 	}
@@ -476,21 +461,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 	private void showErrorMessage(String s) {
 		view.showErrorMessage(s);
-	}
-
-	/**
-	 * Convert a full UserProfile to a UserGroupHeader
-	 */
-	private static UserGroupHeader convertProfileToHeader(UserProfile profile) {
-		UserGroupHeader header = new UserGroupHeader();
-		header.setDisplayName(profile.getDisplayName());
-		header.setEmail(profile.getEmail());
-		header.setFirstName(profile.getFirstName());
-		header.setLastName(profile.getLastName());
-		header.setIsIndividual(true);
-		header.setOwnerId(profile.getOwnerId());
-		header.setPic(profile.getPic());
-		return header;
 	}
 
 	interface Callback<T> {
