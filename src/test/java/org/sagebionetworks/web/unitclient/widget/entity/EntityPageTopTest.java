@@ -63,8 +63,8 @@ public class EntityPageTopTest {
 		pageTop = new EntityPageTop(mockView, mockSynapseClient,
 				mockNodeModelCreator, mockAuthenticationController,
 				mockSchemaCache,
-				mockJsonObjectAdapter, mockEntityTypeProvider,
-				mockIconsImageBundle, mockJiraURLHelper, mockEventBus);
+				mockEntityTypeProvider,
+				mockIconsImageBundle, mockEventBus);
 	}
 
 	@Test
