@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.TreeMap;
-
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
@@ -22,14 +21,16 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	
+
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly);
-	
+
 	/**
 	 * Sets the RStudio URL for the view
 	 * @param rStudioUrl
 	 */
 	public void setRStudioUrlReady();
+
+	public void setEntityVersions(Versionable entity);
 
 	/**
 	 * Presenter interface
@@ -46,10 +47,13 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 
 		void loadShortcuts(int offset, int limit, AsyncCallback<PaginatedResults<EntityHeader>> asyncCallback);
 
+		void loadVersions(String id, int offset, int limit,
+				AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback);
+
 		String createEntityLink(String id, String version, String display);
 
 		ImageResource getIconForType(String typeString);
-		
+				
 		boolean isAnonymous();
 		
 		/**
@@ -82,9 +86,8 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 
 		Callback getLoginCallback();
 
+		void getHtmlFromMarkdown(String description, String attachmentBaseUrl, AsyncCallback<String> asyncCallback);
+
 	}
-
-	public void setEntityVersions(Versionable entity, TreeMap<Long, String> latestVersions);
-
 
 }

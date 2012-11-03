@@ -1,33 +1,31 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ResourceAccess;
-import org.sagebionetworks.repo.model.UserGroup;
+import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtilsGWT;
-import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclEntry;
-import org.sagebionetworks.web.shared.users.AclPrincipal;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -35,310 +33,436 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+/**
+ * Editor dialog to view and modify the Access Control List of a given Entity.
+ * This class is the Presenter in the MVP design pattern.
+ * 
+ * @author bkng
+ */
 public class AccessControlListEditor implements AccessControlListEditorView.Presenter {
 	
-	private static final String LOCAL_ACL_CREATION_ERROR = "Creation of local sharing settings failed. Please try again.";
+	private static final String ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS = "Active user permissions cannot be modified. Please select a different user.";
+	private static final String ERROR_CANNOT_MODIFY_ENTITY_OWNER_PERMISSIONS = "Owner permissions cannot be modified. Please select a different user.";
+	private static final String NULL_UEP_MESSAGE = "User's entity permissions are missing.";
+	private static final String NULL_ACL_MESSAGE = "ACL is missing.";
+	private static final String NULL_ENTITY_MESSAGE = "Entity is missing.";
+	
+	// Editor components
 	private AccessControlListEditorView view;
 	private NodeModelCreator nodeModelCreator;
 	private SynapseClientAsync synapseClient;
-	private JSONObjectAdapter jsonObjectAdapter = null;
+	private UserAccountServiceAsync userAccountService;
+	private JSONObjectAdapter jsonObjectAdapter;
+	private AuthenticationController authenticationController;
+	private boolean unsavedChanges;
+	private boolean hasLocalACL_inRepo;
+	private Long publicAclPrincipalId = null;
+	private Long authenticatedAclPrincipalId = null;
 	
-	private String entityId;
+	// Entity components
+	private Entity entity;
 	private UserEntityPermissions uep;
-	private AccessControlList acl;
-	private Map<String, AclPrincipal> groupPrincipals;
+	private AccessControlList acl;	
+	private Map<String, UserGroupHeader> userGroupHeaders;
 	
 	@Inject
 	public AccessControlListEditor(AccessControlListEditorView view,
 			SynapseClientAsync synapseClientAsync,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState, 
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			UserAccountServiceAsync userAccountService) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
+		this.userAccountService = userAccountService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		view.setPresenter(this);
+		this.authenticationController = authenticationController;
+		userGroupHeaders = new HashMap<String, UserGroupHeader>();
+		view.setPresenter(this);		
 	}	
 	
+	/**
+	 * Set the entity with which this ACLEditor is associated.
+	 */
 	public void setResource(Entity entity) {
-		this.entityId=entity.getId();
-	}
-		
-	public void setResource(String entityId) {
-		this.entityId=entityId;
+		if (!entity.equals(this.entity)) {
+			acl = null;
+			uep = null;
+		}
+		this.entity = entity;
 	}
 	
+	/**
+	 * Get the ID of the entity with which this ACLEditor is associated.
+	 */
+	public String getResourceId() {
+		return entity == null ? null : entity.getId();
+	}
+	
+	public boolean hasUnsavedChanges() {
+		return unsavedChanges;
+	}
+	
+	/**
+	 * Generate the ACLEditor Widget
+	 */
 	public Widget asWidget() {
-		if (entityId==null) throw new IllegalStateException("Entity ID must be specified.");
-		
-		// Hide the view panel contents until async callback completes
-		view.showLoading();
-		
-		int partsMask = EntityBundleTransport.ACL |
-						EntityBundleTransport.PERMISSIONS |
-						EntityBundleTransport.GROUPS;
-		synapseClient.getEntityBundle(entityId, partsMask, new AsyncCallback<EntityBundleTransport>(){				
-				@Override
-				public void onSuccess(EntityBundleTransport bundle) {
-					try {
-						// deserialize ACL
-						acl = nodeModelCreator.createEntity(bundle.getAclJson(), AccessControlList.class);
-						// deserialize permissions info
-						uep = nodeModelCreator.createEntity(bundle.getPermissionsJson(), UserEntityPermissions.class);
-						// deserialize usersGroups and translate to ACLEntries
-						PaginatedResults<UserGroup> userGroups = nodeModelCreator.createPaginatedResults(bundle.getGroupsJson(), UserGroup.class);
-						groupPrincipals = getAclPrincipalsFromGroups(userGroups.getResults());
-						setViewDetails();
-					} catch (RestServiceException e) {
-						onFailure(e);
-					}
-					
-				}
-
-				@Override
-				public void onFailure(Throwable throwable) {
-					throwable.printStackTrace();
-					
-					showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-				}
-			});
-			
+		refresh(new VoidCallback(){
+			@Override
+			public void success() {}
+			@Override
+			public void failure(Throwable throwable) {
+				throwable.printStackTrace();					
+				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
+			}
+		});
 		return view.asWidget();
 	}
-	
-	public static Map<String, AclPrincipal> getAclPrincipalsFromGroups(Collection<UserGroup> groups) {
-		Map<String, AclPrincipal> principals = new HashMap<String, AclPrincipal>();
-		for (UserGroup g : groups) {
-			AclPrincipal p = new AclPrincipal();
-			p.setPrincipalId(Long.parseLong(g.getId()));
-			p.setIndividual(false);
-			p.setDisplayName(g.getName());
-			p.setOwner(false);
-			principals.put(g.getId(), p);
-		}
-		return principals;
+	private void initViewPrincipalIds(){
+		view.setPublicPrincipalId(publicAclPrincipalId);
+		view.setAuthenticatedPrincipalId(authenticatedAclPrincipalId);
 	}
 	
-	private static AclPrincipal convertProfileToPrincipal(Long ownerPrincipalId, 
-			UserProfile profile, ResourceAccess ra) {
-		AclPrincipal p = new AclPrincipal();
-		p.setDisplayName(profile.getDisplayName());
-		p.setEmail(profile.getEmail());
-		p.setIndividual(true);
-		p.setPrincipalId(ra.getPrincipalId());
-		p.setOwner(ownerPrincipalId.equals(ra.getPrincipalId()));
-		if (profile.getPic() != null) 
-			p.setPicUrl(DisplayUtils.createUserProfileAttachmentUrl(
-				DisplayUtilsGWT.BASE_PROFILE_ATTACHMENT_URL, profile.getOwnerId(), 
-				profile.getPic().getPreviewId(), null));
-		return p;
-	}
-
-	private void setViewDetails() {
-		if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
-		if (this.acl==null) throw new IllegalStateException("ACL is missing.");
-		if (this.uep==null) throw new IllegalStateException("User's entity permissions are missing.");		
-		boolean isInherited = isInherited(acl, entityId);
-		boolean canEnableInheritance = uep.getCanEnableInheritance();
-		view.buildWindow(isInherited, canEnableInheritance);
-		populateAclEntries(acl, uep.getOwnerPrincipalId());
-	}
-	
-	// create a new ACL and push to Synapse
-	@Override
-	public void createAcl() {
-		try {
-			acl = newACLforEntity(this.entityId, uep.getOwnerPrincipalId());
-		} catch (Exception e) {
-			showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-			return;
-		}
-		createACLInSynapse();
-	}
-	
-	@Override
-	public void addAccess(Long principal, PermissionLevel permissionLevel) {
-		if (principal.equals(uep.getOwnerPrincipalId()))
-			showErrorMessage("Owner permissions cannot be modified. Please select a different user or group.");
-		else
-			setAccess(principal, permissionLevel);
-	}
-	
-	@Override
-	public void changeAccess(Long principal, PermissionLevel permissionLevel) {
-		setAccess(principal, permissionLevel);
-	}
-	
-	private void setAccess(Long principalId, PermissionLevel permissionLevel) {
-		try {
-			if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
-			if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
-			ResourceAccess ra = findPrincipal(principalId, acl);
-			if (ra==null) {
-				ra = new ResourceAccess();
-				ra.setPrincipalId(principalId);
-				ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
-				acl.getResourceAccess().add(ra);
-			} else {
-				ra.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
-			}
-		} catch (Exception e) {
-			showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-			return;
-		}
-		updateACLInSynapse(false);
-	}
-	
-	// clone the current ACL, copying over the entries but skipping the given one
-	// "Remove failed. Please try again."
-	@Override
-	public void removeAccess(Long principalId) {
-		try{
-			if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
-		
-			if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
-			ResourceAccess ra = findPrincipal(principalId, acl);
-			if (ra==null) {
-				throw new IllegalStateException("ACL does not have a record for "+principalId);
-			} else {
-				acl.getResourceAccess().remove(ra);
-			}
-		} catch (Exception e) {
-			showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-			return;
-		}
-		updateACLInSynapse(false);
-	}
-
-
-	@Override
-	public void deleteAcl() {
-		if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
-		synapseClient.deleteAcl(acl.getId(), new AsyncCallback<EntityWrapper>(){
-			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					acl = nodeModelCreator.createEntity(result, AccessControlList.class);
-				} catch (RestServiceException e) {
-					onFailure(e);
-				}
-				refresh(new VoidCallback(){
-					@Override
-					public void success() {
-						// nothing more to do
-					}
-					@Override
-					public void failure(Throwable t) {
-						onFailure(t);
-					}
-				});
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-			}
-
-		});
-	}
-	
-	@Override
-	public void applyAclToChildren() {
-		try {
-			if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
-			if (this.acl==null) throw new IllegalStateException("ACL must be specified.");
-		} catch (Exception e) {
-			showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-			return;
-		}
-		updateACLInSynapse(true);
-	}
-	
-	/*
-	 * Private Methods
+	/**
+	 * Refresh the ACLEditor by fetching from Synapse
 	 */
-	
-	private void showErrorMessage(String s) {
-			view.showErrorMessage(s);
-	}
-
-
-	private void createACLInSynapse() {
-		EntityWrapper aclEntityWrapper = null;
-		try {
-			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
-			aclEntityWrapper = new EntityWrapper(aclJson.toJSONString(), AccessControlList.class.getName(), null);
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-			return;
-		}
-		synapseClient.createAcl(aclEntityWrapper, new AsyncCallback<EntityWrapper>(){
-
-			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					acl = nodeModelCreator.createEntity(result, AccessControlList.class);
-				} catch (RestServiceException e) {
-					onFailure(e);
-				}
-				refresh(new VoidCallback(){
-					@Override
-					public void success() {
-						// nothing more to do
-					}
-					@Override
-					public void failure(Throwable t) {
-						onFailure(t);
-					}
-				});
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-			}
-		});
-	}
-	
-	
-	private void updateACLInSynapse(boolean recursive) {
-		EntityWrapper aclEntityWrapper = null;
-		try {
-			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
-			aclEntityWrapper = new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName(), null);
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-		}
-		synapseClient.updateAcl(aclEntityWrapper, recursive, new AsyncCallback<EntityWrapper>(){
-	
+	private void refresh(final VoidCallback callback) {
+		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
+		view.showLoading();
+		if (publicAclPrincipalId == null){
+			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<String>() {
 				@Override
-				public void onSuccess(EntityWrapper result) {
-					try {
-						acl = nodeModelCreator.createEntity(result, AccessControlList.class);
-					} catch (RestServiceException e) {
-						onFailure(e);
+				public void onSuccess(String result) {
+					if (result != null && result.length() > 0) {
+						String[] principalIds = result.split(",");
+						if (principalIds.length ==2){
+							publicAclPrincipalId = Long.parseLong(principalIds[0]);
+							authenticatedAclPrincipalId = Long.parseLong(principalIds[1]);
+							initViewPrincipalIds();
+						}
 					}
-					refresh(new VoidCallback(){
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					showErrorMessage("Could not find the public group: " + caught.getMessage());
+				}
+			});
+		}
+		else {
+			initViewPrincipalIds();
+		}
+			
+		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
+		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundleTransport>() {
+			@Override
+			public void onSuccess(EntityBundleTransport bundle) {
+				try {
+					// retrieve ACL and user entity permissions from bundle
+					acl = nodeModelCreator.createEntity(bundle.getAclJson(), AccessControlList.class);
+					uep = nodeModelCreator.createEntity(bundle.getPermissionsJson(), UserEntityPermissions.class);
+					fetchUserGroupHeaders(new VoidCallback() {
+						// fetch UserGroup headers for members of ACL
 						@Override
 						public void success() {
-							// nothing more to do
+							// update the view
+							setViewDetails();
+							unsavedChanges = false;
+							hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
+							callback.success();
 						}
 						@Override
 						public void failure(Throwable t) {
-							onFailure(t);
-						}
-					});
+							onFailure(t);							
+						}						
+					});					
+				} catch (Throwable e) {
+					onFailure(e);					
 				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					showErrorMessage(LOCAL_ACL_CREATION_ERROR);
-				}
-			});
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.failure(caught);
+			}
+		});
 	}
 	
+	/**
+	 * Send ACL details to the View.
+	 */
+	private void setViewDetails() {
+		validateEditorState();
+		view.showLoading();
+		boolean isInherited = !acl.getId().equals(entity.getId());
+		boolean canEnableInheritance = uep.getCanEnableInheritance();
+		view.buildWindow(isInherited, canEnableInheritance, unsavedChanges);
+		populateAclEntries();
+		updateIsPublicAccess();
+	}
+
+	private void updateIsPublicAccess(){
+		view.setIsPubliclyVisible(uep.getCanPublicRead());	
+	}
+	
+	private void populateAclEntries() {
+		for (final ResourceAccess ra : acl.getResourceAccess()) {
+			final String principalId = ra.getPrincipalId().toString();
+			UserGroupHeader header = userGroupHeaders.get(principalId);
+			final boolean isOwner = (ra.getPrincipalId().equals(uep.getOwnerPrincipalId()));
+			if (header != null) {
+				view.addAclEntry(new AclEntry(header, ra.getAccessType(), isOwner));
+			} else {
+				showErrorMessage("Could not find user " + principalId);
+			}
+		}
+	}
+
+	private void fetchUserGroupHeaders(final VoidCallback callback) {
+		List<String> ids = new ArrayList<String>();
+		for (ResourceAccess ra : acl.getResourceAccess())
+			ids.add(ra.getPrincipalId().toString());
+		synapseClient.getUserGroupHeadersById(ids, new AsyncCallback<EntityWrapper>(){
+			@Override
+			public void onSuccess(EntityWrapper wrapper) {
+				try {	
+					UserGroupHeaderResponsePage response = nodeModelCreator.createEntity(wrapper, UserGroupHeaderResponsePage.class);
+					for (UserGroupHeader ugh : response.getChildren())
+						userGroupHeaders.put(ugh.getOwnerId(), ugh);
+					if (callback != null)
+						callback.success();
+				} catch (RestServiceException e) {
+					onFailure(e);
+					if (callback != null)
+						callback.failure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {}
+		});
+	}
+
+	@Override
+	public void setAccess(Long principalId, PermissionLevel permissionLevel) {
+		validateEditorState();
+		String currentUserId = getCurrentUserId();
+		if (uep != null && principalId.equals(uep.getOwnerPrincipalId())) {
+			showErrorMessage(ERROR_CANNOT_MODIFY_ENTITY_OWNER_PERMISSIONS);
+			return;
+		} else if (currentUserId != null && principalId.toString().equals(currentUserId)) {
+			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
+			return;
+		}
+		if (principalId.equals(publicAclPrincipalId))
+			uep.setCanPublicRead(true);
+		
+		ResourceAccess toSet = null;
+		for (ResourceAccess ra : acl.getResourceAccess()) {
+			if (ra.getPrincipalId().equals(principalId))
+				toSet = ra;
+		}
+		if (toSet == null) {
+			// New entry in the ACL - need to fetch a new header
+			toSet = new ResourceAccess();
+			toSet.setPrincipalId(principalId);
+			acl.getResourceAccess().add(toSet);
+			toSet.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
+			fetchUserGroupHeaders(new VoidCallback() {
+				// fetch UserGroup headers for members of ACL
+				@Override
+				public void success() {
+					// update the view
+					setViewDetails();
+				}
+				@Override
+				public void failure(Throwable t) {
+					// update the view anyway - will fetch individual Profiles					
+					setViewDetails();
+				}						
+			});
+		} else {
+			// Existing entry in the ACL
+			toSet.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
+			unsavedChanges = true;
+			setViewDetails();
+		}
+		unsavedChanges = true;
+	}
+
+	@Override
+	public void removeAccess(Long principalIdToRemove) {
+		validateEditorState();
+		String currentUserId = getCurrentUserId();
+		if (uep != null && principalIdToRemove.equals(uep.getOwnerPrincipalId())) {
+			showErrorMessage(ERROR_CANNOT_MODIFY_ENTITY_OWNER_PERMISSIONS);
+			return;
+		} else if (currentUserId != null && principalIdToRemove.toString().equals(currentUserId)) {
+			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
+			return;
+		}
+		if (principalIdToRemove.equals(publicAclPrincipalId))
+			uep.setCanPublicRead(false);
+		boolean foundUser = false;;
+		Set<ResourceAccess> newRAs = new HashSet<ResourceAccess>();
+		for (ResourceAccess ra : acl.getResourceAccess()) {
+			if (!ra.getPrincipalId().equals(principalIdToRemove)) {
+				newRAs.add(ra);
+			} else {				
+				foundUser = true;
+			}
+		}
+		if (foundUser) {
+			acl.setResourceAccess(newRAs);
+			unsavedChanges = true;
+			setViewDetails();
+		} else {
+			// not found
+			showErrorMessage("ACL does not have a record for " + principalIdToRemove);
+		}
+	}
+
+	@Override
+	public void createAcl() {
+		validateEditorState();
+		if (acl.getId().equals(entity.getId())) {
+			showErrorMessage("Entity already has an ACL!");
+			return;
+		}		
+		acl.setId(entity.getId());
+		acl.setCreationDate(new Date());		
+		unsavedChanges = true;
+		setViewDetails();
+	}
+	
+	@Override
+	public void deleteAcl() {
+		if (!acl.getId().equals(entity.getId())) {
+			showErrorMessage("Cannot delete an inherited ACL!");
+			return;
+		}
+		if (!uep.getCanEnableInheritance()) {
+			// Parent is root
+			showErrorMessage("Cannot enable inheritance on this entity!");
+			return;
+		}		
+		// Fetch parent's benefactor's ACL (candidate benefactor for this entity)
+		synapseClient.getNodeAcl(entity.getParentId(), new AsyncCallback<EntityWrapper>() {
+			@Override
+			public void onSuccess(EntityWrapper wrapper) {
+				try {
+					acl = nodeModelCreator.createEntity(wrapper, AccessControlList.class);
+					unsavedChanges = hasLocalACL_inRepo;
+					fetchUserGroupHeaders(new VoidCallback() {
+						// fetch UserGroup headers for members of ACL
+						@Override
+						public void success() {
+							// update the view
+							setViewDetails();
+						}
+						@Override
+						public void failure(Throwable t) {
+							// update the view anyway - will fetch individual Profiles					
+							setViewDetails();
+						}						
+					});					
+				} catch (Throwable e) {
+					onFailure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				showErrorMessage("Unable to fetch benefactor permissions.");
+			}
+		});
+	}
+	
+	@Override
+	public void pushChangesToSynapse(boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback) {
+		// TODO: Make recursive option for "Create"
+		if (!unsavedChanges) {
+			showErrorMessage("No changes have been made");
+			return;
+		}
+		validateEditorState();
+		
+		// Wrap the current ACL
+		EntityWrapper aclEW = null;
+		try {
+			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
+			aclEW = new EntityWrapper(aclJson.toJSONString(), AccessControlList.class.getName(), null);
+		} catch (JSONObjectAdapterException e) {
+			showErrorMessage(DisplayConstants.ERROR_LOCAL_ACL_CREATION_FAILED);
+			return;
+		}
+		
+		// Create an async callback to receive the updated ACL from Synapse
+		AsyncCallback<EntityWrapper> callback = new AsyncCallback<EntityWrapper>(){
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				try {
+					acl = nodeModelCreator.createEntity(result, AccessControlList.class);
+					hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
+					unsavedChanges = false;					
+					setViewDetails();
+					view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
+					changesPushedCallback.onSuccess(result);
+				} catch (RestServiceException e) {
+					view.showInfoError("Error", "Permissions were not saved to Synapse");
+					onFailure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				showErrorMessage(DisplayConstants.ERROR_LOCAL_ACL_CREATION_FAILED);
+				changesPushedCallback.onFailure(caught);
+			}
+		};
+		
+		// Apply changes
+		boolean hasLocalACL_inPortal = (acl.getId().equals(entity.getId()));
+		
+		if (hasLocalACL_inPortal && !hasLocalACL_inRepo) {
+			// Local ACL exists in Portal, but does not exist in Repo
+			// Create local ACL in Repo
+			synapseClient.createAcl(aclEW, callback);
+		} else if (hasLocalACL_inPortal && hasLocalACL_inRepo) {
+			// Local ACL exists in both Portal and Repo
+			// Apply updates to local ACL in Repo
+			synapseClient.updateAcl(aclEW, recursive, callback);				
+		} else if (!hasLocalACL_inPortal && hasLocalACL_inRepo) {
+			// Local ACL does not exist in Portal but does exist in Repo
+			// Delete local ACL in Repo
+			synapseClient.deleteAcl(entity.getId(), callback);
+		} else { /* (!hasLocal_inPortal && !isInherited_inSynapse) */
+			// Local ACL does not exist in both Portal and Repo
+			// Do not modify Repo
+			throw new IllegalStateException("Cannot modify an inherited ACL.");
+		}
+	}
+	
+	/**
+	 * @return the uep associated with the entity
+	 */
+	public UserEntityPermissions getUserEntityPermissions() {
+		return uep;
+	}
+	
+	private String getCurrentUserId() {
+		return authenticationController.getLoggedInUser().getProfile().getOwnerId();
+	}
+
+	/**
+	 * Ensure the editor has a valid Entity ID, ACL, and User Permissions.
+	 */
+	private void validateEditorState() {
+		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
+		if (this.acl == null) throw new IllegalStateException(NULL_ACL_MESSAGE);
+		if (this.uep == null) throw new IllegalStateException(NULL_UEP_MESSAGE);
+	}
+	
+	private void showErrorMessage(String s) {
+		view.showErrorMessage(s);
+	}
+
 	interface Callback<T> {
 		void success(T data);
 		void failure(Throwable t);
@@ -355,113 +479,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		@Override
 		public void failure(Throwable t) {
 			if (t instanceof RuntimeException) 
-				throw (RuntimeException)t; 
+				throw (RuntimeException) t; 
 			else throw new RuntimeException(t);
 		}
-	}
-	
-	private void refresh(final VoidCallback callback) {
-		if (this.entityId==null) throw new IllegalStateException("Entity must be specified.");
-		view.showLoading();
-		// get the updated ACL and UsersEntityPermissions
-		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
-		synapseClient.getEntityBundle(entityId, partsMask, new AsyncCallback<EntityBundleTransport>() {
-			@Override
-			public void onSuccess(EntityBundleTransport bundle) {
-				try {
-					// deserialize ACL
-					acl = nodeModelCreator.createEntity(bundle.getAclJson(), AccessControlList.class);
-					// deserialize permissions info
-					uep = nodeModelCreator.createEntity(bundle.getPermissionsJson(), UserEntityPermissions.class);
-					setViewDetails();
-					callback.success();
-				} catch (Throwable e) {
-					onFailure(e);					
-				}									
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.failure(caught);
-			}
-		});
-	}
-	
-	
-	/*
-	 * Utility Methods
-	 */
-	public static boolean isInherited(AccessControlList acl, String entityId) {
-		return !acl.getId().equals(entityId);
-	}
-	
-	public static AclEntry findAclEntry(Collection<AclEntry> entries, Long principalId) {
-		for (AclEntry entry : entries) {
-			if (entry.getPrincipal().getPrincipalId().equals(principalId)) return entry;
-		}
-		return null;
-	}
-	
-	public void populateAclEntries(AccessControlList acl, final Long ownerPrincipalId) {
-		for (final ResourceAccess ra : acl.getResourceAccess()) {
-			String principalId = ra.getPrincipalId().toString();
-			if (groupPrincipals.containsKey(principalId)) {
-				// Principal is a group; use the cached AclPrincipal
-				AclPrincipal p = groupPrincipals.get(principalId);	
-				view.addAclEntry(new AclEntry(p, new ArrayList<ACCESS_TYPE>(ra.getAccessType())));
-			} else {					
-				// Principal is a user; fetch the UserProfile
-				synapseClient.getUserProfile(principalId, new AsyncCallback<String>(){
-					@Override
-					public void onSuccess(String userProfileJson) {
-						try {								
-							UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
-							AclPrincipal p = convertProfileToPrincipal(ownerPrincipalId, profile, ra);
-							view.addAclEntry(new AclEntry(p, new ArrayList<ACCESS_TYPE>(ra.getAccessType())));
-						} catch (RestServiceException e) {
-							onFailure(e);
-						}
-					}
-
-					@Override
-					public void onFailure(Throwable caught) {}
-				});
-			}
-		}
-	}
-	
-	public static AccessControlList newACLforEntity(String entityId, Long creatorPrincipalId) {
-		if (entityId==null) throw new IllegalStateException("Entity must be specified.");
-		if (creatorPrincipalId==null)  throw new IllegalStateException("Entity creator must be specified.");
-		AccessControlList acl = new AccessControlList();
-		acl.setId(entityId);
-		Set<ResourceAccess> ras = new HashSet<ResourceAccess>();
-		acl.setResourceAccess(ras);
-		addOwnerAdministrativeAccess(acl, creatorPrincipalId);	
-		return acl;
-	}
-	
-	public static void addOwnerAdministrativeAccess(AccessControlList acl, Long creatorPrincipalId) {
-		ResourceAccess ra = new ResourceAccess();
-		ra.setPrincipalId(creatorPrincipalId);
-		Set<ACCESS_TYPE> ats = AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER);
-		ra.setAccessType(ats);
-
-		acl.getResourceAccess().add(ra);
-	}
-
-	/**
-	 * Note this returns a **pointer** to the ResourceAccess record.  Therefore, changing
-	 * the returned object also changes the parent ACL.
-	 * @param principalId
-	 * @param acl
-	 * @return
-	 */
-	public static ResourceAccess findPrincipal(Long principalId, AccessControlList acl) {
-		for (ResourceAccess ra : acl.getResourceAccess()) {
-			if (ra.getPrincipalId().equals(principalId)) return ra;
-		}
-		return null;
-	}
-	
-
+	}	
 }

@@ -14,7 +14,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -32,8 +31,10 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -51,6 +52,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
+import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
@@ -63,6 +65,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
+import com.petebevin.markdown.MarkdownProcessor;
 
 @SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -76,6 +79,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
+	MarkdownProcessor markdownProcessor = new MarkdownProcessor();
 	
 	/**
 	 * Injected with Gin
@@ -198,11 +202,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String getEntityVersions(String entityId)
+	public String getEntityVersions(String entityId, int offset, int limit)
 			throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<EntityHeader> versions = synapseClient.getEntityVersions(entityId);
+			PaginatedResults<VersionInfo> versions = synapseClient.getEntityVersions(entityId, offset, limit);
 			JSONObjectAdapter entityJson = versions.writeToJSONObject(adapterFactory.createNew());
 			return entityJson.toJSONString();
 		} catch (SynapseException e) {
@@ -311,14 +315,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				}
 				ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
 			}
-			if ((EntityBundleTransport.USERS & partsMask) > 0) {
-				PaginatedResults<UserProfile> u = eb.getUsers();
-				ebt.setUsersJson(EntityFactory.createJSONStringForEntity(u));
-			}
-			if ((EntityBundleTransport.GROUPS & partsMask) > 0) {
-				PaginatedResults<UserGroup> g = eb.getGroups();
-				ebt.setGroupsJson(EntityFactory.createJSONStringForEntity(g));
-			}
 			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask)!=0) {
 				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
 			}
@@ -353,7 +349,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
-		synapseClient.setSearchEndpoint(urlProvider.getSearchServiceUrl());
 		return synapseClient;
 	}
 
@@ -597,7 +592,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
-
+	
+	@Override
+	public EntityWrapper getUserGroupHeadersById(List<String> ids)
+			throws RestServiceException {
+		try {
+			Synapse synapseClient = createSynapseClient();
+			UserGroupHeaderResponsePage response = synapseClient.getUserGroupHeadersByIds(ids);
+			JSONObjectAdapter responseJSON = response
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(responseJSON.toJSONString(), responseJSON
+					.getClass().getName(), null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e); 
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 	@Override
 	public void updateUserProfile(String userProfileJson)
 			throws RestServiceException {
@@ -863,5 +875,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		} 
+	}
+	
+	@Override
+	public String markdown2Html(String markdown, String attachmentUrl) {
+		return ServerMarkdownUtils.markdown2Html(markdown, attachmentUrl, markdownProcessor);
 	}
 }

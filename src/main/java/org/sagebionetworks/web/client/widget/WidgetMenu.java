@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget;
 
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
 import com.extjs.gxt.ui.client.event.MenuEvent;
@@ -108,12 +109,15 @@ public class WidgetMenu extends LayoutContainer {
 		// Add
 		if((mask & ADD) > 0) {						
 			AbstractImagePrototype icon = AbstractImagePrototype.create(iconsImageBundle.add16());
-			this.add(createIconLink(icon, new ClickHandler() {				
+			Anchor anchor = DisplayUtils.createIconLink(icon, new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					addClicked(event);
 				}
-			}));
+			});
+			anchor.addStyleName("margin-right-5");
+
+			this.add(anchor);
 			
 //			if(showCog) {
 //				cogMenu.add(new MenuItem(DisplayConstants.BUTTON_ADD, icon, new SelectionListener<MenuEvent>() {
@@ -128,12 +132,15 @@ public class WidgetMenu extends LayoutContainer {
 		// Edit
 		if((mask & EDIT) > 0) {						
 			AbstractImagePrototype icon = AbstractImagePrototype.create(iconsImageBundle.editGrey16());
-			this.add(createIconLink(icon, new ClickHandler() {				
+			Anchor anchor = DisplayUtils.createIconLink(icon, new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					editClicked(event);
 				}
-			}));
+			});
+			anchor.addStyleName("margin-right-5");
+
+			this.add(anchor);
 			
 //			if(showCog) {
 //				cogMenu.add(new MenuItem(DisplayConstants.BUTTON_EDIT, icon, new SelectionListener<MenuEvent>() {
@@ -148,12 +155,15 @@ public class WidgetMenu extends LayoutContainer {
 		// Delete
 		if((mask & DELETE) > 0) {			
 			AbstractImagePrototype icon = AbstractImagePrototype.create(iconsImageBundle.delete16());
-			this.add(createIconLink(icon, new ClickHandler() {				
+			Anchor anchor = DisplayUtils.createIconLink(icon, new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					deleteClicked(event);
 				}
-			}));
+			});
+			anchor.addStyleName("margin-right-5");
+
+			this.add(anchor);
 			
 //			if(showCog) {
 //				cogMenu.add(new MenuItem(DisplayConstants.LABEL_DELETE, icon, new SelectionListener<MenuEvent>() {
@@ -175,15 +185,5 @@ public class WidgetMenu extends LayoutContainer {
 		}
 				
 	}
-
-	private Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
-		Anchor anchor = new Anchor();
-		anchor.setHTML(icon.getHTML());			
-		anchor.addClickHandler(clickHandler);
-		anchor.addStyleName("margin-right-5");
-		return anchor;
-	}
-
-	
 	
 }

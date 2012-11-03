@@ -1,17 +1,21 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.extjs.gxt.ui.client.Style.Direction;
-import com.extjs.gxt.ui.client.Style.Scroll;
+import com.extjs.gxt.ui.client.event.FxEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
-import com.extjs.gxt.ui.client.widget.layout.TableData;
-import com.extjs.gxt.ui.client.widget.layout.VBoxLayout;
+import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -23,8 +27,28 @@ public class EntityMetadata extends Composite {
 	interface EntityMetadataUiBinder extends UiBinder<Widget, EntityMetadata> {
 	}
 
+	protected static final String VERSION_KEY_ID = "id";
+
+	protected static final String VERSION_KEY_NUMBER = "number";
+
+	protected static final String VERSION_KEY_LABEL = "label";
+
+	protected static final String VERSION_KEY_COMMENT = "comment";
+
+	protected static final String VERSION_KEY_MOD_ON = "modifiedOn";
+
+	protected static final String VERSION_KEY_MOD_BY = "modifiedBy";
+
 	private static EntityMetadataUiBinder uiBinder = GWT
 			.create(EntityMetadataUiBinder.class);
+
+	interface Style extends CssResource {
+		String limitedHeight();
+		String currentVersion();
+	}
+
+	@UiField
+	Style style;
 
 	@UiField
 	HTMLPanel panel;
@@ -40,33 +64,50 @@ public class EntityMetadata extends Composite {
 	@UiField
 	HTMLPanel versions;
 	@UiField
-	SpanElement version;
+	SpanElement label;
+	@UiField
+	SpanElement comment;
 
 	@UiField
-	VerticalPanel previousVersions;
+	LayoutContainer previousVersions;
 
 	@UiField
 	InlineLabel allVersions;
 
 	public EntityMetadata() {
 		initWidget(uiBinder.createAndBindUi(this));
+
+		final FxConfig config = new FxConfig(400);
+		config.setEffectCompleteListener(new Listener<FxEvent>() {
+			@Override
+			public void handleEvent(FxEvent be) {
+				// This call to layout is necessary to force the scroll bar to appear on page-load
+				previousVersions.layout(true);
+				allVersions.getElement().setPropertyBoolean("animating", false);
+			}
+		});
+
 		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+		allVersions.getElement().setPropertyBoolean("animating", false);
 		allVersions.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (previousVersions.isVisible()) {
-					previousVersions.el().slideOut(Direction.UP, FxConfig.NONE);
-					allVersions.setText(DisplayConstants.SHOW_VERSIONS);
-				} else {
-					previousVersions.setVisible(true);
-					previousVersions.el().slideIn(Direction.DOWN, FxConfig.NONE);
-					allVersions.setText(DisplayConstants.HIDE_VERSIONS);
+				if (!allVersions.getElement().getPropertyBoolean("animating")) {
+					allVersions.getElement().setPropertyBoolean("animating", true);
+					if (previousVersions.el().isVisible()) {
+						allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+						previousVersions.el().slideOut(Direction.UP, config);
+					} else {
+						previousVersions.setVisible(true);
+						allVersions.setText(DisplayConstants.HIDE_VERSIONS);
+						previousVersions.el().slideIn(Direction.DOWN, config);
+					}
 				}
 			}
 		});
-		previousVersions.setLayout(new VBoxLayout());
-		previousVersions.setScrollMode(Scroll.AUTOY);
+		previousVersions.setLayout(new FlowLayout(10));
 	}
+
 
 	public void setCreateName(String text) {
 		createName.setInnerText(text);
@@ -84,19 +125,34 @@ public class EntityMetadata extends Composite {
 		modifyDate.setInnerText(text);
 	}
 
-	public void setVersionInfo(String text) {
-		version.setInnerText(text);
+	public void setVersionInfo(Versionable vb) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(vb.getVersionLabel());
+
+		if (vb.getVersionComment() != null) {
+			sb.append(" - ");
+
+			comment.setTitle(vb.getVersionComment());
+			comment.setInnerText(DisplayUtils.stubStr(vb.getVersionComment(), 60));
+		}
+		label.setInnerText(sb.toString());
 	}
 
-	public void addToPreviousVersions(Widget widget) {
-		TableData data = new TableData();
-		data.setStyle("padding-left:10px");
-		previousVersions.add(widget, data);
+	public void setPreviousVersions(ContentPanel versions) {
+		previousVersions.add(versions);
 		previousVersions.layout(true);
+	}
+
+	public void clearPreviousVersions() {
+		previousVersions.removeAll();
 	}
 
 	public void setVersionsVisible(boolean visible) {
 		versions.setVisible(visible);
+	}
+
+	public Style getStyle() {
+		return style;
 	}
 
 }

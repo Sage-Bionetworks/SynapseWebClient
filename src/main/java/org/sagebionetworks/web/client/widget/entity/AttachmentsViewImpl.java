@@ -8,13 +8,17 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.data.BaseModelData;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Dialog;
+import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
@@ -24,24 +28,29 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
+import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.extjs.gxt.ui.client.widget.tips.ToolTip;
-import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsView {
 	
+	private static final String ATTACHMENT_COLUMN_WIDTH = "210px";
 	private static final String LINK_KEY = "link";
 	private static final String ATTACHMENT_DATA_TOKEN_KEY = "attachmentDataKey";
 	private static final String TOOLTIP_TEXT_KEY = "tooltip";
 	private static final String ATTACHMENT_DATA_NAME_KEY = "attachmentDataName";
+
 	Grid<BaseModelData> grid;
 	ListStore<BaseModelData> gridStore;
 	ColumnModel columnModel;
@@ -90,7 +99,6 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 		grid.setTrackMouseOver(false);
 		grid.setShadow(false);		
 		
-		configureContextMenu();
 		this.add(grid);
 	}
 	
@@ -98,12 +106,12 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	public void configure(String baseUrl, String entityId,
 			List<AttachmentData> attachments) {		
 		gridStore.removeAll();
-		if(attachments == null){
+		if(attachments == null || attachments.size() == 0){
 			addNoAttachmentRow();
 		} else {
 			populateStore(baseUrl, entityId, attachments);			
 		}
-		configureContextMenu();
+
 		
 		if(isRendered())
 			grid.reconfigure(gridStore, columnModel);
@@ -170,7 +178,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 
 			@Override
 			public Object render(BaseModelData model, String property,
-					ColumnData config, int rowIndex, int colIndex,
+					ColumnData config, final int rowIndex, int colIndex,
 					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
 				String value = model.get(property);
 				if (value == null) {
@@ -186,14 +194,37 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 				if(tooltip != null) {
 				    html.setToolTip(tooltip);
 				}
-				return html;
+
+				if (model.get(TOOLTIP_TEXT_KEY) == null) {
+					return html;
+				}
+
+				HorizontalPanel panel = new HorizontalPanel();
+				FlowPanel wrap = new FlowPanel();
+				wrap.add(html);
+				wrap.setWidth(ATTACHMENT_COLUMN_WIDTH);
+				panel.add(wrap);
+
+				AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle.deleteButtonGrey16());
+				Anchor button = DisplayUtils.createIconLink(img, new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						deleteAttachmentAt(rowIndex);
+					}
+				});
+
+				TableData td = new TableData();
+				td.setHorizontalAlign(HorizontalAlignment.RIGHT);
+				td.setVerticalAlign(VerticalAlignment.MIDDLE);
+				panel.add(button, td);
+				panel.setAutoWidth(true);
+				return panel;
 			}
 
 		};
 		return valueRenderer;
 	}
 
-	
 	@Override
 	public Widget asWidget() {
 		if(isRendered()) {
@@ -234,36 +265,24 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	/*
 	 * Private Methods
 	 */
-	private void configureContextMenu() {
-		if(grid == null) return;
-		
-		if(!isEmpty) {
-			Menu contextMenu = new Menu();
-	
-			MenuItem remove = new MenuItem();
-			remove.setText(DisplayConstants.LABEL_DELETE);
-			remove.setIcon(AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
-			remove.addSelectionListener(new SelectionListener<MenuEvent>() {
-				public void componentSelected(MenuEvent ce) {
-					final BaseModelData model = grid.getSelectionModel().getSelectedItem();
-					if (model != null) {
-						MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + model.get(ATTACHMENT_DATA_NAME_KEY), DisplayConstants.PROMPT_SURE_DELETE + " " + model.get(ATTACHMENT_DATA_NAME_KEY) +"?", new Listener<MessageBoxEvent>() {					
-							@Override
-							public void handleEvent(MessageBoxEvent be) { 												
-								Button btn = be.getButtonClicked();
-								if(Dialog.YES.equals(btn.getItemId())) {
-									presenter.deleteAttachment((String)model.get(ATTACHMENT_DATA_TOKEN_KEY));								
-								}
+	public void deleteAttachmentAt(int rowIndex) {
+		final BaseModelData model = grid.getStore().getAt(rowIndex);
+		if (model != null) {
+			MessageBox.confirm(
+					DisplayConstants.LABEL_DELETE + " "
+							+ model.get(ATTACHMENT_DATA_NAME_KEY),
+					DisplayConstants.PROMPT_SURE_DELETE + " "
+							+ model.get(ATTACHMENT_DATA_NAME_KEY) + "?",
+					new Listener<MessageBoxEvent>() {
+						@Override
+						public void handleEvent(MessageBoxEvent be) {
+							Button btn = be.getButtonClicked();
+							if (Dialog.YES.equals(btn.getItemId())) {
+								presenter.deleteAttachment((String) model
+										.get(ATTACHMENT_DATA_TOKEN_KEY));
 							}
-						});					
-					}
-				}
-			});
-			contextMenu.add(remove);
-	
-			grid.setContextMenu(contextMenu);
-		} else {
-			grid.setContextMenu(null);
+						}
+					});
 		}
 	}
 
@@ -280,7 +299,6 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 			if(foundIdx != null) {
 				gridStore.remove(foundIdx);
 				if(gridStore.getCount() == 0) {
-					configureContextMenu();
 					addNoAttachmentRow();
 				}
 				grid.reconfigure(gridStore, columnModel);

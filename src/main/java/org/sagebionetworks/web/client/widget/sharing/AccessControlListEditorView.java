@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.VoidCallback;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView {
@@ -20,7 +23,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 	 * @param principals the available principals
 	 * @param isEditable
 	 */
-	public void buildWindow(boolean isInherited, boolean canEnableInheritance);
+	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges);
 	
 	/**
 	 * Add an ACL Entry to the permissions dialog
@@ -29,54 +32,61 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 	 */
 	public void addAclEntry(AclEntry entry);
 	
+	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
+	public void setPublicPrincipalId(Long id);
+	public void setAuthenticatedPrincipalId(Long id);
+	
 	/**
 	 * Set the view to a loading state while async loads
 	 */
 	public void showLoading();
 	
+	void showInfoError(String title, String message);
+
+	void showInfoSuccess(String title, String message);
+
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		
 		/**
-		 * Create an ACL for the current entity (which otherwise inherits its 
-		 * ACL from an ancestor)
-		 */
-		void createAcl();
-		
-		/**
-		 * Add the given principal to the ACL, with the given permission level
+		 * Set the access level of the given principal. Changes are NOT pushed
+		 * to Synapse.
+		 * 
 		 * @param principalId
 		 * @param permissionLevel
 		 */
-		void addAccess(Long principalId, PermissionLevel permissionLevel);
-		
+		void setAccess(Long principalId, PermissionLevel permissionLevel);
+
 		/**
-		 * Change the access level of the given principal (already in the ACL) 
-		 * to the given permission level
-		 * @param principalId
-		 * @param permissionLevel
-		 */
-		void changeAccess(Long principalId, PermissionLevel permissionLevel);
-		
-		/**
-		 * Remove the given principal from the ACL
+		 * Remove the given principal from the ACL. Changes are NOT pushed to 
+		 * Synapse.
 		 * 
 		 * @param principalId
 		 */
 		void removeAccess(Long principalId);
+
+		/**
+		 * Create a local for the current entity, with permissions copied from 
+		 * the entity's benefactor. Changes are NOT pushed to Synapse.
+		 */
+		void createAcl();
 		
 		/**
-		 * Delete the ACL for the current entity, making the entity inherit its 
-		 * access permissions from its ancestor's ACL
+		 * Delete the ACL for the current entity. The entity will subsequently 
+		 * inherit access permissions from its ancestor's ACL. Changes are NOT
+		 * pushed to Synapse.		 * 
 		 */
 		void deleteAcl();
 
 		/**
-		 * Apply the ACL for the current entity to all of its descendant 
-		 * entities. Any local ACLs for descendant entities will be deleted.
+		 * Push ACL changes to Synapse.
+		 * 
+		 * If 'recursive' is true, then all ACLs for all descendant entities
+		 * will be deleted in Synapse. These descendant entities will 
+		 * consequently inherit access permissions from this entity's ACL.
 		 */
-		void applyAclToChildren();
+		void pushChangesToSynapse(boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback);
 	}
 }

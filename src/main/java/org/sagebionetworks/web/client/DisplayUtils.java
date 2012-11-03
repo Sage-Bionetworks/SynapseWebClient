@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
@@ -25,6 +26,7 @@ import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -36,6 +38,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.shared.EntityType;
@@ -46,7 +49,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.sagebionetworks.web.shared.users.AclPrincipal;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
@@ -60,6 +62,7 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
@@ -159,6 +162,7 @@ public class DisplayUtils {
 	public static final String HOMESEARCH_BOX_STYLE_NAME = "homesearchbox";	
 	public static final String STYLE_SMALL_SEARCHBOX = "smallsearchbox";
 	public static final String STYLE_OTHER_SEARCHBOX = "othersearchbox";
+	public static final String STYLE_BREAK_WORD = "break-word";
 
 
 	/*
@@ -227,16 +231,26 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Returns a properly aligned name and e-mail address for a given AclPrincipal
+	 * Returns a properly aligned name and e-mail address for a given UserGroupHeader
 	 * @param principal
 	 * @return
 	 */
-	public static String getUserNameEmailHtml(AclPrincipal principal) {
+	public static String getUserNameEmailHtml(UserGroupHeader principal) {
 		if (principal == null) return "";
 		String name = principal.getDisplayName() == null ? "" : principal.getDisplayName();
 		String email = principal.getEmail() == null ? "" : principal.getEmail();
 		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, email).asString();
 	}
+	
+	/**
+	 * Returns a properly aligned name and description for a special user or group
+	 * @param name of user or group
+	 * @return
+	 */
+	public static String getUserNameEmailHtml(String name, String description) {
+		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, description).asString();
+	}
+	
 	
 	/**
 	 * Returns html for a thumbnail image.
@@ -531,6 +545,7 @@ public class DisplayUtils {
 		DateTime dt = new DateTime(toFormat.getTime());
 		return ISODateTimeFormat.dateTime().print(dt);		
 	}
+	
 	
 	/**
 	 * Converts a date to just a date.
@@ -893,7 +908,7 @@ public class DisplayUtils {
 	private static int popoverCount= 0;
 
 	/**
-	 * Adds a twitter bootstrap tooltip to the given widget
+	 * Adds a twitter bootstrap tooltip to the given widget using the standard Synapse configuration
 	 *
 	 * CAUTION - If not used with a non-block level element like
 	 * an anchor, img, or span the results will probably not be
@@ -902,9 +917,18 @@ public class DisplayUtils {
 	 *
 	 * @param util the JSNIUtils class (or mock)
 	 * @param widget the widget to attach the tooltip to
-	 * @param optionsMap a map containing the options for the tooltip and the text
+	 * @param tooltipText text to display
+	 * @param pos where to position the tooltip relative to the widget
 	 */
-	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
+	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, String tooltipText, TOOLTIP_POSITION pos){
+		Map<String, String> optionsMap = new TreeMap<String, String>();
+		optionsMap.put("title", tooltipText);
+		optionsMap.put("data-placement", pos.toString().toLowerCase());
+		optionsMap.put("data-animation", "false");
+		addTooltip(util, widget, optionsMap);
+	}
+	
+	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
 
 		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId(); 
@@ -1000,7 +1024,7 @@ public class DisplayUtils {
 		}
 		return version;
 	}
-
+	
 	
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	public static native JavaScriptObject newWindow(String url, String name, String features)/*-{
@@ -1042,4 +1066,10 @@ public class DisplayUtils {
 		return html;
 	}
 
+	public static Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
+		Anchor anchor = new Anchor();
+		anchor.setHTML(icon.getHTML());
+		anchor.addClickHandler(clickHandler);
+		return anchor;
+	}
 }

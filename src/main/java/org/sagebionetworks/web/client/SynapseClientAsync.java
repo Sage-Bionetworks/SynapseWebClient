@@ -7,9 +7,6 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-
-import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
@@ -22,7 +19,7 @@ public interface SynapseClientAsync {
 	
 	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundleTransport> callback);
 
-	void getEntityVersions(String entityId, AsyncCallback<String> callback);
+	void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<String> callback);
 
 	void updateEntity(String entityJson, AsyncCallback<EntityWrapper> callback);
 
@@ -57,6 +54,8 @@ public interface SynapseClientAsync {
 	
 	void getUserProfile(String userId, AsyncCallback<String> callback);
 	
+	void getUserGroupHeadersById(List<String> ids, AsyncCallback<EntityWrapper> headers);
+	
 	void updateUserProfile(String userProfileJson, AsyncCallback<Void> callback);
 	
 	void createUserProfileAttachmentPresignedUrl(String id, String tokenOrPreviewId, AsyncCallback<String> callback);
@@ -85,4 +84,5 @@ public interface SynapseClientAsync {
 
 	public void updateExternalLocationable(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback);
 
+	public void markdown2Html(String markdown, String attachmentUrl, AsyncCallback<String> callback);
 }

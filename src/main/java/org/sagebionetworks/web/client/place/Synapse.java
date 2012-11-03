@@ -4,7 +4,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 
 public class Synapse extends Place{
-	private static final String VERSION_DELIMITER = "."; 
+	private static final String VERSION_DELIMITER = "/version/"; 
 	
 	private String token;
 	private String entityId;
@@ -13,7 +13,7 @@ public class Synapse extends Place{
 	public Synapse(String token) {
 		this.token = token;
 		if(token.contains(VERSION_DELIMITER)) {
-			String[] parts = token.split("\\.");
+			String[] parts = token.split(VERSION_DELIMITER);
 			if(parts.length == 2) {				
 				entityId = parts[0];
 				versionNumber = Long.parseLong(parts[1]);

@@ -127,7 +127,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			public void onSuccess(String storageUsageSummaryListJson) {
 				try {
 					StorageUsageSummaryList storageUsageSummaryList = nodeModelCreator.createEntity(storageUsageSummaryListJson, StorageUsageSummaryList.class);
-					view.updateStorageUsage(storageUsageSummaryList.getGrandTotal());
+					view.updateStorageUsage(storageUsageSummaryList.getTotalSize());
 				} catch (RestServiceException e) {
 					onFailure(e);
 				}    				
