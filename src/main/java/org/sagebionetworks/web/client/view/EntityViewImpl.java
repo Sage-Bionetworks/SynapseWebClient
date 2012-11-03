@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class EntityViewImpl extends Composite implements EntityView {
 	
@@ -58,20 +59,22 @@ public class EntityViewImpl extends Composite implements EntityView {
 	}
 
 	
-	private EntityUpdatedHandler handler = null;
+	private HandlerRegistration handlerRegistration = null;
 	
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		if (handler==null) {
-			handler = new EntityUpdatedHandler() {			
-				@Override
-				public void onPersistSuccess(EntityUpdatedEvent event) {
-					presenter.refresh();
-				}
-			};
-			entityPageTop.addEntityUpdatedHandler(handler);
+		if (handlerRegistration!=null) {
+			// clean it up
+			handlerRegistration.removeHandler();
 		}
+		EntityUpdatedHandler handler = new EntityUpdatedHandler() {			
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.refresh();
+			}
+		};
+		handlerRegistration = entityPageTop.addEntityUpdatedHandler(handler);
 		header.clear();
 		header.add(headerWidget.asWidget());
 		footer.clear();

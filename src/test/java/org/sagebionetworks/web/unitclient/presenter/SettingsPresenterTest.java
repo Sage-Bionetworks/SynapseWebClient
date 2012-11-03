@@ -143,15 +143,15 @@ public class SettingsPresenterTest {
 		
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
 		StorageUsageSummaryList usageSummary = new StorageUsageSummaryList();
-		Long grandTotal = 12345l;
-		usageSummary.setGrandTotal(grandTotal);
+		Long totalSize = 12345l;
+		usageSummary.setTotalSize(totalSize);
+		usageSummary.setTotalCount(54321L);
 		usageSummary.setSummaryList(new ArrayList<StorageUsageSummary>());
-		usageSummary.setUserId(testUser.getProfile().getOwnerId());
 		
 		when(mockNodeModelCreator.createEntity(any(String.class), eq(StorageUsageSummaryList.class))).thenReturn(usageSummary);
 		AsyncMockStubber.callSuccessWith(EntityFactory.createJSONStringForEntity(usageSummary)).when(mockUserService).getStorageUsage(any(AsyncCallback.class));		
 		profilePresenter.setPlace(place);
-		verify(mockView).updateStorageUsage(eq(grandTotal));
+		verify(mockView).updateStorageUsage(eq(totalSize));
 	}
 	@Test
 	public void testUsageFailure() throws RestServiceException {

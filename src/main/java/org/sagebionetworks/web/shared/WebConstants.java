@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.shared;
+import org.sagebionetworks.repo.model.util.ModelConstants;
 
 /**
  * Constants for query parameter keys, header names, and field names used by the
@@ -17,7 +18,7 @@ public class WebConstants {
 	 * compatibility across services and clients.
 	 * 
 	 */
-	public static final String VALID_ENTITY_NAME_REGEX = "^[a-z,A-Z,0-9,_,., ,\\-,\\+,(,)]+";
+	public static final String VALID_ENTITY_NAME_REGEX = ModelConstants.VALID_ENTITY_NAME_REGEX;
 	
 	public static final String INVALID_ENTITY_NAME_MESSAGE = "Entity names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	

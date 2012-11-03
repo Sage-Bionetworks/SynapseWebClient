@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -28,7 +29,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -46,11 +46,11 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter  {
 
 	private EntityPageTopView view;
-	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -65,8 +65,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private String entityTypeDisplay;
 	private EventBus bus;
 	private JiraURLHelper jiraURLHelper;
+	private String publicAndAuthenticatedAclPrincipalIds;
+	
 	@Inject
-	public EntityPageTop(EntityPageTopView view, NodeServiceAsync service,
+	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
@@ -78,7 +80,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			JiraURLHelper jiraURLHelper,
 			EventBus bus) {
 		this.view = view;
-		this.nodeService = service;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
@@ -134,10 +135,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		bus.fireEvent(new EntityUpdatedEvent());
 	}
 
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		bus.addHandler(EntityUpdatedEvent.getType(), handler);
+	public HandlerRegistration addEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		return bus.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
-
+	
 	@Override
 	public boolean isLocationable() {
 		if(bundle.getEntity() instanceof Locationable) {
@@ -171,7 +172,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void loadShortcuts(int offset, int limit, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
-		PaginatedResults<EntityHeader> references = null;
 		if(offset == 0) {
 			 callback.onSuccess(bundle.getReferencedBy());
 		} else {
@@ -189,6 +189,30 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		}
 	}
 
+	@Override
+	public void loadVersions(String id, int offset, int limit,
+				final AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback) {
+		// TODO: If we ever change the offset api to actually take 0 as a valid offset, then we need to remove "+1"
+		synapseClient.getEntityVersions(id, offset+1, limit, new AsyncCallback<String>(){
+			@Override
+			public void onSuccess(String result) {
+				PaginatedResults<VersionInfo> paginatedResults = nodeModelCreator
+						.createPaginatedResults(result,
+								VersionInfo.class);
+				asyncCallback.onSuccess(paginatedResults);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				asyncCallback.onFailure(caught);
+			}
+		});
+	}
+
+	@Override
+	public void getHtmlFromMarkdown(String markdown, String attachmentBaseUrl, final AsyncCallback<String> asyncCallback) {
+		synapseClient.markdown2Html(markdown, attachmentBaseUrl, asyncCallback);
+			}
+	
 	/*
 	 * Private Methods
 	 */
@@ -364,53 +388,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	private void sendVersionInfoToView() {
-		final Entity entity = bundle.getEntity();
+		Entity entity = bundle.getEntity();
 		if (entity instanceof Versionable) {
-			synapseClient.getEntityVersions(entity.getId(),
-					new AsyncCallback<String>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							view.setEntityVersions((Versionable)entity, null);
-						}
-
-						@Override
-						public void onSuccess(String result) {
-							setEntityVersions(result);
-						}
-
-					});
+			view.setEntityVersions((Versionable)entity);
 		}
 	}
-
-	private void setEntityVersions(String jsonVersions) {
-		TreeMap<Long, String> versions = new TreeMap<Long, String>(new ReverseLong());
-		JSONObjectAdapter joa;
-		try {
-			joa = this.jsonObjectAdapter.createNew(jsonVersions);
-			int numResults = joa.getInt("totalNumberOfResults");
-
-			JSONArrayAdapter jsonArray = joa.getJSONArray("results");
-			for (int i = 0; i < numResults; i++) {
-				JSONObjectAdapter jsonObject = jsonArray.getJSONObject(i);
-				long number = jsonObject.getInt("versionNumber");
-				String label = jsonObject.getString("versionLabel");
-				versions.put(number, label);
-			}
-		} catch (JSONObjectAdapterException e) {
-		}
-		Versionable vb = (Versionable)bundle.getEntity();
-
-		view.setEntityVersions(vb, versions);
-	}
-
-	static class ReverseLong implements Comparator<Long> {
-
-		@Override
-		public int compare(Long o1, Long o2) {
-			return o1 > o2 ? -1 :
-					o1 < o2 ? +1 : 0;
-		}
-    }
 
 }

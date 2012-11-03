@@ -114,7 +114,6 @@ public class ServiceUtils {
 		Synapse client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		client.setSearchEndpoint(urlProvider.getSearchServiceUrl());
 		client.setSessionToken(sessionToken);
 		return client;
 	}

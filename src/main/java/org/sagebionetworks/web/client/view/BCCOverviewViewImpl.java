@@ -67,23 +67,23 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 
 	@Override
 	public void showOverView() {
-		LayoutContainer megaButton = new LayoutContainer();
-		megaButton.setStyleName("mega-button");
-		megaButton.setStyleAttribute("margin-top", "10px;");
-		megaButton.setStyleAttribute("float", "left;");
-		Anchor applyForChallengeLink = new Anchor();
-		applyForChallengeLink.setText("Join the Challenge");
-		applyForChallengeLink.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				BCCSignupProfile profile = presenter.getBCCSignupProfile();
-				final BCCCallback callback = presenter.getBCCSignupCallback();
-				BCCSignupHelper.showDialog(profile, callback);				
-			}
-		});
-		megaButton.add(applyForChallengeLink);
-		applyForChallenge.clear();
-		applyForChallenge.add(megaButton);
+//		LayoutContainer megaButton = new LayoutContainer();
+//		megaButton.setStyleName("mega-button");
+//		megaButton.setStyleAttribute("margin-top", "10px;");
+//		megaButton.setStyleAttribute("float", "left;");
+//		Anchor applyForChallengeLink = new Anchor();
+//		applyForChallengeLink.setText("Join the Challenge");
+//		applyForChallengeLink.addClickHandler(new ClickHandler() {			
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				BCCSignupProfile profile = presenter.getBCCSignupProfile();
+//				final BCCCallback callback = presenter.getBCCSignupCallback();
+//				BCCSignupHelper.showDialog(profile, callback);				
+//			}
+//		});
+//		megaButton.add(applyForChallengeLink);
+//		applyForChallenge.clear();
+//		applyForChallenge.add(megaButton);
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -20,10 +19,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Data;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.EntityGroup;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -37,6 +36,8 @@ import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidget;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -165,6 +166,38 @@ public class SnapshotWidgetTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
+	public void testLoadRowDetailsFailureForbidden() throws Exception {
+		// load one row
+		String targetId = "syn321";
+		Long targetVersionNumber = new Long(2);
+		addSingleGroupRecordToSnapshot(snapshot, targetId, targetVersionNumber, null);
+		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
+		ForbiddenException exception = new ForbiddenException();
+		AsyncMockStubber.callFailureWith(exception).when(mockSynapseClient).getEntityForVersion(eq(targetId), eq(targetVersionNumber), any(AsyncCallback.class));
+		
+		snapshotWidget.loadRowDetails();
+
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
+	}	
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadRowDetailsFailureNotFound() throws Exception {
+		// load one row
+		String targetId = "syn321";
+		Long targetVersionNumber = new Long(2);
+		addSingleGroupRecordToSnapshot(snapshot, targetId, targetVersionNumber, null);
+		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
+		NotFoundException exception = new NotFoundException();
+		AsyncMockStubber.callFailureWith(exception).when(mockSynapseClient).getEntityForVersion(eq(targetId), eq(targetVersionNumber), any(AsyncCallback.class));
+		
+		snapshotWidget.loadRowDetails();
+
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
+	}	
+	
+	@SuppressWarnings("unchecked")
+	@Test
 	public void testLoadRowDetailsFailureOther() throws Exception {
 		// load one row
 		String targetId = "syn321";
@@ -176,7 +209,7 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.loadRowDetails();
 
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FAILED_PERSIST); 
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
 	}	
 	
 	

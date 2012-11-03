@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityGroup;
+import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Summary;
-import org.sagebionetworks.repo.model.EntityGroup;
-import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -21,6 +21,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
@@ -40,7 +42,7 @@ import com.google.inject.Inject;
  */
 public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	
-	private static final int MAX_DESCRIPTION_CHARS = 300;
+	private static final int MAX_DESCRIPTION_CHARS = 165;
 	private AdapterFactory factory;
 	private SnapshotWidgetView view;
 	private Summary snapshot;
@@ -374,11 +376,20 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	/*
 	 * Private methods
 	 */
-	private EntityGroupRecordDisplay getUnauthDisplay() {
+	private EntityGroupRecordDisplay getEmptyDisplay() {
+		return new EntityGroupRecordDisplay(
+				"",
+				SafeHtmlUtils.EMPTY_SAFE_HTML,
+				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
+	}
+
+	private EntityGroupRecordDisplay getGenericErrorDisplay(String id, Long version) {
+		String msg = "Error Loading: " + id;
+		if(version != null) msg += ", Version " + version;
 		return new EntityGroupRecordDisplay(
 				null,
-				SafeHtmlUtils.fromSafeConstant(DisplayConstants.TITLE_UNAUTHORIZED),
-				null, null, null, null, null, null, null);
+				SafeHtmlUtils.fromSafeConstant(msg),
+				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
 	}
 
 	private void updateSnapshot(final AsyncCallback<String> callback) {
@@ -469,6 +480,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		
 		// desc
 		String description = referencedEntity.getDescription() == null ? "" : referencedEntity.getDescription();
+		description = description.replaceAll("\\n", " "); // keep to 3 lines by removing new lines
 		if(description.length() > MAX_DESCRIPTION_CHARS) 
 			description = description.substring(0, MAX_DESCRIPTION_CHARS) + " ...";
 		SafeHtml descSafe =  new SafeHtmlBuilder().appendEscapedLines(description).toSafeHtml();  
@@ -508,13 +520,19 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				if(caught instanceof UnauthorizedException) {
-				EntityGroupRecordDisplay unauthDisplay = getUnauthDisplay();
-				unauthDisplay.setEntityId(ref.getTargetId());
-				view.setEntityGroupRecordDisplay(groupIndex, rowIndex, unauthDisplay);
+				EntityGroupRecordDisplay errorDisplay = getEmptyDisplay();
+				errorDisplay.setEntityId(ref.getTargetId());
+				errorDisplay.setVersion(SafeHtmlUtils.fromSafeConstant(ref.getTargetVersionNumber().toString()));
+				String msg = ref.getTargetId();
+				if(ref.getTargetVersionNumber() != null) msg += ", Version " + ref.getTargetVersionNumber();
+				if(caught instanceof UnauthorizedException || caught instanceof ForbiddenException) {
+					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.TITLE_UNAUTHORIZED + ": " + msg));
+				} else if (caught instanceof NotFoundException) {
+					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.NOT_FOUND + ": " + msg));
 				} else {
-					view.showErrorMessage(DisplayConstants.ERROR_FAILED_PERSIST);					
+					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.ERROR_LOADING + ": " + msg));
 				}
+				view.setEntityGroupRecordDisplay(groupIndex, rowIndex, errorDisplay);
 			}
 		};
 		if(ref.getTargetVersionNumber() != null) {

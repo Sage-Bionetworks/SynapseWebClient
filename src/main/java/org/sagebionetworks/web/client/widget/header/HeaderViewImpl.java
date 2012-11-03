@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 
@@ -145,11 +146,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				}
 			});
    		 	
-	 		Map<String, String> optionsMap = new TreeMap<String, String>();
-			optionsMap.put("title", DisplayConstants.TEXT_USER_SETTINGS);
-			optionsMap.put("data-placement", "bottom");
-			optionsMap.put("data-animation", "false");
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, optionsMap);
+	 		DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, DisplayConstants.TEXT_USER_SETTINGS, TOOLTIP_POSITION.BOTTOM);
 		 	
    		 	Image logout = new Image(iconsImageBundle.logoutGrey16());
    		 	logout.addStyleName("imageButton");
@@ -159,11 +156,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
 				}
 			});
-		 	optionsMap = new TreeMap<String, String>();
-			optionsMap.put("title", DisplayConstants.LABEL_LOGOUT_TEXT);
-			optionsMap.put("data-placement", "bottom");
-			optionsMap.put("data-animation", "false");
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, optionsMap);
+			DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
 		 	
 		 	userCommands.add(settings);
 		 	userCommands.add(logout);

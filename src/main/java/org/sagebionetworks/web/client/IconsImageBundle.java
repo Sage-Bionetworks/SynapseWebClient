@@ -116,6 +116,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/globe-green-16.png")
 	ImageResource globe16();	
 	
+	@Source("images/icons/globe-green-32.png")
+	ImageResource globe32();	
+	
 	@Source("images/icons/google-16.png")
 	ImageResource google16();	
 	
@@ -134,6 +137,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/lock-16.png")
 	ImageResource lock16();	
 		
+	@Source("images/icons/lock-grey-16.png")
+	ImageResource lockGrey16();	
+	
 	@Source("images/icons/lock-unlock-16.png")
 	ImageResource lockUnlocked16();	
 

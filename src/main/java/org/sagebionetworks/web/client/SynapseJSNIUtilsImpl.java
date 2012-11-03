@@ -31,7 +31,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public void bindBootstrapPopover(String id) {
 		_bindBootstrapPopover(id);
 	}
-
+	
+	@Override
+	public void highlightCodeBlocks() {
+		_highlightCodeBlocks();
+	}
+	
+	public static native void _highlightCodeBlocks() /*-{
+	  $wnd.jQuery('code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
+	}-*/;
+	
 	private static native void _bindBootstrapPopover(String id) /*-{
 		$wnd.jQuery('#'+id).popover();
 	}-*/;

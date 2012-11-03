@@ -9,6 +9,7 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -19,7 +20,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber);
 		
-	public String getEntityVersions(String entityId) throws RestServiceException;
+	public String getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
 	
 	public void deleteEntity(String entityId) throws RestServiceException;
 
@@ -112,6 +113,15 @@ public interface SynapseClient extends RemoteService {
 	public String getUserProfile(String userId) throws RestServiceException;
 	
 	/**
+	 * Batch get headers for users/groups matching a list of Synapse IDs.
+	 * 
+	 * @param ids
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public EntityWrapper getUserGroupHeadersById(List<String> ids) throws RestServiceException;
+
+	/**
 	 * Updates the user's profile json object 
 	 * @param userProfileJson json object of the user's profile
 	 * @throws RestServiceException
@@ -154,5 +164,10 @@ public interface SynapseClient extends RemoteService {
 			throws RestServiceException;
 	
 	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl) throws RestServiceException;
-	
+	/**
+	 * convenience method for converting markdown to html
+	 * @param markdown
+	 * @return
+	 */
+	public String markdown2Html(String markdown, String attachmentUrl);
 }

@@ -43,6 +43,8 @@ public interface UserAccountServiceAsync {
 	
 	void getFastPassSupportUrl(AsyncCallback<String> callback) throws RestServiceException;
 	
+	void getPublicAndAuthenticatedGroupPrincipalIds(AsyncCallback<String> callback);
+	
 	/**
 	 * This needs to be replaced with a Synapse Java Client call
 	 */

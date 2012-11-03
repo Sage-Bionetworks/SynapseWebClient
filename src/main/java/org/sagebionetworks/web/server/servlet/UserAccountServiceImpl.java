@@ -2,6 +2,7 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import net.oauth.OAuthException;
@@ -12,10 +13,15 @@ import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseTermsOfUseException;
+import org.sagebionetworks.repo.model.AuthorizationConstants;
+import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.AuthorizationConstants.DEFAULT_GROUPS;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;
@@ -30,6 +36,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -347,6 +354,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		ResponseEntity<String> response;
 		try {
 			response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
+		} catch(HttpClientErrorException ex) {
+			if (ex.getStatusCode() == HttpStatus.BAD_REQUEST)
+				throw new BadRequestException(ex.getResponseBodyAsString());
+			else if (ex.getMessage().toLowerCase().contains("no content-type found"))
+				return;
+			else throw ex;
 		} catch (RestClientException ex) {
 			if (ex.getMessage().toLowerCase().contains("no content-type found"))
 				return;
@@ -541,6 +554,34 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		return FastPass.url(StackConfiguration.getPortalGetSatisfactionKey(), StackConfiguration.getPortalGetSatisfactionSecret(), email, displayName, principleId, false);
 	}
 	
+	@Override
+	public String getPublicAndAuthenticatedGroupPrincipalIds() {
+		validateService();
+		Synapse synapseClient = createSynapseClient();
+		return getPublicAndAuthenticatedPrincipalIds(synapseClient);		
+	}
+	
+	public static String getPublicAndAuthenticatedPrincipalIds(Synapse synapseClient) {
+		String publicPrincipalId = "";
+		String authenticatedPrincipalId = "";
+		try {
+			PaginatedResults<UserGroup> allGroups = synapseClient.getGroups(0, Integer.MAX_VALUE);
+			
+			for (Iterator iterator = allGroups.getResults().iterator(); iterator.hasNext();) {
+				UserGroup userGroup = (UserGroup) iterator.next();
+				if (userGroup.getName() != null){
+					if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.PUBLIC.name()))
+						publicPrincipalId = userGroup.getId();
+					else if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.AUTHENTICATED_USERS.name()))
+						authenticatedPrincipalId = userGroup.getId();
+				}
+			}
+		} catch (Exception e) {
+			throw new RestClientException(e.getMessage());
+		}
+		return publicPrincipalId + "," + authenticatedPrincipalId;	
+	}
+	
 	/**
 	 * The synapse client is stateful so we must create a new one for each
 	 * request
@@ -559,7 +600,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
-		synapseClient.setSearchEndpoint(urlProvider.getSearchServiceUrl());
 		return synapseClient;
 	}
 }

@@ -4,15 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.shared.users.AclUtils;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -26,6 +30,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -56,7 +61,7 @@ public class EntityViewUtils {
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}
 	}
-
+	
 	public static Widget createRestrictionsWidget(
 			final String jiraFlagLink, 
 			final boolean isAnonymous, 
@@ -70,29 +75,28 @@ public class EntityViewUtils {
 			final boolean hasFulfilledAccessRequirements,
 			final IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
+		
+		final SimplePanel div = new SimplePanel();
+		String shieldStyleName = shieldStyleName(restrictionLevel);
+		String description = restrictionDescriptor(restrictionLevel);
+		String tooltip = DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP;
+		
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">"+DisplayConstants.DATA_ACCESS_RESTRICTIONS_TEXT+"</span><div class=\"" + shieldStyleName+ "\" style=\"display:inline-block; position:absolute\"></div>");
+		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 20px;\">"+description+"</span>");
+		
+		//form the html
+		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
+		htmlPanel.addStyleName("inline-block");
+		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.RIGHT);
+		div.add(htmlPanel);
+		
 		LayoutContainer lc = new HorizontalPanel();
-		lc.setStyleAttribute("font-size", "80%");
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		TableData td = new TableData();
-		td.setVerticalAlign(VerticalAlignment.BOTTOM);
-		lc.setLayout(new ColumnLayout());
 		
-		String shieldStyleName = shieldStyleName(restrictionLevel);
-
-		String dataRestrictionType = "Data Access: "+restrictionDescriptor(restrictionLevel);
-		
-		
-		SimplePanel shieldPanel = new SimplePanel();
-		shieldPanel.setStyleName("left "+shieldStyleName);
-		lc.add(shieldPanel, td);
-		
-		{
-			SafeHtmlBuilder shb = new SafeHtmlBuilder();
-			shb.appendHtmlConstant("<span class=\"strong\" style=\"margin-right: 10px; margin-left: 7px;\">"+dataRestrictionType+"</span>");
-			lc.add(new HTML(shb.toSafeHtml()), td);
-		}
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		lc.add(div);
+		shb = new SafeHtmlBuilder();
 		String infoHyperlinkText = DisplayConstants.INFO;
 		if (restrictionLevel==APPROVAL_REQUIRED.NONE) { // OPEN data
 			if (hasAdministrativeAccess) {
@@ -107,7 +111,7 @@ public class EntityViewUtils {
 		}
 		shb.appendHtmlConstant("<span style=\"padding-right:30px;\"> (<a class=\"link\">"+infoHyperlinkText+"</a>)</span>");
 		Anchor aboutLink = new Anchor(shb.toSafeHtml());
-		lc.add(aboutLink, td);
+		lc.add(aboutLink);
 		aboutLink.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -138,11 +142,8 @@ public class EntityViewUtils {
 				}
 			}
 		});		
-		lc.add(flagLink, td);
-		Map<String,String> optionsMap = new HashMap<String,String>();
-		optionsMap.put("title", DisplayConstants.FLAG_TOOL_TIP);
-		optionsMap.put("data-placement", "right");
-		DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, optionsMap);
+		lc.add(flagLink);
+		DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, DisplayConstants.FLAG_TOOL_TIP, TOOLTIP_POSITION.RIGHT);
 	    
 	    lc.layout();
 		return lc;
