@@ -1,5 +1,5 @@
 
-ipackage org.sagebionetworks.web.client;
+package org.sagebionetworks.web.client;
 
 import java.util.List;
 
