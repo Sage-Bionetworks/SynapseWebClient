@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.Attachments;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 import org.sagebionetworks.web.client.widget.entity.FormFieldFactory;
@@ -24,6 +25,7 @@ import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -43,13 +45,17 @@ public class EntityEditorDialogImpl implements EntityEditorDialog, Previewable{
 	IconsImageBundle icons;
 	SageImageBundle sageImageBundle;
 	SynapseClientAsync synapseClient;
+	EventBus bus;
+	NodeModelCreator nodeModelCreator;
 	
 	@Inject
-	public EntityEditorDialogImpl(FormFieldFactory formFactory, IconsImageBundle icons, SageImageBundle sageImageBundle, SynapseClientAsync synapseClient){
+	public EntityEditorDialogImpl(FormFieldFactory formFactory, IconsImageBundle icons, SageImageBundle sageImageBundle, SynapseClientAsync synapseClient, EventBus bus, NodeModelCreator nodeModelCreator){
 		this.formFactory = formFactory;
 		this.icons = icons;
 		this.sageImageBundle = sageImageBundle;
 		this.synapseClient = synapseClient;
+		this.nodeModelCreator = nodeModelCreator;
+		this.bus = bus;
 	}
 
 	@Override
@@ -115,7 +121,7 @@ public class EntityEditorDialogImpl implements EntityEditorDialog, Previewable{
 	    window.setHideOnButtonClick(true);
 	    
 	    // Create the property from
-	    EntityPropertyForm editor = new EntityPropertyForm(formFactory, icons, sageImageBundle, this);
+	    EntityPropertyForm editor = new EntityPropertyForm(formFactory, icons, sageImageBundle, this, bus, nodeModelCreator, synapseClient);
 	    editor.setDataCopies(newAdapter, schema, newAnnos, filter, bundle, attachmentsWidget);
 	    window.add(editor, new FitData(0));
 	    // List for the button selection

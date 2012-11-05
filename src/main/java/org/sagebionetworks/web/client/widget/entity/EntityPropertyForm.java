@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -7,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -15,16 +18,22 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.MarkdownUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.SelectAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -49,9 +58,11 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
@@ -77,6 +88,7 @@ public class EntityPropertyForm extends FormPanel {
 	VerticalPanel vp;
 	IconsImageBundle iconsImageBundle;
 	SageImageBundle sageImageBundle;
+	EventBus bus;
 	
 	JSONObjectAdapter adapter;
 	ObjectSchema schema;
@@ -88,13 +100,19 @@ public class EntityPropertyForm extends FormPanel {
 	Attachments attachmentsWidget;
 	Previewable previewGenerator;
 	SafeHtml showFormattingTipsSafeHTML, hideFormattingTipsSafeHTML;
+	EntityUpdatedHandler entityUpdatedHandler;
+	NodeModelCreator nodeModelCreator;
+	SynapseClientAsync synapseClient;
 	
 	@Inject
-	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Previewable previewGenerator) {
+	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Previewable previewGenerator, EventBus bus, NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle= sageImageBundle;
 		this.previewGenerator = previewGenerator;
+		this.bus = bus;
+		this.nodeModelCreator = nodeModelCreator;
+		this.synapseClient = synapseClient;
 		showFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
 		hideFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_HIDE_TIPS_TEXT);
 	}
@@ -192,7 +210,71 @@ public class EntityPropertyForm extends FormPanel {
 		vp.add(propPanel);
 		vp.add(annoPanel);
 		
+		//also, if attachments should change, the entity must be updated. we should update the attachments, and etag.  then let our version (which may have other modifications) update
+		if (entityUpdatedHandler == null) {
+			entityUpdatedHandler = new EntityUpdatedHandler() {
+				@Override
+				public void onPersistSuccess(EntityUpdatedEvent event) {
+					//ask for the new entity, update our attachments and etag, and reconfigure the attachments widget
+					refreshEntityAttachments();
+				}
+			};
+			bus.addHandler(EntityUpdatedEvent.getType(), entityUpdatedHandler);	
+		}
+		
+		
 		rebuild();
+	}
+	
+	private void refreshEntityAttachments() {
+		// We need to refresh the entity, and update our entity bundle with the most current attachments and etag.
+		int mask = ENTITY;
+		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
+			@Override
+			public void onSuccess(EntityBundleTransport transport) {
+				EntityBundle newBundle = null;
+				try {
+					newBundle = nodeModelCreator.createEntityBundle(transport);
+				} catch (RestServiceException e) {
+					onFailure(e);
+				}
+				//if we ignore attachments and etag, are these the same objects?
+				Entity oldEntity = bundle.getEntity();
+				Entity newEntity = newBundle.getEntity();
+				String oldEtag = oldEntity.getEtag();
+				String newEtag = newEntity.getEtag();
+				List<AttachmentData> oldAttachments = oldEntity.getAttachments();
+				List<AttachmentData> newAttachments = newEntity.getAttachments();
+				//clear values
+				oldEntity.setEtag("");
+				oldEntity.setAttachments(null);
+				newEntity.setEtag("");
+				newEntity.setAttachments(null);
+				//check if equal
+				boolean isEqual = oldEntity.equals(newEntity);
+				//restore values
+				oldEntity.setEtag(oldEtag);
+				oldEntity.setAttachments(oldAttachments);
+				newEntity.setEtag(newEtag);
+				newEntity.setAttachments(newAttachments);
+				
+				//these must be equal, otherwise, other modifications have taken place that we don't know how to sync
+				if (isEqual) {
+					oldEntity.setEtag(newEtag);
+					oldEntity.setAttachments(newAttachments);
+					attachmentsWidget.configure(GWT.getModuleBaseURL()+"attachment", oldEntity);
+				} else {
+					DisplayUtils.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_UPDATE_ATTACHMENTS);
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				DisplayUtils.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + caught.getMessage());
+			}			
+		};
+		
+		synapseClient.getEntityBundle(bundle.getEntity().getId(), mask, callback);
 	}
 	
 	/**
@@ -286,7 +368,7 @@ public class EntityPropertyForm extends FormPanel {
 		        attachmentsWidget.clearHandlers();
 		        
 				
-				final Dialog d = SelectAttachmentDialog.showSelectAttachmentDialog(baseURl, bundle, attachmentsWidget, "Select Attachment", "Insert",iconsImageBundle, sageImageBundle);
+				final Dialog d = SelectAttachmentDialog.showSelectAttachmentDialog(baseURl, bundle, attachmentsWidget, "Select Attachment", "Insert",iconsImageBundle, sageImageBundle, bus);
 				attachmentsWidget.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {
 					@Override
 					public void onAttachmentSelected(AttachmentSelectedEvent event) {

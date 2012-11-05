@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.Attachments;
 
@@ -20,6 +21,7 @@ import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.ScrollPanel;
 
@@ -33,7 +35,7 @@ public class SelectAttachmentDialog {
 	 * 
 	 * @param callback
 	 */
-	public static Dialog showSelectAttachmentDialog(String baseUrl, EntityBundle bundle, Attachments attachmentsWidget, String windowTitle, String buttonText, IconsImageBundle iconsImageBundle, final SageImageBundle sageImageBundle) {
+	public static Dialog showSelectAttachmentDialog(String baseUrl, EntityBundle bundle, Attachments attachmentsWidget, String windowTitle, String buttonText, IconsImageBundle iconsImageBundle, final SageImageBundle sageImageBundle, final EventBus bus) {
 		final Dialog dialog = new Dialog();
 		dialog.setMaximizable(false);
 		dialog.setSize(285, 230);
@@ -76,6 +78,7 @@ public class SelectAttachmentDialog {
 								DisplayUtils.showErrorMessage(DisplayConstants.ERRROR_ATTACHMENT_FAILED+result.getMessage());
 							}
 						}
+						bus.fireEvent(new EntityUpdatedEvent());
 					}
 				});
 			}
