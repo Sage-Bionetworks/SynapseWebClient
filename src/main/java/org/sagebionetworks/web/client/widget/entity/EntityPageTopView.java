@@ -2,11 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -30,8 +26,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	 */
 	public void setRStudioUrlReady();
 
-	public void setEntityVersions(Versionable entity);
-
 	/**
 	 * Presenter interface
 	 */
@@ -47,44 +41,9 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 
 		void loadShortcuts(int offset, int limit, AsyncCallback<PaginatedResults<EntityHeader>> asyncCallback);
 
-		void loadVersions(String id, int offset, int limit,
-				AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback);
-
 		String createEntityLink(String id, String version, String display);
 
 		ImageResource getIconForType(String typeString);
-				
-		boolean isAnonymous();
-		
-		/**
-		 * 
-		 * @return
-		 * @exception if anonymous
-		 */
-		String getJiraFlagUrl();
-		
-		/**
-		 * 
-		 */
-		String getJiraRequestAccessUrl();
-		
-		boolean hasAdministrativeAccess();
-		
-		boolean includeRestrictionWidget();
-		
-		public APPROVAL_REQUIRED getRestrictionLevel();		
-				
-		Callback accessRequirementCallback();
-		
-		Callback getImposeRestrictionsCallback();
-		
-		boolean hasFulfilledAccessRequirements();
-		
-		String accessRequirementText();
-		
-		boolean isTermsOfUseAccessRequirement();
-
-		Callback getLoginCallback();
 
 		void getHtmlFromMarkdown(String description, String attachmentBaseUrl, AsyncCallback<String> asyncCallback);
 
