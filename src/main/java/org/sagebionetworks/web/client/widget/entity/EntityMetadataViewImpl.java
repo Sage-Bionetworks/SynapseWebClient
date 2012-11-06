@@ -22,6 +22,7 @@ import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.BasePagingLoadConfig;
 import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
+import com.extjs.gxt.ui.client.data.LoadEvent;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
@@ -30,6 +31,7 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.LoadListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -139,6 +141,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	 * row link.
 	 */
 	private boolean previousVersionsHasNotPaged = true;
+	private BaseModelData currentModel;
 
 	final private FxConfig config;
 
@@ -364,6 +367,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 									model.set(
 											EntityMetadataViewImpl.VERSION_KEY_MOD_BY,
 											version.getModifiedBy());
+
+									if (entity.getVersionNumber().equals(version.getVersionNumber()))
+										currentModel = model;
 									dataList.add(model);
 								}
 								PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(
@@ -389,6 +395,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				proxy);
 		loader.setRemoteSort(false);
 		loader.setReuseLoadConfig(true);
+		loader.addLoadListener(new LoadListener() {
+			@Override
+			public void loaderLoad(LoadEvent le) {
+				vGrid.getSelectionModel().select(currentModel, false);
+			}
+		});
 		vToolbar.bind(loader);
 
 		// add initial data to the store
