@@ -473,7 +473,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
 		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY /*, VERSION_KEY_NUMBER*/};
-		String[] names = {""               , "Comment"          , "Modified On"     , "Modified By"      /*, ""                */};
+		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"      /*, ""                */};
 		int[] widths =	 {100              , 230                , 100               , 100                /*, 70                */};
 		int MOD_ON_INDEX = -1;
 
