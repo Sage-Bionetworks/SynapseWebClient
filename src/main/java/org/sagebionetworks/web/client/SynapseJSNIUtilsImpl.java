@@ -28,6 +28,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
 	@Override
+	public void hideBootstrapTooltip(String id) {
+		_hideBootstrapTooltip(id);
+	}
+
+	private static native void _hideBootstrapTooltip(String id) /*-{
+		$wnd.jQuery('#'+id).tooltip('hide');
+	}-*/;
+
+	
+	@Override
 	public void bindBootstrapPopover(String id) {
 		_bindBootstrapPopover(id);
 	}

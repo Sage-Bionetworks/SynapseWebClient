@@ -89,6 +89,8 @@ import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloa
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderView;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarView;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
@@ -341,6 +343,11 @@ public class PortalGinModule extends AbstractGinModule {
 		// ActionMenu
 		bind(ActionMenuViewImpl.class).in(Singleton.class);
 		bind(ActionMenuView.class).to(ActionMenuViewImpl.class);
+		
+		// FileBox
+		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
+		bind(LocationableTitleBarView.class).to(LocationableTitleBarViewImpl.class);
+
 		
 		// EntityChildBrowser
 		bind(EntityChildBrowserViewImpl.class).in(Singleton.class);

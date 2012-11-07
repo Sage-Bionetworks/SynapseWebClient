@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -30,6 +31,7 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -97,6 +99,8 @@ public class EntityMetadata implements Presenter {
 	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
 		this.bundle = bundle;
 		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit() && readOnly);
+		boolean isLocationable = bundle.getEntity() instanceof Locationable;
+		view.setDetailedMetadataVisible(!isLocationable || LocationableTitleBarViewImpl.isDataPossiblyWithinLocationable(bundle, !isAnonymous()));
 	}
 
 	private UserProfile getUserProfile() {
