@@ -14,10 +14,12 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.BasePagingLoadConfig;
 import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
@@ -141,6 +143,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	 * row link.
 	 */
 	private boolean previousVersionsHasNotPaged = true;
+
+	/**
+	 * This variable should ONLY be set by the load call in the VersionsRpcProxy
+	 * It is used to set the selection (i.e. highlighting) for the currently being
+	 * viewed model in the grid.
+	 */
 	private BaseModelData currentModel;
 
 	final private FxConfig config;
@@ -164,6 +172,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
 				allVersions.getElement().setPropertyBoolean("animating", false);
+				vGrid.getSelectionModel().select(currentModel, false);
 			}
 		});
 
@@ -184,9 +193,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		vGrid = new Grid<BaseModelData>(new ListStore<BaseModelData>(),
 										new ColumnModel(new ArrayList<ColumnConfig>()));
 
-		GridSelectionModel<BaseModelData> sm = new GridSelectionModel<BaseModelData>();
-		sm.setLocked(true);
+		GridFineSelectionModel<BaseModelData> sm = new GridFineSelectionModel<BaseModelData>();
+		sm.setLocked(false);
+		sm.setUserLocked(true);
 		sm.setFiresEvents(false);
+		sm.setSelectionMode(SelectionMode.SINGLE);
+
 		vGrid.setSelectionModel(sm);
 		vGrid.getView().setForceFit(true);
 		vGrid.getView().setEmptyText("Sorry, no versions were found.");
@@ -395,12 +407,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				proxy);
 		loader.setRemoteSort(false);
 		loader.setReuseLoadConfig(true);
-		loader.addLoadListener(new LoadListener() {
-			@Override
-			public void loaderLoad(LoadEvent le) {
-				vGrid.getSelectionModel().select(currentModel, false);
-			}
-		});
 		vToolbar.bind(loader);
 
 		// add initial data to the store
