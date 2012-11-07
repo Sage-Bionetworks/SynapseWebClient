@@ -24,7 +24,6 @@ import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.BasePagingLoadConfig;
 import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
-import com.extjs.gxt.ui.client.data.LoadEvent;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
@@ -33,7 +32,6 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.LoadListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -43,7 +41,6 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
-import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
@@ -430,10 +427,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			public Object render(BaseModelData model, String property,
 					ColumnData config, int rowIndex, int colIndex,
 					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
-
+				boolean currentVersion = false;
+				if (vb.getVersionNumber().equals(model.get(VERSION_KEY_NUMBER))) {
+					currentVersion = true;
+				}
 				if (property.equals(VERSION_KEY_LABEL)) {
-					if (vb.getVersionNumber().equals(
-							model.get(VERSION_KEY_NUMBER))) {
+					if (currentVersion) {
 						InlineLabel label = new InlineLabel("Version "
 								+ model.get(VERSION_KEY_LABEL));
 						return label;
@@ -473,9 +472,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY, VERSION_KEY_NUMBER};
-		String[] names = {""               , "Comment"          , "Modified On"     , "Modified By"     , ""                };
-		int[] widths =	 {100              , 230                , 100               , 100               , 70                };
+		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY /*, VERSION_KEY_NUMBER*/};
+		String[] names = {""               , "Comment"          , "Modified On"     , "Modified By"      /*, ""                */};
+		int[] widths =	 {100              , 230                , 100               , 100                /*, 70                */};
 		int MOD_ON_INDEX = -1;
 
 		if (keys.length != names.length || names.length != widths.length)
