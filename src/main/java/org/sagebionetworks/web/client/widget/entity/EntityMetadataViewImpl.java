@@ -427,31 +427,34 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			public Object render(BaseModelData model, String property,
 					ColumnData config, int rowIndex, int colIndex,
 					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
+				boolean currentVersion = vb.getVersionNumber().equals(model.get(VERSION_KEY_NUMBER));
+				boolean topVersion = previousVersionsHasNotPaged && rowIndex == 0;
 
-				if         (property.equals(VERSION_KEY_NUMBER)) {
-					if (vb.getVersionNumber().equals(model.get(property))) {
-						InlineLabel label = new InlineLabel("viewing");
-						label.getElement().setAttribute("style", "font-weight:bold;");
+				if (property.equals(VERSION_KEY_LABEL)) {
+					if (currentVersion) {
+						InlineLabel label = new InlineLabel("Version "
+								+ model.get(VERSION_KEY_LABEL));
+						label.addStyleName(style.currentVersion());
 						return label;
 					} else {
 						Hyperlink link = new Hyperlink();
-						if (previousVersionsHasNotPaged && rowIndex == 0) {
+						if (topVersion) {
 							// This is so the user can easily get back to the non-readonly page
 							link.setTargetHistoryToken(DisplayUtils
 								.getSynapseHistoryTokenNoHash(vb.getId()));
 						} else {
 							link.setTargetHistoryToken(DisplayUtils
 									.getSynapseHistoryTokenNoHash(vb.getId(),
-											(Long) model.get(property)));
+											(Long) model.get(VERSION_KEY_NUMBER)));
 						}
-						link.setText("view");
+						link.setText("Version " + model.get(VERSION_KEY_LABEL));
 						link.setStyleName("link");
 						return link;
 					}
 				} else if (property.equals(VERSION_KEY_COMMENT)) {
 					String comment;
-					if (null != model.get(property))
-						comment = model.get(property).toString();
+					if (null != model.get(VERSION_KEY_COMMENT))
+						comment = model.get(VERSION_KEY_COMMENT).toString();
 					else
 						return null;
 					// By default, overflow on a gridcell, results in eliding of the text.
