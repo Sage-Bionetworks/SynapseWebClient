@@ -435,6 +435,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 					if (currentVersion) {
 						InlineLabel label = new InlineLabel("Version "
 								+ model.get(VERSION_KEY_LABEL));
+						label.addStyleName(style.currentVersion());
 						return label;
 					} else {
 						Hyperlink link = new Hyperlink();
