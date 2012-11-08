@@ -273,4 +273,23 @@ public class EntityMetadata implements Presenter {
 		};
 	}
 
+	@Override
+	public void editCurrentVersionInfo(String entityId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void promoteVersion(String entityId, Long versionNumber) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void deleteVersion(String entityId, Long versionNumber) {
+		// TODO Auto-generated method stub
+
+	}
+
+
 }
