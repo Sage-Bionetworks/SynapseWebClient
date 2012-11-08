@@ -39,6 +39,7 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
+import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
@@ -179,6 +180,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		vGrid = new Grid<BaseModelData>(new ListStore<BaseModelData>(),
 										new ColumnModel(new ArrayList<ColumnConfig>()));
+
+		GridSelectionModel<BaseModelData> sm = new GridSelectionModel<BaseModelData>();
+		sm.setLocked(true);
+		sm.setFiresEvents(false);
+		vGrid.setSelectionModel(sm);
 		vGrid.getView().setForceFit(true);
 		vGrid.getView().setEmptyText("Sorry, no versions were found.");
 		vGrid.setLayoutData(new FitLayout());
@@ -407,10 +413,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 					ColumnData config, int rowIndex, int colIndex,
 					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
 
-				if         (property.equals(VERSION_KEY_NUMBER)) {
-					if (vb.getVersionNumber().equals(model.get(property))) {
-						InlineLabel label = new InlineLabel("viewing");
-						label.getElement().setAttribute("style", "font-weight:bold;");
+				if (property.equals(VERSION_KEY_LABEL)) {
+					if (vb.getVersionNumber().equals(
+							model.get(VERSION_KEY_NUMBER))) {
+						InlineLabel label = new InlineLabel("Version "
+								+ model.get(VERSION_KEY_LABEL));
 						return label;
 					} else {
 						Hyperlink link = new Hyperlink();
@@ -421,16 +428,16 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 						} else {
 							link.setTargetHistoryToken(DisplayUtils
 									.getSynapseHistoryTokenNoHash(vb.getId(),
-											(Long) model.get(property)));
+											(Long) model.get(VERSION_KEY_NUMBER)));
 						}
-						link.setText("view");
+						link.setText("Version " + model.get(VERSION_KEY_LABEL));
 						link.setStyleName("link");
 						return link;
 					}
 				} else if (property.equals(VERSION_KEY_COMMENT)) {
 					String comment;
-					if (null != model.get(property))
-						comment = model.get(property).toString();
+					if (null != model.get(VERSION_KEY_COMMENT))
+						comment = model.get(VERSION_KEY_COMMENT).toString();
 					else
 						return null;
 					// By default, overflow on a gridcell, results in eliding of the text.
@@ -438,8 +445,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 					InlineLabel label = new InlineLabel(comment);
 					label.setTitle(comment);
 					return label;
-				} else if (model.get(property) != null) {
-					return model.get(property).toString();
 				} else {
 					return null;
 				}
@@ -451,7 +456,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
 		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY, VERSION_KEY_NUMBER};
-		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"     , ""                };
+		String[] names = {""               , "Comment"          , "Modified On"     , "Modified By"     , ""                };
 		int[] widths =	 {100              , 230                , 100               , 100               , 70                };
 		int MOD_ON_INDEX = -1;
 
