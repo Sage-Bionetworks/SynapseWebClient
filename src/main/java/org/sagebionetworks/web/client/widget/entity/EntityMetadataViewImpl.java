@@ -427,10 +427,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			public Object render(BaseModelData model, String property,
 					ColumnData config, int rowIndex, int colIndex,
 					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
-				boolean currentVersion = false;
-				if (vb.getVersionNumber().equals(model.get(VERSION_KEY_NUMBER))) {
-					currentVersion = true;
-				}
+				boolean currentVersion = vb.getVersionNumber().equals(model.get(VERSION_KEY_NUMBER));
+				boolean topVersion = previousVersionsHasNotPaged && rowIndex == 0;
+
 				if (property.equals(VERSION_KEY_LABEL)) {
 					if (currentVersion) {
 						InlineLabel label = new InlineLabel("Version "
@@ -439,7 +438,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 						return label;
 					} else {
 						Hyperlink link = new Hyperlink();
-						if (previousVersionsHasNotPaged && rowIndex == 0) {
+						if (topVersion) {
 							// This is so the user can easily get back to the non-readonly page
 							link.setTargetHistoryToken(DisplayUtils
 								.getSynapseHistoryTokenNoHash(vb.getId()));
