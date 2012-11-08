@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.IconMenu;
+import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.Direction;
@@ -494,22 +495,23 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			private Object setupIconMenu(final ModelData model, boolean currentVersion) {
 				IconMenu menu = new IconMenu();
 				if (currentVersion) {
-					menu.addIcon(icons.cog16(), "Edit Version Info",
+					menu.addIcon(icons.editGrey16(), "Edit Version Info",
 							new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {
-									presenter.editCurrentVersionInfo(
-											(String) model.get(VERSION_KEY_ID));
-								}
-							});
-				} else {
-					menu.addIcon(icons.NavigateUp16(), "Promote to Current",
-							new ClickHandler() {
-								@Override
-								public void onClick(ClickEvent event) {
-									presenter.promoteVersion(
-											(String) model.get(VERSION_KEY_ID),
-											(Long) model.get(VERSION_KEY_NUMBER));
+									NameAndDescriptionEditorDialog.showNameAndDescriptionDialog(
+											(String) model.get(VERSION_KEY_LABEL),
+											(String) model.get(VERSION_KEY_COMMENT),
+											"Version",
+											"Comment",
+											new NameAndDescriptionEditorDialog.Callback() {
+												@Override
+												public void onSave(String version,
+														String comment) {
+													presenter.editCurrentVersionInfo(
+															(String) model.get(VERSION_KEY_ID), version, comment);
+												}
+											});
 								}
 							});
 				}
@@ -517,6 +519,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 						new ClickHandler() {
 							@Override
 							public void onClick(ClickEvent event) {
+
 								presenter.deleteVersion(
 										(String) model.get(VERSION_KEY_ID),
 										(Long) model.get(VERSION_KEY_NUMBER));

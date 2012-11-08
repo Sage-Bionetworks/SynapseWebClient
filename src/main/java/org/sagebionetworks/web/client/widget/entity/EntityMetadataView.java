@@ -57,7 +57,7 @@ public interface EntityMetadataView extends IsWidget {
 
 		void fireEntityUpdatedEvent();
 
-		void editCurrentVersionInfo(String entityId);
+		void editCurrentVersionInfo(String entityId, String version, String comment);
 
 		void promoteVersion(String entityId, Long versionNumber);
 

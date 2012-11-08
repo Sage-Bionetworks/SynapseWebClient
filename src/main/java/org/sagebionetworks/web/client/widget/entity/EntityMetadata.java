@@ -2,11 +2,13 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -274,9 +276,19 @@ public class EntityMetadata implements Presenter {
 	}
 
 	@Override
-	public void editCurrentVersionInfo(String entityId) {
-		// TODO Auto-generated method stub
-
+	public void editCurrentVersionInfo(String entityId, String version, String comment) {
+		Entity entity = bundle.getEntity();
+		if (entity.getId().equals(entityId) && entity instanceof Versionable) {
+			Versionable vb = (Versionable)entity;
+			if (version != null && version.equals(vb.getVersionLabel()) &&
+				comment != null && comment.equals(vb.getVersionComment()))
+				return;
+			if (version == null || version.equals(""))
+				version = null; // Null out the version field if empty so it defaults to number
+			vb.setVersionLabel(version);
+			vb.setVersionComment(comment);
+			// TODO: actually send this to Synapse
+		}
 	}
 
 	@Override
