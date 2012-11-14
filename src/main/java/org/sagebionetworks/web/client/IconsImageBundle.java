@@ -176,11 +176,17 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/navigation-090-button-16.png")
 	ImageResource NavigateUp16();
 
+	@Source("images/icons/navigation-090-button-16-blue.png")
+	ImageResource NavigateUpColor16();
+	
 	@Source("images/icons/navigation-180-button-16.png")
 	ImageResource NavigateLeft16();
 
 	@Source("images/icons/navigation-270-button-16.png")
 	ImageResource NavigateDown16();
+
+	@Source("images/icons/navigation-270-button-16-blue.png")
+	ImageResource NavigateDownColor16();
 
 	@Source("images/icons/sticky-note--plus-16.png")
 	ImageResource notePlus16();

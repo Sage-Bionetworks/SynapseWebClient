@@ -214,7 +214,7 @@ public class DisplayConstants {
 	public static final String LABEL_SEARCH = "Search";
 	public static final String LABEL_PROJECT_NAME = "Project Name";
 	public static final String LABEL_PROJECT_CREATED = "Project Created";
-	public static final String TEXT_UPLOAD_FILE = "Upload File";
+	public static final String TEXT_UPLOAD_FILE = "Upload";
 	public static final String TEXT_USER_SETTINGS = "Settings";
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
 	public static final String LABEL_UPLOAD_TO_SYNAPSE = "To Synapse";
@@ -319,6 +319,9 @@ public class DisplayConstants {
 	public static final String ENTITY_DESCRIPTION_SHOW_TIPS_TEXT = "Formatting Guide";
 	public static final String MARKDOWN_CSS_CLASSNAME = "from-markdown";
 	public static final String ENTITY_DESCRIPTION_ATTACHMENT_PREFIX = "Attachment/entity/";
+	public static final String ENTITY_STORAGE_NOT_FOUND_ERROR = "Unable to determine the usage associated with entity id: ";
+	public static final String LOCATIONABLE_NO_FILE_FOUND = "No File Found";
+	public static final String LOCATIONABLE_NO_FILE_FOUND_DETAIL = "A file must be uploaded (or externally linked to) before analysis can be run.";
 	/*
 	 * Element ids for Selenium
 	 */

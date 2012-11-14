@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -15,6 +17,7 @@ import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.Direction;
@@ -98,7 +101,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	HTMLPanel versions;
 	@UiField
 	HTMLPanel readOnly;
-
+	@UiField
+	HTMLPanel entityNamePanel;
+	@UiField
+	HTMLPanel detailedMetadata;
+	@UiField
+	HTMLPanel fileNamePanel;
+	
 	@UiField
 	DivElement widgetContainer;
 
@@ -120,6 +129,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	SpanElement label;
 	@UiField
 	SpanElement comment;
+	@UiField
+	SpanElement fileName;
 
 	@UiField
 	LayoutContainer previousVersions;
@@ -246,10 +257,19 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
 		synapseIconForEntity.applyTo(entityIcon);
-
+		
 		setEntityName(e.getName());
 		setEntityId(e.getId());
-
+		boolean isLocationable = (e instanceof Locationable);
+		//show the entity name if this isn't locationable, or if it has no data.
+		boolean isEntityNamePanelVisible = !isLocationable || !LocationableTitleBarViewImpl.isDataPossiblyWithinLocationable(bundle, !presenter.isAnonymous());
+		this.entityNamePanel.setVisible(isEntityNamePanelVisible);
+		//if entity name is not shown, we might have a locationable filename to show
+		String locationPath = isLocationable ? LocationableTitleBarViewImpl.getLocationablePath(bundle) : null;
+		boolean isFilenameShown = locationPath != null;
+		this.fileNamePanel.setVisible(isFilenameShown);
+		if (isFilenameShown)
+			setFileName(DisplayUtils.getFileNameFromLocationPath(locationPath));
 		this.readOnly.setVisible(readOnly);
 
 		Widget shareSettings = createShareSettingsWidget(bundle.getPermissions().getCanPublicRead());
@@ -259,10 +279,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		if (restrictionsWidget != null) panel.add(restrictionsWidget, widgetContainer);
 
 		setCreateName(e.getCreatedBy());
-		setCreateDate(String.valueOf(e.getCreatedOn()));
+		setCreateDate(DisplayUtilsGWT.convertDateToSmallString(e.getCreatedOn()));
 
 		setModifyName(e.getModifiedBy());
-		setModifyDate(String.valueOf(e.getModifiedOn()));
+		setModifyDate(DisplayUtilsGWT.convertDateToSmallString(e.getModifiedOn()));
 
 		setVersionsVisible(false);
 		if (e instanceof Versionable) {
@@ -282,10 +302,19 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setPresenter(Presenter p) {
 		presenter = p;
 	}
-
+	
+	@Override
+	public void setDetailedMetadataVisible(boolean visible) {
+		detailedMetadata.setVisible(visible);
+	}
+	
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+
+	public void setFileName(String text) {
+		fileName.setInnerText(text);
 	}
 
 	public void setEntityName(String text) {

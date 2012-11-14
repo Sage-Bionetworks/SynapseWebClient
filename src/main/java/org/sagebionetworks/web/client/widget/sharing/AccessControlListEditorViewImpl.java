@@ -215,7 +215,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			fieldSet.setWidth(FIELD_WIDTH);
 			
 			// user/group combobox
-			final ComboBox<ModelData> peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl());
+			final ComboBox<ModelData> peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), authenticatedPrincipalId);
 			peopleCombo.setEmptyText("Enter a user or group name...");
 			peopleCombo.setFieldLabel("User/Group");
 			peopleCombo.setForceSelection(true);

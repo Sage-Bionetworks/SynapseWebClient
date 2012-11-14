@@ -39,7 +39,6 @@
 	padding: 2px 4px 2px 3px;
 }
 
-
 .sendButton {
 	display: block;
 	font-size: 16pt;
@@ -87,6 +86,8 @@
 	color: #939598;
 	font-size: 11px;
 }
+
+.downloadLink,.downloadLink:hover,.downloadLink:visited { text-decoration:underline; margin-left:5px;}
 
 /* header links. transition from grey to black on hover, don't underline */
 .headerLink { font-weight: bold; color: #6e6e6e; padding: 0px 2px 0px 4px;
@@ -473,6 +474,10 @@ blockquote.from-markdown {
     background: none repeat scroll 0 0 #FFFFFF;
     padding: 20px;
 }
+
+.file-md5 { font-style: italic; }
+
+.file-size {}
 
 .public-acl-image {
 	background-image: url(images/icons/globe-green-16.png);

@@ -71,6 +71,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	}		
 		
 	public Widget asWidget(EntityBundle entityBundle) {
+		this.view.setPresenter(this);
 		this.entityBundle = entityBundle;
 		this.view.createUploadForm();
 		return this.view.asWidget();
