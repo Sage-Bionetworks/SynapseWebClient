@@ -576,13 +576,23 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public void deleteEntity(String entityId) throws RestServiceException {
+	public void deleteEntityById(String entityId) throws RestServiceException {
 		try {
 			Synapse synapseClient = createSynapseClient();
 			synapseClient.deleteEntityById(entityId);			
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
+	}
+
+	@Override
+	public void deleteEntityVersionById(String entityId, Long versionNumber) throws RestServiceException {
+		try {
+			Synapse synapseClient = createSynapseClient();
+			synapseClient.deleteEntityVersionById(entityId, versionNumber);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 
 	@Override
