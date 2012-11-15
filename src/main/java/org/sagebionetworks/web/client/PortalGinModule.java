@@ -365,7 +365,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(HomeSearchBoxView.class).to(HomeSearchBoxViewImpl.class);
 
 		// LocationableUploader
-		bind(LocationableUploaderViewImpl.class).in(Singleton.class);
 		bind(LocationableUploaderView.class).to(LocationableUploaderViewImpl.class);
 
 		// EntityTreeBrowser

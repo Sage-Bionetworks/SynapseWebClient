@@ -475,9 +475,7 @@ blockquote.from-markdown {
     padding: 20px;
 }
 
-.file-md5 { font-style: italic; }
-
-.file-size {}
+.font-italic { font-style: italic; }
 
 .public-acl-image {
 	background-image: url(images/icons/globe-green-16.png);

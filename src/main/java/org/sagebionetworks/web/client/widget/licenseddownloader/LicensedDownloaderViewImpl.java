@@ -112,7 +112,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	@Override
 	public Widget asWidget() {
 		final LicensedDownloaderView view = this;
-		Image downloadButton = new Image(icons.NavigateDownColor16());
+		Image downloadButton = new Image(icons.NavigateDown16());
 		downloadButton.addStyleName("imageButton");
 		downloadButton.addClickHandler(new ClickHandler() {
 			@Override

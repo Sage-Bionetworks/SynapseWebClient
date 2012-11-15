@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import java.util.List;
-
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
@@ -27,7 +25,7 @@ public interface LocationableTitleBarView extends IsWidget, SynapseWidgetView {
 	 * @param isAdministrator 
 	 * @param readOnly 
 	 */
-	public void createMenu(
+	public void createTitlebar(
 			EntityBundle entityBundle, 
 			EntityType entityType, 
 			AuthenticationController authenticationController,

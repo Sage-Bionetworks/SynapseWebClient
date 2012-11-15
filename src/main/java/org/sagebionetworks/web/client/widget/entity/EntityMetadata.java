@@ -23,7 +23,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -100,7 +100,7 @@ public class EntityMetadata implements Presenter {
 		this.bundle = bundle;
 		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit() && readOnly);
 		boolean isLocationable = bundle.getEntity() instanceof Locationable;
-		view.setDetailedMetadataVisible(!isLocationable || LocationableTitleBarViewImpl.isDataPossiblyWithinLocationable(bundle, !isAnonymous()));
+		view.setDetailedMetadataVisible(!isLocationable || LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous()));
 	}
 
 	private UserProfile getUserProfile() {

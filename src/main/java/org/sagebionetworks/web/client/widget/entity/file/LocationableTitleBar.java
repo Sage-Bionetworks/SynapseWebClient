@@ -44,7 +44,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
-		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, readOnly);
+		view.createTitlebar(bundle, entityType, authenticationController, isAdministrator, canEdit, readOnly);
 		Widget widget =  view.asWidget();
 		widget.setVisible(bundle.getEntity() instanceof Locationable);
 		return widget;
@@ -96,6 +96,23 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 	@Override
 	public void updateNodeStorageUsage(final AsyncCallback<Long> callback) {
 		synapseClient.getStorageUsage(entityBundle.getEntity().getId(), callback);
+	}
+
+	public static boolean isDataPossiblyWithinLocationable(EntityBundle bundle, boolean isLoggedIn) {
+		if (!(bundle.getEntity() instanceof Locationable))
+			throw new IllegalArgumentException("Bundle must reference a Locationable entity");
+		
+		boolean hasData = false;
+		//if user isn't logged in, then there might be something here
+		if (!isLoggedIn)
+			hasData = true;
+		//if it has unmet access requirements, then there might be something here
+		else if (bundle.getUnmetAccessRequirements() != null && bundle.getUnmetAccessRequirements().size() > 0)
+			hasData = true;
+		//else, if it has a locations list whose size is > 0
+		else if (((Locationable)bundle.getEntity()).getLocations() != null && ((Locationable)bundle.getEntity()).getLocations().size() > 0)
+			hasData = true;
+		return hasData;
 	}
 	
 	/*

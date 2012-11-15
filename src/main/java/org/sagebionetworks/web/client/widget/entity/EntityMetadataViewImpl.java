@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -262,7 +263,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setEntityId(e.getId());
 		boolean isLocationable = (e instanceof Locationable);
 		//show the entity name if this isn't locationable, or if it has no data.
-		boolean isEntityNamePanelVisible = !isLocationable || !LocationableTitleBarViewImpl.isDataPossiblyWithinLocationable(bundle, !presenter.isAnonymous());
+		boolean isEntityNamePanelVisible = !isLocationable || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !presenter.isAnonymous());
 		this.entityNamePanel.setVisible(isEntityNamePanelVisible);
 		
 		//if entity name is not shown, we might have a locationable filename to show

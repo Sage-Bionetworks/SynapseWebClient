@@ -87,25 +87,8 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 		return locationPath;
 	}
 	
-	public static boolean isDataPossiblyWithinLocationable(EntityBundle bundle, boolean isLoggedIn) {
-		if (!(bundle.getEntity() instanceof Locationable))
-			throw new IllegalArgumentException("Bundle must reference a Locationable entity");
-		
-		boolean hasData = false;
-		//if user isn't logged in, then there might be something here
-		if (!isLoggedIn)
-			hasData = true;
-		//if it has unmet access requirements, then there might be something here
-		else if (bundle.getUnmetAccessRequirements() != null && bundle.getUnmetAccessRequirements().size() > 0)
-			hasData = true;
-		//else, if it has a locations list whose size is > 0
-		else if (((Locationable)bundle.getEntity()).getLocations() != null && ((Locationable)bundle.getEntity()).getLocations().size() > 0)
-			hasData = true;
-		return hasData;
-	}
-	
 	@Override
-	public void createMenu(
+	public void createTitlebar(
 			EntityBundle entityBundle, 
 			EntityType entityType, 
 			AuthenticationController authenticationController,
@@ -128,7 +111,7 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 			//configure this view based on if this entity has locations to download
 			Locationable locationable = (Locationable)entity;
 			
-			if (isDataPossiblyWithinLocationable(entityBundle, authenticationController.isLoggedIn())) {
+			if (LocationableTitleBar.isDataPossiblyWithinLocationable(entityBundle, authenticationController.isLoggedIn())) {
 				HorizontalPanel panel = new HorizontalPanel();
 				panel.setVerticalAlign(VerticalAlignment.MIDDLE);
 				
@@ -182,7 +165,7 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 					panel.add(sizePanel);
 					if (!isExternal) {
 						//also add md5 if not external
-						a = new Anchor("<span style=\"margin-left: 10px;\" class=\"file-md5\">md5</span>", true);
+						a = new Anchor("<span style=\"margin-left: 10px;\" class=\"font-italic\">md5</span>", true);
 						final String md5 = locationable.getMd5();
 						a.addClickHandler(new ClickHandler() {
 							@Override
@@ -263,7 +246,7 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 	 * @param entityType 
 	 */
 	private Widget getUploadButton(final EntityBundle entityBundle, EntityType entityType) {
-		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE, AbstractImagePrototype.create(iconsImageBundle.NavigateUpColor16()));
+		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
 		final Window window = initializeLocationableUploaderWindow();
 		
