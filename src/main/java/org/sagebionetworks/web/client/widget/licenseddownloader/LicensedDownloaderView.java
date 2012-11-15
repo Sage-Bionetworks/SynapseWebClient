@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
-import org.sagebionetworks.web.shared.FileDownload;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -40,13 +39,6 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	 * Shows loading in the contents window
 	 */
 	public void showDownloadsLoading();
-
-	
-	/**
-	 * Sets the content of the download pane
-	 * @param downloads
-	 */
-	public void setDownloadUrls(List<FileDownload> downloads);
 
 	/**
 	 * Sets the content of the download pane

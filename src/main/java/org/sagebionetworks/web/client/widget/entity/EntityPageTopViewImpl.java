@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -24,6 +25,8 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -105,6 +108,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private IconsImageBundle iconsImageBundle;
 	private PreviewDisclosurePanel previewDisclosurePanel;
 	private ActionMenu actionMenu;
+	private LocationableTitleBar locationableTitleBar;
+	
 	private EntityChildBrowser entityChildBrowser;
 	private Breadcrumb breadcrumb;
 	private PropertyWidget propertyWidget;
@@ -126,6 +131,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			AccessMenuButton accessMenuButton,
 			PreviewDisclosurePanel previewDisclosurePanel,
 			ActionMenu actionMenu,
+			LocationableTitleBar locationableTitleBar,
 			EntityChildBrowser entityChildBrowser, Breadcrumb breadcrumb,
 			PropertyWidget propertyWidget,EntityTypeProvider entityTypeProvider,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
@@ -142,7 +148,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.snapshotWidget = snapshotWidget;
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-
+		this.locationableTitleBar = locationableTitleBar;
+		
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
@@ -174,12 +181,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if(bundle.getEntity() instanceof Summary) {
 		    renderSnapshotEntity(bundle, userProfile, entityTypeDisplay, canEdit, readOnly, widgetMargin);
 		} else if (bundle.getEntity() instanceof Folder) {
-			renderFolderEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		} else if (bundle.getEntity() instanceof Project) {
-			renderProjectEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		} else {
 			// default entity view
-			renderDefaultEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+			renderDefaultEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		}
 
 		colLeftContainer.layout(true);
@@ -211,7 +218,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				presenter.fireEntityUpdatedEvent();
-	}
+			}
+		});
+		locationableTitleBar.addEntityUpdatedHandler(new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
 		});
 	}
 
@@ -233,6 +246,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void clear() {
 		actionMenu.clearState();
+		locationableTitleBar.clearState();
 		if (colLeftContainer != null)
 			colLeftContainer.removeAll();
 		if (colRightContainer != null)
@@ -253,25 +267,29 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * Private Methods
 	 */
 	private void renderFolderEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean canEdit, boolean readOnly2,
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
 			MarginData widgetMargin) {
 		// TODO: make this actually render folders differently
-		renderDefaultEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+		renderDefaultEntity(bundle, entityTypeDisplay, isAdmin, canEdit, readOnly, widgetMargin);
 	}
 
 	private void renderProjectEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean canEdit, boolean readOnly2,
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
 			MarginData widgetMargin) {
 		// TODO: make this actually render projects differently
-		renderDefaultEntity(bundle, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+		renderDefaultEntity(bundle, entityTypeDisplay, isAdmin, canEdit, readOnly, widgetMargin);
 	}
 
-	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
+	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
+		colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin,
+				canEdit, readOnly), new MarginData(0, 0, 0, 0));
+		
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
-
+			
+		
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
 		// Child Browser
