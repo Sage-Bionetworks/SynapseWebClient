@@ -264,12 +264,18 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		//show the entity name if this isn't locationable, or if it has no data.
 		boolean isEntityNamePanelVisible = !isLocationable || !LocationableTitleBarViewImpl.isDataPossiblyWithinLocationable(bundle, !presenter.isAnonymous());
 		this.entityNamePanel.setVisible(isEntityNamePanelVisible);
+		
 		//if entity name is not shown, we might have a locationable filename to show
 		String locationPath = isLocationable ? LocationableTitleBarViewImpl.getLocationablePath(bundle) : null;
-		boolean isFilenameShown = locationPath != null;
+		boolean isLocationPopulated = locationPath != null;
+		boolean isFilenameShown = false;
+		if (isLocationPopulated) {
+			String fileName = DisplayUtils.getFileNameFromLocationPath(locationPath);
+			//only show if it differs from the entity name
+			isFilenameShown = !e.getName().equals(fileName);
+			setFileName(fileName);
+		}
 		this.fileNamePanel.setVisible(isFilenameShown);
-		if (isFilenameShown)
-			setFileName(DisplayUtils.getFileNameFromLocationPath(locationPath));
 		this.readOnly.setVisible(readOnly);
 
 		Widget shareSettings = createShareSettingsWidget(bundle.getPermissions().getCanPublicRead());

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import javax.swing.text.html.HTML;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
@@ -132,7 +134,7 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 				
 				//add an anchor with the file name, that redirects to the download button for functionality
 				
-				Anchor a = new Anchor("<h2 class=\"downloadLink link\">" + entity.getName() + " ("+entity.getId()+")</h2>", true);
+				Anchor a = new Anchor("<h2 class=\"downloadLink link\">" + entity.getName() + "</h2>", true);
 				a.addClickHandler(new ClickHandler() {
 					
 					@Override
@@ -144,6 +146,7 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 				
 				panel.add(downloadButton);
 				panel.add(a);
+				panel.add(new HTMLPanel("<h2 style=\"margin-left: 5px;\">("+entity.getId()+")</h2>"));
 				final SimplePanel sizePanel = new SimplePanel();
 				
 				if (locationable.getLocations() != null && locationable.getLocations().size() > 0) {
@@ -187,7 +190,7 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 								showMd5Dialog(md5);
 							}
 						});
-						DisplayUtils.addTooltip(synapseJSNIUtils, a, md5, TOOLTIP_POSITION.RIGHT);
+						DisplayUtils.addTooltip(synapseJSNIUtils, a, md5, TOOLTIP_POSITION.BOTTOM);
 						panel.add(a);
 					}
 				}
