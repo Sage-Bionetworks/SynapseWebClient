@@ -170,4 +170,6 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 */
 	public String markdown2Html(String markdown, String attachmentUrl);
+	
+	public Long getStorageUsage(String entityId) throws RestServiceException;
 }
