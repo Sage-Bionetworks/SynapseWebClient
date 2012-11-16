@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -19,7 +21,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.openid4java.consumer.ConsumerManager;
+import org.openid4java.discovery.Discovery;
+import org.openid4java.discovery.html.HtmlResolver;
+import org.openid4java.discovery.yadis.YadisResolver;
+import org.openid4java.server.RealmVerifierFactory;
+import org.openid4java.util.HttpFetcherFactory;
 import org.sagebionetworks.authutil.AuthenticationException;
 import org.sagebionetworks.authutil.CrowdAuthUtil;
 import org.sagebionetworks.authutil.Session;
@@ -47,6 +56,27 @@ public class OpenIDUtils {
 	private static final String ACCEPTS_TERMS_OF_USE_COOKIE_NAME = "org.sagebionetworks.auth.acceptsTermsOfUse";
 	private static final int RETURN_TO_URL_COOKIE_MAX_AGE_SECONDS = 60; // seconds
 	
+	private static ConsumerManager createConsumerManager() {
+		SSLContext sslContext=null;
+//	    DefaultHttpClient client = new DefaultHttpClient();
+//	    SSLSocketFactory sslSocketFactory = (SSLSocketFactory) client
+//	            .getConnectionManager().getSchemeRegistry().getScheme("https")
+//	            .getSocketFactory();
+//	    final X509HostnameVerifier delegate = sslSocketFactory.;
+		X509HostnameVerifier hostnameVerifier= new HostnameVerifier(null);
+		HttpFetcherFactory httpFetcherFactory = new HttpFetcherFactory(sslContext, hostnameVerifier);
+		YadisResolver yadisResolver = new YadisResolver(httpFetcherFactory);
+		Discovery discovery = new Discovery(
+				  new HtmlResolver(httpFetcherFactory),
+		          yadisResolver,
+		          Discovery.getXriResolver());
+		return new ConsumerManager(
+					new RealmVerifierFactory(yadisResolver),
+		            discovery, 
+		            httpFetcherFactory);
+	
+	}
+	
 	/**
 	 * 
 	 * @param openIdProvider
@@ -68,7 +98,7 @@ public class OpenIDUtils {
 
 		HttpServlet servlet = null;
 		
-		ConsumerManager manager = new ConsumerManager();
+		ConsumerManager manager = createConsumerManager();
 		SampleConsumer sampleConsumer = new SampleConsumer(manager);
 		
 		String openIDCallbackURL = redirectEndpoint+OPENID_CALLBACK_URI;
@@ -89,7 +119,7 @@ public class OpenIDUtils {
 			HttpServletResponse response) throws IOException, NotFoundException, AuthenticationException, XPathExpressionException {
 		try {
 			
-			ConsumerManager manager = new ConsumerManager();
+			ConsumerManager manager = createConsumerManager();
 			
 			SampleConsumer sampleConsumer = new SampleConsumer(manager);
 

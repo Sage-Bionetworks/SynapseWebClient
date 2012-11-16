@@ -301,11 +301,19 @@
 			<artifactId>org.springframework.web</artifactId>
 			<version>${org.springframework.version}</version>
 		</dependency>
+		
+		<!--dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2.2</version>
+		</dependency-->
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.httpclient</artifactId>
 			<version>3.1.0</version>
 		</dependency>
+				
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
