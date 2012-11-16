@@ -28,9 +28,6 @@
 			<g:HTMLPanel ui:field="readOnly">
 			  <h4 class="colored">READ ONLY <g:Image resource="{icons.help16}"/></h4>
 			</g:HTMLPanel>
-			<g:HTMLPanel ui:field="fileNamePanel">
-			  File: <span ui:field="fileName"></span><br/>
-			</g:HTMLPanel>
 			<div ui:field="widgetContainer" ></div>
 			Added by <span ui:field="createName"></span> on <span ui:field="createDate"></span><br/>
 			Modified by <span ui:field="modifyName"></span> on <span ui:field="modifyDate"></span><br/>

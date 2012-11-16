@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import javax.swing.text.html.HTML;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
@@ -29,39 +27,73 @@ import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.Element;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class LocationableTitleBarViewImpl extends HorizontalPanel implements LocationableTitleBarView {
+public class LocationableTitleBarViewImpl extends Composite implements LocationableTitleBarView {
 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private LocationableUploader locationableUploader;
 	private LicensedDownloader licensedDownloader;
 	private Widget downloadButton = null;
-	
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private Anchor md5Link;
+	//private Anchor md5Link;
+	
+	@UiField
+	HTMLPanel panel;
+	@UiField
+	HTMLPanel fileFoundContainer;
+	@UiField
+	HTMLPanel noFileFoundContainer;
+	@UiField
+	HTMLPanel fileNameContainer;
+	@UiField
+	Anchor entityLink;
+	@UiField
+	SimplePanel md5LinkContainer;
+	@UiField
+	SimplePanel downloadButtonContainer;
+	@UiField
+	SimplePanel uploadButtonContainer;
+	@UiField
+	SpanElement entityId;
+	@UiField
+	Image entityIcon;
+	@UiField
+	SpanElement fileName;
+	@UiField
+	SpanElement fileSize;
+	
+	
+	interface LocationableTitleBarViewImplUiBinder extends UiBinder<Widget, LocationableTitleBarViewImpl> {
+	}
+
+	private static LocationableTitleBarViewImplUiBinder uiBinder = GWT
+			.create(LocationableTitleBarViewImplUiBinder.class);
+	
 	@Inject
 	public LocationableTitleBarViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
@@ -76,7 +108,17 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 		this.locationableUploader = locationableUploader;
 		this.licensedDownloader = licensedDownloader;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.setTableHeight("30px");
+		initWidget(uiBinder.createAndBindUi(this));
+		downloadButtonContainer.addStyleName("inline-block margin-left-5");
+		md5LinkContainer.addStyleName("inline-block font-italic margin-left-5");
+		entityLink.addStyleName("downloadLink link");
+		uploadButtonContainer.addStyleName("inline-block vertical-align-bottom");
+		entityLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				downloadButton.fireEvent(event);
+			}
+		});
 	}
 	public static String getLocationablePath(EntityBundle bundle) {
 		String locationPath = null;
@@ -100,59 +142,47 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 
 		UserSessionData sessionData = authenticationController.getLoggedInUser();
 		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
-
-		if(downloadButton == null){
-			downloadButton = licensedDownloader.asWidget(entityBundle, userProfile);
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, downloadButton, DisplayConstants.BUTTON_DOWNLOAD, TOOLTIP_POSITION.BOTTOM);
-		}
+		
+		downloadButton = licensedDownloader.asWidget(entityBundle, userProfile);
+		DisplayUtils.addTooltip(this.synapseJSNIUtils, downloadButton, DisplayConstants.BUTTON_DOWNLOAD, TOOLTIP_POSITION.BOTTOM);
+		downloadButtonContainer.clear();
+		downloadButtonContainer.add(downloadButton);
+		
+		md5Link = new Anchor("md5");
+		md5LinkContainer.clear();
+		md5LinkContainer.add(md5Link);
 		
 		if (entity instanceof Locationable) {
-			
 			//configure this view based on if this entity has locations to download
 			Locationable locationable = (Locationable)entity;
-			
-			if (LocationableTitleBar.isDataPossiblyWithinLocationable(entityBundle, authenticationController.isLoggedIn())) {
-				HorizontalPanel panel = new HorizontalPanel();
-				panel.setVerticalAlign(VerticalAlignment.MIDDLE);
-				
+			boolean isDataPossiblyWithinLocationable = LocationableTitleBar.isDataPossiblyWithinLocationable(entityBundle, authenticationController.isLoggedIn());
+			noFileFoundContainer.setVisible(!isDataPossiblyWithinLocationable);
+			fileFoundContainer.setVisible(isDataPossiblyWithinLocationable);
+			if (isDataPossiblyWithinLocationable) {
 				//add an anchor with the file name, that redirects to the download button for functionality
+				entityLink.setText(entity.getName());
+				entityId.setInnerText(entity.getId());
+				AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
+				synapseIconForEntity.applyTo(entityIcon);
 				
-				Anchor a = new Anchor("<h2 class=\"downloadLink link\">" + entity.getName() + "</h2>", true);
-				a.addClickHandler(new ClickHandler() {
-					
-					@Override
-					public void onClick(ClickEvent event) {
-						downloadButton.fireEvent(event);
-					}
-				});
-				DisplayUtils.addTooltip(this.synapseJSNIUtils, a, DisplayConstants.BUTTON_DOWNLOAD, TOOLTIP_POSITION.BOTTOM);
-				
-				panel.add(downloadButton);
-				panel.add(a);
-				panel.add(new HTMLPanel("<h2 style=\"margin-left: 5px;\">("+entity.getId()+")</h2>"));
-				final SimplePanel sizePanel = new SimplePanel();
-				
-				if (locationable.getLocations() != null && locationable.getLocations().size() > 0) {
+				boolean isFilenamePanelVisible = locationable.getLocations() != null && locationable.getLocations().size() > 0;
+				fileNameContainer.setVisible(isFilenamePanelVisible);
+				if (isFilenamePanelVisible) {
+					//if entity name is not shown, we might have a locationable filename to show
+					String locationPath = LocationableTitleBarViewImpl.getLocationablePath(entityBundle);
+					fileName.setInnerText(locationPath != null ? DisplayUtils.getFileNameFromLocationPath(locationPath) : "");
 					LocationData locationData = locationable.getLocations().get(0);
 					LocationTypeNames locationTypeName = locationData.getType();
 					//don't ask for the size if it's external, just display that this is external data
 					boolean isExternal = locationTypeName == LocationTypeNames.external;
 					if (isExternal) {
-						SafeHtmlBuilder shb = new SafeHtmlBuilder();
-						shb.appendHtmlConstant("<span style=\"margin-left: 10px;\" class=\"file-size\">(External Storage)</span>");
-						HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-						sizePanel.add( htmlPanel);
+						fileSize.setInnerText("(External Storage)");
 					}
 					else {
 						presenter.updateNodeStorageUsage(new AsyncCallback<Long>() {
 							@Override
 							public void onSuccess(Long result) {
-								SafeHtmlBuilder shb = new SafeHtmlBuilder();
-								shb.appendHtmlConstant("<span style=\"margin-left: 10px;\" class=\"file-size\">(");
-								shb.appendEscaped(DisplayUtils.getFriendlySize(result.doubleValue(), true));
-								shb.appendHtmlConstant(" - Synapse Storage)</span>");
-								HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-								sizePanel.add(htmlPanel);
+								fileSize.setInnerText("("+DisplayUtils.getFriendlySize(result.doubleValue(), true) + " - Synapse Storage)");
 							}
 							
 							@Override
@@ -161,40 +191,24 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 							}
 						});
 					}
-						
-					panel.add(sizePanel);
+					md5Link.setVisible(!isExternal);
 					if (!isExternal) {
 						//also add md5 if not external
-						a = new Anchor("<span style=\"margin-left: 10px;\" class=\"font-italic\">md5</span>", true);
 						final String md5 = locationable.getMd5();
-						a.addClickHandler(new ClickHandler() {
+						md5Link.addClickHandler(new ClickHandler() {
 							@Override
 							public void onClick(ClickEvent event) {
 								showMd5Dialog(md5);
 							}
 						});
-						DisplayUtils.addTooltip(synapseJSNIUtils, a, md5, TOOLTIP_POSITION.BOTTOM);
-						panel.add(a);
+						DisplayUtils.addTooltip(synapseJSNIUtils, md5Link, md5, TOOLTIP_POSITION.BOTTOM);
 					}
 				}
-				this.add(panel);
 			}
 			else {
-				SimplePanel panel = new SimplePanel();
-				panel.addStyleName("span-17");
-				panel.addStyleName("bordered-form");
-				panel.addStyleName("notopmargin");
-				VerticalPanel vPanel = new VerticalPanel();
-				panel.add(vPanel);
-				HorizontalPanel topRow = new HorizontalPanel();
-				String colon = canEdit ? ":" : "";
-				topRow.add(new Html("<h3 style=\"margin-right: 10px;\">"+DisplayConstants.LOCATIONABLE_NO_FILE_FOUND + colon+"</h3>"));
+				uploadButtonContainer.clear();
 				if (canEdit)
-					topRow.add(getUploadButton(entityBundle, entityType));
-				HTMLPanel bottomRow = new HTMLPanel(DisplayConstants.LOCATIONABLE_NO_FILE_FOUND_DETAIL);
-				vPanel.add(topRow);
-				vPanel.add(bottomRow);
-				this.add(panel);
+					uploadButtonContainer.add(getUploadButton(entityBundle, entityType));
 			}
 		}
 		
@@ -237,7 +251,6 @@ public class LocationableTitleBarViewImpl extends HorizontalPanel implements Loc
 
 	@Override
 	public void clear() {
-		this.removeAll();
 	}
 
 	/**
