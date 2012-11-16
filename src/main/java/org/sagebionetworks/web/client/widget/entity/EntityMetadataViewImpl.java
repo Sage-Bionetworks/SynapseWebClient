@@ -106,8 +106,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	HTMLPanel entityNamePanel;
 	@UiField
 	HTMLPanel detailedMetadata;
-	@UiField
-	HTMLPanel fileNamePanel;
 	
 	@UiField
 	DivElement widgetContainer;
@@ -130,8 +128,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	SpanElement label;
 	@UiField
 	SpanElement comment;
-	@UiField
-	SpanElement fileName;
 
 	@UiField
 	LayoutContainer previousVersions;
@@ -266,17 +262,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		boolean isEntityNamePanelVisible = !isLocationable || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !presenter.isAnonymous());
 		this.entityNamePanel.setVisible(isEntityNamePanelVisible);
 		
-		//if entity name is not shown, we might have a locationable filename to show
-		String locationPath = isLocationable ? LocationableTitleBarViewImpl.getLocationablePath(bundle) : null;
-		boolean isLocationPopulated = locationPath != null;
-		boolean isFilenameShown = false;
-		if (isLocationPopulated) {
-			String fileName = DisplayUtils.getFileNameFromLocationPath(locationPath);
-			//only show if it differs from the entity name
-			isFilenameShown = !e.getName().equals(fileName);
-			setFileName(fileName);
-		}
-		this.fileNamePanel.setVisible(isFilenameShown);
 		this.readOnly.setVisible(readOnly);
 
 		Widget shareSettings = createShareSettingsWidget(bundle.getPermissions().getCanPublicRead());
@@ -318,10 +303,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	public void setFileName(String text) {
-		fileName.setInnerText(text);
 	}
 
 	public void setEntityName(String text) {
