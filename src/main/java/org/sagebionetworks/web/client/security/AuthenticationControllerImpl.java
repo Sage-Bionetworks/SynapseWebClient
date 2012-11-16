@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.security;
 
+import java.util.Date;
+
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -12,6 +14,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class AuthenticationControllerImpl implements AuthenticationController {
@@ -54,9 +57,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(String userSessionJson) {
 				UserSessionData userSessionData = null;
 				try {
-					cookies.setCookie(CookieKeys.USER_LOGIN_DATA, userSessionJson);
+					//automatically expire after a day
+					Date tomorrow = getDayFromNow();
+					cookies.setCookie(CookieKeys.USER_LOGIN_DATA, userSessionJson, tomorrow);
 					userSessionData = nodeModelCreator.createEntity(userSessionJson, UserSessionData.class);
-					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken());
+					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken(), tomorrow);
 				} catch (RestServiceException e) {
 					//can't save the cookie
 					e.printStackTrace();
@@ -71,6 +76,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				callback.onFailure(caught);
 			}
 		});
+	}
+	
+	private Date getDayFromNow() {
+		Date date = new Date();
+		CalendarUtil.addDaysToDate(date, 1);
+		return date;  
 	}
 	
 	@Override
@@ -131,8 +142,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						userSessionData.setIsSSO(isSSO);
 						JSONObjectAdapter adapter = userSessionData.writeToJSONObject(JSONObjectGwt.createNewAdapter());
 						updatedSessionJson = adapter.toJSONString();
-						cookies.setCookie(CookieKeys.USER_LOGIN_DATA, updatedSessionJson);
-						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken());
+						Date tomorrow = getDayFromNow();
+						cookies.setCookie(CookieKeys.USER_LOGIN_DATA, updatedSessionJson, tomorrow);
+						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken(), tomorrow);
 					} catch (JSONObjectAdapterException e){
 						callback.onFailure(e);
 					} catch( RestServiceException e){
