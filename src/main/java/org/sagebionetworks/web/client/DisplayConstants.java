@@ -320,8 +320,6 @@ public class DisplayConstants {
 	public static final String MARKDOWN_CSS_CLASSNAME = "from-markdown";
 	public static final String ENTITY_DESCRIPTION_ATTACHMENT_PREFIX = "Attachment/entity/";
 	public static final String ENTITY_STORAGE_NOT_FOUND_ERROR = "Unable to determine the usage associated with entity id: ";
-	public static final String LOCATIONABLE_NO_FILE_FOUND = "No File Found";
-	public static final String LOCATIONABLE_NO_FILE_FOUND_DETAIL = "It is recommended that you upload a file or link to an external location as this object is intended to reference a file.";
 	/*
 	 * Element ids for Selenium
 	 */

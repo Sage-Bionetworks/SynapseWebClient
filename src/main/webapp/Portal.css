@@ -389,7 +389,7 @@ a.shortBtn {
 	margin-right: 5px;
 }
 
-.facet-btn {
+.floatleft {
 	float: left;
 }
 
@@ -451,7 +451,9 @@ a.shortBtn {
 	margin-top: 10px;
 	margin-left: 10px;
 }
-
+.margin-left-5 {
+	margin-left: 5px;
+}
 ol.from-markdown { 
 	list-style-type: decimal;
 	padding-left: 17px;
@@ -491,6 +493,10 @@ blockquote.from-markdown {
 
 .inline-block {
 	display:inline-block;
+}
+
+.vertical-align-bottom {
+	vertical-align: bottom;
 }
 
 h1, h2, h3, h4, h5, h6 {
