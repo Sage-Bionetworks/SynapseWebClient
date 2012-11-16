@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.view.TermsOfUseHelper;
+import org.sagebionetworks.web.server.servlet.openid.OpenIDUtils;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -50,7 +51,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 	private SafeHtml createSSOLoginButton(boolean userHasExplictlyAcceptedTermsOfUse) {
 		// federated login button
 		SafeHtmlBuilder sb = new SafeHtmlBuilder()		
-		.appendHtmlConstant("<form accept-charset=\"UTF-8\" action=\""+ presenter.getOpenIdActionUrl() +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
+		.appendHtmlConstant("<form accept-charset=\"UTF-8\" action=\""+ OpenIDUtils.OPEN_ID_URI +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
 		.appendHtmlConstant("    <input name=\"OPEN_ID_PROVIDER\" type=\"hidden\" value=\""+ DisplayConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>")
 		.appendHtmlConstant("    <input name=\"RETURN_TO_URL\" type=\"hidden\" value=\""+  getRedirectURL() +"\"/>");
 		if (userHasExplictlyAcceptedTermsOfUse) {

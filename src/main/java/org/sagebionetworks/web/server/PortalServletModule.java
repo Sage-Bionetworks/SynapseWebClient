@@ -7,9 +7,9 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.sagebionetworks.web.server.servlet.BCCSignupImpl;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.server.servlet.BCCSignupImpl;
 import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.FileUpload;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
@@ -26,6 +26,8 @@ import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
+import org.sagebionetworks.web.server.servlet.openid.OpenIDServlet;
+import org.sagebionetworks.web.server.servlet.openid.OpenIDUtils;
 
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
@@ -113,6 +115,11 @@ public class PortalServletModule extends ServletModule {
 		// Setup the Rss service mapping
 		bind(RssServiceImpl.class).in(Singleton.class);
 		serve("/Portal/rss").with(RssServiceImpl.class);
+		
+		// Setup the OpenID service mapping
+		bind(OpenIDServlet.class).in(Singleton.class);
+		serve(OpenIDUtils.OPEN_ID_URI).with(OpenIDServlet.class);
+		serve(OpenIDUtils.OPENID_CALLBACK_URI).with(OpenIDServlet.class);
 		
 		// The Rest template provider should be a singleton.
 		bind(RestTemplateProviderImpl.class).in(Singleton.class);

@@ -250,6 +250,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
+			<artifactId>auth-util</artifactId>
+			<version>${synapse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-communicationUtilities</artifactId>
 			<version>${synapse.version}</version>
 		</dependency>
@@ -471,6 +476,13 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava-io</artifactId>
 			<version>r03</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openid4java</groupId>
+			<artifactId>openid4java-consumer</artifactId>
+			<version>0.9.6</version>
+			<type>pom</type>
 		</dependency>
 
 	</dependencies>
