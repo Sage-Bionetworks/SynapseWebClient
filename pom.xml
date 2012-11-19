@@ -498,13 +498,6 @@
       		<artifactId>nekohtml</artifactId>
        		<version>1.9.14</version>
     	</dependency>
-    
-    	<!--dependency>
-			<groupId>org.openid4java</groupId>
-			<artifactId>openid4java-consumer</artifactId>
-			<version>0.9.6</version>
-			<type>pom</type>
-		</dependency-->
 
 	</dependencies>
 
