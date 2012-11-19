@@ -28,5 +28,15 @@ public class WebConstants {
 	 * 
 	 */
 	public static final String VALID_ANNOTATION_NAME_REGEX = "^[a-z,A-Z,0-9,_,.]+";
+	
+	// OpenID related constants
 
+	public static final String OPEN_ID_URI = "/Portal/openid";
+
+	public static final String OPEN_ID_PROVIDER = "OPEN_ID_PROVIDER";
+	// 		e.g. https://www.google.com/accounts/o8/id
+	
+	// this is the parameter name for the value of the final redirect
+	public static final String RETURN_TO_URL_PARAM = "RETURN_TO_URL";
+	
 }

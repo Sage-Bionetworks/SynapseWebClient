@@ -653,7 +653,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			    profile.setPic(pic);
 				userProfileJSONObject = EntityFactory.createJSONObjectForEntity(profile);
 			}
-			synapseClient.putEntity("/userProfile", userProfileJSONObject);			
+			synapseClient.updateEntity("/userProfile", userProfileJSONObject);			
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONException e) {
