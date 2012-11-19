@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
-		<synapse.version>2012-11-14-8d0e564-223</synapse.version>
+		<synapse.version>2012-11-19-65c60b5-231</synapse.version>
 
 		<gwtVersion>2.4.0</gwtVersion>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
@@ -250,6 +250,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
+			<artifactId>auth-util</artifactId>
+			<version>${synapse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-communicationUtilities</artifactId>
 			<version>${synapse.version}</version>
 		</dependency>
@@ -296,11 +301,19 @@
 			<artifactId>org.springframework.web</artifactId>
 			<version>${org.springframework.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.httpclient</artifactId>
 			<version>3.1.0</version>
 		</dependency>
+				
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
@@ -437,7 +450,7 @@
 		<dependency>
 			<groupId>org.jukito</groupId>
 			<artifactId>jukito</artifactId>
-			<version>1.0</version>
+			<version>1.1</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -472,6 +485,19 @@
 			<artifactId>guava-io</artifactId>
 			<version>r03</version>
 		</dependency>
+
+		<!-- note: This refers to a custom POM in the SageBionetworks artifactory, omitting Guice 2.0 -->
+		<dependency>
+		    <groupId>org.openid4java</groupId>
+		    <artifactId>openid4java-nodeps</artifactId>
+		    <version>0.9.6.sb</version>
+		</dependency>
+    	
+    	<dependency>
+      		<groupId>net.sourceforge.nekohtml</groupId>
+      		<artifactId>nekohtml</artifactId>
+       		<version>1.9.14</version>
+    	</dependency>
 
 	</dependencies>
 
