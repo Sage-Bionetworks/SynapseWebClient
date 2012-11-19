@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -21,14 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.http.conn.ssl.X509HostnameVerifier;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.openid4java.consumer.ConsumerManager;
-import org.openid4java.discovery.Discovery;
-import org.openid4java.discovery.html.HtmlResolver;
-import org.openid4java.discovery.yadis.YadisResolver;
-import org.openid4java.server.RealmVerifierFactory;
-import org.openid4java.util.HttpFetcherFactory;
 import org.sagebionetworks.authutil.AuthenticationException;
 import org.sagebionetworks.authutil.CrowdAuthUtil;
 import org.sagebionetworks.authutil.Session;
@@ -40,15 +31,8 @@ import org.sagebionetworks.repo.web.NotFoundException;
 public class OpenIDUtils {
 	private static Random rand = new Random();
 	
-	public static final String OPEN_ID_URI = "/Portal/openid";
 	
 	public static final String OPENID_CALLBACK_URI = "/Portal/openidcallback";
-	
-	public static final String OPEN_ID_PROVIDER = "OPEN_ID_PROVIDER";
-	// 		e.g. https://www.google.com/accounts/o8/id
-	
-	// this is the parameter name for the value of the final redirect
-	public static final String RETURN_TO_URL_PARAM = "RETURN_TO_URL";
 	
 	private static final String OPEN_ID_ATTRIBUTE = "OPENID";
 	
@@ -57,24 +41,7 @@ public class OpenIDUtils {
 	private static final int RETURN_TO_URL_COOKIE_MAX_AGE_SECONDS = 60; // seconds
 	
 	private static ConsumerManager createConsumerManager() {
-		SSLContext sslContext=null;
-//	    DefaultHttpClient client = new DefaultHttpClient();
-//	    SSLSocketFactory sslSocketFactory = (SSLSocketFactory) client
-//	            .getConnectionManager().getSchemeRegistry().getScheme("https")
-//	            .getSocketFactory();
-//	    final X509HostnameVerifier delegate = sslSocketFactory.;
-		X509HostnameVerifier hostnameVerifier= new HostnameVerifier(null);
-		HttpFetcherFactory httpFetcherFactory = new HttpFetcherFactory(sslContext, hostnameVerifier);
-		YadisResolver yadisResolver = new YadisResolver(httpFetcherFactory);
-		Discovery discovery = new Discovery(
-				  new HtmlResolver(httpFetcherFactory),
-		          yadisResolver,
-		          Discovery.getXriResolver());
-		return new ConsumerManager(
-					new RealmVerifierFactory(yadisResolver),
-		            discovery, 
-		            httpFetcherFactory);
-	
+		return new ConsumerManager();
 	}
 	
 	/**
@@ -179,7 +146,7 @@ public class OpenIDUtils {
 			if (returnToURL==null) throw new RuntimeException("Missing required return-to URL.");
 			
 			String redirectUrl = returnToURL+":";
-			if (acceptsTermsOfUse(email, acceptsTermsOfUse)) {
+			if (CrowdAuthUtil.acceptsTermsOfUse(email, acceptsTermsOfUse)) {
 				redirectUrl += crowdSession.getSessionToken();
 			} else {
 				redirectUrl += ServiceConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN;
@@ -193,39 +160,5 @@ public class OpenIDUtils {
 			throw ae;
 		}
 	}
-
-	public static boolean getAcceptsTermsOfUse(String userId) throws NotFoundException, IOException {
-		Map<String,Collection<String>> attributes = CrowdAuthUtil.getUserAttributes(userId);
-		Collection<String> values = attributes.get(ACCEPTS_TERMS_OF_USE_ATTRIBUTE);
-		return values!=null && values.size()>0 && Boolean.parseBoolean(values.iterator().next());
-	}
-	
-	public static void setAcceptsTermsOfUse(String userId, boolean accepts) throws IOException {
-		Map<String,Collection<String>> attributes = new HashMap<String,Collection<String>>();
-		attributes.put(ACCEPTS_TERMS_OF_USE_ATTRIBUTE, Arrays.asList(new String[]{""+accepts}));
-		CrowdAuthUtil.setUserAttributes(userId, attributes);
-	}
-	
-	/**
-	 * 
-	 * @param userId -- the ID/email address of the user
-	 * @param acceptsTermsOfUse -- says whether the request explicitly accepts the terms (false=acceptance is omitted in request, may have been given previously)
-	 * @throws NotFoundException
-	 * @throws IOException
-	 * @throws ForbiddenException thrown if user doesn't accept terms in this request or previously
-	 */
-	public static boolean acceptsTermsOfUse(String userId, Boolean acceptsTermsOfUse) throws NotFoundException, IOException {
-		if (CrowdAuthUtil.isAdmin(userId)) return true; // administrator need not sign terms of use
-		if (!getAcceptsTermsOfUse(userId)) {
-			if (acceptsTermsOfUse!=null && acceptsTermsOfUse==true) {
-				setAcceptsTermsOfUse(userId, true);
-				return true;
-			} else {
-				return false;
-			}
-		}	
-		return true;
-	}
-	
 
 }

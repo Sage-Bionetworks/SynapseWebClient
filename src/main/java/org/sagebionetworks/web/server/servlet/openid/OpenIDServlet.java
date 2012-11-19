@@ -2,7 +2,6 @@ package org.sagebionetworks.web.server.servlet.openid;
 
 import static org.sagebionetworks.repo.model.ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM;
 
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -13,6 +12,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.sagebionetworks.authutil.AuthenticationException;
 import org.sagebionetworks.repo.web.NotFoundException;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpStatus;
 
 public class OpenIDServlet extends HttpServlet {
@@ -20,30 +20,30 @@ public class OpenIDServlet extends HttpServlet {
 	
 	@Override
     public void doPost(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {        
-		if (!request.getRequestURI().equals(OpenIDUtils.OPEN_ID_URI)) {
+		if (!request.getRequestURI().equals(WebConstants.OPEN_ID_URI)) {
 			response.setStatus(HttpStatus.NOT_FOUND.value());
 			return;
 		}
 		String thisUrl = request.getRequestURL().toString();
-		int i = thisUrl.indexOf(OpenIDUtils.OPEN_ID_URI);
+		int i = thisUrl.indexOf(WebConstants.OPEN_ID_URI);
 		if (i<0)  {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
-			response.getWriter().println("Request URL is missing suffix "+OpenIDUtils.OPEN_ID_URI);
+			response.getWriter().println("Request URL is missing suffix "+WebConstants.OPEN_ID_URI);
 			return;
 		}
 		String redirectEndpoint = thisUrl.substring(0, i);
-		String openIdProvider = request.getParameter(OpenIDUtils.OPEN_ID_PROVIDER);
+		String openIdProvider = request.getParameter(WebConstants.OPEN_ID_PROVIDER);
 		if (openIdProvider==null) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
-			response.getWriter().println("Missing parameter "+OpenIDUtils.OPEN_ID_PROVIDER);
+			response.getWriter().println("Missing parameter "+WebConstants.OPEN_ID_PROVIDER);
 			return;
 		}
 		String explicitlyAcceptsTermsOfUseString = request.getParameter(ACCEPTS_TERMS_OF_USE_PARAM);
 		Boolean explicitlyAcceptsTermsOfUse = explicitlyAcceptsTermsOfUseString==null ? false : new Boolean(explicitlyAcceptsTermsOfUseString);
-		String returnToURL = request.getParameter(OpenIDUtils.RETURN_TO_URL_PARAM);
+		String returnToURL = request.getParameter(WebConstants.RETURN_TO_URL_PARAM);
 		if (returnToURL==null) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
-			response.getWriter().println("Missing parameter "+OpenIDUtils.RETURN_TO_URL_PARAM);
+			response.getWriter().println("Missing parameter "+WebConstants.RETURN_TO_URL_PARAM);
 			return;
 		}
 

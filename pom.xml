@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
-		<synapse.version>2012-10-25-77ff52d-184</synapse.version>
+		<synapse.version>2012-11-19-65c60b5-231</synapse.version>
 
 		<gwtVersion>2.4.0</gwtVersion>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
@@ -302,11 +302,11 @@
 			<version>${org.springframework.version}</version>
 		</dependency>
 		
-		<!--dependency>
+		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.2.2</version>
-		</dependency-->
+			<version>4.1.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -450,7 +450,7 @@
 		<dependency>
 			<groupId>org.jukito</groupId>
 			<artifactId>jukito</artifactId>
-			<version>1.0</version>
+			<version>1.1</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -486,12 +486,25 @@
 			<version>r03</version>
 		</dependency>
 
+		<!-- note: This refers to a custom POM in the SageBionetworks artifactory, omitting Guice 2.0 -->
 		<dependency>
+		    <groupId>org.openid4java</groupId>
+		    <artifactId>openid4java-nodeps</artifactId>
+		    <version>0.9.6.sb</version>
+		</dependency>
+    	
+    	<dependency>
+      		<groupId>net.sourceforge.nekohtml</groupId>
+      		<artifactId>nekohtml</artifactId>
+       		<version>1.9.14</version>
+    	</dependency>
+    
+    	<!--dependency>
 			<groupId>org.openid4java</groupId>
 			<artifactId>openid4java-consumer</artifactId>
 			<version>0.9.6</version>
 			<type>pom</type>
-		</dependency>
+		</dependency-->
 
 	</dependencies>
 
