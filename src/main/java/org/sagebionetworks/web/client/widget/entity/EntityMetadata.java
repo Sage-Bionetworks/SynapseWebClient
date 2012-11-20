@@ -299,7 +299,8 @@ public class EntityMetadata implements Presenter {
 							}
 							@Override
 							public void onSuccess(EntityWrapper result) {
-								view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated entity " + vb.getId());
+								view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
+								fireEntityUpdatedEvent();
 							}
 						});
 			} catch (JSONObjectAdapterException e) {
