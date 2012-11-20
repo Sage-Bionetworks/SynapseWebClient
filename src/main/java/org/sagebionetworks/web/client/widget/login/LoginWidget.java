@@ -18,6 +18,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private LoginWidgetView view;
 	private AuthenticationController authenticationController;	
 	private List<UserListener> listeners = new ArrayList<UserListener>();	
+	private String openIdActionUrl;
 	private String openIdReturnUrl;
 	private NodeModelCreator nodeModelCreator;
 	
@@ -84,9 +85,18 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			listener.userChanged(user);
 		}
 	}
+	
+	public void setOpenIdActionUrl(String url) {
+		this.openIdActionUrl = url;
+	}
 
 	public void setOpenIdReturnUrl(String url) {
 		this.openIdReturnUrl = url;
+	}
+	
+	@Override
+	public String getOpenIdActionUrl() {
+		return openIdActionUrl;
 	}
 	
 	@Override
