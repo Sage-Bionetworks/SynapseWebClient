@@ -48,7 +48,9 @@ public interface SynapseClientAsync {
 	void getEntityTypeBatch(List<String> entityIds,
 			AsyncCallback<String> callback);
 
-	void deleteEntity(String entityId, AsyncCallback<Void> callback);
+	void deleteEntityById(String entityId, AsyncCallback<Void> callback);
+
+	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void getUserProfile(AsyncCallback<String> callback);
 	

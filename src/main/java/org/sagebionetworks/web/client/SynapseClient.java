@@ -9,7 +9,6 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -21,8 +20,10 @@ public interface SynapseClient extends RemoteService {
 	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber);
 		
 	public String getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
-	
-	public void deleteEntity(String entityId) throws RestServiceException;
+
+	public void deleteEntityById(String entityId) throws RestServiceException;
+
+	public void deleteEntityVersionById(String entityId, Long versionNumber) throws RestServiceException;
 
 	public String getEntityTypeRegistryJSON();
 	
