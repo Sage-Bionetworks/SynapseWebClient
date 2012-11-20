@@ -38,10 +38,14 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -515,14 +519,24 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 								}
 							});
 				}
+				final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
 				menu.addIcon(icons.deleteButtonGrey16(), "Delete Version",
 						new ClickHandler() {
 							@Override
 							public void onClick(ClickEvent event) {
-
-								presenter.deleteVersion(
-										(String) model.get(VERSION_KEY_ID),
-										(Long) model.get(VERSION_KEY_NUMBER));
+								MessageBox.confirm(DisplayConstants.LABEL_DELETE + " " + versionLabel,
+										DisplayConstants.PROMPT_SURE_DELETE + " version?",
+										new Listener<MessageBoxEvent>() {
+									@Override
+									public void handleEvent(MessageBoxEvent be) {
+										Button btn = be.getButtonClicked();
+										if(Dialog.YES.equals(btn.getItemId())) {
+											presenter.deleteVersion(
+													(String) model.get(VERSION_KEY_ID),
+													(Long) model.get(VERSION_KEY_NUMBER));
+										}
+									}
+								});
 							}
 						});
 				return menu.asWidget();

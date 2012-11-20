@@ -282,8 +282,10 @@ public class EntityMetadata implements Presenter {
 		if (entity.getId().equals(entityId) && entity instanceof Versionable) {
 			final Versionable vb = (Versionable)entity;
 			if (version != null && version.equals(vb.getVersionLabel()) &&
-				comment != null && comment.equals(vb.getVersionComment()))
+				comment != null && comment.equals(vb.getVersionComment())) {
+				view.showInfo("Version Info Unchanged", "You didn't change anything about the version info.");
 				return;
+			}
 			if (version == null || version.equals(""))
 				version = null; // Null out the version field if empty so it defaults to number
 			vb.setVersionLabel(version);
@@ -295,7 +297,12 @@ public class EntityMetadata implements Presenter {
 						new AsyncCallback<EntityWrapper>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								DisplayUtils.showErrorMessage(DisplayConstants.ERROR_FAILED_PERSIST);
+								if (!DisplayUtils.handleServiceException(
+										caught, globalApplicationState.getPlaceChanger(),
+										authenticationController.getLoggedInUser())) {
+									view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE
+											+ "\n" + caught.getMessage());
+								}
 							}
 							@Override
 							public void onSuccess(EntityWrapper result) {
@@ -316,8 +323,22 @@ public class EntityMetadata implements Presenter {
 	}
 
 	@Override
-	public void deleteVersion(String entityId, Long versionNumber) {
-
+	public void deleteVersion(final String entityId, final Long versionNumber) {
+		synapseClient.deleteEntityVersionById(entityId, versionNumber, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				if (!DisplayUtils.handleServiceException(caught,
+						globalApplicationState.getPlaceChanger(),
+						authenticationController.getLoggedInUser())) {
+					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + "\n" + caught.getMessage());
+				}
+			}
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + entityId + DisplayConstants.LABEL_DELETED);
+				fireEntityUpdatedEvent();
+			}
+		});
 	}
 
 
