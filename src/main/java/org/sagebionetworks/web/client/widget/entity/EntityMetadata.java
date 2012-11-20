@@ -303,7 +303,7 @@ public class EntityMetadata implements Presenter {
 							}
 						});
 			} catch (JSONObjectAdapterException e) {
-				DisplayUtils.showErrorMessage(DisplayConstants.ERROR_INVALID_VERSION_FORMAT);
+				view.showErrorMessage(DisplayConstants.ERROR_INVALID_VERSION_FORMAT);
 			}
 		}
 	}
@@ -316,7 +316,6 @@ public class EntityMetadata implements Presenter {
 
 	@Override
 	public void deleteVersion(String entityId, Long versionNumber) {
-		// TODO Auto-generated method stub
 
 	}
 

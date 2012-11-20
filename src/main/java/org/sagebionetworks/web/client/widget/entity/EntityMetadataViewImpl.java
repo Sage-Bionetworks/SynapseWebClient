@@ -626,4 +626,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				icons,
 				synapseJSNIUtils);
 	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
 }
