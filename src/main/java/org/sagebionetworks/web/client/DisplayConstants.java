@@ -397,6 +397,7 @@ public class DisplayConstants {
 		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
 		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
 		"without restrictions select \"save unrestricted\", below.  Otherwise select \"save restricted\".";
+	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 
 }
 

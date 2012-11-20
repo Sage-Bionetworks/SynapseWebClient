@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -279,7 +280,7 @@ public class EntityMetadata implements Presenter {
 	public void editCurrentVersionInfo(String entityId, String version, String comment) {
 		Entity entity = bundle.getEntity();
 		if (entity.getId().equals(entityId) && entity instanceof Versionable) {
-			Versionable vb = (Versionable)entity;
+			final Versionable vb = (Versionable)entity;
 			if (version != null && version.equals(vb.getVersionLabel()) &&
 				comment != null && comment.equals(vb.getVersionComment()))
 				return;
@@ -287,7 +288,23 @@ public class EntityMetadata implements Presenter {
 				version = null; // Null out the version field if empty so it defaults to number
 			vb.setVersionLabel(version);
 			vb.setVersionComment(comment);
-			// TODO: actually send this to Synapse
+			JSONObjectAdapter joa = jsonObjectAdapter.createNew();
+			try {
+				vb.writeToJSONObject(joa);
+				synapseClient.updateEntity(joa.toJSONString(),
+						new AsyncCallback<EntityWrapper>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								DisplayUtils.showErrorMessage(DisplayConstants.ERROR_FAILED_PERSIST);
+							}
+							@Override
+							public void onSuccess(EntityWrapper result) {
+								view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated entity " + vb.getId());
+							}
+						});
+			} catch (JSONObjectAdapterException e) {
+				DisplayUtils.showErrorMessage(DisplayConstants.ERROR_INVALID_VERSION_FORMAT);
+			}
 		}
 	}
 
