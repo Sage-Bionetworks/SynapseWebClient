@@ -294,6 +294,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private void clear() {
 		widgetContainer.setInnerHTML("");
+		comment.setInnerText("");
 	}
 
 	@Override
