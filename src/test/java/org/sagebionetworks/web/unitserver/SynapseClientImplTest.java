@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -43,12 +44,14 @@ import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
+import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.storage.StorageUsage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -427,5 +430,23 @@ public class SynapseClientImplTest {
 		EntityWrapper returnedLayer = synapseClient.updateExternalLocationable(testId, testUrl);
 		
 		assertEquals(returnedLayer.getEntityJson(), EntityFactory.createJSONStringForEntity(layer));
+	}
+	
+	@Test
+	public void testGetStorageUsage() throws Exception {
+		//verify call is directly calling the synapse client provider.
+		PaginatedResults<StorageUsage> testPaginatedResults = new PaginatedResults<StorageUsage>();
+		StorageUsage expectedUsage = new StorageUsage();
+		Long expectedSize = 12345l;
+		expectedUsage.setId("usageId");
+		expectedUsage.setContentSize(expectedSize);
+		List<StorageUsage> list = new ArrayList<StorageUsage>();
+		list.add(expectedUsage);
+		testPaginatedResults.setResults(list);
+		testPaginatedResults.setTotalNumberOfResults(1l);
+		
+		when(mockSynapse.getItemizedStorageUsageForNode(anyString(), anyInt(), anyInt())).thenReturn(testPaginatedResults);
+		Long actual = synapseClient.getStorageUsage(entityId);
+		assertEquals(expectedSize, actual);
 	}
 }

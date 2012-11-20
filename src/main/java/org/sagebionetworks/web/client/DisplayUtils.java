@@ -63,6 +63,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
@@ -143,6 +144,8 @@ public class DisplayUtils {
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
 	public static final int BIG_BUTTON_HEIGHT_PX = 36;
+	
+	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
 	/**
 	 * Sometimes we are forced to use a table to center an image in a fixed space. 
@@ -320,6 +323,23 @@ public class DisplayUtils {
 		table.setHTML(row, 2, value);
 	}
 	
+	public static String getFriendlySize(double size, boolean abbreviatedUnits) {
+		NumberFormat df = NumberFormat.getDecimalFormat();
+		if(size >= TB) {
+            return df.format(size/TB) + (abbreviatedUnits?" TB":" Terabytes");
+        }
+		if(size >= GB) {
+            return df.format(size/GB) + (abbreviatedUnits?" GB":" Gigabytes");
+        }
+		if(size >= MB) {
+            return df.format(size/MB) + (abbreviatedUnits?" MB":" Megabytes");
+        }
+		if(size >= KB) {
+            return df.format(size/KB) + (abbreviatedUnits?" KB":" Kilobytes");
+        }
+        return df.format(size) + " bytes";
+    }
+	
 	/**
 	 * Use an EntityWrapper instead and check for an exception there
 	 * @param obj
@@ -354,6 +374,21 @@ public class DisplayUtils {
 		}
 	}	
 
+	public static String getFileNameFromLocationPath(String path){
+		//grab the text between the last '/' and following '?'
+		String fileName = "";
+		if (path != null) {
+			int lastSlash = path.lastIndexOf("/");
+			if (lastSlash > -1) {
+				int firstQuestionMark = path.indexOf("?", lastSlash);
+				if (firstQuestionMark > -1) {
+					fileName = path.substring(lastSlash+1, firstQuestionMark);
+				}
+			}
+		}
+		return fileName;
+	}
+	
 	/**
 	 * Handles the exception. Resturn true if the user has been alerted to the exception already
 	 * @param ex
@@ -906,7 +941,7 @@ public class DisplayUtils {
 	 */
 	private static int tooltipCount= 0;
 	private static int popoverCount= 0;
-
+	
 	/**
 	 * Adds a twitter bootstrap tooltip to the given widget using the standard Synapse configuration
 	 *
@@ -945,6 +980,8 @@ public class DisplayUtils {
 				public void onAttachOrDetach(AttachEvent event) {
 					if (event.isAttached()) {
 						util.bindBootstrapTooltip(el.getId());
+					} else {
+						util.hideBootstrapTooltip(el.getId());
 					}
 				}
 			});

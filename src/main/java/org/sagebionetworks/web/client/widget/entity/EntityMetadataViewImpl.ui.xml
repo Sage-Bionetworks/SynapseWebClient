@@ -19,18 +19,22 @@
   </ui:style>
 
 	<g:HTMLPanel ui:field="panel">
-		<h2>
-		 <g:Image ui:field="entityIcon" />&nbsp;<span ui:field="entityName"></span>&nbsp;(<span ui:field="entityId"></span>)
-		</h2>
-		<g:HTMLPanel ui:field="readOnly">
-		  <h4 class="colored">READ ONLY <g:Image resource="{icons.help16}"/></h4>
+		<g:HTMLPanel ui:field="entityNamePanel">
+			<h2>
+			 <g:Image ui:field="entityIcon" />&nbsp;<span ui:field="entityName"></span>&nbsp;(<span ui:field="entityId"></span>)
+			</h2>
 		</g:HTMLPanel>
-		<div ui:field="widgetContainer" ></div>
-		Added by <span ui:field="createName"></span> on <span ui:field="createDate"></span><br/>
-		Modified by <span ui:field="modifyName"></span> on <span ui:field="modifyDate"></span><br/>
-		<g:HTMLPanel ui:field="versions">
-		 Version: <span ui:field="label"></span><span ui:field="comment"></span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
-		 <gxt:LayoutContainer ui:field="previousVersions" styleName="{style.limitedHeight}" visible="false" autoHeight="true" />
-    </g:HTMLPanel>
+		<g:HTMLPanel ui:field="detailedMetadata">
+			<g:HTMLPanel ui:field="readOnly">
+			  <h4 class="colored">READ ONLY <g:Image resource="{icons.help16}"/></h4>
+			</g:HTMLPanel>
+			<div ui:field="widgetContainer" ></div>
+			Added by <span ui:field="createName"></span> on <span ui:field="createDate"></span><br/>
+			Modified by <span ui:field="modifyName"></span> on <span ui:field="modifyDate"></span><br/>
+			<g:HTMLPanel ui:field="versions">
+			 Version: <span ui:field="label"></span><span ui:field="comment"></span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
+			 <gxt:LayoutContainer ui:field="previousVersions" styleName="{style.limitedHeight}" visible="false" autoHeight="true" />
+			</g:HTMLPanel>
+	    </g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder>

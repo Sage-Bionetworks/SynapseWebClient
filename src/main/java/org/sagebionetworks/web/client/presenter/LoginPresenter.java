@@ -33,7 +33,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private EventBus bus;
 	private AuthenticationController authenticationController;
 	private UserAccountServiceAsync userService;
-	private String openIdActionUrl;
 	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
@@ -65,38 +64,26 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.loginPlace = place;
 		view.setPresenter(this);
 		view.clear();
-		if(openIdActionUrl != null && openIdReturnUrl != null) {
+		if(openIdReturnUrl != null) {
 			showView(place);
 		} else {
 			// load Open ID urls
 			// retrieve endpoints for SSO
-			userService.getPublicAuthServiceUrl(new AsyncCallback<String>() {
+			userService.getSynapseWebUrl(new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
-					openIdActionUrl = result + "/openid";
+					// this should be a string as the Auth service completes the URL with ":<sessionId>"
+					openIdReturnUrl = result + "/#"+LOGIN_PLACE;
 					
-					userService.getSynapseWebUrl(new AsyncCallback<String>() {
-						@Override
-						public void onSuccess(String result) {
-							// this should be a string as the Auth service completes the URL with ":<sessionId>"
-							openIdReturnUrl = result + "/#"+LOGIN_PLACE;
-							
-							// now show the view
-							showView(place);
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
-						}
-					});					
+					// now show the view
+					showView(place);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
-						view.showErrorMessage("An Error occurred. Please try reloading the page.");
-					}
+					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 				}
-			});
+			});					
+
 		}
 	}
 
@@ -152,7 +139,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				}
 				public void onFailure(Throwable throwable) {
 					view.showErrorMessage("An error occurred. Please try logging in again.");
-					view.showLogin(openIdActionUrl, openIdReturnUrl);
+					view.showLogin(openIdReturnUrl);
 				}
 			});
 		} else if (!DisplayUtils.DEFAULT_PLACE_TOKEN.equals(token)				
@@ -182,12 +169,12 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 								}
 								public void onFailure(Throwable t) {
 									view.showErrorMessage("An error occurred. Please try logging in again.");
-									view.showLogin(openIdActionUrl, openIdReturnUrl);									
+									view.showLogin(openIdReturnUrl);									
 								}
 							});
 						} else {
 							view.showErrorMessage("An error occurred. Please try logging in again.");
-							view.showLogin(openIdActionUrl, openIdReturnUrl);
+							view.showLogin(openIdReturnUrl);
 						}
 					}
 				});
@@ -195,7 +182,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		} else {
 			// standard view
 			authenticationController.logoutUser();
-			view.showLogin(openIdActionUrl, openIdReturnUrl);
+			view.showLogin(openIdReturnUrl);
 		}
 	}
 	

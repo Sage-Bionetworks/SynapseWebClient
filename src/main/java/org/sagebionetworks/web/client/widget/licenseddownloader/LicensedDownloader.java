@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
-import org.sagebionetworks.web.shared.FileDownload;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -215,11 +214,6 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		} else {
 			this.setRequireApproval(APPROVAL_REQUIRED.NONE);
 		}
-	}
-	
-	@Deprecated
-	public void setDownloadUrls(List<FileDownload> downloads) {		
-		this.view.setDownloadUrls(downloads);
 	}
 	
 	public void showLoading() {

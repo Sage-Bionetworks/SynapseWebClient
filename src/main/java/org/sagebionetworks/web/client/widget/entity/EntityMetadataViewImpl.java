@@ -4,20 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.BasePagingLoadConfig;
 import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
@@ -96,7 +102,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	HTMLPanel versions;
 	@UiField
 	HTMLPanel readOnly;
-
+	@UiField
+	HTMLPanel entityNamePanel;
+	@UiField
+	HTMLPanel detailedMetadata;
+	
 	@UiField
 	DivElement widgetContainer;
 
@@ -139,6 +149,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	 */
 	private boolean previousVersionsHasNotPaged = true;
 
+	/**
+	 * This variable should ONLY be set by the load call in the VersionsRpcProxy
+	 * It is used to set the selection (i.e. highlighting) for the currently being
+	 * viewed model in the grid.
+	 */
+	private BaseModelData currentModel;
+
 	final private FxConfig config;
 
 	// Widget variables
@@ -160,6 +177,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
 				allVersions.getElement().setPropertyBoolean("animating", false);
+				vGrid.getSelectionModel().select(currentModel, false);
 			}
 		});
 
@@ -179,6 +197,14 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		vGrid = new Grid<BaseModelData>(new ListStore<BaseModelData>(),
 										new ColumnModel(new ArrayList<ColumnConfig>()));
+
+		GridFineSelectionModel<BaseModelData> sm = new GridFineSelectionModel<BaseModelData>();
+		sm.setLocked(false);
+		sm.setUserLocked(true);
+		sm.setFiresEvents(false);
+		sm.setSelectionMode(SelectionMode.SINGLE);
+
+		vGrid.setSelectionModel(sm);
 		vGrid.getView().setForceFit(true);
 		vGrid.getView().setEmptyText("Sorry, no versions were found.");
 		vGrid.setLayoutData(new FitLayout());
@@ -228,10 +254,14 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
 		synapseIconForEntity.applyTo(entityIcon);
-
+		
 		setEntityName(e.getName());
 		setEntityId(e.getId());
-
+		boolean isLocationable = (e instanceof Locationable);
+		//show the entity name if this isn't locationable, or if it has no data.
+		boolean isEntityNamePanelVisible = !isLocationable || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !presenter.isAnonymous());
+		this.entityNamePanel.setVisible(isEntityNamePanelVisible);
+		
 		this.readOnly.setVisible(readOnly);
 
 		Widget shareSettings = createShareSettingsWidget(bundle.getPermissions().getCanPublicRead());
@@ -241,10 +271,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		if (restrictionsWidget != null) panel.add(restrictionsWidget, widgetContainer);
 
 		setCreateName(e.getCreatedBy());
-		setCreateDate(String.valueOf(e.getCreatedOn()));
+		setCreateDate(DisplayUtilsGWT.convertDateToSmallString(e.getCreatedOn()));
 
 		setModifyName(e.getModifiedBy());
-		setModifyDate(String.valueOf(e.getModifiedOn()));
+		setModifyDate(DisplayUtilsGWT.convertDateToSmallString(e.getModifiedOn()));
 
 		setVersionsVisible(false);
 		if (e instanceof Versionable) {
@@ -264,7 +294,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setPresenter(Presenter p) {
 		presenter = p;
 	}
-
+	
+	@Override
+	public void setDetailedMetadataVisible(boolean visible) {
+		detailedMetadata.setVisible(visible);
+	}
+	
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
@@ -358,6 +393,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 									model.set(
 											EntityMetadataViewImpl.VERSION_KEY_MOD_BY,
 											version.getModifiedBy());
+
+									if (entity.getVersionNumber().equals(version.getVersionNumber()))
+										currentModel = model;
 									dataList.add(model);
 								}
 								PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(
@@ -406,31 +444,34 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			public Object render(BaseModelData model, String property,
 					ColumnData config, int rowIndex, int colIndex,
 					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
+				boolean currentVersion = vb.getVersionNumber().equals(model.get(VERSION_KEY_NUMBER));
+				boolean topVersion = previousVersionsHasNotPaged && rowIndex == 0;
 
-				if         (property.equals(VERSION_KEY_NUMBER)) {
-					if (vb.getVersionNumber().equals(model.get(property))) {
-						InlineLabel label = new InlineLabel("viewing");
-						label.getElement().setAttribute("style", "font-weight:bold;");
+				if (property.equals(VERSION_KEY_LABEL)) {
+					if (currentVersion) {
+						InlineLabel label = new InlineLabel("Version "
+								+ model.get(VERSION_KEY_LABEL));
+						label.addStyleName(style.currentVersion());
 						return label;
 					} else {
 						Hyperlink link = new Hyperlink();
-						if (previousVersionsHasNotPaged && rowIndex == 0) {
+						if (topVersion) {
 							// This is so the user can easily get back to the non-readonly page
 							link.setTargetHistoryToken(DisplayUtils
 								.getSynapseHistoryTokenNoHash(vb.getId()));
 						} else {
 							link.setTargetHistoryToken(DisplayUtils
 									.getSynapseHistoryTokenNoHash(vb.getId(),
-											(Long) model.get(property)));
+											(Long) model.get(VERSION_KEY_NUMBER)));
 						}
-						link.setText("view");
+						link.setText("Version " + model.get(VERSION_KEY_LABEL));
 						link.setStyleName("link");
 						return link;
 					}
 				} else if (property.equals(VERSION_KEY_COMMENT)) {
 					String comment;
-					if (null != model.get(property))
-						comment = model.get(property).toString();
+					if (null != model.get(VERSION_KEY_COMMENT))
+						comment = model.get(VERSION_KEY_COMMENT).toString();
 					else
 						return null;
 					// By default, overflow on a gridcell, results in eliding of the text.
@@ -450,9 +491,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY, VERSION_KEY_NUMBER};
-		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"     , ""                };
-		int[] widths =	 {100              , 230                , 100               , 100               , 70                };
+		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY /*, VERSION_KEY_NUMBER*/};
+		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"      /*, ""                */};
+		int[] widths =	 {100              , 230                , 100               , 100                /*, 70                */};
 		int MOD_ON_INDEX = -1;
 
 		if (keys.length != names.length || names.length != widths.length)
