@@ -487,7 +487,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 					label.setTitle(comment);
 					return label;
 				} else if (property.equals(VERSION_KEY_NUMBER)) {
-					return setupIconMenu(model, currentVersion);
+					return setupIconMenu(model, topVersion);
 
 				} else if (model.get(property) != null) {
 					return model.get(property).toString();
