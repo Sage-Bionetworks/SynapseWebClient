@@ -1,158 +1,276 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
+import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
+import org.sagebionetworks.web.shared.EntityUtil;
+import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
-import com.extjs.gxt.ui.client.Style.Direction;
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.SpanElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.resources.client.CssResource;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
-public class EntityMetadata extends Composite {
-	interface EntityMetadataUiBinder extends UiBinder<Widget, EntityMetadata> {
+public class EntityMetadata implements Presenter {
+
+	private EntityMetadataView view;
+	private SynapseClientAsync synapseClient;
+	private NodeModelCreator nodeModelCreator;
+	private AuthenticationController authenticationController;
+	private JSONObjectAdapter jsonObjectAdapter;
+	private EntityTypeProvider entityTypeProvider;
+	private JiraURLHelper jiraURLHelper;
+	private EventBus bus;
+	private GlobalApplicationState globalApplicationState;
+
+	private EntityBundle bundle;
+
+	@Inject
+	public EntityMetadata(EntityMetadataView view,
+			SynapseClientAsync synapseClient,
+			NodeModelCreator nodeModelCreator,
+			AuthenticationController authenticationController,
+			JSONObjectAdapter jsonObjectAdapter,
+			GlobalApplicationState globalApplicationState,
+			EntityTypeProvider entityTypeProvider, JiraURLHelper jiraURLHelper,
+			EventBus bus) {
+		this.view = view;
+		this.view.setPresenter(this);
+		this.synapseClient = synapseClient;
+		this.nodeModelCreator = nodeModelCreator;
+		this.authenticationController = authenticationController;
+		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.globalApplicationState = globalApplicationState;
+		this.entityTypeProvider = entityTypeProvider;
+		this.jiraURLHelper = jiraURLHelper;
+		this.bus = bus;
 	}
 
-	protected static final String VERSION_KEY_ID = "id";
-
-	protected static final String VERSION_KEY_NUMBER = "number";
-
-	protected static final String VERSION_KEY_LABEL = "label";
-
-	protected static final String VERSION_KEY_COMMENT = "comment";
-
-	protected static final String VERSION_KEY_MOD_ON = "modifiedOn";
-
-	protected static final String VERSION_KEY_MOD_BY = "modifiedBy";
-
-	private static EntityMetadataUiBinder uiBinder = GWT
-			.create(EntityMetadataUiBinder.class);
-
-	interface Style extends CssResource {
-		String limitedHeight();
-		String currentVersion();
-	}
-
-	@UiField
-	Style style;
-
-	@UiField
-	HTMLPanel panel;
-
-	@UiField
-	SpanElement createName;
-	@UiField
-	SpanElement createDate;
-	@UiField
-	SpanElement modifyName;
-	@UiField
-	SpanElement modifyDate;
-	@UiField
-	HTMLPanel versions;
-	@UiField
-	SpanElement label;
-	@UiField
-	SpanElement comment;
-
-	@UiField
-	LayoutContainer previousVersions;
-
-	@UiField
-	InlineLabel allVersions;
-
-	public EntityMetadata() {
-		initWidget(uiBinder.createAndBindUi(this));
-
-		final FxConfig config = new FxConfig(400);
-		config.setEffectCompleteListener(new Listener<FxEvent>() {
-			@Override
-			public void handleEvent(FxEvent be) {
-				// This call to layout is necessary to force the scroll bar to appear on page-load
-				previousVersions.layout(true);
-				allVersions.getElement().setPropertyBoolean("animating", false);
-			}
-		});
-
-		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
-		allVersions.getElement().setPropertyBoolean("animating", false);
-		allVersions.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (!allVersions.getElement().getPropertyBoolean("animating")) {
-					allVersions.getElement().setPropertyBoolean("animating", true);
-					if (previousVersions.el().isVisible()) {
-						allVersions.setText(DisplayConstants.SHOW_VERSIONS);
-						previousVersions.el().slideOut(Direction.UP, config);
-					} else {
-						previousVersions.setVisible(true);
-						allVersions.setText(DisplayConstants.HIDE_VERSIONS);
-						previousVersions.el().slideIn(Direction.DOWN, config);
+	@Override
+	public void loadVersions(String id, int offset, int limit,
+			final AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback) {
+		// TODO: If we ever change the offset api to actually take 0 as a valid
+		// offset, then we need to remove "+1"
+		synapseClient.getEntityVersions(id, offset + 1, limit,
+				new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String result) {
+						PaginatedResults<VersionInfo> paginatedResults = nodeModelCreator
+								.createPaginatedResults(result,
+										VersionInfo.class);
+						asyncCallback.onSuccess(paginatedResults);
 					}
-				}
-			}
-		});
-		previousVersions.setLayout(new FlowLayout(10));
+
+					@Override
+					public void onFailure(Throwable caught) {
+						asyncCallback.onFailure(caught);
+					}
+				});
 	}
 
-
-	public void setCreateName(String text) {
-		createName.setInnerText(text);
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 
-	public void setCreateDate(String text) {
-		createDate.setInnerText(text);
+	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
+		this.bundle = bundle;
+		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit() && readOnly);
+		boolean isLocationable = bundle.getEntity() instanceof Locationable;
+		view.setDetailedMetadataVisible(!isLocationable || LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous()));
 	}
 
-	public void setModifyName(String text) {
-		modifyName.setInnerText(text);
+	private UserProfile getUserProfile() {
+		UserSessionData sessionData = authenticationController.getLoggedInUser();
+		return (sessionData==null ? null : sessionData.getProfile());
+		
 	}
 
-	public void setModifyDate(String text) {
-		modifyDate.setInnerText(text);
+	@Override
+	public boolean isAnonymous() {
+		return getUserProfile()==null;
 	}
 
-	public void setVersionInfo(Versionable vb) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(vb.getVersionLabel());
+	@Override
+	public String getJiraFlagUrl() {
+		UserProfile userProfile = getUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		return jiraURLHelper.createFlagIssue(
+				userProfile.getUserName(), 
+				userProfile.getDisplayName(), 
+				bundle.getEntity().getId());
+	}
 
-		if (vb.getVersionComment() != null) {
-			sb.append(" - ");
+	private String getJiraRestrictionUrl() {
+		UserProfile userProfile = getUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		return jiraURLHelper.createAccessRestrictionIssue(
+				userProfile.getUserName(), 
+				userProfile.getDisplayName(), 
+				bundle.getEntity().getId());
+	}
 
-			comment.setTitle(vb.getVersionComment());
-			comment.setInnerText(DisplayUtils.stubStr(vb.getVersionComment(), 60));
+	@Override
+	public String getJiraRequestAccessUrl() {
+		UserProfile userProfile = getUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		return jiraURLHelper.createRequestAccessIssue(
+				userProfile.getOwnerId(), 
+				userProfile.getDisplayName(), 
+				userProfile.getUserName(), 
+				bundle.getEntity().getId(), 
+				getAccessRequirement().getId().toString());
+	}
+
+	@Override
+	public boolean hasAdministrativeAccess() {
+		return bundle.getPermissions().getCanChangePermissions();
+	}
+
+	@Override
+	public APPROVAL_REQUIRED getRestrictionLevel() {
+		if (bundle.getAccessRequirements().size()==0L) return APPROVAL_REQUIRED.NONE;
+		if (isTermsOfUseAccessRequirement()) return APPROVAL_REQUIRED.LICENSE_ACCEPTANCE;
+		return APPROVAL_REQUIRED.ACT_APPROVAL;
+	}
+
+	@Override
+	public boolean hasFulfilledAccessRequirements() {
+		return bundle.getUnmetAccessRequirements().size()==0L;
+	}
+
+	@Override
+	public boolean includeRestrictionWidget() {
+		return (bundle.getEntity() instanceof Locationable);
+	}
+
+	@Override
+	public String accessRequirementText() {
+		if (bundle.getAccessRequirements().size()==0) throw new IllegalStateException("There is no access requirement.");
+		AccessRequirement ar = bundle.getAccessRequirements().get(0);
+		if (ar instanceof TermsOfUseAccessRequirement) {
+			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
+		} else if (ar instanceof ACTAccessRequirement) {
+			return ((ACTAccessRequirement)ar).getActContactInfo();			
+		} else {
+			throw new IllegalStateException("Unexpected access requirement type "+ar.getClass());
 		}
-		label.setInnerText(sb.toString());
+	}
+	
+	private AccessRequirement getAccessRequirement() {
+		return bundle.getAccessRequirements().get(0);
 	}
 
-	public void setPreviousVersions(ContentPanel versions) {
-		previousVersions.add(versions);
-		previousVersions.layout(true);
+	@Override
+	public boolean isTermsOfUseAccessRequirement() {
+		if (bundle.getAccessRequirements().size()==0) throw new IllegalStateException("There is no access requirement.");
+		AccessRequirement ar = getAccessRequirement();
+		if (ar instanceof TermsOfUseAccessRequirement) {
+			return true;		
+		} else {
+			return false;
+		}
 	}
 
-	public void clearPreviousVersions() {
-		previousVersions.removeAll();
+	@Override
+	public Callback accessRequirementCallback() {
+		if (!isTermsOfUseAccessRequirement()) throw new IllegalStateException("not a TOU Access Requirement");
+		AccessRequirement ar = getAccessRequirement();
+		TermsOfUseAccessRequirement tou = (TermsOfUseAccessRequirement)ar;
+		return new Callback() {
+			@Override
+			public void invoke() {
+				// create the self-signed access approval, then update this object
+				String principalId = getUserProfile().getOwnerId();
+				AccessRequirement ar = getAccessRequirement();
+				Callback onSuccess = new Callback() {
+					@Override
+					public void invoke() {
+						fireEntityUpdatedEvent();
+					}
+				};
+				CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
+					@Override
+					public void invoke(Throwable t) {
+						view.showInfo("Error", t.getMessage());
+					}
+				};
+				GovernanceServiceHelper.signTermsOfUse(
+						principalId, 
+						ar.getId(), 
+						onSuccess, 
+						onFailure, 
+						synapseClient, 
+						jsonObjectAdapter);
+			}
+		};
 	}
 
-	public void setVersionsVisible(boolean visible) {
-		versions.setVisible(visible);
+	@Override
+	public void fireEntityUpdatedEvent() {
+		bus.fireEvent(new EntityUpdatedEvent());
 	}
 
-	public Style getStyle() {
-		return style;
+	
+	@Override
+	public Callback getImposeRestrictionsCallback() {
+		return new Callback() {
+			@Override
+			public void invoke() {
+				EntityWrapper ew = null;
+				try {
+					ew = EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(bundle.getEntity().getId(), jsonObjectAdapter);
+				} catch (JSONObjectAdapterException e) {
+					view.showInfo("Error", e.getMessage());
+					return;
+				}
+				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
+				final JavaScriptObject window = DisplayUtils.newWindow("", "", "");
+				synapseClient.createAccessRequirement(ew, new AsyncCallback<EntityWrapper>(){
+					@Override
+					public void onSuccess(EntityWrapper result) {
+						fireEntityUpdatedEvent();
+						DisplayUtils.setWindowTarget(window, getJiraRestrictionUrl());
+				}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showInfo("Error", caught.getMessage());
+					}
+				});
+			}
+		};
+	}
+	
+	@Override
+	public Callback getLoginCallback() {
+		return new Callback() {
+			public void invoke() {		
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			}
+		};
 	}
 
 }

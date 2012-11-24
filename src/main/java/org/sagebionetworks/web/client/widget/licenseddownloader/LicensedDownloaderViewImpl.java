@@ -7,10 +7,11 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.GovernanceDialogHelper;
-import org.sagebionetworks.web.shared.FileDownload;
 
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.Orientation;
@@ -24,12 +25,15 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -44,15 +48,17 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	private IconsImageBundle icons;
 	private SageImageBundle sageImageBundle;
 	private int downloadWindowWidth;
-
+	private List<LocationData> locations;
+	private SynapseJSNIUtils synapseJSNIUtils;
+	
 	/*
 	 * Constructors
 	 */
 	@Inject
-	public LicensedDownloaderViewImpl(IconsImageBundle icons, SageImageBundle sageImageBundle) {
+	public LicensedDownloaderViewImpl(IconsImageBundle icons, SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils) {
 		this.icons = icons;
 		this.sageImageBundle = sageImageBundle;
-		
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		clear();
 	}
 
@@ -73,8 +79,13 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		if (!presenter.isDownloadAllowed()) return;
 		
 		if (approvalRequired==APPROVAL_REQUIRED.NONE) {
-			createDownloadWindow();
-			downloadWindow.show();
+			//if 1, open it
+			if (locations != null && locations.size() == 1){
+				DisplayUtils.newWindow(locations.get(0).getPath(),"","");
+			} else {
+				createDownloadWindow();
+				downloadWindow.show();
+			}
 		} else {
 			Callback termsOfUseCallback = presenter.getTermsOfUseCallback();
 			GovernanceDialogHelper.showAccessRequirement(
@@ -101,13 +112,15 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	@Override
 	public Widget asWidget() {
 		final LicensedDownloaderView view = this;
-		Button downloadButton = new Button(DisplayConstants.BUTTON_DOWNLOAD, AbstractImagePrototype.create(icons.NavigateDown16()));		
-		downloadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		Image downloadButton = new Image(icons.NavigateDown16());
+		downloadButton.addStyleName("imageButton");
+		downloadButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				view.showWindow();
 			}
-		});		
+		});
+				
 		return downloadButton;
 	}
 
@@ -121,38 +134,9 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		this.licenseTextHtml = licenseHtml;
 	}
 	
-	@Deprecated
-	@Override
-	public void setDownloadUrls(List<FileDownload> downloads) {
-		if(downloads != null && downloads.size() > 0) {
-			// build a list of links in HTML
-			SafeHtmlBuilder sb = new SafeHtmlBuilder();
-			for(int i=0; i<downloads.size(); i++) {
-				FileDownload dl = downloads.get(i);
-				sb.appendHtmlConstant("<a href=\"" + dl.getUrl() + "\" target=\"new\">")
-				.appendEscaped(dl.getDisplay())
-				.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
-				if(dl.getChecksum() != null) {
-					sb.appendHtmlConstant("&nbsp;<small>md5 checksum: ")
-					.appendEscaped(dl.getChecksum())
-					.appendHtmlConstant("</small>");
-				}
-				sb.appendHtmlConstant("<br/>");				
-			}
-			safeDownloadHtml = sb.toSafeHtml();
-
-			// replace the view content if this is after initialization
-			if(downloadContentContainer != null) {
-				safeDownloadHtml = sb.toSafeHtml();
-				fillDownloadContentContainer();
-			}			
-		} else {
-			setNoDownloads();
-		}
-	}
-	
 	@Override
 	public void setDownloadLocations(List<LocationData> locations, String md5) {
+		this.locations = locations;
 		if(locations != null && locations.size() > 0) {
 			// build a list of links in HTML
 			SafeHtmlBuilder sb = new SafeHtmlBuilder();
@@ -179,7 +163,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 			if(downloadContentContainer != null) {
 				safeDownloadHtml = sb.toSafeHtml();
 				fillDownloadContentContainer();
-			}			
+			}
 		} else {
 			setNoDownloads();
 		}
@@ -189,7 +173,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	public void clear() {
 		// defaults
 		licenseTextHtml = "";
-		safeDownloadHtml = SafeHtmlUtils.fromSafeConstant("");		
+		safeDownloadHtml = SafeHtmlUtils.fromSafeConstant("");
+		locations = null;
 	}
 
 	@Override

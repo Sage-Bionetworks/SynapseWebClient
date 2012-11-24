@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.view.TermsOfUseHelper;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;

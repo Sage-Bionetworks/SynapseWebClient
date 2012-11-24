@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.login;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -86,11 +85,11 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			listener.userChanged(user);
 		}
 	}
-
-	public void setOpenIdActionUrl(String url) {
-		this.openIdActionUrl = url;		
-	}
 	
+	public void setOpenIdActionUrl(String url) {
+		this.openIdActionUrl = url;
+	}
+
 	public void setOpenIdReturnUrl(String url) {
 		this.openIdReturnUrl = url;
 	}
@@ -99,7 +98,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	public String getOpenIdActionUrl() {
 		return openIdActionUrl;
 	}
-
+	
 	@Override
 	public String getOpenIdReturnUrl() {
 		return openIdReturnUrl;

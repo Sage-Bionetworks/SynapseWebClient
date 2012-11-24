@@ -225,7 +225,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				}
 			}
 			Button btn = new Button(text, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
-			btn.addStyleName("facet-btn");
+			btn.addStyleName("floatleft");
 			btn.setIconAlign(IconAlign.RIGHT);
 			btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override

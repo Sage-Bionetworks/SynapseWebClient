@@ -135,7 +135,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	public void showLogin(String openIdActionUrl, String openIdReturnUrl) {
 		clear();
 		headerWidget.refresh();
-		loginWidget.setOpenIdActionUrl(openIdActionUrl);
+	  	loginWidget.setOpenIdActionUrl(openIdActionUrl);
 		loginWidget.setOpenIdReturnUrl(openIdReturnUrl);
 		
 		// Add the widget to the panel

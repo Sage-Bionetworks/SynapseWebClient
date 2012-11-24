@@ -40,6 +40,7 @@ import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.storage.StorageUsage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -49,6 +50,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
@@ -269,6 +271,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					e.getMessage()));
 		}
 	}
+	
+	@Override
+	public Long getStorageUsage(String entityId) throws RestServiceException{
+		//direct call to the Synapse Client (made available there)
+		Synapse synapseClient = createSynapseClient();
+		Long size = -1l;
+		try {
+			PaginatedResults<StorageUsage> usageResults = synapseClient.getItemizedStorageUsageForNode(entityId, 0, 1);
+			if (usageResults.getResults().size() > 0)
+				size = usageResults.getResults().get(0).getContentSize();
+		} catch (SynapseException e) {
+			log.error(e);
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+		if (size < 0)
+			throw new RuntimeException(DisplayConstants.ENTITY_STORAGE_NOT_FOUND_ERROR + entityId);
+		return size;
+	}
+
 
 	/*
 	 * Private Methods
@@ -653,7 +674,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			    profile.setPic(pic);
 				userProfileJSONObject = EntityFactory.createJSONObjectForEntity(profile);
 			}
-			synapseClient.putEntity("/userProfile", userProfileJSONObject);			
+			synapseClient.putJSONObject("/userProfile", userProfileJSONObject, null);				
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONException e) {

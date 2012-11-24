@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
 import com.extjs.gxt.ui.client.data.JsonPagingLoadResultReader;
 import com.extjs.gxt.ui.client.data.LoadEvent;
@@ -39,7 +43,7 @@ public class UserGroupSearchBox {
 	 * @param url
 	 * @return
 	 */
-	public static ComboBox<ModelData> createUserGroupSearchSuggestBox(String repositoryUrl) {
+	public static ComboBox<ModelData> createUserGroupSearchSuggestBox(String repositoryUrl, final Long publicPrincipleId, final Long authenticatedPrincipleId) {
 		String url = repositoryUrl + USER_GROUP_HEADER_URL;
 		ScriptTagProxy<PagingLoadResult<ModelData>> proxy = 
 				new ScriptTagProxy<PagingLoadResult<ModelData>>(url);
@@ -71,6 +75,34 @@ public class UserGroupSearchBox {
 				be.<ModelData> getConfig().set(KEY_PREFIX,	be.<ModelData> getConfig().get(KEY_QUERY));
 			}
 		});
+		if (authenticatedPrincipleId != null || publicPrincipleId != null) {
+			//don't show the authenticated users group
+			loader.addListener(Loader.Load, new Listener<LoadEvent>() {
+				@Override
+				public void handleEvent(LoadEvent be) {
+					PagingLoadResult<ModelData> pagedResults = be.getData();
+					if (pagedResults != null) {
+						List<ModelData> modelDataList = pagedResults.getData();
+						if (modelDataList != null)  {
+							String authenticatedPrincipleIdString = authenticatedPrincipleId != null ? authenticatedPrincipleId.toString() : "";
+							String publicPrincipleIdString = publicPrincipleId != null ? publicPrincipleId.toString() : "";
+							List<ModelData> removeItems = new ArrayList<ModelData>();
+							for (Iterator iterator = modelDataList.iterator(); iterator
+									.hasNext();) {
+								ModelData modelData = (ModelData) iterator.next();
+								String testPrincipleId = modelData.get(KEY_PRINCIPAL_ID);
+								if (authenticatedPrincipleIdString.equals(testPrincipleId)) {
+									removeItems.add(modelData);
+								} else if (publicPrincipleIdString.equals(testPrincipleId)) {
+									removeItems.add(modelData);
+								}
+							}
+							modelDataList.removeAll(removeItems);
+						}
+					}
+				}
+			});
+		}
 		
 		ListStore<ModelData> store = new ListStore<ModelData>(loader);
 

@@ -32,7 +32,6 @@ public class ServiceUtils {
 	public static final String REPOSVC_SUFFIX_PATH_BENEFACTOR = "benefactor"; 
 	public static final String REPOSVC_STORAGE_SUMMARY = "storageSummary";
 	
-	
 	public static final String AUTHSVC_SET_REGISTRATION_USER_PASSWORD_PATH = "registeringUserPassword";
 	public static final String AUTHSVC_SEND_PASSWORD_CHANGE_PATH = "userPasswordEmail";
 	public static final String AUTHSVC_SEND_API_PASSWORD_PATH = "apiPasswordEmail";
