@@ -157,7 +157,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		final String parentId = entityBundle.getEntity().getParentId();
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
-		synapseClient.deleteEntity(entityBundle.getEntity().getId(), new AsyncCallback<Void>() {			
+		synapseClient.deleteEntityById(entityBundle.getEntity().getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {				
 				view.showInfo(entityTypeDisplay + " Deleted", "The " + entityTypeDisplay + " was successfully deleted."); 

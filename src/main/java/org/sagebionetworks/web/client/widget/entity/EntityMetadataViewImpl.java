@@ -19,6 +19,8 @@ import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
+import org.sagebionetworks.web.client.widget.IconMenu;
+import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.Direction;
@@ -36,10 +38,14 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -288,6 +294,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private void clear() {
 		widgetContainer.setInnerHTML("");
+		comment.setInnerText("");
 	}
 
 	@Override
@@ -479,11 +486,61 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 					InlineLabel label = new InlineLabel(comment);
 					label.setTitle(comment);
 					return label;
+				} else if (property.equals(VERSION_KEY_NUMBER)) {
+					return setupIconMenu(model, topVersion);
+
 				} else if (model.get(property) != null) {
 					return model.get(property).toString();
+
 				} else {
 					return null;
 				}
+			}
+
+			private Object setupIconMenu(final ModelData model, boolean currentVersion) {
+				IconMenu menu = new IconMenu();
+				if (currentVersion) {
+					menu.addIcon(icons.editGrey16(), "Edit Version Info",
+							new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									NameAndDescriptionEditorDialog.showNameAndDescriptionDialog(
+											(String) model.get(VERSION_KEY_LABEL),
+											(String) model.get(VERSION_KEY_COMMENT),
+											"Version",
+											"Comment",
+											new NameAndDescriptionEditorDialog.Callback() {
+												@Override
+												public void onSave(String version,
+														String comment) {
+													presenter.editCurrentVersionInfo(
+															(String) model.get(VERSION_KEY_ID), version, comment);
+												}
+											});
+								}
+							});
+				}
+				final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
+				menu.addIcon(icons.deleteButtonGrey16(), "Delete Version",
+						new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								MessageBox.confirm(DisplayConstants.LABEL_DELETE + " " + versionLabel,
+										DisplayConstants.PROMPT_SURE_DELETE + " version?",
+										new Listener<MessageBoxEvent>() {
+									@Override
+									public void handleEvent(MessageBoxEvent be) {
+										Button btn = be.getButtonClicked();
+										if(Dialog.YES.equals(btn.getItemId())) {
+											presenter.deleteVersion(
+													(String) model.get(VERSION_KEY_ID),
+													(Long) model.get(VERSION_KEY_NUMBER));
+										}
+									}
+								});
+							}
+						});
+				return menu.asWidget();
 			}
 		};
 		return cellRenderer;
@@ -491,9 +548,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY /*, VERSION_KEY_NUMBER*/};
-		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"      /*, ""                */};
-		int[] widths =	 {100              , 230                , 100               , 100                /*, 70                */};
+		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY , VERSION_KEY_NUMBER};
+		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"      , ""                };
+		int[] widths =	 {70               , 230                , 70                , 100                , 50                };
 		int MOD_ON_INDEX = -1;
 
 		if (keys.length != names.length || names.length != widths.length)
@@ -583,5 +640,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				hasFulfilledAccessRequirements,
 				icons,
 				synapseJSNIUtils);
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 }

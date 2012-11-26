@@ -2,13 +2,16 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -272,5 +275,71 @@ public class EntityMetadata implements Presenter {
 			}
 		};
 	}
+
+	@Override
+	public void editCurrentVersionInfo(String entityId, String version, String comment) {
+		Entity entity = bundle.getEntity();
+		if (entity.getId().equals(entityId) && entity instanceof Versionable) {
+			final Versionable vb = (Versionable)entity;
+			if (version != null && version.equals(vb.getVersionLabel()) &&
+				comment != null && comment.equals(vb.getVersionComment())) {
+				view.showInfo("Version Info Unchanged", "You didn't change anything about the version info.");
+				return;
+			}
+			if (version == null || version.equals(""))
+				version = null; // Null out the version field if empty so it defaults to number
+			vb.setVersionLabel(version);
+			vb.setVersionComment(comment);
+			JSONObjectAdapter joa = jsonObjectAdapter.createNew();
+			try {
+				vb.writeToJSONObject(joa);
+				synapseClient.updateEntity(joa.toJSONString(),
+						new AsyncCallback<EntityWrapper>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								if (!DisplayUtils.handleServiceException(
+										caught, globalApplicationState.getPlaceChanger(),
+										authenticationController.getLoggedInUser())) {
+									view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE
+											+ "\n" + caught.getMessage());
+								}
+							}
+							@Override
+							public void onSuccess(EntityWrapper result) {
+								view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
+								fireEntityUpdatedEvent();
+							}
+						});
+			} catch (JSONObjectAdapterException e) {
+				view.showErrorMessage(DisplayConstants.ERROR_INVALID_VERSION_FORMAT);
+			}
+		}
+	}
+
+	@Override
+	public void promoteVersion(String entityId, Long versionNumber) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void deleteVersion(final String entityId, final Long versionNumber) {
+		synapseClient.deleteEntityVersionById(entityId, versionNumber, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				if (!DisplayUtils.handleServiceException(caught,
+						globalApplicationState.getPlaceChanger(),
+						authenticationController.getLoggedInUser())) {
+					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + "\n" + caught.getMessage());
+				}
+			}
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + entityId + DisplayConstants.LABEL_DELETED);
+				fireEntityUpdatedEvent();
+			}
+		});
+	}
+
 
 }
