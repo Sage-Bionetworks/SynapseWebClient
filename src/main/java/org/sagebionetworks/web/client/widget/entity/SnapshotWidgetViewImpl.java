@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.widget.WidgetMenu;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox.EntitySelectedHandler;
@@ -70,11 +71,13 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	private AddEntityToGroupWidget addEntityToGroupWidget; 
 	private LayoutContainer addEditor;
 	private FlexTable groupsTable;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public SnapshotWidgetViewImpl(IconsImageBundle iconsImageBundle, EntitySearchBox entitySearchBox) {
+	public SnapshotWidgetViewImpl(IconsImageBundle iconsImageBundle, EntitySearchBox entitySearchBox, SynapseJSNIUtils synapseJSNIUtils) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.entitySearchBox = entitySearchBox;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 	}
 	
 	@Override
@@ -557,7 +560,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			table.setWidget(rowIndex, HEADER_DOWNLOAD_IDX, downloadLink);			
 			if(version != null) table.setHTML(rowIndex, HEADER_VERSION_IDX, version);			
 			table.setWidget(rowIndex, HEADER_DESC_IDX, description);
-			table.setHTML(rowIndex, HEADER_DATE_IDX, date == null ? "" : DisplayUtilsGWT.convertDateToSmallString(date) + "</br>&nbsp;");
+			table.setHTML(rowIndex, HEADER_DATE_IDX, date == null ? "" : synapseJSNIUtils.convertDateToSmallString(date) + "</br>&nbsp;");
 			table.setHTML(rowIndex, HEADER_CREATEDBY_IDX, createdBy);
 			updateRowNote(rowIndex, note);
 		}

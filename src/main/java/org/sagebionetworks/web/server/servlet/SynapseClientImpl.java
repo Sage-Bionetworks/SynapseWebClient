@@ -30,6 +30,7 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -38,6 +39,8 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.storage.StorageUsage;
@@ -574,6 +577,23 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 
 	}
+	
+
+	@Override
+	public String getEntityHeaderBatch(String referenceList)
+			throws RestServiceException {
+		try {
+			ReferenceList list = new ReferenceList(new JSONObjectAdapterImpl(referenceList));
+			Synapse synapseClient = createSynapseClient();
+			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(list.getReferences());
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 
 	@Override
 	public void deleteEntityById(String entityId) throws RestServiceException {
@@ -912,4 +932,38 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String markdown2Html(String markdown, String attachmentUrl) {
 		return ServerMarkdownUtils.markdown2Html(markdown, attachmentUrl, markdownProcessor);
 	}
+
+	@Override
+	public String getActivityForEntity(String entityId)
+			throws RestServiceException {
+		return getActivityForEntityVersion(entityId, null);
+	}
+	
+	@Override
+	public String getActivityForEntityVersion(String entityId,
+			Long versionNumber) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			Activity activity = synapseClient.getActivityForEntityVersion(entityId, versionNumber);
+			return EntityFactory.createJSONStringForEntity(activity);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String getActivity(String activityId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			Activity activity = synapseClient.getActivity(activityId);
+			return EntityFactory.createJSONStringForEntity(activity);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 }

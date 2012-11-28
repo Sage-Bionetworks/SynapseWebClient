@@ -458,7 +458,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				if (principal.getPic() != null) {
 					// Principal has a profile picture
 					String url = DisplayUtils.createUserProfileAttachmentUrl(
-							DisplayUtilsGWT.BASE_PROFILE_ATTACHMENT_URL, 
+							synapseJSNIUtils.getBaseProfileAttachmentUrl(), 
 							principal.getOwnerId(), 
 							principal.getPic().getPreviewId(), 
 							null
