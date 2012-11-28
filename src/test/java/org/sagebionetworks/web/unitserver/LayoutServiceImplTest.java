@@ -30,7 +30,7 @@ public class LayoutServiceImplTest {
 	@Test
 	public void testLayoutProvTree() {
 		ProvTreeNode root = new EntityTreeNode("rand123", "syn123", "root", "2", (long)2, Data.class.getName());
-		ProvTreeNode activity = new ActivityTreeNode("rand456", "123", ActivityType.CODE_EXECUTION, "Normaliztion", "1", (long)1, Code.class.getName());
+		ProvTreeNode activity = new ActivityTreeNode("rand456", "123", "act name", ActivityType.CODE_EXECUTION, "syn1234", "Normaliztion", "1", (long)1, Code.class.getName());
 		root.addChild(activity);
 		ProvTreeNode oldVersion = new EntityTreeNode("rand789", "syn123", "oldVersion", "1", (long)1, Data.class.getName());
 		activity.addChild(oldVersion);

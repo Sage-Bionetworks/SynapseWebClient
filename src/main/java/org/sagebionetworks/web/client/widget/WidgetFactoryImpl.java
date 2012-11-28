@@ -46,7 +46,7 @@ public class WidgetFactoryImpl implements WidgetFactory {
 	@Override
 	public ProvenanceWidget createProvenanceWidget() {
 		ProvenanceWidgetView view = new ProvenanceWidgetViewImpl(sageImageBundle, iconsImageBundle, synapseJSNIUtils);
-	    return new ProvenanceWidget(view, synapseClient, nodeModelCreator, authenticationController, layoutService, adapterFactory);
+	    return new ProvenanceWidget(view, synapseClient, nodeModelCreator, authenticationController, layoutService, adapterFactory, synapseJSNIUtils);
 	}
 
 	

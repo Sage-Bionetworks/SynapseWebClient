@@ -64,8 +64,7 @@
 }
 
 .provUndefinedChange {
-	height: 3em;
-	background-image: url('file:///Users/dburdick/code/platform/synapseWebClient/src/main/resources/images/icons/question-16.png');	
+	height: 3em;	
 	background-repeat: no-repeat;	
 	background-position: 4em 1.7em;
 } 
@@ -79,27 +78,3 @@
 	font-size: 0.8em;
 	margin-top: -0.4em
 }
-
-.provDataEntity {
-	background-image: url('file:///Users/dburdick/code/platform/synapseWebClient/src/main/resources/images/icons/synapse-data-16.png');
-}
-
-.provProjectEntity {
-	background-image: url('file:///Users/dburdick/code/platform/synapseWebClient/src/main/resources/images/icons/synapse-project-16.png');
-}
-
-.provCodeEntity {
-	background-image: url('file:///Users/dburdick/code/platform/synapseWebClient/src/main/resources/images/icons/synapse-code-16.png');
-}
-
-
-/* Layout */
-#window1 { left:20em;top:36em;}
-#window2 { left:10em;top:20em;}
-#window3 { left:30em;top:20em;}
-#window4 { left:4em;}
-#window5 { left:22em;}
-#window6 { left:33em;}
-#window7 { left:47em; top: 10em}
-#window8 { left:45em;top:20em;}
-#window9 { left:48em;}

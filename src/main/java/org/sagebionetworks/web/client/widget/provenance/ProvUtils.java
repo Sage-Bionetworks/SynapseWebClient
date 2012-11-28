@@ -13,9 +13,9 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
@@ -27,19 +27,20 @@ import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
 import org.sagebionetworks.web.shared.provenance.ExpandTreeNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
-import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ProvUtils {
 
-	public static ProvTreeNode buildProvTree(List<Activity> activities, Entity rootEntity, Map<String, ProvTreeNode> idToNode, Map<Reference, EntityHeader> refToHeader, boolean showExpand) {
+	public static ProvTreeNode buildProvTree(List<Activity> activities, Entity rootEntity, Map<String, ProvTreeNode> idToNode, Map<Reference, EntityHeader> refToHeader, boolean showExpand, SynapseJSNIUtils synapseJSNIUtils) {
 		String versionLabel = null;
 		Long versionNumber = null;
 		if(rootEntity instanceof Versionable) {
 			versionLabel = ((Versionable)rootEntity).getVersionLabel();
 			versionNumber = ((Versionable)rootEntity).getVersionNumber();
 		}
-		ProvTreeNode root = new EntityTreeNode(rootEntity.getId(), rootEntity.getId(), rootEntity.getName(), versionLabel, versionNumber, rootEntity.getEntityType());
+		ProvTreeNode root = new EntityTreeNode(createUniqueNodeId(idToNode,
+				synapseJSNIUtils), rootEntity.getId(), rootEntity.getName(),
+				versionLabel, versionNumber, rootEntity.getEntityType());
 		idToNode.put(root.getId(), root);		
 		for(Activity act : activities) {			
 			ProvTreeNode activityNode;
@@ -50,7 +51,7 @@ public class ProvUtils {
 				EntityHeader header = firstExecuted != null ? refToHeader.get(firstExecuted.getReference()) : null;
 				if(header == null) header = new EntityHeader();
 				activityNode = new ActivityTreeNode(
-						createUniqueNodeId(idToNode), 
+						createUniqueNodeId(idToNode, synapseJSNIUtils), 
 						act.getId(),
 						act.getName(), 
 						type, 
@@ -61,7 +62,7 @@ public class ProvUtils {
 						header.getType());
 			} else {
 				activityNode = new ActivityTreeNode(
-						createUniqueNodeId(idToNode), 
+						createUniqueNodeId(idToNode, synapseJSNIUtils), 
 						act.getId(),
 						act.getName(), 
 						type);
@@ -78,13 +79,13 @@ public class ProvUtils {
 					Reference ref = ue.getReference();
 					EntityHeader header = refToHeader.get(ref);
 					if(header == null) header = new EntityHeader();
-					ProvTreeNode usedNode = new EntityTreeNode(createUniqueNodeId(idToNode), ref.getTargetId(), header.getName(), header.getVersionLabel(), header.getVersionNumber(), header.getType());
+					ProvTreeNode usedNode = new EntityTreeNode(createUniqueNodeId(idToNode, synapseJSNIUtils), ref.getTargetId(), header.getName(), header.getVersionLabel(), header.getVersionNumber(), header.getType());
 					idToNode.put(usedNode.getId(), usedNode);
 					// add used to activity in tree
 					activityNode.addChild(usedNode);
 					
 					if(showExpand) {
-						ProvTreeNode expandNode = new ExpandTreeNode(createUniqueNodeId(idToNode), ref.getTargetId(), ref.getTargetVersionNumber());
+						ProvTreeNode expandNode = new ExpandTreeNode(createUniqueNodeId(idToNode, synapseJSNIUtils), ref.getTargetId(), ref.getTargetVersionNumber());
 						idToNode.put(expandNode.getId(), expandNode);
 						usedNode.addChild(expandNode);
 					}
@@ -97,10 +98,10 @@ public class ProvUtils {
 	/**
 	 * Creates a random id that is not in use yet 
 	 */
-	public static String createUniqueNodeId(Map<String, ProvTreeNode> idToNode) {
+	public static String createUniqueNodeId(Map<String, ProvTreeNode> idToNode, SynapseJSNIUtils synapseJSNIUtils) {
 		String id;
 		do{
-			id = "provNode" + String.valueOf(Random.nextInt());
+			id = "provNode" + String.valueOf(synapseJSNIUtils.randomNextInt());
 		} while(idToNode.containsKey(id));
 		return id;
 	}
@@ -122,13 +123,15 @@ public class ProvUtils {
 		return allRefs;
 	}
 	
-	public static void mapReferencesToHeaders(BatchResults<EntityHeader> headers, Map<Reference, EntityHeader> refToHeader) {		
+	public static Map<Reference, EntityHeader> mapReferencesToHeaders(BatchResults<EntityHeader> headers) {
+		Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
 		for(EntityHeader header : headers.getResults()) {
 			Reference equivalentRef = new Reference();
 			equivalentRef.setTargetId(header.getId());
 			equivalentRef.setTargetVersionNumber(header.getVersionNumber());
 			refToHeader.put(equivalentRef, header);
 		}
+		return refToHeader;
 	}
 
 	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity) {
@@ -200,11 +203,11 @@ public class ProvUtils {
 	 * @param nodeModelCreator
 	 * @param idToNode mapping from id to ProvTreeNode
 	 */
-	public static void getInfo(String nodeId,
-			final AsyncCallback<KeyValueDisplay<String>> callback,
+	public static void getInfo(String nodeId,			
 			SynapseClientAsync synapseClient,
 			final NodeModelCreator nodeModelCreator,
-			Map<String, ProvTreeNode> idToNode) {
+			Map<String, ProvTreeNode> idToNode,
+			final AsyncCallback<KeyValueDisplay<String>> callback) {
 		if(callback == null) return;
 		if(nodeId == null) callback.onFailure(null);
 				

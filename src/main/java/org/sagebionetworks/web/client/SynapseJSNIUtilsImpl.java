@@ -5,6 +5,7 @@ import java.util.Date;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Random;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
@@ -68,6 +69,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	@Override
 	public String getBaseProfileAttachmentUrl() {
 		return GWT.getModuleBaseURL() + "profileAttachment";
+	}
+
+	@Override
+	public int randomNextInt() {
+		return Random.nextInt();
 	}
 
 }

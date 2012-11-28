@@ -21,6 +21,7 @@ public class ActivityTypeUtil {
 			UsedEntity ue = itr.next();
 			if(ue != null && ue.getWasExecuted() != null && ue.getWasExecuted()) {
 				isManual = false;
+				break;
 			}
 		}
 		
@@ -36,6 +37,7 @@ public class ActivityTypeUtil {
 		if(activity == null) return null;
 		
 		Set<UsedEntity> used = activity.getUsed();
+		if(used == null || used.size() == 0) return null;
 		// look for executed
 		Iterator<UsedEntity> itr = used.iterator();
 		while(itr.hasNext()) {

@@ -2,10 +2,8 @@ package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -28,7 +26,6 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -131,8 +128,6 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	 */
 	private void addNodeTree(ProvTreeNode root, LayoutContainer prov) {
 		if(root == null) return;
-		Anchor a = new Anchor();
-		Hyperlink h = new Hyperlink();		
 		prov.add(getNodeContainer(root));
 		Iterator<ProvTreeNode> itr = root.iterator();
 		while(itr.hasNext()) {
@@ -173,8 +168,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			@Override
 			public void handleEvent(BaseEvent be) {	
 				// load the tooltip contents only once
-				if(filledPopoverIds.containsKey(container.getId())) {															
-					container.setToolTip(ProvViewUtil.createTooltipConfig(title, filledPopoverIds.get(container.getId())));
+				if(filledPopoverIds.containsKey(node.getId())) {															
+					container.setToolTip(ProvViewUtil.createTooltipConfig(title, filledPopoverIds.get(node.getId())));
 					return;
 				}															
 				// retrieve info

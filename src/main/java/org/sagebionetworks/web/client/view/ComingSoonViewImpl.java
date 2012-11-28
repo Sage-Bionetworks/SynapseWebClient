@@ -82,9 +82,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
 	@Override
 	public void setEntity(Entity entity) {
-//		provenanceWidget.buildTree(entity, 1, false);
-//		entityView.clear();
-//		entityView.add(provenanceWidget.asWidget());
+		// use the entity how you like
 	}
 
 }

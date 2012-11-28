@@ -19,4 +19,6 @@ public interface SynapseJSNIUtils {
 	public String convertDateToSmallString(Date toFormat);
 	
 	public String getBaseProfileAttachmentUrl();
+
+	public int randomNextInt();
 }

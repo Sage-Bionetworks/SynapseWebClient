@@ -340,7 +340,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	    // Create the property body
 	    // the headers for properties.
-		lc.addStyleName("span-7 notopmargin right last");
 		ProvenanceWidget provenanceWidget = widgetFactory.createProvenanceWidget();		
 		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);
 	    provenanceWidget.buildTree(bundle.getEntity(), 1, false);

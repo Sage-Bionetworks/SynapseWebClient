@@ -17,6 +17,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -39,13 +40,15 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, Synapse
 	private SynapseClientAsync synapseClient;
 	private Map<String, ProvTreeNode> idToNode = new HashMap<String, ProvTreeNode>();
 	private AdapterFactory adapterFactory;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController, 
 			LayoutServiceAsync layoutService, 
-			AdapterFactory adapterFactory) {
+			AdapterFactory adapterFactory,
+			SynapseJSNIUtils synapseJSNIUtils) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -53,6 +56,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, Synapse
 		this.globalApplicationState = globalApplicationState;
 		this.layoutService = layoutService;
 		this.adapterFactory = adapterFactory;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.setPresenter(this);
 	}	
 		
@@ -70,7 +74,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, Synapse
 					Activity activity = new Activity(adapterFactory.createNew(result));
 					final List<Activity> activities = new ArrayList<Activity>();
 					activities.add(activity);					
-					lookupReferencesAndBuildTree(entity, showExpand, activities);					
+					lookupReferencesThenBuildTree(entity, showExpand, activities);					
 				} catch (JSONObjectAdapterException e) {
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 				}
@@ -82,15 +86,16 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, Synapse
 					Activity activity = new Activity();
 					final List<Activity> activities = new ArrayList<Activity>();
 					activities.add(activity);					
-					lookupReferencesAndBuildTree(entity, showExpand, activities);					
+					lookupReferencesThenBuildTree(entity, showExpand, activities);					
 				}
+				view.showErrorMessage(DisplayConstants.ERROR_PROVENANCE);
 			}
 		});		
 	}
 	
 	@Override
 	public void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback) {
-		ProvUtils.getInfo(nodeId, callback, synapseClient, nodeModelCreator, idToNode);
+		ProvUtils.getInfo(nodeId, synapseClient, nodeModelCreator, idToNode, callback);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -109,9 +114,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, Synapse
 	/*
 	 * Private Methods
 	 */
-	private void lookupReferencesAndBuildTree(final Entity entity,
-			final boolean showExpand, final List<Activity> activities) {
-		final Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
+	private void lookupReferencesThenBuildTree(final Entity entity,
+			final boolean showExpand, final List<Activity> activities) {	
 
 		// lookup all references in batch to get EntityHeaders
 		List<Reference> allRefs = ProvUtils.extractReferences(activities);
@@ -123,29 +127,29 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, Synapse
 				public void onSuccess(String result) {
 					
 					BatchResults<EntityHeader> headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
-					ProvUtils.mapReferencesToHeaders(headers, refToHeader);
-					buildTreeAndSendToView(entity, showExpand, activities, refToHeader);
+					Map<Reference, EntityHeader> refToHeader = ProvUtils.mapReferencesToHeaders(headers);
+					buildTreeThenLayout(entity, showExpand, activities, refToHeader);
 				}
 				@Override
-				public void onFailure(Throwable caught) {
-					buildTreeAndSendToView(entity, showExpand, activities, refToHeader);
+				public void onFailure(Throwable caught) {					
+					buildTreeThenLayout(entity, showExpand, activities, new HashMap<Reference, EntityHeader>());
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 		}
 	}
 
 	
-	private void buildTreeAndSendToView(final Entity entity,
+	private void buildTreeThenLayout(final Entity entity,
 			final boolean showExpand, List<Activity> activities, Map<Reference, EntityHeader> refToHeader) {
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvTreeNode>();
-		ProvTreeNode root = ProvUtils.buildProvTree(activities, entity, idToNode, refToHeader, showExpand);					
-		layoutTreeAndSendToView(root);
+		ProvTreeNode root = ProvUtils.buildProvTree(activities, entity, idToNode, refToHeader, showExpand, synapseJSNIUtils);					
+		layoutTreeThenSendToView(root);
 	}
 
-	private void layoutTreeAndSendToView(ProvTreeNode root) {
+	private void layoutTreeThenSendToView(ProvTreeNode root) {
 		// layout tree
 		layoutService.layoutProvTree(root, new AsyncCallback<ProvTreeNode>() {
 			
