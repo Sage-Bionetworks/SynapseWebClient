@@ -317,7 +317,6 @@ public class DisplayConstants {
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
 	public static final String ENTITY_DESCRIPTION_HIDE_TIPS_TEXT = "Hide Formatting Guide";
 	public static final String ENTITY_DESCRIPTION_SHOW_TIPS_TEXT = "Formatting Guide";
-	public static final String MARKDOWN_CSS_CLASSNAME = "from-markdown";
 	public static final String ENTITY_DESCRIPTION_ATTACHMENT_PREFIX = "Attachment/entity/";
 	public static final String ENTITY_STORAGE_NOT_FOUND_ERROR = "Unable to determine the usage associated with entity id: ";
 	public static final String CODE_EXECUTION = "Code Execution";

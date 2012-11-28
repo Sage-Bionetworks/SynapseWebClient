@@ -39,12 +39,12 @@ public class ServerMarkdownUtils {
 		ServerMarkdownUtils.sendAllLinksToNewWindow(doc);
 		Elements anchors = doc.getElementsByTag("a");
 		anchors.addClass("link");
-		ServerMarkdownUtils.applyCssClass(doc, DisplayConstants.MARKDOWN_CSS_CLASSNAME);
 		ServerMarkdownUtils.resolveAttachmentImages(doc, attachmentUrl);
 		ServerMarkdownUtils.addSynapseLinks(doc);
 		ServerMarkdownUtils.addUrlLinks(doc);
 		ServerMarkdownUtils.addYouTubeVideos(doc);
-		return doc.html();
+		String returnHtml = "<div class=\"markdown\">" + doc.html() + "</div>";
+		return returnHtml;
 	}
 
 	public static void applyCssClass(Document doc, String cssClass) {
