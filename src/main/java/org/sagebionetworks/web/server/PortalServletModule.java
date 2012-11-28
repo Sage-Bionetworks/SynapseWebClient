@@ -12,6 +12,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.BCCSignupImpl;
 import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.FileUpload;
+import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
@@ -72,6 +73,10 @@ public class PortalServletModule extends ServletModule {
 		// setup the node service
 		bind(NodeServiceImpl.class).in(Singleton.class);
 		serve("/Portal/node").with(NodeServiceImpl.class);
+			
+		// setup the layout service
+		bind(LayoutServiceImpl.class).in(Singleton.class);
+		serve("/Portal/layout").with(LayoutServiceImpl.class);
 			
 		
 		// Setup the License service mapping

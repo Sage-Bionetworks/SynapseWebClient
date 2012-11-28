@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RObject;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
@@ -446,7 +447,7 @@ public class DisplayUtils {
 		button.setText(DisplayConstants.BUTTON_SAVING);
 		button.setIcon(AbstractImagePrototype.create(sageImageBundle.loading16()));
 	}
-
+	
 	/**
 	 * Check if an Annotation key is valid with the repository service
 	 * @param key
@@ -502,6 +503,11 @@ public class DisplayUtils {
 		cp.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()))));		
 		return cp;
 	}
+	
+	public static String getLoadingHtml(SageImageBundle sageImageBundle) {
+		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " " + DisplayConstants.LOADING + "...";
+	}
+
 
 	/**
 	 * Shows an info message to the user in the "Global Alert area".
@@ -962,7 +968,7 @@ public class DisplayUtils {
 		optionsMap.put("data-animation", "false");
 		addTooltip(util, widget, optionsMap);
 	}
-	
+		
 	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
 
@@ -1061,8 +1067,7 @@ public class DisplayUtils {
 		}
 		return version;
 	}
-	
-	
+
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	public static native JavaScriptObject newWindow(String url, String name, String features)/*-{
     	var window = $wnd.open(url, name, features);
@@ -1108,5 +1113,14 @@ public class DisplayUtils {
 		anchor.setHTML(icon.getHTML());
 		anchor.addClickHandler(clickHandler);
 		return anchor;
+	}
+
+	public static String getVersionDisplay(Reference ref) {
+		if (ref == null) return null;
+		String version = ref.getTargetId();
+		if(ref.getTargetVersionNumber() != null) {
+			version += " (#" + ref.getTargetVersionNumber() + ")";
+		}
+		return version;
 	}
 }

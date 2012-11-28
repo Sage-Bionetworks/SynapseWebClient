@@ -277,10 +277,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		if (restrictionsWidget != null) panel.add(restrictionsWidget, widgetContainer);
 
 		setCreateName(e.getCreatedBy());
-		setCreateDate(DisplayUtilsGWT.convertDateToSmallString(e.getCreatedOn()));
+		setCreateDate(synapseJSNIUtils.convertDateToSmallString(e.getCreatedOn()));
 
 		setModifyName(e.getModifiedBy());
-		setModifyDate(DisplayUtilsGWT.convertDateToSmallString(e.getModifiedOn()));
+		setModifyDate(synapseJSNIUtils.convertDateToSmallString(e.getModifiedOn()));
 
 		setVersionsVisible(false);
 		if (e instanceof Versionable) {

@@ -44,4 +44,7 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("images/defaultProfilePicture.png")
 	ImageResource defaultProfilePicture();
 	
+	@Source("images/expand.png")
+	ImageResource expand();
+	
 }

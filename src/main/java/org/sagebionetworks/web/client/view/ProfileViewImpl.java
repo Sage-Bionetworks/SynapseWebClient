@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -103,21 +104,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	private HandlerRegistration editPhotoHandler = null;
 
-	private String baseProfileAttachmentUrl = DisplayUtilsGWT.BASE_PROFILE_ATTACHMENT_URL;
-
 	private Footer footerWidget;
-	
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle, SageImageBundle sageImageBundle,Breadcrumb breadcrumb) {		
+			SageImageBundle imageBundle, SageImageBundle sageImageBundle,Breadcrumb breadcrumb, SynapseJSNIUtils synapseJSNIUtils) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.breadcrumb = breadcrumb;
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -447,7 +447,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			 profilePictureContainer.add(profilePictureHtml);
 			 profilePictureHtml.setHtml(SafeHtmlUtils.fromSafeConstant("<div class=\"profile-image-loading\" >"
 			    		+ "<img style=\"margin:auto; display:block;\" src=\"" 
-			    		+ DisplayUtils.createUserProfileAttachmentUrl(baseProfileAttachmentUrl, profile.getOwnerId(), profile.getPic().getPreviewId(), null) + "\"/>"
+			    		+ DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null) + "\"/>"
 			    		+ "</div>").asString());
 		 }
 		 else {
@@ -457,7 +457,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 pictureCanvasContainer.setVisible(true);
 		 
 		 String userId = profile.getOwnerId();
-		 final String actionUrl =  baseProfileAttachmentUrl+ "?" + DisplayUtils.USER_PROFILE_PARAM_KEY + "=" + userId;
+		 final String actionUrl =  synapseJSNIUtils.getBaseProfileAttachmentUrl()+ "?" + DisplayUtils.USER_PROFILE_PARAM_KEY + "=" + userId;
 		 if (editPhotoHandler != null)
 			 editPhotoHandler.removeHandler();
 		 editPhotoHandler = editPhotoLink.addClickHandler(new ClickHandler() {
