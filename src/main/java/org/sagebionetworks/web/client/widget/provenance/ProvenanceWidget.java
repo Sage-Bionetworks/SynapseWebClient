@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
@@ -87,8 +88,11 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, Synapse
 					final List<Activity> activities = new ArrayList<Activity>();
 					activities.add(activity);					
 					lookupReferencesThenBuildTree(entity, showExpand, activities);					
+				} else if(caught instanceof ForbiddenException) {
+					view.showInfo("Provenance Error", "You do not have permission to view this Entity's Provenance record");
+				} else {
+					view.showErrorMessage(DisplayConstants.ERROR_PROVENANCE);
 				}
-				view.showErrorMessage(DisplayConstants.ERROR_PROVENANCE);
 			}
 		});		
 	}
