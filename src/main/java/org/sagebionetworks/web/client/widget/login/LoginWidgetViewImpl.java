@@ -53,7 +53,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		SafeHtmlBuilder sb = new SafeHtmlBuilder()		
 		.appendHtmlConstant("<form accept-charset=\"UTF-8\" action=\""+ presenter.getOpenIdActionUrl() +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
 		.appendHtmlConstant("    <input name=\"OPEN_ID_PROVIDER\" type=\"hidden\" value=\""+ DisplayConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>")
-		.appendHtmlConstant("    <input name=\"RETURN_TO_URL\" type=\"hidden\" value=\""+  getRedirectURL() +"\"/>");
+		.appendHtmlConstant("    <input name=\"RETURN_TO_URL\" type=\"hidden\" value=\""+  presenter.getOpenIdReturnUrl() +"\"/>");
 		if (userHasExplictlyAcceptedTermsOfUse) {
 			sb.appendHtmlConstant("    <input name=\""+ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
 		}
@@ -62,15 +62,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		.appendHtmlConstant("<p>&nbsp;</p>");
 		return sb.toSafeHtml();
 	}
-	
-	public String getRedirectURL() {
-		String redirectURL = Location.getHref();
-		String tailMarker = LoginPresenter.LOGIN_PLACE;
-		int i = redirectURL.indexOf(tailMarker);
-		if (i>0) redirectURL = redirectURL.substring(0, i+tailMarker.length());
-		return redirectURL;
-	}
-	
+		
 //	private Html ssoLoginButton;
 	private boolean explicitlyAcceptsTermsOfUse = false;
 	
