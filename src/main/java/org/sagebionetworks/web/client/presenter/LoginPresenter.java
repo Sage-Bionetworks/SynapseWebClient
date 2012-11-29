@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
@@ -41,9 +42,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private NodeModelCreator nodeModelCreator;
 	private CookieProvider cookies;
 	private GWTWrapper gwtWrapper;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper){
+	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils){
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -51,6 +53,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.nodeModelCreator = nodeModelCreator;
 		this.cookies = cookies;
 		this.gwtWrapper = gwtWrapper;
+		this.synapseJSNIUtils=synapseJSNIUtils;
 		view.setPresenter(this);
 	} 
 
@@ -69,8 +72,12 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		view.clear();
 		openIdActionUrl = WebConstants.OPEN_ID_URI;
 		// note, this is now a relative URL
-		openIdReturnUrl = Location.getPath()+Location.getQueryString()+"#"+LOGIN_PLACE; 
+		openIdReturnUrl = synapseJSNIUtils.getLocationPath()+synapseJSNIUtils.getLocationQueryString()+"#"+LOGIN_PLACE; 
 		showView(place);
+	}
+	
+	public String getOpenIdReturnUrl() {
+		return openIdReturnUrl;
 	}
 
 	public void showView(final LoginPlace place) {

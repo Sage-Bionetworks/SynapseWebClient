@@ -231,6 +231,17 @@ public class ProvenanceWidgetTest {
 				// TODO Auto-generated method stub
 				
 			}
+
+			@Override
+			public String getLocationPath() {
+				return "/Portal.html";
+			}
+
+			@Override
+			public String getLocationQueryString() {
+				return "?foo=bar";
+			}
+			
 		};
 	}
 
