@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
@@ -52,7 +51,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private boolean readOnly = false;
 	
 	@Inject
-	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor, AutoGenFactory entityFactory) {
+	public ActionMenu(ActionMenuView view, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor, AutoGenFactory entityFactory) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;

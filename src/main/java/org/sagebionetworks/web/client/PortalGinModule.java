@@ -30,8 +30,6 @@ import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.view.HomeViewImpl;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
-import org.sagebionetworks.web.client.view.LookupView;
-import org.sagebionetworks.web.client.view.LookupViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
@@ -52,8 +50,6 @@ import org.sagebionetworks.web.client.widget.WidgetFactory;
 import org.sagebionetworks.web.client.widget.WidgetFactoryImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.AnnotationEditorView;
-import org.sagebionetworks.web.client.widget.editpanels.AnnotationEditorViewImpl;
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnDefinitionEditorView;
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnDefinitionEditorViewImpl;
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnMappingEditorView;
@@ -253,11 +249,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(GovernanceViewImpl.class).in(Singleton.class);
 		bind(GovernanceView.class).to(GovernanceViewImpl.class);									
 		
-
-		// LookupView
-		bind(LookupViewImpl.class).in(Singleton.class);
-		bind(LookupView.class).to(LookupViewImpl.class);					
-		
 		// SearchView
 		bind(SearchViewImpl.class).in(Singleton.class);
 		bind(SearchView.class).to(SearchViewImpl.class);
@@ -315,10 +306,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AccessMenuButtonViewImpl.class).in(Singleton.class);
 		bind(AccessMenuButtonView.class).to(AccessMenuButtonViewImpl.class);
 
-		// AnnotationEditor
-		bind(AnnotationEditorViewImpl.class).in(Singleton.class);
-		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
-
 		// ACL Editor
 		bind(AccessControlListEditorView.class).to(AccessControlListEditorViewImpl.class);
 		
@@ -353,6 +340,10 @@ public class PortalGinModule extends AbstractGinModule {
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
 		bind(LocationableTitleBarView.class).to(LocationableTitleBarViewImpl.class);
+		
+		// EntityChildBrowser
+		bind(EntityChildBrowserViewImpl.class).in(Singleton.class);
+		bind(EntityChildBrowserView.class).to(EntityChildBrowserViewImpl.class);
 		
 		// EntityChildBrowser (not singleton as you may want multiple)
 		bind(LocationableDownloaderView.class).to(LocationableDownloaderViewImpl.class);

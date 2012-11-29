@@ -2,11 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.children;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -26,15 +23,12 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.LayerPreview;
-import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -45,7 +39,6 @@ import com.google.inject.Inject;
 public class EntityChildBrowser implements EntityChildBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private EntityChildBrowserView view;
-	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
 	private SearchServiceAsync searchService;
 	private NodeModelCreator nodeModelCreator;
@@ -60,13 +53,12 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	
 	@Inject
 	public EntityChildBrowser(EntityChildBrowserView view,
-			NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator,
+			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			SynapseClientAsync synapseClient, SearchServiceAsync searchService,
 			GlobalApplicationState globalApplicationState) {
 		this.view = view;
-		this.nodeService = nodeService;
 		this.synapseClient = synapseClient;
 		this.searchService = searchService;
 		this.nodeModelCreator = nodeModelCreator;

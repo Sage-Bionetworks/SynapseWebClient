@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -38,7 +37,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private EntityView view;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private String entityId;
@@ -49,11 +47,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			NodeServiceAsync nodeService, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.nodeService = nodeService;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 	

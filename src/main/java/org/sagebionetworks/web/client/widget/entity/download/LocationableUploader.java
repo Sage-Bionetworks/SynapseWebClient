@@ -15,14 +15,12 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.core.client.GWT;
@@ -34,7 +32,6 @@ import com.google.inject.Inject;
 public class LocationableUploader implements LocationableUploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable {
 	
 	private LocationableUploaderView view;
-	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager;
@@ -48,8 +45,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	
 	@Inject
 	public LocationableUploader(
-			LocationableUploaderView view, 
-			NodeServiceAsync nodeService, 
+			LocationableUploaderView view, 			
 			NodeModelCreator nodeModelCreator, 
 			AuthenticationController authenticationController, 
 			EntityTypeProvider entityTypeProvider,
@@ -58,8 +54,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 			JSONObjectAdapter jsonObjectAdapter
 			) {
 	
-		this.view = view;
-		this.nodeService = nodeService;
+		this.view = view;		
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;

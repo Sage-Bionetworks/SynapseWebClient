@@ -14,12 +14,10 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -29,8 +27,7 @@ import com.google.inject.Inject;
 
 public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, SynapseWidgetPresenter {
 	
-	private MyEntitiesBrowserView view;
-	private NodeServiceAsync nodeService;
+	private MyEntitiesBrowserView view;	
 	private SearchServiceAsync searchService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -47,7 +44,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	
 	@Inject
 	public MyEntitiesBrowser(MyEntitiesBrowserView view,
-			NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator,
+			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			final GlobalApplicationState globalApplicationState,
@@ -55,7 +52,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			JSONObjectAdapter jsonObjectAdapter, 
 			SearchServiceAsync searchService) {
 		this.view = view;
-		this.nodeService = nodeService;
 		this.searchService = searchService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;

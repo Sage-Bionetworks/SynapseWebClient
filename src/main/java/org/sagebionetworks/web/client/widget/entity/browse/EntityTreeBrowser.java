@@ -25,7 +25,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
@@ -33,7 +32,6 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -45,7 +43,6 @@ import com.google.inject.Inject;
 public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private EntityTreeBrowserView view;
-	private NodeServiceAsync nodeService;
 	private SearchServiceAsync searchService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -64,7 +61,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	
 	@Inject
 	public EntityTreeBrowser(EntityTreeBrowserView view,
-			NodeServiceAsync nodeService, SearchServiceAsync searchService,
+			SearchServiceAsync searchService,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
@@ -73,8 +70,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			JSONObjectAdapter jsonObjectAdapter,
 			IconsImageBundle iconsImageBundle,
 			AutoGenFactory entityFactory, EntityEditor entityEditor) {
-		this.view = view;
-		this.nodeService = nodeService;
+		this.view = view;		
 		this.searchService = searchService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
