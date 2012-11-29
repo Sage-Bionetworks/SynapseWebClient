@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -15,6 +16,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -99,8 +101,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			public void onSuccess(String result) {
 				try {
 					view.showNews(getHtml(result));
-				} catch (RestServiceException e) {
-					onFailure(e);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			}
 			@Override
@@ -116,8 +118,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			public void onSuccess(String result) {
 				try {
 					view.showSupportFeed(getSupportFeedHtml(result));
-				} catch (RestServiceException e) {
-					onFailure(e);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			}
 			@Override
@@ -128,8 +130,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 
 	}
 	
-	public String getHtml(String rssFeedJson) throws RestServiceException {
-		RSSFeed feed = nodeModelCreator.createEntity(rssFeedJson, RSSFeed.class);
+	public String getHtml(String rssFeedJson) throws JSONObjectAdapterException {
+		RSSFeed feed = nodeModelCreator.createJSONEntity(rssFeedJson, RSSFeed.class);
 		StringBuilder htmlResponse = new StringBuilder();
 	
 		for (int i = 0; i < feed.getEntries().size(); i++) {
@@ -148,8 +150,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		return htmlResponse.toString();
 	}
 
-	public String getSupportFeedHtml(String rssFeedJson) throws RestServiceException {
-		RSSFeed feed = nodeModelCreator.createEntity(rssFeedJson, RSSFeed.class);
+	public String getSupportFeedHtml(String rssFeedJson) throws JSONObjectAdapterException {
+		RSSFeed feed = nodeModelCreator.createJSONEntity(rssFeedJson, RSSFeed.class);
 		StringBuilder htmlResponse = new StringBuilder();
 		htmlResponse.append("<div class=\"span-12 last notopmargin\"> <ul class=\"list question-list\">");
 		for (int i = 0; i < feed.getEntries().size(); i++) {

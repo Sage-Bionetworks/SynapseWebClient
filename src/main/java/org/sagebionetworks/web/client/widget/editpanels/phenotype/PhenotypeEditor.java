@@ -6,10 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.ontology.StaticEnumerations;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
@@ -19,7 +17,6 @@ import com.google.inject.Inject;
 public class PhenotypeEditor implements PhenotypeEditorView.Presenter, SynapseWidgetPresenter {
 
 	private PhenotypeEditorView view;
-	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
     private StaticEnumerations staticOntologies;
     private AuthenticationController authenticationController;
@@ -33,9 +30,14 @@ public class PhenotypeEditor implements PhenotypeEditorView.Presenter, SynapseWi
     private Map<String,String> columnToOntology;
     
 	@Inject
-	public PhenotypeEditor(PhenotypeEditorView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, StaticEnumerations staticOntologies, ColumnDefinitionEditor columnDefinitionEditor, ColumnMappingEditor columnMappingEditor, PhenotypeMatrix phenotypeMatrix) {
+	public PhenotypeEditor(PhenotypeEditorView view,
+			NodeModelCreator nodeModelCreator,
+			AuthenticationController authenticationController,
+			StaticEnumerations staticOntologies,
+			ColumnDefinitionEditor columnDefinitionEditor,
+			ColumnMappingEditor columnMappingEditor,
+			PhenotypeMatrix phenotypeMatrix) {
         this.view = view;
-		this.nodeService = nodeService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.staticOntologies = staticOntologies;
 		this.authenticationController = authenticationController;

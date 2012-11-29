@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
 
@@ -27,7 +26,6 @@ public class EntityPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
-	NodeServiceAsync mockNodeService;
 	NodeModelCreator mockNodeModelCreator;
 	String EntityId = "1";
 	Synapse place = new Synapse("Synapse:"+ EntityId);
@@ -39,10 +37,9 @@ public class EntityPresenterTest {
 		mockView = mock(EntityView.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		mockNodeService = mock(NodeServiceAsync.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockNodeService, mockSynapseClient, mockNodeModelCreator);
+		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator);
 
 		verify(mockView).setPresenter(entityPresenter);
 	}	
@@ -59,7 +56,7 @@ public class EntityPresenterTest {
 	@Test
 	public void testStart() {
 		resetMocks();
-		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockNodeService, mockSynapseClient, mockNodeModelCreator);
+		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator);
 		entityPresenter.setPlace(place);		
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
 		EventBus eventBus = mock(EventBus.class);		

@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -302,9 +303,9 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 				public void onSuccess(EntityWrapper result) {
 					currentResult = new SearchResults();		
 					try {
-						currentResult = nodeModelCreator.createEntity(result, SearchResults.class);
-					} catch (RestServiceException e) {
-						onFailure(null);					
+						currentResult = nodeModelCreator.createJSONEntity(result.getEntityJson(), SearchResults.class);
+					} catch (JSONObjectAdapterException e) {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}									
 					view.setSearchResults(currentResult, join(currentSearch.getQueryTerm(), " "), newQuery);
 					newQuery = false;

@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -159,8 +160,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			public void onSuccess(EntityBundleTransport bundle) {
 				try {
 					// retrieve ACL and user entity permissions from bundle
-					acl = nodeModelCreator.createEntity(bundle.getAclJson(), AccessControlList.class);
-					uep = nodeModelCreator.createEntity(bundle.getPermissionsJson(), UserEntityPermissions.class);
+					acl = nodeModelCreator.createJSONEntity(bundle.getAclJson(), AccessControlList.class);
+					uep = nodeModelCreator.createJSONEntity(bundle.getPermissionsJson(), UserEntityPermissions.class);
 					fetchUserGroupHeaders(new VoidCallback() {
 						// fetch UserGroup headers for members of ACL
 						@Override
@@ -225,19 +226,20 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			@Override
 			public void onSuccess(EntityWrapper wrapper) {
 				try {	
-					UserGroupHeaderResponsePage response = nodeModelCreator.createEntity(wrapper, UserGroupHeaderResponsePage.class);
+					UserGroupHeaderResponsePage response = nodeModelCreator.createJSONEntity(wrapper.getEntityJson(), UserGroupHeaderResponsePage.class);
 					for (UserGroupHeader ugh : response.getChildren())
 						userGroupHeaders.put(ugh.getOwnerId(), ugh);
 					if (callback != null)
 						callback.success();
-				} catch (RestServiceException e) {
-					onFailure(e);
-					if (callback != null)
-						callback.failure(e);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			}
 			@Override
-			public void onFailure(Throwable caught) {}
+			public void onFailure(Throwable caught) {
+				if (callback != null)
+					callback.failure(caught);
+			}
 		});
 	}
 
@@ -349,7 +351,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			@Override
 			public void onSuccess(EntityWrapper wrapper) {
 				try {
-					acl = nodeModelCreator.createEntity(wrapper, AccessControlList.class);
+					acl = nodeModelCreator.createJSONEntity(wrapper.getEntityJson(), AccessControlList.class);
 					unsavedChanges = hasLocalACL_inRepo;
 					fetchUserGroupHeaders(new VoidCallback() {
 						// fetch UserGroup headers for members of ACL
@@ -388,7 +390,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		EntityWrapper aclEW = null;
 		try {
 			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
-			aclEW = new EntityWrapper(aclJson.toJSONString(), AccessControlList.class.getName(), null);
+			aclEW = new EntityWrapper(aclJson.toJSONString(), AccessControlList.class.getName());
 		} catch (JSONObjectAdapterException e) {
 			showErrorMessage(DisplayConstants.ERROR_LOCAL_ACL_CREATION_FAILED);
 			return;
@@ -399,20 +401,19 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			@Override
 			public void onSuccess(EntityWrapper result) {
 				try {
-					acl = nodeModelCreator.createEntity(result, AccessControlList.class);
+					acl = nodeModelCreator.createJSONEntity(result.getEntityJson(), AccessControlList.class);
 					hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
 					unsavedChanges = false;					
 					setViewDetails();
 					view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
 					changesPushedCallback.onSuccess(result);
-				} catch (RestServiceException e) {
-					view.showInfoError("Error", "Permissions were not saved to Synapse");
-					onFailure(e);
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				showErrorMessage(DisplayConstants.ERROR_LOCAL_ACL_CREATION_FAILED);
+				view.showInfoError("Error", "Permissions were not saved to Synapse");				
 				changesPushedCallback.onFailure(caught);
 			}
 		};

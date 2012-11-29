@@ -2,11 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.children;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -15,6 +12,8 @@ import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Summary;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -24,15 +23,13 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.LayerPreview;
-import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -42,7 +39,6 @@ import com.google.inject.Inject;
 public class EntityChildBrowser implements EntityChildBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private EntityChildBrowserView view;
-	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
 	private SearchServiceAsync searchService;
 	private NodeModelCreator nodeModelCreator;
@@ -57,13 +53,12 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	
 	@Inject
 	public EntityChildBrowser(EntityChildBrowserView view,
-			NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator,
+			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			SynapseClientAsync synapseClient, SearchServiceAsync searchService,
 			GlobalApplicationState globalApplicationState) {
 		this.view = view;
-		this.nodeService = nodeService;
 		this.synapseClient = synapseClient;
 		this.searchService = searchService;
 		this.nodeModelCreator = nodeModelCreator;
@@ -153,116 +148,6 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 		return location;
 	}
 	
-	/**
-	 * Load the Preview for this layer from the server
-	 */
-	public void loadPreview() {			
-		// Treat preview of Layers of Media type specially
-		if(entity instanceof Data && ((Data)entity).getType() == LayerTypeNames.M) {			
-			return;
-		}
-		
-		// get the preview string to get file header order, then get the previewAsData
-		nodeService.getNodePreview(DisplayUtils.getNodeTypeForEntity(entity), entity.getId(), new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String pagedResultString) {
-				layerPreview = null;				
-				try {
-					PagedResults  pagedResult = nodeModelCreator.createPagedResults(pagedResultString);
-					if(pagedResult != null) {
-						List<String> results = pagedResult.getResults();
-						if(results.size() > 0) {
-							layerPreview = nodeModelCreator.createLayerPreview(results.get(0));
-						} else {
-							layerPreview = null;
-							onFailure(null);
-							return;
-						}					
-					}
-				} catch (RestServiceException ex) {
-					DisplayUtils.handleServiceException(ex, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
-					onFailure(null);					
-					return;
-				}				
-
-				if(layerPreview != null) {					
-					// get column display order, if possible from the layer preview
-	
-					nodeService.getNodeAnnotationsJSON(DisplayUtils.getNodeTypeForEntity(entity), entity.getId(), new AsyncCallback<String>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							// set the table even if we can't get the annotations
-							callSetLayerPreviewTable();
-						}
-
-						@Override
-						public void onSuccess(String annotationJsonString) {
-							
-							previewData.setColumnDisplayOrder(layerPreview.getHeaders());
-							previewData.setColumnDescriptions(new HashMap<String, String>());
-							previewData.setColumnUnits(new HashMap<String, String>());							
-							final Map<String, String> columnDescriptions = previewData.getColumnDescriptions();
-							final Map<String, String> columnUnits = previewData.getColumnUnits();	
-
-							// get columns descriptions from service
-							try {
-								Annotations annotations = nodeModelCreator.initializeEntity(annotationJsonString, new Annotations());
-								Map<String, List<String>> strAnnotations = annotations.getStringAnnotations();
-								for(String annotKey : strAnnotations.keySet()) {
-									// process descriptions									
-									if(annotKey.startsWith(DisplayUtils.LAYER_COLUMN_DESCRIPTION_KEY_PREFIX)) {
-										String colName = annotKey.substring(DisplayUtils.LAYER_COLUMN_DESCRIPTION_KEY_PREFIX.length());
-										List<String> values = strAnnotations.get(annotKey);
-										if(values != null && values.size() > 0) {										
-											columnDescriptions.put(colName, values.get(0));
-											continue; // skip the units test
-										}
-									}
-
-									// process units									
-									if(annotKey.startsWith(DisplayUtils.LAYER_COLUMN_UNITS_KEY_PREFIX)) {
-										String colName = annotKey.substring(DisplayUtils.LAYER_COLUMN_UNITS_KEY_PREFIX.length());
-										List<String> values = strAnnotations.get(annotKey);
-										if(values != null && values.size() > 0) {										
-											columnUnits.put(colName, values.get(0));
-										}
-									}
-								}
-							} catch (RestServiceException ex) {
-								onFailure(ex);
-							}												
-							callSetLayerPreviewTable();
-						}
-						
-						private void callSetLayerPreviewTable() {
-							Map<String, String> columnDescriptions = previewData.getColumnDescriptions();
-							Map<String, String> columnUnits = previewData.getColumnUnits();	
-							// append units onto description
-							for(String key : columnUnits.keySet()) {
-								String units = columnUnits.get(key);
-								columnDescriptions.put(key, columnDescriptions.get(key) + " (" + units + ")");
-							}		
-							if(layerPreview != null && layerPreview.getRows() != null && layerPreview.getRows().size() > 0 ) {
-								previewData.setRows(layerPreview.getRows());
-							}
-							view.setPreviewTable(previewData);
-						}
-					});
-				}
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
-				// continue
-				layerPreview = null;
-				view.setPreviewTable(null);
-			}
-		});		
-
-	}
-
 	@Override
 	public String getReferenceUri(EntityHeader header) {
 		String token = header.getId();
@@ -286,9 +171,9 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
 					for(String entityHeaderJson : result) {
 						try {
-							headers.add(nodeModelCreator.createEntity(entityHeaderJson, EntityHeader.class));
-						} catch (RestServiceException e) {
-							onFailure(e);
+							headers.add(nodeModelCreator.createJSONEntity(entityHeaderJson, EntityHeader.class));
+						} catch (JSONObjectAdapterException e) {
+							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 						}
 					}
 					callback.onSuccess(headers);

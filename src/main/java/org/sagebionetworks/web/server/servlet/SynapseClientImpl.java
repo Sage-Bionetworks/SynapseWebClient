@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -27,10 +25,8 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -146,17 +142,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	/*
 	 * SynapseClient Service Methods
 	 */
-
-	/**
-	 * Get an Entity by its id
-	 */
 	@Override
-	public EntityWrapper getEntity(String entityId) {
+	public EntityWrapper getEntity(String entityId) throws RestServiceException {
 		return getEntityForVersion(entityId, null);
 	}
 
 	@Override
-	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber) {
+	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
 			Entity entity;
@@ -167,18 +159,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}
 			JSONObjectAdapter entityJson = entity
 					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(entityJson.toJSONString(), entity
-					.getClass().getName(), null);
+			return new EntityWrapper(entityJson.toJSONString(), entity.getClass().getName());
 		} catch (SynapseException e) {
-			// Since we are not throwing errors, log them
-			log.error(e);
-			return new EntityWrapper(null, null,
-					ExceptionUtil.convertSynapseException(e));
+			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
-			// Since we are not throwing errors, log them
-			log.error(e);
-			return new EntityWrapper(null, null, new UnknownErrorException(
-					e.getMessage()));
+			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 		
@@ -225,53 +210,35 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String getEntityTypeRegistryJSON() {
-		return SynapseClientImpl.getEntityTypeRegistryJson();
-	}
-
-	@Override
-	public EntityWrapper getEntityPath(String entityId) {
+	public EntityWrapper getEntityPath(String entityId) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
 			EntityPath entityPath = synapseClient.getEntityPath(entityId);
 			JSONObjectAdapter entityPathJson = entityPath
 					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(entityPathJson.toJSONString(), entityPath
-					.getClass().getName(), null);
+			return new EntityWrapper(entityPathJson.toJSONString(), entityPath.getClass().getName());
 		} catch (SynapseException e) {
-			return new EntityWrapper(null, null,
-					ExceptionUtil.convertSynapseException(e));
+			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
-			// Since we are not throwing errors, log them
-			log.error(e);
-			return new EntityWrapper(null, null, new UnknownErrorException(
-					e.getMessage()));
+			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
 	@Override
-	public EntityWrapper search(String searchQueryJson) {
+	public EntityWrapper search(String searchQueryJson) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
 			JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 			SearchResults searchResults = synapseClient.search(new SearchQuery(
 					adapter.createNew(searchQueryJson)));
 			searchResults.writeToJSONObject(adapter);
-			return new EntityWrapper(adapter.toJSONString(),
-					SearchResults.class.getName(), null);
+			return new EntityWrapper(adapter.toJSONString(), SearchResults.class.getName());
 		} catch (SynapseException e) {
-			return new EntityWrapper(null, null,
-					ExceptionUtil.convertSynapseException(e));
+			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
-			// Since we are not throwing errors, log them
-			log.error(e);
-			return new EntityWrapper(null, null, new UnknownErrorException(
-					e.getMessage()));
+			throw new UnknownErrorException(e.getMessage());
 		} catch (UnsupportedEncodingException e) {
-			// Since we are not throwing errors, log them
-			log.error(e);
-			return new EntityWrapper(null, null, new UnknownErrorException(
-					e.getMessage()));
+			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 	
@@ -376,49 +343,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return synapseClient;
 	}
 
-	/**
-	 * Read an input stream into a string.
-	 * 
-	 * @param in
-	 * @return
-	 * @throws IOException
-	 */
-	private static String readToString(InputStream in) throws IOException {
-		try {
-			BufferedInputStream bufferd = new BufferedInputStream(in);
-			byte[] buffer = new byte[1024];
-			StringBuilder builder = new StringBuilder();
-			int index = -1;
-			while ((index = bufferd.read(buffer, 0, buffer.length)) > 0) {
-				builder.append(new String(buffer, 0, index, "UTF-8"));
-			}
-			return builder.toString();
-		} finally {
-			in.close();
-		}
-	}
-
 	@Override
 	public SerializableWhitelist junk(SerializableWhitelist l) {
 		return null;
-	}
-
-	public static String getEntityTypeRegistryJson() {
-		ClassLoader classLoader = EntityType.class.getClassLoader();
-		InputStream in = classLoader
-				.getResourceAsStream(EntityType.REGISTER_JSON_FILE_NAME);
-		if (in == null)
-			throw new IllegalStateException("Cannot find the "
-					+ EntityType.REGISTER_JSON_FILE_NAME
-					+ " file on the classpath");
-		String jsonString = "";
-		try {
-			jsonString = readToString(in);
-		} catch (IOException e) {
-			log.error(e);
-			// error reading file
-		}
-		return jsonString;
 	}
 
 	private static final int USER_PAGINATION_OFFSET = 0;
@@ -645,15 +572,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public EntityWrapper getUserGroupHeadersById(List<String> ids)
-			throws RestServiceException {
+	public EntityWrapper getUserGroupHeadersById(List<String> ids) throws RestServiceException {
 		try {
 			Synapse synapseClient = createSynapseClient();
 			UserGroupHeaderResponsePage response = synapseClient.getUserGroupHeadersByIds(ids);
 			JSONObjectAdapter responseJSON = response
 					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(responseJSON.toJSONString(), responseJSON
-					.getClass().getName(), null);
+			return new EntityWrapper(responseJSON.toJSONString(), responseJSON.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e); 
 		} catch (JSONObjectAdapterException e) {
@@ -662,8 +587,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public void updateUserProfile(String userProfileJson)
-			throws RestServiceException {
+	public void updateUserProfile(String userProfileJson) throws RestServiceException {
 		try {
 			Synapse synapseClient = createSynapseClient();
 			JSONObject userProfileJSONObject = new JSONObject(userProfileJson);
@@ -729,8 +653,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			AccessControlList acl = getAcl(id);
 			JSONObjectAdapter aclJson = acl
 					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aclJson.toJSONString(), aclJson
-					.getClass().getName(), null);
+			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -747,8 +670,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			acl = synapseClient.createACL(acl);
 			JSONObjectAdapter aclJson = acl
 					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aclJson.toJSONString(), aclJson
-					.getClass().getName(), null);
+			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -770,8 +692,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			acl = synapseClient.updateACL(acl, recursive);
 			JSONObjectAdapter aclJson = acl
 					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aclJson.toJSONString(), aclJson
-					.getClass().getName(), null);
+			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -789,8 +710,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			AccessControlList acl = getAcl(ownerEntityId);
 			JSONObjectAdapter aclJson = acl
 					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aclJson.toJSONString(), aclJson
-					.getClass().getName(), null);
+			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -814,7 +734,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			PaginatedResults<UserProfile> userProfiles = synapseClient.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT);
 			JSONObjectAdapter upJson = userProfiles.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(upJson.toJSONString(), upJson.getClass().getName(), null);
+			return new EntityWrapper(upJson.toJSONString(), upJson.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -828,7 +748,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			PaginatedResults<UserGroup> userGroups = synapseClient.getGroups(GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
 			JSONObjectAdapter ugJson = userGroups.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(ugJson.toJSONString(), ugJson.getClass().getName(), null);		
+			return new EntityWrapper(ugJson.toJSONString(), ugJson.getClass().getName());		
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -860,7 +780,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					(Class<AccessRequirement>)Class.forName(arEW.getEntityClassName()));
 			AccessRequirement result = synapseClient.createAccessRequirement(ar);
 			JSONObjectAdapter arJson = result.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(arJson.toJSONString(), arJson.getClass().getName(), null);
+			return new EntityWrapper(arJson.toJSONString(), arJson.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -901,7 +821,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					(Class<AccessApproval>)Class.forName(aaEW.getEntityClassName()));
 			AccessApproval result = synapseClient.createAccessApproval(aa);
 			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName(), null);
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (ClassNotFoundException e) {
@@ -920,7 +840,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}						
 			Locationable result = synapseClient.updateExternalLocationableToSynapse((Locationable)locationable, externalUrl);
 			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName(), null);
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {

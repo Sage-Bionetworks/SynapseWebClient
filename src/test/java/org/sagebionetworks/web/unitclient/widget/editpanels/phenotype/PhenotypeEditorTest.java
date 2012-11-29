@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.ontology.StaticEnumerations;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnDefinitionEditor;
 import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnDefinitionEditorView;
@@ -22,8 +21,7 @@ import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatri
 public class PhenotypeEditorTest {
 	
 	PhenotypeEditor phenotypeEditor;
-	PhenotypeEditorView mockView;
-	NodeServiceAsync mockNodeService;	
+	PhenotypeEditorView mockView;	
 	NodeModelCreator mockNodeModelCreator;
 	AuthenticationController mockAuthenticationController;
 	
@@ -36,11 +34,9 @@ public class PhenotypeEditorTest {
 		PhenotypeMatrix phenotypeMatrix = new PhenotypeMatrix(mock(PhenotypeMatrixView.class));
 		
 		mockView = mock(PhenotypeEditorView.class);
-		mockNodeService = mock(NodeServiceAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		phenotypeEditor = new PhenotypeEditor(mockView, mockNodeService,
-				mockNodeModelCreator, mockAuthenticationController,
+		phenotypeEditor = new PhenotypeEditor(mockView, mockNodeModelCreator, mockAuthenticationController,
 				staticOntologies, columnDefinitionEditor, columnMappingEditor,
 				phenotypeMatrix);		
 		
@@ -61,7 +57,6 @@ public class PhenotypeEditorTest {
 	 */
 	private void resetMocks() {
 		reset(mockView);
-		reset(mockNodeService);
 		reset(mockNodeModelCreator);
 		reset(mockAuthenticationController);
 	}	

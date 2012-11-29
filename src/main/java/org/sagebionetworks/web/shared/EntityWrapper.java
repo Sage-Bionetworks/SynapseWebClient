@@ -7,17 +7,12 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class EntityWrapper implements IsSerializable {
 
 	private String entityJson;
-	private RestServiceException restServiceException;
 	private String entityClassName;
 
 	public String getEntityJson() {
 		return entityJson;
 	}
-
-	public RestServiceException getRestServiceException() {
-		return restServiceException;
-	}
-
+	
 	public String getEntityClassName() {
 		return entityClassName;
 	}
@@ -28,24 +23,16 @@ public class EntityWrapper implements IsSerializable {
 	public EntityWrapper(){
 		
 	}
-	public EntityWrapper(String entityJson,	String entityClassName, RestServiceException restServiceException) {
+	public EntityWrapper(String entityJson,	String entityClassName) {
 		super();
-		if(restServiceException == null){
-			// When the exception is null, then both the json and class name cannot be null
-			if(entityJson == null) throw new IllegalArgumentException("Json string cannot be null");
-			if(entityClassName == null) throw new IllegalArgumentException("EntityClassName cannot be null");
-		}
+		if(entityJson == null) throw new IllegalArgumentException("Json string cannot be null");
+		if(entityClassName == null) throw new IllegalArgumentException("EntityClassName cannot be null");
 		this.entityJson = entityJson;
-		this.restServiceException = restServiceException;
 		this.entityClassName = entityClassName;
 	}
 
 	public void setEntityJson(String entityJson) {
 		this.entityJson = entityJson;
-	}
-
-	public void setRestServiceException(RestServiceException restServiceException) {
-		this.restServiceException = restServiceException;
 	}
 
 	public void setEntityClassName(String entityClassName) {
@@ -60,10 +47,6 @@ public class EntityWrapper implements IsSerializable {
 				+ ((entityClassName == null) ? 0 : entityClassName.hashCode());
 		result = prime * result
 				+ ((entityJson == null) ? 0 : entityJson.hashCode());
-		result = prime
-				* result
-				+ ((restServiceException == null) ? 0 : restServiceException
-						.hashCode());
 		return result;
 	}
 
@@ -86,19 +69,14 @@ public class EntityWrapper implements IsSerializable {
 				return false;
 		} else if (!entityJson.equals(other.entityJson))
 			return false;
-		if (restServiceException == null) {
-			if (other.restServiceException != null)
-				return false;
-		} else if (!restServiceException.equals(other.restServiceException))
-			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "EntityWrapper [entityJson=" + entityJson
-				+ ", restServiceException=" + restServiceException
-				+ ", entityClassName=" + entityClassName + "]";
+		return "EntityWrapper [entityJson=" + entityJson + ", entityClassName="
+				+ entityClassName + "]";
 	}
+
 
 }

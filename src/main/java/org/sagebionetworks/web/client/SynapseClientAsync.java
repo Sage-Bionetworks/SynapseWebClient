@@ -25,8 +25,6 @@ public interface SynapseClientAsync {
 
 	void updateEntity(String entityJson, AsyncCallback<EntityWrapper> callback);
 
-	void getEntityTypeRegistryJSON(AsyncCallback<String> callback);
-
 	void getEntityPath(String entityId, AsyncCallback<EntityWrapper> callback);
 
 	void search(String searchQueryJson, AsyncCallback<EntityWrapper> callback);

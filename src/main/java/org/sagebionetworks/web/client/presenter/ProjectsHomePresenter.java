@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -27,7 +26,6 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 	private ProjectsHome place;
 	private ProjectsHomeView view;
 	private GlobalApplicationState globalApplicationState;
-	private NodeServiceAsync nodeService;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -37,12 +35,11 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 	@Inject
 	public ProjectsHomePresenter(ProjectsHomeView view,
 			GlobalApplicationState globalApplicationState,
-			NodeServiceAsync nodeService, JSONObjectAdapter jsonObjectAdapter,
+			JSONObjectAdapter jsonObjectAdapter,
 			NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, 
 			SynapseClientAsync synapseClient, AutoGenFactory entityFactory) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.nodeService = nodeService;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;

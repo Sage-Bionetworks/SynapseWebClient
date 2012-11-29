@@ -11,6 +11,7 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_
 
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -19,11 +20,10 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -37,7 +37,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private EntityView view;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private String entityId;
@@ -48,11 +47,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			NodeServiceAsync nodeService, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.nodeService = nodeService;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 	
@@ -117,9 +115,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					} 					
 					
 					view.setEntityBundle(bundle, readOnly);					
-				} catch (RestServiceException ex) {					
-					onFailure(null);					
-					globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+				} catch (JSONObjectAdapterException ex) {					
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
 				}				
 			}
 			

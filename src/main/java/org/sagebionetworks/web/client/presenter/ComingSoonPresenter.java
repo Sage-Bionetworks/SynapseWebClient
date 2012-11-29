@@ -1,13 +1,14 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -51,8 +52,8 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 				try {
 					Entity entity = nodeModelCreator.createEntity(result);
 					view.setEntity(entity);
-				} catch (RestServiceException e) {
-					onFailure(e);
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 				}
 			}			
 			@Override
