@@ -49,8 +49,6 @@ public class LoginPresenterTest {
 		mockCookieProvier = mock(CookieProvider.class);
 		mockGwtWrapper = mock(GWTWrapper.class);
 		mockJSNIUtils = mock(SynapseJSNIUtils.class);
-		when(mockJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
-		when(mockJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
 		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockUserAccountServiceAsync, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier, mockGwtWrapper, mockJSNIUtils);
 		
 		verify(mockView).setPresenter(loginPresenter);
@@ -59,6 +57,8 @@ public class LoginPresenterTest {
 	@Test
 	public void testSetPlace() {
 		LoginPlace place = Mockito.mock(LoginPlace.class);
+		when(mockJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
+		when(mockJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
 		loginPresenter.setPlace(place);
 		Assert.assertEquals("/Portal.html?foo=bar#LoginPlace", loginPresenter.getOpenIdReturnUrl());
 	}
