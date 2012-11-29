@@ -60,7 +60,7 @@ public class ServerMarkdownUtilsTest {
 		String attachmentName = "my attachment image";
 		String attachmentMd = MarkdownUtils.getAttachmentLinkMarkdown(attachmentName, entityId, tokenId, previewTokenId, attachmentName);
 		String actualResult = ServerMarkdownUtils.markdown2Html(attachmentMd, "http://mySynapse/attachment", new MarkdownProcessor());
-		String expectedResult = "<html>\n <head></head>\n <body>\n  <p><img src=\"http://mySynapse/attachment?entityId=entityId123&amp;tokenId=tokenId123/previewTokenId&amp;waitForUrl=true\" alt=\"my attachment image\" title=\"my attachment image\" /></p> \n </body>\n</html>";
+		String expectedResult = "<div class=\"markdown\"><html>\n <head></head>\n <body>\n  <p><img src=\"http://mySynapse/attachment?entityId=entityId123&amp;tokenId=tokenId123/previewTokenId&amp;waitForUrl=true\" alt=\"my attachment image\" title=\"my attachment image\" /></p> \n </body>\n</html></div>";
 		assertEquals(expectedResult, actualResult);
 	}
 	
@@ -68,7 +68,7 @@ public class ServerMarkdownUtilsTest {
 	public void testMarkdown2HtmlEscapeControlCharacters(){
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
 		String testString = "& ==> &amp;\" ==> &quot;> ==> &gt;< ==> &lt;' =";
-		String expectedResult = "<html>\n <head></head>\n <body>\n  <p>&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt;&lt; ==&gt; &lt;' =</p> \n </body>\n</html>";
+		String expectedResult = "<div class=\"markdown\"><html>\n <head></head>\n <body>\n  <p>&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt;&lt; ==&gt; &lt;' =</p> \n </body>\n</html></div>";
 		
 		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", new MarkdownProcessor());
 		assertEquals(expectedResult, actualResult);
