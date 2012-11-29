@@ -121,7 +121,7 @@ public class SnapshotWidgetTest {
 		addSingleGroupRecordToSnapshot(snapshot, targetId, targetVersionNumber, null);
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		Data rowData = getDataEntity(targetId, targetVersionNumber);
-		EntityWrapper expectedWrapper =  new EntityWrapper(rowData.writeToJSONObject(factory.createNew()).toJSONString(), Data.class.getName(), null);
+		EntityWrapper expectedWrapper =  new EntityWrapper(rowData.writeToJSONObject(factory.createNew()).toJSONString(), Data.class.getName());
 		AsyncMockStubber.callSuccessWith(expectedWrapper).when(mockSynapseClient).getEntityForVersion(eq(targetId), eq(targetVersionNumber), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(expectedWrapper)).thenReturn(rowData);
 		
@@ -139,7 +139,7 @@ public class SnapshotWidgetTest {
 		addSingleGroupRecordToSnapshot(snapshot, targetId, targetVersionNumber, null);
 		snapshotWidget.setSnapshot(snapshot, CAN_EDIT, READ_ONLY);
 		Data rowData = getDataEntity(targetId, targetVersionNumber);
-		EntityWrapper expectedWrapper =  new EntityWrapper(rowData.writeToJSONObject(factory.createNew()).toJSONString(), Data.class.getName(), null);
+		EntityWrapper expectedWrapper =  new EntityWrapper(rowData.writeToJSONObject(factory.createNew()).toJSONString(), Data.class.getName());
 		AsyncMockStubber.callSuccessWith(expectedWrapper).when(mockSynapseClient).getEntity(eq(targetId), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(expectedWrapper)).thenReturn(rowData);
 		
@@ -771,9 +771,9 @@ public class SnapshotWidgetTest {
 		expectedSnapshot.getGroups().get(1).setDescription(testDesc);
 		expectedSnapshot.getGroups().get(1).setRecords(Arrays.asList(new EntityGroupRecord[] {}));
 		String expectedJson = expectedSnapshot.writeToJSONObject(factory.createNew()).toJSONString();
-		EntityWrapper expectedWrapper = new EntityWrapper(expectedJson, Summary.class.getName(), null);
+		EntityWrapper expectedWrapper = new EntityWrapper(expectedJson, Summary.class.getName());
 		AsyncMockStubber.callSuccessWith(expectedWrapper).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));		
-		when(mockNodeModelCreator.createEntity(expectedJson, Summary.class.getName())).thenReturn(expectedSnapshot);
+		when(mockNodeModelCreator.createJSONEntity(expectedJson, Summary.class.getName())).thenReturn(expectedSnapshot);
 		return expectedJson;
 	}
 
@@ -818,9 +818,9 @@ public class SnapshotWidgetTest {
 
 	@SuppressWarnings("unchecked")
 	private void setupRebuildEverythingCallbacks(Summary rebuildSnapshot) throws Exception {
-		EntityWrapper rebuildWrapper = new EntityWrapper(rebuildSnapshot.writeToJSONObject(factory.createNew()).toJSONString(), Summary.class.getName(), null);
+		EntityWrapper rebuildWrapper = new EntityWrapper(rebuildSnapshot.writeToJSONObject(factory.createNew()).toJSONString(), Summary.class.getName());
 		AsyncMockStubber.callSuccessWith(rebuildWrapper).when(mockSynapseClient).getEntity(eq(snapshot.getId()), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntity(rebuildWrapper, Summary.class)).thenReturn(rebuildSnapshot);
+		when(mockNodeModelCreator.createJSONEntity(rebuildWrapper.getEntityJson(), Summary.class)).thenReturn(rebuildSnapshot);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -831,9 +831,9 @@ public class SnapshotWidgetTest {
 	}
 	
 	private void setupUpdateEntityWhens(Summary expectedSnapshot) throws Exception {
-		EntityWrapper expectedWrapper = new EntityWrapper(expectedSnapshot.writeToJSONObject(factory.createNew()).toJSONString(), Summary.class.getName(), null);
+		EntityWrapper expectedWrapper = new EntityWrapper(expectedSnapshot.writeToJSONObject(factory.createNew()).toJSONString(), Summary.class.getName());
 		AsyncMockStubber.callSuccessWith(expectedWrapper).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));		
-		when(mockNodeModelCreator.createEntity(anyString(), eq(Summary.class.getName()))).thenReturn(expectedSnapshot);
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(Summary.class.getName()))).thenReturn(expectedSnapshot);
 	}
 	
 	private EntityGroupRecord createRecord(String entityId, Long versionNumber, String note) {

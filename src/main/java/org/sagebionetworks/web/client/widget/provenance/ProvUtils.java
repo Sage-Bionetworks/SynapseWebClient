@@ -13,6 +13,8 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -20,6 +22,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.ActivityTypeUtil;
@@ -234,10 +237,10 @@ public class ProvUtils {
 			@Override
 			public void onSuccess(String result) {
 				try {
-					Activity activity = nodeModelCreator.createEntity(result, Activity.class);
+					Activity activity = nodeModelCreator.createJSONEntity(result, Activity.class);
 					callback.onSuccess(ProvUtils.activityToKeyValueDisplay(activity));			
-				} catch (RestServiceException e) {
-					onFailure(e);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			}		
 			@Override
@@ -254,16 +257,12 @@ public class ProvUtils {
 		synapseClient.getEntityForVersion(etNode.getEntityId(), etNode.getVersionNumber(), new AsyncCallback<EntityWrapper>() {
 			@Override
 			public void onSuccess(EntityWrapper result) {
-				if(result.getRestServiceException() != null) {
-					onFailure(result.getRestServiceException());
-					return;
-				}
 				Entity entity;
 				try {
 					entity = nodeModelCreator.createEntity(result);
 					callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity));
-				} catch (RestServiceException e) {
-					onFailure(e);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			}
 			@Override

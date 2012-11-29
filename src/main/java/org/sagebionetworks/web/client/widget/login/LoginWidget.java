@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,8 +50,10 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 				UserSessionData userSessionData = null;
 				if (result != null){
 					try {
-						userSessionData = nodeModelCreator.createEntity(result, UserSessionData.class);
-					} catch (RestServiceException e) {}
+						userSessionData = nodeModelCreator.createJSONEntity(result, UserSessionData.class);
+					} catch (JSONObjectAdapterException e) {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+					}
 				}
 				fireUserChage(userSessionData);
 			}

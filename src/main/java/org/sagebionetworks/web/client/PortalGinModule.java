@@ -353,11 +353,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
 		bind(LocationableTitleBarView.class).to(LocationableTitleBarViewImpl.class);
-
-		
-		// EntityChildBrowser
-		bind(EntityChildBrowserViewImpl.class).in(Singleton.class);
-		bind(EntityChildBrowserView.class).to(EntityChildBrowserViewImpl.class);
 		
 		// EntityChildBrowser (not singleton as you may want multiple)
 		bind(LocationableDownloaderView.class).to(LocationableDownloaderViewImpl.class);

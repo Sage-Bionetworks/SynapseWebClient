@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -88,8 +89,8 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 				// TODO : convert this class to working with the Annotations object and not the JSONObject
 				originalAnnotationObject = JSONParser.parseStrict(annotationJsonString).isObject();
 				try {
-					Annotations annotations = nodeModelCreator.initializeEntity(annotationJsonString, new Annotations());
-				} catch (RestServiceException ex) {
+					Annotations annotations = nodeModelCreator.initializeJSONEntity(annotationJsonString, new Annotations());
+				} catch (JSONObjectAdapterException ex) {
 					onFailure(null);
 					return;
 				}
@@ -196,7 +197,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 			@Override
 			public void onSuccess(String result) {
 				try {
-					Annotations annotations = nodeModelCreator.initializeEntity(result, new Annotations());
+					Annotations annotations = nodeModelCreator.initializeJSONEntity(result, new Annotations());
 					originalAnnotationObject = JSONParser.parseStrict(result).isObject();
 					view.updateAnnotations(formFields);										
 					if(operation == PersistOperation.CREATE) {
@@ -206,7 +207,7 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 					} else {
 						view.showPersistSuccess();
 					}
-				} catch (RestServiceException ex) {
+				} catch (JSONObjectAdapterException ex) {
 					onFailure(null);					
 					return;
 				}				
@@ -235,8 +236,8 @@ public class AnnotationEditor implements AnnotationEditorView.Presenter {
 				// TODO : convert this class to working with the Annotations object and not the JSONObject
 				originalAnnotationObject = JSONParser.parseStrict(annotationJsonString).isObject();
 				try {
-					Annotations annotations = nodeModelCreator.initializeEntity(annotationJsonString, new Annotations());
-				} catch (RestServiceException ex) {
+					Annotations annotations = nodeModelCreator.initializeJSONEntity(annotationJsonString, new Annotations());
+				} catch (JSONObjectAdapterException ex) {
 					onFailure(null);
 					return;
 				}

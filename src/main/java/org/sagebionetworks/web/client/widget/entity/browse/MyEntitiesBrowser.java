@@ -6,6 +6,8 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -18,6 +20,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -115,9 +118,9 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
 					for(String entityHeaderJson : result) {
 						try {
-							headers.add(nodeModelCreator.createEntity(entityHeaderJson, EntityHeader.class));
-						} catch (RestServiceException e) {
-							onFailure(e);
+							headers.add(nodeModelCreator.createJSONEntity(entityHeaderJson, EntityHeader.class));
+						} catch (JSONObjectAdapterException e) {
+							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 						}
 					} 
 					//show whatever projects that we found (maybe zero)

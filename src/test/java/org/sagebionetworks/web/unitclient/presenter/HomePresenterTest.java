@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
@@ -89,21 +90,21 @@ public class HomePresenterTest {
 	}	
 	
 	@Test
-	public void testNewsFeed() throws RestServiceException {
+	public void testNewsFeed() throws JSONObjectAdapterException {
 		//when news is loaded, the view should be updated with the service result
 		String exampleNewsFeedResult = "news feed";
 		AsyncMockStubber.callSuccessWith(exampleNewsFeedResult).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));		
-		when(mockNodeModelCreator.createEntity(anyString(), eq(RSSFeed.class))).thenReturn(testFeed);
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(RSSFeed.class))).thenReturn(testFeed);
 		homePresenter.loadNewsFeed();
 		verify(mockView).showNews(anyString());
 	}	
 	
 	@Test
-	public void testSupportFeed() throws RestServiceException {
+	public void testSupportFeed() throws JSONObjectAdapterException {
 		//when support feed is loaded, the view should be updated with the service result
 		String exampleSupportFeedResult = "support feed";
 		AsyncMockStubber.callSuccessWith(exampleSupportFeedResult).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntity(anyString(), eq(RSSFeed.class))).thenReturn(testFeed);
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(RSSFeed.class))).thenReturn(testFeed);
 		homePresenter.loadSupportFeed();
 		verify(mockView).showSupportFeed(anyString());
 	}	

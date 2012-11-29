@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
@@ -106,7 +107,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 			
 			public void onSuccess(EntityWrapper result) {
 				try {
-					Entity entity = nodeModelCreator.createEntity(result, entityBundle.getEntity().getClass());
+					Entity entity = nodeModelCreator.createJSONEntity(result.getEntityJson(), entityBundle.getEntity().getClass());
 					if (isNewlyRestricted) {
 						EntityWrapper arEW = null;
 						try {
@@ -131,8 +132,8 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 						view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
 						entityUpdated();						
 					}
-				} catch (RestServiceException e) {
-					onFailure(null);					
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			};
 			@Override

@@ -25,6 +25,7 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -399,9 +400,9 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 				@Override
 				public void onSuccess(EntityWrapper result) {
 					try {
-						snapshot = nodeModelCreator.createEntity(result.getEntityJson(), result.getEntityClassName());
-					} catch (RestServiceException e) {
-						onFailure(e);
+						snapshot = nodeModelCreator.createJSONEntity(result.getEntityJson(), result.getEntityClassName());
+					} catch (JSONObjectAdapterException e) {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
 					callback.onSuccess(null);
 				}
@@ -411,7 +412,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
+			callback.onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 		}
 	}
 
@@ -436,10 +437,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			public void onSuccess(EntityWrapper result) {
 				try {
 					// update current entity
-					snapshot = nodeModelCreator.createEntity(result, Summary.class);
+					snapshot = nodeModelCreator.createJSONEntity(result.getEntityJson(), Summary.class);
 					setSnapshot(snapshot, canEdit, readOnly);
-				} catch (RestServiceException e) {
-					onFailure(e);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			}
 
@@ -453,7 +454,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 
 	private EntityGroupRecordDisplay createRecordDisplay(
 			EntityGroupRecord record, EntityWrapper result)
-			throws RestServiceException {	
+			throws JSONObjectAdapterException {	
 		Entity referencedEntity = nodeModelCreator.createEntity(result);
 				
 		// download
@@ -513,8 +514,8 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 				try {
 					EntityGroupRecordDisplay display = createRecordDisplay(record, result);								
 					view.setEntityGroupRecordDisplay(groupIndex, rowIndex, display);									
-				} catch (RestServiceException e) {
-					onFailure(e);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			}
 

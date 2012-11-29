@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.breadcrumb;
 
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Matchers.isNull;
@@ -10,31 +11,22 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.management.RuntimeErrorException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.ResourceEncoder;
-import org.sagebionetworks.ResourceUtils;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.RegisterConstants;
 import org.sagebionetworks.repo.model.Study;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -51,7 +43,6 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class BreadcrumbTest {
 		
@@ -71,11 +62,7 @@ public class BreadcrumbTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		
-		String registryJson = SynapseClientImpl.getEntityTypeRegistryJson();
-		AsyncMockStubber.callSuccessWith(registryJson).when(mockSynapseClient).getEntityTypeRegistryJSON(any(AsyncCallback.class));
-		// Load the register from the classpath.
-		
+				
 		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
 		
 		breadcrumb = new Breadcrumb(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, entityTypeProvider);
@@ -112,7 +99,7 @@ public class BreadcrumbTest {
 		JSONObjectAdapter pathAdapter = new JSONObjectAdapterImpl();
 		entityPath.writeToJSONObject(pathAdapter);
 				
-		EntityWrapper entityWrapper = new EntityWrapper(pathAdapter.toJSONString(), EntityPath.class.getName(), null);	
+		EntityWrapper entityWrapper = new EntityWrapper(pathAdapter.toJSONString(), EntityPath.class.getName());	
 		
 		// Fail path service call
 //		reset(mockView);		
@@ -124,14 +111,14 @@ public class BreadcrumbTest {
 		// fail model creation
 		reset(mockView);			
 		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class), eq(EntityPath.class))).thenReturn(null); // null model return
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(EntityPath.class))).thenReturn(null); // null model return
 		breadcrumb.asWidget((EntityPath)null);
 		verify(mockView).setLinksList(any(List.class), (String)isNull());
 		
 		// success test
 		reset(mockView);			
 		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntity(entityWrapper, EntityPath.class)).thenReturn(entityPath);
+		when(mockNodeModelCreator.createJSONEntity(entityWrapper.getEntityJson(), EntityPath.class)).thenReturn(entityPath);
 		breadcrumb.asWidget(entityPath);
 		verify(mockView).setLinksList(any(List.class), (String)isNotNull());				
 	}
