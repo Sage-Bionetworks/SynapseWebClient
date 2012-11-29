@@ -16,21 +16,19 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("synapse")	
 public interface SynapseClient extends RemoteService {
 
-	public EntityWrapper getEntity(String entityId);
+	public EntityWrapper getEntity(String entityId) throws RestServiceException;
 	
-	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber);
+	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException;
 		
 	public String getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
 
 	public void deleteEntityById(String entityId) throws RestServiceException;
 
 	public void deleteEntityVersionById(String entityId, Long versionNumber) throws RestServiceException;
-
-	public String getEntityTypeRegistryJSON();
 	
-	public EntityWrapper getEntityPath(String entityId);
+	public EntityWrapper getEntityPath(String entityId) throws RestServiceException;
 	
-	public EntityWrapper search(String searchQueryJson); 
+	public EntityWrapper search(String searchQueryJson) throws RestServiceException; 
 	
 	public String getEntityTypeBatch(List<String> entityIds) throws RestServiceException;
 	
@@ -173,7 +171,7 @@ public interface SynapseClient extends RemoteService {
 	 * @param markdown
 	 * @return
 	 */
-	public String markdown2Html(String markdown, String attachmentUrl);
+	public String markdown2Html(String markdown, String attachmentUrl) throws RestServiceException;
 	
 	public Long getStorageUsage(String entityId) throws RestServiceException;
 

@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -17,7 +15,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -96,8 +95,13 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 				synapseClient.getEntityVersions(entityId, 1, 20, new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String result) {
-						PaginatedResults<VersionInfo> versions = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
-						handler.onSelected(entityId, name, versions.getResults());
+						PaginatedResults<VersionInfo> versions;
+						try {
+							versions = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
+							handler.onSelected(entityId, name, versions.getResults());
+						} catch (JSONObjectAdapterException e) {
+							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+						}
 					}
 					@Override
 					public void onFailure(Throwable caught) {
@@ -139,9 +143,9 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 				public void onSuccess(EntityWrapper result) {
 					SearchResults currentResult = new SearchResults();		
 					try {
-						currentResult = nodeModelCreator.createEntity(result, SearchResults.class);
-					} catch (RestServiceException e) {
-						onFailure(null);					
+						currentResult = nodeModelCreator.createJSONEntity(result.getEntityJson(), SearchResults.class);
+					} catch (JSONObjectAdapterException e) {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
 					}									
 					view.setSearchResults(currentResult);					
 				}

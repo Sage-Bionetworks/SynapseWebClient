@@ -89,7 +89,7 @@ public class AccessControlListEditorTest {
 		entityBundleTransport_localACL = createEBT(localACL, createUEP());
 		entityBundleTransport_inheritedACL = createEBT(inheritedACL, createUEP());
 		userGroupHeaderRP = createUGHRP();
-		userGroupHeaderRPWrapper = new EntityWrapper(userGroupHeaderRP.writeToJSONObject(adapterFactory.createNew()).toJSONString(), AccessControlList.class.getName(), null);
+		userGroupHeaderRPWrapper = new EntityWrapper(userGroupHeaderRP.writeToJSONObject(adapterFactory.createNew()).toJSONString(), AccessControlList.class.getName());
 		
 		// set up mocks
 		mockSynapseClient = mock(SynapseClientAsync.class);
@@ -205,9 +205,7 @@ public class AccessControlListEditorTest {
 		// create response ACL
 		final EntityWrapper expectedEntityWrapper = new EntityWrapper(
 				localACL.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
-				AccessControlList.class.getName(), 
-				null
-		);
+				AccessControlList.class.getName());
 		
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_inheritedACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
@@ -231,7 +229,7 @@ public class AccessControlListEditorTest {
 		
 		
 		verify(mockSynapseClient).createAcl(captor.capture(), any(AsyncCallback.class));
-		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
+		AccessControlList returnedACL = nodeModelCreator.createJSONEntity(captor.getValue().getEntityJson(), AccessControlList.class);
 		localACL.setCreationDate(returnedACL.getCreationDate());
 		assertEquals("Created ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
@@ -249,9 +247,7 @@ public class AccessControlListEditorTest {
 		localACL.getResourceAccess().add(ra);
 		EntityWrapper expectedEntityWrapper = new EntityWrapper(
 				localACL.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
-				AccessControlList.class.getName(), 
-				null
-		);
+				AccessControlList.class.getName());
 		
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
@@ -265,7 +261,7 @@ public class AccessControlListEditorTest {
 		verify(mockPushToSynapseCallback).onSuccess(any(EntityWrapper.class));
 		
 		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
-		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
+		AccessControlList returnedACL = nodeModelCreator.createJSONEntity(captor.getValue().getEntityJson(), AccessControlList.class);
 		localACL.setCreationDate(returnedACL.getCreationDate());
 		
 		//add/remove public ready, verify it's reflected in UEP
@@ -294,9 +290,7 @@ public class AccessControlListEditorTest {
 		
 		EntityWrapper expectedEntityWrapper = new EntityWrapper(
 				localACL.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
-				AccessControlList.class.getName(), 
-				null
-		);
+				AccessControlList.class.getName());
 		
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
@@ -310,7 +304,7 @@ public class AccessControlListEditorTest {
 		verify(mockPushToSynapseCallback).onSuccess(any(EntityWrapper.class));
 		
 		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
-		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
+		AccessControlList returnedACL = nodeModelCreator.createJSONEntity(captor.getValue().getEntityJson(), AccessControlList.class);
 		localACL.setCreationDate(returnedACL.getCreationDate());
 		
 		Set<ResourceAccess> localRAs = localACL.getResourceAccess();
@@ -339,9 +333,7 @@ public class AccessControlListEditorTest {
 		
 		EntityWrapper expectedEntityWrapper = new EntityWrapper(
 				localACL.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
-				AccessControlList.class.getName(), 
-				null
-		);
+				AccessControlList.class.getName());
 		
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
@@ -355,7 +347,7 @@ public class AccessControlListEditorTest {
 		verify(mockPushToSynapseCallback).onSuccess(any(EntityWrapper.class));
 		
 		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
-		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
+		AccessControlList returnedACL = nodeModelCreator.createJSONEntity(captor.getValue().getEntityJson(), AccessControlList.class);
 		localACL.setCreationDate(returnedACL.getCreationDate());
 		
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
@@ -369,9 +361,7 @@ public class AccessControlListEditorTest {
 		// create response ACL: benefactor's
 		EntityWrapper expectedEntityWrapper = new EntityWrapper(
 				inheritedACL.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
-				AccessControlList.class.getName(), 
-				null
-		);
+				AccessControlList.class.getName());
 		
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
@@ -399,9 +389,7 @@ public class AccessControlListEditorTest {
 		localACL.getResourceAccess().add(ra);
 		EntityWrapper expectedEntityWrapper = new EntityWrapper(
 				localACL.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
-				AccessControlList.class.getName(), 
-				null
-		);
+				AccessControlList.class.getName());
 		
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
@@ -415,7 +403,7 @@ public class AccessControlListEditorTest {
 		verify(mockPushToSynapseCallback).onSuccess(any(EntityWrapper.class));
 		
 		verify(mockSynapseClient).updateAcl(captor.capture(), eq(true), any(AsyncCallback.class));
-		AccessControlList returnedACL = nodeModelCreator.createEntity(captor.getValue(), AccessControlList.class);
+		AccessControlList returnedACL = nodeModelCreator.createJSONEntity(captor.getValue().getEntityJson(), AccessControlList.class);
 		localACL.setCreationDate(returnedACL.getCreationDate());
 		
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);

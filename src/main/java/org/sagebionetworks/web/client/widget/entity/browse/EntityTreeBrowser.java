@@ -10,12 +10,12 @@ import java.util.List;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
@@ -25,7 +25,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
@@ -33,7 +32,7 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ImageResource;
@@ -44,7 +43,6 @@ import com.google.inject.Inject;
 public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private EntityTreeBrowserView view;
-	private NodeServiceAsync nodeService;
 	private SearchServiceAsync searchService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -63,7 +61,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	
 	@Inject
 	public EntityTreeBrowser(EntityTreeBrowserView view,
-			NodeServiceAsync nodeService, SearchServiceAsync searchService,
+			SearchServiceAsync searchService,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
@@ -72,8 +70,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			JSONObjectAdapter jsonObjectAdapter,
 			IconsImageBundle iconsImageBundle,
 			AutoGenFactory entityFactory, EntityEditor entityEditor) {
-		this.view = view;
-		this.nodeService = nodeService;
+		this.view = view;		
 		this.searchService = searchService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
@@ -121,9 +118,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
 					for(String entityHeaderJson : result) {
 						try {
-							headers.add(nodeModelCreator.createEntity(entityHeaderJson, EntityHeader.class));
-						} catch (RestServiceException e) {
-							onFailure(e);
+							headers.add(nodeModelCreator.createJSONEntity(entityHeaderJson, EntityHeader.class));
+						} catch (JSONObjectAdapterException e) {
+							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 						}
 					}
 					asyncCallback.onSuccess(headers);
@@ -231,8 +228,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 				try {
 					bundle = nodeModelCreator.createEntityBundle(transport);										
 					entityEditor.editEntity(bundle, false);					
-				} catch (RestServiceException ex) {					
-					onFailure(null);					
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}				
 			}
 			

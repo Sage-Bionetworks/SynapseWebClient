@@ -30,9 +30,10 @@ public interface HeaderView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		
 		UserSessionData getUser();
+
 		void getSupportHRef(AsyncCallback<String> callback);
-		void lookupId(String synapseId);
 	}
 
 
