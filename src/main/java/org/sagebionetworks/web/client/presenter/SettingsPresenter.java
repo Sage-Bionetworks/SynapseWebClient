@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -11,6 +13,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -126,10 +129,10 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			@Override
 			public void onSuccess(String storageUsageSummaryListJson) {
 				try {
-					StorageUsageSummaryList storageUsageSummaryList = nodeModelCreator.createEntity(storageUsageSummaryListJson, StorageUsageSummaryList.class);
+					StorageUsageSummaryList storageUsageSummaryList = nodeModelCreator.createJSONEntity(storageUsageSummaryListJson, StorageUsageSummaryList.class);
 					view.updateStorageUsage(storageUsageSummaryList.getTotalSize());
-				} catch (RestServiceException e) {
-					onFailure(e);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}    				
 			}
 			

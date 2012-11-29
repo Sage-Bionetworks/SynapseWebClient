@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
@@ -82,10 +83,13 @@ public class EntityMetadata implements Presenter {
 				new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String result) {
-						PaginatedResults<VersionInfo> paginatedResults = nodeModelCreator
-								.createPaginatedResults(result,
-										VersionInfo.class);
-						asyncCallback.onSuccess(paginatedResults);
+						PaginatedResults<VersionInfo> paginatedResults;
+						try {
+							paginatedResults = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
+							asyncCallback.onSuccess(paginatedResults);
+						} catch (JSONObjectAdapterException e) {							
+							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+						}
 					}
 
 					@Override

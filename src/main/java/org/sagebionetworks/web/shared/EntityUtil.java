@@ -29,6 +29,6 @@ public class EntityUtil {
 		AccessRequirement ar = createLockDownDataAccessRequirement(entityId);
 		JSONObjectAdapter arJson = ar.writeToJSONObject(jsonObjectAdapter.createNew());
 		String arClassName = ar.getClass().getName();
-		return new EntityWrapper(arJson.toJSONString(), arClassName, null);
+		return new EntityWrapper(arJson.toJSONString(), arClassName);
 	}
 }

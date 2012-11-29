@@ -6,6 +6,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.Window.Location;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
@@ -74,6 +75,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	@Override
 	public int randomNextInt() {
 		return Random.nextInt();
+	}
+
+	@Override
+	public String getLocationPath() {
+		return Location.getPath();
+	}
+
+	@Override
+	public String getLocationQueryString() {
+		return Location.getQueryString();
 	}
 
 }

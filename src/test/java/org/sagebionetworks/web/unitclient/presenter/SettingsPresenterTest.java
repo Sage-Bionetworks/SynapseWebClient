@@ -148,7 +148,7 @@ public class SettingsPresenterTest {
 		usageSummary.setTotalCount(54321L);
 		usageSummary.setSummaryList(new ArrayList<StorageUsageSummary>());
 		
-		when(mockNodeModelCreator.createEntity(any(String.class), eq(StorageUsageSummaryList.class))).thenReturn(usageSummary);
+		when(mockNodeModelCreator.createJSONEntity(any(String.class), eq(StorageUsageSummaryList.class))).thenReturn(usageSummary);
 		AsyncMockStubber.callSuccessWith(EntityFactory.createJSONStringForEntity(usageSummary)).when(mockUserService).getStorageUsage(any(AsyncCallback.class));		
 		profilePresenter.setPlace(place);
 		verify(mockView).updateStorageUsage(eq(totalSize));

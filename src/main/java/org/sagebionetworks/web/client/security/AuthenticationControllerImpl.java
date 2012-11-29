@@ -38,7 +38,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
 		if(loginCookieString != null) {
 			try {
-				currentUser = nodeModelCreator.createEntity(loginCookieString, UserSessionData.class);
+				currentUser = nodeModelCreator.createJSONEntity(loginCookieString, UserSessionData.class);
 			} catch (Throwable e) {
 				//invalid user
 				e.printStackTrace();
@@ -60,9 +60,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					//automatically expire after a day
 					Date tomorrow = getDayFromNow();
 					cookies.setCookie(CookieKeys.USER_LOGIN_DATA, userSessionJson, tomorrow);
-					userSessionData = nodeModelCreator.createEntity(userSessionJson, UserSessionData.class);
+					userSessionData = nodeModelCreator.createJSONEntity(userSessionJson, UserSessionData.class);
 					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken(), tomorrow);
-				} catch (RestServiceException e) {
+				} catch (JSONObjectAdapterException e) {
 					//can't save the cookie
 					e.printStackTrace();
 				}
@@ -138,7 +138,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					String updatedSessionJson = userSessionJson;
 					UserSessionData userSessionData = null;
 					try {
-						userSessionData = nodeModelCreator.createEntity(userSessionJson, UserSessionData.class);
+						userSessionData = nodeModelCreator.createJSONEntity(userSessionJson, UserSessionData.class);
 						userSessionData.setIsSSO(isSSO);
 						JSONObjectAdapter adapter = userSessionData.writeToJSONObject(JSONObjectGwt.createNewAdapter());
 						updatedSessionJson = adapter.toJSONString();
@@ -147,10 +147,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken(), tomorrow);
 					} catch (JSONObjectAdapterException e){
 						callback.onFailure(e);
-					} catch( RestServiceException e){
-						callback.onFailure(e);
 					}
-					
 					AuthenticationControllerImpl.currentUser = userSessionData;
 					callback.onSuccess(updatedSessionJson);
 				} else {

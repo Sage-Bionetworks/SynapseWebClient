@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Layer;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Lookup;
 import org.sagebionetworks.web.client.place.PhenoEdit;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Project;
@@ -41,7 +40,7 @@ import com.google.gwt.place.shared.WithTokenizers;
 		AnalysesHome.Tokenizer.class, StepsHome.Tokenizer.class,
 		Analysis.Tokenizer.class, Step.Tokenizer.class,
 		ComingSoon.Tokenizer.class, PhenoEdit.Tokenizer.class,
-		Lookup.Tokenizer.class, Synapse.Tokenizer.class,
+		Synapse.Tokenizer.class,
 		Search.Tokenizer.class, Settings.Tokenizer.class,
 		BCCOverview.Tokenizer.class, Governance.Tokenizer.class,WikiPlace.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {

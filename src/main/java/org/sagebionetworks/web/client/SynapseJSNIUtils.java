@@ -21,4 +21,8 @@ public interface SynapseJSNIUtils {
 	public String getBaseProfileAttachmentUrl();
 
 	public int randomNextInt();
+	
+	public String getLocationPath();
+	
+	public String getLocationQueryString();
 }

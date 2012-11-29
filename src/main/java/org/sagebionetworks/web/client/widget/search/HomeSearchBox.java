@@ -2,10 +2,7 @@ package org.sagebionetworks.web.client.widget.search;
 
 import java.util.ArrayList;
 
-import org.sagebionetworks.repo.model.Code;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -14,13 +11,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,7 +23,6 @@ import com.google.inject.Inject;
 public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidgetPresenter {
 	
 	private HomeSearchBoxView view;
-	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
@@ -39,14 +32,13 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 	private JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
-	public HomeSearchBox(HomeSearchBoxView view, NodeServiceAsync nodeService,
+	public HomeSearchBox(HomeSearchBoxView view, 
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			GlobalApplicationState globalApplicationState,
 			JSONObjectAdapter jsonObjectAdapter) {
-		this.view = view;
-		this.nodeService = nodeService;
+		this.view = view;		
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
