@@ -110,21 +110,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 			currentUser = null;
 		}
-	}
-	
-	@Override
-	public void saveShowDemo() {
-		cookies.setCookie(CookieKeys.SHOW_DEMO, Boolean.toString(DisplayConstants.showDemoHtml));
 	}	
-	
-	@Override
-	public void loadShowDemo() {
-		String value = cookies.getCookie(CookieKeys.SHOW_DEMO);
-		if(value != null) {
-			DisplayConstants.showDemoHtml = Boolean.parseBoolean(value);
-		}
-	}
-	
 
 	/*
 	 * Private Methods
