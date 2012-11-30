@@ -96,8 +96,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
 		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override
-			public void onSuccess(EntityBundleTransport transport) {
-				
+			public void onSuccess(EntityBundleTransport transport) {				
 				EntityBundle bundle = null;
 				try {
 					bundle = nodeModelCreator.createEntityBundle(transport);
@@ -107,11 +106,15 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						Reference ref = ((Link)bundle.getEntity()).getLinksTo();
 						entityId = null;
 						if(ref != null){
+							// redefine where the page is and refresh
 							entityId = ref.getTargetId();
 							versionNumber = ref.getTargetVersionNumber();
+							refresh();
+							return;
+						} else {
+							// show error and then allow entity bundle to go to view
+							view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 						}
-						refresh();
-						return;
 					} 					
 					
 					view.setEntityBundle(bundle, readOnly);					
