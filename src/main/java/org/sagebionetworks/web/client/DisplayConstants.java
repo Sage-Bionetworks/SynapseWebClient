@@ -412,6 +412,7 @@ public class DisplayConstants {
 	
 	public static final String DEFINE_ACTIVITY = "Please Define Provenance";
 	public static final String HOW_TO_DEFINE_ACTIVITY = "Create Provenance using the Synapse R Client.";
+	public static final String ERROR_NO_LINK_DEFINED = "Warning: No target reference is defined for this link.";
 
 }
 
