@@ -289,7 +289,7 @@ public class DisplayConstants {
 	public static final String SHOW_LIST_EDITOR = "Show List Editor";
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 	public static final String FLAG = "flag";
-	public static final String FLAG_TOOL_TIP = "Click here to learn more about flagging this data for review by the Synapse Access and Compliance Team";
+	public static final String FLAG_TOOL_TIP = "Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team";
 	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Data use conditions:";
 	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Data use conditions are set by human privacy regulations or contractual obligations";
 	
@@ -381,7 +381,7 @@ public class DisplayConstants {
 	public static final String FLAG_DIALOG_TITLE = "Flag Data";
 	public static String UNRESTRICTED_DATA_DIALOG_TITLE = "Unrestricted Data";
 	public static String RESTRICTED_DATA_DIALOG_TITLE = "Restricted Data";
-	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to this data is restricted.";
+	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to these data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
 	
 	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
@@ -393,10 +393,10 @@ public class DisplayConstants {
 	public static String RESTRICTION_DIALOG_TEXT_3 = "To add data restrictions, contact the Access and Compliance Team (ACT), by clicking below.</p>";
 	public static String RESTRICTION_DIALOG_TEXT_4 = "<p class=\"strong\">NOTE:  If you continue, data access to all registered Synapse users will be temporarily restricted pending review by the ACT.</p>";
 	
-	public static final String TOU_RESTRICTION_HEADER = "In order to access this data you must be a registered Synapse user and agree to the following terms:";
+	public static final String TOU_RESTRICTION_HEADER = "In order to access these data you must be a registered Synapse user and agree to the following terms:";
 	public static final String TOU_PROMPT = "Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:";
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
-	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to this data under the following terms:</p>";
+	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
 	public static final String FILE_DOWNLOAD_NOTE = 
 		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
@@ -412,6 +412,9 @@ public class DisplayConstants {
 	
 	public static final String DEFINE_ACTIVITY = "Please Define Provenance";
 	public static final String HOW_TO_DEFINE_ACTIVITY = "Create Provenance using the Synapse R Client.";
+	public static final String ERROR_NO_LINK_DEFINED = "Warning: No target reference is defined for this link.";
+	public static final String DATA_USE = "Data Use";
+	public static final String ACCESS_TO_DATA = "Access to these data is";
 
 }
 

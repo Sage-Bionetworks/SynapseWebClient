@@ -161,11 +161,11 @@ public class GovernanceDialogHelper {
 		final Dialog dialog = new Dialog();
         configureDialog(dialog);
         ContentPanel panel = createTextPanel(dialog);
- 		// title and icon are based on restriction level, e.g. "Data Access: Restricted"
+ 		// title and icon are based on restriction level, e.g. "Data Use: Restricted"
         dialog.setIcon(AbstractImagePrototype.create(restrictionLevelIcon(restrictionLevel, iconsImageBundle)));
-        dialog.setHeading("Data Access: "+EntityViewUtils.restrictionDescriptor(restrictionLevel)); 
+        dialog.setHeading(DisplayConstants.DATA_USE + ": " + EntityViewUtils.restrictionDescriptor(restrictionLevel)); 
 		// next comes the restriction descriptor, e.g. "Access to the data is Restricted." (Bold)
-      	panel.addText("<p class=\"strong\">Access to the data is "+EntityViewUtils.restrictionDescriptor(restrictionLevel)+".</p>");
+      	panel.addText("<p class=\"strong\">" + DisplayConstants.ACCESS_TO_DATA +" "+EntityViewUtils.restrictionDescriptor(restrictionLevel)+".</p>");
       	if (restrictionLevel==APPROVAL_REQUIRED.NONE) {
       		panel.addText("<p>"+DisplayConstants.UNRESTRICTED_DESCRIPTION+"</p>");
       	} else {

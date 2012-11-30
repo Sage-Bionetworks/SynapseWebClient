@@ -50,16 +50,6 @@ import org.sagebionetworks.web.client.widget.WidgetFactory;
 import org.sagebionetworks.web.client.widget.WidgetFactoryImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnDefinitionEditorView;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnDefinitionEditorViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnMappingEditorView;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnMappingEditorViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.OntologySearchPanelView;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.OntologySearchPanelViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeEditorView;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeEditorViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatrixView;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatrixViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
@@ -214,7 +204,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ProjectsHomeView.class).to(ProjectsHomeViewImpl.class);		
 				
 		// QueryService View
-		//bind(QueryServiceTableView.class).to(QueryServiceTableViewImpl.class);
 		bind(QueryServiceTableView.class).to(QueryServiceTableViewGxtImpl.class);
 		
 		// LoginView
@@ -308,27 +297,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// ACL Editor
 		bind(AccessControlListEditorView.class).to(AccessControlListEditorViewImpl.class);
-		
-		// PhenotypeEditor
-		bind(PhenotypeEditorViewImpl.class).in(Singleton.class);
-		bind(PhenotypeEditorView.class).to(PhenotypeEditorViewImpl.class);
-		
-		// Column Definition Editor
-		bind(ColumnDefinitionEditorViewImpl.class).in(Singleton.class);
-		bind(ColumnDefinitionEditorView.class).to(ColumnDefinitionEditorViewImpl.class);		
-
-		// Column Mapping Editor
-		bind(ColumnMappingEditorViewImpl.class).in(Singleton.class);
-		bind(ColumnMappingEditorView.class).to(ColumnMappingEditorViewImpl.class);		
-
-		// Ontology Search Panel
-		bind(OntologySearchPanelViewImpl.class).in(Singleton.class);
-		bind(OntologySearchPanelView.class).to(OntologySearchPanelViewImpl.class);		
-
-		// PhenotypeMatrix
-		bind(PhenotypeMatrixViewImpl.class).in(Singleton.class);
-		bind(PhenotypeMatrixView.class).to(PhenotypeMatrixViewImpl.class);
-		
+				
 		// EntityPageTop
 		bind(EntityPageTopViewImpl.class).in(Singleton.class);
 		bind(EntityPageTopView.class).to(EntityPageTopViewImpl.class);

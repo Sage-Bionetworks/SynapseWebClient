@@ -236,7 +236,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		for(int i=0; i<headers.size() && i<maxlimit; i++) {
 			EntityHeader header = headers.get(i);
 			String name;
-			if(makeLinks) {
+			if(makeLinks && !PLACEHOLDER_ID.equals(header.getId())) {
 				name = "<a href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\">" + header.getName() + "</a>";
 			} else {
 				name = header.getName();
