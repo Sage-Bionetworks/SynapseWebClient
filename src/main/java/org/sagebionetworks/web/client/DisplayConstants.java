@@ -401,6 +401,7 @@ public class DisplayConstants {
 	public static final String ACCESS_TO_DATA = "Access to these data is";
 	public static final String PAGE_NOT_FOUND = "Page not found";
 	public static final String PAGE_NOT_FOUND_DESC = "The page you requested was not found, that's all we know.";
+	public static final String ANNOTATIONS = "Annotations";
 
 }
 
