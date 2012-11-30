@@ -51,6 +51,8 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 	private LayerPreview layerPreview; 
 	PreviewData previewData;
 	
+	private static final int MAX_FOLDER_LIMIT = 500;
+	
 	@Inject
 	public EntityChildBrowser(EntityChildBrowserView view,
 			NodeModelCreator nodeModelCreator,
@@ -159,12 +161,11 @@ public class EntityChildBrowser implements EntityChildBrowserView.Presenter, Syn
 
 	@Override
 	public void getChildrenHeaders(final AsyncCallback<List<EntityHeader>> callback) {
-		List<EntityHeader> headers = new ArrayList<EntityHeader>();		
-		final int MAX_LIMIT = 200;
+		List<EntityHeader> headers = new ArrayList<EntityHeader>();				
 
 		searchService.searchEntities("entity", Arrays
 				.asList(new WhereCondition[] { new WhereCondition("parentId",
-						WhereOperator.EQUALS, entity.getId()) }), 1, MAX_LIMIT, null,
+						WhereOperator.EQUALS, entity.getId()) }), 1, MAX_FOLDER_LIMIT, null,
 				false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {

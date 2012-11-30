@@ -57,7 +57,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	
 	private String currentSelection;
 	
-	private final int MAX_LIMIT = 200;
+	private final int MAX_FOLDER_LIMIT = 500;
 	
 	@Inject
 	public EntityTreeBrowser(EntityTreeBrowserView view,
@@ -111,7 +111,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		
 		searchService.searchEntities("entity", Arrays
 				.asList(new WhereCondition[] { new WhereCondition("parentId",
-						WhereOperator.EQUALS, entityId) }), 1, MAX_LIMIT, null,
+						WhereOperator.EQUALS, entityId) }), 1, MAX_FOLDER_LIMIT, null,
 				false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {
@@ -165,7 +165,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	
 	@Override
 	public int getMaxLimit() {
-		return MAX_LIMIT;
+		return MAX_FOLDER_LIMIT;
 	}
 
 	@Override
