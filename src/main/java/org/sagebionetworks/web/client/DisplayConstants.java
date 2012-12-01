@@ -415,6 +415,8 @@ public class DisplayConstants {
 	public static final String ERROR_NO_LINK_DEFINED = "Warning: No target reference is defined for this link.";
 	public static final String DATA_USE = "Data Use";
 	public static final String ACCESS_TO_DATA = "Access to these data is";
+	public static final String PAGE_NOT_FOUND = "Page not found";
+	public static final String PAGE_NOT_FOUND_DESC = "The page you requested was not found, that's all we know.";
 
 }
 
