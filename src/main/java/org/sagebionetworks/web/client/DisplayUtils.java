@@ -1123,4 +1123,14 @@ public class DisplayUtils {
 		}
 		return version;
 	}
+
+	public static SafeHtml get404Html() {
+		return SafeHtmlUtils
+				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">404</p><h1>"
+						+ DisplayConstants.PAGE_NOT_FOUND
+						+ "</h1>"
+						+ "<p>"
+						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
+	}
+	
 }
