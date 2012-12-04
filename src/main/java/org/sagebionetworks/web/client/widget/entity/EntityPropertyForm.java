@@ -24,9 +24,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.T
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
-import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -47,7 +45,6 @@ import com.extjs.gxt.ui.client.widget.layout.AnchorLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.VBoxLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -276,7 +273,7 @@ public class EntityPropertyForm extends FormPanel {
 				previewGenerator.showPreview(((TextArea)descriptionField).getValue());
 			}
 	    });
-		final String baseURl = GWT.getModuleBaseURL()+"attachment";
+		//final String baseURl = GWT.getModuleBaseURL()+"attachment";
 		insertYouTubeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
@@ -285,12 +282,15 @@ public class EntityPropertyForm extends FormPanel {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						insertWidgetMarkdown(event.getName());
-						
-						Entity entity;
 						try {
-							entity = nodeModelCreator.createEntity(event.getEntityWrapper());
-							//update etag and attachments 
+							//switch to the up-to-date entity version after adding the attachment, but save our local description and name (in case they've changed here)
+							Entity entity = nodeModelCreator.createEntity(event.getEntityWrapper());
+							String newDescription = (String) adapter.get("description");
+							String newName = (String) adapter.get("name");
 							entity.writeToJSONObject(adapter);
+							
+							adapter.put("description", newDescription);
+							adapter.put("name", newName);
 						} catch (JSONObjectAdapterException e) {
 							throw new RuntimeException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 						}
