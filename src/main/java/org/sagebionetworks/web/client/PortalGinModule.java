@@ -81,8 +81,16 @@ import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserView;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
+import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialogImpl;
+import org.sagebionetworks.web.client.widget.entity.dialog.editors.ImageConfigView;
+import org.sagebionetworks.web.client.widget.entity.dialog.editors.ImageConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.dialog.editors.ProvenanceConfigView;
+import org.sagebionetworks.web.client.widget.entity.dialog.editors.ProvenanceConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.dialog.editors.YouTubeConfigView;
+import org.sagebionetworks.web.client.widget.entity.dialog.editors.YouTubeConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderView;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderView;
@@ -380,6 +388,13 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
+		
+		// UI Widget Descriptor editor
+		bind(BaseEditWidgetDescriptorViewImpl.class).in(Singleton.class);
+		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
+		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
+		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
+		bind(ProvenanceConfigView.class).to(ProvenanceConfigViewImpl.class);
 	}
 
 }

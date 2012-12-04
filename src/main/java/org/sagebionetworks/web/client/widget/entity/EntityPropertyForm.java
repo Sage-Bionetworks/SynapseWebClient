@@ -6,21 +6,27 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.widget.YouTubeWidgetDescriptor;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.MarkdownUtils;
+import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
+import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
+import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
-import org.sagebionetworks.web.client.widget.entity.dialog.SelectAttachmentDialog;
-import org.sagebionetworks.web.client.widget.entity.dialog.VisualAttachmentsListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
+import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -71,7 +77,8 @@ public class EntityPropertyForm extends FormPanel {
 	ContentPanel propPanel;
 	VerticalPanel vp;
 	IconsImageBundle iconsImageBundle;
-	
+	BaseEditWidgetDescriptorPresenter widgetDescriptorEditor;
+	NodeModelCreator nodeModelCreator;
 	JSONObjectAdapter adapter;
 	ObjectSchema schema;
 	Annotations annos;
@@ -84,10 +91,12 @@ public class EntityPropertyForm extends FormPanel {
 	SafeHtml showFormattingTipsSafeHTML, hideFormattingTipsSafeHTML;
 	
 	@Inject
-	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, Previewable previewGenerator) {
+	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, Previewable previewGenerator, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor, NodeModelCreator nodeModelCreator) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
 		this.previewGenerator = previewGenerator;
+		this.nodeModelCreator = nodeModelCreator;
+		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		showFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
 		hideFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_HIDE_TIPS_TEXT);
 	}
@@ -252,13 +261,13 @@ public class EntityPropertyForm extends FormPanel {
 
 		//and now the description toolbar
 		Button previewButton = new Button(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT);
-		Button addImageButton = new Button(DisplayConstants.ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT);
-		addImageButton.setEnabled(attachments != null && VisualAttachmentsListViewImpl.getVisualAttachments(attachments).size() > 0);
-		
+		//Button addImageButton = new Button(DisplayConstants.ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT);
+		//addImageButton.setEnabled(attachments != null && VisualAttachmentsListViewImpl.getVisualAttachments(attachments).size() > 0);
+		Button insertYouTubeButton = new Button("YouTube Video");
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setTableWidth("180px");
 		hp.add(previewButton);
-		hp.add(addImageButton);
+		hp.add(insertYouTubeButton);
 		
 		// The preview button.
 		previewButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
@@ -268,34 +277,55 @@ public class EntityPropertyForm extends FormPanel {
 			}
 	    });
 		final String baseURl = GWT.getModuleBaseURL()+"attachment";
-        
-		// The add image button
-		addImageButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		insertYouTubeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				//pop up a list of attachments, and have the user pick one.
-				SelectAttachmentDialog.showSelectAttachmentDialog(baseURl,  entityId, attachments, "Select Attachment", "Insert", new SelectAttachmentDialog.Callback() {
+				BaseEditWidgetDescriptorPresenter.editNewWidget(widgetDescriptorEditor, entityId, YouTubeWidgetDescriptor.class.getName(), attachments, new WidgetDescriptorUpdatedHandler() {
 					
 					@Override
-					public void onSelectAttachment(AttachmentData data) {
-						//insert the markdown into the description for the image attachment
-						SafeHtml safeName = SafeHtmlUtils.fromString(data.getName());
-						TextArea descriptionTextArea = (TextArea)descriptionField;
-						String currentValue = descriptionTextArea.getValue();
-						if (currentValue == null)
-							currentValue = "";
-						int cursorPos = descriptionTextArea.getCursorPos();
-						if (cursorPos < 0)
-							cursorPos = 0;
-						else if (cursorPos > currentValue.length())
-							cursorPos = currentValue.length();
-						String attachmentLinkMarkdown = MarkdownUtils.getAttachmentLinkMarkdown(safeName.asString(), entityId, data.getTokenId(), data.getPreviewId(), safeName.asString());
-						descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + attachmentLinkMarkdown + currentValue.substring(cursorPos));
+					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
+						insertWidgetMarkdown(event.getName());
+						
+						Entity entity;
+						try {
+							entity = nodeModelCreator.createEntity(event.getEntityWrapper());
+							//update etag and attachments 
+							entity.writeToJSONObject(adapter);
+						} catch (JSONObjectAdapterException e) {
+							throw new RuntimeException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+						}
 					}
 				});
-					
 			}
-	    });
+		});
+		
+//		// The add image button
+//		addImageButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+//			@Override
+//			public void componentSelected(ButtonEvent ce) {
+//				//pop up a list of attachments, and have the user pick one.
+//				SelectAttachmentDialog.showSelectAttachmentDialog(baseURl,  entityId, attachments, "Select Attachment", "Insert", new SelectAttachmentDialog.Callback() {
+//					
+//					@Override
+//					public void onSelectAttachment(AttachmentData data) {
+//						//insert the markdown into the description for the image attachment
+//						SafeHtml safeName = SafeHtmlUtils.fromString(data.getName());
+//						TextArea descriptionTextArea = (TextArea)descriptionField;
+//						String currentValue = descriptionTextArea.getValue();
+//						if (currentValue == null)
+//							currentValue = "";
+//						int cursorPos = descriptionTextArea.getCursorPos();
+//						if (cursorPos < 0)
+//							cursorPos = 0;
+//						else if (cursorPos > currentValue.length())
+//							cursorPos = currentValue.length();
+//						String attachmentLinkMarkdown = MarkdownUtils.getAttachmentLinkMarkdown(safeName.asString(), entityId, data.getTokenId(), data.getPreviewId(), safeName.asString());
+//						descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + attachmentLinkMarkdown + currentValue.substring(cursorPos));
+//					}
+//				});
+//					
+//			}
+//	    });
 		formPanel.add(hp,formatLinkFormData);
 		
 		// Add them to the form
@@ -315,6 +345,20 @@ public class EntityPropertyForm extends FormPanel {
 		this.layout();
 	}
 	
+	public void insertWidgetMarkdown(String attachmentName) {
+		//insert the markdown into the description for the attachment (where the attachment points to the json used to describe the widget)
+		TextArea descriptionTextArea = (TextArea)descriptionField;
+		String currentValue = descriptionTextArea.getValue();
+		if (currentValue == null)
+			currentValue = "";
+		int cursorPos = descriptionTextArea.getCursorPos();
+		if (cursorPos < 0)
+			cursorPos = 0;
+		else if (cursorPos > currentValue.length())
+			cursorPos = currentValue.length();
+		String md = "{Widget:" + attachmentName+"}";
+		descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
+	}
 	
 	/**
 	 * Pass editable copies of all objects.

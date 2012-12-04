@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.transform;
 
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -93,6 +94,18 @@ public class JSONEntityFactoryImpl implements JSONEntityFactory {
 		Entity entity = (Entity) internalFactory.newInstance(entityType);
 		entity.initializeFromJSONObject(adapter);
 		return entity;
+	}
+
+	@Override
+	public WidgetDescriptor createWidget(String json) throws JSONObjectAdapterException {
+		// first we must parse the json to determine the type.
+		JSONObjectAdapter adapter = this.adapterFactory.createNew(json);
+		if(!adapter.has("entityType")) throw new IllegalArgumentException("Cannot determine the entity type because the 'entityType' is null");
+		String entityType = adapter.getString("entityType");
+		// create a new instance
+		WidgetDescriptor widgetDescriptor = (WidgetDescriptor) internalFactory.newInstance(entityType);
+		widgetDescriptor.initializeFromJSONObject(adapter);
+		return widgetDescriptor;
 	}
 
 }

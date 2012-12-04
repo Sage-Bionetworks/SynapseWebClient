@@ -15,6 +15,9 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.dialog.editors.ImageConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.dialog.editors.ProvenanceConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.dialog.editors.YouTubeConfigEditor;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
@@ -64,4 +67,10 @@ public interface PortalGinInjector extends Ginjector {
 	public EventBus getEventBus();
 	
 	public JiraURLHelper getJiraURLHelper();
+	
+	public YouTubeConfigEditor getYouTubeConfigEditor();
+	
+	public ProvenanceConfigEditor getProvenanceConfigEditor();
+	
+	public ImageConfigEditor getImageConfigEditor();
 }

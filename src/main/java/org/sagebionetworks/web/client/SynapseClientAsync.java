@@ -3,10 +3,6 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.provenance.Activity;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -102,7 +98,9 @@ public interface SynapseClientAsync {
 
 	void getActivity(String activityId, AsyncCallback<String> callback);
 	
-	void addWidgetDescriptorToEntity(WidgetDescriptor descriptor, String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	void addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 	
 	void removeAttachmentFromEntity(String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	
+	void getWidgetDescriptorJson(String entityId, String attachmentName,AsyncCallback<String> callback) throws RestServiceException;
 }

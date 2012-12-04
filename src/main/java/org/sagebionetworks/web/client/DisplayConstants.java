@@ -77,6 +77,7 @@ public class DisplayConstants {
 	
 	public static final String STORAGE_USAGE_FAILED_TEXT = "Unable to determine the current usage at this time.";
 	
+	public static final String INVALID_WIDGET_DESCRIPTOR_TYPE = "Widget descriptor is not of the correct type";
 	/*
 	 * Buttons, titles and labels
 	 */
@@ -311,7 +312,7 @@ public class DisplayConstants {
 																		"<h3>Preformatted Code Blocks</h3><pre><code>Indent every line of a code block by at least 4 spaces or 1 tab.<br><br>This is a normal paragraph.<br><br>    This is a preformatted<br>    code block.</code></pre><br>" +
 																		"<h3>Horizontal Rules</h3>Three or more dashes or asterisks:<pre><code>---<br>* * *<br>- - - - <br></code></pre><br>" +
 																		"<h3>Symbols</h3><pre><code>&amp;copy; = copyright sign<br>&amp;mdash; = wide dash<br>&amp;amp; = ampersand<br>&amp;trade; = trademark TM<br>&amp;reg; = reserved mark R</code></pre><br>"+
-																		"<h3>Synapse Website Specific Markdown</h3><p>Embed YouTube Videos:<pre><code>{youtube=&ltvideo-id&gt}</code></pre><br>Replace <strong class=\"from-markdown\">&ltvideo-id&gt</strong> with <strong class=\"from-markdown\">foobar123</strong> when embedding the video http://www.youtube.com/watch?v=<strong class=\"from-markdown\">foobar123</strong></p><br></div>";
+																		"</div>";
 	public static final String ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT = "Preview failed: ";
 	public static final String ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT = "Preview";
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
@@ -328,7 +329,7 @@ public class DisplayConstants {
 	public static final String ENTITY = "Entity";
 	public static final String LOADING = "Loading";
 	public static final String ACTIVITY = "Activity";
-
+	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, '_' and '.'";
 
 	/*
 	 * Element ids for Selenium

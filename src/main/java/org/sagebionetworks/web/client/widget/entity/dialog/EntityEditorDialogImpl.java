@@ -11,6 +11,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 import org.sagebionetworks.web.client.widget.entity.FormFieldFactory;
 import org.sagebionetworks.web.client.widget.entity.Previewable;
@@ -41,12 +43,16 @@ public class EntityEditorDialogImpl implements EntityEditorDialog, Previewable{
 	FormFieldFactory formFactory;
 	IconsImageBundle icons;
 	SynapseClientAsync synapseClient;
+	BaseEditWidgetDescriptorPresenter baseEditWidgetDescriptor;
+	NodeModelCreator nodeModelCreator;
 	
 	@Inject
-	public EntityEditorDialogImpl(FormFieldFactory formFactory, IconsImageBundle icons, SynapseClientAsync synapseClient){
+	public EntityEditorDialogImpl(FormFieldFactory formFactory, IconsImageBundle icons, SynapseClientAsync synapseClient, BaseEditWidgetDescriptorPresenter baseEditWidgetDescriptor, NodeModelCreator nodeModelCreator){
 		this.formFactory = formFactory;
 		this.icons = icons;
 		this.synapseClient = synapseClient;
+		this.baseEditWidgetDescriptor = baseEditWidgetDescriptor;
+		this.nodeModelCreator = nodeModelCreator;
 	}
 
 	@Override
@@ -112,7 +118,7 @@ public class EntityEditorDialogImpl implements EntityEditorDialog, Previewable{
 	    window.setHideOnButtonClick(true);
 	    
 	    // Create the property from
-	    EntityPropertyForm editor = new EntityPropertyForm(formFactory, icons, this);
+	    EntityPropertyForm editor = new EntityPropertyForm(formFactory, icons, this, baseEditWidgetDescriptor, nodeModelCreator);
 	    editor.setDataCopies(newAdapter, schema, newAnnos, filter, entityId, attachments);
 	    window.add(editor, new FitData(0));
 	    // List for the button selection

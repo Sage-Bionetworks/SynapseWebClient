@@ -3,16 +3,12 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -184,6 +180,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getActivity(String activityId) throws RestServiceException;
 	
-	public EntityWrapper addWidgetDescriptorToEntity(WidgetDescriptor descriptor, String entityId, String attachmentName) throws RestServiceException;
+	public EntityWrapper addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName) throws RestServiceException;
 	public EntityWrapper removeAttachmentFromEntity(String entityId, String attachmentName) throws RestServiceException;
+	public String getWidgetDescriptorJson(String entityId, String attachmentName) throws RestServiceException; 
 }
