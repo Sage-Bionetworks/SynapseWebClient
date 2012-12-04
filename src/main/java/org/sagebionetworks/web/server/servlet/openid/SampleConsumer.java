@@ -188,24 +188,12 @@ public class SampleConsumer
             	}
             }
             if (discovered==null) throw new RuntimeException("OpenID authentication failure: Missing required discovery information.");
-            if (false) {
-                // verify the response
-                VerificationResult verification = manager.verify(
-                        receivingURL.toString(), response, discovered);
-                Identifier verified = verification.getVerifiedId();
-                if (verified != null) {
-                	success = true;
-                    authSuccess = (AuthSuccess) verification.getAuthResponse();
-                    result.setIdentifier(verified.getIdentifier());
-                }
-           } else {
-            	authSuccess = AuthSuccess.createAuthSuccess(response);
-            	boolean nonceVerified = manager.verifyNonce(authSuccess, discovered);
-            	success = nonceVerified;
-            	if (success) {
-            		result.setIdentifier(httpReq.getParameter("openid.identity"));
-            	}
-            }
+        	authSuccess = AuthSuccess.createAuthSuccess(response);
+        	boolean nonceVerified = manager.verifyNonce(authSuccess, discovered);
+        	success = nonceVerified;
+        	if (success) {
+        		result.setIdentifier(httpReq.getParameter("openid.identity"));
+        	}
             
 
             // examine the verification result and extract the verified identifier
