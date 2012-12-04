@@ -28,12 +28,11 @@ public class YouTubeConfigViewImpl extends LayoutContainer implements YouTubeCon
 		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
 		urlField = new TextField<String>();
 		urlField.setAllowBlank(false);
-		urlField.setName("URL");
 		urlField.setRegex(WebConstants.VALID_URL_REGEX);
 		urlField.getMessages().setRegexText("Enter a valid URL");
-		Label urlLabel = new Label("URL:");
-		urlLabel.setWidth(50);
-		urlField.setWidth(205);
+		Label urlLabel = new Label("Video URL:");
+		urlLabel.setWidth(70);
+		urlField.setWidth(185);
 		hp.add(urlLabel);
 		hp.add(urlField);
 		add(hp);

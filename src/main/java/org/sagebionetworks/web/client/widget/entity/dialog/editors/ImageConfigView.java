@@ -11,7 +11,15 @@ public interface ImageConfigView extends IsWidget, WidgetDescriptorView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-
+	
+	/**
+	 * True if user just wants to insert a reference to an image from the web
+	 * @return
+	 */
+	public boolean isExternal();
+	
+	public String getImageUrl();
+	
 	
 	/**
 	 * Presenter interface

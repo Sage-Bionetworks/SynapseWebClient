@@ -75,7 +75,7 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 		nameField = new TextField<String>();
 		nameField.setAllowBlank(false);
 		nameField.setName("Name");
-		nameField.setRegex(WebConstants.VALID_ANNOTATION_NAME_REGEX);
+		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
 		nameField.getMessages().setRegexText(DisplayConstants.ERROR_NAME_PATTERN_MISMATCH);
 		Label nameLabel = new Label("Name:");
 		nameLabel.setWidth(50);

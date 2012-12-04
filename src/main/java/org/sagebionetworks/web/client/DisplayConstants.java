@@ -329,7 +329,7 @@ public class DisplayConstants {
 	public static final String ENTITY = "Entity";
 	public static final String LOADING = "Loading";
 	public static final String ACTIVITY = "Activity";
-	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, '_' and '.'";
+	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 
 	/*
 	 * Element ids for Selenium

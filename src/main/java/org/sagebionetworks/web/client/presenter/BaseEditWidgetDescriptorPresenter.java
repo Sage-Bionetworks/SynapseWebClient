@@ -82,7 +82,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		int i = 1;
 		String newAttachmentName = null;
 		while(!unique){
-			newAttachmentName = attachmentName+"_"+i;
+			newAttachmentName = attachmentName+" ("+i + ")";
 			if (!names.contains(newAttachmentName))
 				unique = true;
 			i++;
