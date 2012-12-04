@@ -97,9 +97,13 @@ public class DisplayConstants {
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
 	public static final String LABEL_PERMISSION_TEXT_ADD_PEOPLE = "Add People";
 	public static final String BUTTON_SHOW_R_CLIENT_INSTALL = "Show R Client Installation Code";
-	public static final String LABEL_R_CLIENT_INSTALL = "Install Synapse R Client";
-	public static final String LABEL_R_CLIENT_GET_ENTITY = "Obtain a pointer";
-	public static final String LABEL_R_CLIENT_LOAD_ENTITY = "Load the data";
+	public static final String LABEL_R_CLIENT_INSTALL = "Install R Client";
+	public static final String LABEL_PYTHON_CLIENT_INSTALL = "Install Python Client";
+	public static final String INSTALL_JAVA_MAVEN = "Install Java Client";
+	public static final String LABEL_CL_CLIENT_INSTALL = "Install Command Line Client";
+	public static final String LABEL_CLIENT_GET_ENTITY = "Obtain a pointer";
+	public static final String LABEL_CLIENT_LOAD_ENTITY = "Load the data";
+	public static final String DOWNLOAD_FILE_LOCAL = "Download file";
 	public static final String LOGIN_USERNAME_LABEL = "Email Address";
 	
 	/*
@@ -402,6 +406,9 @@ public class DisplayConstants {
 	public static final String PAGE_NOT_FOUND = "Page not found";
 	public static final String PAGE_NOT_FOUND_DESC = "The page you requested was not found, that's all we know.";
 	public static final String ANNOTATIONS = "Annotations";
+	public static final String TO_LOAD_VERSION_1 = "To load version 1";
+	public static final String TO_LOAD_AN_ENTITY = "To load an entity";
+	public static final String PROGRAMMATIC_ACCESS = "Programmatic Access";
 
 }
 

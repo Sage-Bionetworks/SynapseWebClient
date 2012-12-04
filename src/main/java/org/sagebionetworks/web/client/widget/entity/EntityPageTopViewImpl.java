@@ -214,7 +214,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		renderTitleAndMetadata(bundle, isAdmin, canEdit, readOnly, widgetMargin);
-		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
+//		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
 		
@@ -226,6 +226,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
 		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly), widgetMargin);
+		// Programmatic Clients
+		colRightContainer.add(createProgrammaticClientsWidget(bundle), widgetMargin);
 		
 		// ** FULL WIDTH **
 		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************
@@ -342,13 +344,27 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);
 	    provenanceWidget.buildTree(bundle.getEntity(), 1, false);
 	    LayoutContainer border = new LayoutContainer();
-	    border.addStyleName("x-border");	    
+	    border.setBorders(true);	    
 	    border.add(provenanceWidget.asWidget());
 	    lc.add(border);
 	    lc.layout();
 		return lc;
 	}
+	
+	private Widget createProgrammaticClientsWidget(EntityBundle bundle) {		
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.PROGRAMMATIC_ACCESS + "</h3>")));
 
+		LayoutContainer border = new LayoutContainer();
+		border.setBorders(true);
+	    border.add(ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), synapseJSNIUtils, sageImageBundle), new MarginData(0,5,5,5));
+	    lc.add(border, new MarginData(10,0,0,0));
+	    lc.layout();
+		return lc;
+	}
+	
 	private Widget createEntityChildBrowserWidget(Entity entity, boolean showTitle) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);

@@ -46,5 +46,18 @@ public interface SageImageBundle extends ClientBundle {
 	
 	@Source("images/expand.png")
 	ImageResource expand();
+
+	@Source("images/logo-R.png")
+	ImageResource logoR45();
+	
+	@Source("images/logo-java.png")
+	ImageResource logoJava45();
+	
+	@Source("images/logo-python.png")
+	ImageResource logoPython45();
+	
+	@Source("images/logo-Shell.png")
+	ImageResource logoCommandLine45();
+	
 	
 }
