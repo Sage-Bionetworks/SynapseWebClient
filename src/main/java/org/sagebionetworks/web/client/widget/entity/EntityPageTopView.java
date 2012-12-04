@@ -21,12 +21,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly);
 
 	/**
-	 * Sets the RStudio URL for the view
-	 * @param rStudioUrl
-	 */
-	public void setRStudioUrlReady();
-
-	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
