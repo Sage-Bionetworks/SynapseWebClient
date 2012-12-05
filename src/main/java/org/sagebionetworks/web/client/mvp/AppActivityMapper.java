@@ -94,10 +94,7 @@ public class AppActivityMapper implements ActivityMapper {
 		}
 		
 		globalApplicationState.setCurrentPlace(place);
-		
-		// check for demo
-		authenticationController.loadShowDemo();
-		
+				
 		// If the user is not logged in then we redirect them to the login screen
 		// except for the fully public places
 		if(!openAccessPlaces.contains(place.getClass())) {

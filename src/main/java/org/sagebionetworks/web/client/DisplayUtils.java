@@ -127,6 +127,9 @@ public class DisplayUtils {
 	public static final String DEFAULT_PLACE_TOKEN = "0";
 	
 	public static final String R_CLIENT_DOWNLOAD_CODE = "source('http://depot.sagebase.org/CRAN.R')<br/>pkgInstall(c(\"synapseClient\"))";
+	public static final String PYTHON_CLIENT_DOWNLOAD_CODE = "# From Terminal Prompt:<br/>pip install SynapseClient<br/><br/># or<br/>easy_install SynapseClient";
+	
+
 	
 	private static final String ERROR_OBJ_REASON_KEY = "reason";
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
@@ -564,17 +567,7 @@ public class DisplayUtils {
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}
-	
-	public static SafeHtml getRClientEntityLoad(String id) {
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("# " + DisplayConstants.LABEL_R_CLIENT_GET_ENTITY + " <br/>")  
-		.appendEscaped(id).appendHtmlConstant(" &lt;- getEntity('").appendEscaped(id).appendHtmlConstant("')")
-		.appendHtmlConstant("<br/><br/># " + DisplayConstants.LABEL_R_CLIENT_LOAD_ENTITY + " <br/>")
-		.appendEscaped(id).appendHtmlConstant(" &lt;- loadEntity('")
-		.appendEscaped(id).appendHtmlConstant("')");
-		return shb.toSafeHtml();
-	}	
-	
+		
 	public static String convertDateToString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
 		DateTime dt = new DateTime(toFormat.getTime());
@@ -994,19 +987,31 @@ public class DisplayUtils {
 		}
 	}
 
+	public static void addClickPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
+		Map<String, String> optionsMap = new TreeMap<String, String>();
+		optionsMap.put("data-html", "true");
+		optionsMap.put("data-animation", "true");
+		optionsMap.put("title", title);
+		optionsMap.put("data-placement", pos.toString().toLowerCase());
+		optionsMap.put("trigger", "click");		
+		addPopover(util, widget, content, optionsMap);
+	}
+
+	
 	/**
 	 * Adds a popover to a target widget
 	 * 
 	 * Same warnings apply as to {@link #addTooltip(SynapseJSNIUtils, Widget, String) addTooltip}
 	 */
-	public static void addPopover(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
+	public static void addPopover(final SynapseJSNIUtils util, Widget widget, String content, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
-
+		el.setAttribute("data-content", content);
+		
 		String id = isNullOrEmpty(el.getId()) ? "sbn-popover-"+(popoverCount++) : el.getId();
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "popover");
 
-		if (el.getNodeType() == 1 && ! isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
+		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
 			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
 
 			applyAttributes(el, optionsMap);

@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -27,58 +24,26 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
-import org.sagebionetworks.web.shared.PaginatedResults;
 
-import com.extjs.gxt.ui.client.Style.Direction;
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.data.BaseModelData;
-import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
-import com.extjs.gxt.ui.client.data.BasePagingLoader;
-import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.data.PagingLoadConfig;
-import com.extjs.gxt.ui.client.data.PagingLoadResult;
-import com.extjs.gxt.ui.client.data.RpcProxy;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Padding;
-import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.button.SplitButton;
-import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
-import com.extjs.gxt.ui.client.widget.grid.ColumnData;
-import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
-import com.extjs.gxt.ui.client.widget.grid.Grid;
-import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
-import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
-import com.google.gwt.cell.client.widget.PreviewDisclosurePanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -92,9 +57,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
 
-	private static final String REFERENCES_KEY_ID = "id";
-	private static final String REFERENCES_KEY_NAME = "name";
-	private static final String REFERENCES_KEY_TYPE = "type";
 	private static final int PROVENANCE_HEIGHT_PX = 250;
 
 	@UiField
@@ -111,7 +73,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
-	private PreviewDisclosurePanel previewDisclosurePanel;
 	private ActionMenu actionMenu;
 	private LocationableTitleBar locationableTitleBar;
 	
@@ -125,8 +86,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Attachments attachmentsPanel;
 	private SnapshotWidget snapshotWidget;
 	private boolean readOnly = false;
-	private boolean rStudioUrlReady = false;
-	private SplitButton showRstudio;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
 	private WidgetFactory widgetFactory;
@@ -135,7 +94,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
 			AccessMenuButton accessMenuButton,
-			PreviewDisclosurePanel previewDisclosurePanel,
 			ActionMenu actionMenu,
 			LocationableTitleBar locationableTitleBar,
 			EntityChildBrowser entityChildBrowser, Breadcrumb breadcrumb,
@@ -145,7 +103,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			WidgetFactory widgetFactory) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
-		this.previewDisclosurePanel = previewDisclosurePanel;
 		this.actionMenu = actionMenu;
 		this.entityChildBrowser = entityChildBrowser;
 		this.breadcrumb = breadcrumb;
@@ -186,15 +143,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		MarginData widgetMargin = new MarginData(0, 0, 20, 0);
 
 		// Custom layouts for certain entities
-		if(bundle.getEntity() instanceof Summary) {
-		    renderSnapshotEntity(bundle, userProfile, entityTypeDisplay, canEdit, readOnly, widgetMargin);
+		if (bundle.getEntity() instanceof Project) {
+			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		} else if (bundle.getEntity() instanceof Folder) {
 			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
-		} else if (bundle.getEntity() instanceof Project) {
-			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
+		} else if (bundle.getEntity() instanceof Summary) {
+		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		} else {
 			// default entity view
-			renderDefaultEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
+			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		}
 
 		colLeftContainer.layout(true);
@@ -202,18 +159,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.layout(true);
 	}
 	
-	private LayoutContainer initContainerAndPanel(LayoutContainer container,
-			SimplePanel panel) {
-		if(container == null) {
-			container = new LayoutContainer();
-			container.setAutoHeight(true);
-			container.setAutoWidth(true);
-			panel.clear();
-			panel.add(container);
-		}
-		return container;
-	}
-
 	@Override
 	public Widget asWidget() {
 		return this;
@@ -242,9 +187,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	@Override
-	public void showLoading() {
-		// TODO
-	}
+	public void showLoading() {	}
 
 	@Override
 	public void showInfo(String title, String message) {
@@ -263,58 +206,18 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			fullWidthContainer.removeAll();
 	}
 
-	@Override
-	public void setRStudioUrlReady() {
-		// allow button to be used now
-		if(showRstudio != null) {
-			showRstudio.enable();
-		}
-	}
-
+	
 	/*
 	 * Private Methods
-	 */
-	private void renderFolderEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
-			MarginData widgetMargin) {
-		// TODO: make this actually render folders differently
-		renderDefaultEntity(bundle, entityTypeDisplay, isAdmin, canEdit, readOnly, widgetMargin);
-	}
-
-	private void renderProjectEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
-			MarginData widgetMargin) {
-		// TODO: make this actually render projects differently
-		renderDefaultEntity(bundle, entityTypeDisplay, isAdmin, canEdit, readOnly, widgetMargin);
-	}
-
-	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
+	 */		
+	// Render the File entity	
+	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
-		// Entity Metadata
-		colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin,
-				canEdit, readOnly), new MarginData(0, 0, 0, 0));
-		
-		entityMetadata.setEntityBundle(bundle, readOnly);
-		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
-			
-		
+		renderTitleAndMetadata(bundle, isAdmin, canEdit, readOnly, widgetMargin);
+//		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
-		// Child Browser
-		if(DisplayUtils.hasChildrenOrPreview(bundle)){
-			colLeftContainer.add(createEntityChildBrowserWidget(bundle.getEntity()), widgetMargin);
-		}
-		// Attachment preview is only added when there are previews.
-
-		if(DisplayUtils.hasAttachmentPreviews(bundle.getEntity())){
-			colLeftContainer.add(createAttachmentPreview(bundle.getEntity()), widgetMargin);
-		}
 		
-		// RStudio Button
-//		colLeftContainer.add(createRstudioWidget(bundle.getEntity()), widgetMargin);
-		// Create Activity Feed widget
-//		colLeftContainer.add(createActivityFeedWidget(bundle.getEntity()), widgetMargin);
-
 		// ** RIGHT **
 		// Provenance Widget for anything other than projects of folders
 		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) 
@@ -323,13 +226,110 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
 		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly), widgetMargin);
-		// Create References widget
-		colRightContainer.add(createReferencesWidget(bundle.getEntity(), bundle.getReferencedBy()), widgetMargin);
-		// Create R Client widget
-		colRightContainer.add(createRClientWidget(bundle.getEntity()), widgetMargin);
+		// Programmatic Clients
+		colRightContainer.add(createProgrammaticClientsWidget(bundle), widgetMargin);
+		
+		// ** FULL WIDTH **
+		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************
+		// Child Browser
+		if(DisplayUtils.hasChildrenOrPreview(bundle)){
+			fullWidthContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), true), widgetMargin);
+		}
+		// Attachment preview is only added when there are previews.
+		if(DisplayUtils.hasAttachmentPreviews(bundle.getEntity())){
+			fullWidthContainer.add(createAttachmentPreview(bundle.getEntity()), widgetMargin);
+		}
+		// ************************************************************************************************		
+	}
+
+	// Render the Folder entity
+	private void renderFolderEntity(EntityBundle bundle,
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
+			MarginData widgetMargin) {
+		// ** LEFT **
+		renderTitleAndMetadata(bundle, isAdmin, canEdit, readOnly, widgetMargin);
+		
+		// ** RIGHT **
+		// none
 
 		// ** FULL WIDTH **
-		// none.
+		// Child Browser
+		fullWidthContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), false), widgetMargin);
+		// Description
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
+	}
+	
+	// Render the Project entity
+	private void renderProjectEntity(EntityBundle bundle,
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
+			MarginData widgetMargin) {
+		// ** LEFT **
+		renderTitleAndMetadata(bundle, isAdmin, canEdit, readOnly, widgetMargin);
+		
+		// ** RIGHT **
+		//none
+	
+		// ** FULL WIDTH **
+		// Description
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
+		// Child Browser
+		fullWidthContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), true), widgetMargin);		
+		// Annotation widget
+		fullWidthContainer.add(createPropertyWidget(bundle), widgetMargin);
+		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************
+		// Attachments
+		fullWidthContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly), widgetMargin);
+		// Attachment preview is only added when there are previews.
+		if(DisplayUtils.hasAttachmentPreviews(bundle.getEntity())){
+			fullWidthContainer.add(createAttachmentPreview(bundle.getEntity()), widgetMargin);
+		}
+		// ************************************************************************************************
+	}
+
+	// Render Snapshot Entity
+	// TODO: This rendering should be phased out in favor of a regular wiki page
+	private void renderSummaryEntity(EntityBundle bundle,
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
+			MarginData widgetMargin) {
+		// ** LEFT **
+		renderTitleAndMetadata(bundle, isAdmin, canEdit, readOnly, widgetMargin);
+		// Description
+		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
+
+		// ** RIGHT **
+		// Annotation Editor widget
+		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
+		// Attachments
+		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly), widgetMargin);
+
+		// ** FULL WIDTH **
+		// Snapshot entity
+		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);
+		fullWidthContainer.add(snapshotWidget.asWidget());
+	}
+	
+	
+	/*
+	 * Widget inits
+	 */	
+	private void renderTitleAndMetadata(EntityBundle bundle, boolean isAdmin,
+			boolean canEdit, boolean readOnly, MarginData widgetMargin) {
+		// Entity Metadata
+		colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
+		entityMetadata.setEntityBundle(bundle, readOnly);
+		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
+	}
+	
+	private Widget createPreviewWidget(EntityBundle bundle) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setHeight(415);
+		lc.setBorders(true);
+		
+		lc.add(new HTML("No Preview Available"), new MarginData(10));
+		
+	    lc.layout();
+		return lc;
 	}
 
 	private Widget createProvenanceWidget(EntityBundle bundle) {
@@ -344,234 +344,37 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);
 	    provenanceWidget.buildTree(bundle.getEntity(), 1, false);
 	    LayoutContainer border = new LayoutContainer();
-	    border.addStyleName("x-border");	    
+	    border.setBorders(true);	    
 	    border.add(provenanceWidget.asWidget());
 	    lc.add(border);
 	    lc.layout();
 		return lc;
 	}
-
-
-	private void renderSnapshotEntity(EntityBundle bundle, UserProfile userProfile,
-			String entityTypeDisplay, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
-
-		entityMetadata.setEntityBundle(bundle, readOnly);
-		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
-		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
-
-		// ** RIGHT **
-		// Annotation Editor widget
-		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
-		// Attachments
-		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly), widgetMargin);
-
-		// ** FULL WIDTH **
-		// Snapshot entity
-		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);
-		fullWidthContainer.add(snapshotWidget.asWidget());
-
-	}
-
-	private Widget createRClientWidget(Entity entity) {
+	
+	private Widget createProgrammaticClientsWidget(EntityBundle bundle) {		
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		lc.add(new Html(SafeHtmlUtils.fromSafeConstant("<h3>Synapse R Client</h3>").asString()));
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.PROGRAMMATIC_ACCESS + "</h3>")));
 
-	    // setup install code widgets
-		SafeHtml rClientLoad = DisplayUtils.getRClientEntityLoad(entity.getId());
-	    Html loadEntityCode = new Html(rClientLoad.asString());
-	    loadEntityCode.setStyleName(DisplayUtils.STYLE_CODE_CONTENT);
-
-		final LayoutContainer container = new LayoutContainer();
-	    String rSnipet = "# " + DisplayConstants.LABEL_R_CLIENT_INSTALL
-		+ "<br/>" + DisplayUtils.R_CLIENT_DOWNLOAD_CODE;
-		container.addText(rSnipet);
-	    container.setStyleName(DisplayUtils.STYLE_CODE_CONTENT);
-	    container.setVisible(false);
-
-
-		Button getRClientButton = new Button(DisplayConstants.BUTTON_SHOW_R_CLIENT_INSTALL,
-				new SelectionListener<ButtonEvent>() {
-					public void componentSelected(ButtonEvent ce) {
-						if (container.isVisible()) {
-							container.el().slideOut(Direction.UP, FxConfig.NONE);
-						} else {
-							container.setVisible(true);
-							container.el().slideIn(Direction.DOWN, FxConfig.NONE);
-						}
-					}
-
-				});
-		getRClientButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.cog16()));
-
-		VerticalPanel vp = new VerticalPanel();
-		vp.add(getRClientButton);
-		vp.add(container);
-
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<p>The Synapse R Client allows you to interact with the Synapse system programmatically.</p>")));
-		lc.add(loadEntityCode);
-		lc.add(vp);
-
-		lc.layout();
-	    return lc;
-	}
-
-	private Widget createReferencesWidget(Entity entity, PaginatedResults<EntityHeader> referencedBy) {
-		LayoutContainer lc = new LayoutContainer();
-		lc.setAutoWidth(true);
-		lc.setAutoHeight(true);
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<h3>Others Using this ").appendEscaped(entityTypeProvider.getEntityDispalyName(entity)).appendHtmlConstant("</h3>");
-		lc.add(new HTML(shb.toSafeHtml()));
-
-	    if(referencedBy.getTotalNumberOfResults() > 0) {
-		    List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-
-		    // ref by column
-			ColumnConfig colConfig = new ColumnConfig(REFERENCES_KEY_ID, "Referenced By", 200);
-			columns.add(colConfig);
-			GridCellRenderer<BaseModelData> cellRenderer = configureReferencedByGridCellRenderer();
-			colConfig.setRenderer(cellRenderer);
-			colConfig.setSortable(false);
-
-		    ColumnModel cm = new ColumnModel(columns);
-
-		    // TODO : eventually remove this block
-		    if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {
-				lc.add(new HTML(DisplayConstants.DEMO_ANALYSIS));
-				return lc;
-			}
-
-		    // CREATE TABLE
-		    // add table of references
-	        RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
-	            @Override
-	            public void load(Object loadConfig, final AsyncCallback<PagingLoadResult<BaseModelData>> callback) {
-	            	int offset = ((PagingLoadConfig) loadConfig).getOffset();
-	            	int limit =  ((PagingLoadConfig) loadConfig).getLimit();
-	            	presenter.loadShortcuts(offset, limit, new AsyncCallback<PaginatedResults<EntityHeader>>() {
-						@Override
-						public void onSuccess(PaginatedResults<EntityHeader> result) {
-							List<BaseModelData> dataList = new ArrayList<BaseModelData>();
-							for(EntityHeader header : result.getResults()) {
-								BaseModelData model = new BaseModelData();
-								model.set(REFERENCES_KEY_ID, header.getId());
-								model.set(REFERENCES_KEY_NAME, header.getName());
-								model.set(REFERENCES_KEY_TYPE, header.getType());
-
-								dataList.add(model);
-							}
-							PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(dataList);
-							loadResultData.setTotalLength((int) result.getTotalNumberOfResults());
-							//loadResultData.setOffset(result.get);
-
-							callback.onSuccess(loadResultData);
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
-						}
-					});
-	            }
-	        };
-
-	        // create a paging loader from the proxy
-	        BasePagingLoader<PagingLoadResult<ModelData>> loader = new BasePagingLoader<PagingLoadResult<ModelData>>(proxy);
-	        loader.setRemoteSort(false);
-	        loader.setReuseLoadConfig(true);
-	        loader.setLimit(200);
-	        loader.setOffset(0);
-
-	        // add initial data to the store
-			ListStore<BaseModelData> store = new ListStore<BaseModelData>(loader);
-
-			Grid<BaseModelData> grid = new Grid<BaseModelData>(store, cm);
-			grid.setLayoutData(new FitLayout());
-			grid.setStateful(false);
-			grid.setLoadMask(true);
-			grid.getView().setForceFit(true);
-			grid.setAutoWidth(false);
-			grid.setStyleAttribute("borderTop", "none");
-			grid.setBorders(false);
-			grid.setStripeRows(true);
-			grid.setHeight(200);
-
-			ContentPanel cp = new ContentPanel();
-			cp.setLayout(new FitLayout());
-			cp.setBodyBorder(true);
-			cp.setButtonAlign(HorizontalAlignment.CENTER);
-			cp.setHeaderVisible(false);
-			cp.setHeight(200);
-
-			// create bottom paging toolbar
-		    PagingToolBar toolBar = new PagingToolBar(10);
-	        toolBar.bind(loader);
-	        toolBar.setSpacing(2);
-	        toolBar.insert(new SeparatorToolItem(), toolBar.getItemCount() - 2);
-
-	    	cp.setBottomComponent(toolBar);
-
-			cp.add(grid);
-
-			lc.add(cp);
-
-			// load initial data
-			loader.load();
-
-	    } else {
-	    	SafeHtmlBuilder shbNoRef = new SafeHtmlBuilder();
-	    	shbNoRef.appendHtmlConstant(DisplayConstants.TEXT_NO_REFERENCES + " ").appendEscaped(entityTypeProvider.getEntityDispalyName(entity)).appendHtmlConstant(".");
-	    	lc.add(new HTML(shbNoRef.toSafeHtml()));
-	    }
+		LayoutContainer border = new LayoutContainer();
+		border.setBorders(true);
+	    border.add(ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), synapseJSNIUtils, sageImageBundle), new MarginData(0,5,5,5));
+	    lc.add(border, new MarginData(10,0,0,0));
 	    lc.layout();
-	    return lc;
+		return lc;
 	}
-
-	private GridCellRenderer<BaseModelData> configureReferencedByGridCellRenderer() {
-		// configure cell renderer
-		GridCellRenderer<BaseModelData> cellRenderer = new GridCellRenderer<BaseModelData>() {
-			public String render(BaseModelData model, String property, ColumnData config, int rowIndex, int colIndex, ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
-				// catch all for types that don't need specific rendering beyond string
-				if(REFERENCES_KEY_ID.equals(property) && model.get(REFERENCES_KEY_ID) != null) {
-					return DisplayUtils.getIconHtml(presenter.getIconForType(model.get(REFERENCES_KEY_TYPE).toString()))
-							+ " "
-							+ presenter.createEntityLink(model.get(REFERENCES_KEY_ID).toString(),null, model.get(REFERENCES_KEY_NAME).toString());
-				} else {
-					return null;
-				}
-			}
-		};
-		return cellRenderer;
-	}
-
-	private Widget createActivityFeedWidget(Entity entity) {
+	
+	private Widget createEntityChildBrowserWidget(Entity entity, boolean showTitle) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Activity Feed</h3>")));
-
-		if(DisplayConstants.showDemoHtml && DisplayConstants.MSKCC_DATASET_DEMO_ID.equals(entity.getId())) {
-			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.DEMO_COMMENTS)));
-		} else {
-			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_ACTIVITY + "</div>")));
+		if(showTitle) {
+			SafeHtmlBuilder shb = new SafeHtmlBuilder();
+			shb.appendHtmlConstant("<h3>Files</h3>");
+			lc.add(new HTML(shb.toSafeHtml()));
 		}
-
-		lc.layout();
-	    return lc;
-	}
-
-	private Widget createEntityChildBrowserWidget(Entity entity) {
-		LayoutContainer lc = new LayoutContainer();
-		lc.setAutoWidth(true);
-		lc.setAutoHeight(true);
-
-		String typeDisplay = entityTypeProvider.getEntityDispalyName(entity);
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<h3>").appendEscaped(typeDisplay).appendHtmlConstant("Contents</h3>");
-		lc.add(new HTML(shb.toSafeHtml()));
 		lc.add(entityChildBrowser.asWidget(entity));
 		lc.layout();
 		return lc;
@@ -616,7 +419,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Properties &amp; Annotations</h3>")));
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.ANNOTATIONS + "</h3>")));
 
 	    // Create the property body
 	    // the headers for properties.
@@ -680,6 +483,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 	
+	// TODO : this should go away
 	private Widget createAttachmentsWidget(EntityBundle bundle, boolean canEdit, boolean readOnly) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
@@ -728,4 +532,18 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.layout();
 		return lc;
 	}
+
+	private LayoutContainer initContainerAndPanel(LayoutContainer container,
+			SimplePanel panel) {
+		if(container == null) {
+			container = new LayoutContainer();
+			container.setAutoHeight(true);
+			container.setAutoWidth(true);
+			panel.clear();
+			panel.add(container);
+		}
+		return container;
+	}
+
+
 }
