@@ -887,13 +887,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public VersionInfo promoteEntityVersion(String entityId, Long versionNumber)
+	public String promoteEntityVersion(String entityId, Long versionNumber)
 			throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			return synapseClient.promoteEntityVersion(entityId, versionNumber);
+			VersionInfo version = synapseClient.promoteEntityVersion(entityId, versionNumber);
+			return EntityFactory.createJSONStringForEntity(version);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 

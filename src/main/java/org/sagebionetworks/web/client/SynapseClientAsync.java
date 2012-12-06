@@ -99,5 +99,5 @@ public interface SynapseClientAsync {
 
 	void getActivity(String activityId, AsyncCallback<String> callback);
 
-	void promoteEntityVersion(String entityId, Long versionNumber, AsyncCallback<VersionInfo> callback);
+	void promoteEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 }
