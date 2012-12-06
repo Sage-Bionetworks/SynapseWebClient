@@ -182,5 +182,5 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getActivity(String activityId) throws RestServiceException;
 
-	VersionInfo promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
+	String promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
 }
