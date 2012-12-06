@@ -4,6 +4,7 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -98,4 +99,5 @@ public interface SynapseClientAsync {
 
 	void getActivity(String activityId, AsyncCallback<String> callback);
 
+	void promoteEntityVersion(String entityId, Long versionNumber, AsyncCallback<VersionInfo> callback);
 }
