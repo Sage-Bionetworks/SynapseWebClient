@@ -1,5 +1,6 @@
-package org.sagebionetworks.web.client.widget.entity.dialog.editors;
+package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -29,10 +30,10 @@ public class YouTubeConfigViewImpl extends LayoutContainer implements YouTubeCon
 		urlField = new TextField<String>();
 		urlField.setAllowBlank(false);
 		urlField.setRegex(WebConstants.VALID_URL_REGEX);
-		urlField.getMessages().setRegexText("Enter a valid URL");
-		Label urlLabel = new Label("Video URL:");
+		urlField.getMessages().setRegexText(DisplayConstants.INVALID_URL_MESSAGE);
+		Label urlLabel = new Label(DisplayConstants.YOUTUBE_VIDEO_URL_LABEL);
 		urlLabel.setWidth(70);
-		urlField.setWidth(185);
+		urlField.setWidth(248);
 		hp.add(urlLabel);
 		hp.add(urlField);
 		add(hp);
@@ -80,7 +81,10 @@ public class YouTubeConfigViewImpl extends LayoutContainer implements YouTubeCon
 	public int getDisplayHeight() {
 		return 50;
 	}
-	
+	@Override
+	public int getAdditionalWidth() {
+		return 0;
+	}
 	@Override
 	public void clear() {
 	}

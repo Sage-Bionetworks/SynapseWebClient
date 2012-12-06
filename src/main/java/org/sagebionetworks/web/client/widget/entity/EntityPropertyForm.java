@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -28,11 +29,11 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
-import org.sagebionetworks.web.client.widget.entity.dialog.SelectAttachmentDialog;
-import org.sagebionetworks.web.client.widget.entity.dialog.WidgetConstants;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -41,33 +42,42 @@ import org.sagebionetworks.web.shared.WebConstants;
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;
+import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.AnchorLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.VBoxLayout;
+import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.inject.Inject;
 
 /**
@@ -79,7 +89,7 @@ import com.google.inject.Inject;
 public class EntityPropertyForm extends FormPanel {
 
 	TextField<String> nameField;
-	Field<?> descriptionField;
+	TextArea descriptionField;
 	List<Field<?>> propertyFields;
 	List<Field<?>> annotationFields;
 	FormFieldFactory formFactory;
@@ -91,6 +101,7 @@ public class EntityPropertyForm extends FormPanel {
 	IconsImageBundle iconsImageBundle;
 	BaseEditWidgetDescriptorPresenter widgetDescriptorEditor;
 	SageImageBundle sageImageBundle;
+	SynapseJSNIUtils synapseJSNIUtils;
 	EventBus bus;
 	
 	JSONObjectAdapter adapter;
@@ -98,17 +109,16 @@ public class EntityPropertyForm extends FormPanel {
 	Annotations annos;
 	Set<String> filter;
 	HTML descriptionFormatInfo;
-	VerticalPanel descriptionFormatInfoContainer;
+	VerticalPanel descriptionFormatInfoContainer, attachmentsContainer;
 	EntityBundle bundle;
 	Attachments attachmentsWidget;
 	Previewable previewGenerator;
-	SafeHtml showFormattingTipsSafeHTML, hideFormattingTipsSafeHTML;
 	EntityUpdatedHandler entityUpdatedHandler;
 	NodeModelCreator nodeModelCreator;
 	SynapseClientAsync synapseClient;
 	
 	@Inject
-	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Previewable previewGenerator, EventBus bus, NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor) {
+	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Previewable previewGenerator, EventBus bus, NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor, SynapseJSNIUtils synapseJSNIUtils) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle= sageImageBundle;
@@ -117,8 +127,7 @@ public class EntityPropertyForm extends FormPanel {
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
-		showFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
-		hideFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_HIDE_TIPS_TEXT);
+		this.synapseJSNIUtils = synapseJSNIUtils;
 	}
 
 	@Override
@@ -128,7 +137,7 @@ public class EntityPropertyForm extends FormPanel {
 		this.setScrollMode(Scroll.AUTO);
 		this.vp = new VerticalPanel();
 		this.add(vp);
-		int width = 700;
+		int width = 850;
 		// This is the property panel
 		propPanel = new ContentPanel();
 		propPanel.setCollapsible(true);
@@ -139,6 +148,42 @@ public class EntityPropertyForm extends FormPanel {
 		// Add a place holder form panel
 		formPanel = new FormPanel();
 		propPanel.add(formPanel);
+		
+		attachmentsContainer = new VerticalPanel();
+		attachmentsContainer.setBorders(false);
+		//attachments widget init
+		attachmentsWidget.configure(GWT.getModuleBaseURL()+"attachment", bundle.getEntity(), true);
+		attachmentsWidget.setAttachmentColumnWidth(800);
+		attachmentsWidget.clearHandlers();
+		attachmentsWidget.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {
+			
+			@Override
+			public void onAttachmentSelected(AttachmentSelectedEvent event) {
+				//insert widget ref into description
+				if (event.getTokenId() != null)
+					insertWidgetMarkdown(event.getName());
+			}
+		});
+		attachmentsWidget.addAttachmentUpdatedHandler(new WidgetDescriptorUpdatedHandler() {
+			@Override
+			public void onUpdate(WidgetDescriptorUpdatedEvent event) {
+				//only do something if the attachment name has changed
+				String newName = event.getName();
+				String oldName = event.getOldName();
+				if (newName == null) {
+					//remove all references to the attachment name
+					removeAllOccurrences(DisplayUtils.getWidgetMD(oldName));
+				} else if (!newName.equals(oldName)) {
+					//renamed. point all references to the new name
+					replaceAllOccurrences(DisplayUtils.getWidgetMD(oldName), DisplayUtils.getWidgetMD(newName));
+				}
+				refreshEntityAttachments();
+			}
+		});
+
+		attachmentsContainer.add(attachmentsWidget.asWidget());
+		attachmentsContainer.setVisible(false);
+		
 		descriptionFormatInfoContainer = new VerticalPanel();
 		descriptionFormatInfoContainer.setBorders(true);
 		descriptionFormatInfo = new HTML(DisplayConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
@@ -231,46 +276,30 @@ public class EntityPropertyForm extends FormPanel {
 	}
 	
 	private void refreshEntityAttachments(Entity newEntity){
-		//check to see if only the attachments and etag have changed
+		//check to see if only the attachments and etag (and potentially description) have changed
 		Entity oldEntity = bundle.getEntity();
-		String oldEtag = oldEntity.getEtag();
-		String newEtag = newEntity.getEtag();
-		List<AttachmentData> oldAttachments = oldEntity.getAttachments();
-		List<AttachmentData> newAttachments = newEntity.getAttachments();
-		Date oldModifiedOn = oldEntity.getModifiedOn();
-		Date newModifiedOn = newEntity.getModifiedOn();
-		//clear values
-		oldEntity.setEtag("");
-		oldEntity.setAttachments(null);
-		oldEntity.setModifiedOn(null);
-		newEntity.setEtag("");
-		newEntity.setAttachments(null);
-		newEntity.setModifiedOn(null);
-		//check if equal
-		boolean isEqual = oldEntity.equals(newEntity);
-		//restore values
-		oldEntity.setEtag(oldEtag);
-		oldEntity.setAttachments(oldAttachments);
-		oldEntity.setModifiedOn(oldModifiedOn);
-		newEntity.setEtag(newEtag);
-		newEntity.setAttachments(newAttachments);
-		newEntity.setModifiedOn(newModifiedOn);
-		
+		boolean isSufficientlyEqual = DisplayUtils.isEqualDuringWidgetEditing(oldEntity, newEntity);
 		//these must be equal, otherwise, other there have been modifications that we don't know how to sync
-		if (isEqual) {
+		if (isSufficientlyEqual) {
 			//update entity (in bundle)
-			oldEntity.setEtag(newEtag);
-			oldEntity.setAttachments(newAttachments);
-			oldEntity.setModifiedOn(newModifiedOn);
+			oldEntity.setEtag(newEntity.getEtag());
+			oldEntity.setAttachments(newEntity.getAttachments());
+			oldEntity.setModifiedOn(newEntity.getModifiedOn());
+			attachmentsWidget.configure(GWT.getModuleBaseURL()+"attachment", oldEntity, true);
 			//and the adapter
 			try{
 				//the primary information hasn't changed, but let's cache some of the metadata
 				//cache the name and description, in case they've changed
 				String name = (String)adapter.get("name");
-				String description = (String)adapter.get("description");
+				boolean hasDescription = adapter.has("description");
+				String description = null;
+				if (hasDescription)
+					description = (String)adapter.get("description");
 				oldEntity.writeToJSONObject(adapter);
 				adapter.put("name", name);
-				adapter.put("description", description);
+				if (hasDescription)
+					adapter.put("description", description);
+				
 			} catch (JSONObjectAdapterException e) {
 				throw new RuntimeException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 			}
@@ -278,6 +307,7 @@ public class EntityPropertyForm extends FormPanel {
 			DisplayUtils.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_UPDATE_ATTACHMENTS);
 		}
 	}
+	
 	
 	private void refreshEntityAttachments() {
 		// We need to refresh the entity, and update our entity bundle with the most current attachments and etag.
@@ -320,6 +350,16 @@ public class EntityPropertyForm extends FormPanel {
 		return form;
 	}
 
+	/**
+	 * Recalculates size for the description field based on it's contents
+	 */
+	private void resizeDescription() {
+		int scrollheight = descriptionField.getElement().getScrollHeight();
+		if (scrollheight == 0)
+			scrollheight = 300;
+		descriptionField.setHeight(scrollheight + "px");
+	}
+	
 	public void rebuild() {
 		// Nothing to do if this is not being rendered.
 		if (!this.isRendered())
@@ -338,122 +378,118 @@ public class EntityPropertyForm extends FormPanel {
 
 		// Name is the first
 		formPanel.add(nameField, basicFormData);
+		
+		FormData formatLinkFormData = new FormData("-5");
+		
+		//Toolbar
+		HorizontalPanel mdCommands = new HorizontalPanel();
+		mdCommands.setVerticalAlign(VerticalAlignment.MIDDLE);
+		mdCommands.addStyleName("view header-inner-commands-container");
+		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.add16()));
+		insertButton.setMenu(createWidgetMenu());
+		FormData descriptionLabelFormData = new FormData();
+		descriptionLabelFormData.setMargins(new Margins(0,15,0,17));
+		formPanel.add(new Label("Description:"),descriptionLabelFormData);
+		FormData mdCommandFormData = new FormData();
+		mdCommandFormData.setMargins(new Margins(0,15,0,10));
+		formPanel.add(mdCommands,mdCommandFormData);
+		
 		// followed by description.
-		FormData descriptionData = new FormData("-20 85%");
-        descriptionData.setMargins(margins);
-		formPanel.add(descriptionField, descriptionData);
-		final Anchor formatLink = new Anchor(showFormattingTipsSafeHTML);
-		formatLink.setStyleName("link");
-		FormData formatLinkFormData = new FormData("-100");
-		formatLinkFormData.setMargins(new Margins(10,10,0,90));
-						
-		formatLink.addClickHandler(new ClickHandler() {
+		SimplePanel descriptionWrapper= new SimplePanel();
+		descriptionWrapper.add(descriptionField);
+		
+		FormData descriptionData = new FormData("-5");
+		//descriptionData.setHeight(310);
+		descriptionData.setMargins(new Margins(0, 10, 0, 10));
+        formPanel.add(descriptionWrapper, descriptionData);
+		
+		//Widgets Manager
+		FormData widgetManagerFormData = new FormData("-5");
+		widgetManagerFormData.setMargins(new Margins(10,10,0,10));
+		widgetManagerFormData.setWidth(170);
+		
+		final com.google.gwt.user.client.ui.Button widgetsManagerButton =  new com.google.gwt.user.client.ui.Button();
+		widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT);
+		widgetsManagerButton.addStyleName("btn btn-info");
+		widgetsManagerButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (descriptionFormatInfoContainer.isVisible()) {
-					descriptionFormatInfoContainer.el().slideOut(Direction.UP, FxConfig.NONE);
-					formatLink.setHTML(showFormattingTipsSafeHTML);
+				if (attachmentsContainer.isVisible()) {
+					attachmentsContainer.el().slideOut(Direction.UP, FxConfig.NONE);
+					widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT);
 				} else {
-					descriptionFormatInfoContainer.setVisible(true);
-					descriptionFormatInfoContainer.el().slideIn(Direction.DOWN, FxConfig.NONE);
-					formatLink.setHTML(hideFormattingTipsSafeHTML);
+					attachmentsContainer.setVisible(true);
+					attachmentsContainer.el().slideIn(Direction.DOWN, FxConfig.NONE);
+					widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_HIDE_WIDGETS_TEXT);
 				}
 			}
 		});
-		descriptionFormatInfoContainer.setLayout(new VBoxLayout());
-		descriptionFormatInfoContainer.setScrollMode(Scroll.AUTOY);
+		attachmentsContainer.setLayout(new VBoxLayout());
+		attachmentsContainer.setScrollMode(Scroll.AUTOY);
 		
-		formPanel.add(formatLink, formatLinkFormData);
-		formPanel.add(descriptionFormatInfoContainer, formatLinkFormData);
-		
-
-		//and now the description toolbar
-		Button previewButton = new Button(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT);
-		//Button addImageButton = new Button(DisplayConstants.ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT);
-		//addImageButton.setEnabled(attachments != null && VisualAttachmentsListViewImpl.getVisualAttachments(attachments).size() > 0);
-		Button insertYouTubeButton = new Button("YouTube Video");
-		Button manageWidgetsButton = new Button("Manage Widgets");
-		
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setTableWidth("180px");
-		hp.add(previewButton);
-		hp.add(insertYouTubeButton);
-		hp.add(manageWidgetsButton);
-		
-		// The preview button.
-		previewButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		//Preview
+		final com.google.gwt.user.client.ui.Button previewButton =  new com.google.gwt.user.client.ui.Button();
+		previewButton.setText(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT);
+		previewButton.addStyleName("btn");
+		previewButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				previewGenerator.showPreview(((TextArea)descriptionField).getValue());
 			}
-	    });
-		final String baseURl = GWT.getModuleBaseURL()+"attachment";
+		});
+		FormData previewFormData = new FormData("-5");
+		previewFormData.setMargins(new Margins(10,10,0,10));
 		
-		manageWidgetsButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		FlowPanel mdCommandsLower = new FlowPanel();
+		formPanel.add(mdCommandsLower, previewFormData);
+		mdCommandsLower.add(widgetsManagerButton);
+		SimplePanel previewButtonWrapper= new SimplePanel();
+		previewButtonWrapper.add(previewButton);
+		previewButtonWrapper.addStyleName("inline-block margin-left-570");
+		mdCommandsLower.add(previewButtonWrapper);
+		
+		//Formatting Guide
+		formatLinkFormData.setMargins(new Margins(10,10,0,10));
+		
+		final Button formatLink = new Button(DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
+		formatLink.setIcon(AbstractImagePrototype.create(iconsImageBundle.slideInfo16()));
+		mdCommands.add(formatLink);
+		mdCommands.add(insertButton);
+		formatLink.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				//configure the attachments widget before popup
-				attachmentsWidget.configure(GWT.getModuleBaseURL()+"attachment", bundle.getEntity(), true);
-				attachmentsWidget.clearHandlers();
-				attachmentsWidget.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {
-					
-					@Override
-					public void onAttachmentSelected(AttachmentSelectedEvent event) {
-						//insert widget ref into description
-						insertWidgetMarkdown(event.getName());
-					}
-				});
-				SelectAttachmentDialog.showAttachmentsManagerDialog(baseURl, bundle, attachmentsWidget, "Widgets");
+				if (descriptionFormatInfoContainer.isVisible()) {
+					descriptionFormatInfoContainer.el().slideOut(Direction.UP, FxConfig.NONE);
+					formatLink.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
+				} else {
+					descriptionFormatInfoContainer.setVisible(true);
+					descriptionFormatInfoContainer.el().slideIn(Direction.DOWN, FxConfig.NONE);
+					formatLink.setText(DisplayConstants.ENTITY_DESCRIPTION_HIDE_TIPS_TEXT);
+				}
 			}
 		});
 		
-		insertYouTubeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				BaseEditWidgetDescriptorPresenter.editNewWidget(widgetDescriptorEditor, bundle.getEntity().getId(), WidgetConstants.YOUTUBE_CONTENT_TYPE, bundle.getEntity().getAttachments(), new WidgetDescriptorUpdatedHandler() {
-						@Override
-					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-						insertWidgetMarkdown(event.getName());
-						try {
-							//switch to the up-to-date entity version after adding the attachment, but save our local description and name (in case they've changed here)
-							Entity updatedEntity = nodeModelCreator.createEntity(event.getEntityWrapper());
-							refreshEntityAttachments(updatedEntity);
-						} catch (JSONObjectAdapterException e) {
-							throw new RuntimeException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-						}
-					}
-				});	
-			}
-	    });
+		descriptionFormatInfoContainer.setLayout(new VBoxLayout());
+		descriptionFormatInfoContainer.setScrollMode(Scroll.AUTOY);
 		
-//		// The add image button
-//		addImageButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-//			@Override
-//			public void componentSelected(ButtonEvent ce) {
-//				//pop up a list of attachments, and have the user pick one.
-//				SelectAttachmentDialog.showSelectAttachmentDialog(baseURl,  entityId, attachments, "Select Attachment", "Insert", new SelectAttachmentDialog.Callback() {
-//					
-//					@Override
-//					public void onSelectAttachment(AttachmentData data) {
-//						//insert the markdown into the description for the image attachment
-//						SafeHtml safeName = SafeHtmlUtils.fromString(data.getName());
-//						TextArea descriptionTextArea = (TextArea)descriptionField;
-//						String currentValue = descriptionTextArea.getValue();
-//						if (currentValue == null)
-//							currentValue = "";
-//						int cursorPos = descriptionTextArea.getCursorPos();
-//						if (cursorPos < 0)
-//							cursorPos = 0;
-//						else if (cursorPos > currentValue.length())
-//							cursorPos = currentValue.length();
-//						String attachmentLinkMarkdown = MarkdownUtils.getAttachmentLinkMarkdown(safeName.asString(), entityId, data.getTokenId(), data.getPreviewId(), safeName.asString());
-//						descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + attachmentLinkMarkdown + currentValue.substring(cursorPos));
-//					}
-//				});
-//					
-//			}
-//	    });
-		formPanel.add(hp,formatLinkFormData);
+		formPanel.add(descriptionFormatInfoContainer, formatLinkFormData);
+		formPanel.add(attachmentsContainer, widgetManagerFormData);
+		
+		Image image = getNewCommand("Insert Image", iconsImageBundle.imagePlus16(),new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE);
+			}
+		}); 
+		mdCommands.add(image);
+		
+		Image link = getNewCommand("Insert Link", iconsImageBundle.link16(),new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleInsertWidgetCommand(WidgetConstants.LINK_CONTENT_TYPE);
+			}
+		}); 
+		mdCommands.add(link);
 		
 		// Add them to the form
 		for (Field<?> formField : propertyFields) {
@@ -470,11 +506,71 @@ public class EntityPropertyForm extends FormPanel {
 		this.propPanel.add(formPanel);
 		this.annoPanel.add(annotationFormPanel);
 		this.layout();
+		resizeDescription();
 	}
-
-	public void insertWidgetMarkdown(String attachmentName) {
-		//insert the markdown into the description for the attachment (where the attachment points to the json used to describe the widget)
-		TextArea descriptionTextArea = (TextArea)descriptionField;
+	
+	private Menu createWidgetMenu() {
+	    Menu menu = new Menu();
+	    menu.add(getNewCommand("Image", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE);
+	    	};
+		}));
+	    menu.add(getNewCommand("Link", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.LINK_CONTENT_TYPE);
+	    	};
+		}));
+	    menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE);	
+	    	};
+		}));
+	    menu.add(getNewCommand("Provenance Graph", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.PROVENANCE_CONTENT_TYPE);
+	    	};
+		}));
+	    
+	    return menu;
+	  }
+	
+	public Image getNewCommand(String tooltipText, ImageResource image, ClickHandler clickHandler){
+		Image command = new Image(image);
+		command.addStyleName("imageButton");
+		command.addClickHandler(clickHandler);
+		DisplayUtils.addTooltip(this.synapseJSNIUtils, command, tooltipText, TOOLTIP_POSITION.BOTTOM);
+		return command;
+	}
+	public MenuItem getNewCommand(String text, SelectionListener selectionListener){
+		MenuItem item = new MenuItem(text);
+		item.addSelectionListener(selectionListener);
+		return item;
+	}
+	
+	public void handleInsertWidgetCommand(String contentTypeKey){
+		BaseEditWidgetDescriptorPresenter.editNewWidget(widgetDescriptorEditor, bundle.getEntity().getId(), contentTypeKey, bundle.getEntity().getAttachments(), new WidgetDescriptorUpdatedHandler() {
+			@Override
+		public void onUpdate(WidgetDescriptorUpdatedEvent event) {
+			if (event.getInsertValue()!=null)
+				insertMarkdown(event.getInsertValue());
+			else {
+				insertWidgetMarkdown(event.getName());
+				try {
+					//switch to the up-to-date entity version after adding the attachment, but save our local description and name (in case they've changed here)
+					Entity updatedEntity = nodeModelCreator.createEntity(event.getEntityWrapper());
+					refreshEntityAttachments(updatedEntity);
+				} catch (JSONObjectAdapterException e) {
+					throw new RuntimeException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				}
+			}
+		}
+	});
+		
+	}
+	
+	public void insertMarkdown(String md) {
+		TextArea descriptionTextArea = descriptionField;
 		String currentValue = descriptionTextArea.getValue();
 		if (currentValue == null)
 			currentValue = "";
@@ -483,9 +579,45 @@ public class EntityPropertyForm extends FormPanel {
 			cursorPos = 0;
 		else if (cursorPos > currentValue.length())
 			cursorPos = currentValue.length();
-		String md = "{Widget:" + attachmentName+"}";
 		descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
 	}
+	
+	public void insertWidgetMarkdown(String attachmentName) {
+		//insert the markdown into the description for the attachment (where the attachment points to the json used to describe the widget)
+		String md = DisplayUtils.getWidgetMD(attachmentName);
+		insertMarkdown(md);
+	}
+	
+	/**
+	 * replace all occurrences of oldMd with newMd
+	 * @param oldMd
+	 * @param newMd
+	 */
+	public void replaceAllOccurrences(String oldMd, String newMd) {
+		if (oldMd != null & newMd != null) {
+			TextArea descriptionTextArea = descriptionField;
+			String currentValue = descriptionTextArea.getValue();
+			if (currentValue != null) {
+				descriptionTextArea.setValue(currentValue.replaceAll(DisplayUtils.quotePattern(oldMd), newMd));
+			}
+		}
+	}
+	
+	/**
+	 * remove all occurrences of oldMd
+	 * @param oldMd
+	 * @param newMd
+	 */
+	public void removeAllOccurrences(String oldMd) {
+		if (oldMd != null) {
+			TextArea descriptionTextArea = descriptionField;
+			String currentValue = descriptionTextArea.getValue();
+			if (currentValue != null) {
+				descriptionTextArea.setValue(currentValue.replaceAll(DisplayUtils.quotePattern(oldMd), ""));
+			}
+		}
+	}
+	
 	public static List<AttachmentData> getVisualAttachments(List<AttachmentData> attachments){
 		List<AttachmentData> visualAttachments = new ArrayList<AttachmentData>();
 		for (Iterator iterator = attachments.iterator(); iterator
@@ -527,7 +659,18 @@ public class EntityPropertyForm extends FormPanel {
 		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
 		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 		descriptionField = formFactory.createTextAreaField(model.getDescription());
-		
+		descriptionField.setWidth("796px");
+		descriptionField.setHeight("200px");
+		resizeDescription();
+		//automatically change size based on content
+		descriptionField.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+//				int keyCode = event.getNativeEvent().getKeyCode();
+				resizeDescription();
+			}
+		});
+
 		// Create the list of fields
 		propertyFields = formFactory.createFormFields(model.getProperties());
 		annotationFields = formFactory.createFormFields(model.getAnnotations());

@@ -1,15 +1,15 @@
-package org.sagebionetworks.web.client.widget.entity.dialog.editors;
+package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.repo.model.widget.YouTubeWidgetDescriptor;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.WidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetDescriptorPresenter {
+public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetEditorPresenter {
 	
 	private YouTubeConfigView view;
 	private YouTubeWidgetDescriptor descriptor;
@@ -20,10 +20,9 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetD
 		view.initView();
 	}
 	@Override
-	public void setWidgetDescriptor(WidgetDescriptor widgetDescriptor) {
+	public void configure(String entityId, WidgetDescriptor widgetDescriptor) {
 		if (!(widgetDescriptor instanceof YouTubeWidgetDescriptor))
 			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_DESCRIPTOR_TYPE);
-		//TODO: set up view based on descriptor parameters
 		descriptor = (YouTubeWidgetDescriptor)widgetDescriptor;
 		String videoId = descriptor.getVideoId();
 		if (videoId != null)
@@ -40,7 +39,6 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetD
 		return view.asWidget();
 	}
 
-
 	@Override
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
@@ -53,6 +51,15 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetD
 		return view.getDisplayHeight();
 	}
 	
+	@Override
+	public int getAdditionalWidth() {
+		return view.getAdditionalWidth();
+	}
+	
+	@Override
+	public String getTextToInsert(String name) {
+		return null;
+	}
 	/*
 	 * Private Methods
 	 */

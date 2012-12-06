@@ -131,9 +131,15 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/help-16.png")
 	ImageResource help16();
 
+	@Source("images/icons/image--plus-16.png")
+	ImageResource imagePlus16();
+	
 	@Source("images/icons/information-balloon-16.png")
 	ImageResource informationBalloon16();	
-		
+	
+	@Source("images/icons/chain-16.png")
+	ImageResource link16();
+	
 	@Source("images/icons/lock-16.png")
 	ImageResource lock16();	
 		
@@ -199,6 +205,9 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/grey_wrench-screwdriver-16.png")
 	ImageResource settings16();	
+	
+	@Source("images/icons/edit-16.png")
+	ImageResource slideInfo16();	
 	
 	@Source("images/icons/table-insert-column-16.png")
 	ImageResource tableInsertColumn16();

@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -19,13 +24,19 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
@@ -39,11 +50,13 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntitySchemaCache schemaCache;
 	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
-
+	private WidgetRegistrar widgetRegistrar;
+	
 	private EntityBundle bundle;
 	private boolean readOnly;
 	private String entityTypeDisplay;
 	private EventBus bus;
+	
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -53,6 +66,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntitySchemaCache schemaCache,
 			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle,
+			WidgetRegistrar widgetRegistrar,
 			EventBus bus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -61,6 +75,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.schemaCache = schemaCache;
 		this.entityTypeProvider = entityTypeProvider;
 		this.iconsImageBundle = iconsImageBundle;
+		this.widgetRegistrar = widgetRegistrar;
 		this.bus = bus;
 		view.setPresenter(this);
 	}
@@ -167,8 +182,65 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void getHtmlFromMarkdown(String markdown, String attachmentBaseUrl, final AsyncCallback<String> asyncCallback) {
-		synapseClient.markdown2Html(markdown, attachmentBaseUrl, asyncCallback);
+		synapseClient.markdown2Html(markdown, attachmentBaseUrl, false, asyncCallback);
 			}
+	@Override
+	public void loadWidgets(final HTMLPanel panel) {
+		loadWidgets(panel, bundle, widgetRegistrar, synapseClient, nodeModelCreator, view, false);
+	}
+	
+	/**
+	 * Shared method for loading the widgets into the html returned by the service (used to render the entity page, and to generate a preview of the description)
+	 * @param panel
+	 * @param bundle
+	 * @param widgetRegistrar
+	 * @param synapseClient
+	 * @param nodeModelCreator
+	 * @param view
+	 */
+	public static void loadWidgets(final HTMLPanel panel, final EntityBundle bundle, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, final NodeModelCreator nodeModelCreator, final SynapseWidgetView view, Boolean isPreview) {
+		List<AttachmentData> attachments = bundle.getEntity().getAttachments();
+		if (attachments != null) {
+			final String entityId = bundle.getEntity().getId();
+			final String suffix = isPreview ? DisplayConstants.DIV_ID_PREVIEW_SUFFIX : "";
+			for (Iterator iterator = attachments.iterator(); iterator.hasNext();) {
+				AttachmentData attachmentData = (AttachmentData) iterator.next();
+				final String name = attachmentData.getName();
+				final String contentTypeKey = attachmentData.getContentType();
+				//is this a widget content type?
+				if (widgetRegistrar.isWidgetContentType(contentTypeKey)) {
+					Element el = panel.getElementById(name + suffix);
+					String contentTypeStyle = contentTypeKey.substring(contentTypeKey.lastIndexOf("/")+1);
+					el.setClassName(contentTypeStyle);
+					//was it referenced in the description?
+					if (el != null) {
+						try {
+							synapseClient.getWidgetDescriptorJson(entityId, name, new AsyncCallback<String>() {
+								
+								@Override
+								public void onSuccess(String widgetDescriptorJson) {
+									try {
+										WidgetDescriptor widgetDescriptor = nodeModelCreator.createJSONEntity(widgetDescriptorJson, widgetRegistrar.getWidgetClass(contentTypeKey));
+										WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(entityId, contentTypeKey, widgetDescriptor);
+										panel.add(presenter.asWidget(), name + suffix);								
+									} catch (JSONObjectAdapterException e) {
+										onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+									}
+								}
+								
+								@Override
+								public void onFailure(Throwable caught) {
+									view.showErrorMessage(caught.getMessage());
+								}
+							});
+						} catch (RestServiceException e) {
+							view.showErrorMessage(e.getMessage());
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	/*
 	 * Private Methods

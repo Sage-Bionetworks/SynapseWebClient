@@ -14,7 +14,7 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
-import org.sagebionetworks.web.client.widget.entity.dialog.WidgetRegistrar;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -45,6 +45,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		handlerManager = new HandlerManager(this);
 	}
 
 	
@@ -71,6 +72,8 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	}
 	
 	public static String getUniqueAttachmentName(List<AttachmentData> attachments, String attachmentName) {
+		if (attachments == null || attachments.size() == 0)
+			return attachmentName;
 		//throw all the names in a hashset, and see if the value is in there
 		HashSet<String> names = new HashSet<String>();
 		for (Iterator iterator = attachments.iterator(); iterator.hasNext();) {
@@ -94,36 +97,59 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	
 	@Override
 	public void apply() {
+		//widgetDescriptor should have all of the updated parameter info.  But we do need to ask for the widget name from the view.
+		final String userProvidedWidgetName = SafeHtmlUtils.htmlEscape(view.getName());
 		try {
-			view.updateDescriptorFromView();
+			String textToInsert = view.getTextToInsert(userProvidedWidgetName);
+			if (textToInsert != null) {
+				//this is it!
+				fireUpdatedEvent(textToInsert);
+				view.hide();
+				return;
+			} else 
+				view.updateDescriptorFromView();
 		} catch (IllegalArgumentException e) {
 			//invalid param, just show a message and return
 			view.showErrorMessage(e.getMessage());
 			return;
 		}
-		//widgetDescriptor should have all of the updated parameter info.  But we do need to ask for the widget name from the view.
-		String newWidgetName = SafeHtmlUtils.htmlEscape(view.getName());
+		
 		//if this is a new attachment, then make it unique.  If it isn't new, then write over the old one
 		if (attachmentName == null && attachments != null) {
-			newWidgetName = getUniqueAttachmentName(attachments, newWidgetName);
-		}
-		final String name = newWidgetName;
+			updateWidget(getUniqueAttachmentName(attachments, userProvidedWidgetName));
+		} else
+			updateWidget(userProvidedWidgetName);
+	}
+	
+	private void updateWidget(final String name) {
 		try {
 			JSONObjectAdapter widgetDescriptorJson = widgetDescriptor.writeToJSONObject(jsonObjectAdapter.createNew());
 			synapseClient.addWidgetDescriptorToEntity(widgetDescriptorJson.toJSONString(), entityId, name, contentTypeKey, new AsyncCallback<EntityWrapper>() {
 				
 				@Override
 				public void onSuccess(EntityWrapper result) {
-
-					// Hide the dialog
-					view.hide();
-					
-					//throw event that contains name and the updated widgetdescriptor
-					WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
-					event.setName(name);
-					event.setEntityWrapper(result);
-					event.setWidgetDescriptor(widgetDescriptor);
-					fireUpdatedEvent(event);
+					if (!name.equals(attachmentName)) {
+						//it's been renamed, remove the old attachment and include the old name in the update event
+						try {
+							synapseClient.removeAttachmentFromEntity(entityId,  attachmentName, new AsyncCallback<EntityWrapper>() {
+								@Override
+								public void onSuccess(EntityWrapper result) {
+									fireUpdatedEvent(name, result, widgetDescriptor, attachmentName);
+									view.hide();
+								}
+								@Override
+								public void onFailure(Throwable caught) {
+									view.showErrorMessage(caught.getMessage());
+								}
+							});
+						} catch (RestServiceException e) {
+							view.showErrorMessage(e.getMessage());
+						}
+					}
+					else {
+						fireUpdatedEvent(name, result, widgetDescriptor, attachmentName);
+						view.hide();
+					}
 				}
 				
 				@Override
@@ -138,18 +164,41 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		}
 	}
 	
+	public void fireUpdatedEvent(String attachmentName, EntityWrapper updatedEntity, WidgetDescriptor descriptor, String oldName) {
+		//fire event that contains name and the updated widgetdescriptor
+		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
+		event.setName(attachmentName);
+		event.setOldName(oldName);
+		event.setEntityWrapper(updatedEntity);
+		event.setWidgetDescriptor(widgetDescriptor);
+		fireUpdatedEvent(event);
+	}
+	
+	public void fireUpdatedEvent(String valueToInsert) {
+		//fire event that contains a value to insert into the description
+		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
+		event.setInsertValue(valueToInsert);
+		fireUpdatedEvent(event);
+	}
+	
 	public void fireUpdatedEvent(WidgetDescriptorUpdatedEvent event) {
 		handlerManager.fireEvent(event);
 	}
 	
 	@Override
 	public void addWidgetDescriptorUpdatedHandler(WidgetDescriptorUpdatedHandler handler) {
-		handlerManager = new HandlerManager(this);
+		clearHandlers();
 		handlerManager.addHandler(WidgetDescriptorUpdatedEvent.getType(), handler);
 	}
 	
+	private void clearHandlers() {
+		while(handlerManager.getHandlerCount(WidgetDescriptorUpdatedEvent.getType()) > 0) {
+			handlerManager.removeHandler(WidgetDescriptorUpdatedEvent.getType(), handlerManager.getHandler(WidgetDescriptorUpdatedEvent.getType(), 0));
+		}
+	}
+	
 	@Override
-	public void editExisting(String entityId, String attachmentName, List<AttachmentData> attachments) {
+	public void editExisting(final String entityId, String attachmentName, List<AttachmentData> attachments) {
 		if(entityId == null) throw new IllegalArgumentException("entityId cannot be null");
 		if(attachmentName == null) throw new IllegalArgumentException("attachmentName type cannot be null");
 		cleanInit();
@@ -157,7 +206,8 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		this.attachmentName = attachmentName;
 		this.attachments = attachments;
 		this.contentTypeKey = getContentType(attachmentName, attachments);
-		
+		view.setName(attachmentName);
+		view.setSaveButtonText(DisplayConstants.SAVE_BUTTON_LABEL);
 		//initialize view with the correct widget descriptor definition and show
 		try {
 			synapseClient.getWidgetDescriptorJson(entityId, attachmentName, new AsyncCallback<String>() {
@@ -165,9 +215,9 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 				@Override
 				public void onSuccess(String widgetDescriptorJson) {
 					try {
-						widgetDescriptor = nodeModelCreator.createWidget(widgetDescriptorJson);
-						view.setWidgetDescriptor(contentTypeKey, widgetDescriptor);
-						view.show();
+						widgetDescriptor = nodeModelCreator.createJSONEntity(widgetDescriptorJson, widgetRegistrar.getWidgetClass(contentTypeKey));
+						view.setWidgetDescriptor(entityId, contentTypeKey, widgetDescriptor);
+						view.show(widgetRegistrar.getFriendlyTypeName(contentTypeKey));
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
@@ -190,18 +240,18 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		cleanInit();
 		this.entityId = entityId;
 		this.attachments = attachments;
+		this.contentTypeKey = contentTypeKey;
 		
 		//initialize the view with a new widget descriptor definition of the correct type and show
 		String widgetClassName = widgetRegistrar.getWidgetClass(contentTypeKey);
-		widgetDescriptor = (WidgetDescriptor)nodeModelCreator.newInstance(widgetClassName);
-		view.setWidgetDescriptor(contentTypeKey, widgetDescriptor);
+		if (widgetClassName != null)
+			widgetDescriptor = (WidgetDescriptor)nodeModelCreator.newInstance(widgetClassName);
+		view.setWidgetDescriptor(entityId, contentTypeKey, widgetDescriptor);
 		//prepopulate with a unique attachment name of the correct type
-		if (attachments != null) {
-			view.setName(getUniqueAttachmentName(attachments, widgetRegistrar.getFriendlyTypeName(contentTypeKey)));
-		}
-				
-		view.show();
-		
+		String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
+		view.setName(getUniqueAttachmentName(attachments, friendlyName));
+		view.show(friendlyName);
+		view.setSaveButtonText(DisplayConstants.INSERT_BUTTON_LABEL);
 	}
 	
 	private String getContentType(String attachmentName, List<AttachmentData> attachments) {

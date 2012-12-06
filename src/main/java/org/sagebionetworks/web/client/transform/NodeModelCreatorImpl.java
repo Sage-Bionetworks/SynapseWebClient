@@ -52,12 +52,6 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 	}
 	
 	@Override
-	public WidgetDescriptor createWidget(String json) throws JSONObjectAdapterException {
-		return factory.createWidget(json);
-	}
-
-	
-	@Override
 	public <T extends JSONEntity> T createJSONEntity(String jsonString, Class<? extends T> clazz) throws JSONObjectAdapterException {
 		return factory.createEntity(jsonString, clazz);
 	}

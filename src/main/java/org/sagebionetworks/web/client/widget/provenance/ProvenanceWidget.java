@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,16 +14,21 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.widget.ProvenanceWidgetDescriptor;
+import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -32,7 +39,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, SynapseWidgetPresenter {
+public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetRendererPresenter {
 	
 	private ProvenanceWidgetView view;
 	private NodeModelCreator nodeModelCreator;
@@ -43,6 +50,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, Synapse
 	private Map<String, ProvTreeNode> idToNode = new HashMap<String, ProvTreeNode>();
 	private AdapterFactory adapterFactory;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private ProvenanceWidgetDescriptor descriptor;
 	
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
@@ -61,7 +69,41 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, Synapse
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.setPresenter(this);
 	}	
-		
+	
+	@Override
+	public void configure(String entityId, WidgetDescriptor widgetDescriptor) {
+		if (!(widgetDescriptor instanceof ProvenanceWidgetDescriptor))
+			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_DESCRIPTOR_TYPE);
+		//set up view based on descriptor parameters
+		descriptor = (ProvenanceWidgetDescriptor)widgetDescriptor;
+		int d = 1;
+		if (descriptor.getDepth()!= null) {
+			d = descriptor.getDepth().intValue();
+		}
+		final int depth = d;
+		final Boolean showExpand = descriptor.getShowExpand();
+		int mask = ENTITY;
+		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
+			@Override
+			public void onSuccess(EntityBundleTransport transport) {
+				EntityBundle newBundle = null;
+				try {
+					newBundle = nodeModelCreator.createEntityBundle(transport);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
+				Entity newEntity = newBundle.getEntity();
+				buildTree(newEntity, depth, showExpand);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				DisplayUtils.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + caught.getMessage());
+			}			
+		};
+		synapseClient.getEntityBundle(descriptor.getEntityId(), mask, callback);
+	}
+	
 	public void setHeight(int height) {
 		view.setHeight(height);
 	}

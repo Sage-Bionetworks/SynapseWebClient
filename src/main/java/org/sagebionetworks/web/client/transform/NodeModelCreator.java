@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.transform;
 
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -17,9 +16,7 @@ public interface NodeModelCreator {
 
 	Entity createEntity(EntityWrapper entityWrapper) throws JSONObjectAdapterException;
 	
-	WidgetDescriptor createWidget(String jsonString) throws JSONObjectAdapterException;
-
-	<T extends JSONEntity> T createJSONEntity(String jsonString, Class<? extends T> clazz) throws JSONObjectAdapterException;
+		<T extends JSONEntity> T createJSONEntity(String jsonString, Class<? extends T> clazz) throws JSONObjectAdapterException;
 
 	<T extends JSONEntity> T createJSONEntity(String jsonString, String entityClassName) throws JSONObjectAdapterException;
 	

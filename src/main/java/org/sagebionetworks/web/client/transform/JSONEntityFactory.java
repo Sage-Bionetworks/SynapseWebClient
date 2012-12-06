@@ -59,12 +59,4 @@ public interface JSONEntityFactory {
 	public Entity createEntity(String json) throws JSONObjectAdapterException;
 
 	public JSONEntity newInstance(String className);
-
-	/**
-	 * Create a widget from the json string.
-	 * @param json
-	 * @return
-	 * @throws JSONObjectAdapterException
-	 */
-	public WidgetDescriptor createWidget(String json) throws JSONObjectAdapterException;
 }

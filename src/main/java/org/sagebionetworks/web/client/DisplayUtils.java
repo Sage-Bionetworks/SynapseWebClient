@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -63,7 +64,6 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -145,6 +145,9 @@ public class DisplayUtils {
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
 	public static final int BIG_BUTTON_HEIGHT_PX = 36;
+	
+	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
+	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
 	
 	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
@@ -1022,7 +1025,7 @@ public class DisplayUtils {
 		}
 	}
 
-	private static void applyAttributes(final Element el,
+	public static void applyAttributes(final Element el,
 			Map<String, String> optionsMap) {
 		for (Entry<String, String> option : optionsMap.entrySet()) {
 			DOM.setElementAttribute(el, option.getKey(), option.getValue());
@@ -1143,4 +1146,69 @@ public class DisplayUtils {
 		}
 		return version;
 	}
+	
+	public static String getWidgetMD(String attachmentName) {
+		if (attachmentName == null)
+			return null;
+		StringBuilder sb = new StringBuilder();
+		sb.append("{Widget:");
+		sb.append(attachmentName);
+		sb.append("}");
+		return sb.toString();
+	}
+	
+	/**
+	 * Provides same functionality as java.util.Pattern.quote().
+	 * @param pattern
+	 * @return
+	 */
+	public static String quotePattern(String pattern) {
+		StringBuilder output = new StringBuilder();
+	    for (int i = 0; i < pattern.length(); i++) {
+	      if (ESCAPE_CHARACTERS_SET.contains(pattern.charAt(i)))
+	    	output.append("\\");
+	      output.append(pattern.charAt(i));
+	    }
+	    return output.toString();
+	  }
+	
+	/**
+	 * Return true if the only things that differ between the two entities are etag, description, attachments, and modified on.
+	 *  
+	 * @param oldEntity
+	 * @param newEntity
+	 * @return
+	 */
+	public static boolean isEqualDuringWidgetEditing(Entity oldEntity, Entity newEntity) {
+		String oldEtag = oldEntity.getEtag();
+		String newEtag = newEntity.getEtag();
+		String oldDescription = oldEntity.getDescription();
+		String newDescription = newEntity.getDescription();
+		List<AttachmentData> oldAttachments = oldEntity.getAttachments();
+		List<AttachmentData> newAttachments = newEntity.getAttachments();
+		Date oldModifiedOn = oldEntity.getModifiedOn();
+		Date newModifiedOn = newEntity.getModifiedOn();
+		//clear values
+		oldEntity.setEtag("");
+		oldEntity.setDescription("");
+		oldEntity.setAttachments(null);
+		oldEntity.setModifiedOn(null);
+		newEntity.setEtag("");
+		newEntity.setDescription("");
+		newEntity.setAttachments(null);
+		newEntity.setModifiedOn(null);
+		//check if equal
+		boolean isEqual = oldEntity.equals(newEntity);
+		//restore values
+		oldEntity.setEtag(oldEtag);
+		oldEntity.setDescription(oldDescription);
+		oldEntity.setAttachments(oldAttachments);
+		oldEntity.setModifiedOn(oldModifiedOn);
+		newEntity.setEtag(newEtag);
+		newEntity.setDescription(newDescription);
+		newEntity.setAttachments(newAttachments);
+		newEntity.setModifiedOn(newModifiedOn);
+		return isEqual;
+	}
+
 }

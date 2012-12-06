@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
+import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -41,18 +42,24 @@ public interface AttachmentsView extends IsWidget, SynapseWidgetView {
 		void addAttachmentSelectedHandler(AttachmentSelectedHandler handler);
 		
 		/**
+		 * add a handler to be informed when an attachment has been edited
+		 * @param handler
+		 */
+		void addAttachmentUpdatedHandler(WidgetDescriptorUpdatedHandler handler); 
+		/**
 		 * recommended to clear existing handlers before adding your own attachment selected handler
 		 */
 		void clearHandlers();
 		
-		void configureWidgetAttachment(String attachmentName);
+		void editAttachment(String tokenId);
+		void setAttachmentColumnWidth(int width);
 	}
 
 	/**
 	 * Configures attachments view for this entity
 	 * @param entity
 	 */
-	public void configure(String baseUrl, String entityId, List<AttachmentData> attachments);
-
+	public void configure(String baseUrl, String entityId, List<AttachmentData> attachments, boolean showEditButton);
+	public void setAttachmentColumnWidth(int width);
 	public void attachmentDeleted(String tokenId, String deletedName);
 }

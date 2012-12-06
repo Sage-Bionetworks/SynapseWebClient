@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -29,11 +29,9 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -144,7 +142,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,EntityTypeProvider entityTypeProvider,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			WidgetFactory widgetFactory) {
+			WidgetFactory widgetFactory, WidgetRegistrar widgetRegistrar) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.previewDisclosurePanel = previewDisclosurePanel;
@@ -579,7 +577,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 
-	private Widget createDescriptionWidget(EntityBundle bundle, String entityTypeDisplay) {
+	private Widget createDescriptionWidget(final EntityBundle bundle, String entityTypeDisplay) {
 		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
@@ -602,6 +600,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					lc.add(panel);
 					lc.layout();
 					synapseJSNIUtils.highlightCodeBlocks();
+					//asynchronously load the widgets
+					presenter.loadWidgets(panel);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -609,7 +609,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				}
 			});
 	    }
-
 	    
    		return lc;
 	}

@@ -14,19 +14,25 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	/**
 	 * Show the popup
 	 */
-	public void show();
+	public void show(String windowTitle);
 	
 	/**
 	 * Hide the popup
 	 */
 	public void hide();
 	
-	public void setWidgetDescriptor(String contentTypeKey, WidgetDescriptor widgetDescriptor);
+	public void setWidgetDescriptor(String entityId, String contentTypeKey, WidgetDescriptor widgetDescriptor);
 
 	/**
 	 * Call to tell the widget descriptor view to update the widgetDescriptor based on user input (called on save) 
 	 */
 	public void updateDescriptorFromView();
+	
+	/**
+	 * Will return a non-null value when this widget should simply insert a value into the description field (without updating the widget descriptor).
+	 * @return
+	 */
+	public String getTextToInsert(String name);
 	
 	public void showBaseParams(boolean visible);
 	
@@ -39,8 +45,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	 * set the name of this widget
 	 */
 	public void setName(String name);
-	
-	
+	public void setSaveButtonText(String text);
 	public interface Presenter {
 		/**
 		 * Pop up an editor for an existing widget attachment

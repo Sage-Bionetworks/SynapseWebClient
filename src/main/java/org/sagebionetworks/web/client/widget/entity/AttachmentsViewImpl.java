@@ -40,7 +40,7 @@ import com.google.inject.Inject;
 
 public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsView {
 	
-	private static final String ATTACHMENT_COLUMN_WIDTH = "210px";
+	private static final int ATTACHMENT_COLUMN_WIDTH = 210;
 	private static final String LINK_KEY = "link";
 	private static final String ATTACHMENT_DATA_TOKEN_KEY = "attachmentDataKey";
 	private static final String ATTACHMENT_DATA_PREVIEW_TOKEN_KEY = "attachmentDataPreviewKey";
@@ -53,11 +53,14 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private boolean isEmpty = true;
+	private boolean showEditButton;
+	private int attachmentColumnWidth;
 	
 	@Inject
 	public AttachmentsViewImpl(IconsImageBundle iconsImageBundle) {
 		this.iconsImageBundle = iconsImageBundle;
 		gridStore = new ListStore<BaseModelData>();
+		setAttachmentColumnWidth(ATTACHMENT_COLUMN_WIDTH);
 	}
 	
 	@Override
@@ -72,7 +75,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	    column.setId(LINK_KEY);  
 	    column.setHeader("Attachment");  	    	   
 	    column.setRowHeader(false);
-	    column.setWidth(259);
+	    column.setWidth(attachmentColumnWidth);
 		column.setRenderer(valueRenderer);
 	    configs.add(column);  
 	  	  	     	 
@@ -82,7 +85,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	    grid.setStyleAttribute("borderTop", "none");  
 	    grid.setAutoExpandColumn(LINK_KEY);  
 		grid.setAutoExpandMin(100);
-		grid.setAutoExpandMax(300);
+		//grid.setAutoExpandMax(300);
 		// This is important, the grid must resize to fit its height.
 		grid.setAutoHeight(true);
 		grid.setAutoWidth(false);
@@ -98,8 +101,14 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	}
 	
 	@Override
+	public void setAttachmentColumnWidth(int width) {
+		attachmentColumnWidth = width;
+	}
+	
+	@Override
 	public void configure(String baseUrl, String entityId,
-			List<AttachmentData> attachments) {		
+			List<AttachmentData> attachments, boolean showEditButton) {		
+		this.showEditButton = showEditButton;
 		gridStore.removeAll();
 		if(attachments == null || attachments.size() == 0){
 			addNoAttachmentRow();
@@ -198,7 +207,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 				HorizontalPanel panel = new HorizontalPanel();
 				LayoutContainer wrap = new LayoutContainer();
 				wrap.add(div);
-				wrap.setWidth(ATTACHMENT_COLUMN_WIDTH);
+				wrap.setWidth(attachmentColumnWidth-50);
 				if(tooltip != null)
 					wrap.setToolTip(tooltip);
 				
@@ -215,6 +224,18 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 				TableData td = new TableData();
 				td.setHorizontalAlign(HorizontalAlignment.RIGHT);
 				td.setVerticalAlign(VerticalAlignment.MIDDLE);
+				
+				if(showEditButton) {
+					img = AbstractImagePrototype.create(iconsImageBundle.editGrey16());
+					Anchor editButton = DisplayUtils.createIconLink(img, new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							editAttachmentAt(rowIndex);
+						}
+					});
+					panel.add(editButton, td);
+				}
+				
 				panel.add(button, td);
 				panel.setAutoWidth(true);
 				return panel;
@@ -284,7 +305,12 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 					});
 		}
 	}
-
+	public void editAttachmentAt(int rowIndex) {
+		final BaseModelData model = grid.getStore().getAt(rowIndex);
+		if (model != null) {
+			presenter.editAttachment((String) model.get(ATTACHMENT_DATA_TOKEN_KEY));
+		}
+	}
 	public void showAttachmentAt(int rowIndex) {
 		final BaseModelData model = grid.getStore().getAt(rowIndex);
 		if (model != null) {

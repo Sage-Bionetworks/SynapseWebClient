@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.pegdown.PegDownProcessor;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -56,7 +57,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
-import org.sagebionetworks.web.client.widget.entity.dialog.WidgetRegistrarImpl;
+import org.sagebionetworks.web.server.ServerConstants;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -70,7 +71,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
-import com.petebevin.markdown.MarkdownProcessor;
 
 @SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -84,7 +84,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
-	MarkdownProcessor markdownProcessor = new MarkdownProcessor();
+	PegDownProcessor markdownProcessor = new PegDownProcessor(ServerConstants.MARKDOWN_OPTIONS);
 	
 	/**
 	 * Injected with Gin
@@ -853,8 +853,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String markdown2Html(String markdown, String attachmentUrl) {
-		return ServerMarkdownUtils.markdown2Html(markdown, attachmentUrl, markdownProcessor);
+	public String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview) {
+		return ServerMarkdownUtils.markdown2Html(markdown, attachmentUrl, isPreview, markdownProcessor);
 	}
 
 	@Override

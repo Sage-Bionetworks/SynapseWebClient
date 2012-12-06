@@ -3,7 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.dialog;
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.WidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
@@ -12,10 +13,11 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -25,34 +27,43 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	Dialog window;
 	SimplePanel paramsPanel;
 	SimplePanel baseContentPanel;
-	
+	String saveButtonText = "Save";
 	TextField<String> nameField;
 	
 	private Presenter presenter;
-	private WidgetDescriptorPresenter widgetDescriptorPresenter;
+	private WidgetEditorPresenter widgetDescriptorPresenter;
 	private static final int STARTING_HEIGHT = 110;
+	private static final int STARTING_WIDTH = 370;
 	private WidgetRegistrar widgetRegistrar;
 	
 	@Inject
 	public BaseEditWidgetDescriptorViewImpl(WidgetRegistrar widgetRegistrar) {
 		this.widgetRegistrar = widgetRegistrar;
-		window = new Dialog();
+		
+		paramsPanel = new SimplePanel();
+		baseContentPanel = new SimplePanel();
+
+		initializeBaseContentPanel();
+	}
+	
+	private Dialog getNewDialog() {
+		Dialog window = new Dialog();
 		window.setMaximizable(false);
 	    window.setPlain(true);  
 	    window.setModal(true);  
 	    window.setBlinkModal(true);  
 	    //window.setLayout(new FitLayout());
-	    // We want okay to say save
-	    window.okText = "Save";
+	    window.okText = saveButtonText;
 	    window.setButtons(Dialog.OKCANCEL);
 	    window.setHideOnButtonClick(false);
 	    
-		paramsPanel = new SimplePanel();
-		baseContentPanel = new SimplePanel();
-		VerticalPanel verticalPanel = new VerticalPanel();
-		verticalPanel.add(paramsPanel);
-		verticalPanel.add(baseContentPanel);
-		window.add(verticalPanel);
+	    FlowPanel container = new FlowPanel();
+		container.add(paramsPanel);
+		container.add(new HTML("<hr style=\"margin: 0px\">"));
+		container.add(baseContentPanel);
+		
+		window.add(container);
+		
 		Button saveButton = window.getButtonById(Dialog.OK);	    
 	    saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
@@ -67,10 +78,17 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 				hide();
 			}
 	    });
+	    
+	    String width = Integer.toString(STARTING_WIDTH + widgetDescriptorPresenter.getAdditionalWidth()) + "px";
+		String height = Integer.toString(STARTING_HEIGHT + widgetDescriptorPresenter.getDisplayHeight())+"px";
+		container.setWidth(width);
+		container.setHeight(height);
+		window.setWidth(width);
+		window.setHeight(height);
 		
-		initializeBaseContentPanel();
+	    return window;
 	}
-
+	
 	private void initializeBaseContentPanel() {
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setStyleAttribute("margin", "10px");
@@ -78,11 +96,11 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 		nameField = new TextField<String>();
 		nameField.setAllowBlank(false);
 		nameField.setName("Name");
-		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
-		nameField.getMessages().setRegexText(DisplayConstants.ERROR_NAME_PATTERN_MISMATCH);
+		nameField.setRegex(WebConstants.VALID_WIDGET_NAME_REGEX);
+		nameField.getMessages().setRegexText(DisplayConstants.ERROR_WIDGET_NAME_PATTERN_MISMATCH);
 		Label nameLabel = new Label("Name:");
 		nameLabel.setWidth(50);
-		nameField.setWidth(205);
+		nameField.setWidth(270);
 		hp.add(nameLabel);
 		hp.add(nameField);
 		
@@ -90,8 +108,9 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	}
 	
 	@Override
-	public void show() {
-		window.setHeight(STARTING_HEIGHT + widgetDescriptorPresenter.getDisplayHeight());
+	public void show(String windowTitle) {
+		window = getNewDialog();
+		window.setHeading(windowTitle);
 		window.show();
 	}
 
@@ -121,15 +140,19 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	}
 	
 	@Override
-	public void setWidgetDescriptor(String contentTypeKey, WidgetDescriptor widgetDescriptor) {
+	public void setWidgetDescriptor(String entityId, String contentTypeKey, WidgetDescriptor widgetDescriptor) {
 		//clear out params panel.  Get the right params editor based on the descriptor (it's concrete class, and configure based on the parameters inside of it).
 		paramsPanel.clear();
-		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(contentTypeKey, widgetDescriptor);
+		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(entityId, contentTypeKey, widgetDescriptor);
 		if (widgetDescriptorPresenter != null) {
 			Widget w = widgetDescriptorPresenter.asWidget();
 			paramsPanel.add(w);
-			window.setHeading(widgetRegistrar.getFriendlyTypeName(contentTypeKey));
 		}
+	}
+	
+	@Override
+	public String getTextToInsert(String name) {
+		return widgetDescriptorPresenter.getTextToInsert(name);
 	}
 	
 	@Override
@@ -158,5 +181,9 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	public void clear() {
 		if (nameField != null)
 			nameField.setValue("");
+	}
+	@Override
+	public void setSaveButtonText(String text) {
+		this.saveButtonText = text;
 	}
 }

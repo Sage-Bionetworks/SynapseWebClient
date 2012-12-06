@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import org.pegdown.Extensions;
+
 import com.google.gwt.i18n.client.DateTimeFormat;
 
 public class DisplayConstants {
@@ -33,7 +35,6 @@ public class DisplayConstants {
 	public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat("dd-MMM-yyyy");
 	public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_MEDIUM);
 	public static final DateTimeFormat DATE_FORMAT_SERVICES = DateTimeFormat.getFormat("yyyy-MM-dd");	
-	
 	
 	/*
 	 * Text constants
@@ -197,12 +198,14 @@ public class DisplayConstants {
 	public static final String BUTTON_SHARE = "Share";
 	public static final String BUTTON_DOWNLOAD = "Download";
 	public static final String LABEL_DELETE = "Delete";
+	public static final String LABEL_RENAME = "Rename";
 	public static final String LABEL_CREATE = "Create";
 	public static final String LABEL_MOVE = "Move";
 	public static final String LABEL_ARE_YOU_SURE = "Are you sure?";
 	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. Please try again.";
 	public static final String ERROR_ENTITY_MOVE_FAILURE = "Move failed. Please try again.";
 	public static final String PROMPT_SURE_DELETE = "Are you sure you want to delete this";
+	public static final String PROMPT_SURE_RENAME_WIDGET = "Are you sure you want to rename this widget?\nIf you make this change, old references to this widget will not work.";
 	public static final String LABEL_NO_PREVIEW_DATA = "A Preview has not been created.";
 	public static final String LABEL_CONTAINS_NO_CHILDREN = "This object contains no children.";
 	public static final String BUTTON_REGISTER = "Register";
@@ -266,6 +269,7 @@ public class DisplayConstants {
 	public static final String ATTACHMENT_DIALOG_WINDOW_TITLE = "Add New File Attachment";
 	public static final String ATTACH_PROFILE_PIC_DIALOG_TITLE = "Upload a New Photo";
 	public static final String ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT = "Upload Photo";
+	public static final String ATTACH_IMAGE_DIALOG_BUTTON_TEXT = "Upload Image";
 	public static final String LABEL_ADD_TO_SNAPSHOT = "ADD ENTITY<br/>TO SUMMARY";
 	public static final String LABEL_CREATE_NEW_GROUP = "Create New Group";
 	public static final String BUTTON_ADD_ENTITY_TO_GROUP = "Add To Summary";
@@ -305,7 +309,7 @@ public class DisplayConstants {
 	public static final String ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
 																		"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br></code></pre><br>" +
 																		"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>An [example][id]. Then, anywhere else in the description, define the link:<br>  [id]: http://example.com/<br></code></pre><br>" +
-																		"<h3>Images</h3>From Attachments:<pre><code>Click the Insert Attachment button to insert at the current cursor position</code></pre></p><p>Other Sources:<pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
+																		"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
 																		"<h3>Headers</h3><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre><br>" +
 																		"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
 																		"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
@@ -318,7 +322,9 @@ public class DisplayConstants {
 	public static final String ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT = "Preview";
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
 	public static final String ENTITY_DESCRIPTION_HIDE_TIPS_TEXT = "Hide Formatting Guide";
-	public static final String ENTITY_DESCRIPTION_SHOW_TIPS_TEXT = "Formatting Guide";
+	public static final String ENTITY_DESCRIPTION_SHOW_TIPS_TEXT = "Show Formatting Guide";
+	public static final String ENTITY_DESCRIPTION_HIDE_WIDGETS_TEXT = "Hide Widget Manager";
+	public static final String ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT = "Show Widget Manager";
 	public static final String ENTITY_DESCRIPTION_ATTACHMENT_PREFIX = "Attachment/entity/";
 	public static final String ENTITY_STORAGE_NOT_FOUND_ERROR = "Unable to determine the usage associated with entity id: ";
 	public static final String CODE_EXECUTION = "Code Execution";
@@ -330,8 +336,30 @@ public class DisplayConstants {
 	public static final String ENTITY = "Entity";
 	public static final String LOADING = "Loading";
 	public static final String ACTIVITY = "Activity";
+	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
 	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
-
+	public static final String ERROR_WIDGET_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, hypens, periods, plus signs, and parentheses.";
+	
+	/**
+	 * Widget editors
+	 */
+	public static final String IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE = "A file must be uploaded to continue.";
+	public static final String IMAGE_CONFIG_INVALID_URL_MESSAGE = "Please enter a valid URL";
+	public static final String IMAGE_CONFIG_UPLOAD = "Upload";
+	public static final String IMAGE_CONFIG_FROM_THE_WEB = "From the Web";
+	public static final String IMAGE_CONFIG_URL_LABEL = "Image URL:";
+	public static final String URL_LABEL = "URL:";
+	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
+	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
+	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
+	public static final String SHOW_EXPANDED_LABEL = "Show Expanded?";
+	public static final String INVALID_NUMBER_MESSAGE = "Please enter a valid number";
+	public static final String DEPTH_LABEL = "Depth";
+	public static final String INVALID_SYNAPSE_ID_MESSAGE = "Please enter a valid Synapse ID";
+	public static final String SYNAPSE_ID_LABEL = "Synapse ID";
+	public static final String SAVE_BUTTON_LABEL = "Save";
+	public static final String INSERT_BUTTON_LABEL = "Insert";
+	
 	/*
 	 * Element ids for Selenium
 	 */

@@ -1,36 +1,35 @@
-package org.sagebionetworks.web.client.widget.entity.dialog.editors;
+package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.widget.WidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetDescriptorPresenter {
+public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPresenter {
 	
-	private ImageConfigView view;
+	private ImageWidgetView view;
 	private ImageAttachmentWidgetDescriptor descriptor;
 	
 	@Inject
-	public ImageConfigEditor(ImageConfigView view) {
+	public ImageWidget(ImageWidgetView view) {
 		this.view = view;
 		view.setPresenter(this);
-		view.initView();
-	}		
+	}
+	
 	@Override
-	public void setWidgetDescriptor(WidgetDescriptor widgetDescriptor) {
+	public void configure(String entityId, WidgetDescriptor widgetDescriptor) {
 		if (!(widgetDescriptor instanceof ImageAttachmentWidgetDescriptor))
 			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_DESCRIPTOR_TYPE);
-		//TODO: set up view based on descriptor parameters
+		//set up view based on descriptor parameters
 		descriptor = (ImageAttachmentWidgetDescriptor)widgetDescriptor;
-		//view.setStuff(descriptor.getStuff());
+		view.configure(entityId, descriptor.getImage());
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
-		view.clear();
 	}
 
 	@Override
@@ -38,16 +37,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetDescr
 		return view.asWidget();
 	}
 
-	@Override
-	public void updateDescriptorFromView() {
-		//TODO: update widget descriptor from the view
-	}
-
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	/*
+		/*
 	 * Private Methods
 	 */
 }
