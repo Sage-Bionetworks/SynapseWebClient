@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -181,4 +182,5 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getActivity(String activityId) throws RestServiceException;
 
+	VersionInfo promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
 }
