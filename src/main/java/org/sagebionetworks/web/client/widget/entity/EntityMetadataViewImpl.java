@@ -497,7 +497,27 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 			private Object setupIconMenu(final ModelData model, boolean currentVersion) {
 				IconMenu menu = new IconMenu();
-				if (currentVersion) {
+				final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
+				if (!currentVersion) {
+					menu.addIcon(icons.applicationPlus16(),
+							"Promote Version to Top", new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									MessageBox.confirm("Promote "+ versionLabel,
+											DisplayConstants.PROMPT_SURE_PROMOTE,
+											new Listener<MessageBoxEvent>() {
+												@Override
+												public void handleEvent(MessageBoxEvent be) {
+													Button btn = be.getButtonClicked();
+													if (Dialog.YES.equals(btn.getItemId())) {
+														presenter.deleteVersion((String) model.get(VERSION_KEY_ID),
+																				(Long) model.get(VERSION_KEY_NUMBER));
+													}
+												}
+											});
+								}
+							});
+				} else {
 					menu.addIcon(icons.editGrey16(), "Edit Version Info",
 							new ClickHandler() {
 								@Override
@@ -518,7 +538,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 								}
 							});
 				}
-				final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
 				menu.addIcon(icons.deleteButtonGrey16(), "Delete Version",
 						new ClickHandler() {
 							@Override
