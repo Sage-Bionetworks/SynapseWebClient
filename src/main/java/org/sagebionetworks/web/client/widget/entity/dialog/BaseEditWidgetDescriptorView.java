@@ -21,7 +21,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	 */
 	public void hide();
 	
-	public void setWidgetDescriptor(WidgetDescriptor widgetDescriptor);
+	public void setWidgetDescriptor(String contentTypeKey, WidgetDescriptor widgetDescriptor);
 
 	/**
 	 * Call to tell the widget descriptor view to update the widgetDescriptor based on user input (called on save) 

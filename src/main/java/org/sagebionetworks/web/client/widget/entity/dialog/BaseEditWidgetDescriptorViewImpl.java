@@ -31,8 +31,11 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	private Presenter presenter;
 	private WidgetDescriptorPresenter widgetDescriptorPresenter;
 	private static final int STARTING_HEIGHT = 110;
+	private WidgetRegistrar widgetRegistrar;
+	
 	@Inject
-	public BaseEditWidgetDescriptorViewImpl() {
+	public BaseEditWidgetDescriptorViewImpl(WidgetRegistrar widgetRegistrar) {
+		this.widgetRegistrar = widgetRegistrar;
 		window = new Dialog();
 		window.setMaximizable(false);
 	    window.setPlain(true);  
@@ -43,7 +46,7 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	    window.okText = "Save";
 	    window.setButtons(Dialog.OKCANCEL);
 	    window.setHideOnButtonClick(false);
-
+	    
 		paramsPanel = new SimplePanel();
 		baseContentPanel = new SimplePanel();
 		VerticalPanel verticalPanel = new VerticalPanel();
@@ -118,14 +121,14 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	}
 	
 	@Override
-	public void setWidgetDescriptor(WidgetDescriptor widgetDescriptor) {
+	public void setWidgetDescriptor(String contentTypeKey, WidgetDescriptor widgetDescriptor) {
 		//clear out params panel.  Get the right params editor based on the descriptor (it's concrete class, and configure based on the parameters inside of it).
 		paramsPanel.clear();
-		widgetDescriptorPresenter = WidgetDescriptorUtils.getWidgetEditorForWidgetDescriptor(widgetDescriptor);
+		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(contentTypeKey, widgetDescriptor);
 		if (widgetDescriptorPresenter != null) {
 			Widget w = widgetDescriptorPresenter.asWidget();
 			paramsPanel.add(w);
-			window.setHeading(WidgetDescriptorUtils.getFriendlyTypeName(widgetDescriptor.getEntityType()));
+			window.setHeading(widgetRegistrar.getFriendlyTypeName(contentTypeKey));
 		}
 	}
 	

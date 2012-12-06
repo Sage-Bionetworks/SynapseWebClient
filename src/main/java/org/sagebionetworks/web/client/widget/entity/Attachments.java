@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -8,15 +10,17 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
+import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.WidgetRegistrar;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -28,43 +32,76 @@ public class Attachments implements AttachmentsView.Presenter,
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	private NodeModelCreator nodeModelCreator;
-	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EventBus bus;
-
+	private HandlerManager handlerManager;
+	private WidgetRegistrar widgetRegistrar;
 	private Entity entity;
 
 	@Inject
 	public Attachments(AttachmentsView view, SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			NodeModelCreator nodeModelCreator,
-			EntityTypeProvider entityTypeProvider,
 			JSONObjectAdapter jsonObjectAdapter,
-			EventBus bus) {
+			EventBus bus, WidgetRegistrar widgetRegistrar) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.nodeModelCreator = nodeModelCreator;
-		this.entityTypeProvider = entityTypeProvider;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.bus = bus;
-
+		this.widgetRegistrar = widgetRegistrar;
 		view.setPresenter(this);
 	}
-
-	public void configure(String baseUrl, Entity entity) {
+	
+	@Override
+	public void configure(String baseUrl, Entity entity, boolean widgetAttachments) {
 		this.entity = entity;
-		view.configure(baseUrl, entity.getId(), entity.getAttachments());
+		List<AttachmentData> workingSet = new ArrayList<AttachmentData>();
+		//show json entity attachments, or everything else
+		List<AttachmentData> allAttachments = entity.getAttachments();
+		if (allAttachments != null) {
+			for (Iterator iterator = allAttachments.iterator(); iterator.hasNext();) {
+				AttachmentData attachmentData = (AttachmentData) iterator.next();
+				//determine if this is a widget attachment
+				String contentType = attachmentData.getContentType();
+				boolean isWidget = widgetRegistrar.isWidgetContentType(contentType);
+				if (isWidget) {
+					if (widgetAttachments)
+						workingSet.add(attachmentData);
+				} else if (!widgetAttachments)
+					workingSet.add(attachmentData);
+			}
+		}
+			
+		view.configure(baseUrl, entity.getId(), workingSet);
+	}
+
+	@Override
+	public void clearHandlers() {
+		handlerManager = new HandlerManager(this);
+	}
+
+	@Override
+	public void configureWidgetAttachment(String attachmentName) {
+		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void addAttachmentSelectedHandler(AttachmentSelectedHandler handler) {
+		handlerManager.addHandler(AttachmentSelectedEvent.getType(), handler);
 	}
 
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
+	
+	@Override
+	public void attachmentClicked(String attachmentName, String tokenId, String previewTokenId) {
+		handlerManager.fireEvent(new AttachmentSelectedEvent(attachmentName, tokenId, previewTokenId));
+	}
+	
 	@Override
 	public void deleteAttachment(final String tokenId) {
 		List<AttachmentData> attachments = entity.getAttachments();

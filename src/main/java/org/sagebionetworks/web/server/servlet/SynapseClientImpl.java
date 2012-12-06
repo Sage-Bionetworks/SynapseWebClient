@@ -56,7 +56,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
-import org.sagebionetworks.web.client.widget.entity.dialog.WidgetDescriptorUtils;
+import org.sagebionetworks.web.client.widget.entity.dialog.WidgetRegistrarImpl;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -957,7 +957,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public EntityWrapper addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName) throws RestServiceException {
+	public EntityWrapper addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName, String contentTypeKey) throws RestServiceException {
 		EntityWrapper updatedEntityWrapper = null;
 		try {
 			
@@ -981,12 +981,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				tempFile.delete();
 			}
 			if (data != null) {
+				data.setContentType(contentTypeKey);
 				// Add the attachment to the entity.
 				Entity e = client.getEntityById(entityId);
 				if (e.getAttachments() == null) {
 					e.setAttachments(new ArrayList<AttachmentData>());
 				}
-				// Add all of the new attachments.
 				e.getAttachments().add(data);
 				// Save the changes.
 				Entity updatedEntity = client.putEntity(e);

@@ -414,7 +414,7 @@ a.shortBtn {
 
 .user-profile-change-photo {
 }
-
+	
 .margin-right-5 {
 	margin-right: 5px;
 }
@@ -576,4 +576,7 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-border-bottom-right-radius: 4px;
   border-bottom-right-radius: 4px;
   -moz-border-radius-bottomright: 4px;
+}
+.attachments-widget-row {
+	font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;
 }

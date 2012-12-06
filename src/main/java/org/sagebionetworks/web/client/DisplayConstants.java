@@ -157,6 +157,7 @@ public class DisplayConstants {
 	public static final String ERROR_FAILED_PERSIST_AGREEMENT_TEXT = "Your license acceptance was not saved. You will need to sign it again in the future.";	
 	public static final String ERROR_USER_ALREADY_EXISTS = "There is an existing account associated with this email.  If you have forgotten your password, please click the \"Forgot Password\" button on the login page.";
 	public static final String ERROR_UNABLE_TO_LOAD = "An error occurred trying to load.";
+	public static final String ERROR_UNABLE_TO_UPDATE_ATTACHMENTS = "The attachments could not be updated because this entity has conflicting changes. Please reload the page and try again.";
 	public static final String ERROR_GENERIC = "An error occurred. Please try again.";
 	public static final String ERROR_INCOMPATIBLE_CLIENT_VERSION = "Your client version is incompatible with the repository. Please try reloading the page.";
 	public static final String ERROR_GENERIC_RELOAD = "An error occurred. Please try reloading the page.";

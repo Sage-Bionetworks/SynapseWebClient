@@ -85,6 +85,9 @@ import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescrip
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialogImpl;
+import org.sagebionetworks.web.client.widget.entity.dialog.WidgetRegistrar;
+import org.sagebionetworks.web.client.widget.entity.dialog.WidgetRegistrarImpl;
+import org.sagebionetworks.web.client.widget.entity.dialog.WidgetRegistration;
 import org.sagebionetworks.web.client.widget.entity.dialog.editors.ImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.dialog.editors.ImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.editors.ProvenanceConfigView;
@@ -388,6 +391,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
+		
+		bind(WidgetRegistrarImpl.class).in(Singleton.class);
+		bind(WidgetRegistrar.class).to(WidgetRegistrarImpl.class);
 		
 		// UI Widget Descriptor editor
 		bind(BaseEditWidgetDescriptorViewImpl.class).in(Singleton.class);

@@ -10,9 +10,12 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.entity.Attachments;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 import org.sagebionetworks.web.client.widget.entity.FormFieldFactory;
 import org.sagebionetworks.web.client.widget.entity.Previewable;
@@ -25,6 +28,7 @@ import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -42,17 +46,21 @@ public class EntityEditorDialogImpl implements EntityEditorDialog, Previewable{
 	
 	FormFieldFactory formFactory;
 	IconsImageBundle icons;
+	SageImageBundle sageImageBundle;
 	SynapseClientAsync synapseClient;
-	BaseEditWidgetDescriptorPresenter baseEditWidgetDescriptor;
+	EventBus bus;
 	NodeModelCreator nodeModelCreator;
+	BaseEditWidgetDescriptorPresenter baseEditWidgetDescriptor;
 	
 	@Inject
-	public EntityEditorDialogImpl(FormFieldFactory formFactory, IconsImageBundle icons, SynapseClientAsync synapseClient, BaseEditWidgetDescriptorPresenter baseEditWidgetDescriptor, NodeModelCreator nodeModelCreator){
+	public EntityEditorDialogImpl(FormFieldFactory formFactory, IconsImageBundle icons, SageImageBundle sageImageBundle, SynapseClientAsync synapseClient, EventBus bus, NodeModelCreator nodeModelCreator, BaseEditWidgetDescriptorPresenter baseEditWidgetDescriptor){
 		this.formFactory = formFactory;
 		this.icons = icons;
+		this.sageImageBundle = sageImageBundle;
 		this.synapseClient = synapseClient;
-		this.baseEditWidgetDescriptor = baseEditWidgetDescriptor;
 		this.nodeModelCreator = nodeModelCreator;
+		this.baseEditWidgetDescriptor = baseEditWidgetDescriptor;
+		this.bus = bus;
 	}
 
 	@Override
@@ -102,7 +110,7 @@ public class EntityEditorDialogImpl implements EntityEditorDialog, Previewable{
 	 * @param annos
 	 * @param callback
 	 */
-	public void showEditEntityDialog(final String windowTitle, final String entityId, final List<AttachmentData> attachments, final JSONObjectAdapter newAdapter,
+	public void showEditEntityDialog(final String windowTitle, final EntityBundle bundle, final Attachments attachmentsWidget, final JSONObjectAdapter newAdapter,
 			ObjectSchema schema, final Annotations newAnnos, Set<String> filter, final Callback callback){
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
@@ -118,8 +126,8 @@ public class EntityEditorDialogImpl implements EntityEditorDialog, Previewable{
 	    window.setHideOnButtonClick(true);
 	    
 	    // Create the property from
-	    EntityPropertyForm editor = new EntityPropertyForm(formFactory, icons, this, baseEditWidgetDescriptor, nodeModelCreator);
-	    editor.setDataCopies(newAdapter, schema, newAnnos, filter, entityId, attachments);
+	    EntityPropertyForm editor = new EntityPropertyForm(formFactory, icons, sageImageBundle, this, bus, nodeModelCreator, synapseClient, baseEditWidgetDescriptor);
+	    editor.setDataCopies(newAdapter, schema, newAnnos, filter, bundle, attachmentsWidget);
 	    window.add(editor, new FitData(0));
 	    // List for the button selection
 	    Button saveButton = window.getButtonById(Dialog.OK);	    

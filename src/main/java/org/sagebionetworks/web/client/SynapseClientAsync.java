@@ -98,7 +98,7 @@ public interface SynapseClientAsync {
 
 	void getActivity(String activityId, AsyncCallback<String> callback);
 	
-	void addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	void addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName, String contentTypeKey, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 	
 	void removeAttachmentFromEntity(String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 	

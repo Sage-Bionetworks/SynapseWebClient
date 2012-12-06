@@ -57,6 +57,19 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	public int getDisplayHeight() {
 		return 50;
 	}
+	
+	@Override
+	public String getImageUrl() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public boolean isExternal() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 	/*
 	 * Private Methods
 	 */

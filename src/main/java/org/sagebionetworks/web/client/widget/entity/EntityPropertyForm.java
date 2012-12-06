@@ -1,29 +1,41 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.widget.YouTubeWidgetDescriptor;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
+import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.SelectAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.Direction;
@@ -45,11 +57,14 @@ import com.extjs.gxt.ui.client.widget.layout.AnchorLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.VBoxLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
@@ -75,24 +90,32 @@ public class EntityPropertyForm extends FormPanel {
 	VerticalPanel vp;
 	IconsImageBundle iconsImageBundle;
 	BaseEditWidgetDescriptorPresenter widgetDescriptorEditor;
-	NodeModelCreator nodeModelCreator;
+	SageImageBundle sageImageBundle;
+	EventBus bus;
+	
 	JSONObjectAdapter adapter;
 	ObjectSchema schema;
 	Annotations annos;
 	Set<String> filter;
 	HTML descriptionFormatInfo;
 	VerticalPanel descriptionFormatInfoContainer;
-	String entityId;
-	List<AttachmentData> attachments;
+	EntityBundle bundle;
+	Attachments attachmentsWidget;
 	Previewable previewGenerator;
 	SafeHtml showFormattingTipsSafeHTML, hideFormattingTipsSafeHTML;
+	EntityUpdatedHandler entityUpdatedHandler;
+	NodeModelCreator nodeModelCreator;
+	SynapseClientAsync synapseClient;
 	
 	@Inject
-	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, Previewable previewGenerator, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor, NodeModelCreator nodeModelCreator) {
+	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Previewable previewGenerator, EventBus bus, NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
+		this.sageImageBundle= sageImageBundle;
 		this.previewGenerator = previewGenerator;
+		this.bus = bus;
 		this.nodeModelCreator = nodeModelCreator;
+		this.synapseClient = synapseClient;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		showFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
 		hideFormattingTipsSafeHTML = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) +" "+ DisplayConstants.ENTITY_DESCRIPTION_HIDE_TIPS_TEXT);
@@ -191,7 +214,95 @@ public class EntityPropertyForm extends FormPanel {
 		vp.add(propPanel);
 		vp.add(annoPanel);
 		
+		//also, if attachments should change, the entity must be updated. we should update the attachments, and etag.  then let our version (which may have other modifications) update
+		if (entityUpdatedHandler == null) {
+			entityUpdatedHandler = new EntityUpdatedHandler() {
+				@Override
+				public void onPersistSuccess(EntityUpdatedEvent event) {
+					//ask for the new entity, update our attachments and etag, and reconfigure the attachments widget
+					refreshEntityAttachments();
+				}
+			};
+			bus.addHandler(EntityUpdatedEvent.getType(), entityUpdatedHandler);	
+		}
+		
+		
 		rebuild();
+	}
+	
+	private void refreshEntityAttachments(Entity newEntity){
+		//check to see if only the attachments and etag have changed
+		Entity oldEntity = bundle.getEntity();
+		String oldEtag = oldEntity.getEtag();
+		String newEtag = newEntity.getEtag();
+		List<AttachmentData> oldAttachments = oldEntity.getAttachments();
+		List<AttachmentData> newAttachments = newEntity.getAttachments();
+		Date oldModifiedOn = oldEntity.getModifiedOn();
+		Date newModifiedOn = newEntity.getModifiedOn();
+		//clear values
+		oldEntity.setEtag("");
+		oldEntity.setAttachments(null);
+		oldEntity.setModifiedOn(null);
+		newEntity.setEtag("");
+		newEntity.setAttachments(null);
+		newEntity.setModifiedOn(null);
+		//check if equal
+		boolean isEqual = oldEntity.equals(newEntity);
+		//restore values
+		oldEntity.setEtag(oldEtag);
+		oldEntity.setAttachments(oldAttachments);
+		oldEntity.setModifiedOn(oldModifiedOn);
+		newEntity.setEtag(newEtag);
+		newEntity.setAttachments(newAttachments);
+		newEntity.setModifiedOn(newModifiedOn);
+		
+		//these must be equal, otherwise, other there have been modifications that we don't know how to sync
+		if (isEqual) {
+			//update entity (in bundle)
+			oldEntity.setEtag(newEtag);
+			oldEntity.setAttachments(newAttachments);
+			oldEntity.setModifiedOn(newModifiedOn);
+			//and the adapter
+			try{
+				//the primary information hasn't changed, but let's cache some of the metadata
+				//cache the name and description, in case they've changed
+				String name = (String)adapter.get("name");
+				String description = (String)adapter.get("description");
+				oldEntity.writeToJSONObject(adapter);
+				adapter.put("name", name);
+				adapter.put("description", description);
+			} catch (JSONObjectAdapterException e) {
+				throw new RuntimeException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+			}
+		} else {
+			DisplayUtils.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_UPDATE_ATTACHMENTS);
+		}
+	}
+	
+	private void refreshEntityAttachments() {
+		// We need to refresh the entity, and update our entity bundle with the most current attachments and etag.
+		int mask = ENTITY;
+		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
+			@Override
+			public void onSuccess(EntityBundleTransport transport) {
+				EntityBundle newBundle = null;
+				try {
+					newBundle = nodeModelCreator.createEntityBundle(transport);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
+				//if we ignore attachments and etag, are these the same objects?
+				Entity newEntity = newBundle.getEntity();
+				refreshEntityAttachments(newEntity);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				DisplayUtils.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + caught.getMessage());
+			}			
+		};
+		
+		synapseClient.getEntityBundle(bundle.getEntity().getId(), mask, callback);
 	}
 	
 	/**
@@ -261,10 +372,13 @@ public class EntityPropertyForm extends FormPanel {
 		//Button addImageButton = new Button(DisplayConstants.ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT);
 		//addImageButton.setEnabled(attachments != null && VisualAttachmentsListViewImpl.getVisualAttachments(attachments).size() > 0);
 		Button insertYouTubeButton = new Button("YouTube Video");
+		Button manageWidgetsButton = new Button("Manage Widgets");
+		
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setTableWidth("180px");
 		hp.add(previewButton);
 		hp.add(insertYouTubeButton);
+		hp.add(manageWidgetsButton);
 		
 		// The preview button.
 		previewButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
@@ -273,31 +387,44 @@ public class EntityPropertyForm extends FormPanel {
 				previewGenerator.showPreview(((TextArea)descriptionField).getValue());
 			}
 	    });
-		//final String baseURl = GWT.getModuleBaseURL()+"attachment";
+		final String baseURl = GWT.getModuleBaseURL()+"attachment";
+		
+		manageWidgetsButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				//configure the attachments widget before popup
+				attachmentsWidget.configure(GWT.getModuleBaseURL()+"attachment", bundle.getEntity(), true);
+				attachmentsWidget.clearHandlers();
+				attachmentsWidget.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {
+					
+					@Override
+					public void onAttachmentSelected(AttachmentSelectedEvent event) {
+						//insert widget ref into description
+						insertWidgetMarkdown(event.getName());
+					}
+				});
+				SelectAttachmentDialog.showAttachmentsManagerDialog(baseURl, bundle, attachmentsWidget, "Widgets");
+			}
+		});
+		
 		insertYouTubeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				BaseEditWidgetDescriptorPresenter.editNewWidget(widgetDescriptorEditor, entityId, YouTubeWidgetDescriptor.class.getName(), attachments, new WidgetDescriptorUpdatedHandler() {
-					
-					@Override
+				BaseEditWidgetDescriptorPresenter.editNewWidget(widgetDescriptorEditor, bundle.getEntity().getId(), WidgetConstants.YOUTUBE_CONTENT_TYPE, bundle.getEntity().getAttachments(), new WidgetDescriptorUpdatedHandler() {
+						@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						insertWidgetMarkdown(event.getName());
 						try {
 							//switch to the up-to-date entity version after adding the attachment, but save our local description and name (in case they've changed here)
-							Entity entity = nodeModelCreator.createEntity(event.getEntityWrapper());
-							String newDescription = (String) adapter.get("description");
-							String newName = (String) adapter.get("name");
-							entity.writeToJSONObject(adapter);
-							
-							adapter.put("description", newDescription);
-							adapter.put("name", newName);
+							Entity updatedEntity = nodeModelCreator.createEntity(event.getEntityWrapper());
+							refreshEntityAttachments(updatedEntity);
 						} catch (JSONObjectAdapterException e) {
 							throw new RuntimeException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 						}
 					}
-				});
+				});	
 			}
-		});
+	    });
 		
 //		// The add image button
 //		addImageButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
@@ -344,7 +471,7 @@ public class EntityPropertyForm extends FormPanel {
 		this.annoPanel.add(annotationFormPanel);
 		this.layout();
 	}
-	
+
 	public void insertWidgetMarkdown(String attachmentName) {
 		//insert the markdown into the description for the attachment (where the attachment points to the json used to describe the widget)
 		TextArea descriptionTextArea = (TextArea)descriptionField;
@@ -359,6 +486,17 @@ public class EntityPropertyForm extends FormPanel {
 		String md = "{Widget:" + attachmentName+"}";
 		descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
 	}
+	public static List<AttachmentData> getVisualAttachments(List<AttachmentData> attachments){
+		List<AttachmentData> visualAttachments = new ArrayList<AttachmentData>();
+		for (Iterator iterator = attachments.iterator(); iterator
+				.hasNext();) {
+			AttachmentData data = (AttachmentData) iterator.next();
+			// Ignore all attachments without a preview.
+			if(data.getPreviewId() != null) 
+				visualAttachments.add(data);
+		}
+		return visualAttachments;
+	}
 	
 	/**
 	 * Pass editable copies of all objects.
@@ -367,13 +505,13 @@ public class EntityPropertyForm extends FormPanel {
 	 * @param annos
 	 * @param filter
 	 */
-	public void setDataCopies(JSONObjectAdapter adapter, ObjectSchema schema, Annotations annos, Set<String> filter, String entityId, List<AttachmentData> attachments){
+	public void setDataCopies(JSONObjectAdapter adapter, ObjectSchema schema, Annotations annos, Set<String> filter, EntityBundle bundle, Attachments attachmentsWidget){
 		this.adapter = adapter;
 		this.schema = schema;
 		this.annos = annos;
 		this.filter = filter;
-		this.entityId = entityId;
-		this.attachments = attachments;
+		this.bundle = bundle;
+		this.attachmentsWidget = attachmentsWidget;
 		rebuildModel();
 	}
 	

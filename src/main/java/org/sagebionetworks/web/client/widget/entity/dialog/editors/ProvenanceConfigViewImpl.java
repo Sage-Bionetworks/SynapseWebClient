@@ -56,7 +56,37 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 	@Override
 	public void clear() {
 	}
-
+	@Override
+	public int getDepth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	@Override
+	public void setDepth(int depth) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public String getEntityId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void setEntityId(String entityId) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public boolean isExpanded() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public void setIsExpanded(boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	/*
 	 * Private Methods
 	 */

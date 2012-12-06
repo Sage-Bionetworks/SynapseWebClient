@@ -14,7 +14,7 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
-import org.sagebionetworks.web.client.widget.entity.dialog.WidgetDescriptorUtils;
+import org.sagebionetworks.web.client.widget.entity.dialog.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -30,14 +30,16 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	private NodeModelCreator nodeModelCreator;
 	private HandlerManager handlerManager;
 	private BaseEditWidgetDescriptorView view;
-	String widgetClassName, entityId, attachmentName;
+	String contentTypeKey, entityId, attachmentName;
 	JSONObjectAdapter jsonObjectAdapter;
 	//contains all of the widget specific parameters
 	WidgetDescriptor widgetDescriptor;
 	private List<AttachmentData> attachments;
+	private WidgetRegistrar widgetRegistrar;
 	
 	@Inject
-	public BaseEditWidgetDescriptorPresenter(BaseEditWidgetDescriptorView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, JSONObjectAdapter jsonObjectAdapter){
+	public BaseEditWidgetDescriptorPresenter(BaseEditWidgetDescriptorView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, JSONObjectAdapter jsonObjectAdapter, WidgetRegistrar widgetRegistrar){
+		this.widgetRegistrar = widgetRegistrar;
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -63,9 +65,9 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	 * @param attachmentName
 	 * @param handler
 	 */
-	public static void editNewWidget(BaseEditWidgetDescriptorPresenter presenter, String entityId, String widgetClassName, List<AttachmentData> attachments, WidgetDescriptorUpdatedHandler handler) {
+	public static void editNewWidget(BaseEditWidgetDescriptorPresenter presenter, String entityId, String contentTypeKey, List<AttachmentData> attachments, WidgetDescriptorUpdatedHandler handler) {
 		presenter.addWidgetDescriptorUpdatedHandler(handler);
-		presenter.editNew(entityId, widgetClassName, attachments);
+		presenter.editNew(entityId, contentTypeKey, attachments);
 	}
 	
 	public static String getUniqueAttachmentName(List<AttachmentData> attachments, String attachmentName) {
@@ -108,7 +110,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		final String name = newWidgetName;
 		try {
 			JSONObjectAdapter widgetDescriptorJson = widgetDescriptor.writeToJSONObject(jsonObjectAdapter.createNew());
-			synapseClient.addWidgetDescriptorToEntity(widgetDescriptorJson.toJSONString(), entityId, name, new AsyncCallback<EntityWrapper>() {
+			synapseClient.addWidgetDescriptorToEntity(widgetDescriptorJson.toJSONString(), entityId, name, contentTypeKey, new AsyncCallback<EntityWrapper>() {
 				
 				@Override
 				public void onSuccess(EntityWrapper result) {
@@ -145,7 +147,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		handlerManager = new HandlerManager(this);
 		handlerManager.addHandler(WidgetDescriptorUpdatedEvent.getType(), handler);
 	}
-
+	
 	@Override
 	public void editExisting(String entityId, String attachmentName, List<AttachmentData> attachments) {
 		if(entityId == null) throw new IllegalArgumentException("entityId cannot be null");
@@ -154,6 +156,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		this.entityId= entityId;
 		this.attachmentName = attachmentName;
 		this.attachments = attachments;
+		this.contentTypeKey = getContentType(attachmentName, attachments);
 		
 		//initialize view with the correct widget descriptor definition and show
 		try {
@@ -163,7 +166,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 				public void onSuccess(String widgetDescriptorJson) {
 					try {
 						widgetDescriptor = nodeModelCreator.createWidget(widgetDescriptorJson);
-						view.setWidgetDescriptor(widgetDescriptor);
+						view.setWidgetDescriptor(contentTypeKey, widgetDescriptor);
 						view.show();
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -181,30 +184,38 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	}
 	
 	@Override
-	public void editNew(String entityId, String widgetClassName, List<AttachmentData> attachments) {
+	public void editNew(String entityId, String contentTypeKey, List<AttachmentData> attachments) {
 		if(entityId == null) throw new IllegalArgumentException("entityId cannot be null");
-		if(widgetClassName == null) throw new IllegalArgumentException("widget class name cannot be null");
+		if(contentTypeKey == null) throw new IllegalArgumentException("content type key cannot be null");
 		cleanInit();
 		this.entityId = entityId;
-		this.widgetClassName = widgetClassName;
 		this.attachments = attachments;
 		
 		//initialize the view with a new widget descriptor definition of the correct type and show
+		String widgetClassName = widgetRegistrar.getWidgetClass(contentTypeKey);
 		widgetDescriptor = (WidgetDescriptor)nodeModelCreator.newInstance(widgetClassName);
-		widgetDescriptor.setEntityType(widgetClassName);
-		view.setWidgetDescriptor(widgetDescriptor);
+		view.setWidgetDescriptor(contentTypeKey, widgetDescriptor);
 		//prepopulate with a unique attachment name of the correct type
 		if (attachments != null) {
-			view.setName(getUniqueAttachmentName(attachments, WidgetDescriptorUtils.getFriendlyTypeName(widgetClassName)));
+			view.setName(getUniqueAttachmentName(attachments, widgetRegistrar.getFriendlyTypeName(contentTypeKey)));
 		}
 				
 		view.show();
 		
 	}
 	
+	private String getContentType(String attachmentName, List<AttachmentData> attachments) {
+		for (Iterator iterator = attachments.iterator(); iterator.hasNext();) {
+			AttachmentData attachmentData = (AttachmentData) iterator.next();
+			if (attachmentName.equals(attachmentData.getName()))
+					return attachmentData.getContentType();
+		}
+		return null;
+	}
+	
 	private void cleanInit() {
 		entityId = null;
-		widgetClassName = null;
+		contentTypeKey = null;
 		attachmentName = null;
 		view.clear();
 	}

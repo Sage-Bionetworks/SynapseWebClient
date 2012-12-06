@@ -19,6 +19,8 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
+import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -680,7 +682,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 	
-	private Widget createAttachmentsWidget(EntityBundle bundle, boolean canEdit, boolean readOnly) {
+	private Widget createAttachmentsWidget(final EntityBundle bundle, boolean canEdit, boolean readOnly) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
@@ -694,7 +696,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         HBoxLayoutData flex = new HBoxLayoutData(new Margins(0, 5, 0, 0));
         flex.setFlex(1);
 
-        String baseURl = GWT.getModuleBaseURL()+"attachment";
+        final String baseURl = GWT.getModuleBaseURL()+"attachment";
         final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId();
 
         if(canEdit && !readOnly) {
@@ -723,7 +725,17 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         lc.add(c);
 
         // We just create a new one each time.
-        attachmentsPanel.configure(baseURl, bundle.getEntity());
+        attachmentsPanel.configure(baseURl, bundle.getEntity(), false);
+        attachmentsPanel.clearHandlers();
+        attachmentsPanel.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {
+			
+			@Override
+			public void onAttachmentSelected(AttachmentSelectedEvent event) {
+				String url = DisplayUtils.createAttachmentUrl(baseURl, bundle.getEntity().getId(), event.getTokenId(), event.getTokenId());
+				DisplayUtils.newWindow(url, "", "");
+			}
+		});
+        		
         lc.add(attachmentsPanel.asWidget());
 		lc.layout();
 		return lc;

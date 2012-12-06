@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
-import org.sagebionetworks.web.client.widget.entity.dialog.WidgetDescriptorUtils;
+import org.sagebionetworks.web.client.widget.entity.dialog.WidgetRegistrarImpl;
 
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
@@ -56,6 +56,6 @@ public class Portal implements EntryPoint {
 		historyHandler.handleCurrentHistory();
 		
 		//Widgets in the UI are injected
-		WidgetDescriptorUtils.ginInjector = ginjector;
+		WidgetRegistrarImpl.ginInjector = ginjector;
 	}
 }
