@@ -523,6 +523,23 @@ h1, h2, h3, h4, h5, h6 {
 	overflow: auto;
 }
 
+.metadata-tag {
+	float:left; 
+	margin-right: 5px;  
+	background-color: #f3f3f3; 
+	padding: 2px 4px 2px 4px;		
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;	
+}
+
+h2.entityTitle {	
+	font-family:Yanone Kaffeesatz;
+	color:#000000;
+	font-size: 32px; 
+	line-height: 40px; 
+	margin-bottom: 0px;
+}
 
 .markdown table {
   border: 1px solid #dddddd;
@@ -577,3 +594,4 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom-right-radius: 4px;
   -moz-border-radius-bottomright: 4px;
 }
+

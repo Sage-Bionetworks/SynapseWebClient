@@ -84,10 +84,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		
 		view.setPresenter(this);
 	}	
-
-	public void setRootEntities(List<EntityHeader> rootEntities) {
-		this.view.setRootEntities(rootEntities);
-	}
 	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
@@ -97,14 +93,37 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 
 	/**
-	 * Does nothing. Use asWidget(Entity)
+	 * Configure tree view with given entityId's children as start set
+	 * @param entityId
 	 */
+	public void configure(String entityId) {
+		getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
+			@Override
+			public void onSuccess(List<EntityHeader> result) {
+				view.setRootEntities(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+			}
+		});
+	}
+	
+	/**
+	 * Configure tree view to be filled initially with the given headers.
+	 * @param rootEntities
+	 */
+	public void configure(List<EntityHeader> rootEntities) {
+		view.setRootEntities(rootEntities);
+	}
+	
+	
 	@Override
 	public Widget asWidget() {
 		view.setPresenter(this);		
 		return view.asWidget();
 	}
-    
+	
 	@Override
 	public void getFolderChildren(String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();		

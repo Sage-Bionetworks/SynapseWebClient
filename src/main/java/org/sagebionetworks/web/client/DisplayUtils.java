@@ -959,6 +959,7 @@ public class DisplayUtils {
 		optionsMap.put("title", tooltipText);
 		optionsMap.put("data-placement", pos.toString().toLowerCase());
 		optionsMap.put("data-animation", "false");
+		optionsMap.put("data-html", "true");
 		addTooltip(util, widget, optionsMap);
 	}
 		
