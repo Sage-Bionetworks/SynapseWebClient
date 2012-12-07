@@ -19,10 +19,8 @@
   </ui:style>
 
 	<g:HTMLPanel>
-		<g:HTMLPanel ui:field="entityNamePanel">
-			<h2 class="entityTitle">
-			 <g:Image ui:field="entityIcon" />&nbsp;<span ui:field="entityName"></span>&nbsp;(<span ui:field="entityId"></span>)
-			</h2>
+		<g:HTMLPanel ui:field="entityNamePanel">			
+			 <g:Image ui:field="entityIcon" />&nbsp;<span ui:field="entityName"></span>&nbsp;(<span ui:field="entityId"></span>)			
 		</g:HTMLPanel>
 		<g:HTMLPanel ui:field="detailedMetadata">
 			<g:HTMLPanel ui:field="dataUseContainer" ></g:HTMLPanel>			
