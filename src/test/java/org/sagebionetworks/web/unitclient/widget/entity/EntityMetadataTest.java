@@ -8,7 +8,6 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -51,6 +50,7 @@ public class EntityMetadataTest {
 	JiraURLHelper mockJiraURLHelper;
 
 	EntityMetadata entityMetadata;
+	Versionable vb;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -68,6 +68,18 @@ public class EntityMetadataTest {
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 
 		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, mockJsonObjectAdapter, mockGlobalApplicationState, mockEntityTypeProvider, mockJiraURLHelper, mockEventBus);
+
+		vb = new Data();
+		vb.setId("syn123");
+		vb.setVersionNumber(new Long(1));
+		vb.setVersionLabel("");
+		vb.setVersionComment("");
+		EntityBundle mockBundle = mock(EntityBundle.class, RETURNS_DEEP_STUBS);
+		when(mockBundle.getPermissions().getCanEdit()).thenReturn(true);
+		when(mockBundle.getEntity()).thenReturn(vb);
+		when(mockJsonObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
+		entityMetadata.setEntityBundle(mockBundle, false);
+
 	}
 
 	@Test
@@ -116,16 +128,6 @@ public class EntityMetadataTest {
 
 	@Test
 	public void testUpdateVersionInfo() throws Exception {
-		Versionable vb = new Data();
-		vb.setId("syn123");
-		vb.setVersionNumber(new Long(1));
-		vb.setVersionLabel("");
-		vb.setVersionComment("");
-		EntityBundle mockBundle = mock(EntityBundle.class, RETURNS_DEEP_STUBS);
-		when(mockBundle.getPermissions().getCanEdit()).thenReturn(true);
-		when(mockBundle.getEntity()).thenReturn(vb);
-		when(mockJsonObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
-		entityMetadata.setEntityBundle(mockBundle, false);
 
 		String testComment = "testComment";
 		String testLabel = "testLabel";
@@ -140,5 +142,17 @@ public class EntityMetadataTest {
 		assertEquals(new Long(1), out.getVersionNumber());
 		assertEquals(testLabel, out.getVersionLabel());
 		assertEquals(testComment, out.getVersionComment());
+	}
+
+	@Test
+	public void testPromoteVersion() throws Exception {
+		entityMetadata.promoteVersion(vb.getId(), vb.getVersionNumber());
+		verify(mockSynapseClient).promoteEntityVersion(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<String>) any());
+	}
+
+	@Test
+	public void testDeleteVersion() throws Exception {
+		entityMetadata.deleteVersion(vb.getId(), vb.getVersionNumber());
+		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
 	}
 }
