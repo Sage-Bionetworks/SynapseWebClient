@@ -321,9 +321,30 @@ public class EntityMetadata implements Presenter {
 	}
 
 	@Override
-	public void promoteVersion(String entityId, Long versionNumber) {
-		// TODO Auto-generated method stub
-
+	public void promoteVersion(final String entityId, final Long versionNumber) {
+		synapseClient.promoteEntityVersion(entityId, versionNumber, new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				if (!DisplayUtils.handleServiceException(caught,
+						globalApplicationState.getPlaceChanger(),
+						authenticationController.getLoggedInUser())) {
+					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_PROMOTE_FAILURE+ "\n "+ caught.getMessage());
+				}
+			}
+			@Override
+			public void onSuccess(String result) {
+				VersionInfo info = new VersionInfo();
+				try {
+					JSONObjectAdapter joa = jsonObjectAdapter.createNew(result);
+					info.initializeFromJSONObject(joa);
+					view.showInfo("Version promoted", "Version "+ info.getVersionLabel() + " of " + info.getId() + 
+							DisplayConstants.LABEL_PROMOTED);
+					fireEntityUpdatedEvent();
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_INVALID_VERSION_FORMAT);
+				}
+			}
+		});
 	}
 
 	@Override
@@ -339,7 +360,7 @@ public class EntityMetadata implements Presenter {
 			}
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + entityId + DisplayConstants.LABEL_DELETED);
+				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + entityId + " " + DisplayConstants.LABEL_DELETED);
 				fireEntityUpdatedEvent();
 			}
 		});

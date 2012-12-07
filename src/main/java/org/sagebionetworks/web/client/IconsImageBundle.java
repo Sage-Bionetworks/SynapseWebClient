@@ -302,4 +302,6 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/visualize-16.png")
 	ImageResource visualize16();	
 
+	@Source("images/icons/arrow-turn-090-left-gray.png")
+	ImageResource arrowTurnLeftGrey16();
 }
