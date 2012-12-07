@@ -40,7 +40,7 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/cog-16.png")
 	ImageResource cog16();
-		
+	
 	@Source("images/icons/cross-button-16.png")
 	ImageResource deleteButton16();
 
