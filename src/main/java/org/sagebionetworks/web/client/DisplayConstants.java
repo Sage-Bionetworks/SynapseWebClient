@@ -410,7 +410,7 @@ public class DisplayConstants {
 	public static final String TO_LOAD_AN_ENTITY = "To load an entity";
 	public static final String PROGRAMMATIC_ACCESS = "Programmatic Access";
 	public static final String PROVENANCE = "Provenance";
-	public static final String ADDED = "Added";
+	public static final String CREATED = "Created";
 	public static final String MODIFIED = "Modified";
 	public static final String NO_VERSION_COMMENT = "No Version Comment";
 
