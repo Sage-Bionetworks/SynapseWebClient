@@ -499,7 +499,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				IconMenu menu = new IconMenu();
 				final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
 				if (!currentVersion) {
-					menu.addIcon(icons.applicationPlus16(),
+					menu.addIcon(icons.arrowTurnLeftGrey16(),
 							"Promote Version to Top", new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {

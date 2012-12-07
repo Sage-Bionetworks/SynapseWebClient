@@ -224,7 +224,7 @@ public class DisplayConstants {
 	public static final String ERROR_ENTITY_CREATION = "Sorry, creation failed. Please try again.";
 	public static final String ERROR_ENTITY_PROMOTE_FAILURE = "Sorry, promoting the entity failed.";
 	public static final String LABEL_SUCCESS = "Success";
-	public static final String LABEL_PROMOTED = " was promoted to version ";
+	public static final String LABEL_PROMOTED = " was promoted to top.";
 	public static final String TEXT_LINK_SAVED = "Link saved.";
 	public static final String ERROR_UPDATE_FAILED = "Update failed. Please try again.";
 	public static final String TEXT_NO_REFERENCES = "No others point to this";

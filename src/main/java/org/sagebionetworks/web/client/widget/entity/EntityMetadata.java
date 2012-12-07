@@ -337,8 +337,8 @@ public class EntityMetadata implements Presenter {
 				try {
 					JSONObjectAdapter joa = jsonObjectAdapter.createNew(result);
 					info.initializeFromJSONObject(joa);
-					view.showInfo("Version promoted", "Version "+ versionNumber + " of " + entityId + 
-							DisplayConstants.LABEL_PROMOTED + info.getVersionNumber());
+					view.showInfo("Version promoted", "Version "+ info.getVersionLabel() + " of " + info.getId() + 
+							DisplayConstants.LABEL_PROMOTED);
 					fireEntityUpdatedEvent();
 				} catch (JSONObjectAdapterException e) {
 					view.showErrorMessage(DisplayConstants.ERROR_INVALID_VERSION_FORMAT);
