@@ -318,17 +318,17 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	public void setCreatedBy(String who, String when) {
-		String text =  DisplayConstants.ADDED + " by " + who + "<br/>" + when; 
+		String text =  DisplayConstants.CREATED + " by " + who + "<br/>" + when; 
 		DisplayUtils.addTooltip(synapseJSNIUtils, addedBy, text, TOOLTIP_POSITION.BOTTOM);		
 		addedBy.clear();
-		addedBy.add(new HTML("Created By"));
+		addedBy.add(new HTML(DisplayConstants.CREATED + " By"));
 	}
 
 	public void setModified(String who, String when) {
 		String text =  DisplayConstants.MODIFIED + " by " + who + "<br/>" + when;
 		DisplayUtils.addTooltip(synapseJSNIUtils, modifiedBy, text, TOOLTIP_POSITION.BOTTOM);
 		modifiedBy.clear();
-		modifiedBy.add(new HTML("Modified By"));		
+		modifiedBy.add(new HTML(DisplayConstants.MODIFIED + " By"));		
 	}
 
 	public void setVersionInfo(Versionable vb) {
