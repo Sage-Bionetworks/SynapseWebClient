@@ -510,7 +510,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 												public void handleEvent(MessageBoxEvent be) {
 													Button btn = be.getButtonClicked();
 													if (Dialog.YES.equals(btn.getItemId())) {
-														presenter.deleteVersion((String) model.get(VERSION_KEY_ID),
+														presenter.promoteVersion((String) model.get(VERSION_KEY_ID),
 																				(Long) model.get(VERSION_KEY_NUMBER));
 													}
 												}

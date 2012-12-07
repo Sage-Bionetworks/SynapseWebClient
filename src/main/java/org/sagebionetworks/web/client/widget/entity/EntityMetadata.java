@@ -360,7 +360,7 @@ public class EntityMetadata implements Presenter {
 			}
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + entityId + DisplayConstants.LABEL_DELETED);
+				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + entityId + " " + DisplayConstants.LABEL_DELETED);
 				fireEntityUpdatedEvent();
 			}
 		});
