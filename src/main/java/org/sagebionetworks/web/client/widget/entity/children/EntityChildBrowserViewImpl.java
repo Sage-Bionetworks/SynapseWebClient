@@ -171,7 +171,7 @@ public class EntityChildBrowserViewImpl extends LayoutContainer implements
 					@Override
 					public void onSuccess(List<EntityHeader> result) {
 						tab.remove(loading);
-						entityTreeBrowser.setRootEntities(result);
+						entityTreeBrowser.configure(result);
 						entityTreeBrowser.addEntityUpdatedHandler(new EntityUpdatedHandler() {							
 							@Override
 							public void onPersistSuccess(EntityUpdatedEvent event) {

@@ -8,7 +8,7 @@
 
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
-			<h2>
+			<h2 style="margin-bottom: 0px;">
 			 	<g:Image ui:field="entityIcon" />
 			 	<g:Anchor ui:field="entityLink"/>
 			 	<g:SimplePanel ui:field="downloadButtonContainer"/>&nbsp;(<span ui:field="entityId"/>)

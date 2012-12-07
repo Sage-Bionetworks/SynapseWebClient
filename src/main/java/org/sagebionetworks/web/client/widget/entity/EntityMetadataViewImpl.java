@@ -41,6 +41,7 @@ import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
+import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -67,6 +68,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -85,6 +87,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static final String VERSION_KEY_MOD_BY = "modifiedBy";
 
 	private static final int VERSION_LIMIT = 100;
+	private static final int NAME_TIME_STUB_LENGTH = 7;
 
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
@@ -101,8 +104,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	Style style;
 
 	@UiField
-	HTMLPanel panel;
-	@UiField
 	HTMLPanel versions;
 	@UiField
 	HTMLPanel readOnly;
@@ -112,7 +113,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	HTMLPanel detailedMetadata;
 	
 	@UiField
-	DivElement widgetContainer;
+	HTMLPanel dataUseContainer;
+	@UiField
+	HTMLPanel sharingContainer;
 
 	@UiField
 	Image entityIcon;
@@ -121,17 +124,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SpanElement entityId;
 	@UiField
-	SpanElement createName;
+	HTMLPanel addedBy;
 	@UiField
-	SpanElement createDate;
-	@UiField
-	SpanElement modifyName;
-	@UiField
-	SpanElement modifyDate;
+	HTMLPanel modifiedBy;
 	@UiField
 	SpanElement label;
-	@UiField
-	SpanElement comment;
 
 	@UiField
 	LayoutContainer previousVersions;
@@ -267,19 +264,22 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.entityNamePanel.setVisible(isEntityNamePanelVisible);
 		
 		this.readOnly.setVisible(readOnly);
+		
+		sharingContainer.clear();
+		sharingContainer.add(createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()));
 
-		Widget shareSettings = createShareSettingsWidget(bundle.getPermissions().getCanPublicRead());
-		if (shareSettings != null) panel.add(shareSettings, widgetContainer);
-
-		Widget restrictionsWidget = createRestrictionWidget();
-		if (restrictionsWidget != null) panel.add(restrictionsWidget, widgetContainer);
-
-		setCreateName(e.getCreatedBy());
-		setCreateDate(synapseJSNIUtils.convertDateToSmallString(e.getCreatedOn()));
-
-		setModifyName(e.getModifiedBy());
-		setModifyDate(synapseJSNIUtils.convertDateToSmallString(e.getModifiedOn()));
-
+		setCreatedBy(e.getCreatedBy(), synapseJSNIUtils.convertDateToSmallString(e.getCreatedOn()));
+		setModified(e.getModifiedBy(), synapseJSNIUtils.convertDateToSmallString(e.getModifiedOn()));
+			
+		dataUseContainer.clear();
+		Widget dataUse = createRestrictionWidget();
+		if(dataUse != null) {
+			dataUseContainer.setVisible(true);
+			dataUseContainer.add(dataUse);
+		} else {
+			dataUseContainer.setVisible(false);
+		}
+		
 		setVersionsVisible(false);
 		if (e instanceof Versionable) {
 			setVersionsVisible(true);
@@ -291,8 +291,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	private void clear() {
-		widgetContainer.setInnerHTML("");
-		comment.setInnerText("");
+		dataUseContainer.clear();
 	}
 
 	@Override
@@ -318,20 +317,18 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		entityId.setInnerText(text);
 	}
 
-	public void setCreateName(String text) {
-		createName.setInnerText(text);
+	public void setCreatedBy(String who, String when) {
+		String text =  DisplayConstants.ADDED + " by " + who + "<br/>" + when; 
+		DisplayUtils.addTooltip(synapseJSNIUtils, addedBy, text, TOOLTIP_POSITION.BOTTOM);		
+		addedBy.clear();
+		addedBy.add(new HTML("Created By"));
 	}
 
-	public void setCreateDate(String text) {
-		createDate.setInnerText(text);
-	}
-
-	public void setModifyName(String text) {
-		modifyName.setInnerText(text);
-	}
-
-	public void setModifyDate(String text) {
-		modifyDate.setInnerText(text);
+	public void setModified(String who, String when) {
+		String text =  DisplayConstants.MODIFIED + " by " + who + "<br/>" + when;
+		DisplayUtils.addTooltip(synapseJSNIUtils, modifiedBy, text, TOOLTIP_POSITION.BOTTOM);
+		modifiedBy.clear();
+		modifiedBy.add(new HTML("Modified By"));		
 	}
 
 	public void setVersionInfo(Versionable vb) {
@@ -339,11 +336,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		sb.append(vb.getVersionLabel());
 
 		if (vb.getVersionComment() != null) {
-			sb.append(" - ");
-
-			comment.setTitle(vb.getVersionComment());
-			comment.setInnerText(DisplayUtils.stubStr(vb.getVersionComment(), 60));
+			DisplayUtils.addTooltip(synapseJSNIUtils, versions, vb.getVersionComment(), TOOLTIP_POSITION.BOTTOM);
+		} else {
+			DisplayUtils.addTooltip(synapseJSNIUtils, versions, DisplayConstants.NO_VERSION_COMMENT, TOOLTIP_POSITION.BOTTOM);
 		}
+		
 		label.setInnerText(sb.toString());
 	}
 
@@ -353,6 +350,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	public void setVersionsVisible(boolean visible) {
+		if(visible) versions.addStyleName("metadata-tag"); 
+		else versions.removeStyleName("metadata-tag");
 		versions.setVisible(visible);
 	}
 
@@ -581,12 +580,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">Sharing:</span><div class=\"" + styleName+ "\" style=\"display:inline-block; position:absolute\"></div>");
-		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 20px;\">"+description+"</span>");
+		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
 
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.RIGHT);
+		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
 		lc.add(htmlPanel);
 
 		return lc;
@@ -643,5 +642,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	
+	private String stubUseTime(String userTime) {
+		String stub = userTime.substring(0,NAME_TIME_STUB_LENGTH-1);
+		if(userTime.length() > NAME_TIME_STUB_LENGTH) stub += "...";
+		return stub;
 	}
 }

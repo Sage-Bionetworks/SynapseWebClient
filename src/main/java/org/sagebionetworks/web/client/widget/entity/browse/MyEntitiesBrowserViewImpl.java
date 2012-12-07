@@ -53,7 +53,7 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 
 	@Override
 	public void setUpdatableEntities(List<EntityHeader> rootEntities) {
-		entityTreeBrowser.setRootEntities(rootEntities);		
+		entityTreeBrowser.configure(rootEntities);		
 	}
 	
 	@Override
