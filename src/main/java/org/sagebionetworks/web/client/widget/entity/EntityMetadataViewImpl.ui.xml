@@ -19,7 +19,7 @@
   </ui:style>
 
 	<g:HTMLPanel>
-		<h2 style="margin-bottom: 0px;">	
+		<h2 style="margin-bottom: 3px;">	
 			<g:HTMLPanel ui:field="entityNamePanel">			
 				 <g:Image ui:field="entityIcon" />&nbsp;<span ui:field="entityName"></span>&nbsp;(<span ui:field="entityId"></span>)			
 			</g:HTMLPanel>
@@ -41,5 +41,6 @@
 			  <h4 class="colored">READ ONLY <g:Image resource="{icons.help16}"/></h4>
 			</g:HTMLPanel>
 	    </g:HTMLPanel>
+		<div style="padding-bottom: 20px;"></div>
 	</g:HTMLPanel>
 </ui:UiBinder>

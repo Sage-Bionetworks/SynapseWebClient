@@ -414,7 +414,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	private Widget createDescriptionWidget(EntityBundle bundle, String entityTypeDisplay) {
 		final LayoutContainer lc = new LayoutContainer();
-		lc.setStyleAttribute("padding-top", "20px");
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 
