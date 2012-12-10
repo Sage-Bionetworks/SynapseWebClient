@@ -9,10 +9,10 @@ import org.sagebionetworks.repo.model.provenance.UsedEntity;
 public class ActivityTypeUtil {
 
 	public static ActivityType get(Activity activity) {
-		if(activity == null) return ActivityType.UNDEFINED;
+		if(activity == null || activity.getCreatedBy() == null) return ActivityType.UNDEFINED;
 		
 		Set<UsedEntity> used = activity.getUsed();
-		if(used == null || used.size() == 0) return ActivityType.UNDEFINED;
+		if(used == null) return ActivityType.MANUAL;
 
 		// look for executed
 		boolean isManual = true;
