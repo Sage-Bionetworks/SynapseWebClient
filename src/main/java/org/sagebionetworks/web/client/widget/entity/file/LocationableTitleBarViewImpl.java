@@ -208,7 +208,12 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			else {
 				uploadButtonContainer.clear();
 				if (canEdit)
-					uploadButtonContainer.add(getUploadButton(entityBundle, entityType));
+					uploadButtonContainer.add(DisplayUtils.getUploadButton(entityBundle, entityType, locationableUploader, iconsImageBundle, new EntityUpdatedHandler() {				
+						@Override
+						public void onPersistSuccess(EntityUpdatedEvent event) {
+							presenter.fireEntityUpdatedEvent();
+						}
+					}));
 			}
 		}
 		
@@ -251,52 +256,6 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 
 	@Override
 	public void clear() {
-	}
-
-	/**
-	 * 'Upload File' button
-	 * @param entity 
-	 * @param entityType 
-	 */
-	private Widget getUploadButton(final EntityBundle entityBundle, EntityType entityType) {
-		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
-		uploadButton.setHeight(25);
-		final Window window = initializeLocationableUploaderWindow();
-		
-		uploadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.removeAll();
-				window.setSize(400, 320);
-				window.setPlain(true);
-				window.setModal(true);		
-				window.setBlinkModal(true);
-				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
-				window.setLayout(new FitLayout());			
-				window.add(locationableUploader.asWidget(entityBundle), new MarginData(5));
-				window.show();
-			}
-		});
-		return uploadButton;
-	}
-	
-	private Window initializeLocationableUploaderWindow() {
-		final Window window = new Window();  
-		locationableUploader.clearHandlers();
-		locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				window.hide();
-				presenter.fireEntityUpdatedEvent();
-			}
-		});
-		locationableUploader.addCancelHandler(new CancelHandler() {				
-			@Override
-			public void onCancel(CancelEvent event) {
-				window.hide();
-			}
-		});
-		return window;
 	}
 	
 	private void showMd5Dialog(String md5) {

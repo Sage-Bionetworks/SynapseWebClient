@@ -35,6 +35,10 @@ import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.events.CancelEvent;
+import org.sagebionetworks.web.client.events.CancelHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -42,6 +46,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -51,12 +56,15 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.NodeList;
@@ -387,8 +395,10 @@ public class DisplayUtils {
 				int firstQuestionMark = path.indexOf("?", lastSlash);
 				if (firstQuestionMark > -1) {
 					fileName = path.substring(lastSlash+1, firstQuestionMark);
+				} else {
+					fileName = path.substring(lastSlash+1);
 				}
-			}
+			} 
 		}
 		return fileName;
 	}
@@ -1139,4 +1149,50 @@ public class DisplayUtils {
 						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
 	}
 	
+	/**
+	 * 'Upload File' button
+	 * @param entity 
+	 * @param entityType 
+	 */
+	public static Widget getUploadButton(final EntityBundle entityBundle,
+			EntityType entityType, final LocationableUploader locationableUploader,
+			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
+		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
+		uploadButton.setHeight(25);
+		final Window window = new Window();  
+		locationableUploader.clearHandlers();
+		// add user defined handler
+		locationableUploader.addPersistSuccessHandler(handler);
+		
+		// add handlers for closing the window
+		locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				window.hide();
+			}
+		});
+		locationableUploader.addCancelHandler(new CancelHandler() {				
+			@Override
+			public void onCancel(CancelEvent event) {
+				window.hide();
+			}
+		});
+		
+		uploadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.removeAll();
+				window.setSize(400, 320);
+				window.setPlain(true);
+				window.setModal(true);		
+				window.setBlinkModal(true);
+				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
+				window.setLayout(new FitLayout());			
+				window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+				window.show();
+			}
+		});
+		return uploadButton;
+	}
+
 }

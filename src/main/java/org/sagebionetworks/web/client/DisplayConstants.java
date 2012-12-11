@@ -232,7 +232,7 @@ public class DisplayConstants {
 	public static final String BUTTON_FILTER_USER_UPDATABLE = "Show Projects I Can Edit";
 	public static final String STATUS_CAN_EDIT = "Can Edit";
 	public static final String STATUS_CREATED_BY = "Owner";
-	public static final String LABEL_NONE_FOUND = "None Found";
+	public static final String EMPTY = "Empty";
 	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
@@ -416,6 +416,10 @@ public class DisplayConstants {
 	public static final String CREATED = "Created";
 	public static final String MODIFIED = "Modified";
 	public static final String NO_VERSION_COMMENT = "No Version Comment";
-
+	public static final String ADD_FOLDER = "Add Folder";
+	public static final String ADD_FILE = "Add File";
+	public static final String FILES = "Files";
+	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
+	
 }
 

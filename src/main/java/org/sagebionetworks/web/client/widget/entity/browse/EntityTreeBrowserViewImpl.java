@@ -205,7 +205,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		if(rootEntities.size() == 0) {
 			EntityHeader eh = new EntityHeader();
 			eh.setId(PLACEHOLDER_ID);
-			eh.setName(PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.LABEL_NONE_FOUND);
+			eh.setName(PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY);
 			eh.setType(PLACEHOLDER_TYPE);
 			rootEntities.add(eh);
 		}
