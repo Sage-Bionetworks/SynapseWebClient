@@ -230,7 +230,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	private void setPreviousVersionsVisible(boolean setVisible) {
-		if (!allVersions.getElement().getPropertyBoolean("animating") && previousVersions.isRendered()) {
+		boolean animating = allVersions.getElement().getPropertyBoolean("animating");
+		boolean rendered = previousVersions.isRendered();
+
+		if (rendered && !animating) {
 			allVersions.getElement().setPropertyBoolean("animating", true);
 
 			boolean isCurrentlyVisible = previousVersions.el().isVisible();
@@ -243,6 +246,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				previousVersions.setVisible(true);
 				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
 				previousVersions.el().slideIn(Direction.DOWN, config);
+			} else {
+				// If we don't initiate an animation, unset the animating property
+				allVersions.getElement().setPropertyBoolean("animating", false);
 			}
 		}
 	}
