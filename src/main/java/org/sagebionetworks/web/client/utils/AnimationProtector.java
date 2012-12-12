@@ -4,33 +4,25 @@ import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 
 public class AnimationProtector {
 
-	private final HasClickHandlers trigger;
-	private final LayoutContainer container;
+	private AnimationProtectorView view;
 
 	private FxConfig hideConfig     = null;
 	private FxConfig userHideConfig = null;
 	private FxConfig showConfig     = null;
 	private FxConfig userShowConfig = null;
 
-	boolean animating = false;
+	private boolean animating = false;
 
-	public AnimationProtector(HasClickHandlers trigger, LayoutContainer container) {
-		super();
-		this.trigger = trigger;
-		this.container = container;
-		this.trigger.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				toggle();
-			}
-		});
+	private HandlerRegistration clickRegistration = null;
+
+	public AnimationProtector(AnimationProtectorView view) {
+		setView(view);
 		this.showConfig = new FxConfig();
 		this.showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
 			@Override
@@ -47,6 +39,19 @@ public class AnimationProtector {
 				animating = false;
 				if (userHideConfig != null)
 					userHideConfig.getEffectCompleteListener().handleEvent(be);
+			}
+		});
+	}
+
+	public void setView(AnimationProtectorView view) {
+		if (clickRegistration != null)
+			clickRegistration.removeHandler();
+
+		this.view = view;
+		clickRegistration = view.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				toggle();
 			}
 		});
 	}
@@ -82,23 +87,22 @@ public class AnimationProtector {
 	}
 
 	public void toggle() {
-		setVisible(!container.isVisible());
+		setVisible(!view.isContainerVisible());
 	}
 
 	private void setVisible(boolean shouldBeVisible) {
-		if (container.isRendered() && !animating) {
+		if (view.isContainerRendered() && !animating) {
 
-			boolean isCurrentlyVisible = container.el().isVisible();
+			boolean isCurrentlyVisible = view.isContainerVisible();
 
 			if (!shouldBeVisible && isCurrentlyVisible) {
 				animating = true;
-				container.el().slideOut(Direction.UP, hideConfig);
+				view.slideContainerOut(Direction.UP, hideConfig);
 
 			} else if (shouldBeVisible && !isCurrentlyVisible) {
 				animating = true;
-				container.setVisible(true);
-				container.el().slideIn(Direction.DOWN, showConfig);
-
+				view.setContainerVisible(true);
+				view.slideContainerIn(Direction.DOWN, showConfig);
 			}
 		}
 	}

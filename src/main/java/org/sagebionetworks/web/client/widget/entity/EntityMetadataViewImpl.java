@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
+import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
@@ -171,7 +172,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		initWidget(uiBinder.createAndBindUi(this));
 
-		versionAnimation = new AnimationProtector(allVersions, previousVersions);
+		versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(allVersions, previousVersions));
 		FxConfig hideConfig = new FxConfig(400);
 		hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
 			@Override
