@@ -13,6 +13,8 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.AnimationProtector;
+import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
@@ -157,11 +159,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	 */
 	private BaseModelData currentModel;
 
-	final private FxConfig config;
-
 	// Widget variables
 	private PagingToolBar vToolbar;
 	private Grid<BaseModelData> vGrid;
+	private AnimationProtector versionAnimation;
 
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
@@ -171,26 +172,32 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		initWidget(uiBinder.createAndBindUi(this));
 
-		config = new FxConfig(400);
-		config.setEffectCompleteListener(new Listener<FxEvent>() {
+		versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(allVersions, previousVersions));
+		FxConfig hideConfig = new FxConfig(400);
+		hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
 			@Override
 			public void handleEvent(FxEvent be) {
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
-				allVersions.getElement().setPropertyBoolean("animating", false);
+				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
 				vGrid.getSelectionModel().select(currentModel, false);
 			}
 		});
+		versionAnimation.setHideConfig(hideConfig);
 
-		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
-		allVersions.getElement().setPropertyBoolean("animating", false);
-		allVersions.addClickHandler(new ClickHandler() {
+		FxConfig showConfig = new FxConfig(400);
+		showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
 			@Override
-			public void onClick(ClickEvent event) {
-				// Toggle previousVersions
-				setPreviousVersionsVisible(!previousVersions.el().isVisible());
+			public void handleEvent(FxEvent be) {
+				// This call to layout is necessary to force the scroll bar to appear on page-load
+				previousVersions.layout(true);
+				allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+				vGrid.getSelectionModel().select(currentModel, false);
 			}
 		});
+		versionAnimation.setShowConfig(showConfig);
+
+		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
 
 		vToolbar = new PagingToolBar(VERSION_LIMIT);
 		vToolbar.setSpacing(2);
@@ -227,30 +234,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setPreviousVersions(cp);
 
 		previousVersions.setLayout(new FlowLayout(10));
-	}
-
-	private void setPreviousVersionsVisible(boolean setVisible) {
-		boolean animating = allVersions.getElement().getPropertyBoolean("animating");
-		boolean rendered = previousVersions.isRendered();
-
-		if (rendered && !animating) {
-			allVersions.getElement().setPropertyBoolean("animating", true);
-
-			boolean isCurrentlyVisible = previousVersions.el().isVisible();
-
-			if (!setVisible && isCurrentlyVisible) {
-				allVersions.setText(DisplayConstants.SHOW_VERSIONS);
-				previousVersions.el().slideOut(Direction.UP, config);
-
-			} else if (setVisible && !isCurrentlyVisible) {
-				previousVersions.setVisible(true);
-				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
-				previousVersions.el().slideIn(Direction.DOWN, config);
-			} else {
-				// If we don't initiate an animation, unset the animating property
-				allVersions.getElement().setPropertyBoolean("animating", false);
-			}
-		}
 	}
 
 	@Override
@@ -292,7 +275,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			Versionable vb = (Versionable) e;
 			setVersionInfo(vb);
 			setEntityVersions(vb);
-			setPreviousVersionsVisible(false);
+			versionAnimation.hide();
 		}
 	}
 
