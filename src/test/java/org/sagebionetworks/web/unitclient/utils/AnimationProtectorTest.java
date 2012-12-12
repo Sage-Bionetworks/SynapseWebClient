@@ -2,6 +2,8 @@ package org.sagebionetworks.web.unitclient.utils;
 
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Field;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
@@ -66,13 +68,34 @@ public class AnimationProtectorTest {
 		verifyShown();
 	}
 
+	@Test
+	public void testAnimationToggle() throws SecurityException,
+			NoSuchFieldException, IllegalArgumentException,
+			IllegalAccessException {
+		Class<? extends AnimationProtector> clazz = animation.getClass();
+		Field field = clazz.getDeclaredField("animating");
+		field.setAccessible(true);
+		field.set(animation, true);
+
+		setViewVisible(true);
+		animation.toggle();
+		animation.hide();
+		animation.show();
+		setViewVisible(false);
+		animation.toggle();
+		animation.hide();
+		animation.show();
+
+		verifyNoSlides();
+	}
+
 	private void setViewVisible(boolean setVisible) {
 		when(mockView.isContainerVisible()).thenReturn(setVisible);
 	}
 
 	private void verifyNoSlides() {
-		verify(mockView, times(0)).slideContainerIn((Direction)any(), (FxConfig)any());
-		verify(mockView, times(0)).slideContainerOut((Direction)any(), (FxConfig)any());
+		verify(mockView, never()).slideContainerIn((Direction)any(), (FxConfig)any());
+		verify(mockView, never()).slideContainerOut((Direction)any(), (FxConfig)any());
 	}
 
 	private void verifyHidden() {
