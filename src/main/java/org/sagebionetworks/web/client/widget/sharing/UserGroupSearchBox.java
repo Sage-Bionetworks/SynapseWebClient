@@ -126,7 +126,7 @@ public class UserGroupSearchBox {
 			@Override
 			public ModelData convertStringValue(String entry) {
 				// Extract Principal ID from entry String
-				String[] split = entry.split("\\|  ");
+				String[] split = entry.split("  ");
 				String id = split[split.length - 1].trim();
 				
 				// Search for matching ModelData
