@@ -88,7 +88,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
 	private WidgetFactory widgetFactory;
-	private FilesBrowser filesBrowser; 
+	private FilesBrowser filesBrowser;	
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -216,7 +216,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 //		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
 		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
+		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 		
 		// ** RIGHT **
 		// Programmatic Clients
@@ -227,7 +227,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Annotation Editor widget
 		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
-		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly), widgetMargin);
+		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly, false), widgetMargin);
 		
 		// ** FULL WIDTH **
 		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************
@@ -247,9 +247,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
 			MarginData widgetMargin) {
 		// ** LEFT **
-		colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
+		fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
-		colLeftContainer.add(entityMetadata.asWidget());
+		fullWidthContainer.add(entityMetadata.asWidget(), new MarginData(0));
 
 		
 		// ** RIGHT **
@@ -259,7 +259,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Child Browser
 		fullWidthContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), false));
 		// Description
-		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);		
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);		
 		
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -277,16 +277,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
-		colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
+		fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
-		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
+		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
 		
 		// ** RIGHT **
 		//none
 	
 		// ** FULL WIDTH **
 		// Description
-		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 		// Child Browser
 		fullWidthContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), true));		
 
@@ -299,7 +299,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		threeCol.add(createSpacer());
 		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************		
 		// Attachments
-		LayoutContainer attachContainer = createAttachmentsWidget(bundle, canEdit, readOnly);
+		LayoutContainer attachContainer = createAttachmentsWidget(bundle, canEdit, readOnly, false);
 		attachContainer.addStyleName("span-7 notopmargin");
 		threeCol.add(attachContainer);
 		threeCol.add(createSpacer());
@@ -331,13 +331,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay), widgetMargin);
+		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 
 		// ** RIGHT **
 		// Annotation Editor widget
 		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
-		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly), widgetMargin);
+		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly, false), widgetMargin);
 
 		// ** FULL WIDTH **
 		// Snapshot entity
@@ -404,15 +404,21 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 
-	private Widget createDescriptionWidget(EntityBundle bundle, String entityTypeDisplay) {
+	private Widget createDescriptionWidget(EntityBundle bundle, String entityTypeDisplay, boolean showWhenEmpty) {
 		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
+		String description = bundle.getEntity().getDescription();
+		
+		if(!showWhenEmpty) {
+			if(description == null || "".equals(description))
+				return lc;
+		}
+		
 
 		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3 style=\"clear: left;\">Description</h3>")));
 
 		// Add the description body
-	    String description = bundle.getEntity().getDescription();
 	    if(description == null || "".equals(description)) {
 	    	lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>")));
 			lc.layout();
@@ -508,10 +514,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	// TODO : this should go away
-	private LayoutContainer createAttachmentsWidget(EntityBundle bundle, boolean canEdit, boolean readOnly) {
+	private LayoutContainer createAttachmentsWidget(EntityBundle bundle, boolean canEdit, boolean readOnly, boolean showWhenEmpty) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
+		
+        String baseURl = GWT.getModuleBaseURL()+"attachment";
+        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId();
+		
+        // We just create a new one each time.
+        attachmentsPanel.configure(baseURl, bundle.getEntity());
+        if(!showWhenEmpty && attachmentsPanel.isEmpty()) 
+        	return new LayoutContainer();
+		
         LayoutContainer c = new LayoutContainer();
         HBoxLayout layout = new HBoxLayout();
         layout.setPadding(new Padding(5));
@@ -521,9 +536,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         c.add(new Html("<h4>Attachments</h4>"), new HBoxLayoutData(new Margins(0, 5, 0, 0)));
         HBoxLayoutData flex = new HBoxLayoutData(new Margins(0, 5, 0, 0));
         flex.setFlex(1);
-
-        String baseURl = GWT.getModuleBaseURL()+"attachment";
-        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId();
 
         if(canEdit && !readOnly) {
 	        Anchor addBtn = new Anchor();
@@ -550,8 +562,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         }
         lc.add(c);
 
-        // We just create a new one each time.
-        attachmentsPanel.configure(baseURl, bundle.getEntity());
         lc.add(attachmentsPanel.asWidget());
 		lc.layout();
 		return lc;
