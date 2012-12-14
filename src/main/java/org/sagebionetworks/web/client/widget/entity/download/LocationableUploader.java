@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -35,7 +38,8 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager;
-	private EntityBundle entityBundle;
+	private Entity entity;
+	private List<AccessRequirement> accessRequirements;
 	private EntityTypeProvider entityTypeProvider;
 	private GlobalApplicationState globalApplicationState;
 	private JSONObjectAdapter jsonObjectAdapter;
@@ -66,9 +70,10 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		clearHandlers();
 	}		
 		
-	public Widget asWidget(EntityBundle entityBundle) {
+	public Widget asWidget(Entity entity, List<AccessRequirement> accessRequirements) {
 		this.view.setPresenter(this);
-		this.entityBundle = entityBundle;
+		this.entity = entity;
+		this.accessRequirements = accessRequirements;
 		this.view.createUploadForm();
 		return this.view.asWidget();
 	}
@@ -79,7 +84,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		view.clear();
 		// remove handlers
 		handlerManager = new HandlerManager(this);		
-		this.entityBundle = null;		
+		this.entity = null;		
 	}
 
 	@Override
@@ -87,26 +92,30 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		return null;
 	}
 
+	public Entity getEntity() {
+		return entity;
+	}
+	
 	@Override
 	public String getUploadActionUrl(boolean isRestricted) {
 		return GWT.getModuleBaseURL() + "upload" + "?" + 
-			DisplayUtils.ENTITY_PARAM_KEY + "=" + entityBundle.getEntity().getId() + "&" +
+			DisplayUtils.ENTITY_PARAM_KEY + "=" + entity.getId() + "&" +
 			DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
 	}
 
 	@Override
 	public void setExternalLocation(String path, final boolean isNewlyRestricted) {
-		String entityId = entityBundle.getEntity().getId();
+		String entityId = entity.getId();
 		
 		synapseClient.updateExternalLocationable(entityId, path, new AsyncCallback<EntityWrapper>() {
 			
 			public void onSuccess(EntityWrapper result) {
 				try {
-					Entity entity = nodeModelCreator.createJSONEntity(result.getEntityJson(), entityBundle.getEntity().getClass());
+					Entity updatedEntity = nodeModelCreator.createJSONEntity(result.getEntityJson(), entity.getClass());
 					if (isNewlyRestricted) {
 						EntityWrapper arEW = null;
 						try {
-							arEW=EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(entity.getId(), jsonObjectAdapter);
+							arEW=EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(updatedEntity.getId(), jsonObjectAdapter);
 						} catch (JSONObjectAdapterException caught) {
 							view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);							
 						}
@@ -182,7 +191,8 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	
 	@Override
 	public boolean isRestricted() {
-		return entityBundle.getAccessRequirements().size() > 0;
+		if(accessRequirements == null) return false;
+		return accessRequirements.size() > 0;
 	}
 	
 	
@@ -191,6 +201,6 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		UserProfile userProfile = authenticationController.getLoggedInUser().getProfile();
 		if (userProfile==null) throw new NullPointerException("User profile cannot be null.");
 		return jiraURLHelper.createAccessRestrictionIssue(
-				userProfile.getUserName(), userProfile.getDisplayName(), entityBundle.getEntity().getId());
+				userProfile.getUserName(), userProfile.getDisplayName(), entity.getId());
 	}
 }

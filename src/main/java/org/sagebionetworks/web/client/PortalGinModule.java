@@ -67,10 +67,11 @@ import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserView;
-import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialogImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderView;
@@ -309,11 +310,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
 		bind(LocationableTitleBarView.class).to(LocationableTitleBarViewImpl.class);
-		
-		// EntityChildBrowser
-		bind(EntityChildBrowserViewImpl.class).in(Singleton.class);
-		bind(EntityChildBrowserView.class).to(EntityChildBrowserViewImpl.class);
-		
+				
 		// EntityChildBrowser (not singleton as you may want multiple)
 		bind(LocationableDownloaderView.class).to(LocationableDownloaderViewImpl.class);
 
@@ -349,6 +346,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
+		
+		// FilesBrowser
+		bind(FilesBrowserView.class).to(FilesBrowserViewImpl.class);
 	}
 
 }
