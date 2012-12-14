@@ -18,6 +18,7 @@ import org.sagebionetworks.client.exceptions.SynapseServiceException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.client.exceptions.SynapseUserException;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -39,6 +40,7 @@ public class ExceptionUtilTest {
             		{ UnknownErrorException.class, new SynapseUserException(message) },
             		{ UnknownErrorException.class, new SynapseServiceException(message) },
             		{ UnknownErrorException.class, new SynapseException(message) },
+            		{ ConflictException.class, new SynapseUserException("Service Error(409):  FAILURE: Got HTTP status 409 for") },
             		});
     }
 	
@@ -58,9 +60,7 @@ public class ExceptionUtilTest {
 		String msg = "msg";
 		RestServiceException ex = ExceptionUtil.convertSynapseException(synapseException);
 		assertNotNull(ex);
-		assertEquals(restServiceException, ex.getClass());
-		assertEquals(msg, ex.getMessage());
+		assertEquals(restServiceException, ex.getClass());		
 	}
-	
-	
+		
 }
