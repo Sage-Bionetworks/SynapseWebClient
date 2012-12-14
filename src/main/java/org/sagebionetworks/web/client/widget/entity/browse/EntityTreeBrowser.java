@@ -5,6 +5,8 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AutoGenFactory;
@@ -96,11 +98,11 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 * Configure tree view with given entityId's children as start set
 	 * @param entityId
 	 */
-	public void configure(String entityId) {
+	public void configure(String entityId, final boolean sort) {
 		getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
-				view.setRootEntities(result);
+				view.setRootEntities(result, sort);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -113,8 +115,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 * Configure tree view to be filled initially with the given headers.
 	 * @param rootEntities
 	 */
-	public void configure(List<EntityHeader> rootEntities) {
-		view.setRootEntities(rootEntities);
+	public void configure(List<EntityHeader> rootEntities, boolean sort) {
+		view.setRootEntities(rootEntities, sort);
 	}
 	
 	

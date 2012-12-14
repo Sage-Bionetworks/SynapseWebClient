@@ -7,6 +7,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
+import org.sagebionetworks.client.exceptions.SynapseUserException;
 
 public class ExceptionUtil {
 
@@ -28,6 +29,8 @@ public class ExceptionUtil {
 			return new NotFoundException(ex.getMessage());
 		} else if(ex instanceof SynapseUnauthorizedException) {
 			return new UnauthorizedException(ex.getMessage());
+		} else if(ex instanceof SynapseUserException && ex.getMessage().contains("(409)")) {
+			return new ConflictException(ex.getMessage());			
 		} else {
 			return new UnknownErrorException(ex.getMessage());
 		}

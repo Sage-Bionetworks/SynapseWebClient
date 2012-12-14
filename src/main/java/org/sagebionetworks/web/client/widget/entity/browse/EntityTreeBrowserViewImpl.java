@@ -11,8 +11,8 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 
 import com.extjs.gxt.ui.client.Style.SelectionMode;
+import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.data.BaseTreeLoader;
-import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelIconProvider;
 import com.extjs.gxt.ui.client.data.ModelKeyProvider;
 import com.extjs.gxt.ui.client.data.RpcProxy;
@@ -44,7 +44,6 @@ import com.google.inject.Inject;
 
 public class EntityTreeBrowserViewImpl extends LayoutContainer implements EntityTreeBrowserView {
 
-	private static final String KEY_NAME = "name";
 	private static final String PLACEHOLDER_ID = "-1";
 	private static final String PLACEHOLDER_TYPE = "-1";
 	private static final String PLACEHOLDER_NAME_PREFIX = "&#8212";
@@ -68,7 +67,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		
 	    tree = new TreePanel<EntityTreeModel>(store);  
 	    tree.setStateful(true);  
-	    tree.setDisplayProperty(KEY_NAME); 
+	    tree.setDisplayProperty(EntityTreeModel.KEY_LINK); 
 	    tree.setBorders(false);	    	    
 	    
 	    // statefull components need a defined id  
@@ -138,7 +137,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 				public void componentSelected(MenuEvent ce) {
 					final EntityTreeModel model = tree.getSelectionModel().getSelectedItem();
 					if (model != null) {
-						MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + model.get(KEY_NAME), DisplayConstants.PROMPT_SURE_DELETE + " " + model.get(KEY_NAME) +"?", new Listener<MessageBoxEvent>() {					
+						MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + model.get(EntityTreeModel.KEY_NAME), DisplayConstants.PROMPT_SURE_DELETE + " " + model.get(EntityTreeModel.KEY_NAME) +"?", new Listener<MessageBoxEvent>() {					
 							@Override
 							public void handleEvent(MessageBoxEvent be) { 												
 								Button btn = be.getButtonClicked();
@@ -197,7 +196,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	}
 
 	@Override
-	public void setRootEntities(List<EntityHeader> rootEntities) {
+	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort) {
 		if(store == null) createStore();
 		store.removeAll();
 		
@@ -205,11 +204,12 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		if(rootEntities.size() == 0) {
 			EntityHeader eh = new EntityHeader();
 			eh.setId(PLACEHOLDER_ID);
-			eh.setName(PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.LABEL_NONE_FOUND);
+			eh.setName(PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY);
 			eh.setType(PLACEHOLDER_TYPE);
 			rootEntities.add(eh);
 		}
 		store.add(convertEntityHeaderToModel(rootEntities), false);
+		if (sort) store.sort(EntityTreeModel.KEY_NAME, SortDir.ASC);
 	}
 	
 	@Override
@@ -235,16 +235,17 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		
 		for(int i=0; i<headers.size() && i<maxlimit; i++) {
 			EntityHeader header = headers.get(i);
-			String name;
+			String link;
+			String name = header.getName();
 			if(makeLinks && !PLACEHOLDER_ID.equals(header.getId())) {
-				name = "<a href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\">" + header.getName() + "</a>";
+				link = "<a href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\">" + name + "</a>";
 			} else {
-				name = header.getName();
+				link = name;
 			}
-			models.add(new EntityTreeModel(header.getId(), name, header.getType()));
+			models.add(new EntityTreeModel(header.getId(), name, link, header.getType()));
 		}
 		if(headers.size() >= maxlimit) {
-			models.add(new EntityTreeModel(PLACEHOLDER_ID, PLACEHOLDER_NAME_PREFIX + " Limited to " + maxlimit + " results" , PLACEHOLDER_TYPE));
+			models.add(new EntityTreeModel(PLACEHOLDER_ID, PLACEHOLDER_ID, PLACEHOLDER_NAME_PREFIX + " Limited to " + maxlimit + " results" , PLACEHOLDER_TYPE));
 		}
 		return models;
 	}
@@ -285,9 +286,9 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	    	// put placeholders at end
 	    	  if(m1.getName().startsWith(PLACEHOLDER_NAME_PREFIX)) return 1;
 	    	  if(m2.getName().startsWith(PLACEHOLDER_NAME_PREFIX)) return -1;
-	        return m1.getName().compareTo(m2.getName());  
+	        return m1.getName().compareToIgnoreCase(m2.getName());  
 	      }  
-	    });  	
+	    });  		   
 	}
 
 	private void setSelection(EntityTreeModel selectedItem) {

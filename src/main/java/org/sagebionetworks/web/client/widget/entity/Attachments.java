@@ -34,7 +34,8 @@ public class Attachments implements AttachmentsView.Presenter,
 	private EventBus bus;
 
 	private Entity entity;
-
+	private boolean isEmpty = true;
+	
 	@Inject
 	public Attachments(AttachmentsView view, SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
@@ -57,9 +58,14 @@ public class Attachments implements AttachmentsView.Presenter,
 
 	public void configure(String baseUrl, Entity entity) {
 		this.entity = entity;
+		isEmpty = (entity.getAttachments() == null || entity.getAttachments().size() == 0) ? true : false; 
 		view.configure(baseUrl, entity.getId(), entity.getAttachments());
 	}
 
+	public boolean isEmpty() {
+		return isEmpty;
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
