@@ -233,11 +233,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************
 		// Child Browser
 		if(DisplayUtils.hasChildrenOrPreview(bundle)){
-			fullWidthContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), true));
+			colLeftContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
 		}
 		// Attachment preview is only added when there are previews.
 		if(DisplayUtils.hasAttachmentPreviews(bundle.getEntity())){
-			fullWidthContainer.add(createAttachmentPreview(bundle.getEntity()), widgetMargin);
+			colLeftContainer.add(createAttachmentPreview(bundle.getEntity()), widgetMargin);
 		}
 		// ************************************************************************************************		
 	}
@@ -257,7 +257,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// ** FULL WIDTH **
 		// Child Browser
-		fullWidthContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), false));
+		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false));
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);		
 		
@@ -288,7 +288,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 		// Child Browser
-		fullWidthContainer.add(createEntityChildBrowserWidget(bundle.getEntity(), true));		
+		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));		
 
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -391,7 +391,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 	
-	private Widget createEntityChildBrowserWidget(Entity entity, boolean showTitle) {
+	private Widget createEntityFilesBrowserWidget(Entity entity, boolean showTitle) {
 		String title = DisplayConstants.FILES;
 		if(showTitle) 
 			filesBrowser.configure(entity.getId(), DisplayConstants.FILES);

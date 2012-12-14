@@ -102,7 +102,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		
 		LayoutContainer files = new LayoutContainer();
 		files.setStyleName("span-24 notopmargin");
-		entityTreeBrowser.configure(entityId);
+		entityTreeBrowser.configure(entityId, true);
 		files.add(entityTreeBrowser.asWidget());
 		lc.add(topbar);
 		lc.add(files);
@@ -141,7 +141,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 
 	@Override
 	public void refreshTreeView(String entityId) {
-		entityTreeBrowser.configure(entityId);
+		entityTreeBrowser.configure(entityId, true);
 	}
 	
 	/**
