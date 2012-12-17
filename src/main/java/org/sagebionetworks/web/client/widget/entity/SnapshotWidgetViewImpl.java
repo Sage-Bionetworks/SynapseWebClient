@@ -25,6 +25,7 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
@@ -218,7 +219,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 
 	@Override
 	public void setEntityGroupRecordDisplay(final int groupIndex, final int rowIndex,
-			final EntityGroupRecordDisplay display) {
+			final EntityGroupRecordDisplay display, boolean isLoggedIn) {
 		final EntityGroupDisplay groupDisplay = groupDisplays.get(groupIndex);
 
 		// convert EntityGroupRecordDisplay to a row entry
@@ -242,7 +243,16 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			link.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.NavigateDown16())));
 			//DisplayConstants.BUTTON_DOWNLOAD
 			link.setStyleName("link");
-			link.setTarget("_new");
+			if(isLoggedIn) {
+				link.setTarget("_new");
+			} else {
+				link.addClickHandler(new ClickHandler() {					
+					@Override
+					public void onClick(ClickEvent event) {
+						MessageBox.info(DisplayConstants.INFO, DisplayConstants.LOGIN_TO_DOWNLOAD, null);
+					}
+				});				
+			}
 			downloadLink = link;
 		} else {
 			downloadLink = new HTML("");
