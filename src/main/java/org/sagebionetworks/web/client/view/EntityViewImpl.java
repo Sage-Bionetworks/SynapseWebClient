@@ -122,4 +122,10 @@ public class EntityViewImpl extends Composite implements EntityView {
 		entityPageTopPanel.setWidget(new HTML(DisplayUtils.get404Html()));
 	}
 
+	@Override
+	public void show403() {
+		entityPageTop.clearState();
+		entityPageTopPanel.setWidget(new HTML(DisplayUtils.get403Html()));
+	}
+
 }

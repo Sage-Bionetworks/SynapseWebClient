@@ -31,4 +31,6 @@ public interface EntityView extends IsWidget, SynapseView {
 
 	public void show404();
 	
+	public void show403();
+	
 }
