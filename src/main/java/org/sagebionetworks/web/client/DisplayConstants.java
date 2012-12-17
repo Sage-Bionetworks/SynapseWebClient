@@ -422,6 +422,7 @@ public class DisplayConstants {
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
 	public static final String UNAUTHORIZED = "Unauthorized";
 	public static final String UNAUTHORIZED_DESC = "You are not authorized to access the page requested.";
+	public static final String LOGIN_TO_DOWNLOAD = "Please login to download data.";
 	
 }
 
