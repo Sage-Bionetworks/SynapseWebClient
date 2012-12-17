@@ -72,16 +72,34 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserView;
+import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
+import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialogImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderView;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderView;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuViewImpl;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterViewImpl;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
@@ -298,7 +316,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// ACL Editor
 		bind(AccessControlListEditorView.class).to(AccessControlListEditorViewImpl.class);
-				
+		
 		// EntityPageTop
 		bind(EntityPageTopViewImpl.class).in(Singleton.class);
 		bind(EntityPageTopView.class).to(EntityPageTopViewImpl.class);
@@ -310,7 +328,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
 		bind(LocationableTitleBarView.class).to(LocationableTitleBarViewImpl.class);
-				
+		
 		// EntityChildBrowser (not singleton as you may want multiple)
 		bind(LocationableDownloaderView.class).to(LocationableDownloaderViewImpl.class);
 
@@ -344,6 +362,21 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityMetadataViewImpl.class).in(Singleton.class);
 		bind(EntityMetadataView.class).to(EntityMetadataViewImpl.class);
 		
+
+		//Widget Registration
+		bind(WidgetRegistrarImpl.class).in(Singleton.class);
+		bind(WidgetRegistrar.class).to(WidgetRegistrarImpl.class);
+		
+		// UI Widget Descriptor editor
+		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
+		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
+		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
+		bind(ProvenanceConfigView.class).to(ProvenanceConfigViewImpl.class);
+		bind(LinkConfigView.class).to(LinkConfigViewImpl.class);
+		
+		// UI Widget Renderers
+		bind(YouTubeWidgetView.class).to(YouTubeWidgetViewImpl.class);
+		bind(ImageWidgetView.class).to(ImageWidgetViewImpl.class);
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
 		

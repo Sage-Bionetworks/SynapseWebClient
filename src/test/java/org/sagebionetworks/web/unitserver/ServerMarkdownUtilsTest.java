@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
+import org.pegdown.PegDownProcessor;
 import org.sagebionetworks.web.client.MarkdownUtils;
+import org.sagebionetworks.web.server.ServerConstants;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
-
-import com.petebevin.markdown.MarkdownProcessor;
 
 public class ServerMarkdownUtilsTest {
 
@@ -59,18 +59,49 @@ public class ServerMarkdownUtilsTest {
 		String previewTokenId = "previewTokenId123";
 		String attachmentName = "my attachment image";
 		String attachmentMd = MarkdownUtils.getAttachmentLinkMarkdown(attachmentName, entityId, tokenId, previewTokenId, attachmentName);
-		String actualResult = ServerMarkdownUtils.markdown2Html(attachmentMd, "http://mySynapse/attachment", new MarkdownProcessor());
-		String expectedResult = "<div class=\"markdown\"><html>\n <head></head>\n <body>\n  <p><img src=\"http://mySynapse/attachment?entityId=entityId123&amp;tokenId=tokenId123/previewTokenId&amp;waitForUrl=true\" alt=\"my attachment image\" title=\"my attachment image\" /></p> \n </body>\n</html></div>";
-		assertEquals(expectedResult, actualResult);
+		String actualResult = ServerMarkdownUtils.markdown2Html(attachmentMd, "http://mySynapse/attachment", false, new PegDownProcessor(ServerConstants.MARKDOWN_OPTIONS));
+		assertTrue(actualResult.contains("<img src=\"http://mySynapse/attachment?entityId=entityId123&amp;tokenId=tokenId123/previewTokenId&amp;waitForUrl=true\" alt=\"my attachment image\""));
 	}
 	
 	@Test
 	public void testMarkdown2HtmlEscapeControlCharacters(){
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
 		String testString = "& ==> &amp;\" ==> &quot;> ==> &gt;< ==> &lt;' =";
-		String expectedResult = "<div class=\"markdown\"><html>\n <head></head>\n <body>\n  <p>&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt;&lt; ==&gt; &lt;' =</p> \n </body>\n</html></div>";
 		
-		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", new MarkdownProcessor());
+		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", false, new PegDownProcessor(ServerConstants.MARKDOWN_OPTIONS));
+		assertTrue(actualResult.contains("&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt;&lt; ==&gt; &lt;Õ ="));
+	}
+	
+	@Test
+	public void testRemoveAllHTML(){
+		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
+		String testString = "<table><tr><td>this is a test</td><td>column 2</td></tr></table><iframe width=\"420\" height=\"315\" src=\"http://www.youtube.com/embed/AOjaQ7Vl7SM\" frameborder=\"0\" allowfullscreen></iframe><embed>";
+		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", false, new PegDownProcessor(ServerConstants.MARKDOWN_OPTIONS));
+		assertTrue(!actualResult.contains("<table>"));
+		assertTrue(!actualResult.contains("<iframe>"));
+		assertTrue(!actualResult.contains("<embed>"));
+	}
+	
+	@Test
+	public void testTableSupport(){
+		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
+		String testString = 
+				"|             |          Grouping           ||\nFirst Header  | Second Header | Third Header |\n ------------ | :-----------: | -----------: |\nContent       |          *Long Cell*        ||\nContent       |   **Cell**    |         Cell |\n";
+		
+		PegDownProcessor processor = new PegDownProcessor(ServerConstants.MARKDOWN_OPTIONS);
+		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", false, processor);
+		assertTrue(actualResult.contains("<table>"));
+		assertTrue(actualResult.contains("<tr>"));
+		assertTrue(actualResult.contains("<td>"));
+	}
+
+	@Test
+	public void testAddWidgetDivs(){
+		String testString = "<p>Line of widgets: <ul><li>{Widget:a widget name}</li><li>{Widget:a second widget name}</li></ul></p>";
+		String expectedResult = "<html>\n <head></head>\n <body>\n  <p>Line of widgets: </p>\n  <ul>\n   <li>\n    <div>\n     <div id=\"a widget name\"></div>\n    </div></li>\n   <li>\n    <div>\n     <div id=\"a second widget name\"></div>\n    </div></li>\n  </ul>\n </body>\n</html>";
+		Document htmlDoc = Jsoup.parse(testString);
+		ServerMarkdownUtils.addWidgets(htmlDoc, false);
+		String actualResult = htmlDoc.html();
 		assertEquals(expectedResult, actualResult);
 	}
 }

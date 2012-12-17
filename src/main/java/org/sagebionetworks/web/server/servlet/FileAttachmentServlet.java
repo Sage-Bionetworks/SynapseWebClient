@@ -154,6 +154,7 @@ public class FileAttachmentServlet extends HttpServlet {
 			// get Entity and store file in location
 			String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
 			FileItemIterator iter = upload.getItemIterator(request);
+			AttachmentData data = null;
 			while (iter.hasNext()) {
 				FileItemStream item = iter.next();
 
@@ -163,7 +164,7 @@ public class FileAttachmentServlet extends HttpServlet {
 				File temp = ServiceUtils.writeToTempFile(stream, MAX_ATTACHMENT_SIZE_IN_BYTES);
 				try{
 					// Now upload the file
-					AttachmentData data = client.uploadAttachmentToSynapse(entityId, temp, fileName);
+					data = client.uploadAttachmentToSynapse(entityId, temp, fileName);
 					// If this had a preview then wait for it
 					list.add(data);
 				}finally{
@@ -181,6 +182,8 @@ public class FileAttachmentServlet extends HttpServlet {
 			// Save the changes.
 			client.putEntity(e);
 			UploadResult result = new UploadResult();
+			if (data != null)
+				result.setAttachmentData(data);
 			result.setMessage("File upload successfully");
 			result.setUploadStatus(UploadStatus.SUCCESS);
 			String out = EntityFactory.createJSONStringForEntity(result);

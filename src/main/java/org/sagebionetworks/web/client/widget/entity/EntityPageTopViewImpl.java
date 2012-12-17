@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -15,6 +17,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
+import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -25,6 +29,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 
@@ -176,7 +181,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu.addEntityUpdatedHandler(handler);
 		locationableTitleBar.addEntityUpdatedHandler(handler);
 		filesBrowser.addEntityUpdatedHandler(handler);
-	}
+			}
 
 	@Override
 	public void showErrorMessage(String message) {
@@ -203,10 +208,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			fullWidthContainer.removeAll();
 	}
 
-	
+
 	/*
 	 * Private Methods
-	 */		
+	 */
 	// Render the File entity	
 	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
@@ -217,7 +222,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 //		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
-		
+			
 		// ** RIGHT **
 		// Programmatic Clients
 		colRightContainer.add(createProgrammaticClientsWidget(bundle));
@@ -241,7 +246,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		}
 		// ************************************************************************************************		
 	}
-
+		
 	// Render the Folder entity
 	private void renderFolderEntity(EntityBundle bundle,
 			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
@@ -270,7 +275,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		threeCol.add(createSpacer(), widgetMargin);
 		fullWidthContainer.add(threeCol, widgetMargin);
 	}
-	
+
 	// Render the Project entity
 	private void renderProjectEntity(EntityBundle bundle,
 			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
@@ -280,7 +285,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
-		
+
 		// ** RIGHT **
 		//none
 	
@@ -308,7 +313,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			LayoutContainer previewContainer = createAttachmentPreview(bundle.getEntity());
 			previewContainer.addStyleName("span-7 notopmargin");
 			threeCol.add(previewContainer);
-		}
+	}
 		// ************************************************************************************************
 		fullWidthContainer.add(threeCol, widgetMargin);
 	}
@@ -344,7 +349,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);
 		fullWidthContainer.add(snapshotWidget.asWidget());
 	}
-	
+
 	
 	/*
 	 * Widget inits
@@ -354,16 +359,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoWidth(true);
 		lc.setHeight(415);
 		lc.setBorders(true);
-		
+
 		lc.add(new HTML("No Preview Available"), new MarginData(10));
-		
-	    lc.layout();
-		return lc;
+
+		lc.layout();
+	    return lc;
 	}
 
 	private Widget createProvenanceWidget(EntityBundle bundle) {
 		LayoutContainer lc = new LayoutContainer();
-		lc.setAutoWidth(true);				
+		lc.setAutoWidth(true);
 		lc.addStyleName("span-7 notopmargin right last");
 		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.PROVENANCE + "</h4>")));
 
@@ -377,9 +382,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    border.add(provenanceWidget.asWidget());
 	    lc.add(border);
 	    lc.layout();
-		return lc;
+	    return lc;
 	}
-	
+
 	private Widget createProgrammaticClientsWidget(EntityBundle bundle) {		
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("span-7 notopmargin");
@@ -387,10 +392,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		LayoutContainer pcc = ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), synapseJSNIUtils, sageImageBundle);
 		pcc.addStyleName("right");
 		lc.add(pcc);
-	    lc.layout();
-		return lc;
+		lc.layout();
+	    return lc;
 	}
-	
+
 	private Widget createEntityFilesBrowserWidget(Entity entity, boolean showTitle) {
 		String title = DisplayConstants.FILES;
 		if(showTitle) 
@@ -404,12 +409,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 
-	private Widget createDescriptionWidget(EntityBundle bundle, String entityTypeDisplay, boolean showWhenEmpty) {
+	private Widget createDescriptionWidget(final EntityBundle bundle, String entityTypeDisplay) {
 		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 		String description = bundle.getEntity().getDescription();
-		
+
 		if(!showWhenEmpty) {
 			if(description == null || "".equals(description))
 				return lc;
@@ -433,6 +438,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					lc.add(panel);
 					lc.layout();
 					synapseJSNIUtils.highlightCodeBlocks();
+					//asynchronously load the widgets
+					presenter.loadWidgets(panel);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -440,7 +447,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				}
 			});
 	    }
-
 	    
    		return lc;
 	}
@@ -513,20 +519,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 	
-	// TODO : this should go away
-	private LayoutContainer createAttachmentsWidget(EntityBundle bundle, boolean canEdit, boolean readOnly, boolean showWhenEmpty) {
+	private Widget createAttachmentsWidget(final EntityBundle bundle, boolean canEdit, boolean readOnly) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		
-        String baseURl = GWT.getModuleBaseURL()+"attachment";
-        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId();
-		
-        // We just create a new one each time.
-        attachmentsPanel.configure(baseURl, bundle.getEntity());
-        if(!showWhenEmpty && attachmentsPanel.isEmpty()) 
-        	return new LayoutContainer();
-		
         LayoutContainer c = new LayoutContainer();
         HBoxLayout layout = new HBoxLayout();
         layout.setPadding(new Padding(5));
@@ -536,6 +532,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         c.add(new Html("<h4>Attachments</h4>"), new HBoxLayoutData(new Margins(0, 5, 0, 0)));
         HBoxLayoutData flex = new HBoxLayoutData(new Margins(0, 5, 0, 0));
         flex.setFlex(1);
+
+        final String baseURl = GWT.getModuleBaseURL()+"attachment";
+        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId();
 
         if(canEdit && !readOnly) {
 	        Anchor addBtn = new Anchor();
@@ -562,6 +561,18 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         }
         lc.add(c);
 
+        // We just create a new one each time.
+        attachmentsPanel.configure(baseURl, bundle.getEntity(), false);
+        attachmentsPanel.clearHandlers();
+        attachmentsPanel.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {
+			
+			@Override
+			public void onAttachmentSelected(AttachmentSelectedEvent event) {
+				String url = DisplayUtils.createAttachmentUrl(baseURl, bundle.getEntity().getId(), event.getTokenId(), event.getTokenId());
+				DisplayUtils.newWindow(url, "", "");
+			}
+		});
+        		
         lc.add(attachmentsPanel.asWidget());
 		lc.layout();
 		return lc;
@@ -575,7 +586,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			container.setAutoWidth(true);
 			panel.clear();
 			panel.add(container);
-		}
+}
 		return container;
 	}
 

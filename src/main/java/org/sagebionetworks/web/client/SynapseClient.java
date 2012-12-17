@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -172,7 +170,7 @@ public interface SynapseClient extends RemoteService {
 	 * @param markdown
 	 * @return
 	 */
-	public String markdown2Html(String markdown, String attachmentUrl) throws RestServiceException;
+	public String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview) throws RestServiceException;
 	
 	public Long getStorageUsage(String entityId) throws RestServiceException;
 
@@ -181,6 +179,9 @@ public interface SynapseClient extends RemoteService {
 	public String getActivityForEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
 	
 	public String getActivity(String activityId) throws RestServiceException;
-
+	
 	String promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
+	public EntityWrapper addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName, String contentTypeKey) throws RestServiceException;
+	public EntityWrapper removeAttachmentFromEntity(String entityId, String attachmentName) throws RestServiceException;
+	public String getWidgetDescriptorJson(String entityId, String attachmentName) throws RestServiceException; 
 }

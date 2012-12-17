@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.provenance;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -15,30 +17,35 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.widget.ProvenanceWidgetDescriptor;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
-import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.unitclient.presenter.AccessControlListEditorTest;
 
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -117,12 +124,16 @@ public class ProvenanceWidgetTest {
 	@Test
 	public void testBuildTreeSuccess() throws Exception {		
 		provenanceWidget.buildTree(entity, 1, false);	
+		verifyBuildTreeCalls();
+	}
+
+	private void verifyBuildTreeCalls() throws Exception {
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(entity.getId()), eq(entity.getVersionNumber()), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceListJSON), any(AsyncCallback.class));
 		verify(mockLayoutService).layoutProvTree(any(ProvTreeNode.class), any(AsyncCallback.class));
 		verify(mockView).setTree(root);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildTreeFailGetActivity() throws Exception {
@@ -168,6 +179,34 @@ public class ProvenanceWidgetTest {
 		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceListJSON), any(AsyncCallback.class));
 		verify(mockLayoutService).layoutProvTree(any(ProvTreeNode.class), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_LAYOUT);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigure() throws Exception {
+		//verify that calling configure eventually does the same thing as buildTree
+		EntityBundleTransport ebt = new EntityBundleTransport();
+		when(mockNodeModelCreator.createEntityBundle(ebt)).thenReturn(new EntityBundle(entity, null, null, null, null, null, null));
+		
+		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		ProvenanceWidgetDescriptor widgetDescriptor = new ProvenanceWidgetDescriptor();
+		widgetDescriptor.setDepth(42l);
+		widgetDescriptor.setEntityId(entity.getId());
+		widgetDescriptor.setShowExpand(true);
+		provenanceWidget.configure("bad entity id", widgetDescriptor);
+		verifyBuildTreeCalls();
+	}
+	
+	private static EntityBundleTransport createEBT(JSONEntity entity, AccessControlList acl, UserEntityPermissions uep) {
+		try {
+			EntityBundleTransport ebt = new EntityBundleTransport();
+			ebt.setEntityJson(EntityFactory.createJSONStringForEntity(entity));
+			ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
+			ebt.setPermissionsJson(EntityFactory.createJSONStringForEntity(uep));
+			return ebt;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 

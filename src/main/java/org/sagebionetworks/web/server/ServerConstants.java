@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.server;
 
+import org.pegdown.Extensions;
+
 /**
  * Constant property keys
  * 
@@ -89,4 +91,13 @@ public class ServerConstants {
 	 */
 	public static final String KEY_FILTER_ENUMERATION_CONFIG_XML_FILE = "org.sagebionetworks.fileter.enumeration.xml.resource";
 
+	public static int MARKDOWN_OPTIONS = Extensions.ABBREVIATIONS |
+		      Extensions.AUTOLINKS |
+		      Extensions.DEFINITIONS |
+		      Extensions.QUOTES |
+		      Extensions.SMARTS |
+		      Extensions.TABLES |
+		      Extensions.SUPPRESS_ALL_HTML |
+		      Extensions.WIKILINKS;
+	
 }
