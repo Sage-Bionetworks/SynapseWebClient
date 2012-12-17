@@ -5,6 +5,8 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AutoGenFactory;
@@ -57,7 +59,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	
 	private String currentSelection;
 	
-	private final int MAX_LIMIT = 200;
+	private final int MAX_FOLDER_LIMIT = 500;
 	
 	@Inject
 	public EntityTreeBrowser(EntityTreeBrowserView view,
@@ -84,10 +86,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		
 		view.setPresenter(this);
 	}	
-
-	public void setRootEntities(List<EntityHeader> rootEntities) {
-		this.view.setRootEntities(rootEntities);
-	}
 	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
@@ -97,21 +95,44 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 
 	/**
-	 * Does nothing. Use asWidget(Entity)
+	 * Configure tree view with given entityId's children as start set
+	 * @param entityId
 	 */
+	public void configure(String entityId, final boolean sort) {
+		getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
+			@Override
+			public void onSuccess(List<EntityHeader> result) {
+				view.setRootEntities(result, sort);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+			}
+		});
+	}
+	
+	/**
+	 * Configure tree view to be filled initially with the given headers.
+	 * @param rootEntities
+	 */
+	public void configure(List<EntityHeader> rootEntities, boolean sort) {
+		view.setRootEntities(rootEntities, sort);
+	}
+	
+	
 	@Override
 	public Widget asWidget() {
 		view.setPresenter(this);		
 		return view.asWidget();
 	}
-    
+	
 	@Override
 	public void getFolderChildren(String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();		
 		
 		searchService.searchEntities("entity", Arrays
 				.asList(new WhereCondition[] { new WhereCondition("parentId",
-						WhereOperator.EQUALS, entityId) }), 1, MAX_LIMIT, null,
+						WhereOperator.EQUALS, entityId) }), 1, MAX_FOLDER_LIMIT, null,
 				false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {
@@ -165,7 +186,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	
 	@Override
 	public int getMaxLimit() {
-		return MAX_LIMIT;
+		return MAX_FOLDER_LIMIT;
 	}
 
 	@Override

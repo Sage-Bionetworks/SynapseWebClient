@@ -1,17 +1,29 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
+import com.extjs.gxt.ui.client.Style.AnchorPosition;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
+import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -36,7 +48,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle, ProvenanceWidget provenanceWidget) {		
+			SageImageBundle sageImageBundle, ProvenanceWidget provenanceWidget,
+			SynapseJSNIUtils synapseJSNIUtils) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
@@ -46,9 +59,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
+				
 	}
-
-
 
 	@Override
 	public void setPresenter(final Presenter presenter) {

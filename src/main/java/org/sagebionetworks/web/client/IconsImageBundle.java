@@ -40,7 +40,7 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/cog-16.png")
 	ImageResource cog16();
-		
+	
 	@Source("images/icons/cross-button-16.png")
 	ImageResource deleteButton16();
 
@@ -246,11 +246,17 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/synapse-data-16.png")
 	ImageResource synapseData16();
 	
+	@Source("images/icons/synapse-data-plus-16.png")
+	ImageResource synapseDataAdd16();
+	
 	@Source("images/icons/synapse-data-24.png")
 	ImageResource synapseData24();
 	
 	@Source("images/icons/synapse-folder-16.png")
 	ImageResource synapseFolder16();
+	
+	@Source("images/icons/synapse-folder-plus-16.png")
+	ImageResource synapseFolderAdd16();
 	
 	@Source("images/icons/synapse-folder-24.png")
 	ImageResource synapseFolder24();
@@ -302,4 +308,6 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/visualize-16.png")
 	ImageResource visualize16();	
 
+	@Source("images/icons/arrow-turn-090-left-gray.png")
+	ImageResource arrowTurnLeftGrey16();
 }

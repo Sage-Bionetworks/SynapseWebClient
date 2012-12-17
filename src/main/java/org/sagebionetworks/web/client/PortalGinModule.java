@@ -50,16 +50,6 @@ import org.sagebionetworks.web.client.widget.WidgetFactory;
 import org.sagebionetworks.web.client.widget.WidgetFactoryImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnDefinitionEditorView;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnDefinitionEditorViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnMappingEditorView;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.ColumnMappingEditorViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.OntologySearchPanelView;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.OntologySearchPanelViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeEditorView;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeEditorViewImpl;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatrixView;
-import org.sagebionetworks.web.client.widget.editpanels.phenotype.PhenotypeMatrixViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
@@ -77,10 +67,11 @@ import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserView;
-import org.sagebionetworks.web.client.widget.entity.children.EntityChildBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialogImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderView;
@@ -214,7 +205,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ProjectsHomeView.class).to(ProjectsHomeViewImpl.class);		
 				
 		// QueryService View
-		//bind(QueryServiceTableView.class).to(QueryServiceTableViewImpl.class);
 		bind(QueryServiceTableView.class).to(QueryServiceTableViewGxtImpl.class);
 		
 		// LoginView
@@ -308,27 +298,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// ACL Editor
 		bind(AccessControlListEditorView.class).to(AccessControlListEditorViewImpl.class);
-		
-		// PhenotypeEditor
-		bind(PhenotypeEditorViewImpl.class).in(Singleton.class);
-		bind(PhenotypeEditorView.class).to(PhenotypeEditorViewImpl.class);
-		
-		// Column Definition Editor
-		bind(ColumnDefinitionEditorViewImpl.class).in(Singleton.class);
-		bind(ColumnDefinitionEditorView.class).to(ColumnDefinitionEditorViewImpl.class);		
-
-		// Column Mapping Editor
-		bind(ColumnMappingEditorViewImpl.class).in(Singleton.class);
-		bind(ColumnMappingEditorView.class).to(ColumnMappingEditorViewImpl.class);		
-
-		// Ontology Search Panel
-		bind(OntologySearchPanelViewImpl.class).in(Singleton.class);
-		bind(OntologySearchPanelView.class).to(OntologySearchPanelViewImpl.class);		
-
-		// PhenotypeMatrix
-		bind(PhenotypeMatrixViewImpl.class).in(Singleton.class);
-		bind(PhenotypeMatrixView.class).to(PhenotypeMatrixViewImpl.class);
-		
+				
 		// EntityPageTop
 		bind(EntityPageTopViewImpl.class).in(Singleton.class);
 		bind(EntityPageTopView.class).to(EntityPageTopViewImpl.class);
@@ -340,11 +310,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
 		bind(LocationableTitleBarView.class).to(LocationableTitleBarViewImpl.class);
-		
-		// EntityChildBrowser
-		bind(EntityChildBrowserViewImpl.class).in(Singleton.class);
-		bind(EntityChildBrowserView.class).to(EntityChildBrowserViewImpl.class);
-		
+				
 		// EntityChildBrowser (not singleton as you may want multiple)
 		bind(LocationableDownloaderView.class).to(LocationableDownloaderViewImpl.class);
 
@@ -380,6 +346,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
+		
+		// FilesBrowser
+		bind(FilesBrowserView.class).to(FilesBrowserViewImpl.class);
 	}
 
 }

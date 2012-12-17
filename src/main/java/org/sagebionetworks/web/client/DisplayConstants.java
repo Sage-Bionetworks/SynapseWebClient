@@ -3,22 +3,6 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.i18n.client.DateTimeFormat;
 
 public class DisplayConstants {
-	
-	/*
-	 * DEMO FLAG
-	 * Set this flag if you want demo content shown
-	 */
-	public static boolean showDemoHtml = false;
-	public static final String MSKCC_DATASET_DEMO_ID = "4494";
-	public static final String TURN_DEMO_ON_TOKEN = "d";
-	public static final String TURN_DEMO_OFF_TOKEN = "nd";
-	
-	/*
-	 * Demo strings
-	 */
-	public static final String DEMO_COMMENTS = "<div id=\"scrollable_item\">							<span class=\"scrollable_header\">								<img src=\"static/images/down_arrow.png\" class=\"right\" />								<span class=\"scroll_text\">New analysis using this dataset in the Federation Warburg Project</span>								<span class=\"author\"><a href=\"\">Xudong D.</a></span>								<span class=\"date\">21-Nov-2010</span>							</span>							<span class=\"scrollable_comments\">								<span class=\"scrollable_comment\">									<span class=\"comment_text\">The paper references 149 matched normal samples.  Do you have this data?</span>									<span class=\"comment_author\">Sam S.</span>									<span class=\"comment_date\">22-Dec-2010</span>								</span>								<span class=\"scrollable_comment\">									<span class=\"comment_text\">We have only able to obtain 29 matched normal samples.</span>									<span class=\"comment_author\">Matt F.</span>									<span class=\"comment_date\">22-Nov-2010</span>								</span>							</span>						</div>						<div id=\"scrollable_item\">							<span class=\"scrollable_header\">								<img src=\"static/images/down_arrow.png\" class=\"right\" />								<span class=\"scroll_text\">New analysis using this dataset in the MetaGEO Project</span>								<span class=\"author\"><a href=\"\">Brig M</a></span>								<span class=\"date\">01-Apr-2011</span>							</span>							<span class=\"scrollable_comments\">								<span class=\"scrollable_comment\">									<span class=\"comment_text\">Look out, there is a large batch effect in this data.  Have been working on a way to remove it.</span>									<span class=\"comment_author\">Brig M.</span>									<span class=\"comment_date\">02-Apr-2011</span>								</span>								<span class=\"scrollable_comment\">									<span class=\"comment_text\">Appreciate the help.  We can post new version of the normalized data.</span>									<span class=\"comment_author\">Matt F.</span>									<span class=\"comment_date\">02-Apr-2011</span>								</span>							</span>						</div>";
-	public static final String DEMO_ANALYSIS = "<div class=\"scrollable\"><table width=\"100%\" class=\"detail\"><tr><th class=\"analysis\">Analysis</th><th class=\"project\">Project</th><th class=\"last_modified\">Last Modified</th></tr>							<tr>								<td class=\"analysis\"><a href=\"network_overview.html\">Network Generation</a></td>								<td class=\"project\"><a href=\"project_details.html\">Federation Warburg</a></td>								<td class=\"last_modified\">12-Apr-2011</td>							</tr>							<tr class=\"gray\">								<td class=\"analysis\"><a href=\"network_overview.html\">Network Survey</a></td>								<td class=\"project\"><a href=\"project_details.html\">Federation Warburg</a></td>								<td class=\"last_modified\">23-Mar-2011</td>							</tr>							<tr>								<td class=\"analysis\"><a href=\"network_overview.html\">Interactome</a></td>								<td class=\"project\"><a href=\"project_details.html\">Federation Warburg</a></td>								<td class=\"last_modified\">04-Mar-2011</td>							</tr>							<tr class=\"gray\">								<td class=\"analysis\"><a href=\"network_overview_metageo.html\">GSE 21034</a></td>								<td class=\"project\"><a href=\"project_details_metageo.html\">MetaGEO</a></td>								<td class=\"last_modified\">2-Apr-2011</td>							</tr> <tr> <td class=\"analysis\"><a href=\"analysis_predictor.html\">Biomarker Prediction</a></td> <td class=\"project\"><a href=\"project_details_predictor.html\">Predictive Modeling</a></td> <td class=\"last_modified\">07-Jul-2011</td> </tr>						</table></div>";
-	public static final String DEMO_OVERVIEW = "Genetic and epigenetic alterations have been identified that lead to transcriptional Annotation of prostate cancer genomes provides a foundation for discoveries that can impact disease understanding and treatment. Concordant assessment of DNA copy number, mRNA expression, and focused exon resequencing in the 218 prostate cancer tumors represented in this dataset haveidentified the nuclear receptor coactivator NCOA2 as an oncogene in approximately 11% of tumors. Additionally, the androgen-driven TMPRSS2-ERG fusion was associated with a previously unrecognized, prostate-specific deletion at chromosome 3p14 that implicates FOXP1, RYBP, and SHQ1 as potential cooperative tumor suppressors. DNA copy-number data from primary tumors revealed that copy-number alterations robustly define clusters of low- and high-risk disease beyond that achieved by Gleason score.";
 
 	/*
 	 * Dimensions
@@ -113,9 +97,13 @@ public class DisplayConstants {
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
 	public static final String LABEL_PERMISSION_TEXT_ADD_PEOPLE = "Add People";
 	public static final String BUTTON_SHOW_R_CLIENT_INSTALL = "Show R Client Installation Code";
-	public static final String LABEL_R_CLIENT_INSTALL = "Install Synapse R Client";
-	public static final String LABEL_R_CLIENT_GET_ENTITY = "Obtain a pointer";
-	public static final String LABEL_R_CLIENT_LOAD_ENTITY = "Load the data";
+	public static final String LABEL_R_CLIENT_INSTALL = "Install R Client";
+	public static final String LABEL_PYTHON_CLIENT_INSTALL = "Install Python Client";
+	public static final String INSTALL_JAVA_MAVEN = "Install Java Client";
+	public static final String LABEL_CL_CLIENT_INSTALL = "Install Command Line Client";
+	public static final String LABEL_CLIENT_GET_ENTITY = "Obtain a pointer";
+	public static final String LABEL_CLIENT_LOAD_ENTITY = "Load the data";
+	public static final String DOWNLOAD_FILE_LOCAL = "Download file";
 	public static final String LOGIN_USERNAME_LABEL = "Email Address";
 	
 	/*
@@ -201,6 +189,7 @@ public class DisplayConstants {
 	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. Please try again.";
 	public static final String ERROR_ENTITY_MOVE_FAILURE = "Move failed. Please try again.";
 	public static final String PROMPT_SURE_DELETE = "Are you sure you want to delete this";
+	public static final String PROMPT_SURE_PROMOTE = "Are you sure you want to promote this version to the top?";
 	public static final String LABEL_NO_PREVIEW_DATA = "A Preview has not been created.";
 	public static final String LABEL_CONTAINS_NO_CHILDREN = "This object contains no children.";
 	public static final String BUTTON_REGISTER = "Register";
@@ -233,7 +222,9 @@ public class DisplayConstants {
 	public static final String ERROR_NOT_AUTHORIZED = "Sorry, you are not authorized to modify the requested entity.";
 	public static final String ERROR_ENTITY_CANT_LINKS = "Sorry, the requested entity can not contain links.";
 	public static final String ERROR_ENTITY_CREATION = "Sorry, creation failed. Please try again.";
+	public static final String ERROR_ENTITY_PROMOTE_FAILURE = "Sorry, promoting the entity failed.";
 	public static final String LABEL_SUCCESS = "Success";
+	public static final String LABEL_PROMOTED = " was promoted to top.";
 	public static final String TEXT_LINK_SAVED = "Link saved.";
 	public static final String ERROR_UPDATE_FAILED = "Update failed. Please try again.";
 	public static final String TEXT_NO_REFERENCES = "No others point to this";
@@ -241,7 +232,7 @@ public class DisplayConstants {
 	public static final String BUTTON_FILTER_USER_UPDATABLE = "Show Projects I Can Edit";
 	public static final String STATUS_CAN_EDIT = "Can Edit";
 	public static final String STATUS_CREATED_BY = "Owner";
-	public static final String LABEL_NONE_FOUND = "None Found";
+	public static final String EMPTY = "Empty";
 	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
@@ -289,7 +280,7 @@ public class DisplayConstants {
 	public static final String SHOW_LIST_EDITOR = "Show List Editor";
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 	public static final String FLAG = "flag";
-	public static final String FLAG_TOOL_TIP = "Click here to learn more about flagging this data for review by the Synapse Access and Compliance Team";
+	public static final String FLAG_TOOL_TIP = "Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team";
 	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Data use conditions:";
 	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Data use conditions are set by human privacy regulations or contractual obligations";
 	
@@ -381,7 +372,7 @@ public class DisplayConstants {
 	public static final String FLAG_DIALOG_TITLE = "Flag Data";
 	public static String UNRESTRICTED_DATA_DIALOG_TITLE = "Unrestricted Data";
 	public static String RESTRICTED_DATA_DIALOG_TITLE = "Restricted Data";
-	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to this data is restricted.";
+	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to these data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
 	
 	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
@@ -393,10 +384,10 @@ public class DisplayConstants {
 	public static String RESTRICTION_DIALOG_TEXT_3 = "To add data restrictions, contact the Access and Compliance Team (ACT), by clicking below.</p>";
 	public static String RESTRICTION_DIALOG_TEXT_4 = "<p class=\"strong\">NOTE:  If you continue, data access to all registered Synapse users will be temporarily restricted pending review by the ACT.</p>";
 	
-	public static final String TOU_RESTRICTION_HEADER = "In order to access this data you must be a registered Synapse user and agree to the following terms:";
+	public static final String TOU_RESTRICTION_HEADER = "In order to access these data you must be a registered Synapse user and agree to the following terms:";
 	public static final String TOU_PROMPT = "Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:";
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
-	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to this data under the following terms:</p>";
+	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
 	public static final String FILE_DOWNLOAD_NOTE = 
 		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
@@ -412,6 +403,25 @@ public class DisplayConstants {
 	
 	public static final String DEFINE_ACTIVITY = "Please Define Provenance";
 	public static final String HOW_TO_DEFINE_ACTIVITY = "Create Provenance using the Synapse R Client.";
-
+	public static final String ERROR_NO_LINK_DEFINED = "Warning: No target reference is defined for this link.";
+	public static final String DATA_USE = "Data Use";
+	public static final String ACCESS_TO_DATA = "Access to these data is";
+	public static final String PAGE_NOT_FOUND = "Page not found";
+	public static final String PAGE_NOT_FOUND_DESC = "The page you requested was not found, that's all we know.";
+	public static final String ANNOTATIONS = "Annotations";
+	public static final String TO_LOAD_VERSION_1 = "To load version 1";
+	public static final String TO_LOAD_AN_ENTITY = "To load an entity";
+	public static final String PROGRAMMATIC_ACCESS = "Programmatic Access";
+	public static final String PROVENANCE = "Provenance";
+	public static final String CREATED = "Created";
+	public static final String MODIFIED = "Modified";
+	public static final String NO_VERSION_COMMENT = "No Version Comment";
+	public static final String ADD_FOLDER = "Add Folder";
+	public static final String ADD_FILE = "Add File";
+	public static final String FILES = "Files";
+	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
+	public static final String UNAUTHORIZED = "Unauthorized";
+	public static final String UNAUTHORIZED_DESC = "You are not authorized to access the page requested.";
+	
 }
 

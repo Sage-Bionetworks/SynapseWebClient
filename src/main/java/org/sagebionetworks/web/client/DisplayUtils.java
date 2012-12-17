@@ -35,6 +35,10 @@ import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.events.CancelEvent;
+import org.sagebionetworks.web.client.events.CancelHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -42,6 +46,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -51,12 +56,15 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.NodeList;
@@ -127,6 +135,9 @@ public class DisplayUtils {
 	public static final String DEFAULT_PLACE_TOKEN = "0";
 	
 	public static final String R_CLIENT_DOWNLOAD_CODE = "source('http://depot.sagebase.org/CRAN.R')<br/>pkgInstall(c(\"synapseClient\"))";
+	public static final String PYTHON_CLIENT_DOWNLOAD_CODE = "# From Terminal Prompt:<br/>pip install SynapseClient<br/><br/># or<br/>easy_install SynapseClient";
+	
+
 	
 	private static final String ERROR_OBJ_REASON_KEY = "reason";
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
@@ -384,8 +395,10 @@ public class DisplayUtils {
 				int firstQuestionMark = path.indexOf("?", lastSlash);
 				if (firstQuestionMark > -1) {
 					fileName = path.substring(lastSlash+1, firstQuestionMark);
+				} else {
+					fileName = path.substring(lastSlash+1);
 				}
-			}
+			} 
 		}
 		return fileName;
 	}
@@ -564,17 +577,7 @@ public class DisplayUtils {
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}
-	
-	public static SafeHtml getRClientEntityLoad(String id) {
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("# " + DisplayConstants.LABEL_R_CLIENT_GET_ENTITY + " <br/>")  
-		.appendEscaped(id).appendHtmlConstant(" &lt;- getEntity('").appendEscaped(id).appendHtmlConstant("')")
-		.appendHtmlConstant("<br/><br/># " + DisplayConstants.LABEL_R_CLIENT_LOAD_ENTITY + " <br/>")
-		.appendEscaped(id).appendHtmlConstant(" &lt;- loadEntity('")
-		.appendEscaped(id).appendHtmlConstant("')");
-		return shb.toSafeHtml();
-	}	
-	
+		
 	public static String convertDateToString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
 		DateTime dt = new DateTime(toFormat.getTime());
@@ -966,6 +969,7 @@ public class DisplayUtils {
 		optionsMap.put("title", tooltipText);
 		optionsMap.put("data-placement", pos.toString().toLowerCase());
 		optionsMap.put("data-animation", "false");
+		optionsMap.put("data-html", "true");
 		addTooltip(util, widget, optionsMap);
 	}
 		
@@ -994,19 +998,31 @@ public class DisplayUtils {
 		}
 	}
 
+	public static void addClickPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
+		Map<String, String> optionsMap = new TreeMap<String, String>();
+		optionsMap.put("data-html", "true");
+		optionsMap.put("data-animation", "true");
+		optionsMap.put("title", title);
+		optionsMap.put("data-placement", pos.toString().toLowerCase());
+		optionsMap.put("trigger", "click");		
+		addPopover(util, widget, content, optionsMap);
+	}
+
+	
 	/**
 	 * Adds a popover to a target widget
 	 * 
 	 * Same warnings apply as to {@link #addTooltip(SynapseJSNIUtils, Widget, String) addTooltip}
 	 */
-	public static void addPopover(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
+	public static void addPopover(final SynapseJSNIUtils util, Widget widget, String content, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
-
+		el.setAttribute("data-content", content);
+		
 		String id = isNullOrEmpty(el.getId()) ? "sbn-popover-"+(popoverCount++) : el.getId();
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "popover");
 
-		if (el.getNodeType() == 1 && ! isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
+		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
 			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
 
 			applyAttributes(el, optionsMap);
@@ -1123,4 +1139,69 @@ public class DisplayUtils {
 		}
 		return version;
 	}
+
+	public static SafeHtml get404Html() {
+		return SafeHtmlUtils
+				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">404</p><h1>"
+						+ DisplayConstants.PAGE_NOT_FOUND
+						+ "</h1>"
+						+ "<p>"
+						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
+	}
+	
+	public static SafeHtml get403Html() {
+		return SafeHtmlUtils
+				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">403</p><h1>"
+						+ DisplayConstants.UNAUTHORIZED
+						+ "</h1>"
+						+ "<p>"
+						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div>");
+	}
+	
+	/**
+	 * 'Upload File' button
+	 * @param entity 
+	 * @param entityType 
+	 */
+	public static Widget getUploadButton(final EntityBundle entityBundle,
+			EntityType entityType, final LocationableUploader locationableUploader,
+			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
+		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
+		uploadButton.setHeight(25);
+		final Window window = new Window();  
+		locationableUploader.clearHandlers();
+		// add user defined handler
+		locationableUploader.addPersistSuccessHandler(handler);
+		
+		// add handlers for closing the window
+		locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				window.hide();
+			}
+		});
+		locationableUploader.addCancelHandler(new CancelHandler() {				
+			@Override
+			public void onCancel(CancelEvent event) {
+				window.hide();
+			}
+		});
+		
+		uploadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.removeAll();
+				window.setSize(400, 320);
+				window.setPlain(true);
+				window.setModal(true);		
+				window.setBlinkModal(true);
+				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
+				window.setLayout(new FitLayout());			
+				window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+				window.show();
+			}
+		});
+		return uploadButton;
+	}
+	
 }

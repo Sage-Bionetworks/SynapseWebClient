@@ -68,5 +68,15 @@ public class DisplayUtilsTest {
 		String actualResult = MarkdownUtils.getAttachmentLinkMarkdown("Example", "syn12345", "tokenA/1234", "previewA/5678", "my title");
 		Assert.assertEquals(actualResult, expectedResult);
 	}
+
+	@Test
+	public void testGetFileNameFromLocationPath() {
+		String name = "filename.txt";
+		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://some.really.long.com/path/to/a/file/" + name));
+		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://some.really.long.com/path/to/a/file/" + name + "?param1=value&param2=value"));
+		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("/root/" + name));
+		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://google.com/" + name));
+		
+	}
 	
 }

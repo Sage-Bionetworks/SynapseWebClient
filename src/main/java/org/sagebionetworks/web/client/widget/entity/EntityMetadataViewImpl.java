@@ -9,18 +9,18 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.AnimationProtector;
+import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.IconMenu;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
+import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.Direction;
@@ -43,6 +43,7 @@ import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
+import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -69,6 +70,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -87,6 +89,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static final String VERSION_KEY_MOD_BY = "modifiedBy";
 
 	private static final int VERSION_LIMIT = 100;
+	private static final int NAME_TIME_STUB_LENGTH = 7;
 
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
@@ -103,8 +106,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	Style style;
 
 	@UiField
-	HTMLPanel panel;
-	@UiField
 	HTMLPanel versions;
 	@UiField
 	HTMLPanel readOnly;
@@ -114,7 +115,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	HTMLPanel detailedMetadata;
 	
 	@UiField
-	DivElement widgetContainer;
+	HTMLPanel dataUseContainer;
+	@UiField
+	HTMLPanel sharingContainer;
 
 	@UiField
 	Image entityIcon;
@@ -123,17 +126,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SpanElement entityId;
 	@UiField
-	SpanElement createName;
+	HTMLPanel addedBy;
 	@UiField
-	SpanElement createDate;
-	@UiField
-	SpanElement modifyName;
-	@UiField
-	SpanElement modifyDate;
+	HTMLPanel modifiedBy;
 	@UiField
 	SpanElement label;
-	@UiField
-	SpanElement comment;
 
 	@UiField
 	LayoutContainer previousVersions;
@@ -162,11 +159,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	 */
 	private BaseModelData currentModel;
 
-	final private FxConfig config;
-
 	// Widget variables
 	private PagingToolBar vToolbar;
 	private Grid<BaseModelData> vGrid;
+	private AnimationProtector versionAnimation;
 
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
@@ -176,26 +172,32 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		initWidget(uiBinder.createAndBindUi(this));
 
-		config = new FxConfig(400);
-		config.setEffectCompleteListener(new Listener<FxEvent>() {
+		versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(allVersions, previousVersions));
+		FxConfig hideConfig = new FxConfig(400);
+		hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
 			@Override
 			public void handleEvent(FxEvent be) {
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
-				allVersions.getElement().setPropertyBoolean("animating", false);
+				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
 				vGrid.getSelectionModel().select(currentModel, false);
 			}
 		});
+		versionAnimation.setHideConfig(hideConfig);
 
-		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
-		allVersions.getElement().setPropertyBoolean("animating", false);
-		allVersions.addClickHandler(new ClickHandler() {
+		FxConfig showConfig = new FxConfig(400);
+		showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
 			@Override
-			public void onClick(ClickEvent event) {
-				// Toggle previousVersions
-				setPreviousVersionsVisible(!previousVersions.el().isVisible());
+			public void handleEvent(FxEvent be) {
+				// This call to layout is necessary to force the scroll bar to appear on page-load
+				previousVersions.layout(true);
+				allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+				vGrid.getSelectionModel().select(currentModel, false);
 			}
 		});
+		versionAnimation.setShowConfig(showConfig);
+
+		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
 
 		vToolbar = new PagingToolBar(VERSION_LIMIT);
 		vToolbar.setSpacing(2);
@@ -234,24 +236,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		previousVersions.setLayout(new FlowLayout(10));
 	}
 
-	private void setPreviousVersionsVisible(boolean setVisible) {
-		if (!allVersions.getElement().getPropertyBoolean("animating") && previousVersions.isRendered()) {
-			allVersions.getElement().setPropertyBoolean("animating", true);
-
-			boolean isCurrentlyVisible = previousVersions.el().isVisible();
-
-			if (!setVisible && isCurrentlyVisible) {
-				allVersions.setText(DisplayConstants.SHOW_VERSIONS);
-				previousVersions.el().slideOut(Direction.UP, config);
-
-			} else if (setVisible && !isCurrentlyVisible) {
-				previousVersions.setVisible(true);
-				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
-				previousVersions.el().slideIn(Direction.DOWN, config);
-			}
-		}
-	}
-
 	@Override
 	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
 		clear();
@@ -269,32 +253,34 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.entityNamePanel.setVisible(isEntityNamePanelVisible);
 		
 		this.readOnly.setVisible(readOnly);
+		
+		sharingContainer.clear();
+		sharingContainer.add(createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()));
 
-		Widget shareSettings = createShareSettingsWidget(bundle.getPermissions().getCanPublicRead());
-		if (shareSettings != null) panel.add(shareSettings, widgetContainer);
-
-		Widget restrictionsWidget = createRestrictionWidget();
-		if (restrictionsWidget != null) panel.add(restrictionsWidget, widgetContainer);
-
-		setCreateName(e.getCreatedBy());
-		setCreateDate(synapseJSNIUtils.convertDateToSmallString(e.getCreatedOn()));
-
-		setModifyName(e.getModifiedBy());
-		setModifyDate(synapseJSNIUtils.convertDateToSmallString(e.getModifiedOn()));
-
+		setCreatedBy(e.getCreatedBy(), synapseJSNIUtils.convertDateToSmallString(e.getCreatedOn()));
+		setModified(e.getModifiedBy(), synapseJSNIUtils.convertDateToSmallString(e.getModifiedOn()));
+			
+		dataUseContainer.clear();
+		Widget dataUse = createRestrictionWidget();
+		if(dataUse != null) {
+			dataUseContainer.setVisible(true);
+			dataUseContainer.add(dataUse);
+		} else {
+			dataUseContainer.setVisible(false);
+		}
+		
 		setVersionsVisible(false);
 		if (e instanceof Versionable) {
 			setVersionsVisible(true);
 			Versionable vb = (Versionable) e;
 			setVersionInfo(vb);
 			setEntityVersions(vb);
-			setPreviousVersionsVisible(false);
+			versionAnimation.hide();
 		}
 	}
 
 	private void clear() {
-		widgetContainer.setInnerHTML("");
-		comment.setInnerText("");
+		dataUseContainer.clear();
 	}
 
 	@Override
@@ -320,20 +306,18 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		entityId.setInnerText(text);
 	}
 
-	public void setCreateName(String text) {
-		createName.setInnerText(text);
+	public void setCreatedBy(String who, String when) {
+		String text =  DisplayConstants.CREATED + " by " + who + "<br/>" + when; 
+		DisplayUtils.addTooltip(synapseJSNIUtils, addedBy, text, TOOLTIP_POSITION.BOTTOM);		
+		addedBy.clear();
+		addedBy.add(new HTML(DisplayConstants.CREATED + " By"));
 	}
 
-	public void setCreateDate(String text) {
-		createDate.setInnerText(text);
-	}
-
-	public void setModifyName(String text) {
-		modifyName.setInnerText(text);
-	}
-
-	public void setModifyDate(String text) {
-		modifyDate.setInnerText(text);
+	public void setModified(String who, String when) {
+		String text =  DisplayConstants.MODIFIED + " by " + who + "<br/>" + when;
+		DisplayUtils.addTooltip(synapseJSNIUtils, modifiedBy, text, TOOLTIP_POSITION.BOTTOM);
+		modifiedBy.clear();
+		modifiedBy.add(new HTML(DisplayConstants.MODIFIED + " By"));		
 	}
 
 	public void setVersionInfo(Versionable vb) {
@@ -341,11 +325,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		sb.append(vb.getVersionLabel());
 
 		if (vb.getVersionComment() != null) {
-			sb.append(" - ");
-
-			comment.setTitle(vb.getVersionComment());
-			comment.setInnerText(DisplayUtils.stubStr(vb.getVersionComment(), 60));
+			DisplayUtils.addTooltip(synapseJSNIUtils, versions, vb.getVersionComment(), TOOLTIP_POSITION.BOTTOM);
+		} else {
+			DisplayUtils.addTooltip(synapseJSNIUtils, versions, DisplayConstants.NO_VERSION_COMMENT, TOOLTIP_POSITION.BOTTOM);
 		}
+		
 		label.setInnerText(sb.toString());
 	}
 
@@ -355,6 +339,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	public void setVersionsVisible(boolean visible) {
+		if(visible) versions.addStyleName("metadata-tag"); 
+		else versions.removeStyleName("metadata-tag");
 		versions.setVisible(visible);
 	}
 
@@ -499,7 +485,27 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 			private Object setupIconMenu(final ModelData model, boolean currentVersion) {
 				IconMenu menu = new IconMenu();
-				if (currentVersion) {
+				final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
+				if (!currentVersion) {
+					menu.addIcon(icons.arrowTurnLeftGrey16(),
+							"Promote Version to Top", new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									MessageBox.confirm("Promote "+ versionLabel,
+											DisplayConstants.PROMPT_SURE_PROMOTE,
+											new Listener<MessageBoxEvent>() {
+												@Override
+												public void handleEvent(MessageBoxEvent be) {
+													Button btn = be.getButtonClicked();
+													if (Dialog.YES.equals(btn.getItemId())) {
+														presenter.promoteVersion((String) model.get(VERSION_KEY_ID),
+																				(Long) model.get(VERSION_KEY_NUMBER));
+													}
+												}
+											});
+								}
+							});
+				} else {
 					menu.addIcon(icons.editGrey16(), "Edit Version Info",
 							new ClickHandler() {
 								@Override
@@ -520,7 +526,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 								}
 							});
 				}
-				final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
 				menu.addIcon(icons.deleteButtonGrey16(), "Delete Version",
 						new ClickHandler() {
 							@Override
@@ -583,12 +588,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">Sharing:</span><div class=\"" + styleName+ "\" style=\"display:inline-block; position:absolute\"></div>");
-		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 20px;\">"+description+"</span>");
+		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
 
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.RIGHT);
+		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
 		lc.add(htmlPanel);
 
 		return lc;
@@ -645,5 +650,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	
+	private String stubUseTime(String userTime) {
+		String stub = userTime.substring(0,NAME_TIME_STUB_LENGTH-1);
+		if(userTime.length() > NAME_TIME_STUB_LENGTH) stub += "...";
+		return stub;
 	}
 }

@@ -38,7 +38,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private AuthenticationController authenticationController;
 	private EntitySchemaCache schemaCache;
 	private EntityTypeProvider entityTypeProvider;
-	private IconsImageBundle iconsImageBundle;
+	private IconsImageBundle iconsImageBundle;	
 
 	private EntityBundle bundle;
 	private boolean readOnly;

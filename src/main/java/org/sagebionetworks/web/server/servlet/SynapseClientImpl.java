@@ -5,14 +5,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -45,7 +40,6 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.storage.StorageUsage;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -56,7 +50,6 @@ import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
@@ -892,79 +885,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public EntityWrapper removeAttachmentFromEntity(String entityId,
-			String attachmentName) throws RestServiceException {
-		EntityWrapper updatedEntityWrapper = null;
+	public String promoteEntityVersion(String entityId, Long versionNumber)
+			throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
 		try {
-				Synapse client = createSynapseClient();
-				Entity e = client.getEntityById(entityId);
-				if (e.getAttachments() != null) {
-					for (Iterator iterator = e.getAttachments().iterator(); iterator
-							.hasNext();) {
-						AttachmentData data = (AttachmentData) iterator.next();
-						if (data.getName().equals(attachmentName)) {
-							e.getAttachments().remove(data);
-							break;
-						}
-					}
-				}
-				// Save the changes.
-				Entity updatedEntity = client.putEntity(e);
-				updatedEntityWrapper = new EntityWrapper(EntityFactory.createJSONStringForEntity(updatedEntity), updatedEntity.getClass().getName(), null);
+			VersionInfo version = synapseClient.promoteEntityVersion(entityId, versionNumber);
+			return EntityFactory.createJSONStringForEntity(version);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-		return updatedEntityWrapper;
-
-	
 	}
-	
-	@Override
-	public EntityWrapper addWidgetDescriptorToEntity(WidgetDescriptor descriptor, String entityId, String attachmentName) throws RestServiceException {
-		EntityWrapper updatedEntityWrapper = null;
-		try {
-			//write the descriptor json string to a temp file
-			String fileExtension = ".json";
-			File tempFile = File.createTempFile(descriptor.getWidgetType()+"_", fileExtension);
 
-			if (attachmentName == null || attachmentName.trim().length() == 0) {
-				attachmentName = tempFile.getName().substring(0, tempFile.getName().length() - fileExtension.length());
-			}
-
-			Synapse client = createSynapseClient();
-			String widgetDescriptorString = EntityFactory.createJSONStringForEntity(descriptor);
-			FileUtils.writeStringToFile(tempFile, widgetDescriptorString);
-			AttachmentData data = null;
-			try{
-				// Now upload the file
-				data = client.uploadAttachmentToSynapse(entityId, tempFile, attachmentName);
-			}finally{
-				// Unconditionally delete the tmp file
-				tempFile.delete();
-			}
-			if (data != null) {
-				// Add the attachment to the entity.
-				Entity e = client.getEntityById(entityId);
-				if (e.getAttachments() == null) {
-					e.setAttachments(new ArrayList<AttachmentData>());
-				}
-				// Add all of the new attachments.
-				e.getAttachments().add(data);
-				// Save the changes.
-				Entity updatedEntity = client.putEntity(e);
-				updatedEntityWrapper = new EntityWrapper(EntityFactory.createJSONStringForEntity(updatedEntity), updatedEntity.getClass().getName(), null);
-			}
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		} catch (IOException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-		return updatedEntityWrapper;
-	}
 }
