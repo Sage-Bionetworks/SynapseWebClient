@@ -73,7 +73,6 @@ public class Attachments implements AttachmentsView.Presenter,
 		this.baseUrl = baseUrl;
 		this.entity = entity;
 		this.widgetAttachments = widgetAttachments;
-		isEmpty = (entity.getAttachments() == null || entity.getAttachments().size() == 0) ? true : false;
 		
 		workingSet = new ArrayList<AttachmentData>();
 		//show json entity attachments, or everything else
@@ -91,6 +90,7 @@ public class Attachments implements AttachmentsView.Presenter,
 					workingSet.add(attachmentData);
 			}
 		}
+		isEmpty = (entity.getAttachments() == null || workingSet.size() == 0) ? true : false;
 		view.configure(baseUrl, entity.getId(), workingSet, widgetAttachments);
 	}
 

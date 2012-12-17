@@ -304,7 +304,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		threeCol.add(createSpacer());
 		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************		
 		// Attachments
-		LayoutContainer attachContainer = createAttachmentsWidget(bundle, canEdit, readOnly, false);
+		Widget attachContainer = createAttachmentsWidget(bundle, canEdit, readOnly, false);
 		attachContainer.addStyleName("span-7 notopmargin");
 		threeCol.add(attachContainer);
 		threeCol.add(createSpacer());
@@ -409,7 +409,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 
-	private Widget createDescriptionWidget(final EntityBundle bundle, String entityTypeDisplay) {
+	private Widget createDescriptionWidget(final EntityBundle bundle, String entityTypeDisplay, boolean showWhenEmpty) {
 		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
@@ -519,7 +519,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 	
-	private Widget createAttachmentsWidget(final EntityBundle bundle, boolean canEdit, boolean readOnly) {
+	private Widget createAttachmentsWidget(final EntityBundle bundle, boolean canEdit, boolean readOnly, boolean showWhenEmpty) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
@@ -563,6 +563,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
         // We just create a new one each time.
         attachmentsPanel.configure(baseURl, bundle.getEntity(), false);
+        if(!showWhenEmpty && attachmentsPanel.isEmpty()) 
+        	return new LayoutContainer();
         attachmentsPanel.clearHandlers();
         attachmentsPanel.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {
 			

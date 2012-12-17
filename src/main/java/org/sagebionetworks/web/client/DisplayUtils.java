@@ -68,9 +68,11 @@ import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -91,6 +93,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
@@ -1171,6 +1174,7 @@ public class DisplayUtils {
 						+ "</h1>"
 						+ "<p>"
 						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
+	}
 	
 	public static String getWidgetMD(String attachmentName) {
 		if (attachmentName == null)
@@ -1236,8 +1240,7 @@ public class DisplayUtils {
 		});
 		return uploadButton;
 	}
-	
-}
+
 	
 	/**
 	 * Provides same functionality as java.util.Pattern.quote().
@@ -1293,4 +1296,8 @@ public class DisplayUtils {
 		return isEqual;
 	}
 
+	public static void updateTextArea(TextArea textArea, String newValue) {
+		textArea.setValue(newValue);
+		DomEvent.fireNativeEvent(Document.get().createChangeEvent(), textArea);
+	}
 }

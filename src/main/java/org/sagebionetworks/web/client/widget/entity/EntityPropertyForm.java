@@ -43,6 +43,7 @@ import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
+import com.extjs.gxt.ui.client.data.ChangeEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -63,8 +64,10 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -445,7 +448,7 @@ public class EntityPropertyForm extends FormPanel {
 		mdCommandsLower.add(widgetsManagerButton);
 		SimplePanel previewButtonWrapper= new SimplePanel();
 		previewButtonWrapper.add(previewButton);
-		previewButtonWrapper.addStyleName("inline-block margin-left-570");
+		previewButtonWrapper.addStyleName("inline-block margin-left-530");
 		mdCommandsLower.add(previewButtonWrapper);
 		
 		//Formatting Guide
@@ -579,7 +582,7 @@ public class EntityPropertyForm extends FormPanel {
 			cursorPos = 0;
 		else if (cursorPos > currentValue.length())
 			cursorPos = currentValue.length();
-		descriptionTextArea.setValue(currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
+		DisplayUtils.updateTextArea(descriptionField, currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
 	}
 	
 	public void insertWidgetMarkdown(String attachmentName) {
@@ -598,7 +601,7 @@ public class EntityPropertyForm extends FormPanel {
 			TextArea descriptionTextArea = descriptionField;
 			String currentValue = descriptionTextArea.getValue();
 			if (currentValue != null) {
-				descriptionTextArea.setValue(currentValue.replaceAll(DisplayUtils.quotePattern(oldMd), newMd));
+				DisplayUtils.updateTextArea(descriptionField, currentValue.replaceAll(DisplayUtils.quotePattern(oldMd), newMd));
 			}
 		}
 	}
@@ -613,7 +616,7 @@ public class EntityPropertyForm extends FormPanel {
 			TextArea descriptionTextArea = descriptionField;
 			String currentValue = descriptionTextArea.getValue();
 			if (currentValue != null) {
-				descriptionTextArea.setValue(currentValue.replaceAll(DisplayUtils.quotePattern(oldMd), ""));
+				DisplayUtils.updateTextArea(descriptionField, currentValue.replaceAll(DisplayUtils.quotePattern(oldMd), ""));
 			}
 		}
 	}
