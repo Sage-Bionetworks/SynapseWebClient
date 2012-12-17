@@ -1149,6 +1149,15 @@ public class DisplayUtils {
 						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
 	}
 	
+	public static SafeHtml get403Html() {
+		return SafeHtmlUtils
+				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">403</p><h1>"
+						+ DisplayConstants.UNAUTHORIZED
+						+ "</h1>"
+						+ "<p>"
+						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div>");
+	}
+	
 	/**
 	 * 'Upload File' button
 	 * @param entity 

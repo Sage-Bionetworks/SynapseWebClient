@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -128,6 +129,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			public void onFailure(Throwable caught) {
 				if(caught instanceof NotFoundException) {
 					view.show404();
+				} else if(caught instanceof ForbiddenException) {
+					view.show403();
 				} else if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
 				}

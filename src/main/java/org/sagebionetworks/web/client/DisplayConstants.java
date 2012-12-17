@@ -420,6 +420,8 @@ public class DisplayConstants {
 	public static final String ADD_FILE = "Add File";
 	public static final String FILES = "Files";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
+	public static final String UNAUTHORIZED = "Unauthorized";
+	public static final String UNAUTHORIZED_DESC = "You are not authorized to access the page requested.";
 	
 }
 
