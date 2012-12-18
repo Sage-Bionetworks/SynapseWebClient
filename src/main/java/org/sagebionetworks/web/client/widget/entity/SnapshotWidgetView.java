@@ -37,6 +37,6 @@ public interface SnapshotWidgetView extends IsWidget, SynapseWidgetView {
 	
 	void setSnapshot(Summary entity, boolean canEdit, boolean readOnly, boolean showEdit);
 
-	void setEntityGroupRecordDisplay(int groupIndex, int rowIndex, EntityGroupRecordDisplay display);
+	void setEntityGroupRecordDisplay(int groupIndex, int rowIndex, EntityGroupRecordDisplay display, boolean isLoggedIn);
 
 }
