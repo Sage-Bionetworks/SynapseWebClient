@@ -5,7 +5,7 @@ import org.pegdown.Extensions;
 import com.google.gwt.i18n.client.DateTimeFormat;
 
 public class DisplayConstants {
-	
+
 	/*
 	 * Dimensions
 	 */
@@ -329,7 +329,7 @@ public class DisplayConstants {
 	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
 	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	public static final String ERROR_WIDGET_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, hypens, periods, plus signs, and parentheses.";
-	
+
 	/**
 	 * Widget editors
 	 */
@@ -349,7 +349,7 @@ public class DisplayConstants {
 	public static final String SYNAPSE_ID_LABEL = "Synapse ID";
 	public static final String SAVE_BUTTON_LABEL = "Save";
 	public static final String INSERT_BUTTON_LABEL = "Insert";
-	
+
 	/*
 	 * Element ids for Selenium
 	 */
@@ -451,6 +451,7 @@ public class DisplayConstants {
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
 	public static final String UNAUTHORIZED = "Unauthorized";
 	public static final String UNAUTHORIZED_DESC = "You are not authorized to access the page requested.";
-
+	public static final String LOGIN_TO_DOWNLOAD = "Please login to download data.";
+	
 }
 

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import java.util.Date;
+
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -7,6 +9,7 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
@@ -48,14 +51,15 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 
 	@Override
-	public Place getLastPlace() {
+	public Place getLastPlace() {		
 		String historyValue = cookieProvider.getCookie(CookieKeys.LAST_PLACE);
 		return getPlaceFromHistoryValue(historyValue);		
 	}
 
 	@Override
 	public void setLastPlace(Place lastPlace) {
-		cookieProvider.setCookie(CookieKeys.LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace));
+		Date expires = new Date(System.currentTimeMillis() + 300000); // store for 5 minutes
+		cookieProvider.setCookie(CookieKeys.LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace), expires);
 	}
 
 	@Override
@@ -66,7 +70,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 	@Override
 	public void setCurrentPlace(Place currentPlace) {		
-		cookieProvider.setCookie(CookieKeys.CURRENT_PLACE, appPlaceHistoryMapper.getToken(currentPlace));
+		Date expires = new Date(System.currentTimeMillis() + 300000); // store for 5 minutes
+		cookieProvider.setCookie(CookieKeys.CURRENT_PLACE, appPlaceHistoryMapper.getToken(currentPlace), expires);
 	}
 
 	@Override
@@ -94,5 +99,5 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void setActivityMapper(ActivityMapper mapper) {
 		this.directMapper = mapper;
 	}
-	
+		
 }

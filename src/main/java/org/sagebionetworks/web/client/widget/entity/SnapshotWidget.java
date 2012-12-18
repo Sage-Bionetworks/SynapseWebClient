@@ -53,6 +53,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	private AuthenticationController authenticationController;
 	private boolean canEdit = false;
 	private boolean readOnly = false;
+	private boolean isLoggedIn = false;
 	
 	/**
 	 * 
@@ -82,6 +83,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		this.readOnly = readOnly;
 		
 		boolean showEdit = canEdit;
+		isLoggedIn = authenticationController.isLoggedIn();		
 		
 		// add a default group if there are none, but don't persist unless record is added
 		if(snapshot != null && (snapshot.getGroups() == null || snapshot.getGroups().size() == 0)) {
@@ -457,20 +459,22 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			throws JSONObjectAdapterException {	
 		Entity referencedEntity = nodeModelCreator.createEntity(result);
 				
+		String nameLinkUrl;
+		if(referencedEntity instanceof Versionable) {
+			nameLinkUrl = DisplayUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId(), ((Versionable)referencedEntity).getVersionNumber());
+		} else {
+			nameLinkUrl = DisplayUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId());
+		}
+
 		// download
 		String downloadUrl = null;
 		if(referencedEntity instanceof Locationable) {
 			List<LocationData> locations = ((Locationable) referencedEntity).getLocations();
 			if(locations != null && locations.size() > 0) {
 				downloadUrl = locations.get(0).getPath();
+			} else if(!isLoggedIn) {				
+				downloadUrl = "#" + nameLinkUrl;
 			}
-		}
-		
-		String nameLinkUrl;
-		if(referencedEntity instanceof Versionable) {
-			nameLinkUrl = DisplayUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId(), ((Versionable)referencedEntity).getVersionNumber());
-		} else {
-			nameLinkUrl = DisplayUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId());
 		}
 		
 		// version
@@ -513,7 +517,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			public void onSuccess(EntityWrapper result) {
 				try {
 					EntityGroupRecordDisplay display = createRecordDisplay(record, result);								
-					view.setEntityGroupRecordDisplay(groupIndex, rowIndex, display);									
+					view.setEntityGroupRecordDisplay(groupIndex, rowIndex, display, isLoggedIn);									
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -533,7 +537,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 				} else {
 					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.ERROR_LOADING + ": " + msg));
 				}
-				view.setEntityGroupRecordDisplay(groupIndex, rowIndex, errorDisplay);
+				view.setEntityGroupRecordDisplay(groupIndex, rowIndex, errorDisplay, isLoggedIn);
 			}
 		};
 		if(ref.getTargetVersionNumber() != null) {

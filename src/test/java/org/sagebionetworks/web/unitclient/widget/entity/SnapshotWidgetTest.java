@@ -127,7 +127,7 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.loadRowDetails();
 
-		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class), eq(false)); 
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -145,7 +145,7 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.loadRowDetails();
 
-		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class), eq(false)); 
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -161,7 +161,7 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.loadRowDetails();
 
-		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class), eq(false)); 
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -177,7 +177,7 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.loadRowDetails();
 
-		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class), eq(false)); 
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -193,7 +193,7 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.loadRowDetails();
 
-		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class), eq(false)); 
 	}	
 	
 	@SuppressWarnings("unchecked")
@@ -209,7 +209,7 @@ public class SnapshotWidgetTest {
 		
 		snapshotWidget.loadRowDetails();
 
-		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class)); 
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), eq(0), any(EntityGroupRecordDisplay.class), eq(false)); 
 	}	
 	
 	
