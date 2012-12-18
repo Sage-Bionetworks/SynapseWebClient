@@ -56,6 +56,7 @@ import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
@@ -123,6 +124,7 @@ public class EntityPropertyForm extends FormPanel {
 	SynapseClientAsync synapseClient;
 	
 	private AnimationProtector widgetManagerAnimation;
+	Window loading;
 	
 	@Inject
 	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Previewable previewGenerator, EventBus bus, NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor, SynapseJSNIUtils synapseJSNIUtils) {
@@ -135,6 +137,7 @@ public class EntityPropertyForm extends FormPanel {
 		this.synapseClient = synapseClient;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		loading = DisplayUtils.createLoadingWindow(sageImageBundle, "Updating...");
 	}
 	
 	private void initAnimator(final com.google.gwt.user.client.ui.Button widgetsManagerButton, final VerticalPanel widgetManagerContainer) {
@@ -361,10 +364,12 @@ public class EntityPropertyForm extends FormPanel {
 	
 	private void refreshEntityAttachments() {
 		// We need to refresh the entity, and update our entity bundle with the most current attachments and etag.
+		loading.show();
 		int mask = ENTITY;
 		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override
 			public void onSuccess(EntityBundleTransport transport) {
+				loading.hide();
 				EntityBundle newBundle = null;
 				try {
 					newBundle = nodeModelCreator.createEntityBundle(transport);
@@ -378,6 +383,7 @@ public class EntityPropertyForm extends FormPanel {
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				loading.hide();
 				DisplayUtils.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + caught.getMessage());
 			}			
 		};
@@ -404,6 +410,8 @@ public class EntityPropertyForm extends FormPanel {
 	 * Recalculates size for the description field based on it's contents
 	 */
 	private void resizeDescription() {
+		//GWT TextArea reports the correct scrollheight, GXT TextArea always reports scrollheight = clientheight (even when scrollbar is present).
+		//Moved to GWT Textarea for this reason, to support dynamic enlarging of area based on content.
 		int scrollheight = descriptionField.getElement().getScrollHeight();
 		if (scrollheight == 0)
 			scrollheight = 300;

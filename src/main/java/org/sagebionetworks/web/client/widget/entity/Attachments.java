@@ -185,7 +185,9 @@ public class Attachments implements AttachmentsView.Presenter,
 					@Override
 					public void onSuccess(String result) {
 						view.attachmentDeleted(tokenId, deletedName);
-						bus.fireEvent(new EntityUpdatedEvent());
+						//if widget attachments, then entity updating is handled by the entitypropertyform
+						if (!widgetAttachments)
+							bus.fireEvent(new EntityUpdatedEvent());
 						//also tell the listeners that this descriptor has been deleted, via a widget descriptor update event (where the new name is null)
 						WidgetDescriptorUpdatedEvent e = new WidgetDescriptorUpdatedEvent();
 						e.setName(null);

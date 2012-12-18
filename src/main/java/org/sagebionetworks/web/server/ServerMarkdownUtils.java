@@ -10,7 +10,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
-import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -25,7 +24,7 @@ public class ServerMarkdownUtils {
 	 * *applying the markdown css classname to entities supported by the markdown.
 	 * *auto detects Synapse IDs (and creates links out of them)
 	 * *auto detects generic urls (and creates links out of them)
-	 * *convert special youtube video embedded notation to real iframes 
+	 * *resolve Widgets!
 	 * @param panel
 	 */
 	public static String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview, PegDownProcessor markdownProcessor) {
@@ -35,27 +34,22 @@ public class ServerMarkdownUtils {
 			markdown = markdown.replace("\n", "  \n");
 		}
 		String html = markdownProcessor.markdownToHtml(markdown);
+		if (html == null) {
+			//if the markdown processor fails to convert the md to html (will return null in this case), return the raw markdown instead. (as ugly as it might be, it's better than no information).
+			return markdown; 
+		}
 		//using jsoup, since it's already in this project!
 		Document doc = Jsoup.parse(html);
 		ServerMarkdownUtils.sendAllLinksToNewWindow(doc);
 		Elements anchors = doc.getElementsByTag("a");
 		anchors.addClass("link");
+		//TODO: remove old attachment image syntax support (now that we have widgets)?
 		ServerMarkdownUtils.resolveAttachmentImages(doc, attachmentUrl);
 		ServerMarkdownUtils.addSynapseLinks(doc);
-		ServerMarkdownUtils.addUrlLinks(doc);
-		ServerMarkdownUtils.addYouTubeVideos(doc);
+		//URLs are automatically resolved from the markdown processor
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
 		String returnHtml = "<div class=\"markdown\">" + doc.html() + "</div>";
 		return returnHtml;
-	}
-
-	public static void applyCssClass(Document doc, String cssClass) {
-		String[] elementTypes = new String[]{"a", "ol", "ul", "strong", "em", "blockquote"};
-		for (int i = 0; i < elementTypes.length; i++) {
-			String elementTagName = elementTypes[i];
-			Elements elements = doc.getElementsByTag(elementTagName);
-			elements.addClass(cssClass);
-		}
 	}
 
 	public static void sendAllLinksToNewWindow(Document doc) {
@@ -134,37 +128,6 @@ public class ServerMarkdownUtils {
 			}
 		}
 	}
-
-	public static void addYouTubeVideos(Document doc) {
-		// using a regular expression to find our special YouTube video embedding notation, replace with an embedded version of the video!
-		String regEx = "\\W*(\\{youtube=(\\w*)\\})\\W*";
-		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
-		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
-		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
-			Element element = (Element) iterator.next();
-			//only process the TextNode children (ignore others)
-			for (Iterator iterator2 = element.childNodes().iterator(); iterator2.hasNext();) {
-				Node childNode = (Node) iterator2.next();
-				if (childNode instanceof TextNode) {
-					String oldText = ((TextNode) childNode).text();
-					// find it in the text
-					Matcher matcher = pattern.matcher(oldText);
-					StringBuilder sb = new StringBuilder();
-					int previousFoundIndex = 0;
-					while (matcher.find() && matcher.groupCount() == 2) {
-						sb.append(ServerMarkdownUtils.getYouTubeHTML(matcher.group(2)));
-						previousFoundIndex = matcher.end(1);
-					}
-					if (previousFoundIndex < oldText.length() - 1)
-						// substring, go from the previously found index to the end
-						sb.append(oldText.substring(previousFoundIndex));
-					Element newElement = doc.createElement("span"); //wrap new html in a span, since it needs a container!
-					newElement.html(sb.toString());
-					childNode.replaceWith(newElement);		
-				}
-			}
-		}
-	}
 	
 	public static void addWidgets(Document doc, Boolean isPreview) {
 		String suffix = isPreview ? DisplayConstants.DIV_ID_PREVIEW_SUFFIX : "";
@@ -196,37 +159,6 @@ public class ServerMarkdownUtils {
 					Element newElement = doc.createElement("div"); //wrap new html in a span, since it needs a container!
 					newElement.html(sb.toString());
 					childNode.replaceWith(newElement);
-				}
-			}
-		}
-	}
-
-	public static void addUrlLinks(Document doc) {
-		String regEx = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"; //from http://stackoverflow.com/questions/163360/regular-expresion-to-match-urls-java
-		Elements elements = doc.select("*:matchesOwn(" + regEx + "):not(code)");  	// selector is case insensitive
-		Pattern pattern = Pattern.compile(regEx);
-		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
-			Element element = (Element) iterator.next();
-			//only process the TextNode children (ignore others)
-			for (Iterator iterator2 = element.childNodes().iterator(); iterator2.hasNext();) {
-				Node childNode = (Node) iterator2.next();
-				if (childNode instanceof TextNode) {
-					String oldText = ((TextNode) childNode).text();
-					// find it in the text
-					Matcher matcher = pattern.matcher(oldText);
-					StringBuilder sb = new StringBuilder();
-					int previousFoundIndex = 0;
-					while (matcher.find()) {
-						sb.append(oldText.substring(previousFoundIndex, matcher.start()));
-						sb.append(ServerMarkdownUtils.getUrlHtml(matcher.group()));
-						previousFoundIndex = matcher.end();
-					}
-					if (previousFoundIndex < oldText.length() - 1)
-						// substring, go from the previously found index to the end
-						sb.append(oldText.substring(previousFoundIndex));
-					Element newElement = doc.createElement("span"); //wrap new html in a span, since it needs a container!
-					newElement.html(sb.toString());
-					childNode.replaceWith(newElement);		
 				}
 			}
 		}

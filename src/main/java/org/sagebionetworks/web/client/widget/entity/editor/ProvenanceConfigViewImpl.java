@@ -44,7 +44,7 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 		basicFormData.setMargins(margins);
 		
 		entityIdTextField = new TextField<String>();
-		entityIdTextField.setEmptyText("syn12345");
+		entityIdTextField.setEmptyText("syn12345 ");
 		entityIdTextField.setFieldLabel(DisplayConstants.SYNAPSE_ID_LABEL);
 		entityIdTextField.setRegex(WebConstants.VALID_ENTITY_ID_REGEX);
 		entityIdTextField.getMessages().setRegexText(DisplayConstants.INVALID_SYNAPSE_ID_MESSAGE);
