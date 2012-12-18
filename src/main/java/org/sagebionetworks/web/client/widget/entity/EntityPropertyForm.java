@@ -29,6 +29,8 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.AnimationProtector;
+import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
@@ -39,17 +41,18 @@ import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
-import com.extjs.gxt.ui.client.data.ChangeEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.FxEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
@@ -58,17 +61,15 @@ import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.AnchorLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.VBoxLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -79,6 +80,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.inject.Inject;
@@ -112,13 +114,15 @@ public class EntityPropertyForm extends FormPanel {
 	Annotations annos;
 	Set<String> filter;
 	HTML descriptionFormatInfo;
-	VerticalPanel descriptionFormatInfoContainer, attachmentsContainer;
+	VerticalPanel attachmentsContainer;
 	EntityBundle bundle;
 	Attachments attachmentsWidget;
 	Previewable previewGenerator;
 	EntityUpdatedHandler entityUpdatedHandler;
 	NodeModelCreator nodeModelCreator;
 	SynapseClientAsync synapseClient;
+	
+	private AnimationProtector widgetManagerAnimation;
 	
 	@Inject
 	public EntityPropertyForm(FormFieldFactory formFactory, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Previewable previewGenerator, EventBus bus, NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor, SynapseJSNIUtils synapseJSNIUtils) {
@@ -132,7 +136,34 @@ public class EntityPropertyForm extends FormPanel {
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 	}
+	
+	private void initAnimator(final com.google.gwt.user.client.ui.Button widgetsManagerButton, final VerticalPanel widgetManagerContainer) {
+		widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT);
+		widgetsManagerButton.addStyleName("btn btn-info");
+		widgetManagerAnimation = new AnimationProtector(new AnimationProtectorViewImpl(widgetsManagerButton, widgetManagerContainer));
+		FxConfig hideConfig = new FxConfig(400);
+		hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
+			@Override
+			public void handleEvent(FxEvent be) {
+				// This call to layout is necessary to force the scroll bar to appear on page-load
+				widgetManagerContainer.layout(true);
+				widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT);
+			}
+		});
+		widgetManagerAnimation.setHideConfig(hideConfig);
 
+		FxConfig showConfig = new FxConfig(400);
+		showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
+			@Override
+			public void handleEvent(FxEvent be) {
+				// This call to layout is necessary to force the scroll bar to appear on page-load
+				widgetManagerContainer.layout(true);
+				widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_HIDE_WIDGETS_TEXT);
+			}
+		});
+		widgetManagerAnimation.setShowConfig(showConfig);
+	}
+	
 	@Override
 	protected void onRender(Element parent, int index) {
 		super.onRender(parent, index);
@@ -187,11 +218,7 @@ public class EntityPropertyForm extends FormPanel {
 		attachmentsContainer.add(attachmentsWidget.asWidget());
 		attachmentsContainer.setVisible(false);
 		
-		descriptionFormatInfoContainer = new VerticalPanel();
-		descriptionFormatInfoContainer.setBorders(true);
 		descriptionFormatInfo = new HTML(DisplayConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
-		descriptionFormatInfoContainer.add(descriptionFormatInfo);
-		descriptionFormatInfoContainer.setVisible(false);
 		ToolBar toolBar = new ToolBar();
 		Button addButton = new Button("Add Annotation");
 		addButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.addSquare16()));
@@ -276,6 +303,26 @@ public class EntityPropertyForm extends FormPanel {
 		
 		
 		rebuild();
+	}
+	
+	public void showFormattingGuideDialog() {
+        final Dialog window = new Dialog();
+        window.setMaximizable(false);
+        window.setSize(550, 600);
+        window.setPlain(true); 
+        window.setModal(true); 
+        window.setBlinkModal(true); 
+
+        window.setHeading(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT); 
+        window.setButtons(Dialog.OK);
+        window.setHideOnButtonClick(true);
+
+        window.setLayout(new FitLayout());
+        ScrollPanel wrapper = new ScrollPanel();
+        wrapper.add(descriptionFormatInfo);
+	    window.add(wrapper);
+        // show the window
+	    window.show();		
 	}
 	
 	private void refreshEntityAttachments(Entity newEntity){
@@ -411,22 +458,7 @@ public class EntityPropertyForm extends FormPanel {
 		widgetManagerFormData.setMargins(new Margins(10,10,0,10));
 		widgetManagerFormData.setWidth(170);
 		
-		final com.google.gwt.user.client.ui.Button widgetsManagerButton =  new com.google.gwt.user.client.ui.Button();
-		widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT);
-		widgetsManagerButton.addStyleName("btn btn-info");
-		widgetsManagerButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (attachmentsContainer.isVisible()) {
-					attachmentsContainer.el().slideOut(Direction.UP, FxConfig.NONE);
-					widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT);
-				} else {
-					attachmentsContainer.setVisible(true);
-					attachmentsContainer.el().slideIn(Direction.DOWN, FxConfig.NONE);
-					widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_HIDE_WIDGETS_TEXT);
-				}
-			}
-		});
+		com.google.gwt.user.client.ui.Button widgetsManagerButton =  new com.google.gwt.user.client.ui.Button();
 		attachmentsContainer.setLayout(new VBoxLayout());
 		attachmentsContainer.setScrollMode(Scroll.AUTOY);
 		
@@ -454,29 +486,21 @@ public class EntityPropertyForm extends FormPanel {
 		//Formatting Guide
 		formatLinkFormData.setMargins(new Margins(10,10,0,10));
 		
-		final Button formatLink = new Button(DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
+		final Button formatLink = new Button(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT);
 		formatLink.setIcon(AbstractImagePrototype.create(iconsImageBundle.slideInfo16()));
 		mdCommands.add(formatLink);
 		mdCommands.add(insertButton);
 		formatLink.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				if (descriptionFormatInfoContainer.isVisible()) {
-					descriptionFormatInfoContainer.el().slideOut(Direction.UP, FxConfig.NONE);
-					formatLink.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_TIPS_TEXT);
-				} else {
-					descriptionFormatInfoContainer.setVisible(true);
-					descriptionFormatInfoContainer.el().slideIn(Direction.DOWN, FxConfig.NONE);
-					formatLink.setText(DisplayConstants.ENTITY_DESCRIPTION_HIDE_TIPS_TEXT);
-				}
+				//pop up format guide
+				showFormattingGuideDialog();
 			}
 		});
 		
-		descriptionFormatInfoContainer.setLayout(new VBoxLayout());
-		descriptionFormatInfoContainer.setScrollMode(Scroll.AUTOY);
-		
-		formPanel.add(descriptionFormatInfoContainer, formatLinkFormData);
 		formPanel.add(attachmentsContainer, widgetManagerFormData);
+		
+		initAnimator(widgetsManagerButton, attachmentsContainer);
 		
 		Image image = getNewCommand("Insert Image", iconsImageBundle.imagePlus16(),new ClickHandler() {
 			@Override

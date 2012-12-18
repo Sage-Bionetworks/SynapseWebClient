@@ -312,8 +312,7 @@ public class DisplayConstants {
 	public static final String ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT = "Preview failed: ";
 	public static final String ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT = "Preview";
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
-	public static final String ENTITY_DESCRIPTION_HIDE_TIPS_TEXT = "Hide Formatting Guide";
-	public static final String ENTITY_DESCRIPTION_SHOW_TIPS_TEXT = "Show Formatting Guide";
+	public static final String ENTITY_DESCRIPTION_TIPS_TEXT = "Formatting Guide";
 	public static final String ENTITY_DESCRIPTION_HIDE_WIDGETS_TEXT = "Hide Widget Manager";
 	public static final String ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT = "Show Widget Manager";
 	public static final String ENTITY_DESCRIPTION_ATTACHMENT_PREFIX = "Attachment/entity/";
