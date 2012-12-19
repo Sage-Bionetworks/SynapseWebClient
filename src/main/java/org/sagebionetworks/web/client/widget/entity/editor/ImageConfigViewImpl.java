@@ -111,7 +111,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	
 	private UploadFormPanel getUploadPanel(String entityId) {
 		final String baseURl = GWT.getModuleBaseURL()+"attachment";
-		final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + entityId;
+		final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + entityId + "&" + DisplayUtils.ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY + "=false";
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(actionUrl,sageImageBundle,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,25,new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {

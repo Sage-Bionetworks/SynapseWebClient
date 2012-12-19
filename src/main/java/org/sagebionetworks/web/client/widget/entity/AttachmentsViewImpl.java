@@ -40,7 +40,7 @@ import com.google.inject.Inject;
 
 public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsView {
 	
-	private static final int ATTACHMENT_COLUMN_WIDTH = 210;
+	private static final int ATTACHMENT_COLUMN_WIDTH_PX = 210;
 	private static final String LINK_KEY = "link";
 	private static final String ATTACHMENT_DATA_TOKEN_KEY = "attachmentDataKey";
 	private static final String ATTACHMENT_DATA_PREVIEW_TOKEN_KEY = "attachmentDataPreviewKey";
@@ -60,7 +60,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	public AttachmentsViewImpl(IconsImageBundle iconsImageBundle) {
 		this.iconsImageBundle = iconsImageBundle;
 		gridStore = new ListStore<BaseModelData>();
-		setAttachmentColumnWidth(ATTACHMENT_COLUMN_WIDTH);
+		setAttachmentColumnWidth(ATTACHMENT_COLUMN_WIDTH_PX);
 	}
 	
 	@Override
@@ -85,7 +85,6 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	    grid.setStyleAttribute("borderTop", "none");  
 	    grid.setAutoExpandColumn(LINK_KEY);  
 		grid.setAutoExpandMin(100);
-		//grid.setAutoExpandMax(300);
 		// This is important, the grid must resize to fit its height.
 		grid.setAutoHeight(true);
 		grid.setAutoWidth(false);

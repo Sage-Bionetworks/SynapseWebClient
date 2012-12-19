@@ -328,37 +328,17 @@ public class EntityPropertyForm extends FormPanel {
 	    window.show();		
 	}
 	
-	private void refreshEntityAttachments(Entity newEntity){
-		//check to see if only the attachments and etag (and potentially description) have changed
-		Entity oldEntity = bundle.getEntity();
-		boolean isSufficientlyEqual = DisplayUtils.isEqualDuringWidgetEditing(oldEntity, newEntity);
-		//these must be equal, otherwise, other there have been modifications that we don't know how to sync
-		if (isSufficientlyEqual) {
-			//update entity (in bundle)
-			oldEntity.setEtag(newEntity.getEtag());
-			oldEntity.setAttachments(newEntity.getAttachments());
-			oldEntity.setModifiedOn(newEntity.getModifiedOn());
-			attachmentsWidget.configure(GWT.getModuleBaseURL()+"attachment", oldEntity, true);
-			//and the adapter
-			try{
-				//the primary information hasn't changed, but let's cache some of the metadata
-				//cache the name and description, in case they've changed
-				String name = (String)adapter.get("name");
-				boolean hasDescription = adapter.has("description");
-				String description = null;
-				if (hasDescription)
-					description = (String)adapter.get("description");
-				oldEntity.writeToJSONObject(adapter);
-				adapter.put("name", name);
-				if (hasDescription)
-					adapter.put("description", description);
-				
-			} catch (JSONObjectAdapterException e) {
-				throw new RuntimeException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-			}
-		} else {
-			DisplayUtils.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_UPDATE_ATTACHMENTS);
-		}
+	private void refreshEntityAttachments(Entity newEntity) throws JSONObjectAdapterException {
+		bundle.setEntity(newEntity);
+		String name = (String)adapter.get("name");
+		boolean hasDescription = adapter.has("description");
+		String description = null;
+		if (hasDescription)
+			description = (String)adapter.get("description");
+		newEntity.setDescription(description);
+		newEntity.setName(name);
+		newEntity.writeToJSONObject(adapter);
+		attachmentsWidget.configure(GWT.getModuleBaseURL()+"attachment", newEntity, true);
 	}
 	
 	
@@ -373,12 +353,11 @@ public class EntityPropertyForm extends FormPanel {
 				EntityBundle newBundle = null;
 				try {
 					newBundle = nodeModelCreator.createEntityBundle(transport);
+					Entity newEntity = newBundle.getEntity();
+					refreshEntityAttachments(newEntity);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
-				//if we ignore attachments and etag, are these the same objects?
-				Entity newEntity = newBundle.getEntity();
-				refreshEntityAttachments(newEntity);
 			}
 			
 			@Override

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.transform;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 

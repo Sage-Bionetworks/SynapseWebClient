@@ -465,6 +465,11 @@ a.shortBtn {
 .margin-left-530 {
 	margin-left: 530px;
 }
+.markdown {
+	word-wrap:break-word;
+	overflow: hidden;
+}
+
 .markdown ol { 
 	list-style-type: decimal;
 	padding-left: 17px;

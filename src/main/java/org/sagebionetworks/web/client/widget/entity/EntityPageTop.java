@@ -211,9 +211,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				if (widgetRegistrar.isWidgetContentType(contentTypeKey)) {
 					Element el = panel.getElementById(name + suffix);
 					String contentTypeStyle = contentTypeKey.substring(contentTypeKey.lastIndexOf("/")+1);
-					el.setClassName(contentTypeStyle);
 					//was it referenced in the description?
 					if (el != null) {
+						el.setClassName(contentTypeStyle);
 						try {
 							synapseClient.getWidgetDescriptorJson(entityId, name, new AsyncCallback<String>() {
 								

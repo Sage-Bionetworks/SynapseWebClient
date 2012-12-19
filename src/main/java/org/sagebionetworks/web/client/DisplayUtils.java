@@ -148,6 +148,7 @@ public class DisplayUtils {
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
+	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
 	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
 	public static final String WAIT_FOR_URL = "waitForUrl";
@@ -987,7 +988,7 @@ public class DisplayUtils {
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "tooltip");
 
-		if (el.getNodeType() == 1 && ! isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
+		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
 			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
 			
 			applyAttributes(el, optionsMap);
@@ -1257,45 +1258,6 @@ public class DisplayUtils {
 	    return output.toString();
 	  }
 	
-	/**
-	 * Return true if the only things that differ between the two entities are etag, description, attachments, and modified on.
-	 *  
-	 * @param oldEntity
-	 * @param newEntity
-	 * @return
-	 */
-	public static boolean isEqualDuringWidgetEditing(Entity oldEntity, Entity newEntity) {
-		String oldEtag = oldEntity.getEtag();
-		String newEtag = newEntity.getEtag();
-		String oldDescription = oldEntity.getDescription();
-		String newDescription = newEntity.getDescription();
-		List<AttachmentData> oldAttachments = oldEntity.getAttachments();
-		List<AttachmentData> newAttachments = newEntity.getAttachments();
-		Date oldModifiedOn = oldEntity.getModifiedOn();
-		Date newModifiedOn = newEntity.getModifiedOn();
-		//clear values
-		oldEntity.setEtag("");
-		oldEntity.setDescription("");
-		oldEntity.setAttachments(null);
-		oldEntity.setModifiedOn(null);
-		newEntity.setEtag("");
-		newEntity.setDescription("");
-		newEntity.setAttachments(null);
-		newEntity.setModifiedOn(null);
-		//check if equal
-		boolean isEqual = oldEntity.equals(newEntity);
-		//restore values
-		oldEntity.setEtag(oldEtag);
-		oldEntity.setDescription(oldDescription);
-		oldEntity.setAttachments(oldAttachments);
-		oldEntity.setModifiedOn(oldModifiedOn);
-		newEntity.setEtag(newEtag);
-		newEntity.setDescription(newDescription);
-		newEntity.setAttachments(newAttachments);
-		newEntity.setModifiedOn(newModifiedOn);
-		return isEqual;
-	}
-
 	public static void updateTextArea(TextArea textArea, String newValue) {
 		textArea.setValue(newValue);
 		DomEvent.fireNativeEvent(Document.get().createChangeEvent(), textArea);
