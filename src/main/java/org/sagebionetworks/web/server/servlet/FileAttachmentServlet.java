@@ -153,7 +153,14 @@ public class FileAttachmentServlet extends HttpServlet {
 			Synapse client = createNewClient(token);
 			// get Entity and store file in location
 			String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
+			String addToEntityAttachmentsParam = request.getParameter(DisplayUtils.ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY);
+			boolean addToEntityAttachments = true;
+			//only if it's defined, and equal to false
+			if (addToEntityAttachmentsParam != null && addToEntityAttachmentsParam.equalsIgnoreCase(Boolean.FALSE.toString())) {
+				addToEntityAttachments = false;
+			}
 			FileItemIterator iter = upload.getItemIterator(request);
+			AttachmentData data = null;
 			while (iter.hasNext()) {
 				FileItemStream item = iter.next();
 
@@ -163,7 +170,7 @@ public class FileAttachmentServlet extends HttpServlet {
 				File temp = ServiceUtils.writeToTempFile(stream, MAX_ATTACHMENT_SIZE_IN_BYTES);
 				try{
 					// Now upload the file
-					AttachmentData data = client.uploadAttachmentToSynapse(entityId, temp, fileName);
+					data = client.uploadAttachmentToSynapse(entityId, temp, fileName);
 					// If this had a preview then wait for it
 					list.add(data);
 				}finally{
@@ -171,16 +178,22 @@ public class FileAttachmentServlet extends HttpServlet {
 					temp.delete();
 				}
 			}
-			// Now add all of the attachments to the entity.
-			Entity e = client.getEntityById(entityId);
-			if (e.getAttachments() == null) {
-				e.setAttachments(new ArrayList<AttachmentData>());
+			
+			if (addToEntityAttachments) {
+				// Now add all of the attachments to the entity.
+				Entity e = client.getEntityById(entityId);
+				if (e.getAttachments() == null) {
+					e.setAttachments(new ArrayList<AttachmentData>());
+				}
+				// Add all of the new attachments.
+				e.getAttachments().addAll(list);
+				// Save the changes.
+				client.putEntity(e);
 			}
-			// Add all of the new attachments.
-			e.getAttachments().addAll(list);
-			// Save the changes.
-			client.putEntity(e);
+			
 			UploadResult result = new UploadResult();
+			if (data != null)
+				result.setAttachmentData(data);
 			result.setMessage("File upload successfully");
 			result.setUploadStatus(UploadStatus.SUCCESS);
 			String out = EntityFactory.createJSONStringForEntity(result);

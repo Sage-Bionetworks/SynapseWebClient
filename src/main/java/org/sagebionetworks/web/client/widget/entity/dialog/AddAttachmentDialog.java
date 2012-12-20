@@ -64,12 +64,34 @@ public class AddAttachmentDialog {
 		dialog.setLayout(new FitLayout());
 		dialog.setBorders(false);
 		
+		dialog.add(getUploadFormPanel(actionUrl, images, buttonText, 75, callback, dialog));
+		dialog.show();
+
+	}
+
+	/**
+	 * 
+	 * @param actionUrl
+	 * @param images
+	 * @param buttonText
+	 * @param callback
+	 * @param dialog dialog that will contain this panel (will close automatically if given)
+	 * @return
+	 */
+	public static UploadFormPanel getUploadFormPanel(String actionUrl, SageImageBundle images, String buttonText, int labelWidth, final Callback callback, final Dialog dialog) {
 		/**
 		 * This window is shown while we wait for the file to upload.
 		 */
 		final Window loading = DisplayUtils.createLoadingWindow(images, "Uploading...");
-
-		final FormPanel panel = new FormPanel();
+		final FileUploadField file = new FileUploadField();
+		
+		final UploadFormPanel panel = new UploadFormPanel() {
+			
+			@Override
+			public FileUploadField getFileUploadField() {
+				return file;
+			}
+		};
 		panel.setHeaderVisible(false);
 		panel.setFrame(false);
 		panel.setBorders(false);
@@ -80,11 +102,11 @@ public class AddAttachmentDialog {
 		panel.setButtonAlign(HorizontalAlignment.CENTER);
 		panel.setLabelAlign(LabelAlign.RIGHT);
 		panel.setBodyBorder(false);
-
-		final FileUploadField file = new FileUploadField();
+		
 		file.setAllowBlank(false);
 		file.setName("uploadedfile");
 		file.setFieldLabel("File");
+		
 		file.addListener(Events.OnChange, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {
@@ -94,10 +116,10 @@ public class AddAttachmentDialog {
 				file.setValue(fileName);
 			}
 		});
-
+		file.setWidth(365);
 		
-		Margins margins = new Margins(10, 10, 0, 10);
 		FormData basicFormData = new FormData("-50");
+		Margins margins = new Margins(10, 10, 0, 10);
 		basicFormData.setMargins(margins);
 		
 		panel.add(file, basicFormData);
@@ -127,7 +149,8 @@ public class AddAttachmentDialog {
 			@Override
 			public void handleEvent(FormEvent event) {
 				loading.hide();
-				dialog.hide();
+				if (dialog != null)
+					dialog.hide();
 				UploadResult result = new UploadResult();
 				result.setUploadStatus(UploadStatus.SUCCESS);
 				if(event != null && event.getResultHtml() != null){
@@ -137,9 +160,9 @@ public class AddAttachmentDialog {
 				callback.onSaveAttachment(result);
 			}
 		});
-		dialog.add(panel);
-		dialog.show();
-
+		
+		panel.setLabelWidth(labelWidth);
+		return panel;
 	}
 	
 	private static UploadResult getUploadResult(String html){

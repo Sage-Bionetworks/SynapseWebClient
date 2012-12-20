@@ -24,9 +24,11 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.DateField;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.NumberPropertyEditor;
-import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.form.Validator;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.inject.Inject;
 
 /**
@@ -390,19 +392,14 @@ public class FormFieldFactory {
 	public TextArea createTextAreaField(final EntityRowScalar<String> row) {
 		final TextArea field = new TextArea();
 		field.setValue(row.getValue());
-		field.addListener(Events.Change, new Listener<FieldEvent>() {
+		field.addChangeHandler(new ChangeHandler() {
+			
 			@Override
-			public void handleEvent(FieldEvent be) {
+			public void onChange(ChangeEvent event) {
 				row.setValue(field.getValue());
 			}
 		});
-		field.setBorders(false);
 		field.setEnabled(true);
-		field.setShadow(false);
-		field.setFireChangeEventOnSetValue(true);
-		field.setFieldLabel(row.getLabel());
-		field.setToolTip(row.getDescription());
-		field.setAllowBlank(true);
 		return field;
 	}
 }

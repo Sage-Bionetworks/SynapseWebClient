@@ -5,13 +5,17 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.pegdown.PegDownProcessor;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -53,6 +57,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
+import org.sagebionetworks.web.server.ServerConstants;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -66,7 +71,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
-import com.petebevin.markdown.MarkdownProcessor;
 
 @SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -80,7 +84,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
-	MarkdownProcessor markdownProcessor = new MarkdownProcessor();
+	PegDownProcessor markdownProcessor = new PegDownProcessor(ServerConstants.MARKDOWN_OPTIONS);
 	
 	/**
 	 * Injected with Gin
@@ -849,8 +853,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String markdown2Html(String markdown, String attachmentUrl) {
-		return ServerMarkdownUtils.markdown2Html(markdown, attachmentUrl, markdownProcessor);
+	public String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview) {
+		return ServerMarkdownUtils.markdown2Html(markdown, attachmentUrl, isPreview, markdownProcessor);
 	}
 
 	@Override
@@ -885,6 +889,118 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public String getWidgetDescriptorJson(String entityId, String attachmentName) throws RestServiceException {
+		String widgetDescriptorJson = null;
+		try {
+				Synapse client = createSynapseClient();
+				Entity e = client.getEntityById(entityId);
+				if (e.getAttachments() != null) {
+					for (Iterator<AttachmentData> iterator = e.getAttachments().iterator(); iterator
+							.hasNext();) {
+						AttachmentData data = iterator.next();
+						if (data.getName().equals(attachmentName)) {
+							//found
+							File attachmentDownload = null;
+							try{
+								attachmentDownload = File.createTempFile(entityId+"_"+attachmentName, ".json");
+								client.downloadEntityAttachment(entityId, data, attachmentDownload);
+								widgetDescriptorJson = FileUtils.readFileToString(attachmentDownload);
+							} finally {
+								if (attachmentDownload != null)
+									attachmentDownload.delete();
+							}
+							break;
+						}
+					}
+				}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} catch (IOException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+
+		return widgetDescriptorJson;
+	}
+	
+	
+	@Override
+	public EntityWrapper removeAttachmentFromEntity(String entityId,
+			String attachmentName) throws RestServiceException {
+		EntityWrapper updatedEntityWrapper = null;
+		try {
+				Synapse client = createSynapseClient();
+				Entity e = client.getEntityById(entityId);
+				if (e.getAttachments() != null) {
+					for (Iterator<AttachmentData> iterator = e.getAttachments().iterator(); iterator
+							.hasNext();) {
+						AttachmentData data = iterator.next();
+						if (data.getName().equals(attachmentName)) {
+							e.getAttachments().remove(data);
+							break;
+						}
+					}
+				}
+				// Save the changes.
+				Entity updatedEntity = client.putEntity(e);
+				updatedEntityWrapper = new EntityWrapper(EntityFactory.createJSONStringForEntity(updatedEntity), updatedEntity.getClass().getName());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+		
+		return updatedEntityWrapper;
+	}
+	
+	@Override
+	public EntityWrapper addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName, String contentTypeKey) throws RestServiceException {
+		EntityWrapper updatedEntityWrapper = null;
+		try {
+			
+			//write the descriptor json string to a temp file
+			String fileExtension = ".json";
+			File tempFile = File.createTempFile(attachmentName, fileExtension);
+
+			if (attachmentName == null || attachmentName.trim().length() == 0) {
+				attachmentName = tempFile.getName().substring(0, tempFile.getName().length() - fileExtension.length());
+			}
+			//delete any attachments with the same name first.
+			removeAttachmentFromEntity(entityId, attachmentName);
+			Synapse client = createSynapseClient();
+			FileUtils.writeStringToFile(tempFile, descriptorJson);
+			AttachmentData data = null;
+			try{
+				// Now upload the file
+				data = client.uploadAttachmentToSynapse(entityId, tempFile, attachmentName);
+			}finally{
+				// Unconditionally delete the tmp file
+				tempFile.delete();
+			}
+			if (data != null) {
+				data.setContentType(contentTypeKey);
+				// Add the attachment to the entity.
+				Entity e = client.getEntityById(entityId);
+				if (e.getAttachments() == null) {
+					e.setAttachments(new ArrayList<AttachmentData>());
+				}
+				e.getAttachments().add(data);
+				// Save the changes.
+				Entity updatedEntity = client.putEntity(e);
+				updatedEntityWrapper = new EntityWrapper(EntityFactory.createJSONStringForEntity(updatedEntity), updatedEntity.getClass().getName());
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} catch (IOException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+		return updatedEntityWrapper;
+	}
 
 	@Override
 	public String promoteEntityVersion(String entityId, Long versionNumber)
@@ -899,5 +1015,4 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-
 }

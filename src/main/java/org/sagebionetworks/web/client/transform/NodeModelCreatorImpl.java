@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.transform;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.BatchResults;
@@ -12,21 +11,18 @@ import org.sagebionetworks.repo.model.EntityClassHelper;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.shared.DownloadLocation;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.LayerPreview;
-import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
@@ -148,6 +144,11 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		return eb;
 	}
 
+	@Override
+	public JSONEntity newInstance(String className) {
+		return factory.newInstance(className);
+	}
+	
 	@Deprecated
 	@Override
 	public EntityTypeResponse createEntityTypeResponse(String json) throws RestServiceException {

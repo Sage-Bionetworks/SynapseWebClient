@@ -3,13 +3,12 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
@@ -89,7 +88,7 @@ public interface SynapseClientAsync {
 
 	public void updateExternalLocationable(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback);
 
-	public void markdown2Html(String markdown, String attachmentUrl, AsyncCallback<String> callback);
+	public void markdown2Html(String markdown, String attachmentUrl, Boolean isPreview, AsyncCallback<String> callback);
 	
 	public void getStorageUsage(String entityId, AsyncCallback<Long> callback);
 
@@ -98,6 +97,11 @@ public interface SynapseClientAsync {
 	void getActivityForEntity(String entityId, AsyncCallback<String> callback);
 
 	void getActivity(String activityId, AsyncCallback<String> callback);
-
+	
 	void promoteEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
+	void addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName, String contentTypeKey, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	
+	void removeAttachmentFromEntity(String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	
+	void getWidgetDescriptorJson(String entityId, String attachmentName,AsyncCallback<String> callback) throws RestServiceException;
 }
