@@ -157,7 +157,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			}
 			return container;
 		} else if(node instanceof ExpandTreeNode) {
-			return ProvViewUtil.createExpandContainer((ExpandTreeNode)node, sageImageBundle);
+			return ProvViewUtil.createExpandContainer((ExpandTreeNode)node, sageImageBundle, presenter);
 		}
 		return null;
 	}
@@ -227,7 +227,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 					var arrowCommon = { foldback:0.7, fillStyle:color, length:10, width:10 },
 						// use three-arg spec to create two different arrows with the common values:
 						overlays = [
-							[ "Arrow", { location:0.001, direction:-1 }, arrowCommon ]
+							[ "Arrow", { location:0.5, direction:1 }, arrowCommon ]
 						];				
 				}
 			};

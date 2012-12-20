@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.Presenter;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
 import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
@@ -16,6 +17,8 @@ import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 import com.extjs.gxt.ui.client.Style.AnchorPosition;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -93,11 +96,18 @@ public class ProvViewUtil {
 		return container;
 	}
 	
-	public static LayoutContainer createExpandContainer(ExpandTreeNode node, SageImageBundle sageImageBundle) {
+	public static LayoutContainer createExpandContainer(final ExpandTreeNode node, SageImageBundle sageImageBundle, final Presenter presenter) {
 		LayoutContainer container = new LayoutContainer();
 		container.setId(node.getId());
 		container.setStyleName(PROV_ENTTITY_NODE_STYLE + " " + PROV_EXPAND_NODE_STYLE);
-		container.add(new HTML(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML()));
+		Anchor content = new Anchor(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML());
+		content.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.expand(node);
+			}
+		});
+		container.add(content);
 		setPosition(node, container);
 		return container;
 	}	

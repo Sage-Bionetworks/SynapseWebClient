@@ -33,6 +33,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.provenance.ExpandTreeNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -150,6 +151,10 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		return view.asWidget();		
 	}
 	
+	@Override
+	public void expand(ExpandTreeNode node) {
+		
+	}
 
 	
 	/*
@@ -210,7 +215,5 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			}
 		});
 	}
-
-	
 
 }
