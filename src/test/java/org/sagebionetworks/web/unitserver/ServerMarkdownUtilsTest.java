@@ -39,7 +39,7 @@ public class ServerMarkdownUtilsTest {
 		String testString = "& ==> &amp;\" ==> &quot;> ==> &gt;< ==> &lt;' =";
 		
 		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", false, new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS));
-		assertTrue(actualResult.contains("&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt;&lt; ==&gt; &lt;Õ ="));
+		assertTrue(actualResult.contains("&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt;&lt; ==&gt; &lt;"));
 	}
 	
 	@Test
