@@ -7,8 +7,8 @@ import org.jsoup.nodes.Document;
 import org.junit.Test;
 import org.pegdown.PegDownProcessor;
 import org.sagebionetworks.web.client.MarkdownUtils;
-import org.sagebionetworks.web.server.ServerConstants;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 public class ServerMarkdownUtilsTest {
 
@@ -29,7 +29,7 @@ public class ServerMarkdownUtilsTest {
 		String previewTokenId = "previewTokenId123";
 		String attachmentName = "my attachment image";
 		String attachmentMd = MarkdownUtils.getAttachmentLinkMarkdown(attachmentName, entityId, tokenId, previewTokenId, attachmentName);
-		String actualResult = ServerMarkdownUtils.markdown2Html(attachmentMd, "http://mySynapse/attachment", false, new PegDownProcessor(ServerConstants.MARKDOWN_OPTIONS));
+		String actualResult = ServerMarkdownUtils.markdown2Html(attachmentMd, "http://mySynapse/attachment", false, new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS));
 		assertTrue(actualResult.contains("<img src=\"http://mySynapse/attachment?entityId=entityId123&amp;tokenId=tokenId123/previewTokenId&amp;waitForUrl=true\" alt=\"my attachment image\""));
 	}
 	
@@ -38,7 +38,7 @@ public class ServerMarkdownUtilsTest {
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
 		String testString = "& ==> &amp;\" ==> &quot;> ==> &gt;< ==> &lt;' =";
 		
-		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", false, new PegDownProcessor(ServerConstants.MARKDOWN_OPTIONS));
+		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", false, new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS));
 		assertTrue(actualResult.contains("&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt;&lt; ==&gt; &lt;Õ ="));
 	}
 	
@@ -46,7 +46,7 @@ public class ServerMarkdownUtilsTest {
 	public void testRemoveAllHTML(){
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
 		String testString = "<table><tr><td>this is a test</td><td>column 2</td></tr></table><iframe width=\"420\" height=\"315\" src=\"http://www.youtube.com/embed/AOjaQ7Vl7SM\" frameborder=\"0\" allowfullscreen></iframe><embed>";
-		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", false, new PegDownProcessor(ServerConstants.MARKDOWN_OPTIONS));
+		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", false, new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS));
 		assertTrue(!actualResult.contains("<table>"));
 		assertTrue(!actualResult.contains("<iframe>"));
 		assertTrue(!actualResult.contains("<embed>"));
@@ -58,7 +58,7 @@ public class ServerMarkdownUtilsTest {
 		String testString = 
 				"|             |          Grouping           ||\nFirst Header  | Second Header | Third Header |\n ------------ | :-----------: | -----------: |\nContent       |          *Long Cell*        ||\nContent       |   **Cell**    |         Cell |\n";
 		
-		PegDownProcessor processor = new PegDownProcessor(ServerConstants.MARKDOWN_OPTIONS);
+		PegDownProcessor processor = new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS);
 		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", false, processor);
 		assertTrue(actualResult.contains("<table>"));
 		assertTrue(actualResult.contains("<tr>"));
