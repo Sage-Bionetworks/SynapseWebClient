@@ -42,11 +42,12 @@ public class EntityEditor {
 	ClientLogger log;
 	GlobalApplicationState globalApplicationState;
 	SynapseClientAsync client;
+	Attachments attachments;
 	
 	@Inject
 	public EntityEditor(EntitySchemaCache cache, AdapterFactory factory,
 			AutoGenFactory entityFactory, EntityEditorDialog editorDialog,
-			ClientLogger log, GlobalApplicationState globalApplicationState, SynapseClientAsync client) {
+			ClientLogger log, GlobalApplicationState globalApplicationState, Attachments attachments, SynapseClientAsync client) {
 		super();
 		this.cache = cache;
 		this.factory = factory;
@@ -55,6 +56,7 @@ public class EntityEditor {
 		this.log = log;
 		this.globalApplicationState = globalApplicationState;
 		this.client = client;
+		this.attachments = attachments;
 	}
 
 	/**
@@ -82,7 +84,7 @@ public class EntityEditor {
 	    title.append(DisplayUtils.getEntityTypeDisplay(schema));
 	    
 	    // Show the edit dialog.
-	    editorDialog.showEditEntityDialog(title.toString(), entity.getId(), entity.getAttachments(), newAdapter, schema, newAnnos, filter, new EntityEditorDialog.Callback(){
+	    editorDialog.showEditEntityDialog(title.toString(), bundle, attachments, newAdapter, schema, newAnnos, filter, new EntityEditorDialog.Callback(){
 
 			@Override
 			public void saveEntity(JSONObjectAdapter newAdapter, Annotations newAnnos) {

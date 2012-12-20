@@ -11,11 +11,8 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.data.BaseModelData;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -29,8 +26,6 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
-import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -39,15 +34,16 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsView {
 	
-	private static final String ATTACHMENT_COLUMN_WIDTH = "210px";
+	private static final int ATTACHMENT_COLUMN_WIDTH_PX = 210;
 	private static final String LINK_KEY = "link";
 	private static final String ATTACHMENT_DATA_TOKEN_KEY = "attachmentDataKey";
+	private static final String ATTACHMENT_DATA_PREVIEW_TOKEN_KEY = "attachmentDataPreviewKey";
 	private static final String TOOLTIP_TEXT_KEY = "tooltip";
 	private static final String ATTACHMENT_DATA_NAME_KEY = "attachmentDataName";
 
@@ -57,12 +53,14 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private boolean isEmpty = true;
+	private boolean showEditButton;
+	private int attachmentColumnWidth;
 	
 	@Inject
 	public AttachmentsViewImpl(IconsImageBundle iconsImageBundle) {
 		this.iconsImageBundle = iconsImageBundle;
-		
 		gridStore = new ListStore<BaseModelData>();
+		setAttachmentColumnWidth(ATTACHMENT_COLUMN_WIDTH_PX);
 	}
 	
 	@Override
@@ -77,7 +75,7 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	    column.setId(LINK_KEY);  
 	    column.setHeader("Attachment");  	    	   
 	    column.setRowHeader(false);
-	    column.setWidth(259);
+	    column.setWidth(attachmentColumnWidth);
 		column.setRenderer(valueRenderer);
 	    configs.add(column);  
 	  	  	     	 
@@ -87,7 +85,6 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	    grid.setStyleAttribute("borderTop", "none");  
 	    grid.setAutoExpandColumn(LINK_KEY);  
 		grid.setAutoExpandMin(100);
-		grid.setAutoExpandMax(300);
 		// This is important, the grid must resize to fit its height.
 		grid.setAutoHeight(true);
 		grid.setAutoWidth(false);
@@ -103,8 +100,14 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 	}
 	
 	@Override
+	public void setAttachmentColumnWidth(int width) {
+		attachmentColumnWidth = width;
+	}
+	
+	@Override
 	public void configure(String baseUrl, String entityId,
-			List<AttachmentData> attachments) {		
+			List<AttachmentData> attachments, boolean showEditButton) {		
+		this.showEditButton = showEditButton;
 		gridStore.removeAll();
 		if(attachments == null || attachments.size() == 0){
 			addNoAttachmentRow();
@@ -132,27 +135,20 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 		 
 		for(AttachmentData data: attachments){
 			SafeHtml dataName = SafeHtmlUtils.fromString(data.getName());
-			
 			SafeHtmlBuilder builder = new SafeHtmlBuilder();
-			builder.appendHtmlConstant("<a href=\"" 
-					+ DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getTokenId(), data.getTokenId()) 
-					+ "\" target=\"_blank\" name=\"" 
-					+ dataName.asString() 
-					+ "\">");
 			SafeHtml iconNumber = SafeHtmlUtils.fromSafeConstant(DisplayUtils.getAttachmentIcon(data.getName()));
 			builder.appendHtmlConstant("<div class=\"icon-white-small icon"+iconNumber.asString()+"-white\">");
 			builder.appendHtmlConstant("<div style=\"margin-left:20px\">");
-			builder.appendEscaped(DisplayUtils.replaceWhiteSpace(data.getName()));
+			builder.appendEscaped(data.getName());
 			builder.appendHtmlConstant("</div>");
 			builder.appendHtmlConstant("</div>");
-			builder.appendHtmlConstant("</a>");
 			Html listItem = new Html(builder.toSafeHtml().asString());
 		    // If we have a preview then show it as a tooltip.
 			SafeHtml previewToolip;
 		    if(data.getPreviewId() != null){
 		    	previewToolip = SafeHtmlUtils.fromSafeConstant("<div class=\"preview-image-loading\" >"
 			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_START
-			    		+ "<img style=\"margin:auto; display:block;\" src=\"" 
+			    		+ "<img style=\"background: white; margin:auto; display:block;\" src=\"" 
 			    		+ DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getPreviewId(), null) + "\"/>"
 			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_END
 			    		+ "</div>");  
@@ -165,6 +161,8 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 			model.set(ATTACHMENT_DATA_TOKEN_KEY, data.getTokenId());
 			model.set(ATTACHMENT_DATA_NAME_KEY, SafeHtmlUtils.fromString(data.getName()).asString());
 			model.set(TOOLTIP_TEXT_KEY, previewToolip.asString());
+			model.set(ATTACHMENT_DATA_PREVIEW_TOKEN_KEY, data.getPreviewId());
+			
 			gridStore.add(model);
 		}
 		
@@ -184,25 +182,34 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 				if (value == null) {
 					value = "";
 				}
-				StringBuilder builder = new StringBuilder();
-				builder.append("<div style='font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;'>");
-				builder.append(value);
-				builder.append("</div>");
+				//from the value, create an anchor (with click handler)
+				SimplePanel div = new SimplePanel();
+				div.addStyleName("attachments-widget-row");
+				
+				Anchor attachmentLink = new Anchor(value, true);
+				attachmentLink.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						//by default this pops up the attachment image.
+						showAttachmentAt(rowIndex);
+					}
+				});
+				div.add(attachmentLink);
+										
 				// TODO : determine if value should be SafeHtml escaped
-				Html html = new Html(builder.toString());
 				String tooltip = (String)model.get(TOOLTIP_TEXT_KEY);
-				if(tooltip != null) {
-				    html.setToolTip(tooltip);
-				}
-
+				
 				if (model.get(TOOLTIP_TEXT_KEY) == null) {
-					return html;
+					return div;
 				}
 
 				HorizontalPanel panel = new HorizontalPanel();
-				FlowPanel wrap = new FlowPanel();
-				wrap.add(html);
-				wrap.setWidth(ATTACHMENT_COLUMN_WIDTH);
+				LayoutContainer wrap = new LayoutContainer();
+				wrap.add(div);
+				wrap.setWidth(attachmentColumnWidth-50);
+				if(tooltip != null)
+					wrap.setToolTip(tooltip);
+				
 				panel.add(wrap);
 
 				AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle.deleteButtonGrey16());
@@ -216,6 +223,18 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 				TableData td = new TableData();
 				td.setHorizontalAlign(HorizontalAlignment.RIGHT);
 				td.setVerticalAlign(VerticalAlignment.MIDDLE);
+				
+				if(showEditButton) {
+					img = AbstractImagePrototype.create(iconsImageBundle.editGrey16());
+					Anchor editButton = DisplayUtils.createIconLink(img, new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							editAttachmentAt(rowIndex);
+						}
+					});
+					panel.add(editButton, td);
+				}
+				
 				panel.add(button, td);
 				panel.setAutoWidth(true);
 				return panel;
@@ -283,6 +302,21 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 							}
 						}
 					});
+		}
+	}
+	public void editAttachmentAt(int rowIndex) {
+		final BaseModelData model = grid.getStore().getAt(rowIndex);
+		if (model != null) {
+			presenter.editAttachment((String) model.get(ATTACHMENT_DATA_TOKEN_KEY));
+		}
+	}
+	public void showAttachmentAt(int rowIndex) {
+		final BaseModelData model = grid.getStore().getAt(rowIndex);
+		if (model != null) {
+			String name = (String) model.get(ATTACHMENT_DATA_NAME_KEY);
+			String tokenId = (String) model.get(ATTACHMENT_DATA_TOKEN_KEY);
+			String previewTokenId = (String) model.get(ATTACHMENT_DATA_PREVIEW_TOKEN_KEY);
+			presenter.attachmentClicked(name, tokenId, previewTokenId);
 		}
 	}
 

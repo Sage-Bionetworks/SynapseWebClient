@@ -414,7 +414,7 @@ a.shortBtn {
 
 .user-profile-change-photo {
 }
-
+	
 .margin-right-5 {
 	margin-right: 5px;
 }
@@ -451,9 +451,25 @@ a.shortBtn {
 	margin-top: 10px;
 	margin-left: 10px;
 }
+.margin-left-10 {
+	margin-left: 10px;
+}
+
 .margin-left-5 {
 	margin-left: 5px;
 }
+.margin-left-180 {
+	margin-left: 180px;
+}
+
+.margin-left-530 {
+	margin-left: 530px;
+}
+.markdown {
+	word-wrap:break-word;
+	overflow: hidden;
+}
+
 .markdown ol { 
 	list-style-type: decimal;
 	padding-left: 17px;
@@ -472,6 +488,9 @@ a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
 	padding: .5em 1em;
 	border-left: 5px solid #fce27c;
 	background-color: #f6ebc1; }
+.markdown img {
+	max-width: 940px;
+}
 .entity-description-preview-wrapper {
     background: none repeat scroll 0 0 #FFFFFF;
     padding: 20px;
@@ -586,4 +605,22 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom-right-radius: 4px;
   -moz-border-radius-bottomright: 4px;
 }
+.attachments-widget-row {
+	font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;
+}
 
+/**
+content type div sizes
+**/
+.youtubeDescriptor {
+	width: 480px;
+	height: 385px;
+}
+.provenanceDescriptor {
+	width: 260px;
+	height: 250px;
+}
+.imageDescriptor{
+	max-width: 940px;
+}
+	

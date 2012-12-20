@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -67,9 +68,11 @@ import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -90,6 +93,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
@@ -144,6 +148,7 @@ public class DisplayUtils {
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
+	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
 	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
 	public static final String WAIT_FOR_URL = "waitForUrl";
@@ -156,6 +161,9 @@ public class DisplayUtils {
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
 	public static final int BIG_BUTTON_HEIGHT_PX = 36;
+	
+	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
+	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
 	
 	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
@@ -398,7 +406,7 @@ public class DisplayUtils {
 				} else {
 					fileName = path.substring(lastSlash+1);
 				}
-			} 
+			}
 		}
 		return fileName;
 	}
@@ -577,7 +585,7 @@ public class DisplayUtils {
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}
-		
+	
 	public static String convertDateToString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
 		DateTime dt = new DateTime(toFormat.getTime());
@@ -980,7 +988,7 @@ public class DisplayUtils {
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "tooltip");
 
-		if (el.getNodeType() == 1 && ! isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
+		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
 			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
 			
 			applyAttributes(el, optionsMap);
@@ -1017,12 +1025,12 @@ public class DisplayUtils {
 	public static void addPopover(final SynapseJSNIUtils util, Widget widget, String content, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
 		el.setAttribute("data-content", content);
-		
+
 		String id = isNullOrEmpty(el.getId()) ? "sbn-popover-"+(popoverCount++) : el.getId();
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "popover");
 
-		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
+		if (el.getNodeType() == 1 && ! isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
 			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
 
 			applyAttributes(el, optionsMap);
@@ -1038,7 +1046,7 @@ public class DisplayUtils {
 		}
 	}
 
-	private static void applyAttributes(final Element el,
+	public static void applyAttributes(final Element el,
 			Map<String, String> optionsMap) {
 		for (Entry<String, String> option : optionsMap.entrySet()) {
 			DOM.setElementAttribute(el, option.getKey(), option.getValue());
@@ -1123,6 +1131,26 @@ public class DisplayUtils {
 		}
 		return html;
 	}
+	
+	public static String getYouTubeVideoUrl(String videoId) {
+		return "http://www.youtube.com/watch?v=" + videoId;
+	}
+	
+	public static String getYouTubeVideoId(String videoUrl) {
+		String videoId = null;
+		//parse out the video id from the url
+		int start = videoUrl.indexOf("v=");
+		if (start > -1) {
+			int end = videoUrl.indexOf("&", start);
+			if (end == -1)
+				end = videoUrl.length();
+			videoId = videoUrl.substring(start + "v=".length(), end);
+		}
+		if (videoId == null || videoId.trim().length() == 0) {
+			throw new IllegalArgumentException("Could not determine the video ID from the given URL.");
+		}
+		return videoId;
+	}
 
 	public static Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
 		Anchor anchor = new Anchor();
@@ -1147,6 +1175,16 @@ public class DisplayUtils {
 						+ "</h1>"
 						+ "<p>"
 						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
+	}
+	
+	public static String getWidgetMD(String attachmentName) {
+		if (attachmentName == null)
+			return null;
+		StringBuilder sb = new StringBuilder();
+		sb.append("{Widget:");
+		sb.append(attachmentName);
+		sb.append("}");
+		return sb.toString();
 	}
 	
 	public static SafeHtml get403Html() {
@@ -1203,5 +1241,25 @@ public class DisplayUtils {
 		});
 		return uploadButton;
 	}
+
 	
+	/**
+	 * Provides same functionality as java.util.Pattern.quote().
+	 * @param pattern
+	 * @return
+	 */
+	public static String quotePattern(String pattern) {
+		StringBuilder output = new StringBuilder();
+	    for (int i = 0; i < pattern.length(); i++) {
+	      if (ESCAPE_CHARACTERS_SET.contains(pattern.charAt(i)))
+	    	output.append("\\");
+	      output.append(pattern.charAt(i));
+	    }
+	    return output.toString();
+	  }
+	
+	public static void updateTextArea(TextArea textArea, String newValue) {
+		textArea.setValue(newValue);
+		DomEvent.fireNativeEvent(Document.get().createChangeEvent(), textArea);
+	}
 }
