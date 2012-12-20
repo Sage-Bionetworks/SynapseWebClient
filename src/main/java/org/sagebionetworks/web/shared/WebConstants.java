@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.shared;
+import org.pegdown.Extensions;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 
 /**
@@ -45,5 +46,14 @@ public class WebConstants {
 	
 	// this is the parameter name for the value of the final redirect
 	public static final String RETURN_TO_URL_PARAM = "RETURN_TO_URL";
+
+	public static int MARKDOWN_OPTIONS = 
+		Extensions.ABBREVIATIONS |		//Abbreviations in the way of PHP Markdown Extra.
+		Extensions.AUTOLINKS |			//Plain (undelimited) autolinks the way Github-flavoured-Markdown implements them.
+		Extensions.QUOTES |				//Beautifies single quotes, double quotes and double angle quotes (Ç and È)
+		Extensions.SMARTS |				//Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")		
+		Extensions.TABLES |				//Tables similar to MultiMarkdown (which is in turn like the PHP Markdown Extra tables, but with colspan support).
+		Extensions.SUPPRESS_ALL_HTML |	//Suppresses HTML
+		Extensions.WIKILINKS;			//Support [[Wiki-style links]] with a customizable URL rendering logic.
 	
 }
