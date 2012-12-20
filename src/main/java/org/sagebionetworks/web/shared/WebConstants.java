@@ -50,7 +50,7 @@ public class WebConstants {
 	public static int MARKDOWN_OPTIONS = 
 		Extensions.ABBREVIATIONS |		//Abbreviations in the way of PHP Markdown Extra.
 		Extensions.AUTOLINKS |			//Plain (undelimited) autolinks the way Github-flavoured-Markdown implements them.
-		Extensions.QUOTES |				//Beautifies single quotes, double quotes and double angle quotes (Ç and È)
+		Extensions.QUOTES |				//Beautifies single quotes, double quotes and double angle quotes
 		Extensions.SMARTS |				//Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")		
 		Extensions.TABLES |				//Tables similar to MultiMarkdown (which is in turn like the PHP Markdown Extra tables, but with colspan support).
 		Extensions.SUPPRESS_ALL_HTML |	//Suppresses HTML
