@@ -87,8 +87,13 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
-				Entity newEntity = newBundle.getEntity();
-				buildTree(newEntity, depth, showExpand);
+				rootEntity = newBundle.getEntity();
+				Reference rootReference = new Reference();
+				rootReference.setTargetId(rootEntity.getId());
+				Long versionNumber = rootEntity instanceof Versionable ? ((Versionable)rootEntity).getVersionNumber() : null;
+				rootReference.setTargetVersionNumber(versionNumber);
+				int startDepth = 1;
+				buildTree(rootReference, startDepth, showExpand);
 			}
 			
 			@Override
@@ -103,15 +108,16 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		view.setHeight(height);
 	}
 		
-	public void buildTree(final Entity entity, int depth, final boolean showExpand) {
-		// get activity
-		Long versionNumber = entity instanceof Versionable ? ((Versionable)entity).getVersionNumber() : null;		
-		synapseClient.getActivityForEntityVersion(entity.getId(), versionNumber, new AsyncCallback<String>() {
+	public void buildTree(final Reference entityRef, int depth, final boolean showExpand) {
+		if(depth > buildDepth) return;
+		if(entityRef == null || entityRef.getTargetId() == null) return;
+		
+		// get activity, then recurse			
+		synapseClient.getActivityForEntityVersion(entityRef.getTargetId(), entityRef.getTargetVersionNumber(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {										
-					Activity activity = new Activity(adapterFactory.createNew(result));
-					final List<Activity> activities = new ArrayList<Activity>();
+					Activity activity = new Activity(adapterFactory.createNew(result));					
 					activities.add(activity);					
 					lookupReferencesThenBuildTree(entity, showExpand, activities);					
 				} catch (JSONObjectAdapterException e) {
@@ -160,8 +166,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	/*
 	 * Private Methods
 	 */
-	private void lookupReferencesThenBuildTree(final Entity entity,
-			final boolean showExpand, final List<Activity> activities) {	
+	private void lookupReferencesThenBuildTree(final boolean showExpand, final List<Activity> activities) {	
 
 		// lookup all references in batch to get EntityHeaders
 		List<Reference> allRefs = ProvUtils.extractReferences(activities);
@@ -175,7 +180,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 					try {
 						headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
 						Map<Reference, EntityHeader> refToHeader = ProvUtils.mapReferencesToHeaders(headers);
-						buildTreeThenLayout(entity, showExpand, activities, refToHeader);
+						buildTreeThenLayout(showExpand, activities, refToHeader);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
@@ -183,7 +188,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				
 				@Override
 				public void onFailure(Throwable caught) {					
-					buildTreeThenLayout(entity, showExpand, activities, new HashMap<Reference, EntityHeader>());
+					buildTreeThenLayout(showExpand, activities, new HashMap<Reference, EntityHeader>());
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
@@ -192,11 +197,10 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}
 
 	
-	private void buildTreeThenLayout(final Entity entity,
-			final boolean showExpand, List<Activity> activities, Map<Reference, EntityHeader> refToHeader) {
+	private void buildTreeThenLayout(final boolean showExpand, List<Activity> activities, Map<Reference, EntityHeader> refToHeader) {
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvTreeNode>();
-		ProvTreeNode root = ProvUtils.buildProvTree(activities, entity, idToNode, refToHeader, showExpand, synapseJSNIUtils);					
+		ProvTreeNode root = ProvUtils.buildProvTree(activities, rootEntity, idToNode, refToHeader, showExpand, synapseJSNIUtils);					
 		layoutTreeThenSendToView(root);
 	}
 
