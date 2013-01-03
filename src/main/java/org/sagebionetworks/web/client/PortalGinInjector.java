@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.Attachments;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
@@ -73,8 +72,6 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public JiraURLHelper getJiraURLHelper();
 
-	public Attachments getAttachmentsWidget();
-	
 	// Widgets
 	////// Editors
 	public YouTubeConfigEditor getYouTubeConfigEditor();
