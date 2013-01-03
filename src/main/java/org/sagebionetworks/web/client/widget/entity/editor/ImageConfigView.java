@@ -31,5 +31,7 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		//when something is uploaded, change the attachment name to the uploaded file name
+		public void setName(String name);
 	}
 }

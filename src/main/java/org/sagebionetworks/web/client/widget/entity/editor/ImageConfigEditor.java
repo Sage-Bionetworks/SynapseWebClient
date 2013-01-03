@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.WidgetNameProvider;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -12,6 +13,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	
 	private ImageConfigView view;
 	private ImageAttachmentWidgetDescriptor descriptor;
+	private WidgetNameProvider provider;
 	
 	@Inject
 	public ImageConfigEditor(ImageConfigView view) {
@@ -63,6 +65,24 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	public int getAdditionalWidth() {
 		return view.getAdditionalWidth();
 	}
+	
+	@Override
+	public void setName(String name) {
+		//try to strip off the file extension
+		if (name != null) {
+			int lastIndex = name.lastIndexOf('.');
+			if (lastIndex > 0)
+				name = name.substring(0, lastIndex);
+			provider.setName(name);
+		}
+	}
+	
+	@Override
+	public void setNameProvider(WidgetNameProvider provider) {
+		//when an image is uploaded, also set the name of the widget
+		this.provider = provider;
+	}
+	
 	/*
 	 * Private Methods
 	 */

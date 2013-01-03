@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -15,6 +13,7 @@ import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
@@ -22,14 +21,12 @@ import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.WidgetFactory;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 
@@ -80,7 +77,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private IconsImageBundle iconsImageBundle;
 	private ActionMenu actionMenu;
 	private LocationableTitleBar locationableTitleBar;
-	
+	private PortalGinInjector ginInjector;
 	private EntityTreeBrowser entityTreeBrowser;
 	private Breadcrumb breadcrumb;
 	private PropertyWidget propertyWidget;
@@ -92,7 +89,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private boolean readOnly = false;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
-	private WidgetFactory widgetFactory;
 	private FilesBrowser filesBrowser;	
 
 	@Inject
@@ -105,7 +101,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			WidgetFactory widgetFactory, FilesBrowser filesBrowser) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -117,7 +113,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.locationableTitleBar = locationableTitleBar;
-		this.widgetFactory = widgetFactory;
+		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
 		
 		initWidget(uiBinder.createAndBindUi(this));
@@ -374,7 +370,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	    // Create the property body
 	    // the headers for properties.
-		ProvenanceWidget provenanceWidget = widgetFactory.createProvenanceWidget();		
+		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();		
 		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);
 	    provenanceWidget.buildTree(bundle.getEntity(), 1, false);
 	    LayoutContainer border = new LayoutContainer();

@@ -6,8 +6,8 @@ import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
 import org.sagebionetworks.repo.model.widget.ProvenanceWidgetDescriptor;
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.repo.model.widget.YouTubeWidgetDescriptor;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.WidgetFactory;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 
 import com.google.inject.Inject;
@@ -15,13 +15,12 @@ import com.google.inject.Inject;
 
 public class WidgetRegistrarImpl implements WidgetRegistrar {
 	
-	private WidgetFactory widgetFactory;
 	private HashMap<String, WidgetRegistration> contentType2WidgetInfo = new HashMap<String, WidgetRegistration>();
-	
+	PortalGinInjector ginInjector;
 	@Inject
-	public WidgetRegistrarImpl(WidgetFactory widgetFactory) {
+	public WidgetRegistrarImpl(PortalGinInjector ginInjector) {
+		this.ginInjector = ginInjector;
 		initWithKnownWidgets();
-		this.widgetFactory = widgetFactory;
 	}
 	
 	@Override
@@ -48,13 +47,13 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
-			presenter = widgetFactory.createYouTubeWidgetEditor();
+			presenter = ginInjector.getYouTubeConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
-			presenter = widgetFactory.createProvenanceWidgetEditor();
+			presenter = ginInjector.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
-			presenter = widgetFactory.createImageWidgetEditor();
+			presenter = ginInjector.getImageConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
-			presenter = widgetFactory.createLinkWidgetEditor();
+			presenter = ginInjector.getLinkConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -72,11 +71,11 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
-			presenter = widgetFactory.createYouTubeWidget();
+			presenter = ginInjector.getYouTubeRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
-			presenter = widgetFactory.createProvenanceWidget();
+			presenter = ginInjector.getProvenanceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
-			presenter = widgetFactory.createImageWidget();
+			presenter = ginInjector.getImageRenderer();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)

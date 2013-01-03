@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
@@ -24,6 +26,7 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -37,7 +40,10 @@ import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.HTMLPanel;
 
 public class EntityPageTopTest {
 
@@ -128,17 +134,20 @@ public class EntityPageTopTest {
 	}
 	
 	@Test
+	@Ignore //ignoring due to GWT.create() failure when mocking HTMLPanel
 	public void testLoadWidgets() throws Exception{
-//		HTMLPanel htmlPanel = new HTMLPanel(DisplayUtils.getWidgetMD(attachment1.getName()));
-//		EntityBundle bundle = new EntityBundle(entity, null, null, null, null, null, null);
-//		ExampleEntity entity = new ExampleEntity();
-//		bundle.setEntity(entity);
-//		pageTop.setBundle(bundle, false);
-//		AsyncMockStubber
-//			.callSuccessWith("")
-//			.when(mockSynapseClient)
-//			.getWidgetDescriptorJson(anyString(), anyString(), any(AsyncCallback.class));
-//		pageTop.loadWidgets(htmlPanel);
+		HTMLPanel htmlPanel = Mockito.mock(HTMLPanel.class);
+		Element testElement = DOM.createDiv();
+		when(htmlPanel.getElementById(anyString())).thenReturn(testElement);
+		EntityBundle bundle = new EntityBundle(entity, null, null, null, null, null, null);
+		ExampleEntity entity = new ExampleEntity();
+		bundle.setEntity(entity);
+		pageTop.setBundle(bundle, false);
+		AsyncMockStubber
+			.callSuccessWith("")
+			.when(mockSynapseClient)
+			.getWidgetDescriptorJson(anyString(), anyString(), any(AsyncCallback.class));
+		pageTop.loadWidgets(htmlPanel);
 	}
 
 }

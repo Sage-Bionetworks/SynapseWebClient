@@ -1,21 +1,24 @@
 package org.sagebionetworks.web.unitclient.widget.entity.registration;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
-import org.junit.*;
-import org.sagebionetworks.web.client.widget.WidgetFactory;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 
 public class WidgetRegistrarImplTest {
 		
 	WidgetRegistrarImpl widgetRegistrar;
-	WidgetFactory mockWidgetFactory;
+	PortalGinInjector mockGinInjector;
 	
 	@Before
 	public void setup(){	
-		mockWidgetFactory = mock(WidgetFactory.class);
-		widgetRegistrar= new WidgetRegistrarImpl(mockWidgetFactory);
+		mockGinInjector = mock(PortalGinInjector.class);
+		widgetRegistrar= new WidgetRegistrarImpl(mockGinInjector);
 	}
 	
 	@Test
@@ -28,19 +31,19 @@ public class WidgetRegistrarImplTest {
 	@Test
 	public void testCreateWidgets() {
 		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null);
-		verify(mockWidgetFactory).createYouTubeWidget();
+		verify(mockGinInjector).getYouTubeRenderer();
 		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null);
-		verify(mockWidgetFactory).createImageWidget();
+		verify(mockGinInjector).getImageRenderer();
 		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null);
-		verify(mockWidgetFactory).createProvenanceWidget();
+		verify(mockGinInjector).getProvenanceRenderer();
 	}
 	@Test
 	public void testCreateWidgetEditors() {
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null);
-		verify(mockWidgetFactory).createYouTubeWidgetEditor();
+		verify(mockGinInjector).getYouTubeConfigEditor();
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null);
-		verify(mockWidgetFactory).createImageWidgetEditor();
+		verify(mockGinInjector).getImageConfigEditor();
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null);
-		verify(mockWidgetFactory).createProvenanceWidgetEditor();
+		verify(mockGinInjector).getProvenanceConfigEditor();
 	}
 }
