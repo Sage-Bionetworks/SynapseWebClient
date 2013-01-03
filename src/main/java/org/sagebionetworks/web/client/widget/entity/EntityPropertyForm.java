@@ -138,7 +138,7 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 		});
 	}
 	
-	private void refreshEntityAttachments(Entity newEntity) throws JSONObjectAdapterException {
+	public void refreshEntityAttachments(Entity newEntity) throws JSONObjectAdapterException {
 		bundle.setEntity(newEntity);
 		String name = (String)adapter.get("name");
 		boolean hasDescription = adapter.has("description");
@@ -172,7 +172,7 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
-				DisplayUtils.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + caught.getMessage());
+				view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + caught.getMessage());
 			}			
 		};
 		

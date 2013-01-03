@@ -75,7 +75,6 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				name = name.substring(0, lastIndex);
 			provider.setName(name);
 		}
-		
 	}
 	
 	@Override
