@@ -56,6 +56,8 @@ import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
+import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -73,8 +75,6 @@ import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
-import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
-import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialogImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderView;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderView;
@@ -173,10 +173,11 @@ public class PortalGinModule extends AbstractGinModule {
 		// the logger
 		bind(ClientLoggerImpl.class).in(Singleton.class);
 		bind(ClientLogger.class).to(ClientLoggerImpl.class);
-		// the edit dialog
-		bind(EntityEditorDialogImpl.class).in(Singleton.class);
-		bind(EntityEditorDialog.class).to(EntityEditorDialogImpl.class);
-		
+
+		// the Entity edit view
+		bind(EntityPropertyFormViewImpl.class).in(Singleton.class);
+		bind(EntityPropertyFormView.class).to(EntityPropertyFormViewImpl.class);
+				
 		// The URL cache
 		bind(UrlCacheImpl.class).in(Singleton.class);
 		bind(UrlCache.class).to(UrlCacheImpl.class);

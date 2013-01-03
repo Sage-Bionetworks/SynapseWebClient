@@ -39,4 +39,6 @@ public interface WidgetEditorPresenter extends SynapseWidgetPresenter {
 	 * @return
 	 */
 	public String getTextToInsert(String name);
+	
+	public void setNameProvider(WidgetNameProvider provider);
 }

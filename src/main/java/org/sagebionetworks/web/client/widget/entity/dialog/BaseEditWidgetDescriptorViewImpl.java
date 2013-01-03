@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.WidgetNameProvider;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -22,7 +23,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseEditWidgetDescriptorView {
+public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseEditWidgetDescriptorView, WidgetNameProvider {
 	
 	Dialog window;
 	SimplePanel paramsPanel;
@@ -147,6 +148,7 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 		if (widgetDescriptorPresenter != null) {
 			Widget w = widgetDescriptorPresenter.asWidget();
 			paramsPanel.add(w);
+			widgetDescriptorPresenter.setNameProvider(this);
 		}
 	}
 	
