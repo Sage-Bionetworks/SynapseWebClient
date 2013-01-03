@@ -190,7 +190,7 @@ public class Attachments implements AttachmentsView.Presenter,
 							bus.fireEvent(new EntityUpdatedEvent());
 						//also tell the listeners that this descriptor has been deleted, via a widget descriptor update event (where the new name is null)
 						WidgetDescriptorUpdatedEvent e = new WidgetDescriptorUpdatedEvent();
-						e.setName(null);
+						e.setDeleted(true);
 						e.setOldName(deletedName);
 						handlerManager.fireEvent(e);
 					}

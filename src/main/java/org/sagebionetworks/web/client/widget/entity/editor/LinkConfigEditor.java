@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.WidgetNameProvider;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -50,6 +51,10 @@ public class LinkConfigEditor implements LinkConfigView.Presenter, WidgetEditorP
 	@Override
 	public String getTextToInsert(String name) {
 		return "["+name+"]("+view.getLinkUrl()+")";
+	}
+	
+	@Override
+	public void setNameProvider(WidgetNameProvider provider) {
 	}
 	
 	/*

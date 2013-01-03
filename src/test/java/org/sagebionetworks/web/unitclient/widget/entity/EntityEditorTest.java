@@ -29,7 +29,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.Attachments;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
-import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
+import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 
 /**
  * Unit test for the entity editor.
@@ -38,7 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
  */
 public class EntityEditorTest {
 
-	EntityEditorDialog mockDialog;
+	EntityPropertyForm mockDialog;
 	EntitySchemaCache schemaCache;
 	AdapterFactory factory;
 	ClientLogger mockLogger;
@@ -56,7 +56,7 @@ public class EntityEditorTest {
 	public void before() throws JSONObjectAdapterException{
 
 		
-		mockDialog = Mockito.mock(EntityEditorDialog.class);
+		mockDialog = Mockito.mock(EntityPropertyForm.class);
 		factory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();
 		schemaCache = new EntitySchemaCacheImpl(factory);
@@ -67,7 +67,7 @@ public class EntityEditorTest {
 		mockAttachmentsWidget= Mockito.mock(Attachments.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		// setup the entity editor with 
-		editor = new EntityEditor(schemaCache, factory, autoGenFactory, mockDialog, mockLogger, mockGlobal,mockAttachmentsWidget, mockSynapseClient);
+		editor = new EntityEditor(schemaCache, factory, autoGenFactory, mockDialog, mockLogger, mockGlobal, mockSynapseClient);
 	
 		schema = schemaCache.getEntitySchema(ExampleEntity.EFFECTIVE_SCHEMA, ExampleEntity.class);
 		versionableSchema = schemaCache.getEntitySchema(Versionable.EFFECTIVE_SCHEMA, Versionable.class);

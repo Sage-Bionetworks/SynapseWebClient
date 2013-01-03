@@ -3,7 +3,6 @@ package org.sagebionetworks.web.shared;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.web.client.DisplayConstants;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -93,7 +92,7 @@ public class LayerColumnInfo implements HeaderData, IsSerializable, CompositeCol
 	@Override
 	public int getColumnWidth() {
 		// TODO set to reasonable value
-		return DisplayConstants.DEFULAT_GRID_LAYER_COLUMN_WIDTH_PX;
+		return WebConstants.DEFAULT_GRID_LAYER_COLUMN_WIDTH_PX;
 	}
 	
 }

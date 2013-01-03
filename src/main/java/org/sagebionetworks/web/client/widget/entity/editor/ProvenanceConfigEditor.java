@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.widget.YouTubeWidgetDescriptor;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.WidgetNameProvider;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -69,6 +70,10 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 	@Override
 	public String getTextToInsert(String name) {
 		return null;
+	}
+	
+	@Override
+	public void setNameProvider(WidgetNameProvider provider) {
 	}
 	
 	/*

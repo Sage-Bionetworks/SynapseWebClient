@@ -1030,7 +1030,7 @@ public class DisplayUtils {
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "popover");
 
-		if (el.getNodeType() == 1 && ! isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
+		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
 			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
 
 			applyAttributes(el, optionsMap);
