@@ -179,7 +179,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			public void handleEvent(FxEvent be) {
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
-				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
+				allVersions.setText(DisplayConstants.SHOW_VERSIONS);
 				vGrid.getSelectionModel().select(currentModel, false);
 			}
 		});
@@ -191,7 +191,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			public void handleEvent(FxEvent be) {
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
-				allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
 				vGrid.getSelectionModel().select(currentModel, false);
 			}
 		});
