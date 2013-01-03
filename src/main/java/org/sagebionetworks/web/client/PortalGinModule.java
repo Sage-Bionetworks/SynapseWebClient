@@ -46,8 +46,6 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
-import org.sagebionetworks.web.client.widget.WidgetFactory;
-import org.sagebionetworks.web.client.widget.WidgetFactoryImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
@@ -191,8 +189,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AdapterFactory.class).to(GwtAdapterFactory.class);
 		
 		bind(JiraURLHelper.class).to(JiraURLHelperImpl.class);
-		
-		bind(WidgetFactory.class).to(WidgetFactoryImpl.class);
 		
 		/*
 		 * Vanilla Implementation binding

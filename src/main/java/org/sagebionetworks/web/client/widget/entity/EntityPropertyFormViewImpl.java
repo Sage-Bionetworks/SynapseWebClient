@@ -215,7 +215,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 
 		initAnimator(widgetsManagerButton, attachmentsContainer);
 		
-		descriptionFormatInfo = new HTML(DisplayConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
+		descriptionFormatInfo = new HTML(WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
 		
 		ToolBar toolBar = new ToolBar();
 		Button addButton = new Button("Add Annotation");

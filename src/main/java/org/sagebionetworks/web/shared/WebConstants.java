@@ -2,6 +2,7 @@ package org.sagebionetworks.web.shared;
 import org.pegdown.Extensions;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 
+
 /**
  * Constants for query parameter keys, header names, and field names used by the
  * web components.
@@ -55,5 +56,28 @@ public class WebConstants {
 		Extensions.TABLES |				//Tables similar to MultiMarkdown (which is in turn like the PHP Markdown Extra tables, but with colspan support).
 		Extensions.SUPPRESS_ALL_HTML |	//Suppresses HTML
 		Extensions.WIKILINKS;			//Support [[Wiki-style links]] with a customizable URL rendering logic.
+
+	public static final String ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
+			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br></code></pre><br>" +
+			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>An [example][id]. Then, anywhere else in the description, define the link:<br>  [id]: http://example.com/<br></code></pre><br>" +
+			"<h3>Tables</h3><pre><code>First Header  | Second Header <br>------------- | ------------- <br>Content Cell  | Content Cell <br>Content Cell  | Content Cell</code></pre><br>" +
+			"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
+			"<h3>Headers</h3><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre><br>" +
+			"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
+			"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
+			"<h3>Code Spans</h3><pre><code>`&lt;code&gt;` spans are delimited<br>by backticks.<br>You can include literal backticks<br>like `` `this` ``.<br></code></pre><br>" +
+			"<h3>Preformatted Code Blocks</h3><pre><code>Indent every line of a code block by at least 4 spaces or 1 tab.<br><br>This is a normal paragraph.<br><br>    This is a preformatted<br>    code block.</code></pre><br>" +
+			"<h3>Symbols</h3><pre><code>&amp;copy; = copyright sign<br>&amp;mdash; = wide dash<br>&amp;amp; = ampersand<br>&amp;trade; = trademark TM<br>&amp;reg; = reserved mark R</code></pre><br>"+
+			"</div>";
+
+	/*
+	 * Dimensions
+	 */
+	public static final int DEFAULT_GRID_COLUMN_WIDTH_PX = 150;
+	public static final int DEFAULT_GRID_LAYER_COLUMN_WIDTH_PX = 100;
+	public static final int DEFAULT_GRID_DATE_COLUMN_WIDTH_PX = 85;
+
+	public static final int MAX_COLUMNS_IN_GRID = 100;
+	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
 	
 }
