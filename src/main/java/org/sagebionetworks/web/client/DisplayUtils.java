@@ -889,22 +889,6 @@ public class DisplayUtils {
 		return builder.toString();
 	}
 	
-	
-	/**
-	 * Does this entity have attachment previews?
-	 * @param entity
-	 * @return
-	 */
-	public static boolean hasAttachmentPreviews(Entity entity){
-		if(entity == null) return false;
-		if(entity.getAttachments() == null) return false;
-		if(entity.getAttachments().size() < 1) return false;
-		for(AttachmentData data: entity.getAttachments()){
-			if(data.getPreviewId() != null) return true;
-		}
-		return false;
-	}
-	
 	/**
 	 * Does this entity have attachmet previews?
 	 * @param entity
