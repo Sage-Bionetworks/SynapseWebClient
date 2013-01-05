@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
@@ -187,9 +188,15 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		
 		List<EntityType> ignore = new ArrayList<EntityType>();
 		
-		// ignore self type children (except for Folders)
-		if (entityType != entityTypeProvider.getEntityTypeForClassName(Folder.class.getName()))			
+		// ignore self type children (except for Folders and Pages)
+		boolean isFolderType = entityType != entityTypeProvider.getEntityTypeForClassName(Folder.class.getName());
+		boolean isPageType = entityType != entityTypeProvider.getEntityTypeForClassName(Page.class.getName());
+		if (!(isFolderType || isPageType))
 			ignore.add(entityType);
+		
+		if (isFolderType)
+			//if Folder, make sure to ignore Page
+			ignore.add(entityTypeProvider.getEntityTypeForClassName(Page.class.getName()));
 
 		// ignore certain types
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Project.class.getName()));

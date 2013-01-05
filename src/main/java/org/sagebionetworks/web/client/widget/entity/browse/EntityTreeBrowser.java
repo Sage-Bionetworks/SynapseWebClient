@@ -131,8 +131,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();		
 		
 		searchService.searchEntities("entity", Arrays
-				.asList(new WhereCondition[] { new WhereCondition("parentId",
-						WhereOperator.EQUALS, entityId) }), 1, MAX_FOLDER_LIMIT, null,
+				.asList(new WhereCondition[] { 
+						new WhereCondition("parentId", WhereOperator.EQUALS, entityId), 
+						new WhereCondition("name",WhereOperator.NOT_EQUALS, DisplayConstants.PROJECT_WIKI_FOLDER_NAME) 
+						}), 1, MAX_FOLDER_LIMIT, null,
 				false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {
