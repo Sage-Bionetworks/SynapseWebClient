@@ -773,12 +773,11 @@ h1, h2, h3, h4, h5, h6 {
 	background-color: #bfbfbf; 
 	text-decoration:none; 
 }
+
 .sidebarMenu:hover { 
 	background-color: #efefef; 
 	text-decoration:none; 
 }
-
-	
 
 .gwt-TreeItem-selected {
   background: #ffffff !important;
