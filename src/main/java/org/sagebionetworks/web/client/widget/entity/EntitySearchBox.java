@@ -84,7 +84,7 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	
 	public void setEntitySelectedHandler(EntitySelectedHandler handler, boolean retrieveVersions) {
 		this.handler = handler;		
-		this.retrieveVersions = retrieveVersions;
+		this.retrieveVersions = retrieveVersions;		
 	}
 
 	@Override

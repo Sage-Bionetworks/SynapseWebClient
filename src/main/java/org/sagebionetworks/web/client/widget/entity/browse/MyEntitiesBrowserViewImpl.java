@@ -43,7 +43,7 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 		cp = new ContentPanel();
 		cp.setHeaderVisible(false);
 		cp.setHeight(HEIGHT_PX);
-		cp.setWidth(WIDTH_PX);
+		cp.setAutoWidth(true);
 		cp.setScrollMode(Scroll.AUTO);				
 		
 		cp.add(entityTreeBrowser.asWidget());
