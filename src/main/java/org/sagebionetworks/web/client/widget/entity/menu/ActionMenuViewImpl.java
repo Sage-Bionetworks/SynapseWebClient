@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -21,9 +22,8 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
-import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
-import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
@@ -59,11 +59,11 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private IconsImageBundle iconsImageBundle;
 	private AccessControlListEditor accessControlListEditor;
 	private LocationableUploader locationableUploader;
-	private MyEntitiesBrowser myEntitiesBrowser;
 	private EntityTypeProvider typeProvider;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private boolean readOnly;
+	private EntityFinder entityFinder;
 	
+	private boolean readOnly;	
 	private Button editButton;
 	private Button shareButton;
 	private Button addButton;
@@ -76,16 +76,15 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
 			LocationableUploader locationableUploader, 
-			MyEntitiesBrowser myEntitiesBrowser, 
 			EntityTypeProvider typeProvider,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			EntityFinder entityFinder) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.locationableUploader = locationableUploader;
-		this.myEntitiesBrowser = myEntitiesBrowser;
 		this.typeProvider = typeProvider;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-//		this.setLayout(new FitLayout());
+		this.entityFinder = entityFinder;
 		this.setHorizontalAlign(HorizontalAlignment.RIGHT);
 		this.setTableWidth("100%");
 	}
@@ -423,24 +422,22 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			public void componentSelected(MenuEvent ce) {				
 				final Window window = new Window();  
 	
-				EntityTreeBrowser tree = myEntitiesBrowser.getEntityTreeBrowser();
-				tree.setMakeLinks(false);
-				tree.setShowContextMenu(false);
-				myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
+				entityFinder.configure(false);
+				entityFinder.setEntitySelectedHandler(new SelectedHandler() {					
 					@Override
-					public void onSelection(String selectedEntityId) {
-						presenter.createLink(selectedEntityId);
+					public void onSelection(Reference selected) {
+						presenter.moveEntity(selected.getTargetId());
 						window.hide();
 					}
 				});
 				
-				window.setSize(483, 329);
+				window.setSize(839, 582);
 				window.setPlain(true);
 				window.setModal(true);
 				window.setBlinkModal(true);
 				window.setHeading(DisplayConstants.LABEL_WHERE_SAVE_LINK);
 				window.setLayout(new FitLayout());
-				window.add(myEntitiesBrowser.asWidget(), new FitData(4)); 				
+				window.add(entityFinder.asWidget(), new FitData(4)); 				
 				window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
@@ -469,25 +466,23 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			@Override
 			public void componentSelected(MenuEvent ce) {				
 				final Window window = new Window();  
-	
-				EntityTreeBrowser tree = myEntitiesBrowser.getEntityTreeBrowser();
-				tree.setMakeLinks(false);
-				tree.setShowContextMenu(false);
-				myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
+
+				entityFinder.configure(false);
+				entityFinder.setEntitySelectedHandler(new SelectedHandler() {					
 					@Override
-					public void onSelection(String selectedEntityId) {
-						presenter.moveEntity(selectedEntityId);
+					public void onSelection(Reference selected) {
+						presenter.moveEntity(selected.getTargetId());
 						window.hide();
 					}
 				});
 				
-				window.setSize(483, 329);
+				window.setSize(839, 582);
 				window.setPlain(true);
 				window.setModal(true);
 				window.setBlinkModal(true);
 				window.setHeading(DisplayConstants.LABEL_MOVE + " " + typeDisplay);
 				window.setLayout(new FitLayout());
-				window.add(myEntitiesBrowser.asWidget(), new FitData(4)); 				
+				window.add(entityFinder.asWidget(), new FitData(4)); 				
 				window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
