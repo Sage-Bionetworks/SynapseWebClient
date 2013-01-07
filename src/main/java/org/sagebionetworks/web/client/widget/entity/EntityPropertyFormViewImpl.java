@@ -452,7 +452,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		this.annoPanel.add(annotationFormPanel);
 		configureAttachmentsWidget();
 		this.layout();
-		resizeDescription();
 	}
 	
 	private Menu createWidgetMenu() {
@@ -504,16 +503,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 		descriptionField = formFactory.createTextAreaField(model.getDescription());
 		descriptionField.setWidth("796px");
-		descriptionField.setHeight("200px");
-		resizeDescription();
-		//automatically change size based on content
-		descriptionField.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-//				int keyCode = event.getNativeEvent().getKeyCode();
-				resizeDescription();
-			}
-		});
+		descriptionField.setHeight("300px");
 
 		// Create the list of fields
 		propertyFields = formFactory.createFormFields(model.getProperties());
@@ -570,18 +560,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		f.add(panel);
 		window.add(new ScrollPanel(f));
 		window.show();
-	}
-
-	/**
-	 * Recalculates size for the description field based on it's contents
-	 */
-	private void resizeDescription() {
-		//GWT TextArea reports the correct scrollheight, GXT TextArea always reports scrollheight = clientheight (even when scrollbar is present).
-		//Moved to GWT Textarea for this reason, to support dynamic enlarging of area based on content.
-		int scrollheight = descriptionField.getElement().getScrollHeight();
-		if (scrollheight == 0)
-			scrollheight = 300;
-		descriptionField.setHeight(scrollheight + "px");
 	}
 	
 	@Override
