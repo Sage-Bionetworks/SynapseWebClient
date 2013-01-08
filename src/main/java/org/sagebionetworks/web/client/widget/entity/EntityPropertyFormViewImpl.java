@@ -359,6 +359,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		mdCommands.setVerticalAlign(VerticalAlignment.MIDDLE);
 		mdCommands.addStyleName("view header-inner-commands-container");
 		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.add16()));
+		insertButton.setWidth(55);
 		insertButton.setMenu(createWidgetMenu());
 		FormData descriptionLabelFormData = new FormData();
 		descriptionLabelFormData.setMargins(new Margins(0,15,0,17));
@@ -408,6 +409,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		
 		final Button formatLink = new Button(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT);
 		formatLink.setIcon(AbstractImagePrototype.create(iconsImageBundle.slideInfo16()));
+		formatLink.setWidth(120);
 		mdCommands.add(formatLink);
 		mdCommands.add(insertButton);
 		formatLink.addSelectionListener(new SelectionListener<ButtonEvent>() {
