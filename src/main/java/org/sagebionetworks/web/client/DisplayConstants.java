@@ -425,9 +425,9 @@ public class DisplayConstants {
 	public static final String ADD_FILE = "Add File";
 	public static final String FILES = "Files";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
-	public static final String PAGES = "Child Pages";
-	public static final String ADD_PAGE = "Add Page";
-	public static final String PROJECT_WIKI_FOLDER_NAME = "Wiki";
+	public static final String PAGES = "Pages";
+	public static final String ADD_PAGE = "Add a new page";
+	public static final String PROJECT_WIKI_NAME = "Wiki";
 	public static final String ERROR_PAGE_CREATION_FAILED = "Page creation failed. Please try again";
 	public static final String UNAUTHORIZED = "Unauthorized";
 	public static final String UNAUTHORIZED_DESC = "You are not authorized to access the page requested.";

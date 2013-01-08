@@ -189,13 +189,13 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		List<EntityType> ignore = new ArrayList<EntityType>();
 		
 		// ignore self type children (except for Folders and Pages)
-		boolean isFolderType = entityType != entityTypeProvider.getEntityTypeForClassName(Folder.class.getName());
-		boolean isPageType = entityType != entityTypeProvider.getEntityTypeForClassName(Page.class.getName());
+		boolean isFolderType = entityType == entityTypeProvider.getEntityTypeForClassName(Folder.class.getName());
+		boolean isPageType = entityType == entityTypeProvider.getEntityTypeForClassName(Page.class.getName());
 		if (!(isFolderType || isPageType))
 			ignore.add(entityType);
 		
 		if (isFolderType)
-			//if Folder, make sure to ignore Page
+			//if Folder, ignore Page (we will create the root Wiki folder on-the-fly)
 			ignore.add(entityTypeProvider.getEntityTypeForClassName(Page.class.getName()));
 
 		// ignore certain types

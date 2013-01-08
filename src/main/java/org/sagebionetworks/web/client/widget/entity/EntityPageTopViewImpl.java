@@ -180,7 +180,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		locationableTitleBar.addEntityUpdatedHandler(handler);
 		filesBrowser.addEntityUpdatedHandler(handler);
 		pagesBrowser.addEntityUpdatedHandler(handler);
-			}
+	}
 
 	@Override
 	public void showErrorMessage(String message) {
@@ -257,7 +257,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false, false), widgetMargin);
 
 		// Child Page Browser
-		fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), false));
+		fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, false));
 		// ************************************************************************************************		
 	}
 	
@@ -306,10 +306,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ** FULL WIDTH **
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true, false), widgetMargin);
+		// Child Page Browser
+		fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, true));
 		// Child File Browser
 		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
-		// Child Page Browser
-		fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), true));
 
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -402,8 +402,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 	
-	private Widget createEntityPagesBrowserWidget(Entity entity, boolean isProject) {
-		pagesBrowser.configure(entity.getId(), DisplayConstants.PAGES, isProject);
+	private Widget createEntityPagesBrowserWidget(Entity entity, boolean canEdit,  boolean isProject) {
+		pagesBrowser.configure(entity.getId(), DisplayConstants.PAGES, canEdit, isProject);
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("left");
 		lc.setStyleAttribute("margin", "0px 0px 20px 0px");

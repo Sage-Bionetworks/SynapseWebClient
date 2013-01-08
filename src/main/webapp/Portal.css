@@ -609,9 +609,13 @@ h1, h2, h3, h4, h5, h6 {
 	font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;
 }
 
-/**
-content type div sizes
-**/
+.pagelist { 
+	list-style-type: square;
+	padding-left: 17px;
+	margin-bottom: 4px;
+}
+
+/** content type div sizes *********/
 .youtubeDescriptor {
 	width: 480px;
 	height: 385px;
@@ -623,4 +627,6 @@ content type div sizes
 .imageDescriptor{
 	max-width: 940px;
 }
+/**********************************/
+
 	

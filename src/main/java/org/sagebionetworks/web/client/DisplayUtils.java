@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RObject;
@@ -772,7 +773,11 @@ public class DisplayUtils {
 		} else if(Study.class.getName().equals(className)) {
 			// Study
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStudy16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStudy24();			
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStudy24();
+		} else if(Page.class.getName().equals(className)) {
+			// Page
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();			
 		} else {
 			// default to Model
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
