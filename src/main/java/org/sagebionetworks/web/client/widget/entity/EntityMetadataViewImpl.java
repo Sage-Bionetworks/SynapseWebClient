@@ -281,6 +281,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private void clear() {
 		dataUseContainer.clear();
+        //reset versions ui
+        setVersionsVisible(false);
+        previousVersions.setVisible(false);
+        allVersions.setText(DisplayConstants.SHOW_VERSIONS);
 	}
 
 	@Override
