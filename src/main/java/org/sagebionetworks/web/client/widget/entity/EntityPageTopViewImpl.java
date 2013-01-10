@@ -483,7 +483,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         flex.setFlex(1);
 
         final String baseURl = GWT.getModuleBaseURL()+"attachment";
-        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId() +"&"+ DisplayUtils.ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY + "=true" ;
+        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId() ;
 
         if(canEdit && !readOnly) {
 	        Anchor addBtn = new Anchor();

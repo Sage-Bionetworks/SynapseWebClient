@@ -2,21 +2,17 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
-import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.AnimationProtector;
-import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -28,10 +24,7 @@ import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
@@ -55,8 +48,6 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
@@ -79,7 +70,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	FormFieldFactory formFactory;
 	FormPanel formPanel;
 	FormPanel annotationFormPanel;
-	Attachments attachmentsWidget;
 	ContentPanel annoPanel;
 	ContentPanel propPanel;
 	VerticalPanel vp;
@@ -90,8 +80,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	HTML descriptionFormatInfo;
 	VerticalPanel attachmentsContainer;
 	Window loading;
-	private AnimationProtector widgetManagerAnimation;
-	com.google.gwt.user.client.ui.Button widgetsManagerButton;
+	
 	@Inject
 	public EntityPropertyFormViewImpl(FormFieldFactory formFactory, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,SynapseJSNIUtils synapseJSNIUtils, Attachments attachmentsWidget) {
 		this.formFactory = formFactory;
@@ -99,7 +88,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		this.sageImageBundle= sageImageBundle;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.attachmentsWidget = attachmentsWidget;
 		loading = DisplayUtils.createLoadingWindow(sageImageBundle, "Updating...");
 	}
 	
@@ -138,52 +126,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	    window.show();	
 	}
 	
-	private void initAnimator(final com.google.gwt.user.client.ui.Button widgetsManagerButton, final VerticalPanel widgetManagerContainer) {
-		widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT);
-		widgetsManagerButton.addStyleName("btn btn-info");
-		widgetManagerAnimation = new AnimationProtector(new AnimationProtectorViewImpl(widgetsManagerButton, widgetManagerContainer));
-		FxConfig hideConfig = new FxConfig(400);
-		hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-			@Override
-			public void handleEvent(FxEvent be) {
-				// This call to layout is necessary to force the scroll bar to appear on page-load
-				widgetManagerContainer.layout(true);
-				widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT);
-			}
-		});
-		widgetManagerAnimation.setHideConfig(hideConfig);
-
-		FxConfig showConfig = new FxConfig(400);
-		showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-			@Override
-			public void handleEvent(FxEvent be) {
-				// This call to layout is necessary to force the scroll bar to appear on page-load
-				widgetManagerContainer.layout(true);
-				widgetsManagerButton.setText(DisplayConstants.ENTITY_DESCRIPTION_HIDE_WIDGETS_TEXT);
-			}
-		});
-		widgetManagerAnimation.setShowConfig(showConfig);
-	}
-	
-	protected void configureAttachmentsWidget() {
-		//attachments widget refresh
-		attachmentsWidget.configure(GWT.getModuleBaseURL()+"attachment", presenter.getEntity(), true);
-		attachmentsWidget.setAttachmentColumnWidth(800);
-		attachmentsWidget.clearHandlers();
-		attachmentsWidget.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {
-			@Override
-			public void onAttachmentSelected(AttachmentSelectedEvent event) {
-				presenter.attachmentSelected(event);
-			}
-		});
-		attachmentsWidget.addAttachmentUpdatedHandler(new WidgetDescriptorUpdatedHandler() {
-			@Override
-			public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-				presenter.attachmentUpdated(event);
-			}
-		});
-	}
-	
 	@Override
 	protected void onRender(Element parent, int index) {
 		super.onRender(parent, index);
@@ -206,14 +148,10 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		attachmentsContainer = new VerticalPanel();
 		attachmentsContainer.setBorders(false);
 		
-		widgetsManagerButton =  new com.google.gwt.user.client.ui.Button();
-		
-		attachmentsContainer.add(attachmentsWidget.asWidget());
 		attachmentsContainer.setVisible(false);
 		attachmentsContainer.setLayout(new VBoxLayout());
 		attachmentsContainer.setScrollMode(Scroll.AUTOY);
 
-		initAnimator(widgetsManagerButton, attachmentsContainer);
 		
 		descriptionFormatInfo = new HTML(WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
 		
@@ -398,10 +336,9 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		
 		FlowPanel mdCommandsLower = new FlowPanel();
 		formPanel.add(mdCommandsLower, previewFormData);
-		mdCommandsLower.add(widgetsManagerButton);
 		SimplePanel previewButtonWrapper= new SimplePanel();
 		previewButtonWrapper.add(previewButton);
-		previewButtonWrapper.addStyleName("inline-block margin-left-530");
+		previewButtonWrapper.addStyleName("inline-block margin-left-725");
 		mdCommandsLower.add(previewButtonWrapper);
 		
 		//Formatting Guide
@@ -452,7 +389,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		// Add both panels back.
 		this.propPanel.add(formPanel);
 		this.annoPanel.add(annotationFormPanel);
-		configureAttachmentsWidget();
 		this.layout();
 	}
 	
@@ -537,7 +473,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	}
 	
 	@Override
-	public void showPreview(String result, EntityBundle bundle, WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public void showPreview(String result, EntityBundle bundle, WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, JSONObjectAdapter jsonObjectAdapter) throws JSONObjectAdapterException {
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
 	    window.setSize(650, 500);
@@ -556,7 +492,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		else{
 			panel = new HTMLPanel(result);
 		}
-		EntityPageTop.loadWidgets(panel, bundle, widgetRegistrar, synapseClient, nodeModelCreator, this, true);
+		EntityPageTop.loadWidgets(panel, bundle, widgetRegistrar, synapseClient, nodeModelCreator, this, jsonObjectAdapter, iconsImageBundle, true);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
 		f.add(panel);

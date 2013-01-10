@@ -102,38 +102,6 @@ public class Attachments implements AttachmentsView.Presenter,
 	public void clearHandlers() {
 		handlerManager = new HandlerManager(this);
 	}
-
-	@Override
-	public void editAttachment(String tokenId) {
-		if(tokenId != null) {
-			// find attachment via token
-			AttachmentData found = null;
-			for(AttachmentData data : workingSet) {
-				if(tokenId.equals(data.getTokenId())) {
-					found = data;
-				}
-			}
-
-			if(found != null) {
-				String attachmentName = found.getName();
-				final AttachmentData editedAttachment = found;
-				BaseEditWidgetDescriptorPresenter.editExistingWidget(widgetEditor, entity.getId(), attachmentName, entity.getAttachments(), new WidgetDescriptorUpdatedHandler() {
-					@Override
-					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-						//update the view so that it has the right name for the attachment
-						editedAttachment.setName(event.getName());
-						try {
-							Entity updatedEntity = nodeModelCreator.createEntity(event.getEntityWrapper());
-							configure(baseUrl, updatedEntity, widgetAttachments);
-						} catch (JSONObjectAdapterException e) {
-							view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-						}
-						handlerManager.fireEvent(event);
-					}
-				});
-			}
-		}
-	}
 	
 	@Override
 	public void addAttachmentSelectedHandler(AttachmentSelectedHandler handler) {

@@ -7,6 +7,8 @@ import static org.junit.Assert.*;
 import org.junit.*;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 
@@ -14,11 +16,14 @@ public class ImageConfigEditorTest {
 		
 	ImageConfigEditor editor;
 	ImageConfigView mockView;
-	
+	SynapseClientAsync mockSynapseClient;
+	NodeModelCreator mockNodeModelCreator;
 	@Before
 	public void setup(){
 		mockView = mock(ImageConfigView.class);
-		editor = new ImageConfigEditor(mockView);
+		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockNodeModelCreator = mock(NodeModelCreator.class);
+		editor = new ImageConfigEditor(mockView, mockSynapseClient, mockNodeModelCreator);
 	}
 	
 	@Test
@@ -34,11 +39,11 @@ public class ImageConfigEditorTest {
 		testImage.setName("test name");
 		testImage.setTokenId("test token");
 		testImage.setMd5("test md5");
-		descriptor.setImage(testImage);
+		descriptor.setFileName("test name");
 		editor.configure("", descriptor);
 		verify(mockView).setEntityId(anyString());
 		verify(mockView).setExternalVisible(anyBoolean());
-		verify(mockView).setUploadedAttachmentData(eq(testImage));
+		when(mockView.getUploadedAttachmentData()).thenReturn(testImage);
 		
 		when(mockView.isExternal()).thenReturn(false);
 		editor.updateDescriptorFromView();
@@ -52,7 +57,7 @@ public class ImageConfigEditorTest {
 	public void testTextToInsert() {
 		//the case when there is an external image
 		when(mockView.isExternal()).thenReturn(true);
-		String textToInsert = editor.getTextToInsert("");
+		String textToInsert = editor.getTextToInsert();
 		verify(mockView).getImageUrl();
 		assertTrue(textToInsert != null && textToInsert.length() > 0);
 	}

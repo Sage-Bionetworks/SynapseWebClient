@@ -85,7 +85,7 @@ public class EntityPageTopTest {
 				mockEntityTypeProvider,
 				mockIconsImageBundle, 
 				mockWidgetRegistrar, 
-				mockEventBus);
+				mockEventBus, new JSONObjectAdapterImpl());
 		
 		// Setup the the entity
 		String entityId = "123";
@@ -143,10 +143,6 @@ public class EntityPageTopTest {
 		ExampleEntity entity = new ExampleEntity();
 		bundle.setEntity(entity);
 		pageTop.setBundle(bundle, false);
-		AsyncMockStubber
-			.callSuccessWith("")
-			.when(mockSynapseClient)
-			.getWidgetDescriptorJson(anyString(), anyString(), any(AsyncCallback.class));
 		pageTop.loadWidgets(htmlPanel);
 	}
 

@@ -1,15 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.ObjectSchema;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -29,7 +26,6 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.EventBus;
@@ -56,7 +52,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private boolean readOnly;
 	private String entityTypeDisplay;
 	private EventBus bus;
-	
+	private JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -67,7 +63,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle,
 			WidgetRegistrar widgetRegistrar,
-			EventBus bus) {
+			EventBus bus, JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -77,6 +73,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.iconsImageBundle = iconsImageBundle;
 		this.widgetRegistrar = widgetRegistrar;
 		this.bus = bus;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 		view.setPresenter(this);
 	}
 
@@ -186,7 +183,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 	@Override
 	public void loadWidgets(final HTMLPanel panel) {
-		loadWidgets(panel, bundle, widgetRegistrar, synapseClient, nodeModelCreator, view, false);
+		try {
+			loadWidgets(panel, bundle, widgetRegistrar, synapseClient, nodeModelCreator, view, jsonObjectAdapter, iconsImageBundle, false);
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(e.getMessage());
+		}
 	}
 	
 	/**
@@ -197,48 +198,35 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	 * @param synapseClient
 	 * @param nodeModelCreator
 	 * @param view
+	 * @throws JSONObjectAdapterException 
 	 */
-	public static void loadWidgets(final HTMLPanel panel, final EntityBundle bundle, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, final NodeModelCreator nodeModelCreator, final SynapseWidgetView view, Boolean isPreview) {
-		List<AttachmentData> attachments = bundle.getEntity().getAttachments();
-		if (attachments != null) {
-			final String entityId = bundle.getEntity().getId();
-			final String suffix = isPreview ? DisplayConstants.DIV_ID_PREVIEW_SUFFIX : "";
-			for (Iterator iterator = attachments.iterator(); iterator.hasNext();) {
-				AttachmentData attachmentData = (AttachmentData) iterator.next();
-				final String name = attachmentData.getName();
-				final String contentTypeKey = attachmentData.getContentType();
-				//is this a widget content type?
-				if (widgetRegistrar.isWidgetContentType(contentTypeKey)) {
-					Element el = panel.getElementById(name + suffix);
-					String contentTypeStyle = contentTypeKey.substring(contentTypeKey.lastIndexOf("/")+1);
-					//was it referenced in the description?
-					if (el != null) {
-						el.setClassName(contentTypeStyle);
-						try {
-							synapseClient.getWidgetDescriptorJson(entityId, name, new AsyncCallback<String>() {
-								
-								@Override
-								public void onSuccess(String widgetDescriptorJson) {
-									try {
-										WidgetDescriptor widgetDescriptor = nodeModelCreator.createJSONEntity(widgetDescriptorJson, widgetRegistrar.getWidgetClass(contentTypeKey));
-										WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(entityId, contentTypeKey, widgetDescriptor);
-										panel.add(presenter.asWidget(), name + suffix);								
-									} catch (JSONObjectAdapterException e) {
-										onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-									}
-								}
-								
-								@Override
-								public void onFailure(Throwable caught) {
-									view.showErrorMessage(caught.getMessage());
-								}
-							});
-						} catch (RestServiceException e) {
-							view.showErrorMessage(e.getMessage());
-						}
+	public static void loadWidgets(final HTMLPanel panel, final EntityBundle bundle, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, final NodeModelCreator nodeModelCreator, final SynapseWidgetView view, final JSONObjectAdapter jsonObjectAdapter, IconsImageBundle iconsImageBundle, Boolean isPreview) throws JSONObjectAdapterException {
+		final String entityId = bundle.getEntity().getId();
+		final String suffix = isPreview ? DisplayConstants.DIV_ID_PREVIEW_SUFFIX : "";
+		//look for every element that has the right format
+		int i = 0;
+		String currentWidgetDiv = DisplayConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+		Element el = panel.getElementById(currentWidgetDiv);
+		while (el != null) {
+				//based on the contents of the element, create the correct widget descriptor and renderer
+				String innerText = el.getAttribute("widgetParams");
+				if (innerText != null) {
+					try {
+						innerText = innerText.trim();
+						WidgetDescriptor widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
+						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(entityId, widgetRegistrar.getWidgetContentType(widgetDescriptor), widgetDescriptor);
+						panel.add(presenter.asWidget(), currentWidgetDiv);
+					}catch(IllegalArgumentException e) {
+						//try our best to load all of the widgets. if one fails to load, then fail quietly.
+						e.printStackTrace();
+						panel.add(new HTMLPanel(DisplayUtils.getIconHtml(iconsImageBundle.error16()) + innerText), currentWidgetDiv);
 					}
+
 				}
-			}
+			
+			i++;
+			currentWidgetDiv = DisplayConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+			el = panel.getElementById(currentWidgetDiv);
 		}
 	}
 	

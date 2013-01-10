@@ -185,7 +185,11 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 	    synapseClient.markdown2Html(descriptionMarkdown, baseUrl, true, new AsyncCallback<String>() {
 	    	@Override
 			public void onSuccess(String result) {
-	    		view.showPreview(result, bundle, widgetRegistrar, synapseClient, nodeModelCreator);
+	    		try {
+					view.showPreview(result, bundle, widgetRegistrar, synapseClient, nodeModelCreator, adapter);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -254,21 +258,13 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 	
 	@Override
 	public void insertWidget(String contentTypeKey) {
-		BaseEditWidgetDescriptorPresenter.editNewWidget(view.getWidgetDescriptorEditor(), bundle.getEntity().getId(), contentTypeKey, bundle.getEntity().getAttachments(), new WidgetDescriptorUpdatedHandler() {
+		BaseEditWidgetDescriptorPresenter.editNewWidget(view.getWidgetDescriptorEditor(), bundle.getEntity().getId(), contentTypeKey, new WidgetDescriptorUpdatedHandler() {
 			@Override
 		public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-			if (event.getInsertValue()!=null)
+			if (event.getInsertValue()!=null) {
 				view.insertMarkdown(event.getInsertValue());
-			else {
-				view.insertWidgetMarkdown(event.getName());
-				try {
-					//switch to the up-to-date entity version after adding the attachment, but save our local description and name (in case they've changed here)
-					Entity updatedEntity = nodeModelCreator.createEntity(event.getEntityWrapper());
-					refreshEntityAttachments(updatedEntity);
-				} catch (JSONObjectAdapterException e) {
-					throw new RuntimeException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}
 			}
+			refreshEntityAttachments();
 		}
 		});
 	}

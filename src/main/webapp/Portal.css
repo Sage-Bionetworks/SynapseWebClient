@@ -462,8 +462,8 @@ a.shortBtn {
 	margin-left: 180px;
 }
 
-.margin-left-530 {
-	margin-left: 530px;
+.margin-left-725 {
+	margin-left: 725px;
 }
 .markdown {
 	word-wrap:break-word;
@@ -616,15 +616,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /** content type div sizes *********/
-.youtubeDescriptor {
+.youtube {
 	width: 480px;
 	height: 385px;
 }
-.provenanceDescriptor {
+.provenance {
 	width: 260px;
 	height: 250px;
 }
-.imageDescriptor{
+.image{
 	max-width: 940px;
 }
 /**********************************/

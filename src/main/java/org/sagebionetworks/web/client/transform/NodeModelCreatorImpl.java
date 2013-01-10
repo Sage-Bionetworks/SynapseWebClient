@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.EntityClassHelper;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;

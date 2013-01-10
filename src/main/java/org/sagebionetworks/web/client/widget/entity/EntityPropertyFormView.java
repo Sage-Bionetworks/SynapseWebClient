@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
@@ -18,7 +20,7 @@ public interface EntityPropertyFormView extends SynapseWidgetView, IsWidget {
 	public void setPresenter(Presenter presenter);
 	public void refresh();
 	public void hideLoading();
-	public void showPreview(String html, EntityBundle bundle, WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator);
+	public void showPreview(String html, EntityBundle bundle, WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, JSONObjectAdapter jsonObjectAdapter) throws JSONObjectAdapterException;
 	public void insertMarkdown(String md);
 	public void insertWidgetMarkdown(String attachmentName);
 	public BaseEditWidgetDescriptorPresenter getWidgetDescriptorEditor();

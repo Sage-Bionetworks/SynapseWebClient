@@ -23,6 +23,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -33,6 +34,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private TextField<String> urlField;
+	private TextField<String> nameField;
 	private HorizontalPanel externalLinkPanel;
 	private AttachmentData uploadedAttachmentData;
 	TabItem externalTab,uploadTab;
@@ -48,7 +50,9 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	@Override
 	public void initView() {
 		setLayout(new FitLayout());
-		externalLinkPanel = getExternalLinkPanel();
+		VerticalPanel externalLinkPanel = new VerticalPanel();
+		externalLinkPanel.add(getExternalLinkPanel());
+		externalLinkPanel.add(getExternalAltTextPanel());
 		
 		tabPanel = new TabPanel();
 		tabPanel.setPlain(true);
@@ -88,11 +92,26 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		urlField.setRegex(WebConstants.VALID_URL_REGEX);
 		urlField.getMessages().setRegexText(DisplayConstants.IMAGE_CONFIG_INVALID_URL_MESSAGE);
 		Label urlLabel = new Label(DisplayConstants.IMAGE_CONFIG_URL_LABEL);
-		urlLabel.setWidth(70);
-		
-		urlField.setWidth(245);
+		urlLabel.setWidth(90);
+		urlField.setWidth(350);
 		hp.add(urlLabel);
 		hp.add(urlField);
+		hp.addStyleName("margin-top-left-10");
+		return hp;
+	}
+	
+	private HorizontalPanel getExternalAltTextPanel() {
+		HorizontalPanel hp = new HorizontalPanel();
+		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
+		nameField = new TextField<String>();
+		nameField.setAllowBlank(false);
+		nameField.setRegex(WebConstants.VALID_WIDGET_NAME_REGEX);
+		nameField.getMessages().setRegexText(DisplayConstants.IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE);
+		Label label = new Label(DisplayConstants.IMAGE_CONFIG_ALT_TEXT);
+		label.setWidth(90);
+		nameField.setWidth(350);
+		hp.add(label);
+		hp.add(nameField);
 		hp.addStyleName("margin-top-left-10");
 		return hp;
 	}
@@ -110,7 +129,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	
 	private UploadFormPanel getUploadPanel(String entityId) {
 		final String baseURl = GWT.getModuleBaseURL()+"attachment";
-		final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + entityId + "&" + DisplayUtils.ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY + "=false";
+		final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + entityId;
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(actionUrl,sageImageBundle,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,25,new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
@@ -120,7 +139,6 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 					if(UploadStatus.SUCCESS == result.getUploadStatus()){
 						//save close this dialog with a save
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
-						presenter.setName(result.getAttachmentData().getName());
 					}else{
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ result.getMessage()));
 					}
@@ -139,6 +157,9 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		if (isExternal()) {
 			if (!urlField.isValid())
 				throw new IllegalArgumentException(urlField.getErrorMessage());
+			if (!nameField.isValid())
+				throw new IllegalArgumentException(nameField.getErrorMessage());
+
 		} else {
 			//attachment must have been uploaded
 			if (uploadedAttachmentData == null)
@@ -185,6 +206,10 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	@Override
 	public String getImageUrl() {
 		return urlField.getValue();
+	}
+	@Override
+	public String getAltText() {
+		return nameField.getValue();
 	}
 	@Override
 	public void setImageUrl(String url) {
