@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
 
 
 public class DisplayConstants {
@@ -428,5 +429,14 @@ public class DisplayConstants {
 	public static final String UNAUTHORIZED = "Unauthorized";
 	public static final String UNAUTHORIZED_DESC = "You are not authorized to access the page requested.";
 	public static final String LOGIN_TO_DOWNLOAD = "Please login to download data.";
+	public static final String SELECT = "Select";
+	public static final String NONE = "None";
+	public static final String LOOKUP = "Lookup";
+	public static final String CURRENT_VERSION_ALWAYS = "Current Version (Always)";
+	public static final String BROWSE_MY_ENTITIES = "Browse My Entities";
+	public static final String ENTER_SYNAPSE_ID = "Enter Synapse Id";
+	public static final String REFER_TO_SPECIFIC_VERSION = "Refer to a Specific Version";
+	public static final String CURRENT = "Current";
+	
 }
 

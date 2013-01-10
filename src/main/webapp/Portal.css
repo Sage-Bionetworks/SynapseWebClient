@@ -393,6 +393,10 @@ a.shortBtn {
 	float: left;
 }
 
+.clearleft {
+	clear:left;	
+}
+
 .user-profile-headline {
 }
 
@@ -623,4 +627,24 @@ content type div sizes
 .imageDescriptor{
 	max-width: 940px;
 }
+	
+.whiteBackground {
+	background-color: #fff;
+}	
+.sidebarMenu { 
+	font-weight: bold; 	
+    -o-transition:.2s;
+    -ms-transition:.2s;
+    -moz-transition:.2s;
+    -webkit-transition:.2s;
+    transition:.2s;
+    text-decoration:none;
+    padding: 15px 10px;
+    cursor: pointer;  
+}
+.sidebarMenu:hover { 
+	background-color: #efefef; 
+	text-decoration:none; 
+}
+
 	
