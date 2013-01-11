@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
@@ -170,7 +171,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			throw new IllegalArgumentException(e);
 		}
 		return widgetDescriptor;
-
 	}
 	
 	private void initWithKnownWidgets() {
@@ -178,6 +178,14 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME, ProvenanceWidgetDescriptor.class.getName());
 		registerWidget(WidgetConstants.IMAGE_CONTENT_TYPE, WidgetConstants.IMAGE_FRIENDLY_NAME, ImageAttachmentWidgetDescriptor.class.getName());
 		registerWidget(WidgetConstants.LINK_CONTENT_TYPE, WidgetConstants.LINK_FRIENDLY_NAME, null);
+	}
+
+	public static String getWidgetMarkdown(WidgetDescriptor widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
+		StringBuilder sb = new StringBuilder();
+		sb.append(WebConstants.WIDGET_START_MARKDOWN);
+		sb.append(widgetRegistrar.getMDRepresentation(widgetDescriptor));
+		sb.append("}");
+		return sb.toString();
 	}
 
 }

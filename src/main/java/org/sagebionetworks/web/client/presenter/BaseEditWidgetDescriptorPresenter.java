@@ -9,7 +9,7 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
-import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.inject.Inject;
@@ -64,19 +64,11 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 			return;
 		}
 		try {
-			fireUpdatedEvent(getWidgetMarkdown(widgetDescriptor, widgetRegistrar, jsonObjectAdapter));
+			fireUpdatedEvent(WidgetRegistrarImpl.getWidgetMarkdown(widgetDescriptor, widgetRegistrar));
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(e.getMessage());
 		}
 		view.hide();
-	}
-	
-	public static String getWidgetMarkdown(WidgetDescriptor widgetDescriptor, WidgetRegistrar widgetRegistrar, JSONObjectAdapter jsonObjectAdapter) throws JSONObjectAdapterException {
-		StringBuilder sb = new StringBuilder();
-		sb.append(WebConstants.WIDGET_START_MARKDOWN);
-		sb.append(widgetRegistrar.getMDRepresentation(widgetDescriptor));
-		sb.append("}");
-		return sb.toString();
 	}
 	
 	public void fireUpdatedEvent(String valueToInsert) {

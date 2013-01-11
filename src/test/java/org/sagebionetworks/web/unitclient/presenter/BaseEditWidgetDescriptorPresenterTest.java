@@ -96,8 +96,8 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		when(mockView.getTextToInsert()).thenReturn(myInsertText);
 		presenter.apply();
 		verify(mockView).hide();
-		//verify it doesn't update the descriptor, or update the entity attachments in this case (it's a simple insert)
-		verify(mockView, Mockito.times(0)).updateDescriptorFromView();
+		//it should always update the entity attachments
+		verify(mockView).updateDescriptorFromView();
 	}
 	
 	@Test
