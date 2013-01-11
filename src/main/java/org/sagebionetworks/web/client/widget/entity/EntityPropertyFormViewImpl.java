@@ -227,44 +227,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		DisplayUtils.updateTextArea(descriptionField, currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
 	}
 	
-	public void insertWidgetMarkdown(String attachmentName) {
-		//insert the markdown into the description for the attachment (where the attachment points to the json used to describe the widget)
-		String md = DisplayUtils.getWidgetMD(attachmentName);
-		insertMarkdown(md);
-	}
-	
-	/**
-	 * replace all occurrences of oldMd with newMd
-	 * @param oldMd
-	 * @param newMd
-	 */
-	@Override
-	public void replaceAllOccurrences(String oldMd, String newMd) {
-		if (oldMd != null & newMd != null) {
-			TextArea descriptionTextArea = descriptionField;
-			String currentValue = descriptionTextArea.getValue();
-			if (currentValue != null) {
-				DisplayUtils.updateTextArea(descriptionField, currentValue.replaceAll(DisplayUtils.quotePattern(oldMd), newMd));
-			}
-		}
-	}
-	
-	/**
-	 * remove all occurrences of oldMd
-	 * @param oldMd
-	 * @param newMd
-	 */
-	@Override
-	public void removeAllOccurrences(String oldMd) {
-		if (oldMd != null) {
-			TextArea descriptionTextArea = descriptionField;
-			String currentValue = descriptionTextArea.getValue();
-			if (currentValue != null) {
-				DisplayUtils.updateTextArea(descriptionField, currentValue.replaceAll(DisplayUtils.quotePattern(oldMd), ""));
-			}
-		}
-	}
-	
 	@Override
 	public BaseEditWidgetDescriptorPresenter getWidgetDescriptorEditor() {
 		return widgetDescriptorEditor;

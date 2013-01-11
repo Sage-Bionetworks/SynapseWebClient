@@ -122,29 +122,10 @@ public class EntityPropertyFormTest {
 		verify(mockView).showPreview(anyString(), any(EntityBundle.class),any(WidgetRegistrar.class), any(SynapseClientAsync.class), any(NodeModelCreator.class), any(JSONObjectAdapter.class));
 	}
 	
-	@Test
-	public void testAttachmentDeleted() {
-		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
-		event.setDeleted(true);
-		presenter.attachmentUpdated(event);
-		verify(mockView).removeAllOccurrences(anyString());
-	}
-	@Test
-	public void testAttachmentRenamed() {
-		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
-		String oldName = "old";
-		String newName = "new";
-		event.setOldName(oldName);
-		event.setName(newName);
-		presenter.attachmentUpdated(event);
-		verify(mockView).replaceAllOccurrences(anyString(), anyString());
-	}
 	
 	@Test
 	public void testAttachmentRefresh() {
-		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
-		event.setDeleted(true);
-		presenter.attachmentUpdated(event);
+		presenter.refreshEntityAttachments();
 		//testing reload
 		verify(mockView).showLoading();
 		verify(mockView).hideLoading();
@@ -153,11 +134,9 @@ public class EntityPropertyFormTest {
 	
 	@Test
 	public void testAttachmentRefreshFailure() {
-		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
-		event.setDeleted(true);
 		Exception caught = new Exception("test failure");
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		presenter.attachmentUpdated(event);
+		presenter.refreshEntityAttachments();
 		//testing failure
 		verify(mockView).showLoading();
 		verify(mockView).hideLoading();

@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -132,6 +133,8 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 				public void onSuccess(String newId) {
 					view.showInfo("Page '" + name + "' Added", "");
 					refreshChildren(configuredEntityId);
+					//or should it go to the new page after creation?
+					//globalApplicationState.getPlaceChanger().goTo(new Synapse(newId));
 				}
 				
 				@Override

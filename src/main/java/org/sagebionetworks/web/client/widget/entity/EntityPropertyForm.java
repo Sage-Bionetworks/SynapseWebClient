@@ -13,10 +13,8 @@ import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
@@ -151,7 +149,7 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 		view.refresh();
 	}
 	
-	private void refreshEntityAttachments() {
+	public void refreshEntityAttachments() {
 		// We need to refresh the entity, and update our entity bundle with the most current attachments and etag.
 		view.showLoading();
 		int mask = ENTITY;
@@ -197,29 +195,6 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 				view.showErrorMessage(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT + caught.getMessage());
 			}
 		});	
-	}
-	
-	@Override
-	public void attachmentSelected(AttachmentSelectedEvent event) {
-		//insert widget ref into description
-		if (event.getTokenId() != null)
-			view.insertWidgetMarkdown(event.getName());
-	}
-	
-	@Override
-	public void attachmentUpdated(WidgetDescriptorUpdatedEvent event) {
-		//only do something if the attachment name has changed
-		String newName = event.getName();
-		String oldName = event.getOldName();
-		if (event.isDeleted()) {
-			//remove all references to the attachment name
-			view.removeAllOccurrences(DisplayUtils.getWidgetMD(oldName));
-		} else if (!newName.equals(oldName)) {
-			//renamed. point all references to the new name
-			view.replaceAllOccurrences(DisplayUtils.getWidgetMD(oldName), DisplayUtils.getWidgetMD(newName));
-		}
-		refreshEntityAttachments();
-	
 	}
 	
 	/**

@@ -1231,7 +1231,6 @@ public class DisplayUtils {
 		});
 		return uploadButton;
 	}
-
 	
 	/**
 	 * Provides same functionality as java.util.Pattern.quote().
