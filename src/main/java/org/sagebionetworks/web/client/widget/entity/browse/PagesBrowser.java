@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AutoGenFactory;
@@ -197,6 +199,12 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 						}
 					}
+
+					//sort the pages in some logical order
+					Collections.sort(headers, new Comparator<EntityHeader>() {
+						public int compare(EntityHeader o1, EntityHeader o2) {return o1.getName().compareToIgnoreCase(o2.getName());};
+					});
+					
 					view.configure(headers, canEdit);
 				}
 				@Override
