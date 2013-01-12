@@ -42,33 +42,31 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		descriptor = (ImageAttachmentWidgetDescriptor)widgetDescriptor;
 		view.setEntityId(entityId);
 		//if the attachmentData is set then there'a an associated image.  Only show the external url ui if we aren't editing one that already has an attachment
-		view.setExternalVisible(descriptor.getFileName() == null);
-		if (descriptor.getFileName() != null) {
-			//find the attachment associated with this file name
-			synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
-				@Override
-				public void onSuccess(EntityWrapper result) {
-					Entity entity;
-					try {
-						entity = nodeModelCreator.createEntity(result);
-						for (Iterator iterator = entity.getAttachments().iterator(); iterator
-								.hasNext();) {
-							AttachmentData data = (AttachmentData) iterator.next();
-							if (descriptor.getFileName().equals(data.getName()))
-								view.setUploadedAttachmentData(data);				
-						}
-					} catch (JSONObjectAdapterException e) {
-						view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION); 
-					}
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
-				}			
-			});
-		}
-
-		
+//		view.setExternalVisible(descriptor.getFileName() == null);
+//		if (descriptor.getFileName() != null) {
+//			//find the attachment associated with this file name
+//			synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+//				@Override
+//				public void onSuccess(EntityWrapper result) {
+//					Entity entity;
+//					try {
+//						entity = nodeModelCreator.createEntity(result);
+//						for (Iterator iterator = entity.getAttachments().iterator(); iterator
+//								.hasNext();) {
+//							AttachmentData data = (AttachmentData) iterator.next();
+//							if (descriptor.getFileName().equals(data.getName()))
+//								view.setUploadedAttachmentData(data);				
+//						}
+//					} catch (JSONObjectAdapterException e) {
+//						view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION); 
+//					}
+//				}
+//				@Override
+//				public void onFailure(Throwable caught) {
+//					view.showErrorMessage(caught.getMessage());
+//				}			
+//			});
+//		}
 	}
 	
 	@SuppressWarnings("unchecked")

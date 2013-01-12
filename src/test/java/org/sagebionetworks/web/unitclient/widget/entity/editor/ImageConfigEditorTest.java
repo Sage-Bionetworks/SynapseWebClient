@@ -42,7 +42,7 @@ public class ImageConfigEditorTest {
 		descriptor.setFileName("test name");
 		editor.configure("", descriptor);
 		verify(mockView).setEntityId(anyString());
-		verify(mockView).setExternalVisible(anyBoolean());
+		//verify(mockView).setExternalVisible(anyBoolean());
 		when(mockView.getUploadedAttachmentData()).thenReturn(testImage);
 		
 		when(mockView.isExternal()).thenReturn(false);

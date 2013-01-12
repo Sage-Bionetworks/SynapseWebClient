@@ -220,7 +220,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 //		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
 		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false, true), widgetMargin);
+		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 			
 		// ** RIGHT **
 		// Programmatic Clients
@@ -254,7 +254,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description
-		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false, false), widgetMargin);
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 
 		// Child Page Browser
 		fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, false));
@@ -278,7 +278,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Child Browser
 		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false));
 		// Description
-		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false, true), widgetMargin);		
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);		
 		
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -305,9 +305,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 		// ** FULL WIDTH **
 		// Description
-		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true, false), widgetMargin);
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 		// Child Page Browser
-		fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, true));
+		//fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, true));
 		// Child File Browser
 		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
 
@@ -346,7 +346,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true, true), widgetMargin);
+		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 
 		// ** RIGHT **
 		// Annotation Editor widget
@@ -412,7 +412,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 
-	private Widget createDescriptionWidget(final EntityBundle bundle, String entityTypeDisplay, boolean showWhenEmpty, boolean showTitle) {
+	private Widget createDescriptionWidget(final EntityBundle bundle, String entityTypeDisplay, boolean showWhenEmpty) {
 		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
@@ -423,8 +423,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				return lc;
 		}
 		
-		if (showTitle)
-			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3 style=\"clear: left;\">Description</h3>")));
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"clear: left;\"></div>")));
 
 		// Add the description body
 	    if(description == null || "".equals(description)) {
