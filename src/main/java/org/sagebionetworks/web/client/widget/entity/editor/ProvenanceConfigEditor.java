@@ -2,11 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.repo.model.widget.ProvenanceWidgetDescriptor;
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
-import org.sagebionetworks.repo.model.widget.YouTubeWidgetDescriptor;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.WidgetNameProvider;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,16 +23,18 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 		if (!(widgetDescriptor instanceof ProvenanceWidgetDescriptor))
 			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_DESCRIPTOR_TYPE);
 		descriptor = (ProvenanceWidgetDescriptor) widgetDescriptor;
-		Long depth = descriptor.getDepth();
-		Boolean showExpand = descriptor.getShowExpand();
 		String provEntityId = descriptor.getEntityId();
 		
 		if (provEntityId != null)
 			view.setEntityId(provEntityId);
-		if (depth != null)
-			view.setDepth(depth);
-		if (showExpand != null)
-			view.setIsExpanded(showExpand);
+		if (descriptor.getDepth() != null){
+			view.setDepth(Long.parseLong(descriptor.getDepth()));
+		}
+			
+		if (descriptor.getShowExpand() != null) {
+			view.setIsExpanded(Boolean.parseBoolean(descriptor.getShowExpand()));
+		}
+			
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -53,8 +52,9 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 		//update widget descriptor from the view
 		view.checkParams();
 		descriptor.setEntityId(view.getEntityId());
-		descriptor.setDepth(view.getDepth());
-		descriptor.setShowExpand(view.isExpanded());
+		//TODO: uncomment when the view sets these values
+//		descriptor.setDepth(view.getDepth().toString());
+//		descriptor.setShowExpand(Boolean.toString(view.isExpanded()));
 	}
 	
 	@Override
@@ -68,12 +68,8 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 	}
 	
 	@Override
-	public String getTextToInsert(String name) {
+	public String getTextToInsert() {
 		return null;
-	}
-	
-	@Override
-	public void setNameProvider(WidgetNameProvider provider) {
 	}
 	
 	/*

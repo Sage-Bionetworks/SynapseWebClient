@@ -1,21 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.WidgetNameProvider;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -23,13 +18,12 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseEditWidgetDescriptorView, WidgetNameProvider {
+public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseEditWidgetDescriptorView {
 	
 	Dialog window;
 	SimplePanel paramsPanel;
 	SimplePanel baseContentPanel;
 	String saveButtonText = "Save";
-	TextField<String> nameField;
 	
 	private Presenter presenter;
 	private WidgetEditorPresenter widgetDescriptorPresenter;
@@ -94,17 +88,6 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setStyleAttribute("margin", "10px");
 		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		nameField = new TextField<String>();
-		nameField.setAllowBlank(false);
-		nameField.setName("Name");
-		nameField.setRegex(WebConstants.VALID_WIDGET_NAME_REGEX);
-		nameField.getMessages().setRegexText(DisplayConstants.ERROR_WIDGET_NAME_PATTERN_MISMATCH);
-		Label nameLabel = new Label("Name:");
-		nameLabel.setWidth(50);
-		nameField.setWidth(270);
-		hp.add(nameLabel);
-		hp.add(nameField);
-		
 		baseContentPanel.add(hp);
 	}
 	
@@ -148,28 +131,16 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 		if (widgetDescriptorPresenter != null) {
 			Widget w = widgetDescriptorPresenter.asWidget();
 			paramsPanel.add(w);
-			widgetDescriptorPresenter.setNameProvider(this);
 		}
 	}
 	
 	@Override
-	public String getTextToInsert(String name) {
-		return widgetDescriptorPresenter.getTextToInsert(name);
+	public String getTextToInsert() {
+		return widgetDescriptorPresenter.getTextToInsert();
 	}
-	
-	@Override
-	public String getName() {
-		return nameField.getValue();
-	}
-	@Override
-	public void setName(String name) {
-		nameField.setValue(name);
-	}
-	
+
 	@Override
 	public void updateDescriptorFromView() {
-		if (!nameField.isValid())
-			throw new IllegalArgumentException(nameField.getErrorMessage());
 		widgetDescriptorPresenter.updateDescriptorFromView();
 	}
 	
@@ -181,8 +152,6 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	
 	@Override
 	public void clear() {
-		if (nameField != null)
-			nameField.setValue("");
 	}
 	@Override
 	public void setSaveButtonText(String text) {

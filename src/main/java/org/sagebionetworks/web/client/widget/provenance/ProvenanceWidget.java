@@ -76,12 +76,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_DESCRIPTOR_TYPE);
 		//set up view based on descriptor parameters
 		descriptor = (ProvenanceWidgetDescriptor)widgetDescriptor;
-		int d = 1;
-		if (descriptor.getDepth()!= null) {
-			d = descriptor.getDepth().intValue();
-		}
-		final int depth = d;
-		final Boolean showExpand = descriptor.getShowExpand();
+		final int depth = descriptor.getDepth() != null ? Integer.parseInt(descriptor.getDepth()) : 1;
+		final Boolean showExpand = descriptor.getShowExpand() != null ? Boolean.parseBoolean(descriptor.getShowExpand()) : true;
 		int mask = ENTITY;
 		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override

@@ -58,12 +58,8 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetE
 	}
 	
 	@Override
-	public String getTextToInsert(String name) {
+	public String getTextToInsert() {
 		return null;
-	}
-	
-	@Override
-	public void setNameProvider(WidgetNameProvider provider) {
 	}
 	
 	/*

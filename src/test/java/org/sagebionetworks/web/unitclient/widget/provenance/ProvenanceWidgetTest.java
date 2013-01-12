@@ -190,9 +190,9 @@ public class ProvenanceWidgetTest {
 		
 		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		ProvenanceWidgetDescriptor widgetDescriptor = new ProvenanceWidgetDescriptor();
-		widgetDescriptor.setDepth(42l);
+		widgetDescriptor.setDepth("42");
 		widgetDescriptor.setEntityId(entity.getId());
-		widgetDescriptor.setShowExpand(true);
+		widgetDescriptor.setShowExpand("true");
 		provenanceWidget.configure("bad entity id", widgetDescriptor);
 		verifyBuildTreeCalls();
 	}

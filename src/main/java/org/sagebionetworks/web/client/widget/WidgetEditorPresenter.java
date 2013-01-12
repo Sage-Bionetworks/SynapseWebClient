@@ -38,7 +38,5 @@ public interface WidgetEditorPresenter extends SynapseWidgetPresenter {
 	 * @see org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor
 	 * @return
 	 */
-	public String getTextToInsert(String name);
-	
-	public void setNameProvider(WidgetNameProvider provider);
+	public String getTextToInsert();
 }

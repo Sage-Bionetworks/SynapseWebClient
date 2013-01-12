@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -21,6 +22,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
@@ -86,6 +88,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
 	private FilesBrowser filesBrowser;	
+	private PagesBrowser pagesBrowser;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -97,7 +100,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser, PagesBrowser pagesBrowser) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -111,6 +114,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.locationableTitleBar = locationableTitleBar;
 		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
+		this.pagesBrowser = pagesBrowser;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 	}
@@ -146,6 +150,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		} else if (bundle.getEntity() instanceof Summary) {
 		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
+		} else if (bundle.getEntity() instanceof Page) {
+		    renderPageEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		} else {
 			// default entity view
 			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
@@ -173,7 +179,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu.addEntityUpdatedHandler(handler);
 		locationableTitleBar.addEntityUpdatedHandler(handler);
 		filesBrowser.addEntityUpdatedHandler(handler);
-			}
+		pagesBrowser.addEntityUpdatedHandler(handler);
+	}
 
 	@Override
 	public void showErrorMessage(String message) {
@@ -234,7 +241,26 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		}
 		// ************************************************************************************************		
 	}
-		
+	
+	// Render the Page entity	
+	private void renderPageEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
+		// ** LEFT **
+//		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
+			
+		// ** RIGHT **
+		// ** FULL WIDTH **
+		// Entity Metadata
+		fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
+		entityMetadata.setEntityBundle(bundle, readOnly);
+		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
+		// Description
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
+
+		// Child Page Browser
+		fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, false));
+		// ************************************************************************************************		
+	}
+	
 	// Render the Folder entity
 	private void renderFolderEntity(EntityBundle bundle,
 			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
@@ -280,8 +306,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ** FULL WIDTH **
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
-		// Child Browser
-		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));		
+		// Child Page Browser
+		//fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, true));
+		// Child File Browser
+		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
 
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -363,7 +391,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private Widget createEntityFilesBrowserWidget(Entity entity, boolean showTitle) {
-		String title = DisplayConstants.FILES;
 		if(showTitle) 
 			filesBrowser.configure(entity.getId(), DisplayConstants.FILES);
 		else 
@@ -374,6 +401,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.add(filesBrowser.asWidget());
 		return lc;
 	}
+	
+	private Widget createEntityPagesBrowserWidget(Entity entity, boolean canEdit,  boolean isProject) {
+		pagesBrowser.configure(entity.getId(), DisplayConstants.PAGES, canEdit, isProject);
+		LayoutContainer lc = new LayoutContainer();
+		lc.addStyleName("left");
+		lc.setStyleAttribute("margin", "0px 0px 20px 0px");
+		lc.add(pagesBrowser.asWidget());
+		return lc;
+	}
+
 
 	private Widget createDescriptionWidget(final EntityBundle bundle, String entityTypeDisplay, boolean showWhenEmpty) {
 		final LayoutContainer lc = new LayoutContainer();
@@ -386,8 +423,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				return lc;
 		}
 		
-
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3 style=\"clear: left;\">Description</h3>")));
+		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"clear: left;\"></div>")));
 
 		// Add the description body
 	    if(description == null || "".equals(description)) {
@@ -446,7 +482,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         flex.setFlex(1);
 
         final String baseURl = GWT.getModuleBaseURL()+"attachment";
-        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId() +"&"+ DisplayUtils.ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY + "=true" ;
+        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId() ;
 
         if(canEdit && !readOnly) {
 	        Anchor addBtn = new Anchor();

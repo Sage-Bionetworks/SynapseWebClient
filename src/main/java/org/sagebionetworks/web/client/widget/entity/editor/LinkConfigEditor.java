@@ -49,12 +49,8 @@ public class LinkConfigEditor implements LinkConfigView.Presenter, WidgetEditorP
 	}
 	
 	@Override
-	public String getTextToInsert(String name) {
-		return "["+name+"]("+view.getLinkUrl()+")";
-	}
-	
-	@Override
-	public void setNameProvider(WidgetNameProvider provider) {
+	public String getTextToInsert() {
+		return "["+view.getName()+"]("+view.getLinkUrl()+")";
 	}
 	
 	/*

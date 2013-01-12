@@ -20,6 +20,7 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public boolean isExternal();
 	
 	public String getImageUrl();
+	public String getAltText();
 	public void setImageUrl(String url);
 	public AttachmentData getUploadedAttachmentData();
 	public void setUploadedAttachmentData(AttachmentData uploadedAttachmentData);
@@ -31,7 +32,5 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		//when something is uploaded, change the attachment name to the uploaded file name
-		public void setName(String name);
 	}
 }

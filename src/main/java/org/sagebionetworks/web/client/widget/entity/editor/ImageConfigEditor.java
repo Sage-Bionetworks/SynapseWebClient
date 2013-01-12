@@ -1,11 +1,20 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.Iterator;
+
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
 import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetNameProvider;
+import org.sagebionetworks.web.shared.EntityWrapper;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -13,14 +22,18 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	
 	private ImageConfigView view;
 	private ImageAttachmentWidgetDescriptor descriptor;
-	private WidgetNameProvider provider;
+	private SynapseClientAsync synapseClient;
+	private NodeModelCreator nodeModelCreator;
 	
 	@Inject
-	public ImageConfigEditor(ImageConfigView view) {
+	public ImageConfigEditor(ImageConfigView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		view.setPresenter(this);
+		this.synapseClient = synapseClient;
+		this.nodeModelCreator = nodeModelCreator;
 		view.initView();
-	}		
+	}
+	
 	@Override
 	public void configure(String entityId, WidgetDescriptor widgetDescriptor) {
 		if (!(widgetDescriptor instanceof ImageAttachmentWidgetDescriptor))
@@ -29,8 +42,31 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		descriptor = (ImageAttachmentWidgetDescriptor)widgetDescriptor;
 		view.setEntityId(entityId);
 		//if the attachmentData is set then there'a an associated image.  Only show the external url ui if we aren't editing one that already has an attachment
-		view.setExternalVisible(descriptor.getImage() == null);
-		view.setUploadedAttachmentData(descriptor.getImage());
+//		view.setExternalVisible(descriptor.getFileName() == null);
+//		if (descriptor.getFileName() != null) {
+//			//find the attachment associated with this file name
+//			synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+//				@Override
+//				public void onSuccess(EntityWrapper result) {
+//					Entity entity;
+//					try {
+//						entity = nodeModelCreator.createEntity(result);
+//						for (Iterator iterator = entity.getAttachments().iterator(); iterator
+//								.hasNext();) {
+//							AttachmentData data = (AttachmentData) iterator.next();
+//							if (descriptor.getFileName().equals(data.getName()))
+//								view.setUploadedAttachmentData(data);				
+//						}
+//					} catch (JSONObjectAdapterException e) {
+//						view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION); 
+//					}
+//				}
+//				@Override
+//				public void onFailure(Throwable caught) {
+//					view.showErrorMessage(caught.getMessage());
+//				}			
+//			});
+//		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -47,13 +83,13 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	public void updateDescriptorFromView() {
 		view.checkParams();
 		if (!view.isExternal())
-			descriptor.setImage(view.getUploadedAttachmentData());
+			descriptor.setFileName(view.getUploadedAttachmentData().getName());
 	}
 	
 	@Override
-	public String getTextToInsert(String name) {
+	public String getTextToInsert() {
 		if (view.isExternal())
-			return "!["+name+"]("+view.getImageUrl()+")";
+			return "!["+view.getAltText()+"]("+view.getImageUrl()+")";
 		else return null;
 	}
 
@@ -64,23 +100,6 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	@Override
 	public int getAdditionalWidth() {
 		return view.getAdditionalWidth();
-	}
-	
-	@Override
-	public void setName(String name) {
-		//try to strip off the file extension
-		if (name != null) {
-			int lastIndex = name.lastIndexOf('.');
-			if (lastIndex > 0)
-				name = name.substring(0, lastIndex);
-			provider.setName(name);
-		}
-	}
-	
-	@Override
-	public void setNameProvider(WidgetNameProvider provider) {
-		//when an image is uploaded, also set the name of the widget
-		this.provider = provider;
 	}
 	
 	/*

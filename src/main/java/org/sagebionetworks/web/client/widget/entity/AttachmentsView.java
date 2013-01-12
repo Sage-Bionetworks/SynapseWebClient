@@ -51,7 +51,6 @@ public interface AttachmentsView extends IsWidget, SynapseWidgetView {
 		 */
 		void clearHandlers();
 		
-		void editAttachment(String tokenId);
 		void setAttachmentColumnWidth(int width);
 	}
 

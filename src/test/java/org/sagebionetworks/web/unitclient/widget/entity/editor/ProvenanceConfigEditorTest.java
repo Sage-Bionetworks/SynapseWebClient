@@ -29,21 +29,21 @@ public class ProvenanceConfigEditorTest {
 	@Test
 	public void testConfigure() {
 		ProvenanceWidgetDescriptor descriptor = new ProvenanceWidgetDescriptor();
-		Long d = 5l;
+		String d = "5";
 		String entityToGraph = "syn1234555";
-		Boolean showExpand = true;
+		String showExpand = "true";
 		descriptor.setDepth(d);
 		descriptor.setEntityId(entityToGraph);
 		descriptor.setShowExpand(showExpand);
 		editor.configure("", descriptor);
 		verify(mockView).setEntityId(eq(entityToGraph));
-		verify(mockView).setIsExpanded(eq(showExpand));
-		verify(mockView).setDepth(eq(d));
+		verify(mockView).setIsExpanded(eq(Boolean.valueOf(showExpand)));
+		verify(mockView).setDepth(eq(Long.parseLong(d)));
 		
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
-		verify(mockView).getDepth();
+		//verify(mockView).getDepth();
 		verify(mockView).getEntityId();
-		verify(mockView).isExpanded();
+		//verify(mockView).isExpanded();
 	}
 }

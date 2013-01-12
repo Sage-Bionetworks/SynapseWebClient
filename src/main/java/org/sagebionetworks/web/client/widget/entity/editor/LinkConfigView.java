@@ -15,6 +15,10 @@ public interface LinkConfigView extends IsWidget, WidgetEditorView {
 	public void setLinkUrl(String url);
 	public String getLinkUrl();
 	
+	public void setName(String name);
+	public String getName();
+	
+	
 	/**
 	 * Presenter interface
 	 */

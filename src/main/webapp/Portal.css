@@ -462,8 +462,8 @@ a.shortBtn {
 	margin-left: 180px;
 }
 
-.margin-left-530 {
-	margin-left: 530px;
+.margin-left-725 {
+	margin-left: 725px;
 }
 .markdown {
 	word-wrap:break-word;
@@ -609,18 +609,24 @@ h1, h2, h3, h4, h5, h6 {
 	font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;
 }
 
-/**
-content type div sizes
-**/
-.youtubeDescriptor {
+.pagelist { 
+	list-style-type: square;
+	padding-left: 17px;
+	margin-bottom: 4px;
+}
+
+/** content type div sizes *********/
+.youtube {
 	width: 480px;
 	height: 385px;
 }
-.provenanceDescriptor {
+.provenance {
 	width: 260px;
 	height: 250px;
 }
-.imageDescriptor{
+.image{
 	max-width: 940px;
 }
+/**********************************/
+
 	
