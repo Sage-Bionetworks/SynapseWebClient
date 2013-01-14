@@ -141,7 +141,7 @@ public class DisplayUtils {
 	public static final String DEFAULT_PLACE_TOKEN = "0";
 	
 	public static final String R_CLIENT_DOWNLOAD_CODE = "source('http://depot.sagebase.org/CRAN.R')<br/>pkgInstall(c(\"synapseClient\"))";
-	public static final String PYTHON_CLIENT_DOWNLOAD_CODE = "# From Terminal Prompt:<br/>pip install SynapseClient<br/><br/># or<br/>easy_install SynapseClient";
+	public static final String PYTHON_CLIENT_DOWNLOAD_CODE = "# From Terminal Prompt:<br/>pip install synapseclient<br/><br/># or<br/>easy_install synapseclient";
 	
 
 	
