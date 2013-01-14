@@ -64,7 +64,7 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/document-text-16.png")
 	ImageResource documentText16();
-		
+
 	@Source("images/icons/pencil-16.png")
 	ImageResource edit16();
 
@@ -278,6 +278,13 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/synapse-model-24.png")
 	ImageResource synapseModel24();
+
+	@Source("images/icons/document-text-16.png")
+	ImageResource synapsePage16();
+
+	@Source("images/icons/document-text-24.png")
+	ImageResource synapsePage24();
+
 	
 	@Source("images/icons/synapse-project-16.png")
 	ImageResource synapseProject16();

@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RObject;
@@ -50,6 +51,7 @@ import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -772,7 +774,11 @@ public class DisplayUtils {
 		} else if(Study.class.getName().equals(className)) {
 			// Study
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStudy16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStudy24();			
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStudy24();
+		} else if(Page.class.getName().equals(className)) {
+			// Page
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();			
 		} else {
 			// default to Model
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
@@ -1165,7 +1171,7 @@ public class DisplayUtils {
 		if (attachmentName == null)
 			return null;
 		StringBuilder sb = new StringBuilder();
-		sb.append("{Widget:");
+		sb.append(WebConstants.WIDGET_START_MARKDOWN);
 		sb.append(attachmentName);
 		sb.append("}");
 		return sb.toString();
@@ -1225,7 +1231,6 @@ public class DisplayUtils {
 		});
 		return uploadButton;
 	}
-
 	
 	/**
 	 * Provides same functionality as java.util.Pattern.quote().

@@ -890,42 +890,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	@Override
-	public String getWidgetDescriptorJson(String entityId, String attachmentName) throws RestServiceException {
-		String widgetDescriptorJson = null;
-		try {
-				Synapse client = createSynapseClient();
-				Entity e = client.getEntityById(entityId);
-				if (e.getAttachments() != null) {
-					for (Iterator<AttachmentData> iterator = e.getAttachments().iterator(); iterator
-							.hasNext();) {
-						AttachmentData data = iterator.next();
-						if (data.getName().equals(attachmentName)) {
-							//found
-							File attachmentDownload = null;
-							try{
-								attachmentDownload = File.createTempFile(entityId+"_"+attachmentName, ".json");
-								client.downloadEntityAttachment(entityId, data, attachmentDownload);
-								widgetDescriptorJson = FileUtils.readFileToString(attachmentDownload);
-							} finally {
-								if (attachmentDownload != null)
-									attachmentDownload.delete();
-							}
-							break;
-						}
-					}
-				}
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		} catch (IOException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-
-		return widgetDescriptorJson;
-	}
-	
 	
 	@Override
 	public EntityWrapper removeAttachmentFromEntity(String entityId,
@@ -956,52 +920,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return updatedEntityWrapper;
 	}
 	
-	@Override
-	public EntityWrapper addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName, String contentTypeKey) throws RestServiceException {
-		EntityWrapper updatedEntityWrapper = null;
-		try {
-			
-			//write the descriptor json string to a temp file
-			String fileExtension = ".json";
-			File tempFile = File.createTempFile(attachmentName, fileExtension);
-
-			if (attachmentName == null || attachmentName.trim().length() == 0) {
-				attachmentName = tempFile.getName().substring(0, tempFile.getName().length() - fileExtension.length());
-			}
-			//delete any attachments with the same name first.
-			removeAttachmentFromEntity(entityId, attachmentName);
-			Synapse client = createSynapseClient();
-			FileUtils.writeStringToFile(tempFile, descriptorJson);
-			AttachmentData data = null;
-			try{
-				// Now upload the file
-				data = client.uploadAttachmentToSynapse(entityId, tempFile, attachmentName);
-			}finally{
-				// Unconditionally delete the tmp file
-				tempFile.delete();
-			}
-			if (data != null) {
-				data.setContentType(contentTypeKey);
-				// Add the attachment to the entity.
-				Entity e = client.getEntityById(entityId);
-				if (e.getAttachments() == null) {
-					e.setAttachments(new ArrayList<AttachmentData>());
-				}
-				e.getAttachments().add(data);
-				// Save the changes.
-				Entity updatedEntity = client.putEntity(e);
-				updatedEntityWrapper = new EntityWrapper(EntityFactory.createJSONStringForEntity(updatedEntity), updatedEntity.getClass().getName());
-			}
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		} catch (IOException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-		return updatedEntityWrapper;
-	}
-
 	@Override
 	public String promoteEntityVersion(String entityId, Long versionNumber)
 			throws RestServiceException {

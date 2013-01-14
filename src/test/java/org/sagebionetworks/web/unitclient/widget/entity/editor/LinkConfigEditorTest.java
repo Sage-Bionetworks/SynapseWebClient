@@ -29,7 +29,8 @@ public class LinkConfigEditorTest {
 	@Test
 	public void testGetTextToInsert() {
 		when(mockView.getLinkUrl()).thenReturn("http://synapse.sagebase.org/");
-		String md = editor.getTextToInsert("Synapse");
+		when(mockView.getName()).thenReturn("Synapse");
+		String md = editor.getTextToInsert();
 		assertEquals("[Synapse](http://synapse.sagebase.org/)", md);
 	}
 }

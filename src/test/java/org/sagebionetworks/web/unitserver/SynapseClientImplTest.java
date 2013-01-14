@@ -18,7 +18,6 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,8 +30,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -56,7 +53,6 @@ import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.storage.StorageUsage;
-import org.sagebionetworks.repo.model.widget.YouTubeWidgetDescriptor;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -67,7 +63,6 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -466,21 +461,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetWidgetDescriptorJson() throws Exception {
-		synapseClient.getWidgetDescriptorJson(entityId, attachment1.getName());
-		verify(mockSynapse).getEntityById(entityId);
-		verify(mockSynapse).downloadEntityAttachment(anyString(), any(AttachmentData.class), any(File.class));
-	}
-	
-	@Test
-	public void testGetWidgetDescriptorJsonNotFound() throws Exception {
-		synapseClient.getWidgetDescriptorJson(entityId, "missing attachment name");
-		verify(mockSynapse).getEntityById(entityId);
-		//verify that downloadEntityAttachment is not called
-		verify(mockSynapse, Mockito.times(0)).downloadEntityAttachment(anyString(), any(AttachmentData.class), any(File.class));
-	}
-	
-	@Test
 	public void testRemoveAttachmentFromEntity() throws Exception {
 
 		Mockito.when(mockSynapse.putEntity(any(ExampleEntity.class))).thenReturn(entity);
@@ -499,31 +479,4 @@ public class SynapseClientImplTest {
 		assertTrue(attachments.size() == 1 && attachments.get(0).equals(attachment1));
 	}
 
-	@Test
-	public void testAddWidgetDescriptorToEntity() throws Exception {
-		//when it attempts to update the entity, test to see if attachment has been added!
-		String newAttachmentName= "My New Attachment";
-		final AttachmentData myNewAttachment = new AttachmentData();
-		myNewAttachment.setContentType(WidgetConstants.YOUTUBE_CONTENT_TYPE);
-		myNewAttachment.setName(newAttachmentName);
-		
-		Mockito.when(mockSynapse.uploadAttachmentToSynapse(anyString(), any(File.class), anyString())).thenReturn(myNewAttachment);
-		Mockito.when(mockSynapse.putEntity(any(ExampleEntity.class))).thenReturn(entity);
-		YouTubeWidgetDescriptor descriptor = new YouTubeWidgetDescriptor();
-		descriptor.setVideoId("myVideoId");
-		String descriptorJson = EntityFactory.createJSONStringForEntity(descriptor);
-		
-		entity.getAttachments().clear();
-		//before the call, verify entity has no attachments
-		assertTrue(entity.getAttachments().size() == 0);
-		synapseClient.addWidgetDescriptorToEntity(descriptorJson, entityId, myNewAttachment.getName(), myNewAttachment.getContentType());
-		verify(mockSynapse).uploadAttachmentToSynapse(eq(entityId), any(File.class), eq(newAttachmentName));
-		
-		ArgumentCaptor<ExampleEntity> arg = ArgumentCaptor.forClass(ExampleEntity.class);
-		verify(mockSynapse, Mockito.times(2)).putEntity(arg.capture());
-		ExampleEntity updatedEntity = arg.getValue();
-	     //verify that attachment3 has been added
-		List<AttachmentData> attachments = updatedEntity.getAttachments();
-		assertEquals(attachments.get(0), myNewAttachment);
-	}
 }

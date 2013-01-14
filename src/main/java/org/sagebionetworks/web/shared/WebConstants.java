@@ -60,7 +60,7 @@ public class WebConstants {
 	public static final String ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
 			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br></code></pre><br>" +
 			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>An [example][id]. Then, anywhere else in the description, define the link:<br>  [id]: http://example.com/<br></code></pre><br>" +
-			"<h3>Tables</h3><pre><code>First Header  | Second Header <br>------------- | ------------- <br>Content Cell  | Content Cell <br>Content Cell  | Content Cell</code></pre><br>" +
+			"<h3>Tables</h3><pre><code>First Header  | Second Header | Third Header<br>------------- | ------------- | -------------<br>Content Cell  | Content Cell  | Content Cell<br>Content Cell  | Content Cell  | Content Cell</code></pre><br>" +
 			"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
 			"<h3>Headers</h3><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre><br>" +
 			"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
@@ -79,5 +79,7 @@ public class WebConstants {
 
 	public static final int MAX_COLUMNS_IN_GRID = 100;
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
-	
+
+	public static final String WIDGET_START_MARKDOWN = "${";
+	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
 }

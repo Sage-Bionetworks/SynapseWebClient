@@ -181,7 +181,5 @@ public interface SynapseClient extends RemoteService {
 	public String getActivity(String activityId) throws RestServiceException;
 	
 	String promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
-	public EntityWrapper addWidgetDescriptorToEntity(String descriptorJson, String entityId, String attachmentName, String contentTypeKey) throws RestServiceException;
 	public EntityWrapper removeAttachmentFromEntity(String entityId, String attachmentName) throws RestServiceException;
-	public String getWidgetDescriptorJson(String entityId, String attachmentName) throws RestServiceException; 
 }

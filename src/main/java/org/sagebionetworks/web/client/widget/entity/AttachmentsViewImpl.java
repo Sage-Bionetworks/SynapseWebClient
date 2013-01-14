@@ -224,17 +224,6 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 				td.setHorizontalAlign(HorizontalAlignment.RIGHT);
 				td.setVerticalAlign(VerticalAlignment.MIDDLE);
 				
-				if(showEditButton) {
-					img = AbstractImagePrototype.create(iconsImageBundle.editGrey16());
-					Anchor editButton = DisplayUtils.createIconLink(img, new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							editAttachmentAt(rowIndex);
-						}
-					});
-					panel.add(editButton, td);
-				}
-				
 				panel.add(button, td);
 				panel.setAutoWidth(true);
 				return panel;
@@ -302,12 +291,6 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 							}
 						}
 					});
-		}
-	}
-	public void editAttachmentAt(int rowIndex) {
-		final BaseModelData model = grid.getStore().getAt(rowIndex);
-		if (model != null) {
-			presenter.editAttachment((String) model.get(ATTACHMENT_DATA_TOKEN_KEY));
 		}
 	}
 	public void showAttachmentAt(int rowIndex) {

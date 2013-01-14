@@ -303,6 +303,7 @@ public class DisplayConstants {
 	public static final String LOADING = "Loading";
 	public static final String ACTIVITY = "Activity";
 	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
+	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
 	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	public static final String ERROR_WIDGET_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, hypens, periods, plus signs, and parentheses.";
 
@@ -311,9 +312,11 @@ public class DisplayConstants {
 	 */
 	public static final String IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE = "A file must be uploaded to continue.";
 	public static final String IMAGE_CONFIG_INVALID_URL_MESSAGE = "Please enter a valid URL";
+	public static final String IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE = "Please enter valid alternate text for the URL";
 	public static final String IMAGE_CONFIG_UPLOAD = "Upload";
 	public static final String IMAGE_CONFIG_FROM_THE_WEB = "From the Web";
 	public static final String IMAGE_CONFIG_URL_LABEL = "Image URL:";
+	public static final String IMAGE_CONFIG_ALT_TEXT = "Alternate Text:";
 	public static final String URL_LABEL = "URL:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
@@ -425,8 +428,13 @@ public class DisplayConstants {
 	public static final String ADD_FILE = "Add File";
 	public static final String FILES = "Files";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
+	public static final String PAGES = "Pages";
+	public static final String ADD_PAGE = "Add a new page";
+	public static final String PROJECT_WIKI_NAME = "Wiki";
+	public static final String ERROR_PAGE_CREATION_FAILED = "Page creation failed. Please try again";
 	public static final String UNAUTHORIZED = "Unauthorized";
 	public static final String UNAUTHORIZED_DESC = "You are not authorized to access the page requested.";
 	public static final String LOGIN_TO_DOWNLOAD = "Please login to download data.";
+	public static final String INVALID_WIDGET_MARKDOWN_MESSAGE = "Invalid widget markdown: ";
 }
 

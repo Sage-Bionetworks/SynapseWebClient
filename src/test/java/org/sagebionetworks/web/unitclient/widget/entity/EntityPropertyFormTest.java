@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,39 +14,25 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.verification.VerificationMode;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.EntitySchemaCache;
-import org.sagebionetworks.web.client.EntityTypeProvider;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
-import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -123,7 +107,7 @@ public class EntityPropertyFormTest {
 	}
 
 	@Test
-	public void testPreview() {
+	public void testPreview() throws Exception {
 		final String testHtml = "<h1>HTML Returns</h1>";
 		final String testMarkdown = "HTML Returns\n----------";
 		AsyncMockStubber
@@ -135,32 +119,13 @@ public class EntityPropertyFormTest {
 		presenter.showPreview(testMarkdown,  "");
 		verify(mockSynapseClient).markdown2Html(any(String.class),
 				any(String.class), any(Boolean.class), any(AsyncCallback.class));
-		verify(mockView).showPreview(anyString(), any(EntityBundle.class),any(WidgetRegistrar.class), any(SynapseClientAsync.class), any(NodeModelCreator.class));
+		verify(mockView).showPreview(anyString(), any(EntityBundle.class),any(WidgetRegistrar.class), any(SynapseClientAsync.class), any(NodeModelCreator.class), any(JSONObjectAdapter.class));
 	}
 	
-	@Test
-	public void testAttachmentDeleted() {
-		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
-		event.setDeleted(true);
-		presenter.attachmentUpdated(event);
-		verify(mockView).removeAllOccurrences(anyString());
-	}
-	@Test
-	public void testAttachmentRenamed() {
-		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
-		String oldName = "old";
-		String newName = "new";
-		event.setOldName(oldName);
-		event.setName(newName);
-		presenter.attachmentUpdated(event);
-		verify(mockView).replaceAllOccurrences(anyString(), anyString());
-	}
 	
 	@Test
 	public void testAttachmentRefresh() {
-		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
-		event.setDeleted(true);
-		presenter.attachmentUpdated(event);
+		presenter.refreshEntityAttachments();
 		//testing reload
 		verify(mockView).showLoading();
 		verify(mockView).hideLoading();
@@ -169,11 +134,9 @@ public class EntityPropertyFormTest {
 	
 	@Test
 	public void testAttachmentRefreshFailure() {
-		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
-		event.setDeleted(true);
 		Exception caught = new Exception("test failure");
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		presenter.attachmentUpdated(event);
+		presenter.refreshEntityAttachments();
 		//testing failure
 		verify(mockView).showLoading();
 		verify(mockView).hideLoading();

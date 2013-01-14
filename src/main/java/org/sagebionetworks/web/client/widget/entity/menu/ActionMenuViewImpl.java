@@ -281,7 +281,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		Menu menu = new Menu();
 		
 		List<EntityType> children = entityType.getValidChildTypes();
-		List<EntityType> skipTypes = presenter.getAddSkipTypes();		
+		List<EntityType> skipTypes = presenter.getAddSkipTypes();
 		if(children != null) {			 
 			// add child tabs in order
 			for(EntityType child : DisplayUtils.orderForDisplay(children)) {

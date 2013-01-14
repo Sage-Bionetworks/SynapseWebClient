@@ -29,6 +29,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 		sb.append("\"></img>");
 		
 		add(new HTMLPanel(sb.toString()));
+		this.layout(true);
 	}
 	
 	/**

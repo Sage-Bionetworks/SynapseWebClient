@@ -5,8 +5,6 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AutoGenFactory;
@@ -131,8 +129,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();		
 		
 		searchService.searchEntities("entity", Arrays
-				.asList(new WhereCondition[] { new WhereCondition("parentId",
-						WhereOperator.EQUALS, entityId) }), 1, MAX_FOLDER_LIMIT, null,
+				.asList(new WhereCondition[] { 
+						new WhereCondition("parentId", WhereOperator.EQUALS, entityId)
+						}), 1, MAX_FOLDER_LIMIT, null,
 				false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {

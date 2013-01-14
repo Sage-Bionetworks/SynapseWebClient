@@ -45,9 +45,9 @@ public class ServerMarkdownUtils {
 		anchors.addClass("link");
 		//TODO: remove old attachment image syntax support (now that we have widgets)?
 		ServerMarkdownUtils.resolveAttachmentImages(doc, attachmentUrl);
+		ServerMarkdownUtils.addWidgets(doc, isPreview);
 		ServerMarkdownUtils.addSynapseLinks(doc);
 		//URLs are automatically resolved from the markdown processor
-		ServerMarkdownUtils.addWidgets(doc, isPreview);
 		String returnHtml = "<div class=\"markdown\">" + doc.html() + "</div>";
 		return returnHtml;
 	}
@@ -132,9 +132,10 @@ public class ServerMarkdownUtils {
 	public static void addWidgets(Document doc, Boolean isPreview) {
 		String suffix = isPreview ? DisplayConstants.DIV_ID_PREVIEW_SUFFIX : "";
 		// using a regular expression to find our special widget notation, replace with a div with the widget name
-		String regEx = "\\W*?(\\{Widget:("+WebConstants.WIDGET_NAME_REGEX+"*)\\})\\W*?"; //reluctant qualification so that it finds multiple per line
+		String regEx = "\\W*?("+WebConstants.WIDGET_START_MARKDOWN_ESCAPED+"([^\\}]*)\\})\\W*?"; //reluctant qualification so that it finds multiple per line
 		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
 		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
+		int widgetsFound = 0;
 		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
 			Element element = (Element) iterator.next();
 			//only process the TextNode children (ignore others)
@@ -149,7 +150,8 @@ public class ServerMarkdownUtils {
 					while (matcher.find()) {
 						if (matcher.groupCount() == 2) {
 							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
-							sb.append(ServerMarkdownUtils.getWidgetHTML(matcher.group(2) + suffix));
+							sb.append(ServerMarkdownUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
+							widgetsFound++;
 							previousFoundIndex = matcher.end(1);
 						}
 					}
@@ -193,11 +195,16 @@ public class ServerMarkdownUtils {
 	    return sb.toString();
 	}
 	
-	public static String getWidgetHTML(String attachmentName){
+	public static String getWidgetHTML(int widgetIndex, String suffix, String widgetProperties){
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div id=\"");
-		sb.append(attachmentName);
-		sb.append("\"></div>");
+		sb.append(DisplayConstants.DIV_ID_WIDGET_PREFIX);
+		sb.append(widgetIndex);
+		sb.append(suffix);
+		sb.append("\" widgetParams=\"");
+		sb.append(widgetProperties);
+		sb.append("\">");
+		sb.append("</div>");
 	    return sb.toString();
 	}
 
