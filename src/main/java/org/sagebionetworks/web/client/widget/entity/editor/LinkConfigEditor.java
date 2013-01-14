@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
+import java.util.Map;
+
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.WidgetNameProvider;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -17,7 +17,7 @@ public class LinkConfigEditor implements LinkConfigView.Presenter, WidgetEditorP
 		view.initView();
 	}		
 	@Override
-	public void configure(String entityId, WidgetDescriptor widgetDescriptor) {
+	public void configure(String entityId, Map<String, String> widgetDescriptor) {
 		//no way to edit an existing link
 	}
 	

@@ -14,8 +14,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
-import org.sagebionetworks.repo.model.widget.ProvenanceWidgetDescriptor;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -28,6 +26,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -50,7 +49,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private Map<String, ProvTreeNode> idToNode = new HashMap<String, ProvTreeNode>();
 	private AdapterFactory adapterFactory;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private ProvenanceWidgetDescriptor descriptor;
+	private Map<String, String> descriptor;
 	
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
@@ -71,13 +70,11 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}	
 	
 	@Override
-	public void configure(String entityId, WidgetDescriptor widgetDescriptor) {
-		if (!(widgetDescriptor instanceof ProvenanceWidgetDescriptor))
-			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_DESCRIPTOR_TYPE);
+	public void configure(String entityId, Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
-		descriptor = (ProvenanceWidgetDescriptor)widgetDescriptor;
-		final int depth = descriptor.getDepth() != null ? Integer.parseInt(descriptor.getDepth()) : 1;
-		final Boolean showExpand = descriptor.getShowExpand() != null ? Boolean.parseBoolean(descriptor.getShowExpand()) : true;
+		descriptor = widgetDescriptor;
+		final int depth = descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY) != null ? Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY)) : 1;
+		final Boolean showExpand = descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY)) : true;
 		int mask = ENTITY;
 		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override
@@ -97,7 +94,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				DisplayUtils.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + caught.getMessage());
 			}			
 		};
-		synapseClient.getEntityBundle(descriptor.getEntityId(), mask, callback);
+		synapseClient.getEntityBundle(descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY), mask, callback);
 	}
 	
 	public void setHeight(int height) {

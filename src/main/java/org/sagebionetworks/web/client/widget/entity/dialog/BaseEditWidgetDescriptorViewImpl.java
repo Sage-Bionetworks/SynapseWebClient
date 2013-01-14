@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
+import java.util.Map;
+
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -124,7 +125,7 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	}
 	
 	@Override
-	public void setWidgetDescriptor(String entityId, String contentTypeKey, WidgetDescriptor widgetDescriptor) {
+	public void setWidgetDescriptor(String entityId, String contentTypeKey, Map<String, String> widgetDescriptor) {
 		//clear out params panel.  Get the right params editor based on the descriptor (it's concrete class, and configure based on the parameters inside of it).
 		paramsPanel.clear();
 		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(entityId, contentTypeKey, widgetDescriptor);

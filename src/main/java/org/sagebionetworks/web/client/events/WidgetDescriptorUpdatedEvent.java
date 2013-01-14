@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.events;
 
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.google.gwt.event.shared.GwtEvent;
@@ -8,7 +7,6 @@ import com.google.gwt.event.shared.GwtEvent;
 public class WidgetDescriptorUpdatedEvent extends GwtEvent<WidgetDescriptorUpdatedHandler> {
 
 	private static final Type<WidgetDescriptorUpdatedHandler> TYPE = new Type<WidgetDescriptorUpdatedHandler>();
-	private WidgetDescriptor widgetDescriptor;
 	private String name, oldName;
 	private EntityWrapper entityWrapper;
 	private boolean isDeleted;
@@ -34,13 +32,6 @@ public class WidgetDescriptorUpdatedEvent extends GwtEvent<WidgetDescriptorUpdat
 		handler.onUpdate(this);
 	}
 
-	public WidgetDescriptor getWidgetDescriptor() {
-		return widgetDescriptor;
-	}
-
-	public void setWidgetDescriptor(WidgetDescriptor widgetDescriptor) {
-		this.widgetDescriptor = widgetDescriptor;
-	}
 	public String getName() {
 		return name;
 	}

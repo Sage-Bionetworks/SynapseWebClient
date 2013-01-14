@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget;
 
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
+import java.util.Map;
 
 /**
  * To support, add your editor to the PortalGinModule, and add it to the know widgets in the widget registrar.
@@ -14,7 +14,7 @@ public interface WidgetEditorPresenter extends SynapseWidgetPresenter {
 	 * @param entityId
 	 * @param widgetDescriptor
 	 */
-	public void configure(String entityId, WidgetDescriptor widgetDescriptor);
+	public void configure(String entityId, Map<String, String> widgetDescriptor);
 	/**
 	 * You should update the parameters stored in your widget descriptor based on the values currently set in the view.
 	 * User parameter validation should occur in this method (throwing an IllegalArgumentException if a problem is found).

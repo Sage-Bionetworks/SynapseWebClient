@@ -1,13 +1,18 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
-import org.junit.*;
-import org.sagebionetworks.repo.model.widget.YouTubeWidgetDescriptor;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 public class YouTubeConfigEditorTest {
 		
@@ -29,9 +34,9 @@ public class YouTubeConfigEditorTest {
 	@Test
 	public void testConfigure() {
 		when(mockView.getVideoUrl()).thenReturn("http://www.youtube.com/watch?v=G0k3kHtyoqc");
-		YouTubeWidgetDescriptor descriptor = new YouTubeWidgetDescriptor();
+		Map<String, String> descriptor = new HashMap<String, String>();
 		String videoId = "my test video id";
-		descriptor.setVideoId(videoId);
+		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, videoId);
 		editor.configure("", descriptor);
 		verify(mockView).setVideoUrl(anyString());
 		

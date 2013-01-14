@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -22,7 +24,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	String contentTypeKey, entityId, attachmentName;
 	JSONObjectAdapter jsonObjectAdapter;
 	//contains all of the widget specific parameters
-	WidgetDescriptor widgetDescriptor;
+	Map<String, String> widgetDescriptor;
 	private WidgetRegistrar widgetRegistrar;
 	
 	@Inject
@@ -64,7 +66,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 			return;
 		}
 		try {
-			fireUpdatedEvent(WidgetRegistrarImpl.getWidgetMarkdown(widgetDescriptor, widgetRegistrar));
+			fireUpdatedEvent(WidgetRegistrarImpl.getWidgetMarkdown(contentTypeKey, widgetDescriptor, widgetRegistrar));
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(e.getMessage());
 		}
@@ -103,9 +105,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		this.contentTypeKey = contentTypeKey;
 		
 		//initialize the view with a new widget descriptor definition of the correct type and show
-		String widgetClassName = widgetRegistrar.getWidgetClass(contentTypeKey);
-		if (widgetClassName != null)
-			widgetDescriptor = (WidgetDescriptor)nodeModelCreator.newInstance(widgetClassName);
+		widgetDescriptor = new HashMap<String, String>();
 		view.setWidgetDescriptor(entityId, contentTypeKey, widgetDescriptor);
 		//prepopulate with a unique attachment name of the correct type
 		String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);

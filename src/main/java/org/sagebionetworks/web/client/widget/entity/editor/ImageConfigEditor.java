@@ -1,45 +1,31 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import java.util.Iterator;
+import java.util.Map;
 
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.WidgetNameProvider;
-import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEditorPresenter {
 	
 	private ImageConfigView view;
-	private ImageAttachmentWidgetDescriptor descriptor;
-	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
+	private Map<String, String> descriptor;
 	
 	@Inject
-	public ImageConfigEditor(ImageConfigView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public ImageConfigEditor(ImageConfigView view) {
 		this.view = view;
 		view.setPresenter(this);
-		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		view.initView();
 	}
 	
 	@Override
-	public void configure(String entityId, WidgetDescriptor widgetDescriptor) {
-		if (!(widgetDescriptor instanceof ImageAttachmentWidgetDescriptor))
-			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_DESCRIPTOR_TYPE);
+	public void configure(String entityId, Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
-		descriptor = (ImageAttachmentWidgetDescriptor)widgetDescriptor;
+		descriptor = widgetDescriptor;
 		view.setEntityId(entityId);
 		//if the attachmentData is set then there'a an associated image.  Only show the external url ui if we aren't editing one that already has an attachment
 //		view.setExternalVisible(descriptor.getFileName() == null);
@@ -83,7 +69,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	public void updateDescriptorFromView() {
 		view.checkParams();
 		if (!view.isExternal())
-			descriptor.setFileName(view.getUploadedAttachmentData().getName());
+			descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, view.getUploadedAttachmentData().getName());
 	}
 	
 	@Override

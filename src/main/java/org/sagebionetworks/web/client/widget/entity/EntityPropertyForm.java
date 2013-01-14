@@ -72,7 +72,8 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 				@Override
 				public void onPersistSuccess(EntityUpdatedEvent event) {
 					//ask for the new entity, update our attachments and etag, and reconfigure the attachments widget
-					refreshEntityAttachments();
+					if (view.isComponentRendered())
+						refreshEntityAttachments();
 				}
 			};
 			bus.addHandler(EntityUpdatedEvent.getType(), entityUpdatedHandler);	

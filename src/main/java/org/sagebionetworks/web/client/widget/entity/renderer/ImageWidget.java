@@ -1,16 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -20,7 +19,7 @@ import com.google.inject.Inject;
 public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPresenter {
 	
 	private ImageWidgetView view;
-	private ImageAttachmentWidgetDescriptor descriptor;
+	private Map<String,String> descriptor;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	
@@ -33,11 +32,9 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	}
 	
 	@Override
-	public void configure(final String entityId, WidgetDescriptor widgetDescriptor) {
-		if (!(widgetDescriptor instanceof ImageAttachmentWidgetDescriptor))
-			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_DESCRIPTOR_TYPE);
+	public void configure(final String entityId, Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
-		descriptor = (ImageAttachmentWidgetDescriptor)widgetDescriptor;
+		descriptor = widgetDescriptor;
 		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
 			@Override
 			public void onSuccess(EntityWrapper result) {
@@ -48,7 +45,7 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 						for (Iterator iterator = entity.getAttachments().iterator(); iterator
 								.hasNext();) {
 							AttachmentData data = (AttachmentData) iterator.next();
-							if (descriptor.getFileName().equals(data.getName()))
+							if (descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY).equals(data.getName()))
 								view.configure(entityId, data);				
 						}
 					}

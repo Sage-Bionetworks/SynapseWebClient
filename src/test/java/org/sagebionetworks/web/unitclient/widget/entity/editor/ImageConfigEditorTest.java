@@ -1,16 +1,22 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
-import org.junit.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 public class ImageConfigEditorTest {
 		
@@ -23,7 +29,7 @@ public class ImageConfigEditorTest {
 		mockView = mock(ImageConfigView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		editor = new ImageConfigEditor(mockView, mockSynapseClient, mockNodeModelCreator);
+		editor = new ImageConfigEditor(mockView);
 	}
 	
 	@Test
@@ -34,12 +40,13 @@ public class ImageConfigEditorTest {
 	
 	@Test
 	public void testConfigure() {
-		ImageAttachmentWidgetDescriptor descriptor = new ImageAttachmentWidgetDescriptor();
+		Map<String,String> descriptor = new HashMap<String, String>();
 		AttachmentData testImage = new AttachmentData();
 		testImage.setName("test name");
 		testImage.setTokenId("test token");
 		testImage.setMd5("test md5");
-		descriptor.setFileName("test name");
+		
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
 		editor.configure("", descriptor);
 		verify(mockView).setEntityId(anyString());
 		//verify(mockView).setExternalVisible(anyBoolean());
