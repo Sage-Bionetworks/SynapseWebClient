@@ -9,16 +9,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -33,6 +35,8 @@ public class ImageWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	Page testPage;
+	Map<String, String> descriptor;
+	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		mockView = mock(ImageWidgetView.class);
@@ -42,6 +46,8 @@ public class ImageWidgetTest {
 		testPage = new Page();
 		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(testPage);
 		widget = new ImageWidget(mockView, mockSynapseClient, mockNodeModelCreator);
+		descriptor = new HashMap<String, String>();
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
 	}
 	
 	@Test
@@ -52,9 +58,6 @@ public class ImageWidgetTest {
 	
 	@Test
 	public void testConfigure() {
-		ImageAttachmentWidgetDescriptor descriptor = new ImageAttachmentWidgetDescriptor();
-		descriptor.setFileName("test name");
-		
 		//set it up so that the requested entity really does have an attachment with that name
 		List<AttachmentData> attachments = new ArrayList<AttachmentData>();
 		AttachmentData testImage = new AttachmentData();
@@ -70,17 +73,12 @@ public class ImageWidgetTest {
 	
 	@Test
 	public void testConfigureWhenEntityHasNullAttachments() {
-		ImageAttachmentWidgetDescriptor descriptor = new ImageAttachmentWidgetDescriptor();
-		descriptor.setFileName("test name");
-		
 		widget.configure("", descriptor);
 		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class));
 	}
 	
 	@Test
 	public void testConfigureWhenEntityHasZeroAttachments() {
-		ImageAttachmentWidgetDescriptor descriptor = new ImageAttachmentWidgetDescriptor();
-		descriptor.setFileName("test name");
 		testPage.setAttachments(new ArrayList());
 		widget.configure("", descriptor);
 		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class));
@@ -88,9 +86,6 @@ public class ImageWidgetTest {
 	
 	@Test
 	public void testConfigureWhenEntityHasOtherAttachments() {
-		ImageAttachmentWidgetDescriptor descriptor = new ImageAttachmentWidgetDescriptor();
-		descriptor.setFileName("test name");
-		
 		List<AttachmentData> attachments = new ArrayList<AttachmentData>();
 		AttachmentData testImage = new AttachmentData();
 		testImage.setName("the wrong attachment");

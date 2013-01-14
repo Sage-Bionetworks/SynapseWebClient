@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -26,7 +28,6 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
-import org.sagebionetworks.repo.model.widget.ProvenanceWidgetDescriptor;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -38,6 +39,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -45,7 +47,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.sagebionetworks.web.unitclient.presenter.AccessControlListEditorTest;
 
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -189,10 +190,10 @@ public class ProvenanceWidgetTest {
 		when(mockNodeModelCreator.createEntityBundle(ebt)).thenReturn(new EntityBundle(entity, null, null, null, null, null, null));
 		
 		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		ProvenanceWidgetDescriptor widgetDescriptor = new ProvenanceWidgetDescriptor();
-		widgetDescriptor.setDepth("42");
-		widgetDescriptor.setEntityId(entity.getId());
-		widgetDescriptor.setShowExpand("true");
+		Map<String, String> widgetDescriptor = new HashMap<String, String>();
+		widgetDescriptor.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, "42");
+		widgetDescriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY, entity.getId());
+		widgetDescriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, "true");
 		provenanceWidget.configure("bad entity id", widgetDescriptor);
 		verifyBuildTreeCalls();
 	}

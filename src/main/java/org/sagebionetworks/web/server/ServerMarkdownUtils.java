@@ -13,7 +13,7 @@ import org.jsoup.select.Elements;
 import org.pegdown.PegDownProcessor;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 public class ServerMarkdownUtils {
 	
@@ -132,7 +132,7 @@ public class ServerMarkdownUtils {
 	public static void addWidgets(Document doc, Boolean isPreview) {
 		String suffix = isPreview ? DisplayConstants.DIV_ID_PREVIEW_SUFFIX : "";
 		// using a regular expression to find our special widget notation, replace with a div with the widget name
-		String regEx = "\\W*?("+WebConstants.WIDGET_START_MARKDOWN_ESCAPED+"([^\\}]*)\\})\\W*?"; //reluctant qualification so that it finds multiple per line
+		String regEx = "\\W*?("+WidgetConstants.WIDGET_START_MARKDOWN_ESCAPED+"([^\\}]*)\\})\\W*?"; //reluctant qualification so that it finds multiple per line
 		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
 		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
 		int widgetsFound = 0;

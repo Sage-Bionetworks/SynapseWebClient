@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.registration;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
 import org.sagebionetworks.repo.model.widget.ProvenanceWidgetDescriptor;
@@ -14,7 +15,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
@@ -22,8 +22,7 @@ import com.google.inject.Inject;
 
 public class WidgetRegistrarImpl implements WidgetRegistrar {
 	
-	private HashMap<String, WidgetRegistration> contentType2WidgetInfo = new HashMap<String, WidgetRegistration>();
-	private HashMap<String, String> widgetDescriptorClass2ContentType = new HashMap<String, String>();
+	private HashMap<String, String> contentType2FriendlyName = new HashMap<String, String>();
 	
 	PortalGinInjector ginInjector;
 	NodeModelCreator nodeModelCreator;
@@ -38,18 +37,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	}
 	
 	@Override
-	public void registerWidget(String contentTypeKey, String friendlyName, String descriptorClassName) {
-		WidgetRegistration r = new WidgetRegistration(descriptorClassName, friendlyName);
-		contentType2WidgetInfo.put(contentTypeKey, r);
-		widgetDescriptorClass2ContentType.put(descriptorClassName, contentTypeKey);
-	}
-	
-	@Override
-	public String getWidgetClass(String contentTypeKey) {
-		WidgetRegistration r = contentType2WidgetInfo.get(contentTypeKey);
-		if (r != null)
-			return r.getClassName();
-		else return null;
+	public void registerWidget(String contentTypeKey, String friendlyName) {
+		contentType2FriendlyName.put(contentTypeKey, friendlyName);
 	}
 	
 	/**
@@ -58,7 +47,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(String entityId, String contentTypeKey, WidgetDescriptor model) { 
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(String entityId, String contentTypeKey, Map<String, String> model) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
@@ -77,8 +66,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	}
 
 	@Override
-	public String getWidgetContentType(WidgetDescriptor model) {
-		return widgetDescriptorClass2ContentType.get(model.getClass().getName());
+	public String getWidgetContentType(Map<String, String> model) {
+		return model.get("contentType");
 	}
 	
 	/**
@@ -87,7 +76,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(String entityId, String contentTypeKey, WidgetDescriptor model) { 
+	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(String entityId, String contentTypeKey, Map<String, String> model) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
@@ -104,32 +93,26 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	}
 	@Override
 	public String getFriendlyTypeName(String contentTypeKey) {
-		WidgetRegistration r = contentType2WidgetInfo.get(contentTypeKey);
-		if (r != null)
-			return r.getFriendlyName();
+		String friendlyName = contentType2FriendlyName.get(contentTypeKey);
+		if (friendlyName != null)
+			return friendlyName;
 		else return "Widget";
 	}
 
-	@Override
-	public boolean isWidgetContentType(String contentTypeKey) {
-		return contentType2WidgetInfo.containsKey(contentTypeKey);
-	}
 	
 	@Override
-	public String getMDRepresentation(WidgetDescriptor model) throws JSONObjectAdapterException {
-		String decodedMD = getMDRepresentationDecoded(model);
+	public String getMDRepresentation(String contentType, Map<String, String> model){
+		String decodedMD = getMDRepresentationDecoded(contentType, model);
 		return URL.encode(decodedMD);
 	}
 	
-	public String getMDRepresentationDecoded(WidgetDescriptor model) throws JSONObjectAdapterException {
+	public String getMDRepresentationDecoded(String contentType, Map<String, String> model) {
 		StringBuilder urlBuilder = new StringBuilder();
-		JSONObjectAdapter widgetDescriptorJson = model.writeToJSONObject(adapter.createNew());
-		urlBuilder.append(getWidgetContentType(model));
+		urlBuilder.append(contentType);
 		char prefix = '?';
-		for (Iterator iterator = widgetDescriptorJson.keys(); iterator
-				.hasNext();) {
+		for (Iterator iterator = model.keySet().iterator(); iterator.hasNext();) {
 			String key = (String) iterator.next();
-			Object value = widgetDescriptorJson.get(key);
+			Object value = model.get(key);
 			//only include it in the md representation if the value is not null
 			if (value != null) {
 				urlBuilder.append(prefix).append(key).append('=').append(value);
@@ -140,13 +123,13 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	}
 	
 	@Override
-	public WidgetDescriptor getWidgetDescriptor(String mdRepresentation) {
+	public Map<String, String> getWidgetDescriptor(String mdRepresentation) {
 		if (mdRepresentation == null || mdRepresentation.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + mdRepresentation);
 		String decoded = URL.decode(mdRepresentation);
 		return getWidgetDescriptorFromDecoded(decoded);
 	}
 	
-	public WidgetDescriptor getWidgetDescriptorFromDecoded(String decodedMd) {
+	public Map<String, String> getWidgetDescriptorFromDecoded(String decodedMd) {
 		if (decodedMd == null || decodedMd.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + decodedMd);
 		int delimeter = decodedMd.indexOf("?");
 		if (delimeter < 0) {
@@ -155,35 +138,37 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		String contentTypeKey = decodedMd.substring(0, delimeter);
 		String allParamsString = decodedMd.substring(delimeter+1);
 		String[] keyValuePairs = allParamsString.split("&");
-		String widgetClassName = getWidgetClass(contentTypeKey);
-		WidgetDescriptor widgetDescriptor = (WidgetDescriptor) nodeModelCreator.newInstance(widgetClassName);
-		
-		JSONObjectAdapter newAdapter = adapter.createNew();
-		try {
-			for (int j = 0; j < keyValuePairs.length; j++) {
-				String[] keyValue = keyValuePairs[j].split("=");
-				newAdapter.put(keyValue[0], keyValue[1]);
-			}
-			
-			widgetDescriptor.initializeFromJSONObject(newAdapter);
-		} catch (JSONObjectAdapterException e) {
-			//if there were any problems with the format of the given parameters in the markdown, it's invalid markdown
-			throw new IllegalArgumentException(e);
+		Map<String, String> model = new HashMap<String, String>();
+		for (int j = 0; j < keyValuePairs.length; j++) {
+			String[] keyValue = keyValuePairs[j].split("=");
+			model.put(keyValue[0], keyValue[1]);
 		}
-		return widgetDescriptor;
+		return model;
+	}
+
+	@Override
+	public String getWidgetContentType(String mdRepresentation) {
+		if (mdRepresentation == null || mdRepresentation.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + mdRepresentation);
+		String decodedMd = URL.decode(mdRepresentation);
+		if (decodedMd == null || decodedMd.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + decodedMd);
+		int delimeter = decodedMd.indexOf("?");
+		if (delimeter < 0) {
+			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + decodedMd);
+		}
+		return decodedMd.substring(0, delimeter);
 	}
 	
 	private void initWithKnownWidgets() {
-		registerWidget(WidgetConstants.YOUTUBE_CONTENT_TYPE, WidgetConstants.YOUTUBE_FRIENDLY_NAME, YouTubeWidgetDescriptor.class.getName());
-		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME, ProvenanceWidgetDescriptor.class.getName());
-		registerWidget(WidgetConstants.IMAGE_CONTENT_TYPE, WidgetConstants.IMAGE_FRIENDLY_NAME, ImageAttachmentWidgetDescriptor.class.getName());
-		registerWidget(WidgetConstants.LINK_CONTENT_TYPE, WidgetConstants.LINK_FRIENDLY_NAME, null);
+		registerWidget(WidgetConstants.YOUTUBE_CONTENT_TYPE, WidgetConstants.YOUTUBE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.IMAGE_CONTENT_TYPE, WidgetConstants.IMAGE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.LINK_CONTENT_TYPE, WidgetConstants.LINK_FRIENDLY_NAME);
 	}
-
-	public static String getWidgetMarkdown(WidgetDescriptor widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
+	
+	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
 		StringBuilder sb = new StringBuilder();
-		sb.append(WebConstants.WIDGET_START_MARKDOWN);
-		sb.append(widgetRegistrar.getMDRepresentation(widgetDescriptor));
+		sb.append(WidgetConstants.WIDGET_START_MARKDOWN);
+		sb.append(widgetRegistrar.getMDRepresentation(contentType, widgetDescriptor));
 		sb.append("}");
 		return sb.toString();
 	}

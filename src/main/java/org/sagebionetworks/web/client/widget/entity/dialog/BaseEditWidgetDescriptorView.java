@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
-import java.util.List;
+import java.util.Map;
 
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 
@@ -21,7 +19,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	 */
 	public void hide();
 	
-	public void setWidgetDescriptor(String entityId, String contentTypeKey, WidgetDescriptor widgetDescriptor);
+	public void setWidgetDescriptor(String entityId, String contentTypeKey, Map<String, String> widgetDescriptor);
 
 	/**
 	 * Call to tell the widget descriptor view to update the widgetDescriptor based on user input (called on save) 

@@ -79,7 +79,4 @@ public class WebConstants {
 
 	public static final int MAX_COLUMNS_IN_GRID = 100;
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
-
-	public static final String WIDGET_START_MARKDOWN = "${";
-	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
 }
