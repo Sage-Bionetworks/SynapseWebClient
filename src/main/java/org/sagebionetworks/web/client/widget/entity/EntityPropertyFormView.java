@@ -22,6 +22,7 @@ public interface EntityPropertyFormView extends SynapseWidgetView, IsWidget {
 	public void insertMarkdown(String md);
 	public BaseEditWidgetDescriptorPresenter getWidgetDescriptorEditor();
 	public void showEditEntityDialog(final String windowTitle);
+	public boolean isComponentRendered();
 	
 	/**
 	 * Presenter interface

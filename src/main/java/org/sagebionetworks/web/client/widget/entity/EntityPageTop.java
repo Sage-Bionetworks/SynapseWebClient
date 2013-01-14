@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Map;
+
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -213,15 +215,17 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				if (innerText != null) {
 					try {
 						innerText = innerText.trim();
-						WidgetDescriptor widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
-						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(entityId, widgetRegistrar.getWidgetContentType(widgetDescriptor), widgetDescriptor);
+						String contentType = widgetRegistrar.getWidgetContentType(innerText);
+						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
+						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(entityId, contentType, widgetDescriptor);
+						if (presenter == null)
+							throw new IllegalArgumentException("unable to render widget from the specified markdown:" + innerText);
 						panel.add(presenter.asWidget(), currentWidgetDiv);
 					}catch(IllegalArgumentException e) {
 						//try our best to load all of the widgets. if one fails to load, then fail quietly.
 						e.printStackTrace();
 						panel.add(new HTMLPanel(DisplayUtils.getIconHtml(iconsImageBundle.error16()) + innerText), currentWidgetDiv);
 					}
-
 				}
 			
 			i++;

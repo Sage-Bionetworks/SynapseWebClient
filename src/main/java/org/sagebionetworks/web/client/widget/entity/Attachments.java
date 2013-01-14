@@ -46,7 +46,6 @@ public class Attachments implements AttachmentsView.Presenter,
 	private BaseEditWidgetDescriptorPresenter widgetEditor;
 	private String baseUrl;
 	private boolean widgetAttachments;
-	private List<AttachmentData> workingSet;
 	
 	@Inject
 	public Attachments(AttachmentsView view, SynapseClientAsync synapseClient,
@@ -74,24 +73,10 @@ public class Attachments implements AttachmentsView.Presenter,
 		this.entity = entity;
 		this.widgetAttachments = widgetAttachments;
 		
-		workingSet = new ArrayList<AttachmentData>();
 		//show json entity attachments, or everything else
 		List<AttachmentData> allAttachments = entity.getAttachments();
-		if (allAttachments != null) {
-			for (Iterator iterator = allAttachments.iterator(); iterator.hasNext();) {
-				AttachmentData attachmentData = (AttachmentData) iterator.next();
-				//determine if this is a widget attachment
-				String contentType = attachmentData.getContentType();
-				boolean isWidget = widgetRegistrar.isWidgetContentType(contentType);
-				if (isWidget) {
-					if (widgetAttachments)
-						workingSet.add(attachmentData);
-				} else if (!widgetAttachments)
-					workingSet.add(attachmentData);
-			}
-		}
-		isEmpty = (entity.getAttachments() == null || workingSet.size() == 0) ? true : false;
-		view.configure(baseUrl, entity.getId(), workingSet, widgetAttachments);
+		isEmpty = (entity.getAttachments() == null) ? true : false;
+		view.configure(baseUrl, entity.getId(), allAttachments, widgetAttachments);
 	}
 
 	public boolean isEmpty() {
@@ -176,14 +161,6 @@ public class Attachments implements AttachmentsView.Presenter,
 		} else {
 			view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
 		}
-	}
-	
-	/**
-	 * For unit testing purposes only
-	 * @return
-	 */
-	public List<AttachmentData> getWorkingSet() {
-		return workingSet;
 	}
 	
 	@Override

@@ -194,6 +194,11 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		rebuild();
 	}
 
+	@Override
+	public boolean isComponentRendered(){
+		return isRendered();
+	}
+	
 	public void showFormattingGuideDialog() {
         final Dialog window = new Dialog();
         window.setMaximizable(false);

@@ -4,11 +4,14 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.widget.ProvenanceWidgetDescriptor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 public class ProvenanceConfigEditorTest {
 		
@@ -28,13 +31,13 @@ public class ProvenanceConfigEditorTest {
 	}
 	@Test
 	public void testConfigure() {
-		ProvenanceWidgetDescriptor descriptor = new ProvenanceWidgetDescriptor();
+		Map<String, String> descriptor = new HashMap<String, String>();
 		String d = "5";
 		String entityToGraph = "syn1234555";
 		String showExpand = "true";
-		descriptor.setDepth(d);
-		descriptor.setEntityId(entityToGraph);
-		descriptor.setShowExpand(showExpand);
+		descriptor.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, d);
+		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY, entityToGraph);
+		descriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, showExpand);
 		editor.configure("", descriptor);
 		verify(mockView).setEntityId(eq(entityToGraph));
 		verify(mockView).setIsExpanded(eq(Boolean.valueOf(showExpand)));

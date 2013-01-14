@@ -1,22 +1,20 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.widget.YouTubeWidgetDescriptor;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
@@ -34,8 +32,7 @@ public class BaseEditWidgetDescriptorPresenterTest {
 	WidgetRegistrar mockWidgetRegistrar;
 	JSONObjectAdapter mockJSONObjectAdapter;
 	ExampleEntity entity;
-	String descriptor1Json;
-	YouTubeWidgetDescriptor descriptor1;
+	Map<String, String> descriptor1;
 	AttachmentData attachment1, attachment2;
 	
 	@Before
@@ -64,18 +61,15 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		attachments.add(attachment2);
 		entity.setAttachments(attachments);
 		
-		descriptor1 = new YouTubeWidgetDescriptor();
-		descriptor1.setVideoId("myVideoId");
-		descriptor1Json = EntityFactory.createJSONStringForEntity(descriptor1);
-		when(mockWidgetRegistrar.getWidgetClass(eq(WidgetConstants.YOUTUBE_CONTENT_TYPE))).thenReturn(YouTubeWidgetDescriptor.class.getName());
+		descriptor1 = new HashMap<String, String>();
+		descriptor1.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, "myVideoId");
 		when(mockWidgetRegistrar.getFriendlyTypeName(eq(WidgetConstants.YOUTUBE_CONTENT_TYPE))).thenReturn(WidgetConstants.YOUTUBE_FRIENDLY_NAME);
-		when(mockNodeModelCreator.newInstance(eq(YouTubeWidgetDescriptor.class.getName()))).thenReturn(descriptor1);
-		when(mockNodeModelCreator.createJSONEntity(anyString(), anyString())).thenReturn(descriptor1);
 		when(mockJSONObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
 	}
 
 	@Test
 	public void testEditNew() {
+		descriptor1.clear();  //should be no arguments passed to the view, since this is editing a new widget
 		presenter.editNew(entity.getId(), WidgetConstants.YOUTUBE_CONTENT_TYPE);
 		verify(mockView).setWidgetDescriptor(eq(entity.getId()), eq(WidgetConstants.YOUTUBE_CONTENT_TYPE), eq(descriptor1));
 		verify(mockView).show(eq(WidgetConstants.YOUTUBE_FRIENDLY_NAME));
