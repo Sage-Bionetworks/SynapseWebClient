@@ -97,6 +97,8 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			}
 		});
 		addFolder.setHeight(25);
+		//SWC-363: explicitly set the width, since the auto-width is not calculated correctly in Chrome (but it is in Firefox).
+		addFolder.setWidth(90);
 		addFolder.addStyleName("right");
 		right.add(addFolder, new MarginData(0, 3, 0, 0));
 		
