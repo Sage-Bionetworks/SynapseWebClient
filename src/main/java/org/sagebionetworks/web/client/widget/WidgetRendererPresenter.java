@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget;
 
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
+import java.util.Map;
 
 public interface WidgetRendererPresenter extends SynapseWidgetPresenter {
 	/**
@@ -8,5 +8,5 @@ public interface WidgetRendererPresenter extends SynapseWidgetPresenter {
 	 * @param entityId
 	 * @param widgetDescriptor
 	 */
-	public void configure(String entityId, WidgetDescriptor widgetDescriptor);
+	public void configure(String entityId, Map<String, String> widgetDescriptor);
 }

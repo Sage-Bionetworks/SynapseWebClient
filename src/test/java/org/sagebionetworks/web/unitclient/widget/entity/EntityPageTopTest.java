@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -17,7 +18,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -101,9 +101,8 @@ public class EntityPageTopTest {
 		entityAttachments.add(attachment1);
 		entity.setAttachments(entityAttachments);
 		when(mockJsonObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
-		when(mockWidgetRegistrar.isWidgetContentType(anyString())).thenReturn(true);
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
-		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(anyString(), anyString(), any(WidgetDescriptor.class))).thenReturn(testWidgetRenderer);
+		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(anyString(), anyString(), any(Map.class))).thenReturn(testWidgetRenderer);
 	}
 
 	@Test

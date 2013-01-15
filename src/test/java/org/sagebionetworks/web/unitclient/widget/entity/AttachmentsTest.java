@@ -1,13 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.contains;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -86,32 +83,9 @@ public class AttachmentsTest {
 		entityAttachments.add(attachment2);
 		entity.setAttachments(entityAttachments);
 		when(mockJSONObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
-		when(mockWidgetRegistrar.isWidgetContentType(eq(WidgetConstants.YOUTUBE_CONTENT_TYPE))).thenReturn(true);
-		when(mockWidgetRegistrar.isWidgetContentType(eq(otherContentType))).thenReturn(false);
 		
 		// setup the entity editor with 
 		presenter = new Attachments(mockView, mockSynapseClient, mockGlobalAppState, mockAuthenticationController, mockNodeModelCreator, mockJSONObjectAdapter, mockEventBus, mockWidgetRegistrar, mockWidgetEditor);
-	}
-	
-	@Test
-	public void testConfigureWidgetAttachments() {
-		boolean showWidgetAttachments = true;
-		presenter.configure("", entity, showWidgetAttachments);
-		verify(mockView).configure(anyString(), eq(entity.getId()), any(List.class), eq(true));
-		//and verify the working set of attachments contains only the first attachment (the widget).
-		List<AttachmentData> workingSet = presenter.getWorkingSet();
-		assertTrue(workingSet.size() == 1);
-		assertEquals(attachment1, workingSet.get(0));
-	}
-	@Test
-	public void testConfigureOtherAttachments() {
-		boolean showWidgetAttachments = false;
-		presenter.configure("", entity, showWidgetAttachments);
-		verify(mockView).configure(anyString(), eq(entity.getId()), any(List.class), eq(false));
-		//and verify the working set of attachments contains only the second attachment (not the widget).
-		List<AttachmentData> workingSet = presenter.getWorkingSet();
-		assertTrue(workingSet.size() == 1);
-		assertEquals(attachment2, workingSet.get(0));
 	}
 
 	@Test

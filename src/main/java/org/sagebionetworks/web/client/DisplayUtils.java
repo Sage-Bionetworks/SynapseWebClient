@@ -49,9 +49,9 @@ import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -1171,7 +1171,7 @@ public class DisplayUtils {
 		if (attachmentName == null)
 			return null;
 		StringBuilder sb = new StringBuilder();
-		sb.append(WebConstants.WIDGET_START_MARKDOWN);
+		sb.append(WidgetConstants.WIDGET_START_MARKDOWN);
 		sb.append(attachmentName);
 		sb.append("}");
 		return sb.toString();
