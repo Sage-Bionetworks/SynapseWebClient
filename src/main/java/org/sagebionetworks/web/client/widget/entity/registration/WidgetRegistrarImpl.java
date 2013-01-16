@@ -4,10 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.widget.ImageAttachmentWidgetDescriptor;
-import org.sagebionetworks.repo.model.widget.ProvenanceWidgetDescriptor;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
-import org.sagebionetworks.repo.model.widget.YouTubeWidgetDescriptor;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
