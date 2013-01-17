@@ -103,7 +103,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	    window.setSize(880, 660);
 	    window.setPlain(true);  
 	    window.setModal(true);  
-	    window.setBlinkModal(true);  
 	    window.setHeading(windowTitle);
 	    window.setLayout(new FitLayout());
 	    // We want okay to say save
@@ -205,7 +204,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
         window.setSize(550, 600);
         window.setPlain(true); 
         window.setModal(true); 
-        window.setBlinkModal(true); 
 
         window.setHeading(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT); 
         window.setButtons(Dialog.OK);
@@ -446,7 +444,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	    window.setSize(650, 500);
 	    window.setPlain(true);  
 	    window.setModal(true);  
-	    window.setBlinkModal(true);  
 	    window.setHeading("Preview Description");
 	    window.setLayout(new FitLayout());
 	    window.setButtons(Dialog.OK);
