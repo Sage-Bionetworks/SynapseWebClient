@@ -57,7 +57,6 @@ public class AddAttachmentDialog {
 		dialog.setSize(400, 175);
 		dialog.setPlain(true);
 		dialog.setModal(true);
-		dialog.setBlinkModal(true);
 		dialog.setButtons(Dialog.CANCEL);
 		dialog.setHideOnButtonClick(true);
 		dialog.setHeading(windowTitle);

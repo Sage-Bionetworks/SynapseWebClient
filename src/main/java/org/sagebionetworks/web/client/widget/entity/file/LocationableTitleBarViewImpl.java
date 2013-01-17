@@ -263,7 +263,6 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		window.setSize(220, 85);
 		window.setPlain(true);
 		window.setModal(true);
-		window.setBlinkModal(true);
 		window.setHeading("md5");
 		
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
