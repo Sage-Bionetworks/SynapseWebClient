@@ -72,7 +72,7 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 				@Override
 				public void onPersistSuccess(EntityUpdatedEvent event) {
 					//ask for the new entity, update our attachments and etag, and reconfigure the attachments widget
-					if (view.isComponentRendered())
+					if (view.isComponentVisible() && bundle != null && bundle.getEntity() != null && bundle.getEntity().getId() != null)
 						refreshEntityAttachments();
 				}
 			};
@@ -93,7 +93,6 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 		callback.saveEntity(adapter, annos);	
 	}
 
-		
 	@Override
 	public void removeAnnotation() {
 		// Show a form for adding an Annotations
