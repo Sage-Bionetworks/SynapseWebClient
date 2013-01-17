@@ -19,7 +19,6 @@ public class TermsOfUseHelper {
         window.setSize(600, 700);
         window.setPlain(true); 
         window.setModal(true); 
-        window.setBlinkModal(true); 
         window.setHeading("Synapse Terms of Use"); 
         window.setLayout(new FitLayout());
         window.setScrollMode(Scroll.ALWAYS);

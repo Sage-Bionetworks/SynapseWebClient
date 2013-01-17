@@ -77,7 +77,6 @@ public class AddAnnotationDialog {
 		dialog.setSize(325, 175);
 		dialog.setPlain(true);  
 		dialog.setModal(true);  
-		dialog.setBlinkModal(true);  
 		dialog.setHeading("Add New Annotation");  
 		dialog.setLayout(new FitLayout());
 	    // We want okay to say save
