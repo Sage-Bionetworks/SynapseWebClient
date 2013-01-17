@@ -195,8 +195,8 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	}
 
 	@Override
-	public boolean isComponentRendered(){
-		return isRendered();
+	public boolean isComponentVisible(){
+		return this.isVisible();
 	}
 	
 	public void showFormattingGuideDialog() {
