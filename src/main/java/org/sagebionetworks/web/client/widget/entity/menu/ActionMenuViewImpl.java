@@ -226,7 +226,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				window.setSize(560, 465);
 				window.setPlain(true);
 				window.setModal(true);
-				window.setBlinkModal(true);
 				window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
 				window.setLayout(new FitLayout());
 				window.add(accessControlListEditor.asWidget(), new FitData(4));			    
@@ -397,7 +396,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 					window.setSize(400, 320);
 					window.setPlain(true);
 					window.setModal(true);		
-					window.setBlinkModal(true);
 					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
 					window.setLayout(new FitLayout());			
 					window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
@@ -437,7 +435,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				window.setSize(483, 329);
 				window.setPlain(true);
 				window.setModal(true);
-				window.setBlinkModal(true);
 				window.setHeading(DisplayConstants.LABEL_WHERE_SAVE_LINK);
 				window.setLayout(new FitLayout());
 				window.add(myEntitiesBrowser.asWidget(), new FitData(4)); 				
@@ -484,7 +481,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				window.setSize(483, 329);
 				window.setPlain(true);
 				window.setModal(true);
-				window.setBlinkModal(true);
 				window.setHeading(DisplayConstants.LABEL_MOVE + " " + typeDisplay);
 				window.setLayout(new FitLayout());
 				window.add(myEntitiesBrowser.asWidget(), new FitData(4)); 				

@@ -100,7 +100,6 @@ public class AccessMenuButtonViewImpl extends LayoutContainer implements AccessM
 				window.setSize(550, 440);
 				window.setPlain(true);
 				window.setModal(true);
-				window.setBlinkModal(true);
 				window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
 				window.setLayout(new FitLayout());
 				window.add(accessControlListEditor.asWidget(), new FitData(4));

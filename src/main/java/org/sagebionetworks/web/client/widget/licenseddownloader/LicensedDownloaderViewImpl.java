@@ -232,7 +232,6 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		downloadWindow.setSize(downloadWindowWidth, 200);
 		downloadWindow.setPlain(true);
 		downloadWindow.setModal(false);
-		downloadWindow.setBlinkModal(true);
 		downloadWindow.setHeading("Download");
 		downloadWindow.setLayout(new FitLayout());
 		downloadWindow.setResizable(false);		
