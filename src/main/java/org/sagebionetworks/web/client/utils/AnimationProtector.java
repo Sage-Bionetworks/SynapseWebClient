@@ -91,7 +91,17 @@ public class AnimationProtector {
 	}
 
 	private void setVisible(boolean shouldBeVisible) {
-		if (view.isContainerRendered() && !animating) {
+		if (!view.isSlideSupportedByView()) {
+			//if it's not supported, then just set visibility and explicitly invoke the config listener
+			view.setContainerVisible(shouldBeVisible);
+			Listener<FxEvent> listener = null;
+			if (shouldBeVisible)
+				listener = showConfig.getEffectCompleteListener();
+			else
+				listener = hideConfig.getEffectCompleteListener();
+			if (listener != null)
+				listener.handleEvent(new FxEvent(null, null));
+		} else if (view.isContainerRendered() && !animating) {
 
 			boolean isCurrentlyVisible = view.isContainerVisible();
 
