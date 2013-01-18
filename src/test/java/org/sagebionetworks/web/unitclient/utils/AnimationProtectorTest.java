@@ -22,6 +22,7 @@ public class AnimationProtectorTest {
 	public void setup() {
 		mockView = mock(AnimationProtectorView.class);
 		when(mockView.isContainerRendered()).thenReturn(true);
+		when(mockView.isSlideSupportedByView()).thenReturn(true);
 		animation = new AnimationProtector(mockView);
 		verify(mockView).addClickHandler((ClickHandler)any());
 	}
@@ -67,6 +68,23 @@ public class AnimationProtectorTest {
 		animation.toggle();
 		verifyShown();
 	}
+
+	@Test
+	public void testShowHiddenWhenSlidesUnsupported() {
+		when(mockView.isSlideSupportedByView()).thenReturn(false);
+		setViewVisible(false);
+		animation.show();
+		verifyNoSlides();
+	}
+
+	@Test
+	public void testHideVisibleWhenSlidesUnsupported() {
+		when(mockView.isSlideSupportedByView()).thenReturn(false);
+		setViewVisible(true);
+		animation.hide();
+		verifyNoSlides();
+	}
+
 
 	@Test
 	public void testAnimationToggle() throws SecurityException,
