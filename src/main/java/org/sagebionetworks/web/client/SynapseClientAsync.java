@@ -101,4 +101,6 @@ public interface SynapseClientAsync {
 	void promoteEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	
 	void removeAttachmentFromEntity(String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	
+	public void getJSONEntity(String repoUri, AsyncCallback<String> callback);
 }

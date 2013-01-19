@@ -379,7 +379,12 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	    		handleInsertWidgetCommand(WidgetConstants.PROVENANCE_CONTENT_TYPE);
 	    	};
 		}));
-	    
+	    menu.add(getNewCommand("DEBUG Synapse API", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.SYNAPSE_API_CONTENT_TYPE);
+	    	};
+		}));
+
 	    return menu;
 	  }
 	

@@ -13,6 +13,9 @@ public class WidgetConstants {
 	public static final String LINK_CONTENT_TYPE = "link";
 	public static final String LINK_FRIENDLY_NAME ="Link";
 
+	public static final String SYNAPSE_API_CONTENT_TYPE = "api";
+	public static final String SYNAPSE_API_FRIENDLY_NAME = "Synapse API";
+	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
 	
@@ -24,4 +27,9 @@ public class WidgetConstants {
 	public static final String PROV_WIDGET_DEPTH_KEY = "depth";
 	public static final String PROV_WIDGET_EXPAND_KEY = "showExpand";
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
+	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
+	public static final String API_TABLE_WIDGET_COLUMNS_KEY = "columns";
+	public static final String API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY = "displaynames";
+	public static final String API_TABLE_WIDGET_RENDERERS_KEY = "renderers";
+	
 }

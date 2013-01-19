@@ -320,6 +320,10 @@ public class DisplayConstants {
 	public static final String URL_LABEL = "URL:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
+	public static final String SYNAPSE_API_CALL_URL_LABEL = "Synapse API URI:";
+	public static final String SYNAPSE_API_CALL_COLUMNS_LABEL = "Columns To Display:";
+	public static final String SYNAPSE_API_CALL_COLUMN_HEADERS_LABEL = "Column Headers:";
+	public static final String SYNAPSE_API_CALL_RENDERERS_LABEL = "Renderer Names:";
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
 	public static final String SHOW_EXPANDED_LABEL = "Show Expanded?";
 	public static final String INVALID_NUMBER_MESSAGE = "Please enter a valid number";
