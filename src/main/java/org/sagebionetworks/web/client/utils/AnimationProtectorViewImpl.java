@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.utils;
 
+import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.widget.Component;
@@ -45,5 +46,11 @@ public class AnimationProtectorViewImpl implements AnimationProtectorView {
 	@Override
 	public void slideContainerOut(Direction direction, FxConfig config) {
 		container.el().slideOut(direction, config);
+	}
+	
+	@Override
+	public boolean isSlideSupportedByView() {
+		//slide is not supported on Chrome for GWT 2.4
+		return !GXT.isChrome;
 	}
 }

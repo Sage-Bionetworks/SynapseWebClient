@@ -18,5 +18,7 @@ public interface AnimationProtectorView {
 	public void slideContainerIn(Direction direction, FxConfig config);
 
 	public void slideContainerOut(Direction direction, FxConfig config);
+	
+	public boolean isSlideSupportedByView();
 
 }
