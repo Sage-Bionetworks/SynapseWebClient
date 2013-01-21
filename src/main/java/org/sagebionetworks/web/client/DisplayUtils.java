@@ -1222,7 +1222,6 @@ public class DisplayUtils {
 				window.setSize(400, 320);
 				window.setPlain(true);
 				window.setModal(true);		
-				window.setBlinkModal(true);
 				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
 				window.setLayout(new FitLayout());			
 				window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
