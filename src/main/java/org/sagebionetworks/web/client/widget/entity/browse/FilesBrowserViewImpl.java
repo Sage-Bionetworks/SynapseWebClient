@@ -194,7 +194,6 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 						window.setSize(400, 320);
 						window.setPlain(true);
 						window.setModal(true);		
-						window.setBlinkModal(true);
 						window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
 						window.setLayout(new FitLayout());			
 						window.add(locationableUploader.asWidget(entity, new ArrayList<AccessRequirement>()), new MarginData(5));

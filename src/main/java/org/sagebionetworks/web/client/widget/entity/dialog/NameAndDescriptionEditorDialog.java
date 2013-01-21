@@ -72,7 +72,6 @@ public class NameAndDescriptionEditorDialog {
 		dialog.setSize(325, showDescription ? 175 : 135);
 		dialog.setPlain(true);
 		dialog.setModal(true);
-		dialog.setBlinkModal(true);
 		dialog.setHideOnButtonClick(true);
 		dialog.setLayout(new FitLayout());
 		dialog.setBorders(false);

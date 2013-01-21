@@ -47,7 +47,6 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 		window.setMaximizable(false);
 	    window.setPlain(true);  
 	    window.setModal(true);  
-	    window.setBlinkModal(true);  
 	    //window.setLayout(new FitLayout());
 	    window.okText = saveButtonText;
 	    window.setButtons(Dialog.OKCANCEL);

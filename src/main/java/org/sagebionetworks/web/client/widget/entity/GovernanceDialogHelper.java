@@ -45,7 +45,6 @@ public class GovernanceDialogHelper {
 	        dialog.setSize(ProfilePanel.WIDTH, 600);
 	        dialog.setPlain(true); 
 	        dialog.setModal(true); 
-	        dialog.setBlinkModal(true); 
 	        dialog.setAutoHeight(true);
 	        dialog.setResizable(false);		
 	}
