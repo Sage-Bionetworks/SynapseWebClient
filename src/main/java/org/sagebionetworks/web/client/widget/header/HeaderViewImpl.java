@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Settings;
@@ -30,12 +31,15 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -54,7 +58,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	@UiField
 	SimplePanel searchBoxPanel;
-		
+	
+	@UiField
+	SimplePanel testSiteHeading;
+	
 	private Presenter presenter;
 	private Map<MenuItems, Element> itemToElement;
 	private AuthenticationController authenticationController;	
@@ -72,20 +79,43 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private FlowPanel userNameContainer;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private HorizontalPanel userNameWrapper;
+	private CookieProvider cookies;
 	
 	@Inject
-	public HeaderViewImpl(Binder binder, AuthenticationControllerImpl authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState, SearchBox searchBox, SynapseJSNIUtils synapseJSNIUtils) {
+	public HeaderViewImpl(Binder binder, AuthenticationControllerImpl authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState, SearchBox searchBox, SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.iconsImageBundle = iconsImageBundle;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.searchBox = searchBox;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.cookies = cookies;
 		// add search panel
 		searchBoxPanel.clear();		
 		searchBoxPanel.add(searchBox.asWidget());
 		searchBoxPanel.setVisible(false);
+		
+		testSiteHeading.clear();
+		testSiteHeading.add(getTestPanel());
+		testSiteHeading.setVisible(false);
+		refreshTestSiteHeader();
 		commandBar.addStyleName("last sf-j-menu");
+	}
+	
+	private FlowPanel getTestPanel() {
+		Anchor goToStandardSite = new Anchor("Take me back to the release version!");
+		goToStandardSite.addStyleName("link");
+		goToStandardSite.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.setTestWebsite(false, cookies);
+				Window.Location.reload();
+			}
+		});
+		FlowPanel testPanel = new FlowPanel();
+		testPanel.add(new HTMLPanel("<h2>TEST VERSION</h2>"));
+		testPanel.add(goToStandardSite);
+		return testPanel;
 	}
 	
 	@Override
@@ -102,8 +132,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void removeMenuItemActive(MenuItems menuItem) {
 	}
 
+	private void refreshTestSiteHeader() {
+		testSiteHeading.setVisible(DisplayUtils.isInTestWebsite(cookies));
+	}
+	
 	@Override
 	public void refresh() {
+		refreshTestSiteHeader();
 		UserSessionData userSessionData = presenter.getUser();
 		if (cachedUserSessionData == null || !cachedUserSessionData.equals(userSessionData)){
 			cachedUserSessionData = userSessionData;

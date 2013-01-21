@@ -13,8 +13,8 @@ public class WidgetConstants {
 	public static final String LINK_CONTENT_TYPE = "link";
 	public static final String LINK_FRIENDLY_NAME ="Link";
 
-	public static final String SYNAPSE_API_CONTENT_TYPE = "api";
-	public static final String SYNAPSE_API_FRIENDLY_NAME = "Synapse API";
+	public static final String API_TABLE_CONTENT_TYPE = "supertable";
+	public static final String API_TABLE_FRIENDLY_NAME = "Super Table (Synapse API Based)";
 	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
@@ -28,8 +28,25 @@ public class WidgetConstants {
 	public static final String PROV_WIDGET_EXPAND_KEY = "showExpand";
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
 	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
+	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";
+	public static final String API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY = "showRowNumber";
+	public static final String API_TABLE_WIDGET_RESULTS_KEY = "jsonResultsKeyName";
+	public static final String API_TABLE_WIDGET_CSS_STYLE = "cssStyle";
+	public static final String API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY = "rowNumberDisplayName";
+	public static final String API_TABLE_WIDGET_WIDTH_KEY = "width";
+	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
 	public static final String API_TABLE_WIDGET_COLUMNS_KEY = "columns";
-	public static final String API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY = "displaynames";
+	public static final String API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY = "displayNames";
 	public static final String API_TABLE_WIDGET_RENDERERS_KEY = "renderers";
 	
+	
+	
+	/**
+	 * API Table Column Renderers
+	 */
+	public static final String API_TABLE_COLUMN_RENDERER_NONE = "none";
+	public static final String API_TABLE_COLUMN_RENDERER_USER_ID = "userid";
+	public static final String API_TABLE_COLUMN_RENDERER_DATE = "date";
+	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
+	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
 }

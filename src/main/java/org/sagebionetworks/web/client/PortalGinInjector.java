@@ -15,13 +15,18 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.SynapseAPICallConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.SynapseAPICallWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
@@ -80,12 +85,19 @@ public interface PortalGinInjector extends Ginjector {
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
 	public ImageConfigEditor getImageConfigEditor();
 	public LinkConfigEditor getLinkConfigEditor();
-	public SynapseAPICallConfigEditor getSynapseAPICallConfigEditor();
+	public APITableConfigEditor getSynapseAPICallConfigEditor();
 
 
 	////// Renderers
 	public YouTubeWidget getYouTubeRenderer();
 	public ProvenanceWidget getProvenanceRenderer();
 	public ImageWidget getImageRenderer();
-	public SynapseAPICallWidget getSynapseAPICallRenderer();
+	public APITableWidget getSynapseAPICallRenderer();
+	
+	//////API Table Column Renderers
+	public APITableColumnRendererNone getAPITableColumnRendererNone();
+	public APITableColumnRendererUserId getAPITableColumnRendererUserId();
+	public APITableColumnRendererDate getAPITableColumnRendererDate();
+	public APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
+	public APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
 }

@@ -37,6 +37,7 @@ import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -1250,4 +1251,21 @@ public class DisplayUtils {
 		textArea.setValue(newValue);
 		DomEvent.fireNativeEvent(Document.get().createChangeEvent(), textArea);
 	}
+
+	public static boolean isInTestWebsite(CookieProvider cookies) {
+		return cookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY) != null;
+	}
+
+	public static void setTestWebsite(boolean testWebsite, CookieProvider cookies) {
+		if (testWebsite && !isInTestWebsite(cookies)) {
+			//set the cookie
+			cookies.setCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, "true");
+		} else{
+			cookies.removeCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY);
+		}
+			
+		
+	}
+
+	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
 }
