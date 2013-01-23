@@ -18,13 +18,20 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 	}
 	
 	@Override
-	public void configure(String entityId, AttachmentData uploadedAttachmentData) {
+	public void configure(String entityId, AttachmentData uploadedAttachmentData, String explicitWidth) {
 		this.removeAll();
 		//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 		//create img
 		String attachmentBaseUrl = GWT.getModuleBaseURL()+"attachment";
 		StringBuilder sb = new StringBuilder();
-		sb.append("<img class=\"imageDescriptor\" src=\"");
+		sb.append("<img class=\"imageDescriptor\" ");
+		if (explicitWidth != null && explicitWidth.trim().length() > 0) {
+			sb.append(" width=\"");
+			sb.append(explicitWidth);
+			sb.append("\"");
+		}
+			
+		sb.append(" src=\"");
 		sb.append(createAttachmentUrl(attachmentBaseUrl, entityId, uploadedAttachmentData.getTokenId(), DisplayUtils.ENTITY_PARAM_KEY));
 		sb.append("\"></img>");
 		

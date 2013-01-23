@@ -68,20 +68,20 @@ public class ImageWidgetTest {
 		testPage.setAttachments(attachments);
 		
 		widget.configure("", descriptor);
-		verify(mockView).configure(anyString(), eq(testImage));
+		verify(mockView).configure(anyString(), eq(testImage), anyString());
 	}
 	
 	@Test
 	public void testConfigureWhenEntityHasNullAttachments() {
 		widget.configure("", descriptor);
-		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class));
+		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class), anyString());
 	}
 	
 	@Test
 	public void testConfigureWhenEntityHasZeroAttachments() {
 		testPage.setAttachments(new ArrayList());
 		widget.configure("", descriptor);
-		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class));
+		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class), anyString());
 	}
 	
 	@Test
@@ -95,7 +95,7 @@ public class ImageWidgetTest {
 		testPage.setAttachments(attachments);
 
 		widget.configure("", descriptor);
-		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class));
+		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class), anyString());
 	}
 
 }
