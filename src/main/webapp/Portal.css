@@ -491,6 +491,11 @@ a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
 .markdown img {
 	max-width: 940px;
 }
+
+.markdown code {
+	color: #1a0084;
+}
+
 .entity-description-preview-wrapper {
     background: none repeat scroll 0 0 #FFFFFF;
     padding: 20px;

@@ -12,7 +12,7 @@ public interface ImageWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(String entityId, AttachmentData uploadedAttachmentData);
+	public void configure(String entityId, AttachmentData uploadedAttachmentData, String explicitWidth);
 	
 	/**
 	 * Presenter interface

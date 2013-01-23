@@ -20,6 +20,7 @@ public class WidgetConstants {
 	 * Widget parameter keys
 	 */
 	public static final String IMAGE_WIDGET_FILE_NAME_KEY = "fileName";
+	public static final String IMAGE_WIDGET_WIDTH_KEY = "width";
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
 	public static final String PROV_WIDGET_DEPTH_KEY = "depth";
 	public static final String PROV_WIDGET_EXPAND_KEY = "showExpand";
