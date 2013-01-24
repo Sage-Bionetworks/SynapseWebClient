@@ -102,7 +102,7 @@ public class EntityPageTopTest {
 		entity.setAttachments(entityAttachments);
 		when(mockJsonObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
-		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(anyString(), anyString(), any(Map.class))).thenReturn(testWidgetRenderer);
+		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(anyString(), anyString(), anyString(), any(Map.class))).thenReturn(testWidgetRenderer);
 	}
 
 	@Test

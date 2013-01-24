@@ -10,7 +10,7 @@ public interface YouTubeWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(String entityId, String videoId);
+	public void configure(String videoId);
 	
 	/**
 	 * Presenter interface

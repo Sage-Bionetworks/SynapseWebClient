@@ -47,7 +47,7 @@ public class ImageConfigEditorTest {
 		testImage.setMd5("test md5");
 		
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
-		editor.configure("", descriptor);
+		editor.configure("","", descriptor);
 		verify(mockView).setEntityId(anyString());
 		//verify(mockView).setExternalVisible(anyBoolean());
 		when(mockView.getUploadedAttachmentData()).thenReturn(testImage);

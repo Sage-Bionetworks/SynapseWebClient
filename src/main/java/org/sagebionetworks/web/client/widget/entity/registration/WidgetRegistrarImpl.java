@@ -43,7 +43,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(String entityId, String contentTypeKey, Map<String, String> model) { 
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(String ownerObjectId, String ownerObjectType, String contentTypeKey, Map<String, String> model) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
@@ -57,7 +57,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
-			presenter.configure(entityId, model);
+			presenter.configure(ownerObjectId, ownerObjectType, model);
 		return presenter;
 	}
 
@@ -72,7 +72,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(String entityId, String contentTypeKey, Map<String, String> model) { 
+	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(String ownerObjectId, String ownerObjectType, String contentTypeKey, Map<String, String> model) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
@@ -84,7 +84,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
-			presenter.configure(entityId, model);
+			presenter.configure(ownerObjectId, ownerObjectType, model);
 		return presenter;
 	}
 	@Override

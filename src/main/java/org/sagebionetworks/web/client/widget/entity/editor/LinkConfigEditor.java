@@ -17,7 +17,7 @@ public class LinkConfigEditor implements LinkConfigView.Presenter, WidgetEditorP
 		view.initView();
 	}		
 	@Override
-	public void configure(String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(String ownerObjectId, String ownerObjectType, Map<String, String> widgetDescriptor) {
 		//no way to edit an existing link
 	}
 	

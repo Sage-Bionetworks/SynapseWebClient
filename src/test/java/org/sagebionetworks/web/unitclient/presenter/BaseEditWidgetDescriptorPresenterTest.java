@@ -70,18 +70,23 @@ public class BaseEditWidgetDescriptorPresenterTest {
 	@Test
 	public void testEditNew() {
 		descriptor1.clear();  //should be no arguments passed to the view, since this is editing a new widget
-		presenter.editNew(entity.getId(), WidgetConstants.YOUTUBE_CONTENT_TYPE);
-		verify(mockView).setWidgetDescriptor(eq(entity.getId()), eq(WidgetConstants.YOUTUBE_CONTENT_TYPE), eq(descriptor1));
+		presenter.editNew(entity.getId(),WidgetConstants.WIKI_OWNER_ID_ENTITY, WidgetConstants.YOUTUBE_CONTENT_TYPE);
+		verify(mockView).setWidgetDescriptor(eq(entity.getId()), eq(WidgetConstants.WIKI_OWNER_ID_ENTITY), eq(WidgetConstants.YOUTUBE_CONTENT_TYPE), eq(descriptor1));
 		verify(mockView).show(eq(WidgetConstants.YOUTUBE_FRIENDLY_NAME));
 	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testEditNewFailedPreconditions1() {
-		presenter.editNew(null, WidgetConstants.YOUTUBE_CONTENT_TYPE);
+		presenter.editNew(null,WidgetConstants.WIKI_OWNER_ID_ENTITY, WidgetConstants.YOUTUBE_CONTENT_TYPE);
 	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testEditNewFailedPreconditions2() {
-		presenter.editNew(entity.getId(), null);
+		presenter.editNew(entity.getId(),WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
 	}
+	@Test (expected=IllegalArgumentException.class)
+	public void testEditNewFailedPreconditions3() {
+		presenter.editNew(entity.getId(),null, WidgetConstants.YOUTUBE_CONTENT_TYPE);
+	}
+
 	
 	@Test
 	public void testApplySimpleInsert() throws Exception {
@@ -99,7 +104,7 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		//in this case, the descriptor is telling us that we should simply insert some text into the description, and nothing more (examples are external images, and links)
 		when(mockView.getTextToInsert()).thenReturn(null);
 		//set widget by telling it to edit a new one
-		presenter.editNew(entity.getId(), WidgetConstants.YOUTUBE_CONTENT_TYPE);
+		presenter.editNew(entity.getId(),WidgetConstants.WIKI_OWNER_ID_ENTITY, WidgetConstants.YOUTUBE_CONTENT_TYPE);
 		presenter.apply();
 		//verify it updates the descriptor from the view, and updates the entity attachments
 		verify(mockView).updateDescriptorFromView();

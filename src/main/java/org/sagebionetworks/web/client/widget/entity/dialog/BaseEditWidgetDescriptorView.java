@@ -19,7 +19,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	 */
 	public void hide();
 	
-	public void setWidgetDescriptor(String entityId, String contentTypeKey, Map<String, String> widgetDescriptor);
+	public void setWidgetDescriptor(String ownerObjectId, String ownerObjectType, String contentTypeKey, Map<String, String> widgetDescriptor);
 
 	/**
 	 * Call to tell the widget descriptor view to update the widgetDescriptor based on user input (called on save) 
@@ -42,7 +42,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 		 * @param entityId
 		 * @param widgetType
 		 */
-		public void editNew(String entityId, String widgetType);
+		public void editNew(String ownerObjectId, String ownerObjectType, String widgetType);
 		
 		/**
 		 * 

@@ -23,10 +23,11 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	}
 	
 	@Override
-	public void configure(String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(String ownerObjectId, String ownerObjectType, Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		view.setEntityId(entityId);
+		//TODO: change file upload to support other owner object types
+		view.setEntityId(ownerObjectId);
 		//if the attachmentData is set then there'a an associated image.  Only show the external url ui if we aren't editing one that already has an attachment
 //		view.setExternalVisible(descriptor.getFileName() == null);
 //		if (descriptor.getFileName() != null) {

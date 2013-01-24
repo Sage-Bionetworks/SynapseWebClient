@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog.Callback;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
@@ -233,7 +234,7 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 	
 	@Override
 	public void insertWidget(String contentTypeKey) {
-		BaseEditWidgetDescriptorPresenter.editNewWidget(view.getWidgetDescriptorEditor(), bundle.getEntity().getId(), contentTypeKey, new WidgetDescriptorUpdatedHandler() {
+		BaseEditWidgetDescriptorPresenter.editNewWidget(view.getWidgetDescriptorEditor(), bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY,contentTypeKey, new WidgetDescriptorUpdatedHandler() {
 			@Override
 		public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 			if (event.getInsertValue()!=null) {

@@ -20,7 +20,7 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetE
 		view.initView();
 	}
 	@Override
-	public void configure(String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(String ownerObjectId, String ownerObjectType, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
 		String videoId = descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY);
 		if (videoId != null)

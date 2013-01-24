@@ -18,7 +18,7 @@ public class YouTubeWidgetViewImpl extends LayoutContainer implements YouTubeWid
 	}
 	
 	@Override
-	public void configure(String entityId, String videoId) {
+	public void configure(String videoId) {
 		this.removeAll();
 		add(new HTMLPanel(getYouTubeHTML(videoId)));
 	}	

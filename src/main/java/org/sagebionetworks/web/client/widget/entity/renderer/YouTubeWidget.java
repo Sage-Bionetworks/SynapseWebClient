@@ -20,10 +20,10 @@ public class YouTubeWidget implements YouTubeWidgetView.Presenter, WidgetRendere
 	}
 	
 	@Override
-	public void configure(String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(String ownerObjectId, String ownerObjectType, Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		view.configure(entityId, descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY));
+		view.configure(descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY));
 	}
 	
 	@SuppressWarnings("unchecked")

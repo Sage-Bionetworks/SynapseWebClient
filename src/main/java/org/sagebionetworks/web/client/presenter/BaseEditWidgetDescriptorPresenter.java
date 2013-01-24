@@ -21,7 +21,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	private NodeModelCreator nodeModelCreator;
 	private HandlerManager handlerManager;
 	private BaseEditWidgetDescriptorView view;
-	String contentTypeKey, entityId, attachmentName;
+	String contentTypeKey, ownerObjectId, ownerObjectType, attachmentName;
 	JSONObjectAdapter jsonObjectAdapter;
 	//contains all of the widget specific parameters
 	Map<String, String> widgetDescriptor;
@@ -43,9 +43,9 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	 * @param attachmentName
 	 * @param handler
 	 */
-	public static void editNewWidget(BaseEditWidgetDescriptorPresenter presenter, String entityId, String contentTypeKey, WidgetDescriptorUpdatedHandler handler) {
+	public static void editNewWidget(BaseEditWidgetDescriptorPresenter presenter, String ownerObjectId, String ownerObjectType, String contentTypeKey, WidgetDescriptorUpdatedHandler handler) {
 		presenter.addWidgetDescriptorUpdatedHandler(handler);
-		presenter.editNew(entityId, contentTypeKey);
+		presenter.editNew(ownerObjectId, ownerObjectType, contentTypeKey);
 	}
 	
 	@Override
@@ -97,16 +97,18 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	}
 	
 	@Override
-	public void editNew(String entityId, String contentTypeKey) {
-		if(entityId == null) throw new IllegalArgumentException("entityId cannot be null");
+	public void editNew(String ownerObjectId, String ownerObjectType, String contentTypeKey) {
+		if(ownerObjectId == null) throw new IllegalArgumentException("ownerObjectId cannot be null");
+		if(ownerObjectType == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
 		if(contentTypeKey == null) throw new IllegalArgumentException("content type key cannot be null");
 		cleanInit();
-		this.entityId = entityId;
+		this.ownerObjectId = ownerObjectId;
+		this.ownerObjectType = ownerObjectType;
 		this.contentTypeKey = contentTypeKey;
 		
 		//initialize the view with a new widget descriptor definition of the correct type and show
 		widgetDescriptor = new HashMap<String, String>();
-		view.setWidgetDescriptor(entityId, contentTypeKey, widgetDescriptor);
+		view.setWidgetDescriptor(ownerObjectId, ownerObjectType, contentTypeKey, widgetDescriptor);
 		//prepopulate with a unique attachment name of the correct type
 		String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
 		view.show(friendlyName);
@@ -114,7 +116,8 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	}
 	
 	private void cleanInit() {
-		entityId = null;
+		ownerObjectId = null;
+		ownerObjectType = null;
 		contentTypeKey = null;
 		attachmentName = null;
 		view.clear();
