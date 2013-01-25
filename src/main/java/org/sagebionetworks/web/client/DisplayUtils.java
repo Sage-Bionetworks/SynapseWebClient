@@ -31,6 +31,7 @@ import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -1069,7 +1070,7 @@ public class DisplayUtils {
 		Element container = DOM.getElementById(ALERT_CONTAINER_ID);
 		DOM.insertChild(container, alert.getElement(), 0);
 	}
-
+	
 	public static String getVersionDisplay(Versionable versionable) {		
 		String version = "";
 		if(versionable == null || versionable.getVersionNumber() == null) return version;
@@ -1151,13 +1152,17 @@ public class DisplayUtils {
 
 	public static String getVersionDisplay(Reference ref) {
 		if (ref == null) return null;
-		String version = ref.getTargetId();
-		if(ref.getTargetVersionNumber() != null) {
-			version += " (#" + ref.getTargetVersionNumber() + ")";
-		}
-		return version;
+		return getVersionDisplay(ref.getTargetId(), ref.getTargetVersionNumber());
 	}
-
+	
+	public static String getVersionDisplay(String id, Long versionNumber) {
+		String version = id;
+		if(versionNumber != null) {
+			version += " (#" + versionNumber + ")";
+		}
+		return version;		
+	}
+	
 	public static SafeHtml get404Html() {
 		return SafeHtmlUtils
 				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">404</p><h1>"
