@@ -47,6 +47,13 @@ public class WebConstants {
 	
 	// this is the parameter name for the value of the final redirect
 	public static final String RETURN_TO_URL_PARAM = "RETURN_TO_URL";
+	
+	// a parameter to control how the final redirect is issued
+	public static final String OPEN_ID_MODE = "MODE";
+	// redirect "GWT" style with the session token appended ot the URL with ":"
+	public static final String OPEN_ID_MODE_GWT = "GWT";
+	// redirect with the sessio token as a request parameter (this is the default)
+	public static final String OPEN_ID_MODE_STANDARD = "STANDARD";
 
 	public static int MARKDOWN_OPTIONS = 
 		Extensions.ABBREVIATIONS |		//Abbreviations in the way of PHP Markdown Extra.
