@@ -3,6 +3,8 @@ package org.sagebionetworks.web.server.servlet.openid;
 import static org.sagebionetworks.repo.model.AuthorizationConstants.ACCEPTS_TERMS_OF_USE_ATTRIBUTE;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,6 +29,8 @@ import org.sagebionetworks.authutil.User;
 import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.repo.web.ForbiddenException;
 import org.sagebionetworks.repo.web.NotFoundException;
+import org.sagebionetworks.web.shared.WebConstants;
+import org.springframework.http.HttpStatus;
 
 public class OpenIDUtils {
 	private static Random rand = new Random();
@@ -38,7 +42,8 @@ public class OpenIDUtils {
 	
 	private static final String RETURN_TO_URL_COOKIE_NAME = "org.sagebionetworks.auth.returnToUrl";
 	private static final String ACCEPTS_TERMS_OF_USE_COOKIE_NAME = "org.sagebionetworks.auth.acceptsTermsOfUse";
-	private static final int RETURN_TO_URL_COOKIE_MAX_AGE_SECONDS = 60; // seconds
+	private static final String REDIRECT_MODE_COOKIE_NAME = "org.sagebionetworks.auth.redirectMode";
+	private static final int COOKIE_MAX_AGE_SECONDS = 60; // seconds
 	
 	private static ConsumerManager createConsumerManager() {
 		return new ConsumerManager();
@@ -58,6 +63,7 @@ public class OpenIDUtils {
 	public static void openID(
 			String openIdProvider,
 			Boolean acceptsTermsOfUse,
+			String redirectMode,
 			String returnToURL,
               HttpServletRequest request,
               HttpServletResponse response,
@@ -71,19 +77,25 @@ public class OpenIDUtils {
 		String openIDCallbackURL = redirectEndpoint+OPENID_CALLBACK_URI;
 
 		Cookie cookie = new Cookie(RETURN_TO_URL_COOKIE_NAME, returnToURL);
-		cookie.setMaxAge(RETURN_TO_URL_COOKIE_MAX_AGE_SECONDS);
+		cookie.setMaxAge(COOKIE_MAX_AGE_SECONDS);
 		response.addCookie(cookie);
 		
 		cookie = new Cookie(ACCEPTS_TERMS_OF_USE_COOKIE_NAME, ""+acceptsTermsOfUse);
-		cookie.setMaxAge(RETURN_TO_URL_COOKIE_MAX_AGE_SECONDS);
+		cookie.setMaxAge(COOKIE_MAX_AGE_SECONDS);
 		response.addCookie(cookie);
+		
+		if (redirectMode!=null) {
+			cookie = new Cookie(REDIRECT_MODE_COOKIE_NAME, redirectMode);
+			cookie.setMaxAge(COOKIE_MAX_AGE_SECONDS);
+			response.addCookie(cookie);
+		}
 		
 		sampleConsumer.authRequest(openIdProvider, openIDCallbackURL, servlet, request, response);
 	}
 
 	public static void openIDCallback(
 			HttpServletRequest request,
-			HttpServletResponse response) throws IOException, NotFoundException, AuthenticationException, XPathExpressionException {
+			HttpServletResponse response) throws IOException, NotFoundException, AuthenticationException, XPathExpressionException, URISyntaxException {
 		try {
 			
 			ConsumerManager manager = createConsumerManager();
@@ -134,31 +146,71 @@ public class OpenIDUtils {
 
 			String returnToURL = null;
 			Boolean acceptsTermsOfUse = null;
+			String redirectMode = null;
 			Cookie[] cookies = request.getCookies();
 			for (Cookie c : cookies) {
 				if (RETURN_TO_URL_COOKIE_NAME.equals(c.getName())) {
 					returnToURL = c.getValue();
-				}
-				if (ACCEPTS_TERMS_OF_USE_COOKIE_NAME.equals(c.getName())) {
+				} else if (ACCEPTS_TERMS_OF_USE_COOKIE_NAME.equals(c.getName())) {
 					acceptsTermsOfUse = Boolean.parseBoolean(c.getValue());
+				} else if (REDIRECT_MODE_COOKIE_NAME.equals(c.getName())) {
+					redirectMode = c.getValue();
 				}
 			}
 			if (returnToURL==null) throw new RuntimeException("Missing required return-to URL.");
 			
-			String redirectUrl = returnToURL+":";
-			if (CrowdAuthUtil.acceptsTermsOfUse(email, acceptsTermsOfUse)) {
-				redirectUrl += crowdSession.getSessionToken();
+			boolean isGWTMode = redirectMode!=null && WebConstants.OPEN_ID_MODE_GWT.equals(redirectMode);
+			boolean crowdAcceptsTermsOfUse = CrowdAuthUtil.acceptsTermsOfUse(email, acceptsTermsOfUse);
+			String redirectUrl = null;
+			if (isGWTMode) {
+				redirectUrl = returnToURL+":";
+				if (crowdAcceptsTermsOfUse) {
+					redirectUrl += crowdSession.getSessionToken();
+				} else {
+					redirectUrl += ServiceConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN;
+				}
 			} else {
-				redirectUrl += ServiceConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN;
+				redirectUrl = addRequestParameter(returnToURL, "sessionToken="+crowdSession.getSessionToken());
 			}
 			String location = response.encodeRedirectURL(redirectUrl);
-			response.sendRedirect(location);
-			
+			if (isGWTMode || crowdAcceptsTermsOfUse) {
+				response.sendRedirect(location);
+			} else {
+				// if standard mode and user has not accepted the ToU, then return a 403
+				response.setStatus(HttpStatus.FORBIDDEN.value());
+				response.getWriter().println("{\"reason\":\"You must accept the Synapse Terms of Use.\"}");
+			}
 		} catch (AuthenticationException ae) {
 			// include the URL used to authenticate
 			ae.setAuthURL(request.getRequestURL().toString());
 			throw ae;
 		}
+	}
+	
+	/**
+	 * Add a new query parameter to an existing url
+	 * @param urlString
+	 * @param queryParameter
+	 * @return
+	 */
+	public static String addRequestParameter(String urlString, String queryParameter) throws URISyntaxException {
+		URI uri = new URI(urlString);
+		String query = uri.getQuery();
+		if (query==null || query.length()==0) {
+			query = queryParameter;
+		} else {
+			query += "&"+queryParameter;
+		}
+		URI uriMod = new URI(
+				uri.getScheme(), 
+				uri.getUserInfo(), 
+				uri.getHost(), 
+				uri.getPort(), 
+				uri.getPath(), 
+				query, 
+				uri.getFragment()
+				);
+		return uriMod.toString();
 	}
 
 }
