@@ -336,10 +336,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	/**
 	 * The synapse client is stateful so we must create a new one for each
 	 * request
-	 */
+	 */	
 	private Synapse createSynapseClient() {
-		// Create a new syanpse
-		Synapse synapseClient = synapseProvider.createNewClient();
+		// Create a new syanpse			
+		Synapse synapseClient = synapseProvider.createNewClient();		
 		synapseClient.setSessionToken(tokenProvider.getSessionToken());
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());

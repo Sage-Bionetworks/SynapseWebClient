@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
@@ -43,19 +44,16 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private IconsImageBundle icons;
 	private Header headerWidget;
 	private Footer footerWidget;
-	private ProvenanceWidget provenanceWidget;
 	
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle sageImageBundle, ProvenanceWidget provenanceWidget,
-			SynapseJSNIUtils synapseJSNIUtils) {		
+			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.provenanceWidget = provenanceWidget;
 
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
@@ -71,7 +69,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
-
 	}
 
 	@Override
