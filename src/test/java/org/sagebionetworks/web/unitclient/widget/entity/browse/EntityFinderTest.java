@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -14,15 +16,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -31,6 +28,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -116,33 +114,23 @@ public class EntityFinderTest {
 		reset(mockView);
 	}
 	
-	
-//	@SuppressWarnings("unchecked")
-//	@Test
-//	public void testLoadVersions() throws Exception {
-//		String id = "syn456";
-//		String versionsJson = "versions";
-//		PaginatedResults<VersionInfo> paginated = new PaginatedResults<VersionInfo>();
-//		List<VersionInfo> results = new ArrayList<VersionInfo>();
-//		paginated.setResults(results);
-//		AsyncMockStubber.callSuccessWith(versionsJson).when(mockSynapseClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
-//		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);
-//		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(VersionInfo.class))).thenReturn((PaginatedResults<VersionInfo>)paginated);	
-//		
-//		entityFinder.loadVersions(id);
-//		
-//		verify(mockView).setVersions(results);
-//	}	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadVersions() throws Exception {
+		String id = "syn456";
+		String versionsJson = "versions";
+		PaginatedResults<VersionInfo> paginated = new PaginatedResults<VersionInfo>();
+		List<VersionInfo> results = new ArrayList<VersionInfo>();
+		paginated.setResults(results);
+		AsyncMockStubber.callSuccessWith(versionsJson).when(mockSynapseClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
+		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);
+		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(VersionInfo.class))).thenReturn((PaginatedResults<VersionInfo>)paginated);	
+		
+		entityFinder.loadVersions(id);
+		
+		verify(mockView).setVersions(results);
+	}	
 	
 }
-
-
-
-
-
-
-
-
-
 
 

@@ -29,7 +29,7 @@ public interface EntityFinderView extends IsWidget, SynapseWidgetView {
 	 */
 	public interface Presenter {
 
-		void entitySelected(Reference selected);
+		void setSelectedEntity(Reference selected);
 
 		void lookupEntity(String entityId, AsyncCallback<Entity> callback);
 

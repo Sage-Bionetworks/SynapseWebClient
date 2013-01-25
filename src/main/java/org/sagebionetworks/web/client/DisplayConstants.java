@@ -441,11 +441,14 @@ public class DisplayConstants {
 	public static final String SELECT = "Select";
 	public static final String NONE = "None";
 	public static final String LOOKUP = "Lookup";
-	public static final String CURRENT_VERSION_ALWAYS = "Current Version (Always)";
+	public static final String CURRENT_VERSION = "Current Version";
+	public static final String ALWAYS_CURRENT_VERSION = "Always refer to the most current version";
 	public static final String BROWSE_MY_ENTITIES = "Browse My Entities";
 	public static final String ENTER_SYNAPSE_ID = "Enter Synapse Id";
 	public static final String REFER_TO_SPECIFIC_VERSION = "Refer to a Specific Version";
 	public static final String CURRENT = "Current";
+	public static final String CURRENTLY_SELCTED = "Currently Selected";
+	public static final String PLEASE_MAKE_SELECTION = "Please make a selection";
 	
 }
 

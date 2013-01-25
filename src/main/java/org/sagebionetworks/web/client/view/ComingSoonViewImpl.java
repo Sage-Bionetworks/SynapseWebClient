@@ -44,19 +44,16 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private IconsImageBundle icons;
 	private Header headerWidget;
 	private Footer footerWidget;
-	private EntityFinder entityFinder;
 	
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, 
-			EntityFinder entityFinder) {		
+			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.entityFinder = entityFinder;
 
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
@@ -72,9 +69,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
-		
-		entityView.setWidget(entityFinder.asWidget());
-
 	}
 
 	@Override

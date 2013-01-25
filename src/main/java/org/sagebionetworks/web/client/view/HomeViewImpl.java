@@ -183,10 +183,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 			// My Projects
 			LayoutContainer myProjectLayout = new LayoutContainer();
 			myProjectLayout.setStyleName("span-12 notopmargin last");
-			VerticalPanel vp = new VerticalPanel();
-			vp.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>My Projects</h3>")));
-			vp.add(myEntitiesBrowser.asWidget());
-			myProjectLayout.add(vp);			
+			myProjectLayout.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>My Projects</h3>")));
+			myProjectLayout.add(myEntitiesBrowser.asWidget());					
 			mainService.add(myProjectLayout);
 			
 			projectDiv.add(separator);

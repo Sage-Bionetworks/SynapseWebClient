@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
@@ -420,28 +419,32 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			public void componentSelected(MenuEvent ce) {				
 				final Window window = new Window();  
 	
-				entityFinder.configure(false);
-				entityFinder.setEntitySelectedHandler(new SelectedHandler() {					
-					@Override
-					public void onSelection(Reference selected) {
-						presenter.moveEntity(selected.getTargetId());
-						window.hide();
-					}
-				});
-				
+				entityFinder.configure(false);				
 				window.setSize(839, 582);
 				window.setPlain(true);
 				window.setModal(true);
 				window.setHeading(DisplayConstants.LABEL_WHERE_SAVE_LINK);
 				window.setLayout(new FitLayout());
-				window.add(entityFinder.asWidget(), new FitData(4)); 				
+				window.add(entityFinder.asWidget(), new FitData(4));				
+				window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						Reference selected = entityFinder.getSelectedEntity();
+						if(selected.getTargetId() != null) {
+							presenter.createLink(selected.getTargetId());
+							window.hide();
+						} else {
+							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+						}
+					}
+				}));
 				window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
 						window.hide();
 					}
 				}));
-				window.setButtonAlign(HorizontalAlignment.CENTER);
+				window.setButtonAlign(HorizontalAlignment.RIGHT);
 				window.show();
 	
 			}
@@ -464,28 +467,32 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			public void componentSelected(MenuEvent ce) {				
 				final Window window = new Window();  
 
-				entityFinder.configure(false);
-				entityFinder.setEntitySelectedHandler(new SelectedHandler() {					
-					@Override
-					public void onSelection(Reference selected) {
-						presenter.moveEntity(selected.getTargetId());
-						window.hide();
-					}
-				});
-				
+				entityFinder.configure(false);				
 				window.setSize(839, 582);
 				window.setPlain(true);
 				window.setModal(true);
 				window.setHeading(DisplayConstants.SELECT_NEW_PARENT + " " + typeDisplay);
 				window.setLayout(new FitLayout());
 				window.add(entityFinder.asWidget(), new FitData(4)); 				
+				window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						Reference selected = entityFinder.getSelectedEntity();
+						if(selected.getTargetId() != null) {
+							presenter.moveEntity(selected.getTargetId());
+							window.hide();
+						} else {
+							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+						}
+					}
+				}));
 				window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
 						window.hide();
 					}
 				}));
-				window.setButtonAlign(HorizontalAlignment.CENTER);
+				window.setButtonAlign(HorizontalAlignment.RIGHT);
 				window.show();
 	
 			}

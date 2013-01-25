@@ -50,16 +50,13 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	private static final int RIGHT_WIDTH_PX = 621;
 	private static final int MARGIN_WIDTH_PX = 10;
 	private static final MarginData MARGIN_10 = new MarginData(MARGIN_WIDTH_PX);
-	private static final MarginData MARGIN_RIGHT_10 = new MarginData(0, MARGIN_WIDTH_PX, 0, 0);
-	private static final String UNSELECTED_TEXT = "<h4>--</h4>";
+	private static final MarginData MARGIN_RIGHT_10 = new MarginData(0, MARGIN_WIDTH_PX, 0, 0);	
 
 	private static final int TOTAL_WIDTH_PX = LEFT_WIDTH_PX + RIGHT_WIDTH_PX + MARGIN_WIDTH_PX;
 		
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
-	private EntityTreeBrowser entityTreeBrowser;
-	private EntitySelectedHandler entitySelectedHandler;
 	private MyEntitiesBrowser myEntitiesBrowser;	
 	private EntitySearchBox entitySearchBox;
 	
@@ -70,25 +67,25 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	private LayoutContainer versionChooser;
 	private LayoutContainer versionComboContainer;
 	private HTML selectedText;
-	private Button selectButton;
+	private Reference selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
 	private LayoutContainer container;
 	private LayoutContainer left;
 	private LayoutContainer rightTop;
 	private LayoutContainer rightBottom;
-	private Reference selectedEntity = null;
 	private SimpleComboBox<VersionInfoModelData> versionComboBox;
 	private Radio currentVersionRadio;
 	private Radio specifyVersionRadio;
 			
 	@Inject
 	public EntityFinderViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, EntityTreeBrowser entityTreeBrowser,
+			IconsImageBundle iconsImageBundle, 
 			MyEntitiesBrowser myEntitiesBrowser, EntitySearchBox entitySearchBox) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
-		this.entityTreeBrowser = entityTreeBrowser;
 		this.myEntitiesBrowser = myEntitiesBrowser;
 		this.entitySearchBox = entitySearchBox;
+		
+		selectedRef = new Reference();
 	}
 	
 	@Override
@@ -105,6 +102,9 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		} else {
 			container.removeAll();
 		}
+		selectedRef = new Reference();
+		presenter.setSelectedEntity(selectedRef);
+
 		
 		// left and right
 		left = new LayoutContainer();
@@ -149,10 +149,6 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 
 	@Override 
 	public void setPresenter(Presenter presenter) {
-		// create a new handler for this presenter
-		if(entitySelectedHandler != null) {
-			entityTreeBrowser.removeEntitySelectedHandler(entitySelectedHandler);
-		}
 		this.presenter = presenter;
 	}
 		
@@ -185,9 +181,8 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
 			@Override
 			public void onSelection(String selectedEntityId) {
-				selectedEntity = new Reference();
-				selectedEntity.setTargetId(selectedEntityId);		
-				updateSelected();
+				setSelectedId(selectedEntityId);
+				updateSelectedView();
 				createVersionChooser(selectedEntityId);
 			}
 		});
@@ -209,9 +204,8 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		entitySearchBox.setEntitySelectedHandler(new EntitySearchBox.EntitySelectedHandler() {			
 			@Override
 			public void onSelected(String entityId, String name, List<VersionInfo> versions) {
-				selectedEntity = new Reference();
-				selectedEntity.setTargetId(entityId);
-				updateSelected();
+				setSelectedId(entityId);
+				updateSelectedView();
 				createVersionChooser(entityId);
 			}
 		}, false);
@@ -254,13 +248,11 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				// lookup id
-				selectedEntity = new Reference();
-				String entityId = input.getValue();
-				selectedEntity.setTargetId(entityId);
-				presenter.lookupEntity(entityId, new AsyncCallback<Entity>() {
+				presenter.lookupEntity(input.getValue(), new AsyncCallback<Entity>() {
 					@Override
 					public void onSuccess(Entity entity) {
-						updateSelected();											
+						setSelectedId(entity.getId());
+						updateSelectedView();											
 						// if versionable, create and show versions
 						createVersionChooser(entity.getId());
 					}
@@ -293,11 +285,11 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		widget.add(versionChooser);
 		this.enterIdWidget = widget;		
 		
-		// list entry
-		Widget entry = createNewLeftEntry(DisplayConstants.ENTER_SYNAPSE_ID, new ClickHandler(){
+		// list entry		
+		final Widget entry = createNewLeftEntry(DisplayConstants.ENTER_SYNAPSE_ID, new ClickHandler(){
 	        @Override
 	        public void onClick(ClickEvent event) {
-				replaceRightWidget(enterIdWidget);
+				replaceRightWidget(enterIdWidget);				
 	        }
 	    });
 		left.add(entry);
@@ -321,25 +313,13 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	}
 	
 	private void createSelectedWidget() {
-		selectedText = new HTML(UNSELECTED_TEXT);
+		selectedText = new HTML("");
 		selectedText.addStyleName("floatleft");
-		selectButton = new Button(DisplayConstants.SELECT);
-		selectButton.addStyleName("floatleft");
-		selectButton.setHeight(25);
-		selectButton.disable();
-		selectButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				presenter.entitySelected(selectedEntity);
-			}
-		});
 		rightBottom.add(selectedText, MARGIN_10);
-		rightBottom.add(selectButton, MARGIN_10);
 	}
 
-	private void updateSelected() {
-		selectButton.enable();
-		selectedText.setHTML("<h4>" + DisplayUtils.getVersionDisplay(selectedEntity) + "</h4>");
+	private void updateSelectedView() {		
+		selectedText.setHTML("<h4>" + DisplayConstants.CURRENTLY_SELCTED + ": " + DisplayUtils.getVersionDisplay(selectedRef) + "</h4>");
 	}
 
 	private void createVersionChooser(String entityId) {
@@ -360,7 +340,8 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		currentVersionRadio.setId("123");
 		currentVersionRadio.setValue(true);		
 		currentVersionRadio.addStyleName("floatleft");
-		HTML label = new HTML(DisplayConstants.CURRENT_VERSION_ALWAYS);
+		HTML label = showVersions ? new HTML(DisplayConstants.CURRENT_VERSION + " (" + DisplayConstants.ALWAYS_CURRENT_VERSION + ")")
+				: new HTML(DisplayConstants.CURRENT_VERSION);
 		label.addStyleName("floatleft");
 		currentVersion.add(currentVersionRadio, first);
 		currentVersion.add(label, others);
@@ -401,8 +382,8 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		    		}
 		    		if(currentVersionRadio.getValue()) {
 		    			// current always selected. null out selected
-		    			selectedEntity.setTargetVersionNumber(null);
-		    			updateSelected();		    			
+		    			setSelectedVersion(null);
+		    			updateSelectedView();		    			
 		    		}
 		    	} else if(specifyVersionRadio.equals(selected)) {
 		    		if(versionComboBox != null) versionComboBox.enable();
@@ -424,11 +405,18 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		versionComboBox.setForceSelection(true);
 		versionComboBox.setTriggerAction(TriggerAction.ALL);
 		versionComboBox.disable();
-		boolean isCurrent = true;
-		for(int i=versions.size()-1; i>=0; i--) {						
-			versionComboBox.add(new VersionInfoModelData(versions.get(i), isCurrent));
-			isCurrent = false;
+		Long maxVersion = 0L;
+		VersionInfoModelData maxModel = null;
+		for(int i=0; i<versions.size(); i++) {
+			VersionInfo info = versions.get(i);
+			VersionInfoModelData model = new VersionInfoModelData(info, false); 
+			if(info.getVersionNumber() > maxVersion) {
+				maxVersion = info.getVersionNumber();
+				maxModel = model;
+			}
+			versionComboBox.add(model);
 		}
+		if(maxModel != null) maxModel.setIsCurrent(true);
 		versionComboBox.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<VersionInfoModelData>>() {			
 			@Override
 			public void selectionChanged(SelectionChangedEvent<SimpleComboValue<VersionInfoModelData>> se) {
@@ -437,8 +425,8 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 					VersionInfoModelData data = val.getValue();
 					if(data != null && data.getVersionInfo() != null) {
 						VersionInfo info = data.getVersionInfo();
-						selectedEntity.setTargetVersionNumber(info.getVersionNumber());
-						updateSelected();
+						setSelectedVersion(info.getVersionNumber());
+						updateSelectedView();
 						return;
 					}
 				}
@@ -450,6 +438,24 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		versionComboContainer.layout(true);
 	}
 
+	private void setSelected(String entityId, Long versionNumber) {
+		selectedRef.setTargetId(entityId);
+		selectedRef.setTargetVersionNumber(versionNumber);
+		presenter.setSelectedEntity(selectedRef);
+	}
+	
+	private void setSelectedId(String entityId) {
+		// clear out selection and set new id
+		selectedRef.setTargetId(entityId);
+		selectedRef.setTargetVersionNumber(null);
+		presenter.setSelectedEntity(selectedRef);
+	}
+	
+	private void setSelectedVersion(Long versionNumber) {
+		selectedRef.setTargetVersionNumber(versionNumber);
+		presenter.setSelectedEntity(selectedRef);
+	}
+	
 	class VersionInfoModelData {		
 		private VersionInfo info;
 		private boolean isCurrent;
@@ -463,6 +469,10 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 			return info;
 		}
 		
+		public void setIsCurrent(boolean isCurrent) {
+			this.isCurrent = isCurrent;
+		}
+		
 		public String toString() {
 			String current = isCurrent ? " [" + DisplayConstants.CURRENT + "]" : "";
 			if(info.getVersionLabel().equals(info.getVersionNumber().toString())) {
@@ -472,7 +482,7 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 			}			
 		}
 	}
-
+	
 	@Override
 	public int getViewWidth() {
 		return TOTAL_WIDTH_PX;

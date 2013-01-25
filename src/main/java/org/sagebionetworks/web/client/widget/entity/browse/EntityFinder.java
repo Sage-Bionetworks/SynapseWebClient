@@ -25,13 +25,9 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 	private NodeModelCreator nodeModelCreator;
 	private HandlerManager handlerManager = new HandlerManager(this);
 	private SynapseClientAsync synapseClient;
-	private SelectedHandler selectedHandler;
 	private boolean showVersions = true;
-	
-	public interface SelectedHandler {
-		void onSelection(Reference selected);
-	}
-	
+	private Reference selectedEntity;
+		
 	@Inject
 	public EntityFinder(EntityFinderView view,
 			NodeModelCreator nodeModelCreator,
@@ -39,14 +35,7 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 		this.view = view;
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
-		
-		// default selection behavior is to do nothing
-		this.selectedHandler = new SelectedHandler() {			
-			@Override
-			public void onSelection(Reference selected) {								
-			}
-		};
-		
+			
 		view.setPresenter(this);
 	}	
 
@@ -61,26 +50,19 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 		this.showVersions = showVersions;
 	}
 	
-	/**
-	 * Does nothing. Use asWidget(Entity)
-	 */
 	@Override
 	public Widget asWidget() {
 		view.setPresenter(this);
 		return view.asWidget();
 	}
 
-	/**
-	 * Define custom handling for when an entity is clicked
-	 * @param handler
-	 */
-	public void setEntitySelectedHandler(SelectedHandler handler) {
-		selectedHandler = handler;
-	}
-
 	@Override
-	public void entitySelected(Reference selected) {
-		selectedHandler.onSelection(selected);
+	public void setSelectedEntity(Reference selected) {
+		selectedEntity = selected;
+	}
+	
+	public Reference getSelectedEntity() {
+		return selectedEntity;
 	}
 
 	@Override
@@ -92,6 +74,7 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 					callback.onSuccess(nodeModelCreator.createEntity(result));
 				} catch (JSONObjectAdapterException e) {
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+					callback.onFailure(null);
 				}
 			}
 			@Override
@@ -110,7 +93,7 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void loadVersions(String entityId) {
-		synapseClient.getEntityVersions(entityId, 1, 20, new AsyncCallback<String>() {
+		synapseClient.getEntityVersions(entityId, 1, 200, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				PaginatedResults<VersionInfo> versions;
