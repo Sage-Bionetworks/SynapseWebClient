@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -126,6 +127,25 @@ public class APITableWidgetTest {
 		widget.configure("", descriptor);
 		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 	}
+	
+	@Test
+	public void testRendererFailure() {
+		//even if the column renderer fails to initialize, everything should still work
+		APITableColumnRendererSynapseID failColumnRenderer = new APITableColumnRendererSynapseID(){
+			@Override
+			public void init(List<String> columnData,
+					AsyncCallback<Void> callback) {
+				callback.onFailure(new Exception("Load failure"));
+			}
+		};
+		//return our renderer that always fails to initialize when asked for the Synapse ID column renderer
+		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(failColumnRenderer);
+		widget.configure("", descriptor);
+		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
+	}
+
 	
 	//test removing uri causes error to be shown
 	@Test
