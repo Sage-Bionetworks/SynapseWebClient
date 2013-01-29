@@ -8,6 +8,7 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
@@ -19,12 +20,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	public void setPresenter(Presenter presenter);
 
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly);
-
-	/**
-	 * Sets the RStudio URL for the view
-	 * @param rStudioUrl
-	 */
-	public void setRStudioUrlReady();
 
 	/**
 	 * Presenter interface
@@ -46,6 +41,8 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		ImageResource getIconForType(String typeString);
 
 		void getHtmlFromMarkdown(String description, String attachmentBaseUrl, AsyncCallback<String> asyncCallback);
+		
+		void loadWidgets(HTMLPanel container);
 
 	}
 

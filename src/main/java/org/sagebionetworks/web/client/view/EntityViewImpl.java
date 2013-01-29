@@ -13,6 +13,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -113,6 +114,18 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@Override
 	public void clear() {
 
+	}
+
+	@Override
+	public void show404() {
+		entityPageTop.clearState();
+		entityPageTopPanel.setWidget(new HTML(DisplayUtils.get404Html()));
+	}
+
+	@Override
+	public void show403() {
+		entityPageTop.clearState();
+		entityPageTopPanel.setWidget(new HTML(DisplayUtils.get403Html()));
 	}
 
 }

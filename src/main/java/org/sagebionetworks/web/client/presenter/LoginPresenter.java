@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
@@ -14,6 +15,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 
@@ -22,6 +24,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
+import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -33,14 +36,16 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private EventBus bus;
 	private AuthenticationController authenticationController;
 	private UserAccountServiceAsync userService;
+	private String openIdActionUrl;
 	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
 	private CookieProvider cookies;
 	private GWTWrapper gwtWrapper;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper){
+	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils){
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -48,6 +53,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.nodeModelCreator = nodeModelCreator;
 		this.cookies = cookies;
 		this.gwtWrapper = gwtWrapper;
+		this.synapseJSNIUtils=synapseJSNIUtils;
 		view.setPresenter(this);
 	} 
 
@@ -64,27 +70,14 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.loginPlace = place;
 		view.setPresenter(this);
 		view.clear();
-		if(openIdReturnUrl != null) {
-			showView(place);
-		} else {
-			// load Open ID urls
-			// retrieve endpoints for SSO
-			userService.getSynapseWebUrl(new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					// this should be a string as the Auth service completes the URL with ":<sessionId>"
-					openIdReturnUrl = result + "/#"+LOGIN_PLACE;
-					
-					// now show the view
-					showView(place);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
-				}
-			});					
-
-		}
+		openIdActionUrl = WebConstants.OPEN_ID_URI;
+		// note, this is now a relative URL
+		openIdReturnUrl = synapseJSNIUtils.getLocationPath()+synapseJSNIUtils.getLocationQueryString()+"#"+LOGIN_PLACE; 
+		showView(place);
+	}
+	
+	public String getOpenIdReturnUrl() {
+		return openIdReturnUrl;
 	}
 
 	public void showView(final LoginPlace place) {
@@ -139,8 +132,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				}
 				public void onFailure(Throwable throwable) {
 					view.showErrorMessage("An error occurred. Please try logging in again.");
-					view.showLogin(openIdReturnUrl);
-				}
+					view.showLogin(openIdActionUrl, openIdReturnUrl);				}
 			});
 		} else if (!DisplayUtils.DEFAULT_PLACE_TOKEN.equals(token)				
 				&& !"".equals(token) && token != null) {			
@@ -169,12 +161,12 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 								}
 								public void onFailure(Throwable t) {
 									view.showErrorMessage("An error occurred. Please try logging in again.");
-									view.showLogin(openIdReturnUrl);									
+									view.showLogin(openIdActionUrl, openIdReturnUrl);									
 								}
 							});
 						} else {
 							view.showErrorMessage("An error occurred. Please try logging in again.");
-							view.showLogin(openIdReturnUrl);
+							view.showLogin(openIdActionUrl, openIdReturnUrl);
 						}
 					}
 				});
@@ -182,7 +174,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		} else {
 			// standard view
 			authenticationController.logoutUser();
-			view.showLogin(openIdReturnUrl);
+			view.showLogin(openIdActionUrl, openIdReturnUrl);
 		}
 	}
 	

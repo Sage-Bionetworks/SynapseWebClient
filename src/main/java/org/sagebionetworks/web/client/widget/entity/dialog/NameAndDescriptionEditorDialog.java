@@ -4,7 +4,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
@@ -66,10 +69,9 @@ public class NameAndDescriptionEditorDialog {
 		// Show a form for adding an Annotations
 		final Dialog dialog = new Dialog();
 		dialog.setMaximizable(false);
-		dialog.setSize(325, 175);
+		dialog.setSize(325, showDescription ? 175 : 135);
 		dialog.setPlain(true);
 		dialog.setModal(true);
-		dialog.setBlinkModal(true);
 		dialog.setHideOnButtonClick(true);
 		dialog.setLayout(new FitLayout());
 		dialog.setBorders(false);
@@ -107,7 +109,7 @@ public class NameAndDescriptionEditorDialog {
 		}
 		
 		dialog.getButtonBar().removeAll();
-		dialog.addButton(new Button(DisplayConstants.OK, new SelectionListener<ButtonEvent>() {
+		final Button okButton = new Button(DisplayConstants.OK, new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				dialog.hide();
@@ -117,7 +119,9 @@ public class NameAndDescriptionEditorDialog {
 				descField.clear();
 				callback.onSave(nameVal, descVal);
 			}
-		}));
+		});
+		dialog.addButton(okButton);
+		
 		dialog.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
@@ -126,6 +130,19 @@ public class NameAndDescriptionEditorDialog {
 				dialog.hide();
 			}
 		}));
+		
+		// Enter key in name field submits
+		new KeyNav<ComponentEvent>(nameField) {
+			@Override
+			public void onEnter(ComponentEvent ce) {
+				super.onEnter(ce);
+				if(okButton.isEnabled())
+					okButton.fireEvent(Events.Select);
+			}
+		};
+
+		//and name textfield should have focus by default
+		nameField.focus();
 		
 		dialog.add(panel);
 		dialog.show();

@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.widget.WidgetMenu;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox.EntitySelectedHandler;
@@ -24,6 +25,7 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
@@ -70,11 +72,13 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	private AddEntityToGroupWidget addEntityToGroupWidget; 
 	private LayoutContainer addEditor;
 	private FlexTable groupsTable;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public SnapshotWidgetViewImpl(IconsImageBundle iconsImageBundle, EntitySearchBox entitySearchBox) {
+	public SnapshotWidgetViewImpl(IconsImageBundle iconsImageBundle, EntitySearchBox entitySearchBox, SynapseJSNIUtils synapseJSNIUtils) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.entitySearchBox = entitySearchBox;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 	}
 	
 	@Override
@@ -215,7 +219,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 
 	@Override
 	public void setEntityGroupRecordDisplay(final int groupIndex, final int rowIndex,
-			final EntityGroupRecordDisplay display) {
+			final EntityGroupRecordDisplay display, boolean isLoggedIn) {
 		final EntityGroupDisplay groupDisplay = groupDisplays.get(groupIndex);
 
 		// convert EntityGroupRecordDisplay to a row entry
@@ -239,7 +243,16 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			link.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.NavigateDown16())));
 			//DisplayConstants.BUTTON_DOWNLOAD
 			link.setStyleName("link");
-			link.setTarget("_new");
+			if(isLoggedIn) {
+				link.setTarget("_new");
+			} else {
+				link.addClickHandler(new ClickHandler() {					
+					@Override
+					public void onClick(ClickEvent event) {
+						MessageBox.info(DisplayConstants.INFO, DisplayConstants.LOGIN_TO_DOWNLOAD, null);
+					}
+				});				
+			}
 			downloadLink = link;
 		} else {
 			downloadLink = new HTML("");
@@ -557,7 +570,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			table.setWidget(rowIndex, HEADER_DOWNLOAD_IDX, downloadLink);			
 			if(version != null) table.setHTML(rowIndex, HEADER_VERSION_IDX, version);			
 			table.setWidget(rowIndex, HEADER_DESC_IDX, description);
-			table.setHTML(rowIndex, HEADER_DATE_IDX, date == null ? "" : DisplayUtilsGWT.convertDateToSmallString(date) + "</br>&nbsp;");
+			table.setHTML(rowIndex, HEADER_DATE_IDX, date == null ? "" : synapseJSNIUtils.convertDateToSmallString(date) + "</br>&nbsp;");
 			table.setHTML(rowIndex, HEADER_CREATEDBY_IDX, createdBy);
 			updateRowNote(rowIndex, note);
 		}

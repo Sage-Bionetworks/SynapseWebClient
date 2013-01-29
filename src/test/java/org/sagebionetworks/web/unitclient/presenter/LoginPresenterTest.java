@@ -2,21 +2,20 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.AtLeast;
-import org.mockito.verification.VerificationMode;
-import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -38,6 +37,7 @@ public class LoginPresenterTest {
 	NodeModelCreator mockNodeModelCreator;
 	CookieProvider mockCookieProvier;
 	GWTWrapper mockGwtWrapper;
+	SynapseJSNIUtils mockJSNIUtils;
 	
 	@Before
 	public void setup(){
@@ -48,7 +48,8 @@ public class LoginPresenterTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockCookieProvier = mock(CookieProvider.class);
 		mockGwtWrapper = mock(GWTWrapper.class);
-		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockUserAccountServiceAsync, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier, mockGwtWrapper);
+		mockJSNIUtils = mock(SynapseJSNIUtils.class);
+		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockUserAccountServiceAsync, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier, mockGwtWrapper, mockJSNIUtils);
 		
 		verify(mockView).setPresenter(loginPresenter);
 	}	
@@ -56,7 +57,10 @@ public class LoginPresenterTest {
 	@Test
 	public void testSetPlace() {
 		LoginPlace place = Mockito.mock(LoginPlace.class);
+		when(mockJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
+		when(mockJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
 		loginPresenter.setPlace(place);
+		Assert.assertEquals("/Portal.html?foo=bar#LoginPlace", loginPresenter.getOpenIdReturnUrl());
 	}
 	
 	@Test

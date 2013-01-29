@@ -97,8 +97,6 @@ public class LicensedDownloaderTest {
 
 
 		// create entity type provider
-		String registryJson = SynapseClientImpl.getEntityTypeRegistryJson();
-		AsyncMockStubber.callSuccessWith(registryJson).when(mockSynapseClient).getEntityTypeRegistryJSON(any(AsyncCallback.class));
 		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
 
 		AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -175,9 +173,9 @@ public class LicensedDownloaderTest {
 		locations = new ArrayList<LocationData>();
 		locations.add(downloadLocation);
 
-		StudyEntityWrapper = new EntityWrapper("StudyEntityWrapper", Study.class.getName(), null);
-		layerEntityWrapper = new EntityWrapper("layerEntityWrapper", Data.class.getName(), null);
-		pathEntityWrapper = new EntityWrapper("pathEntityWrapper", EntityPath.class.getName(), null);
+		StudyEntityWrapper = new EntityWrapper("StudyEntityWrapper", Study.class.getName());
+		layerEntityWrapper = new EntityWrapper("layerEntityWrapper", Data.class.getName());
+		pathEntityWrapper = new EntityWrapper("pathEntityWrapper", EntityPath.class.getName());
 		
 	}
 	

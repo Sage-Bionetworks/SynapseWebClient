@@ -18,7 +18,9 @@ public interface EntityMetadataView extends IsWidget {
 	public void showInfo(String string, String message);
 	
 	public void setDetailedMetadataVisible(boolean visible);
-	
+
+	public void showErrorMessage(String message);
+
 	public interface Presenter {
 
 		void loadVersions(String id, int offset, int limit,
@@ -56,6 +58,12 @@ public interface EntityMetadataView extends IsWidget {
 		Callback getLoginCallback();
 
 		void fireEntityUpdatedEvent();
+
+		void editCurrentVersionInfo(String entityId, String version, String comment);
+
+		void promoteVersion(String entityId, Long versionNumber);
+
+		void deleteVersion(String entityId, Long versionNumber);
 
 	}
 

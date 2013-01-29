@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.server;
 
+
 /**
  * Constant property keys
  * 
@@ -88,5 +89,5 @@ public class ServerConstants {
 	 * The property key that tell what FilterEnumeration.xml file to load.
 	 */
 	public static final String KEY_FILTER_ENUMERATION_CONFIG_XML_FILE = "org.sagebionetworks.fileter.enumeration.xml.resource";
-
+	
 }

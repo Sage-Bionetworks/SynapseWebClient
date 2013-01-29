@@ -43,15 +43,7 @@ public interface AuthenticationController {
 	 * @return the current user
 	 */
 	public UserSessionData getLoggedInUser();
-	
-	
-	/**
-	 * Saves the show demo flag into a cookie
-	 */
-	public void saveShowDemo();
-	
-	public void loadShowDemo();
-	
+		
 	public void getTermsOfUse(AsyncCallback<String> callback);
 	
 }

@@ -40,7 +40,7 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/cog-16.png")
 	ImageResource cog16();
-		
+	
 	@Source("images/icons/cross-button-16.png")
 	ImageResource deleteButton16();
 
@@ -64,7 +64,7 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/document-text-16.png")
 	ImageResource documentText16();
-		
+
 	@Source("images/icons/pencil-16.png")
 	ImageResource edit16();
 
@@ -131,9 +131,15 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/help-16.png")
 	ImageResource help16();
 
+	@Source("images/icons/image--plus-16.png")
+	ImageResource imagePlus16();
+	
 	@Source("images/icons/information-balloon-16.png")
 	ImageResource informationBalloon16();	
-		
+	
+	@Source("images/icons/chain-16.png")
+	ImageResource link16();
+	
 	@Source("images/icons/lock-16.png")
 	ImageResource lock16();	
 		
@@ -200,6 +206,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/grey_wrench-screwdriver-16.png")
 	ImageResource settings16();	
 	
+	@Source("images/icons/edit-16.png")
+	ImageResource slideInfo16();	
+	
 	@Source("images/icons/table-insert-column-16.png")
 	ImageResource tableInsertColumn16();
 	
@@ -246,11 +255,17 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/synapse-data-16.png")
 	ImageResource synapseData16();
 	
+	@Source("images/icons/synapse-data-plus-16.png")
+	ImageResource synapseDataAdd16();
+	
 	@Source("images/icons/synapse-data-24.png")
 	ImageResource synapseData24();
 	
 	@Source("images/icons/synapse-folder-16.png")
 	ImageResource synapseFolder16();
+	
+	@Source("images/icons/synapse-folder-plus-16.png")
+	ImageResource synapseFolderAdd16();
 	
 	@Source("images/icons/synapse-folder-24.png")
 	ImageResource synapseFolder24();
@@ -263,6 +278,13 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/synapse-model-24.png")
 	ImageResource synapseModel24();
+
+	@Source("images/icons/document-text-16.png")
+	ImageResource synapsePage16();
+
+	@Source("images/icons/document-text-24.png")
+	ImageResource synapsePage24();
+
 	
 	@Source("images/icons/synapse-project-16.png")
 	ImageResource synapseProject16();
@@ -302,4 +324,6 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/visualize-16.png")
 	ImageResource visualize16();	
 
+	@Source("images/icons/arrow-turn-090-left-gray.png")
+	ImageResource arrowTurnLeftGrey16();
 }

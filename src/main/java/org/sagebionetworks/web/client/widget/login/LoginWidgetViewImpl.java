@@ -51,26 +51,19 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 	private SafeHtml createSSOLoginButton(boolean userHasExplictlyAcceptedTermsOfUse) {
 		// federated login button
 		SafeHtmlBuilder sb = new SafeHtmlBuilder()		
-		.appendHtmlConstant("<form accept-charset=\"UTF-8\" action=\""+ WebConstants.OPEN_ID_URI +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
-		.appendHtmlConstant("    <input name=\"OPEN_ID_PROVIDER\" type=\"hidden\" value=\""+ DisplayConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>")
-		.appendHtmlConstant("    <input name=\"RETURN_TO_URL\" type=\"hidden\" value=\""+  getRedirectURL() +"\"/>");
+		.appendHtmlConstant("<form accept-charset=\"UTF-8\" action=\""+ presenter.getOpenIdActionUrl() +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
+		.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_PROVIDER+"\" type=\"hidden\" value=\""+ DisplayConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>")
+		.appendHtmlConstant("    <input name=\""+WebConstants.RETURN_TO_URL_PARAM+"\" type=\"hidden\" value=\""+  presenter.getOpenIdReturnUrl() +"\"/>");
 		if (userHasExplictlyAcceptedTermsOfUse) {
 			sb.appendHtmlConstant("    <input name=\""+ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
 		}
-		sb.appendHtmlConstant("    <button id=\"" + DisplayConstants.ID_BTN_LOGIN_GOOGLE + "\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"http://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")
+		sb.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_MODE+"\" type=\"hidden\" value=\""+  WebConstants.OPEN_ID_MODE_GWT +"\"/>");
+		sb.appendHtmlConstant("    <button id=\"" + DisplayConstants.ID_BTN_LOGIN_GOOGLE + "\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"https://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")
 		.appendHtmlConstant("</form>")		
 		.appendHtmlConstant("<p>&nbsp;</p>");
 		return sb.toSafeHtml();
 	}
-	
-	public String getRedirectURL() {
-		String redirectURL = Location.getHref();
-		String tailMarker = LoginPresenter.LOGIN_PLACE;
-		int i = redirectURL.indexOf(tailMarker);
-		if (i>0) redirectURL = redirectURL.substring(0, i+tailMarker.length());
-		return redirectURL;
-	}
-	
+		
 //	private Html ssoLoginButton;
 	private boolean explicitlyAcceptsTermsOfUse = false;
 	

@@ -33,8 +33,7 @@ public class BCCSignupHelper {
         window.setSize(ProfilePanel.WIDTH, 600);
         window.setPlain(true); 
         window.setModal(true); 
-        window.setBlinkModal(true); 
-
+        
         window.setHeading("Sage / DREAM Breast Cancer Prognosis Challenge Sign-Up"); 
         window.setButtons(Dialog.OKCANCEL);
         window.okText = "Submit";

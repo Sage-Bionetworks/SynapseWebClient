@@ -11,10 +11,10 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -27,27 +27,25 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 	private ProjectsHome place;
 	private ProjectsHomeView view;
 	private GlobalApplicationState globalApplicationState;
-	private NodeServiceAsync nodeService;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
-	private AutoGenFactory entityFactory;
+	private AutoGenFactory autoGenFactory;
 	
 	@Inject
 	public ProjectsHomePresenter(ProjectsHomeView view,
 			GlobalApplicationState globalApplicationState,
-			NodeServiceAsync nodeService, JSONObjectAdapter jsonObjectAdapter,
+			JSONObjectAdapter jsonObjectAdapter,
 			NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, 
-			SynapseClientAsync synapseClient, AutoGenFactory entityFactory) {
+			SynapseClientAsync synapseClient, AutoGenFactory autoGenFactory) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.nodeService = nodeService;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.entityFactory = entityFactory;
+		this.autoGenFactory = autoGenFactory;
 		
 		view.setPresenter(this);
 	}
@@ -71,7 +69,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 
 	@Override
 	public void createProject(final String name) {
-		Project proj = (Project) entityFactory.newInstance(Project.class.getName());
+		Project proj = (Project) autoGenFactory.newInstance(Project.class.getName());
 		proj.setEntityType(Project.class.getName());
 		proj.setName(name);
 		JSONObjectAdapter json = jsonObjectAdapter.createNew();
@@ -86,7 +84,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(caught instanceof BadRequestException) {
+					if(caught instanceof ConflictException) {
 						view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 					} else {
 						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					

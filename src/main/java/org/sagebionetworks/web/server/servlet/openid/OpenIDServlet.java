@@ -3,6 +3,7 @@ package org.sagebionetworks.web.server.servlet.openid;
 import static org.sagebionetworks.repo.model.ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,10 +21,14 @@ public class OpenIDServlet extends HttpServlet {
 	
 	@Override
     public void doPost(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {        
-		if (!request.getRequestURI().equals(WebConstants.OPEN_ID_URI)) {
+		if (request.getRequestURI().equals(WebConstants.OPEN_ID_URI)) {
+			handleOpenIDRequest(request, response);
+		} else {
 			response.setStatus(HttpStatus.NOT_FOUND.value());
-			return;
 		}
+	}	
+
+	private void handleOpenIDRequest(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {        
 		String thisUrl = request.getRequestURL().toString();
 		int i = thisUrl.indexOf(WebConstants.OPEN_ID_URI);
 		if (i<0)  {
@@ -40,6 +45,7 @@ public class OpenIDServlet extends HttpServlet {
 		}
 		String explicitlyAcceptsTermsOfUseString = request.getParameter(ACCEPTS_TERMS_OF_USE_PARAM);
 		Boolean explicitlyAcceptsTermsOfUse = explicitlyAcceptsTermsOfUseString==null ? false : new Boolean(explicitlyAcceptsTermsOfUseString);
+		String redirectMode = request.getParameter(WebConstants.OPEN_ID_MODE);
 		String returnToURL = request.getParameter(WebConstants.RETURN_TO_URL_PARAM);
 		if (returnToURL==null) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -50,19 +56,27 @@ public class OpenIDServlet extends HttpServlet {
 		OpenIDUtils.openID(
 				openIdProvider, 
 				explicitlyAcceptsTermsOfUse, 
+				redirectMode,
 				returnToURL, 
 				request, 
 				response, 
 				redirectEndpoint);
-	}	
-
+		
+	}
 	
 	@Override
     public void doGet(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {        
-		if (!request.getRequestURI().equals(OpenIDUtils.OPENID_CALLBACK_URI)) {
+		String requestURI = request.getRequestURI();
+		if (requestURI.equals(WebConstants.OPEN_ID_URI)) {
+			handleOpenIDRequest(request, response);
+		} else if (requestURI.equals(OpenIDUtils.OPENID_CALLBACK_URI)) {
+			handleOpenIDCallbackRequest(request, response);
+		} else {
 			response.setStatus(HttpStatus.NOT_FOUND.value());
-			return;
 		}
+	}
+	
+	private void handleOpenIDCallbackRequest(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException { 
 		try {
 			OpenIDUtils.openIDCallback(request, response);
 		} catch (NotFoundException e) {
@@ -70,11 +84,16 @@ public class OpenIDServlet extends HttpServlet {
 			response.setStatus(HttpStatus.NOT_FOUND.value());
 		} catch (AuthenticationException e) {
 			response.setStatus(e.getRespStatus());
-			response.getWriter().println(e.getMessage());
+			response.getWriter().println("{\"reason\":\""+e.getMessage()+"\"}");
 		} catch (XPathExpressionException e) {
 			// 500 error
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		} catch (URISyntaxException e) {
+			// 400 error
+			response.setStatus(HttpStatus.BAD_REQUEST.value());
+			response.getWriter().println("{\"reason\":\""+e.getMessage()+"\"}");
 		}
-	}	
+	}
+
 
 }

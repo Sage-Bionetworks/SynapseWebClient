@@ -56,7 +56,6 @@ public class DeleteAnnotationDialog {
 		dialog.setSize(250, height);
 		dialog.setPlain(true);  
 		dialog.setModal(true);  
-		dialog.setBlinkModal(true);  
 		dialog.setHeading("Remove Annotations");  
 		dialog.setLayout(new FitLayout());
 	    // We want okay to say save

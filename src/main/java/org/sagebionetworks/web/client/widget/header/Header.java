@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.place.Lookup;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -64,11 +63,6 @@ public class Header implements HeaderView.Presenter {
 		return authenticationController.getLoggedInUser(); 
 	}
 
-	@Override
-	public void lookupId(String synapseId) {
-		globalApplicationState.getPlaceChanger().goTo(new Lookup(synapseId));
-	}
-	
 	@Override
 	public void getSupportHRef(final AsyncCallback<String> callback) {
 		try {

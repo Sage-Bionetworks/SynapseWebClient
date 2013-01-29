@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.download;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.EntityTypeProvider;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
@@ -15,7 +13,6 @@ import com.google.inject.Inject;
 public class LocationableDownloader implements LocationableDownloaderView.Presenter, SynapseWidgetPresenter {
 	
 	private LocationableDownloaderView view;
-	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager = new HandlerManager(this);
@@ -23,9 +20,11 @@ public class LocationableDownloader implements LocationableDownloaderView.Presen
 	private EntityTypeProvider entityTypeProvider;
 	
 	@Inject
-	public LocationableDownloader(LocationableDownloaderView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider) {
+	public LocationableDownloader(LocationableDownloaderView view,
+			NodeModelCreator nodeModelCreator,
+			AuthenticationController authenticationController,
+			EntityTypeProvider entityTypeProvider) {
 		this.view = view;
-		this.nodeService = nodeService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;

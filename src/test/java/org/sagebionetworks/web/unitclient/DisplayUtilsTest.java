@@ -61,12 +61,61 @@ public class DisplayUtilsTest {
 		String actualYouTube = DisplayUtils.fixEmbeddedYouTube(testYouTube);
 		Assert.assertEquals(actualYouTube, expectedYouTube);
 	}
+
+	@Test
+	public void testYouTubeVideoIdToUrl(){
+		String testVideoId=  "xSfd5mkkmGM";
+		String expectedUrl = "http://www.youtube.com/watch?v=xSfd5mkkmGM";
+		String actualUrl = DisplayUtils.getYouTubeVideoUrl(testVideoId);
+		Assert.assertEquals(actualUrl, expectedUrl);
+	}
+	
+	@Test
+	public void testYouTubeVideoIdFromUrl(){
+		String testVideoUrl=  "http://www.youtube.com/watch?v=b1SJ7yaa7cI";
+		String expectedId = "b1SJ7yaa7cI";
+		String actualId = DisplayUtils.getYouTubeVideoId(testVideoUrl);
+		Assert.assertEquals(actualId, expectedId);
+		
+		testVideoUrl = "http://www.youtube.com/watch?v=aTestVideoId&feature=g-upl";
+		expectedId = "aTestVideoId";
+		actualId = DisplayUtils.getYouTubeVideoId(testVideoUrl);
+		Assert.assertEquals(actualId, expectedId);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidYouTubeVideoIdFromUrl1(){
+		String testVideoUrl=  "http://www.youtube.com/watch?v=";
+		DisplayUtils.getYouTubeVideoId(testVideoUrl);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidYouTubeVideoIdFromUrl2(){
+		String testVideoUrl=  "http://www.cnn.com/";
+		DisplayUtils.getYouTubeVideoId(testVideoUrl);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidYouTubeVideoIdFromUrl3(){
+		String testVideoUrl=  "";
+		DisplayUtils.getYouTubeVideoId(testVideoUrl);
+	}
 	
 	@Test
 	public void testAttachmentLinkMarkdown(){
 		String expectedResult = "![Example](Attachment/entity/syn12345/tokenId/tokenA/1234/previewTokenId/previewA/5678 \"my title\")";
 		String actualResult = MarkdownUtils.getAttachmentLinkMarkdown("Example", "syn12345", "tokenA/1234", "previewA/5678", "my title");
 		Assert.assertEquals(actualResult, expectedResult);
+	}
+
+	@Test
+	public void testGetFileNameFromLocationPath() {
+		String name = "filename.txt";
+		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://some.really.long.com/path/to/a/file/" + name));
+		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://some.really.long.com/path/to/a/file/" + name + "?param1=value&param2=value"));
+		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("/root/" + name));
+		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://google.com/" + name));
+		
 	}
 	
 }

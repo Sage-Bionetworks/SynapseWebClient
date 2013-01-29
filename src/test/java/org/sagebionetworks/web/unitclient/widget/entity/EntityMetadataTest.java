@@ -6,23 +6,29 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -44,6 +50,7 @@ public class EntityMetadataTest {
 	JiraURLHelper mockJiraURLHelper;
 
 	EntityMetadata entityMetadata;
+	Versionable vb;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -61,6 +68,18 @@ public class EntityMetadataTest {
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 
 		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, mockJsonObjectAdapter, mockGlobalApplicationState, mockEntityTypeProvider, mockJiraURLHelper, mockEventBus);
+
+		vb = new Data();
+		vb.setId("syn123");
+		vb.setVersionNumber(new Long(1));
+		vb.setVersionLabel("");
+		vb.setVersionComment("");
+		EntityBundle mockBundle = mock(EntityBundle.class, RETURNS_DEEP_STUBS);
+		when(mockBundle.getPermissions().getCanEdit()).thenReturn(true);
+		when(mockBundle.getEntity()).thenReturn(vb);
+		when(mockJsonObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
+		entityMetadata.setEntityBundle(mockBundle, false);
+
 	}
 
 	@Test
@@ -105,5 +124,35 @@ public class EntityMetadataTest {
 		};
 
 		entityMetadata.loadVersions("synEMPTY", 0, 1, callback);
+	}
+
+	@Test
+	public void testUpdateVersionInfo() throws Exception {
+
+		String testComment = "testComment";
+		String testLabel = "testLabel";
+
+		entityMetadata.editCurrentVersionInfo(vb.getId(), testLabel, testComment);
+		ArgumentCaptor<String> json = ArgumentCaptor.forClass(String.class);
+		verify(mockSynapseClient).updateEntity(json.capture(), (AsyncCallback<EntityWrapper>) any());
+		JSONObjectAdapter joa = new JSONObjectAdapterImpl();
+		joa = joa.createNew(json.getValue());
+		Versionable out = new Data();
+		out.initializeFromJSONObject(joa);
+		assertEquals(new Long(1), out.getVersionNumber());
+		assertEquals(testLabel, out.getVersionLabel());
+		assertEquals(testComment, out.getVersionComment());
+	}
+
+	@Test
+	public void testPromoteVersion() throws Exception {
+		entityMetadata.promoteVersion(vb.getId(), vb.getVersionNumber());
+		verify(mockSynapseClient).promoteEntityVersion(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<String>) any());
+	}
+
+	@Test
+	public void testDeleteVersion() throws Exception {
+		entityMetadata.deleteVersion(vb.getId(), vb.getVersionNumber());
+		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
 	}
 }
