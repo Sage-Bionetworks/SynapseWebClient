@@ -478,5 +478,18 @@ public class SynapseClientImplTest {
 		List<AttachmentData> attachments = updatedEntity.getAttachments();
 		assertTrue(attachments.size() == 1 && attachments.get(0).equals(attachment1));
 	}
+	
+	@Test
+	public void testGetJSONEntity() throws Exception {
+
+		JSONObject json = EntityFactory.createJSONObjectForEntity(entity);
+		Mockito.when(mockSynapse.getEntity(anyString())).thenReturn(json);
+		
+		String testRepoUri = "/testservice";
+		
+		synapseClient.getJSONEntity(testRepoUri);
+		//verify that this call uses Synapse.getEntity(testRepoUri)
+	    verify(mockSynapse).getEntity(testRepoUri);
+	}	
 
 }

@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -90,6 +91,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private EntityMetadata entityMetadata;
 	private FilesBrowser filesBrowser;	
 	private PagesBrowser pagesBrowser;
+	private CookieProvider cookies;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -101,7 +103,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, PagesBrowser pagesBrowser) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser, PagesBrowser pagesBrowser, CookieProvider cookies) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -116,7 +118,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
 		this.pagesBrowser = pagesBrowser;
-		
+		this.cookies = cookies;
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
@@ -308,7 +310,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 		// Child Page Browser
-		//fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, true));
+		if (DisplayUtils.isInTestWebsite(cookies))
+			fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, true));
 		// Child File Browser
 		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
 
