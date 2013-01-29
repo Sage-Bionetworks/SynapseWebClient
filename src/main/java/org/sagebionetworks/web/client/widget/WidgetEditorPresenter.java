@@ -14,7 +14,7 @@ public interface WidgetEditorPresenter extends SynapseWidgetPresenter {
 	 * @param entityId
 	 * @param widgetDescriptor
 	 */
-	public void configure(String entityId, Map<String, String> widgetDescriptor);
+	public void configure(String ownerObjectId, String ownerObjectType, Map<String, String> widgetDescriptor);
 	/**
 	 * You should update the parameters stored in your widget descriptor based on the values currently set in the view.
 	 * User parameter validation should occur in this method (throwing an IllegalArgumentException if a problem is found).

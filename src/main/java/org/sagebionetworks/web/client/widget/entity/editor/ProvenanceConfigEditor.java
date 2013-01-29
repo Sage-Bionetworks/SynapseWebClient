@@ -20,7 +20,7 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 	}		
 
 	@Override
-	public void configure(String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(String ownerObjectId, String ownerObjectType, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
 		String provEntityId = descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY);
 		

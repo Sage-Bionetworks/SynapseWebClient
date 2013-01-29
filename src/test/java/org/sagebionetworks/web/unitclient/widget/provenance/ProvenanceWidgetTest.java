@@ -194,7 +194,7 @@ public class ProvenanceWidgetTest {
 		widgetDescriptor.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, "42");
 		widgetDescriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY, entity.getId());
 		widgetDescriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, "true");
-		provenanceWidget.configure("bad entity id", widgetDescriptor);
+		provenanceWidget.configure("bad id", "test object type",  widgetDescriptor);
 		verifyBuildTreeCalls();
 	}
 	

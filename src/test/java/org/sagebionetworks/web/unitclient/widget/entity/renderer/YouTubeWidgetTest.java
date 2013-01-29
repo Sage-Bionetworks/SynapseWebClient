@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -36,7 +35,7 @@ public class YouTubeWidgetTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String videoId = "my test video id";
 		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, videoId);
-		widget.configure("", descriptor);
-		verify(mockView).configure(anyString(), eq(videoId));
+		widget.configure("", "", descriptor);
+		verify(mockView).configure(eq(videoId));
 	}
 }

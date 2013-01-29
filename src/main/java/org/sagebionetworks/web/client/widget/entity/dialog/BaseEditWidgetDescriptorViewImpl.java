@@ -124,10 +124,10 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	}
 	
 	@Override
-	public void setWidgetDescriptor(String entityId, String contentTypeKey, Map<String, String> widgetDescriptor) {
+	public void setWidgetDescriptor(String ownerObjectId, String ownerObjectType, String contentTypeKey, Map<String, String> widgetDescriptor) {
 		//clear out params panel.  Get the right params editor based on the descriptor (it's concrete class, and configure based on the parameters inside of it).
 		paramsPanel.clear();
-		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(entityId, contentTypeKey, widgetDescriptor);
+		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(ownerObjectId, ownerObjectType, contentTypeKey, widgetDescriptor);
 		if (widgetDescriptorPresenter != null) {
 			Widget w = widgetDescriptorPresenter.asWidget();
 			paramsPanel.add(w);

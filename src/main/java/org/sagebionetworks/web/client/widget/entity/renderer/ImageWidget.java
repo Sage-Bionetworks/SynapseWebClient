@@ -32,10 +32,11 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	}
 	
 	@Override
-	public void configure(final String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(final String ownerObjectId, String ownerObjectType, Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+		//TODO: change to support other object types
+		synapseClient.getEntity(ownerObjectId, new AsyncCallback<EntityWrapper>() {
 			@Override
 			public void onSuccess(EntityWrapper result) {
 				Entity entity;
@@ -46,7 +47,7 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 								.hasNext();) {
 							AttachmentData data = (AttachmentData) iterator.next();
 							if (descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY).equals(data.getName()))
-								view.configure(entityId, data, descriptor.get(WidgetConstants.IMAGE_WIDGET_WIDTH_KEY));				
+								view.configure(ownerObjectId, data, descriptor.get(WidgetConstants.IMAGE_WIDGET_WIDTH_KEY));				
 						}
 					}
 				} catch (JSONObjectAdapterException e) {

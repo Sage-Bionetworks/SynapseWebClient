@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.registration;
 
 public class WidgetConstants {
+	public static final String WIKI_OWNER_ID_ENTITY = "entity";
+	public static final String WIKI_OWNER_ID_COMPETITION = "competition";
+	
+	
 	public static final String YOUTUBE_CONTENT_TYPE = "youtube";
 	public static final String YOUTUBE_FRIENDLY_NAME = "YouTube";
 	

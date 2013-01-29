@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -216,7 +217,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 						innerText = innerText.trim();
 						String contentType = widgetRegistrar.getWidgetContentType(innerText);
 						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
-						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(entityId, contentType, widgetDescriptor);
+						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(entityId, WidgetConstants.WIKI_OWNER_ID_ENTITY, contentType, widgetDescriptor);
 						if (presenter == null)
 							throw new IllegalArgumentException("unable to render widget from the specified markdown:" + innerText);
 						panel.add(presenter.asWidget(), currentWidgetDiv);

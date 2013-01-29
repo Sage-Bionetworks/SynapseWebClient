@@ -8,5 +8,5 @@ public interface WidgetRendererPresenter extends SynapseWidgetPresenter {
 	 * @param entityId
 	 * @param widgetDescriptor
 	 */
-	public void configure(String entityId, Map<String, String> widgetDescriptor);
+	public void configure(String ownerObjectId, String ownerObjectType, Map<String, String> widgetDescriptor);
 }

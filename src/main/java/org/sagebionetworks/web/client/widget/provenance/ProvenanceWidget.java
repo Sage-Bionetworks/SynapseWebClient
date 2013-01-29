@@ -70,7 +70,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}	
 	
 	@Override
-	public void configure(String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(String ownerObjectId, String ownerObjectType, Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		final int depth = descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY) != null ? Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY)) : 1;
