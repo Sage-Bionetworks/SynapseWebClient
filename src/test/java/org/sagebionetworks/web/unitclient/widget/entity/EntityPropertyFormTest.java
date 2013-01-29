@@ -183,39 +183,4 @@ public class EntityPropertyFormTest {
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 	}
 	
-	@Test
-	public void testEntityUpdateHandler() {
-		presenter.init();
-
-		AdapterFactory factory = new AdapterFactoryImpl();
-		JSONObjectAdapter adapter = factory.createNew();
-		
-		ArgumentCaptor<EntityUpdatedHandler> arg = ArgumentCaptor.forClass(EntityUpdatedHandler.class);
-		verify(mockEventBus).addHandler(any(GwtEvent.Type.class), arg.capture());
-		//test the event handler
-		
-		EntityUpdatedHandler handler = arg.getValue();
-		EntityUpdatedEvent testEvent = new EntityUpdatedEvent();
-		//verify that synapseClient.getEntityBundle is called when the view is visible (and bundle is set), and not called if otherwise
-		when(mockView.isComponentVisible()).thenReturn(false);
-		handler.onPersistSuccess(testEvent);
-		verify(mockSynapseClient, Mockito.times(0)).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		
-		//clear out the entity bundle and make sure it's still not called
-		when(mockView.isComponentVisible()).thenReturn(true);
-		presenter.setDataCopies(adapter, null, null, null, null);
-		handler.onPersistSuccess(testEvent);
-		verify(mockSynapseClient, Mockito.times(0)).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		
-		//set the bundle, but don't set the entity id
-		presenter.setDataCopies(adapter, null, null, null, entityBundle);
-		entityBundle.getEntity().setId(null);
-		handler.onPersistSuccess(testEvent);
-		verify(mockSynapseClient, Mockito.times(0)).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		
-		//set the ID, and verify that the service is called now
-		entityBundle.getEntity().setId("syn1");
-		handler.onPersistSuccess(testEvent);
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-	}
 }
