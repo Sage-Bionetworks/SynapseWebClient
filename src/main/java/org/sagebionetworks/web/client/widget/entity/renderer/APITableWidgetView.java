@@ -13,7 +13,7 @@ public interface APITableWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(Map<String, List<String>> columnData, String[] columnNames, String[] displayColumnNames, APITableColumnRenderer[] renderers, String tableWidth, boolean showRowNumbers, String rowNumberColName, String cssStyleName, int offset);
+	public void configure(Map<String, List<String>> columnData, String[] columnNames, String[] displayColumnNames, APITableInitializedColumnRenderer[] renderers, String tableWidth, boolean showRowNumbers, String rowNumberColName, String cssStyleName, int offset);
 	/**
 	 * Call to add the pager bar to the table
 	 * @param start

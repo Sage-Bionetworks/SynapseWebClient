@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -21,7 +20,6 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowAnnotation;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -38,7 +36,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 
 	SynapseClientAsync synapseClient;
 	NodeModelCreator nodeModelCreator;
-	AsyncCallback<Void> finalCallback;
+	AsyncCallback<APITableInitializedColumnRenderer> finalCallback;
 	Map<String, List<EntityRow<?>>> value2Annotations;
 	Map<String, String> value2Error;
 	List<String> entityIds;
@@ -55,7 +53,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 	}
 	
 	@Override
-	public void init(List<String> columnData, AsyncCallback<Void> callback) {
+	public void init(List<String> columnData, AsyncCallback<APITableInitializedColumnRenderer> callback) {
 		Set<String> uniqueIds = new HashSet<String>(columnData.size());
 		uniqueIds.addAll(columnData);
 		entityIds = new ArrayList<String>();
@@ -85,16 +83,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 					EntityBundle bundle = nodeModelCreator.createEntityBundle(result);
 					List<EntityRow<?>> entityRowList =  PropertyWidget.getRows(bundle.getEntity(), bundle.getAnnotations(), factory, cache);
 
-					//let's add a single row scalar to display the entity name
-					ObjectSchema schema = cache.getSchemaEntity(bundle.getEntity());
-					
-					EntityRowAnnotation<String> nameRowAnnotation = new EntityRowAnnotation<String>(new HashMap(), "Name", String.class);
-					List<String> nameList = new ArrayList<String>();
-					nameList.add(bundle.getEntity().getName());
-					nameRowAnnotation.setValue(nameList);
-					entityRowList.add(0, nameRowAnnotation);
-					
-					if (masterAnnotationList == null && entityRowList.size() > 1)
+					if (masterAnnotationList == null && entityRowList.size() > 0)
 						masterAnnotationList = entityRowList;
 					value2Annotations.put(columnData.get(currentIndex), entityRowList);
 				} catch (JSONObjectAdapterException e) {
@@ -114,58 +103,49 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 			private void processNext() {
 				//after all values have initialized, then do the final callback
 				if (currentIndex == columnData.size()-1) {
-					finalCallback.onSuccess(null);
+					finalCallback.onSuccess(new APITableInitializedColumnRenderer() {
+						@Override
+						public int getColumnCount() {
+							return masterAnnotationList.size();
+						}
+						@Override
+						public String getRenderedColumnName(int rendererColIndex) {
+							return masterAnnotationList.get(rendererColIndex).getLabel();
+						}
+						
+						@Override
+						public String render(String value, int rendererColIndex) {
+							//was there an error processing this value?
+							String error = value2Error.get(value);
+							if (error != null) {
+								return error;
+							}
+							
+							int colIndex = rendererColIndex;
+							String masterAnnotationLabel = masterAnnotationList.get(colIndex).getLabel();
+							
+							List<EntityRow<?>> row = value2Annotations.get(value);
+							//does this row have the same annotation
+							String renderedValue = "";
+							if (row != null) {
+								for (Iterator iterator = row.iterator(); iterator.hasNext();) {
+									EntityRow<?> entityRow = (EntityRow<?>) iterator.next();
+									if (entityRow.getLabel().equals(masterAnnotationLabel)) {
+										//report this display value
+										if (entityRow.getValue() != null)
+											renderedValue = entityRow.getDislplayValue();
+										break;
+									}
+								}
+							}
+							return renderedValue;
+						}
+
+					});
 				} else
 					columnDataInit(columnData, currentIndex+1);
 			}
 		};
 		synapseClient.getEntityBundle(columnData.get(currentIndex), ENTITY| ANNOTATIONS, callback);
 	}
-	
-	@Override
-	public int getColumnCount() {
-		if (masterAnnotationList == null) 
-			return 1;
-		
-		return masterAnnotationList.size() + 1;
-	}
-	@Override
-	public String getRenderedColumnName(int rendererColIndex) {
-		if (rendererColIndex == 0)
-			return null;
-		return masterAnnotationList.get(rendererColIndex-1).getLabel();
-	}
-	
-	@Override
-	public String render(String value, int rendererColIndex) {
-		if (rendererColIndex == 0) {
-			return APITableColumnRendererSynapseID.getSynapseLinkHTML(value);
-		}
-		
-		//was there an error processing this value?
-		String error = value2Error.get(value);
-		if (error != null) {
-			return error;
-		}
-		
-		int colIndex = rendererColIndex - 1;
-		String masterAnnotationLabel = masterAnnotationList.get(colIndex).getLabel();
-		
-		List<EntityRow<?>> row = value2Annotations.get(value);
-		//does this row have the same annotation
-		String renderedValue = "";
-		if (row != null) {
-			for (Iterator iterator = row.iterator(); iterator.hasNext();) {
-				EntityRow<?> entityRow = (EntityRow<?>) iterator.next();
-				if (entityRow.getLabel().equals(masterAnnotationLabel)) {
-					//report this display value
-					if (entityRow.getValue() != null)
-						renderedValue = entityRow.getDislplayValue();
-					break;
-				}
-			}
-		}
-		return renderedValue;
-	}
-
 }

@@ -30,7 +30,7 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	}
 	
 	@Override
-	public void configure(java.util.Map<String,java.util.List<String>> columnData, String[] columnNames, String[] displayColumnNames, APITableColumnRenderer[] renderers, String tableWidth, boolean showRowNumbers, String rowNumberColName, String cssStyleName, int offset) {
+	public void configure(java.util.Map<String,java.util.List<String>> columnData, String[] columnNames, String[] displayColumnNames, APITableInitializedColumnRenderer[] renderers, String tableWidth, boolean showRowNumbers, String rowNumberColName, String cssStyleName, int offset) {
 		removeAll();
 		if (columnData.size() > 0) {
 			StringBuilder builder = new StringBuilder();

@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -47,7 +48,6 @@ import com.google.inject.Inject;
 @SuppressWarnings("unused")
 public class HeaderViewImpl extends Composite implements HeaderView {
 
-	private String baseProfileAttachmentUrl = GWT.getModuleBaseURL()+"profileAttachment";
 	
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
@@ -252,7 +252,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			userNameWrapper.clear();
 			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
 				Image profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(baseProfileAttachmentUrl, profile.getOwnerId(), profile.getPic().getPreviewId(), null));
+				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
 				profilePicture.setWidth("20px");
 				profilePicture.setHeight("20px");
 				profilePicture.addStyleName("margin:auto; display:block;");

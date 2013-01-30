@@ -178,7 +178,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 								renderers[i] = createColumnRenderer(rendererNamesArray[i]);
 							}
 							testParameters(columnNamesArray, displayColumnNamesArray, renderers);
-							tableColumnRendererInit(columnData, columnNamesArray, displayColumnNamesArray, renderers, 0);
+							APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[rendererNamesArray.length];
+							tableColumnRendererInit(columnData, columnNamesArray, displayColumnNamesArray, renderers, initializedRenderers, 0);
 						}
 					}
 				} catch (Exception e1) {
@@ -215,10 +216,11 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	 * @param renderers
 	 * @param currentIndex
 	 */
-	private void tableColumnRendererInit(final Map<String, List<String>> columnData, final String[] columnNames, final String[] displayColumnNames, final APITableColumnRenderer[] renderers, final int currentIndex) {
-		AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+	private void tableColumnRendererInit(final Map<String, List<String>> columnData, final String[] columnNames, final String[] displayColumnNames, final APITableColumnRenderer[] renderers, final APITableInitializedColumnRenderer[] initializedRenderers, final int currentIndex) {
+		AsyncCallback<APITableInitializedColumnRenderer> callback = new AsyncCallback<APITableInitializedColumnRenderer>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void onSuccess(APITableInitializedColumnRenderer result) {
+				initializedRenderers[currentIndex] = result;
 				processNext();
 			}
 			@Override
@@ -230,14 +232,14 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			private void processNext() {
 				//after all renderers have initialized, then configure the view
 				if (currentIndex == renderers.length-1) {
-					view.configure(columnData, columnNames, displayColumnNames, renderers, tableWidth, isShowRowNumber, rowNumberColName, cssStyleName, offset);
+					view.configure(columnData, columnNames, displayColumnNames, initializedRenderers, tableWidth, isShowRowNumber, rowNumberColName, cssStyleName, offset);
 					if (isPaging && total > pageSize) {
 						int start = offset+1;
 						int end = start + rowCount - 1;
 						view.configurePager(start, end, total);
 					}
 				} else
-					tableColumnRendererInit(columnData, columnNames, displayColumnNames, renderers, currentIndex+1);
+					tableColumnRendererInit(columnData, columnNames, displayColumnNames, renderers, initializedRenderers, currentIndex+1);
 			}
 		};
 		renderers[currentIndex].init(columnData.get(columnNames[currentIndex]), callback);

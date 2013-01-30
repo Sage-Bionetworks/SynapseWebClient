@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRenderer;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -104,7 +105,7 @@ public class APITableWidgetTest {
 	public void testConfigure() {
 		widget.configure("", descriptor);
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
@@ -125,7 +126,7 @@ public class APITableWidgetTest {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 		
 		widget.configure("", descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 	}
 	
 	@Test
@@ -133,8 +134,7 @@ public class APITableWidgetTest {
 		//even if the column renderer fails to initialize, everything should still work
 		APITableColumnRendererSynapseID failColumnRenderer = new APITableColumnRendererSynapseID(){
 			@Override
-			public void init(List<String> columnData,
-					AsyncCallback<Void> callback) {
+			public void init(List<String> columnData, AsyncCallback<APITableInitializedColumnRenderer> callback) {
 				callback.onFailure(new Exception("Load failure"));
 			}
 		};
@@ -142,7 +142,7 @@ public class APITableWidgetTest {
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(failColumnRenderer);
 		widget.configure("", descriptor);
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
 	}
 
@@ -168,7 +168,7 @@ public class APITableWidgetTest {
 	public void testNoPaging() throws JSONObjectAdapterException {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
 		widget.configure("", descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
@@ -176,7 +176,7 @@ public class APITableWidgetTest {
 	public void testPagerNotNecessary() throws JSONObjectAdapterException {
 		testReturnJSONObject.put("totalNumberOfResults", 2);
 		widget.configure("", descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
