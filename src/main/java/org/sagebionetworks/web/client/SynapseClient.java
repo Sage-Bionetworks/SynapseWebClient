@@ -182,4 +182,5 @@ public interface SynapseClient extends RemoteService {
 	
 	String promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
 	public EntityWrapper removeAttachmentFromEntity(String entityId, String attachmentName) throws RestServiceException;
+	public String getJSONEntity(String repoUri) throws RestServiceException;
 }

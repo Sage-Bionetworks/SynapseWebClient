@@ -322,6 +322,18 @@ public class DisplayConstants {
 	public static final String URL_LABEL = "URL:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
+	public static final String SYNAPSE_API_CALL_URL_LABEL = "Synapse API URI:";
+	public static final String SYNAPSE_API_CALL_COLUMNS_LABEL = "Columns To Display:";
+	public static final String SYNAPSE_API_CALL_COLUMN_HEADERS_LABEL = "Column Headers:";
+	public static final String SYNAPSE_API_CALL_RENDERERS_LABEL = "Renderer Names:";
+	public static final String SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL = "Show Row Numbers?";
+	public static final String SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME = "Row Numbers Col Name:";
+	public static final String SYNAPSE_API_CALL_IS_PAGING = "Support Paging?";
+	public static final String SYNAPSE_API_CALL_PAGE_SIZE = "Page Size:";
+	public static final String SYNAPSE_API_CALL_WIDTH = "Width (% or pixels)";
+	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
+	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
+	
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
 	public static final String SHOW_EXPANDED_LABEL = "Show Expanded?";
 	public static final String INVALID_NUMBER_MESSAGE = "Please enter a valid number";
@@ -450,5 +462,13 @@ public class DisplayConstants {
 	public static final String CURRENTLY_SELCTED = "Currently Selected";
 	public static final String PLEASE_MAKE_SELECTION = "Please make a selection";
 	
+	public static final String API_TABLE_COLUMN_COUNT_MISMATCH = "SuperTable: The number of columns must be the same as the number of renderers and column header titles.";
+	public static final String API_TABLE_MISSING_URI = "SuperTable: Endpoint path not specified.";
+	
+	public static final String PAGE_BACK = "Go to the previous page";
+	public static final String PAGE_NEXT = "Go to the next page";
+	public static final String SWITCH_TO_STANDARD_WEBSITE = "Switch back to the release version";
+	public static final String SWITCH_TO_TEST_WEBSITE = "Try an alpha test version of the website";
+	public static final String TEST_MODE_WARNING = "This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade. Are you sure you want to switch into this mode?";
 }
 

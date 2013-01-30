@@ -56,13 +56,13 @@ public class WebConstants {
 	public static final String OPEN_ID_MODE_STANDARD = "STANDARD";
 
 	public static int MARKDOWN_OPTIONS = 
-		Extensions.ABBREVIATIONS |		//Abbreviations in the way of PHP Markdown Extra.
-		Extensions.AUTOLINKS |			//Plain (undelimited) autolinks the way Github-flavoured-Markdown implements them.
-		Extensions.QUOTES |				//Beautifies single quotes, double quotes and double angle quotes
-		Extensions.SMARTS |				//Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")		
+		//Extensions.ABBREVIATIONS |		//Abbreviations in the way of PHP Markdown Extra.
+		//Extensions.AUTOLINKS |			//Plain (undelimited) autolinks the way Github-flavoured-Markdown implements them.
+		//Extensions.QUOTES |				//Beautifies single quotes, double quotes and double angle quotes
+		//Extensions.SMARTS |				//Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")		
 		Extensions.TABLES |				//Tables similar to MultiMarkdown (which is in turn like the PHP Markdown Extra tables, but with colspan support).
-		Extensions.SUPPRESS_ALL_HTML |	//Suppresses HTML
-		Extensions.WIKILINKS;			//Support [[Wiki-style links]] with a customizable URL rendering logic.
+		Extensions.SUPPRESS_ALL_HTML;	//Suppresses HTML
+		//Extensions.WIKILINKS;			//Support [[Wiki-style links]] with a customizable URL rendering logic.
 
 	public static final String ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
 			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br></code></pre><br>" +
