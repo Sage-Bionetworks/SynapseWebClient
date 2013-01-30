@@ -3,10 +3,18 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
+import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.wiki.WikiHeader;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.WikiPageKeyWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -103,4 +111,12 @@ public interface SynapseClientAsync {
 	void removeAttachmentFromEntity(String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 	
 	public void getJSONEntity(String repoUri, AsyncCallback<String> callback);
+	
+	//wiki crud
+	public void createWikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void getWikiPage(WikiPageKeyWrapper key, AsyncCallback<String> callback);
+	public void updateWikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void deleteWikiPage(WikiPageKeyWrapper key, AsyncCallback<Void> callback);
+	
+	public void getWikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
 }

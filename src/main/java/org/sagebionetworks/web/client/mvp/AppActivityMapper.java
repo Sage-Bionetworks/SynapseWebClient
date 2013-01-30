@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.SynapseWiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -69,6 +70,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(PasswordReset.class);
 		openAccessPlaces.add(RegisterAccount.class);
 		openAccessPlaces.add(Synapse.class);
+		openAccessPlaces.add(SynapseWiki.class);
 		openAccessPlaces.add(ProjectsHome.class);
 		openAccessPlaces.add(ComingSoon.class);
 		openAccessPlaces.add(Governance.class);
@@ -173,6 +175,10 @@ public class AppActivityMapper implements ActivityMapper {
 			// wiki page
 			WikiPresenter presenter = ginjector.getWikiPresenter();
 			presenter.setPlace((WikiPlace)place);
+			return presenter;
+		} else if(place instanceof SynapseWiki){
+			SynapseWikiPresenter presenter = ginjector.getSynapseWikiPresenter();
+			presenter.setPlace((SynapseWiki)place);
 			return presenter;
 		} else {
 			// Log that we have an unknown place but send the user to the default

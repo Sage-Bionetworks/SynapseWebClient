@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -20,7 +20,7 @@ public interface PagesBrowserView extends IsWidget, SynapseWidgetView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(List<EntityHeader> entityHeaders, boolean canEdit);
+	public void configure(String ownerId, String ownerType, List<WikiHeader> wikiHeaders, boolean canEdit);
 	
 	/**
 	 * Presenter interface
@@ -29,8 +29,5 @@ public interface PagesBrowserView extends IsWidget, SynapseWidgetView {
 
 		void createPage(String name);
 
-		void fireEntityUpdatedEvent();
 	}
-
-
 }

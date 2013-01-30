@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -43,7 +44,8 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		void getHtmlFromMarkdown(String description, String attachmentBaseUrl, AsyncCallback<String> asyncCallback);
 		
 		void loadWidgets(HTMLPanel container);
-
+		
+		void loadRootWikiPage(AsyncCallback<WikiPage> asyncCallback);
 	}
 
 }

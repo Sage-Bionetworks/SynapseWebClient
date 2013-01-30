@@ -7,8 +7,10 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.WikiPageKeyWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -183,4 +185,13 @@ public interface SynapseClient extends RemoteService {
 	String promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
 	public EntityWrapper removeAttachmentFromEntity(String entityId, String attachmentName) throws RestServiceException;
 	public String getJSONEntity(String repoUri) throws RestServiceException;
+	
+	//wiki crud
+	public String createWikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
+	public String getWikiPage(WikiPageKeyWrapper key)  throws RestServiceException;
+	public String updateWikiPage(String ownerId, String ownerType, String wikiPageJson)  throws RestServiceException;
+	public void deleteWikiPage(WikiPageKeyWrapper key)  throws RestServiceException;
+	
+	public String getWikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
+
 }

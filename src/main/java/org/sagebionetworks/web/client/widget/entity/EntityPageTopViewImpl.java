@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 
@@ -182,7 +184,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu.addEntityUpdatedHandler(handler);
 		locationableTitleBar.addEntityUpdatedHandler(handler);
 		filesBrowser.addEntityUpdatedHandler(handler);
-		pagesBrowser.addEntityUpdatedHandler(handler);
 	}
 
 	@Override
@@ -247,20 +248,21 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 	// Render the Page entity	
 	private void renderPageEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
+		//TODO: this should be in another Place!  A WikiPage place, since WikiPage is not an Entity
 		// ** LEFT **
 //		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
 			
 		// ** RIGHT **
 		// ** FULL WIDTH **
 		// Entity Metadata
-		fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
-		entityMetadata.setEntityBundle(bundle, readOnly);
-		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
-		// Description
-		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
-
-		// Child Page Browser
-		fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, false));
+//		fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
+//		entityMetadata.setEntityBundle(bundle, readOnly);
+//		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
+//		// Description
+//		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
+//
+//		// Child Page Browser
+//		fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, parentWikiId));
 		// ************************************************************************************************		
 	}
 	
@@ -294,8 +296,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	// Render the Project entity
-	private void renderProjectEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
+	private void renderProjectEntity(final EntityBundle bundle,
+			String entityTypeDisplay, boolean isAdmin, final boolean canEdit, boolean readOnly2,
 			MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
@@ -310,8 +312,24 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 		// Child Page Browser
-		if (DisplayUtils.isInTestWebsite(cookies))
-			fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, true));
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			final LayoutContainer wikiContainer = new LayoutContainer();
+			fullWidthContainer.add(wikiContainer);
+			presenter.loadRootWikiPage(new AsyncCallback<WikiPage>() {
+				public void onSuccess(WikiPage result) {
+					//add the page viewer, and subpage browser
+					wikiContainer.add(getPageViewerWidget(result.getMarkdown()));
+					if (result != null) {
+						wikiContainer.add(createPagesBrowserWidget(pagesBrowser, bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, canEdit, result.getId()));	
+					}
+				};
+				@Override
+				public void onFailure(Throwable caught) {
+					wikiContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + caught.getMessage() + "</div>")));
+				}
+			});
+		}
+			
 		// Child File Browser
 		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
 
@@ -406,8 +424,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 	
-	private Widget createEntityPagesBrowserWidget(Entity entity, boolean canEdit,  boolean isProject) {
-		pagesBrowser.configure(entity.getId(), DisplayConstants.PAGES, canEdit, isProject);
+	public static Widget createPagesBrowserWidget(PagesBrowser pagesBrowser, String ownerId, String contentType, boolean canEdit, String parentWikiId) {
+		pagesBrowser.configure(ownerId, contentType, DisplayConstants.PAGES, canEdit, parentWikiId);
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("left");
 		lc.setStyleAttribute("margin", "0px 0px 20px 0px");

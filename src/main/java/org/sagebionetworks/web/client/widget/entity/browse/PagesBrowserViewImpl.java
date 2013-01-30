@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.Iterator;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -41,10 +41,10 @@ public class PagesBrowserViewImpl extends LayoutContainer implements PagesBrowse
 	};
 
 	@Override
-	public void configure(List<EntityHeader> entityHeaders, boolean canEdit) {
+	public void configure(String ownerId, String ownerType, List<WikiHeader> wikiHeaders, boolean canEdit) {
 		this.removeAll(true);
 		//this widget shows nothing if the user can't edit the entity and it doesn't have any pages!
-		if (!canEdit && entityHeaders.size() == 0)
+		if (!canEdit && wikiHeaders.size() == 0)
 			return;
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("span-24 notopmargin");
@@ -59,7 +59,7 @@ public class PagesBrowserViewImpl extends LayoutContainer implements PagesBrowse
 
 		LayoutContainer files = new LayoutContainer();
 		files.setStyleName("span-24 notopmargin");
-		files.add(getEntityList(entityHeaders));
+		files.add(getAnchorList(ownerId, ownerType, wikiHeaders));
 		lc.add(titleBar);
 		lc.add(files);
 		if (canEdit) {
@@ -88,13 +88,14 @@ public class PagesBrowserViewImpl extends LayoutContainer implements PagesBrowse
 		this.layout(true);
 	}	
 	
-	private HTMLPanel getEntityList(List<EntityHeader> entityHeaders) {
+	private HTMLPanel getAnchorList(String ownerId, String objectType, List<WikiHeader> wikiHeaders) {
 		StringBuilder htmlBuilder = new StringBuilder();
 		htmlBuilder.append("<ol class=\"pagelist\">");
 		
-		for (Iterator iterator = entityHeaders.iterator(); iterator.hasNext();) {
-			EntityHeader header = (EntityHeader) iterator.next();
-			htmlBuilder.append("<li><a class=\"link\" href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\">" + header.getName() + "</a></li>");
+		for (Iterator iterator = wikiHeaders.iterator(); iterator.hasNext();) {
+			WikiHeader header = (WikiHeader) iterator.next();
+			
+			htmlBuilder.append("<li><a class=\"link\" href=\"" + DisplayUtils.getSynapseWikiHistoryToken(ownerId, objectType, header.getId()) + "\">" + header.getTitle() + "</a></li>");
 		}
 		htmlBuilder.append("</ol>");
 		HTMLPanel htmlPanel = new HTMLPanel(htmlBuilder.toString());

@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.SynapseWiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -26,7 +27,7 @@ import com.google.gwt.place.shared.WithTokenizers;
 @WithTokenizers({ Home.Tokenizer.class, LoginPlace.Tokenizer.class,
 		PasswordReset.Tokenizer.class, RegisterAccount.Tokenizer.class,
 		ProjectsHome.Tokenizer.class, Profile.Tokenizer.class,
-		ComingSoon.Tokenizer.class, Synapse.Tokenizer.class,
+		ComingSoon.Tokenizer.class, Synapse.Tokenizer.class, SynapseWiki.Tokenizer.class,
 		Search.Tokenizer.class, Settings.Tokenizer.class,
 		BCCOverview.Tokenizer.class, Governance.Tokenizer.class,
 		WikiPlace.Tokenizer.class })
