@@ -54,6 +54,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getImageConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getLinkConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseAPICallConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -81,6 +83,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getProvenanceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageRenderer();
+		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseAPICallRenderer();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -159,6 +163,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.IMAGE_CONTENT_TYPE, WidgetConstants.IMAGE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.LINK_CONTENT_TYPE, WidgetConstants.LINK_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.API_TABLE_CONTENT_TYPE, WidgetConstants.API_TABLE_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

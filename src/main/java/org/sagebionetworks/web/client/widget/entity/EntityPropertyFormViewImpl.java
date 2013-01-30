@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -80,14 +81,16 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	HTML descriptionFormatInfo;
 	VerticalPanel attachmentsContainer;
 	Window loading;
+	CookieProvider cookies;
 	
 	@Inject
-	public EntityPropertyFormViewImpl(FormFieldFactory formFactory, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,SynapseJSNIUtils synapseJSNIUtils, Attachments attachmentsWidget) {
+	public EntityPropertyFormViewImpl(FormFieldFactory formFactory, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,SynapseJSNIUtils synapseJSNIUtils, Attachments attachmentsWidget, CookieProvider cookies) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle= sageImageBundle;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.cookies = cookies;
 		loading = DisplayUtils.createLoadingWindow(sageImageBundle, "Updating...");
 	}
 	
@@ -379,7 +382,14 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	    		handleInsertWidgetCommand(WidgetConstants.PROVENANCE_CONTENT_TYPE);
 	    	};
 		}));
-	    
+	    if (DisplayUtils.isInTestWebsite(cookies)) {
+		    menu.add(getNewCommand("Synapse API SuperTable", new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		handleInsertWidgetCommand(WidgetConstants.API_TABLE_CONTENT_TYPE);
+		    	};
+			}));
+	    }
+
 	    return menu;
 	  }
 	

@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -933,4 +931,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public String getJSONEntity(String repoUri) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			JSONObject entity = synapseClient.getEntity(repoUri);
+			return entity.toString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
 }

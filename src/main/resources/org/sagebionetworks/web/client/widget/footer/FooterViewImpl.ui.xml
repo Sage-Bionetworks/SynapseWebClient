@@ -60,16 +60,17 @@
 		</div>
         <div class="footer-line-wrapper">
             <div class="footer-container">
-                <div class="span-24 notopmargin footer-line">
+            	<div class="span-24 notopmargin footer-line">
                     <div class="span-8 notopmargin">
-                        <p>Copyright 2012 <a class="link" href="http://www.sagebase.org">Sage Bionetworks</a></p>
+                        <p>Copyright 2013 <a class="link" href="http://www.sagebase.org">Sage Bionetworks</a></p>
                     </div>
                     <div class="span-16 notopmargin last">
                     	<p class="right">
 	                    	<a class="link" href="#Home:0">Home</a> / 
 							<a class="link" href="#Governance:0">Governance</a> /
-							<a class="link" href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a>
-                    	</p>           
+							<a class="link" href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a> / 
+							<g:FlowPanel ui:field="debugModePanel" />
+                    	</p>
                 	</div>
             	</div>
                 <div class="clear"></div>
@@ -77,5 +78,6 @@
     	</div>
 
 		<script ui:field="searchScript"/>
+		
 	</g:HTMLPanel>
 </ui:UiBinder>
