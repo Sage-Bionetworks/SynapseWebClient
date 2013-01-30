@@ -181,7 +181,7 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 	@Override
 	public void showPreview(String descriptionMarkdown, String baseUrl) {
 	    //get the html for the markdown
-	    synapseClient.markdown2Html(descriptionMarkdown, baseUrl, true, new AsyncCallback<String>() {
+	    synapseClient.markdown2Html(descriptionMarkdown, true, new AsyncCallback<String>() {
 	    	@Override
 			public void onSuccess(String result) {
 	    		try {

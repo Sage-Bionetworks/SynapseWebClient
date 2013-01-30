@@ -27,7 +27,7 @@ public class ServerMarkdownUtils {
 	 * *resolve Widgets!
 	 * @param panel
 	 */
-	public static String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview, PegDownProcessor markdownProcessor) {
+	public static String markdown2Html(String markdown, Boolean isPreview, PegDownProcessor markdownProcessor) {
 		if (markdown == null) return "";
 		//before processing, replace all '\n' with '  \n' so that all newlines are correctly interpreted as manual breaks!
 		if (markdown != null) {
@@ -43,8 +43,6 @@ public class ServerMarkdownUtils {
 		ServerMarkdownUtils.sendAllLinksToNewWindow(doc);
 		Elements anchors = doc.getElementsByTag("a");
 		anchors.addClass("link");
-		//TODO: remove old attachment image syntax support (now that we have widgets)?
-		ServerMarkdownUtils.resolveAttachmentImages(doc, attachmentUrl);
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
 		ServerMarkdownUtils.addSynapseLinks(doc);
 		//URLs are automatically resolved from the markdown processor

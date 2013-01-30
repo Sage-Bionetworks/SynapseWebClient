@@ -172,7 +172,7 @@ public interface SynapseClient extends RemoteService {
 	 * @param markdown
 	 * @return
 	 */
-	public String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview) throws RestServiceException;
+	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException;
 	
 	public Long getStorageUsage(String entityId) throws RestServiceException;
 

@@ -466,7 +466,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		else{
 			panel = new HTMLPanel(result);
 		}
-		EntityPageTop.loadWidgets(panel, bundle, widgetRegistrar, synapseClient, nodeModelCreator, this, jsonObjectAdapter, iconsImageBundle, true);
+		MarkdownWidget.loadWidgets(panel, bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, widgetRegistrar, synapseClient, iconsImageBundle, true);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
 		f.add(panel);

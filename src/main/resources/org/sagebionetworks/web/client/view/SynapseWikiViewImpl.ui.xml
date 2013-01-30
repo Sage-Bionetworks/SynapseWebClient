@@ -1,0 +1,40 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+
+	<ui:style>
+		.important {
+			font-weight: bold;
+		}
+		
+		.rowTop {
+			vertical-align: top;
+		}
+	</ui:style>
+
+	<ui:with field='icons'
+		type='org.sagebionetworks.web.client.IconsImageBundle' />
+
+	<g:HTMLPanel>
+				<div class="clear"></div>
+				<g:SimplePanel ui:field="header" />
+				<div class="span-24 notopmargin" style="margin-top: 5px !important">
+					<div class="span-17 notopmargin" style="white-space: normal;">
+						<g:SimplePanel ui:field="breadcrumbsPanel"/>
+					</div>
+					<div class="span-7 last right notopmargin">
+						<g:SimplePanel ui:field="actionMenuPanel" />
+					</div>
+				</div>
+
+				<div class="span-24" style="margin-top: 10px">
+					<div class="span-17 notopmargin left"><g:SimplePanel ui:field="colLeftPanel" /></div>
+					<div class="span-7 notopmargin right last" style="float:right; !important"><g:SimplePanel ui:field="colRightPanel" /></div>
+					<div class="span-24 notopmargin left last"><g:SimplePanel ui:field="fullWidthPanel" /></div>
+				</div>
+				<div class="clear"></div>
+				<g:SimplePanel ui:field="footer" />						
+	</g:HTMLPanel>
+
+</ui:UiBinder> 

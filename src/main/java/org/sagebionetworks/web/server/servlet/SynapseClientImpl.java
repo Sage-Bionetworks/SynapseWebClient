@@ -856,8 +856,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview) {
-		return ServerMarkdownUtils.markdown2Html(markdown, attachmentUrl, isPreview, markdownProcessor);
+	public String markdown2Html(String markdown, Boolean isPreview) {
+		return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
 	}
 
 	@Override

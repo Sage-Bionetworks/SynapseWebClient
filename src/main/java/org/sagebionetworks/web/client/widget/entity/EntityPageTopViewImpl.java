@@ -94,7 +94,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private FilesBrowser filesBrowser;	
 	private PagesBrowser pagesBrowser;
 	private CookieProvider cookies;
-
+	private MarkdownWidget markdownWidget;
+	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
@@ -105,7 +106,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, PagesBrowser pagesBrowser, CookieProvider cookies) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser, PagesBrowser pagesBrowser, CookieProvider cookies, MarkdownWidget markdownWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -121,9 +122,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.filesBrowser = filesBrowser;
 		this.pagesBrowser = pagesBrowser;
 		this.cookies = cookies;
+		this.markdownWidget = markdownWidget;
+		
 		initWidget(uiBinder.createAndBindUi(this));
 	}
-
 
 	@Override
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, boolean readOnly) {
@@ -313,12 +315,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 		// Child Page Browser
 		if (DisplayUtils.isInTestWebsite(cookies)) {
-			final LayoutContainer wikiContainer = new LayoutContainer();
-			fullWidthContainer.add(wikiContainer);
+			fullWidthContainer.add(wikiPageWidget);
+			wikiPageWidget.configure(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, canEdit, null);
+			
 			presenter.loadRootWikiPage(new AsyncCallback<WikiPage>() {
 				public void onSuccess(WikiPage result) {
 					//add the page viewer, and subpage browser
-					wikiContainer.add(getPageViewerWidget(result.getMarkdown()));
+					wikiContainer.add(getWikiPageWidget(result.getMarkdown()));
 					if (result != null) {
 						wikiContainer.add(createPagesBrowserWidget(pagesBrowser, bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, canEdit, result.getId()));	
 					}
@@ -454,22 +457,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    } else {
 	    	//(in resolving the markdown, it escapes any user html)
 	    	//now resolve the markdown
-	    	String attachmentBaseUrl = GWT.getModuleBaseURL()+"attachment";
-    		presenter.getHtmlFromMarkdown(description, attachmentBaseUrl, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					HTMLPanel panel = new HTMLPanel(result);
-					lc.add(panel);
-					lc.layout();
-					synapseJSNIUtils.highlightCodeBlocks();
-					//asynchronously load the widgets
-					presenter.loadWidgets(panel);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					showErrorMessage(DisplayConstants.ERROR_LOADING_DESCRIPTION_FAILED+caught.getMessage());
-				}
-			});
+	    	lc.add(markdownWidget);
+	    	markdownWidget.setMarkdown(description, bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, false);
 	    }
 	    
    		return lc;
