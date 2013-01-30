@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.Rectangle2D.Double;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.abego.treelayout.Configuration.Location;
@@ -12,9 +13,16 @@ import org.abego.treelayout.util.DefaultConfiguration;
 import org.abego.treelayout.util.DefaultTreeForTreeLayout;
 import org.sagebionetworks.web.client.services.LayoutService;
 import org.sagebionetworks.web.server.servlet.layout.ProvTreeNodeExtentProvider;
+import org.sagebionetworks.web.shared.provenance.ProvGraph;
+import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
+import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
+import edu.uci.ics.jung.algorithms.layout.DAGLayout;
+import edu.uci.ics.jung.graph.DirectedGraph;
+import edu.uci.ics.jung.graph.DirectedSparseGraph;
 
 /**
  * The server-side implementation of the DatasetService. This serverlet will
@@ -97,4 +105,41 @@ public class LayoutServiceImpl extends RemoteServiceServlet implements LayoutSer
 		}
 	}
 
+	
+	
+	/*
+	 * DAG Layout for ProvGraph
+	 */	
+	@Override
+	public ProvGraph dagLayout(ProvGraph provGraph) {
+		// convert provGraph into JUNG dag graph
+		DirectedGraph<ProvGraphNode, ProvGraphEdge> graph = new DirectedSparseGraph<ProvGraphNode, ProvGraphEdge>();
+		Set<ProvGraphEdge> edges = provGraph.getEdges();
+		Iterator<ProvGraphEdge> itr = edges.iterator();
+		while(itr.hasNext()) {
+			ProvGraphEdge edge = itr.next();
+			graph.addEdge(edge, edge.getSource(), edge.getSink());
+		}
+		
+		// layout graph and copy values into nodes
+		DAGLayout<ProvGraphNode, ProvGraphEdge> dagLayout = new DAGLayout<ProvGraphNode, ProvGraphEdge>(graph);		
+		Set<ProvGraphNode> nodes = provGraph.getNodes();
+		Iterator<ProvGraphNode> nodeItr = nodes.iterator();
+		while(nodeItr.hasNext()) {
+			ProvGraphNode node = nodeItr.next();			
+			Point2D pt = dagLayout.transform(node);
+			node.setxPos(pt.getX());
+			node.setyPos(pt.getY());
+		}
+		return provGraph;
+	}
+
 }
+
+
+
+
+
+
+
+
