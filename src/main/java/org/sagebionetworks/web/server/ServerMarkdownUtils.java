@@ -40,6 +40,7 @@ public class ServerMarkdownUtils {
 		}
 		//using jsoup, since it's already in this project!
 		Document doc = Jsoup.parse(html);
+		ServerMarkdownUtils.assignIdsToHeadings(doc);
 		ServerMarkdownUtils.sendAllLinksToNewWindow(doc);
 		Elements anchors = doc.getElementsByTag("a");
 		anchors.addClass("link");
@@ -50,6 +51,14 @@ public class ServerMarkdownUtils {
 		return returnHtml;
 	}
 
+	public static void assignIdsToHeadings(Document doc) {
+		Elements hTags = doc.select("h0, h1, h2, h3, h4, h5, h6");
+		for (int i = 0; i < hTags.size(); i++) {
+			hTags.get(i).attr("id", WidgetConstants.MARKDOWN_HEADING_ID_PREFIX+i);
+			hTags.get(i).attr("level", hTags.get(i).tag().getName());
+		}
+	}
+	
 	public static void sendAllLinksToNewWindow(Document doc) {
 		Elements elements = doc.getElementsByTag("a");
 		elements.attr("target", "_blank");

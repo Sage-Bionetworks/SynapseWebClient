@@ -17,16 +17,12 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog.Callback;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
@@ -178,26 +174,6 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 		synapseClient.getEntityBundle(bundle.getEntity().getId(), mask, callback);
 	}
 	
-	@Override
-	public void showPreview(String descriptionMarkdown, String baseUrl) {
-	    //get the html for the markdown
-	    synapseClient.markdown2Html(descriptionMarkdown, true, new AsyncCallback<String>() {
-	    	@Override
-			public void onSuccess(String result) {
-	    		try {
-					view.showPreview(result, bundle, widgetRegistrar, synapseClient, nodeModelCreator, adapter);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				//preview failed
-				view.showErrorMessage(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT + caught.getMessage());
-			}
-		});	
-	}
-	
 	/**
 	 * Pass editable copies of all objects.
 	 * @param adapter
@@ -232,18 +208,6 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 		return bundle.getEntity();
 	}
 	
-	@Override
-	public void insertWidget(String contentTypeKey) {
-		BaseEditWidgetDescriptorPresenter.editNewWidget(view.getWidgetDescriptorEditor(), bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY,contentTypeKey, new WidgetDescriptorUpdatedHandler() {
-			@Override
-		public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-			if (event.getInsertValue()!=null) {
-				view.insertMarkdown(event.getInsertValue());
-			}
-			refreshEntityAttachments();
-		}
-		});
-	}
 	@Override
 	public void clear() {
 		view.clear();

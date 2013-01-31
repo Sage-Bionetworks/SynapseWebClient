@@ -1,9 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -14,11 +10,12 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Tree;
+import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -41,10 +38,10 @@ public class PagesBrowserViewImpl extends LayoutContainer implements PagesBrowse
 	};
 
 	@Override
-	public void configure(String ownerId, String ownerType, List<WikiHeader> wikiHeaders, boolean canEdit) {
+	public void configure(boolean canEdit, TreeItem root) {
 		this.removeAll(true);
 		//this widget shows nothing if the user can't edit the entity and it doesn't have any pages!
-		if (!canEdit && wikiHeaders.size() == 0)
+		if (!canEdit && root == null)
 			return;
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("span-24 notopmargin");
@@ -57,51 +54,64 @@ public class PagesBrowserViewImpl extends LayoutContainer implements PagesBrowse
 		shb.appendHtmlConstant("<h5>" + DisplayConstants.PAGES + "</h5>");
 		titleBar.add(new HTML(shb.toSafeHtml()));
 
-		LayoutContainer files = new LayoutContainer();
-		files.setStyleName("span-24 notopmargin");
-		files.add(getAnchorList(ownerId, ownerType, wikiHeaders));
-		lc.add(titleBar);
-		lc.add(files);
+		//only show the tree if the root has children
+		if (root != null && root.getChildCount() > 0) {
+			LayoutContainer files = new LayoutContainer();
+			files.setStyleName("span-24 notopmargin");
+			Tree t = new Tree();
+			t.addItem(root);
+			root.setState(true);
+			files.add(t);
+			lc.add(titleBar);
+			lc.add(files);
+		}
+		
 		if (canEdit) {
-			Button insertButton = new Button(DisplayConstants.ADD_PAGE, AbstractImagePrototype.create(iconsImageBundle.add16()));
+			final boolean isCreatingWiki = root == null;
+			String buttonText = isCreatingWiki ? DisplayConstants.CREATE_WIKI : DisplayConstants.ADD_PAGE;
+			Button insertButton = new Button(buttonText, AbstractImagePrototype.create(iconsImageBundle.add16()));
 			insertButton.setWidth(115);
 			insertButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
-					NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
-						@Override
-						public void onSave(String name, String description) {
-							presenter.createPage(name);
-						}
-					});
+					if (isCreatingWiki) {
+						presenter.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
+					}
+					else {
+						NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
+							@Override
+							public void onSave(String name, String description) {
+								presenter.createPage(name);
+							}
+						});
+					}
 				}
 			});
 			
-			LayoutContainer addPageBar = new LayoutContainer();		
-			addPageBar.setStyleName("left span-17 notopmargin");
-			addPageBar.add(insertButton, new MarginData(0, 3, 0, 0));
+			FlowPanel addPageBar = new FlowPanel();		
+			addPageBar.setStyleName("left margin-top-10 margin-bottom-40");
+			addPageBar.add(insertButton);
 			lc.add(addPageBar);
 		}
 			
-		lc.layout();
+		lc.layout(true);
 		this.add(lc);
 		this.layout(true);
 	}	
 	
-	private HTMLPanel getAnchorList(String ownerId, String objectType, List<WikiHeader> wikiHeaders) {
-		StringBuilder htmlBuilder = new StringBuilder();
-		htmlBuilder.append("<ol class=\"pagelist\">");
-		
-		for (Iterator iterator = wikiHeaders.iterator(); iterator.hasNext();) {
-			WikiHeader header = (WikiHeader) iterator.next();
-			
-			htmlBuilder.append("<li><a class=\"link\" href=\"" + DisplayUtils.getSynapseWikiHistoryToken(ownerId, objectType, header.getId()) + "\">" + header.getTitle() + "</a></li>");
-		}
-		htmlBuilder.append("</ol>");
-		HTMLPanel htmlPanel = new HTMLPanel(htmlBuilder.toString());
-		return htmlPanel;
+	@Override
+	public String getHTML(String href, String title, boolean isCurrentPage) {
+		StringBuilder html = new StringBuilder();
+		html.append("<a class=\"link");
+		if (isCurrentPage)
+			html.append(" boldText");
+		html.append("\" href=\"");
+		html.append(href);
+		html.append("\">");
+		html.append(title);
+		html.append("</a>");
+		return html.toString();
 	}
-	
 	@Override
 	public Widget asWidget() {
 		return this;

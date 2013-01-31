@@ -3,13 +3,13 @@ package org.sagebionetworks.web.client.place;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 
-public class SynapseWiki extends Place{
+public class Wiki extends Place{
 	private static final String DELIMITER = "/"; 
 	
 	private String token;
 	private String ownerId, ownerType, wikiId;
 	
-	public SynapseWiki(String token) {
+	public Wiki(String token) {
 		this.token = token;
 		if(token.contains(DELIMITER)) {
 			String[] parts = token.split(DELIMITER);
@@ -21,7 +21,7 @@ public class SynapseWiki extends Place{
 		} 
 	}
 
-	public SynapseWiki(String ownerId, String ownerType, String wikiId) {		
+	public Wiki(String ownerId, String ownerType, String wikiId) {		
 		this.token = ownerId + DELIMITER + ownerType + DELIMITER + wikiId;
 		this.ownerId = ownerId;
 		this.ownerType = ownerType;
@@ -56,15 +56,15 @@ public class SynapseWiki extends Place{
 		this.wikiId = wikiId;
 	}
 
-	public static class Tokenizer implements PlaceTokenizer<SynapseWiki> {
+	public static class Tokenizer implements PlaceTokenizer<Wiki> {
         @Override
-        public String getToken(SynapseWiki place) {
+        public String getToken(Wiki place) {
             return place.toToken();
         }
 
         @Override
-        public SynapseWiki getPlace(String token) {
-            return new SynapseWiki(token);
+        public Wiki getPlace(String token) {
+            return new Wiki(token);
         }
     }
 
@@ -84,7 +84,7 @@ public class SynapseWiki extends Place{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SynapseWiki other = (SynapseWiki) obj;
+		Wiki other = (Wiki) obj;
 		if (token == null) {
 			if (other.token != null)
 				return false;

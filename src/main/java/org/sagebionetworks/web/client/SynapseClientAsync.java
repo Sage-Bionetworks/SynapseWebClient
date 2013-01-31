@@ -7,7 +7,7 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
-import org.sagebionetworks.web.shared.WikiPageKeyWrapper;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -109,9 +109,11 @@ public interface SynapseClientAsync {
 	
 	//wiki crud
 	public void createWikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
-	public void getWikiPage(WikiPageKeyWrapper key, AsyncCallback<String> callback);
+	public void getWikiPage(WikiPageKey key, AsyncCallback<String> callback);
 	public void updateWikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
-	public void deleteWikiPage(WikiPageKeyWrapper key, AsyncCallback<Void> callback);
+	public void deleteWikiPage(WikiPageKey key, AsyncCallback<Void> callback);
 	
 	public void getWikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
+	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
+	public void getFileEndpoint(AsyncCallback<String> callback);
 }

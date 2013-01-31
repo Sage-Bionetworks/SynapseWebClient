@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
@@ -24,13 +23,13 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
-import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Padding;
@@ -88,8 +87,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private boolean readOnly = false;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
-	private FilesBrowser filesBrowser;	
-	private PagesBrowser pagesBrowser;
+	private FilesBrowser filesBrowser;
 	private CookieProvider cookies;
 	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
@@ -104,7 +102,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, PagesBrowser pagesBrowser, CookieProvider cookies, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser, CookieProvider cookies, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -118,7 +116,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.locationableTitleBar = locationableTitleBar;
 		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
-		this.pagesBrowser = pagesBrowser;
 		this.cookies = cookies;
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
@@ -156,8 +153,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		} else if (bundle.getEntity() instanceof Summary) {
 		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
-		} else if (bundle.getEntity() instanceof Page) {
-		    renderPageEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		} else {
 			// default entity view
 			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
@@ -226,7 +221,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 //		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
-			
+
+		// Wiki
+		addWikiPageWidget(colLeftContainer, bundle, canEdit);
+
 		// ** RIGHT **
 		// Programmatic Clients
 		colRightContainer.add(createProgrammaticClientsWidget(bundle));
@@ -247,26 +245,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ************************************************************************************************		
 	}
 	
-	// Render the Page entity	
-	private void renderPageEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
-		//TODO: this should be in another Place!  A WikiPage place, since WikiPage is not an Entity
-		// ** LEFT **
-//		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
-			
-		// ** RIGHT **
-		// ** FULL WIDTH **
-		// Entity Metadata
-//		fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
-//		entityMetadata.setEntityBundle(bundle, readOnly);
-//		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
-//		// Description
-//		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
-//
-//		// Child Page Browser
-//		fullWidthContainer.add(createEntityPagesBrowserWidget(bundle.getEntity(), canEdit, parentWikiId));
-		// ************************************************************************************************		
-	}
-	
 	// Render the Folder entity
 	private void renderFolderEntity(EntityBundle bundle,
 			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
@@ -284,7 +262,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Child Browser
 		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false));
 		// Description
-		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);		
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
+
+		addWikiPageWidget(fullWidthContainer, bundle, canEdit);
 		
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -312,16 +292,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ** FULL WIDTH **
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
-		// Child Page Browser
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			fullWidthContainer.add(wikiPageWidget);
-			wikiPageWidget.configure(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null, canEdit, new WikiPageWidget.Callback() {
-				@Override
-				public void pageUpdated() {
-					presenter.fireEntityUpdatedEvent();
-				}
-			});
-		}
+
+		// Wiki
+		addWikiPageWidget(fullWidthContainer, bundle, canEdit);
 			
 		// Child File Browser
 		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
@@ -343,6 +316,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.add(threeCol, widgetMargin);
 	}
 
+	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit) {
+		// Child Page Browser
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			container.add(wikiPageWidget);
+			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), canEdit, new WikiPageWidget.Callback() {
+				@Override
+				public void pageUpdated() {
+					presenter.fireEntityUpdatedEvent();
+				}
+			}, true);
+		}
+
+	}
 
 	private LayoutContainer createSpacer() {
 		LayoutContainer onewide = new LayoutContainer();
@@ -363,6 +349,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 
+		addWikiPageWidget(colLeftContainer, bundle, canEdit);
+		
 		// ** RIGHT **
 		// Annotation Editor widget
 		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
@@ -417,16 +405,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 	
-	public static Widget createPagesBrowserWidget(PagesBrowser pagesBrowser, String ownerId, String contentType, boolean canEdit, String parentWikiId) {
-		pagesBrowser.configure(ownerId, contentType, DisplayConstants.PAGES, canEdit, parentWikiId);
-		LayoutContainer lc = new LayoutContainer();
-		lc.addStyleName("left");
-		lc.setStyleAttribute("margin", "0px 0px 20px 0px");
-		lc.add(pagesBrowser.asWidget());
-		return lc;
-	}
-
-
 	private Widget createDescriptionWidget(final EntityBundle bundle, String entityTypeDisplay, boolean showWhenEmpty) {
 		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
@@ -441,14 +419,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"clear: left;\"></div>")));
 
 		// Add the description body
-	    if(description == null || "".equals(description)) {
-	    	lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>")));
-			lc.layout();
-	    } else {
-	    	//(in resolving the markdown, it escapes any user html)
-	    	//now resolve the markdown
+	    if(description != null && !("".equals(description))) {
+	    	//TODO: markdown to be removed from entity (and only exist in it's associated wiki)
 	    	lc.add(markdownWidget);
-	    	markdownWidget.setMarkdown(description, bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, false);
+	    	markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false);
 	    }
 	    
    		return lc;

@@ -2,8 +2,9 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.SynapseWiki;
+import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.view.SynapseWikiView;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -13,7 +14,7 @@ import com.google.inject.Inject;
 
 public class SynapseWikiPresenter extends AbstractActivity implements SynapseWikiView.Presenter {
 		
-	private SynapseWiki place;
+	private Wiki place;
 	private SynapseWikiView view;
 	private SynapseClientAsync synapseClient;
 	
@@ -30,20 +31,20 @@ public class SynapseWikiPresenter extends AbstractActivity implements SynapseWik
 		panel.setWidget(view);
 	}
 
-	public void setPlace(SynapseWiki place) {
+	public void setPlace(Wiki place) {
 		this.place = place;
 		this.view.setPresenter(this);
 		
-		configure(place.getOwnerId(), place.getOwnerType(), place.getWikiId());
+		configure(new WikiPageKey(place.getOwnerId(), place.getOwnerType(), place.getWikiId()));
 	}
 	
 	
 	@Override
-	public void configure(final String ownerId, final String ownerType, final String wikiId) {
-		synapseClient.hasAccess(ownerId, ownerType, ACCESS_TYPE.UPDATE.toString(), new AsyncCallback<Boolean>() {
+	public void configure(final WikiPageKey wikiKey) {
+		synapseClient.hasAccess(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), ACCESS_TYPE.UPDATE.toString(), new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean result) {
-				view.showPage(ownerId, ownerType, result, wikiId);		
+				view.showPage(wikiKey, result);		
 			}
 			@Override
 			public void onFailure(Throwable caught) {

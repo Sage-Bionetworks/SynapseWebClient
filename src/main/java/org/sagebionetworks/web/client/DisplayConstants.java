@@ -172,6 +172,9 @@ public class DisplayConstants {
 	public static final String BUTTON_TOOLS_MENU = "Tools";
 	public static final String BUTTON_ADD = "Add";
 	public static final String BUTTON_EDIT = "Edit";
+	public static final String BUTTON_EDIT_WIKI = "Edit Wiki";
+	public static final String BUTTON_DELETE_WIKI = "Delete&nbspWiki";
+	public static final String BUTTON_WIKI_ATTACHMENTS = "Attachments";
 	public static final String BUTTON_SHARE = "Share";
 	public static final String BUTTON_DOWNLOAD = "Download";
 	public static final String LABEL_DELETE = "Delete";
@@ -445,8 +448,9 @@ public class DisplayConstants {
 	public static final String FILES = "Files";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
 	public static final String PAGES = "Pages";
-	public static final String ADD_PAGE = "Add a new page";
-	public static final String CREATE_WIKI = "Create a Wiki";
+	public static final String ADD_PAGE = "Add a new Page";
+	public static final String CREATE_WIKI = "Insert Wiki";
+	public static final String DEFAULT_ROOT_WIKI_NAME = "Root";
 	public static final String PROJECT_WIKI_NAME = "Wiki";
 	public static final String ERROR_PAGE_CREATION_FAILED = "Page creation failed. Please try again";
 	public static final String UNAUTHORIZED = "Unauthorized";

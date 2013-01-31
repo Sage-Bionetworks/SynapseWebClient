@@ -62,5 +62,4 @@ public interface GlobalApplicationState {
 	 * @return AppPlaceHistoryMapper
 	 */
 	public AppPlaceHistoryMapper getAppPlaceHistoryMapper();
-	
 }

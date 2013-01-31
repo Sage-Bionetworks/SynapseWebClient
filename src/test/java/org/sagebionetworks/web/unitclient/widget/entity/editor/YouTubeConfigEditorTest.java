@@ -13,11 +13,13 @@ import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class YouTubeConfigEditorTest {
 		
 	YouTubeConfigEditor editor;
 	YouTubeConfigView mockView;
+	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
 	
 	@Before
 	public void setup(){
@@ -37,7 +39,7 @@ public class YouTubeConfigEditorTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String videoId = "my test video id";
 		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, videoId);
-		editor.configure("","", descriptor);
+		editor.configure(wikiKey, descriptor);
 		verify(mockView).setVideoUrl(anyString());
 		
 		editor.updateDescriptorFromView();

@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -24,15 +25,7 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 	SimplePanel footer;
 	
 	@UiField
-	SimplePanel colLeftPanel;
-	@UiField
-	SimplePanel colRightPanel;
-	@UiField
 	SimplePanel fullWidthPanel;
-	@UiField
-	SimplePanel breadcrumbsPanel;
-	@UiField
-	SimplePanel actionMenuPanel;
 
 	private LayoutContainer fullWidthContainer;
 	
@@ -85,17 +78,18 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 	}
 
 	@Override
-	public void showPage(final String ownerId, final String ownerType, final boolean canEdit, final String wikiId){
+	public void showPage(final WikiPageKey wikiKey, final boolean canEdit){
 		fullWidthContainer = initContainerAndPanel(fullWidthContainer, fullWidthPanel);
 		fullWidthContainer.removeAll();
 		
 		fullWidthContainer.add(wikiPage.asWidget());
-		wikiPage.configure(ownerId, ownerType, wikiId, canEdit, new WikiPageWidget.Callback() {
+		wikiPage.configure(wikiKey, canEdit, new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
-				presenter.configure(ownerId, ownerType, wikiId);
+				presenter.configure(wikiKey);
 			}
-		});
+		}, false);
+		fullWidthContainer.layout(true);
 	}
 
 	

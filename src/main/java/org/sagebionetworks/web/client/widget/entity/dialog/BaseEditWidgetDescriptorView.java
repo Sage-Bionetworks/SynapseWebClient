@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 public interface BaseEditWidgetDescriptorView extends SynapseView {
 	
@@ -19,7 +20,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	 */
 	public void hide();
 	
-	public void setWidgetDescriptor(String ownerObjectId, String ownerObjectType, String contentTypeKey, Map<String, String> widgetDescriptor);
+	public void setWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> widgetDescriptor);
 
 	/**
 	 * Call to tell the widget descriptor view to update the widgetDescriptor based on user input (called on save) 
@@ -42,7 +43,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 		 * @param entityId
 		 * @param widgetType
 		 */
-		public void editNew(String ownerObjectId, String ownerObjectType, String widgetType);
+		public void editNew(WikiPageKey wikiKey, String widgetType);
 		
 		/**
 		 * 

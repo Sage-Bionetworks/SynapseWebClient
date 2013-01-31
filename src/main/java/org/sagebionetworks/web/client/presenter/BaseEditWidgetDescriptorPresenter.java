@@ -3,37 +3,33 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.inject.Inject;
 
 public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescriptorView.Presenter {
 	
-	private NodeModelCreator nodeModelCreator;
 	private HandlerManager handlerManager;
 	private BaseEditWidgetDescriptorView view;
-	String contentTypeKey, ownerObjectId, ownerObjectType, attachmentName;
-	JSONObjectAdapter jsonObjectAdapter;
+	String contentTypeKey, attachmentName;
 	//contains all of the widget specific parameters
 	Map<String, String> widgetDescriptor;
 	private WidgetRegistrar widgetRegistrar;
+	private WikiPageKey wikiKey;
 	
 	@Inject
-	public BaseEditWidgetDescriptorPresenter(BaseEditWidgetDescriptorView view, NodeModelCreator nodeModelCreator, JSONObjectAdapter jsonObjectAdapter, WidgetRegistrar widgetRegistrar){
+	public BaseEditWidgetDescriptorPresenter(BaseEditWidgetDescriptorView view, WidgetRegistrar widgetRegistrar){
 		this.widgetRegistrar = widgetRegistrar;
 		this.view = view;
 		this.view.setPresenter(this);
-		this.nodeModelCreator = nodeModelCreator;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		handlerManager = new HandlerManager(this);
 	}
 
@@ -43,9 +39,9 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	 * @param attachmentName
 	 * @param handler
 	 */
-	public static void editNewWidget(BaseEditWidgetDescriptorPresenter presenter, String ownerObjectId, String ownerObjectType, String contentTypeKey, WidgetDescriptorUpdatedHandler handler) {
+	public static void editNewWidget(BaseEditWidgetDescriptorPresenter presenter, WikiPageKey wikiKey, String contentTypeKey, WidgetDescriptorUpdatedHandler handler) {
 		presenter.addWidgetDescriptorUpdatedHandler(handler);
-		presenter.editNew(ownerObjectId, ownerObjectType, contentTypeKey);
+		presenter.editNew(wikiKey, contentTypeKey);
 	}
 	
 	@Override
@@ -97,18 +93,18 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	}
 	
 	@Override
-	public void editNew(String ownerObjectId, String ownerObjectType, String contentTypeKey) {
-		if(ownerObjectId == null) throw new IllegalArgumentException("ownerObjectId cannot be null");
-		if(ownerObjectType == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
+	public void editNew(WikiPageKey wikiKey, String contentTypeKey) {
+		if(wikiKey == null) throw new IllegalArgumentException("wiki key cannot be null");
+		if(wikiKey.getOwnerObjectId() == null) throw new IllegalArgumentException("ownerObjectId cannot be null");
+		if(wikiKey.getOwnerObjectType() == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
 		if(contentTypeKey == null) throw new IllegalArgumentException("content type key cannot be null");
 		cleanInit();
-		this.ownerObjectId = ownerObjectId;
-		this.ownerObjectType = ownerObjectType;
+		this.wikiKey = wikiKey;
 		this.contentTypeKey = contentTypeKey;
 		
 		//initialize the view with a new widget descriptor definition of the correct type and show
 		widgetDescriptor = new HashMap<String, String>();
-		view.setWidgetDescriptor(ownerObjectId, ownerObjectType, contentTypeKey, widgetDescriptor);
+		view.setWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor);
 		//prepopulate with a unique attachment name of the correct type
 		String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
 		view.show(friendlyName);
@@ -116,8 +112,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	}
 	
 	private void cleanInit() {
-		ownerObjectId = null;
-		ownerObjectType = null;
+		wikiKey = null;
 		contentTypeKey = null;
 		attachmentName = null;
 		view.clear();

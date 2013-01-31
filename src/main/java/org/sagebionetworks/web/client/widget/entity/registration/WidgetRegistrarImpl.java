@@ -7,10 +7,13 @@ import java.util.Map;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
@@ -23,12 +26,14 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	PortalGinInjector ginInjector;
 	NodeModelCreator nodeModelCreator;
 	JSONObjectAdapter adapter;
+	CookieProvider cookies;
 	
 	@Inject
-	public WidgetRegistrarImpl(PortalGinInjector ginInjector, NodeModelCreator nodeModelCreator, JSONObjectAdapter adapter) {
+	public WidgetRegistrarImpl(PortalGinInjector ginInjector, NodeModelCreator nodeModelCreator, JSONObjectAdapter adapter, CookieProvider cookies) {
 		this.ginInjector = ginInjector;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapter = adapter;
+		this.cookies = cookies;
 		initWithKnownWidgets();
 	}
 	
@@ -43,7 +48,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(String ownerObjectId, String ownerObjectType, String contentTypeKey, Map<String, String> model) { 
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
@@ -51,15 +56,20 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
-			presenter = ginInjector.getImageConfigEditor();
+			if (DisplayUtils.isInTestWebsite(cookies))
+				presenter = ginInjector.getImageConfigEditor();
+			else
+				presenter = ginInjector.getOldImageConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getLinkConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseAPICallConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
+			presenter = ginInjector.getAttachmentConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
-			presenter.configure(ownerObjectId, ownerObjectType, model);
+			presenter.configure(wikiKey, model);
 		return presenter;
 	}
 
@@ -74,7 +84,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(String ownerObjectId, String ownerObjectType, String contentTypeKey, Map<String, String> model) { 
+	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
@@ -82,13 +92,22 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
-			presenter = ginInjector.getImageRenderer();
+			if (DisplayUtils.isInTestWebsite(cookies))
+				presenter = ginInjector.getImageRenderer();
+			else
+				presenter = ginInjector.getOldImageRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseAPICallRenderer();
+		} else if (contentTypeKey.equals(WidgetConstants.TOC_CONTENT_TYPE)) {
+			presenter = ginInjector.getTableOfContentsRenderer();
+		} else if (contentTypeKey.equals(WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE)) {
+			presenter = ginInjector.getWikiFilesPreviewRenderer();
+		} else if (contentTypeKey.equals(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
+			presenter = ginInjector.getAttachmentPreviewRenderer();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
-			presenter.configure(ownerObjectId, ownerObjectType, model);
+			presenter.configure(wikiKey, model);
 		return presenter;
 	}
 	@Override
@@ -131,14 +150,16 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	
 	public Map<String, String> getWidgetDescriptorFromDecoded(String decodedMd) {
 		if (decodedMd == null || decodedMd.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + decodedMd);
+		Map<String, String> model = new HashMap<String, String>();
 		int delimeter = decodedMd.indexOf("?");
 		if (delimeter < 0) {
-			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + decodedMd);
+			//no parameters
+			return model;
 		}
 		String contentTypeKey = decodedMd.substring(0, delimeter);
 		String allParamsString = decodedMd.substring(delimeter+1);
 		String[] keyValuePairs = allParamsString.split("&");
-		Map<String, String> model = new HashMap<String, String>();
+		
 		for (int j = 0; j < keyValuePairs.length; j++) {
 			String[] keyValue = keyValuePairs[j].split("=");
 			model.put(keyValue[0], keyValue[1]);
@@ -153,7 +174,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		if (decodedMd == null || decodedMd.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + decodedMd);
 		int delimeter = decodedMd.indexOf("?");
 		if (delimeter < 0) {
-			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + decodedMd);
+			//maybe it has no parameters
+			return decodedMd;
 		}
 		return decodedMd.substring(0, delimeter);
 	}
@@ -162,6 +184,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.YOUTUBE_CONTENT_TYPE, WidgetConstants.YOUTUBE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.IMAGE_CONTENT_TYPE, WidgetConstants.IMAGE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, WidgetConstants.ATTACHMENT_PREVIEW_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.LINK_CONTENT_TYPE, WidgetConstants.LINK_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.API_TABLE_CONTENT_TYPE, WidgetConstants.API_TABLE_FRIENDLY_NAME);
 	}
@@ -170,7 +193,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		StringBuilder sb = new StringBuilder();
 		sb.append(WidgetConstants.WIDGET_START_MARKDOWN);
 		sb.append(widgetRegistrar.getMDRepresentation(contentType, widgetDescriptor));
-		sb.append("}");
+		sb.append(WidgetConstants.WIDGET_END_MARKDOWN);
 		return sb.toString();
 	}
 

@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.TreeItem;
 
 public interface PagesBrowserView extends IsWidget, SynapseWidgetView {
 
@@ -20,7 +18,9 @@ public interface PagesBrowserView extends IsWidget, SynapseWidgetView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(String ownerId, String ownerType, List<WikiHeader> wikiHeaders, boolean canEdit);
+	public void configure(boolean canEdit, TreeItem root);
+	
+	public String getHTML(String href, String title, boolean isCurrentPage);
 	
 	/**
 	 * Presenter interface

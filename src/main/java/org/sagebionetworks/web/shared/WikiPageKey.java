@@ -2,17 +2,17 @@ package org.sagebionetworks.web.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class WikiPageKeyWrapper implements IsSerializable {
+public class WikiPageKey implements IsSerializable {
 
 	private String ownerObjectId,ownerObjectType,wikiPageId;
 
 	/**
 	 * This should only be used for RPC
 	 */
-	public WikiPageKeyWrapper(){
+	public WikiPageKey(){
 		
 	}
-	public WikiPageKeyWrapper(String ownerObjectId, String ownerObjectType, String wikiPageId) {
+	public WikiPageKey(String ownerObjectId, String ownerObjectType, String wikiPageId) {
 		super();
 		if(ownerObjectId == null) throw new IllegalArgumentException("owner object id cannot be null");
 		if(ownerObjectType == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
@@ -60,7 +60,7 @@ public class WikiPageKeyWrapper implements IsSerializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		WikiPageKeyWrapper other = (WikiPageKeyWrapper) obj;
+		WikiPageKey other = (WikiPageKey) obj;
 		if (ownerObjectId == null) {
 			if (other.ownerObjectId != null)
 				return false;

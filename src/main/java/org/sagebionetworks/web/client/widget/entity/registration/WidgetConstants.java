@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.registration;
 
 public class WidgetConstants {
-	public static final String WIKI_OWNER_ID_ENTITY = "entity";
-	public static final String WIKI_OWNER_ID_COMPETITION = "competition";
-	
+	public static final String WIKI_OWNER_ID_ENTITY = "ENTITY";
+	public static final String WIKI_OWNER_ID_COMPETITION = "COMPETITION";
 	
 	public static final String YOUTUBE_CONTENT_TYPE = "youtube";
 	public static final String YOUTUBE_FRIENDLY_NAME = "YouTube";
@@ -14,6 +13,10 @@ public class WidgetConstants {
 	public static final String IMAGE_CONTENT_TYPE = "image";
 	public static final String IMAGE_FRIENDLY_NAME ="Image";
 	
+	public static final String ATTACHMENT_PREVIEW_CONTENT_TYPE = "preview";
+	public static final String ATTACHMENT_PREVIEW_FRIENDLY_NAME ="Attachment Preview";
+
+	
 	public static final String LINK_CONTENT_TYPE = "link";
 	public static final String LINK_FRIENDLY_NAME ="Link";
 
@@ -21,13 +24,19 @@ public class WidgetConstants {
 	public static final String API_TABLE_FRIENDLY_NAME = "Super Table (Synapse API Based)";
 	
 	public static final String WIDGET_START_MARKDOWN = "${";
+	public static final String WIDGET_END_MARKDOWN =  "}";
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
+	
+	public static final String TOC_CONTENT_TYPE = "toc";
+	
+	public static final String WIKI_FILES_PREVIEW_CONTENT_TYPE = "wikifilepreview";
 	
 	/**
 	 * Widget parameter keys
 	 */
 	public static final String IMAGE_WIDGET_FILE_NAME_KEY = "fileName";
 	public static final String IMAGE_WIDGET_WIDTH_KEY = "width";
+	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
 	public static final String PROV_WIDGET_DEPTH_KEY = "depth";
 	public static final String PROV_WIDGET_EXPAND_KEY = "showExpand";
@@ -54,4 +63,5 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_DATE = "date";
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
+	public static final String MARKDOWN_HEADING_ID_PREFIX = "synapseheading";
 }

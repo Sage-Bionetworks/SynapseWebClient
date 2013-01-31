@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -20,7 +21,7 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 	}
 	
 	@Override
-	public void configure(String ownerObjectId, String ownerObjectType, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
 		String uri = descriptor.get(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
 		if (uri != null)
