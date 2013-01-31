@@ -74,8 +74,8 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	}
 	
 	@Override
-	public AttachmentData getUploadedAttachmentData() {
-		return uploadedAttachmentData;
+	public String getUploadedDataName() {
+		return uploadPanel.getFileUploadField().getValue();
 	}
 
 	@Override
