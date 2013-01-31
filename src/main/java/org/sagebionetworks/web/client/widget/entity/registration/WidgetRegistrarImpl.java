@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 
-import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 
 
@@ -36,7 +35,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	}
 	
 	public void initCharacter2HexCodeMap() {
-		//encodes { } - _ . ! ~ * ' ( ) [ ] : ; / ? & = + , #
+		//encodes { } - _ . ! ~ * ' ( ) [ ] : ; / ? & = + , # $ %
 		c2h.put('{',"%7B");
 		c2h.put('}', "%7D");
 		c2h.put('-', "%2D");
@@ -62,6 +61,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		c2h.put('+', "%2B");
 		c2h.put(',', "%2C");
 		c2h.put('#', "%23");
+		c2h.put('$', "%24");
+		c2h.put('%', "%25");
 		
 		//reverse lookup for decode
 		for (Iterator iterator = c2h.keySet().iterator(); iterator.hasNext();) {
@@ -173,15 +174,37 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	}
 	
 	public String decodeValue(String value) {
-		//25x slower as encode, but still O(n)
-		//replace for each of the escape values that we support
-		String decodedValue = value;
-		for (Iterator iterator = h2c.keySet().iterator(); iterator.hasNext();) {
-			String encodedValue = (String) iterator.next();
-			decodedValue = decodedValue.replaceAll(encodedValue, h2c.get(encodedValue).toString());
+		//detect the hex codes using a sliding window (of 3 characters)
+		//if the input value is less than 3 in length, then there's nothing to decode
+		if (value.length() < 3){
+			return value;
 		}
+		//build up the output
+		StringBuilder output = new StringBuilder();
 		
-		return decodedValue;
+		int start = 0;
+		int end=3;
+		for (; end <= value.length();) {
+			String currentSubString = value.substring(start, end);
+			if (h2c.containsKey(currentSubString)) {
+				//found one, add the resolved character to the output and skip ahead
+				output.append(h2c.get(currentSubString));
+				start += 3;
+				end += 3;
+			} else {
+				//is not one, just append the character at start, and move the window over
+				output.append(value.charAt(start));
+				start++;
+				end++;
+			}
+		}
+		//check to see if we have any left over in the window
+		if (end == value.length() + 1 && start == value.length()-2) {
+			//our window went outside of the boundary.  append the remaining characters to the output
+			output.append(value.substring(start, value.length()));
+		}
+
+		return output.toString();
 	}
 	
 	@Override

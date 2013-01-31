@@ -94,20 +94,26 @@ public class WidgetRegistrarImplTest {
 	@Test
 	public void testRoundTripEncodeDecode() {
 		//round trip tests
-		String in = "[{value1:\"test\" \nvalue2:[{v2a=\"1\"},{v2b=\"2\"}]}]";
+		String in = "[{value1:\"10%\" \nvalue2:[{v2a=\"1 and %0A\"},{v2b=\"2\"}]}]";
 		String encoded = widgetRegistrar.encodeValue(in);
-		Assert.assertEquals("%5B%7Bvalue1%3A\"test\" %0Avalue2%3A%5B%7Bv2a%3D\"1\"%7D%2C%7Bv2b%3D\"2\"%7D%5D%7D%5D", encoded);
+		Assert.assertEquals("%5B%7Bvalue1%3A\"10%25\" %0Avalue2%3A%5B%7Bv2a%3D\"1 and %250A\"%7D%2C%7Bv2b%3D\"2\"%7D%5D%7D%5D", encoded);
 		String out = widgetRegistrar.decodeValue(encoded);
 		Assert.assertEquals(in, out);
 		
-		in = "{}-_.!~*'()[]:;\n\r/?&=+,#";
+		in = "{}-_.!~*'()[]:;\n\r/?&=+,#$%";
 		encoded = widgetRegistrar.encodeValue(in);
 		out = widgetRegistrar.decodeValue(encoded);
 		Assert.assertEquals(in, out);
 		
 		Assert.assertEquals("", widgetRegistrar.encodeValue(""));
+		Assert.assertEquals("", widgetRegistrar.decodeValue(""));
+		Assert.assertEquals("%", widgetRegistrar.decodeValue("%25"));
 		String oldParamName = "oldNonEscapedDot.png";  //now periods are escaped, but decoding one of these old values should not fail
 		Assert.assertEquals(oldParamName, widgetRegistrar.decodeValue(oldParamName));
+		//test rolling decode window
+		Assert.assertEquals("hi", widgetRegistrar.decodeValue("hi"));
+		Assert.assertEquals("123", widgetRegistrar.decodeValue("123"));
+		Assert.assertEquals("1234", widgetRegistrar.decodeValue("1234"));
 	}
 	
 	
