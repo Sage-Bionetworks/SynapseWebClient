@@ -22,7 +22,7 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public String getImageUrl();
 	public String getAltText();
 	public void setImageUrl(String url);
-	public AttachmentData getUploadedAttachmentData();
+	public String getUploadedDataName();
 	public void setUploadedAttachmentData(AttachmentData uploadedAttachmentData);
 	public void setExternalVisible(boolean visible);
 	

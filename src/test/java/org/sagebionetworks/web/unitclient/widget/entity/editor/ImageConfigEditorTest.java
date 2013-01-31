@@ -50,12 +50,12 @@ public class ImageConfigEditorTest {
 		editor.configure("", descriptor);
 		verify(mockView).setEntityId(anyString());
 		//verify(mockView).setExternalVisible(anyBoolean());
-		when(mockView.getUploadedAttachmentData()).thenReturn(testImage);
+		when(mockView.getUploadedDataName()).thenReturn(testImage.getName());
 		
 		when(mockView.isExternal()).thenReturn(false);
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
-		verify(mockView).getUploadedAttachmentData();
+		verify(mockView).getUploadedDataName();
 	}
 	
 	

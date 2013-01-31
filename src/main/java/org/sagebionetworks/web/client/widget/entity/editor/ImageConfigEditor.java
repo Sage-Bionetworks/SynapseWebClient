@@ -69,7 +69,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	public void updateDescriptorFromView() {
 		view.checkParams();
 		if (!view.isExternal())
-			descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, view.getUploadedAttachmentData().getName());
+			descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, view.getUploadedDataName());
 	}
 	
 	@Override
