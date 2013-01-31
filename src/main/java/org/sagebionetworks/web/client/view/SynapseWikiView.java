@@ -15,7 +15,7 @@ public interface SynapseWikiView extends IsWidget, SynapseView {
 	public void setPresenter(Presenter presenter);	
 	
 	public interface Presenter extends SynapsePresenter {
-		public void configure(String ownerId, String ownerType, boolean canEdit, String wikiId);
+		public void configure(String ownerId, String ownerType, String wikiId);
 	}
 
 }

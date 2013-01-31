@@ -1,16 +1,15 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,17 +34,21 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 	@UiField
 	SimplePanel actionMenuPanel;
 
+	private LayoutContainer fullWidthContainer;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
+	private WikiPageWidget wikiPage;
 	
 	@Inject
 	public SynapseWikiViewImpl(WikiViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, WikiPageWidget wikiPage) {		
 		initWidget(binder.createAndBindUi(this));
-
+		
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
+		this.wikiPage = wikiPage;
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -82,8 +85,30 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 	}
 
 	@Override
-	public void showPage(String ownerId, String ownerType, boolean canEdit, String wikiId){
+	public void showPage(final String ownerId, final String ownerType, final boolean canEdit, final String wikiId){
+		fullWidthContainer = initContainerAndPanel(fullWidthContainer, fullWidthPanel);
+		fullWidthContainer.removeAll();
 		
+		fullWidthContainer.add(wikiPage.asWidget());
+		wikiPage.configure(ownerId, ownerType, wikiId, canEdit, new WikiPageWidget.Callback() {
+			@Override
+			public void pageUpdated() {
+				presenter.configure(ownerId, ownerType, wikiId);
+			}
+		});
+	}
+
+	
+	private LayoutContainer initContainerAndPanel(LayoutContainer container,
+			SimplePanel panel) {
+		if (container == null) {
+			container = new LayoutContainer();
+			container.setAutoHeight(true);
+			container.setAutoWidth(true);
+			panel.clear();
+			panel.add(container);
+		}
+		return container;
 	}
 
 }

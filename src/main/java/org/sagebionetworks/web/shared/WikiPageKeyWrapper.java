@@ -16,7 +16,8 @@ public class WikiPageKeyWrapper implements IsSerializable {
 		super();
 		if(ownerObjectId == null) throw new IllegalArgumentException("owner object id cannot be null");
 		if(ownerObjectType == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
-		if(wikiPageId == null) throw new IllegalArgumentException("wikiPageId cannot be null");
+		//if(wikiPageId == null) throw new IllegalArgumentException("wikiPageId cannot be null");
+		//if wiki page id is null, then it's a request for the root wiki associated with the owner object
 		this.ownerObjectId = ownerObjectId;
 		this.ownerObjectType = ownerObjectType;
 		this.wikiPageId = wikiPageId;

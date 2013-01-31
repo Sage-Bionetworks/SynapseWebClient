@@ -149,6 +149,8 @@ public interface SynapseClient extends RemoteService {
 	public EntityWrapper deleteAcl(String ownerEntityId) throws RestServiceException;
 
 	public boolean hasAccess(String ownerEntityId, String accessType) throws RestServiceException;
+	
+	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException;
 
 	public EntityWrapper getAllUsers() throws RestServiceException;
 	

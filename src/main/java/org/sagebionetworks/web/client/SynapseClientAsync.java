@@ -3,13 +3,6 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
-import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.PaginatedResults;
-import org.sagebionetworks.repo.model.dao.WikiPageKey;
-import org.sagebionetworks.repo.model.message.ObjectType;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -83,6 +76,8 @@ public interface SynapseClientAsync {
 	public void deleteAcl(String ownerEntityId, AsyncCallback<EntityWrapper> callback);
 
 	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
+	
+	public void hasAccess(String ownerId, String ownerType, String accessType,AsyncCallback<Boolean> callback);
 
 	public void getAllUsers(AsyncCallback<EntityWrapper> callback);
 	

@@ -40,7 +40,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	}
 	
 	@Override
-	public void configure(String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(String ownerObjectId, String ownerObjectType,
+			Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		uri = descriptor.get(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);

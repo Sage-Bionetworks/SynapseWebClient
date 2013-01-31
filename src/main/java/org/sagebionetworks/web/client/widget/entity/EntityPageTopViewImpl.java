@@ -9,7 +9,6 @@ import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -47,11 +46,9 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -95,6 +92,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private PagesBrowser pagesBrowser;
 	private CookieProvider cookies;
 	private MarkdownWidget markdownWidget;
+	private WikiPageWidget wikiPageWidget;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -106,7 +104,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, PagesBrowser pagesBrowser, CookieProvider cookies, MarkdownWidget markdownWidget) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser, PagesBrowser pagesBrowser, CookieProvider cookies, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -122,7 +120,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.filesBrowser = filesBrowser;
 		this.pagesBrowser = pagesBrowser;
 		this.cookies = cookies;
-		this.markdownWidget = markdownWidget;
+		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
+		this.wikiPageWidget = wikiPageWidget;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 	}
@@ -316,19 +315,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Child Page Browser
 		if (DisplayUtils.isInTestWebsite(cookies)) {
 			fullWidthContainer.add(wikiPageWidget);
-			wikiPageWidget.configure(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, canEdit, null);
-			
-			presenter.loadRootWikiPage(new AsyncCallback<WikiPage>() {
-				public void onSuccess(WikiPage result) {
-					//add the page viewer, and subpage browser
-					wikiContainer.add(getWikiPageWidget(result.getMarkdown()));
-					if (result != null) {
-						wikiContainer.add(createPagesBrowserWidget(pagesBrowser, bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, canEdit, result.getId()));	
-					}
-				};
+			wikiPageWidget.configure(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null, canEdit, new WikiPageWidget.Callback() {
 				@Override
-				public void onFailure(Throwable caught) {
-					wikiContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + caught.getMessage() + "</div>")));
+				public void pageUpdated() {
+					presenter.fireEntityUpdatedEvent();
 				}
 			});
 		}
