@@ -23,6 +23,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	PortalGinInjector ginInjector;
 	NodeModelCreator nodeModelCreator;
 	JSONObjectAdapter adapter;
+	Map<Character, String> c2h = new HashMap<Character, String>();
+	Map<String, Character> h2c = new HashMap<String, Character>();
 	
 	@Inject
 	public WidgetRegistrarImpl(PortalGinInjector ginInjector, NodeModelCreator nodeModelCreator, JSONObjectAdapter adapter) {
@@ -30,6 +32,42 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapter = adapter;
 		initWithKnownWidgets();
+		initCharacter2HexCodeMap();
+	}
+	
+	public void initCharacter2HexCodeMap() {
+		//encodes { } - _ . ! ~ * ' ( ) [ ] : ; / ? & = + , #
+		c2h.put('{',"%7B");
+		c2h.put('}', "%7D");
+		c2h.put('-', "%2D");
+		c2h.put('_', "%5F");
+		c2h.put('.', "%2E");
+		c2h.put('!', "%21");
+		c2h.put('~', "%7E");
+		c2h.put('*', "%2A");
+		c2h.put('`', "%60");
+		c2h.put('\'', "%27");
+		c2h.put('(', "%28");
+		c2h.put(')', "%29");
+		c2h.put('[', "%5B");
+		c2h.put(']', "%5D");
+		c2h.put(':', "%3A");
+		c2h.put(';', "%3B");
+		c2h.put('\n', "%0A");	//LF
+		c2h.put('\r', "%0D");	//CR
+		c2h.put('/', "%2F");
+		c2h.put('?', "%3F");
+		c2h.put('&', "%26");
+		c2h.put('=', "%3D");
+		c2h.put('+', "%2B");
+		c2h.put(',', "%2C");
+		c2h.put('#', "%23");
+		
+		//reverse lookup for decode
+		for (Iterator iterator = c2h.keySet().iterator(); iterator.hasNext();) {
+			Character v = (Character) iterator.next();
+			h2c.put(c2h.get(v), v);
+		}
 	}
 	
 	@Override
@@ -101,12 +139,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 
 	
 	@Override
-	public String getMDRepresentation(String contentType, Map<String, String> model){
-		String decodedMD = getMDRepresentationDecoded(contentType, model);
-		return URL.encode(decodedMD);
-	}
-	
-	public String getMDRepresentationDecoded(String contentType, Map<String, String> model) {
+	public String getMDRepresentation(String contentType, Map<String, String> model) {
 		StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(contentType);
 		char prefix = '?';
@@ -115,33 +148,56 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			Object value = model.get(key);
 			//only include it in the md representation if the value is not null
 			if (value != null) {
-				urlBuilder.append(prefix).append(key).append('=').append(value);
+				urlBuilder.append(prefix).append(key).append('=').append(encodeValue(value.toString()));
 			}
 			prefix = '&';
 		}
 		return urlBuilder.toString();
 	}
 	
-	@Override
-	public Map<String, String> getWidgetDescriptor(String mdRepresentation) {
-		if (mdRepresentation == null || mdRepresentation.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + mdRepresentation);
-		String decoded = URL.decode(mdRepresentation);
-		return getWidgetDescriptorFromDecoded(decoded);
+	public String encodeValue(String value) {
+		StringBuilder newValue = new StringBuilder(value);
+		//and encode everything that URL says that it doesn't encode (and more).
+		int totalCount = newValue.length();
+		for (int i = 0; i < totalCount; i++) {
+			char c = newValue.charAt(i);
+			if (c2h.containsKey(c)) {
+				newValue.deleteCharAt(i); //-1 character
+				String replacement = c2h.get(c);
+				newValue.insert(i, replacement); //+(replacement.length()) characters
+				totalCount += replacement.length() - 1;
+				i+=replacement.length()-1;
+			}
+		}
+		return newValue.toString();
 	}
 	
-	public Map<String, String> getWidgetDescriptorFromDecoded(String decodedMd) {
-		if (decodedMd == null || decodedMd.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + decodedMd);
-		int delimeter = decodedMd.indexOf("?");
-		if (delimeter < 0) {
-			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + decodedMd);
+	public String decodeValue(String value) {
+		//25x slower as encode, but still O(n)
+		//replace for each of the escape values that we support
+		String decodedValue = value;
+		for (Iterator iterator = h2c.keySet().iterator(); iterator.hasNext();) {
+			String encodedValue = (String) iterator.next();
+			decodedValue = decodedValue.replaceAll(encodedValue, h2c.get(encodedValue).toString());
 		}
-		String contentTypeKey = decodedMd.substring(0, delimeter);
-		String allParamsString = decodedMd.substring(delimeter+1);
+		
+		return decodedValue;
+	}
+	
+	@Override
+	public Map<String, String> getWidgetDescriptor(String md) {
+		if (md == null || md.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + md);
+		int delimeter = md.indexOf("?");
+		if (delimeter < 0) {
+			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + md);
+		}
+		String contentTypeKey = md.substring(0, delimeter);
+		String allParamsString = md.substring(delimeter+1);
 		String[] keyValuePairs = allParamsString.split("&");
 		Map<String, String> model = new HashMap<String, String>();
 		for (int j = 0; j < keyValuePairs.length; j++) {
 			String[] keyValue = keyValuePairs[j].split("=");
-			model.put(keyValue[0], keyValue[1]);
+			model.put(keyValue[0], decodeValue(keyValue[1]));
 		}
 		return model;
 	}
@@ -149,7 +205,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	@Override
 	public String getWidgetContentType(String mdRepresentation) {
 		if (mdRepresentation == null || mdRepresentation.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + mdRepresentation);
-		String decodedMd = URL.decode(mdRepresentation);
+		String decodedMd = mdRepresentation;
 		if (decodedMd == null || decodedMd.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + decodedMd);
 		int delimeter = decodedMd.indexOf("?");
 		if (delimeter < 0) {
