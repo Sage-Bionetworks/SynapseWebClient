@@ -2,7 +2,7 @@ package org.sagebionetworks.web.shared.provenance;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class ActivityTreeNode extends ProvTreeNode implements IsSerializable {
+public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 
 	private String id;
 	private String activityId;
@@ -14,9 +14,9 @@ public class ActivityTreeNode extends ProvTreeNode implements IsSerializable {
 	private Long subVersionNumber;
 	private String subEntityType;
 
-	public ActivityTreeNode() {	}
+	public ActivityGraphNode() {	}
 	
-	public ActivityTreeNode(String id, String activityId, String activityName, ActivityType type) {
+	public ActivityGraphNode(String id, String activityId, String activityName, ActivityType type) {
 		super();
 		this.id = id;
 		this.activityId = activityId;
@@ -24,7 +24,8 @@ public class ActivityTreeNode extends ProvTreeNode implements IsSerializable {
 		this.type = type;
 	}
 
-	public ActivityTreeNode(String id, String activityId, String activityName, ActivityType type, String subEntityId, String subName,
+	@Deprecated
+	public ActivityGraphNode(String id, String activityId, String activityName, ActivityType type, String subEntityId, String subName,
 			String subVersionLabel, Long subVersionNumber, String subEntityType) {
 		super();
 		this.id = id;
@@ -106,7 +107,7 @@ public class ActivityTreeNode extends ProvTreeNode implements IsSerializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ActivityTreeNode other = (ActivityTreeNode) obj;
+		ActivityGraphNode other = (ActivityGraphNode) obj;
 		if (activityId == null) {
 			if (other.activityId != null)
 				return false;

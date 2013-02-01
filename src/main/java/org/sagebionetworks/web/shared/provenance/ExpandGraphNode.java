@@ -2,14 +2,14 @@ package org.sagebionetworks.web.shared.provenance;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class ExpandTreeNode extends ProvTreeNode implements IsSerializable {
+public class ExpandGraphNode extends ProvGraphNode implements IsSerializable {
 	private String id;
 	private String entityId;
 	private Long versionNumber;
 	
-	public ExpandTreeNode() { }
+	public ExpandGraphNode() { }
 	
-	public ExpandTreeNode(String id, String entityId, Long versionNumber) {
+	public ExpandGraphNode(String id, String entityId, Long versionNumber) {
 		super();
 		this.id = id;
 		this.entityId = entityId;
@@ -49,7 +49,7 @@ public class ExpandTreeNode extends ProvTreeNode implements IsSerializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ExpandTreeNode other = (ExpandTreeNode) obj;
+		ExpandGraphNode other = (ExpandGraphNode) obj;
 		if (entityId == null) {
 			if (other.entityId != null)
 				return false;

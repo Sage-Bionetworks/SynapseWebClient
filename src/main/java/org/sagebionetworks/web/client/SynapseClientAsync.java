@@ -116,4 +116,6 @@ public interface SynapseClientAsync {
 	public void getWikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
 	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
 	public void getFileEndpoint(AsyncCallback<String> callback);
+
+	void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<String> callback);
 }

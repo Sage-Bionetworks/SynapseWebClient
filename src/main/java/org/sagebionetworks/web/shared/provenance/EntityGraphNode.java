@@ -3,7 +3,7 @@ package org.sagebionetworks.web.shared.provenance;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 
-public class EntityTreeNode extends ProvTreeNode implements IsSerializable {
+public class EntityGraphNode extends ProvGraphNode implements IsSerializable {
 
 	private String id;
 	private String entityId;
@@ -11,11 +11,13 @@ public class EntityTreeNode extends ProvTreeNode implements IsSerializable {
 	private String versionLabel;
 	private Long versionNumber;
 	private String entityType;
+	private Boolean wasExecuted;
 	
-	public EntityTreeNode() { }
-	
-	public EntityTreeNode(String id, String entityId, String name, String versionLabel,
-			Long versionNumber, String entityType) {
+	public EntityGraphNode() { }
+
+	public EntityGraphNode(String id, String entityId, String name,
+			String versionLabel, Long versionNumber, String entityType,
+			Boolean wasExecuted) {
 		super();
 		this.id = id;
 		this.entityId = entityId;
@@ -23,32 +25,45 @@ public class EntityTreeNode extends ProvTreeNode implements IsSerializable {
 		this.versionLabel = versionLabel;
 		this.versionNumber = versionNumber;
 		this.entityType = entityType;
+		this.wasExecuted = wasExecuted;
 	}
-	
-	@Override
+
 	public String getId() {
 		return id;
 	}
+
 	public String getEntityId() {
 		return entityId;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public String getVersionLabel() {
 		return versionLabel;
 	}
+
 	public Long getVersionNumber() {
 		return versionNumber;
 	}
+
 	public String getEntityType() {
 		return entityType;
+	}
+
+	public Boolean getWasExecuted() {
+		return wasExecuted;
+	}
+	
+	public void setWasExecuted(Boolean wasExecuted) {
+		this.wasExecuted = wasExecuted;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result
 				+ ((entityId == null) ? 0 : entityId.hashCode());
 		result = prime * result
@@ -59,6 +74,8 @@ public class EntityTreeNode extends ProvTreeNode implements IsSerializable {
 				+ ((versionLabel == null) ? 0 : versionLabel.hashCode());
 		result = prime * result
 				+ ((versionNumber == null) ? 0 : versionNumber.hashCode());
+		result = prime * result
+				+ ((wasExecuted == null) ? 0 : wasExecuted.hashCode());
 		return result;
 	}
 
@@ -66,11 +83,11 @@ public class EntityTreeNode extends ProvTreeNode implements IsSerializable {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		EntityTreeNode other = (EntityTreeNode) obj;
+		EntityGraphNode other = (EntityGraphNode) obj;
 		if (entityId == null) {
 			if (other.entityId != null)
 				return false;
@@ -101,15 +118,20 @@ public class EntityTreeNode extends ProvTreeNode implements IsSerializable {
 				return false;
 		} else if (!versionNumber.equals(other.versionNumber))
 			return false;
+		if (wasExecuted == null) {
+			if (other.wasExecuted != null)
+				return false;
+		} else if (!wasExecuted.equals(other.wasExecuted))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "EntityTreeNode [id=" + id + ", entityId=" + entityId
+		return "EntityGraphNode [id=" + id + ", entityId=" + entityId
 				+ ", name=" + name + ", versionLabel=" + versionLabel
 				+ ", versionNumber=" + versionNumber + ", entityType="
-				+ entityType + "]";
+				+ entityType + ", wasExecuted=" + wasExecuted + "]";
 	}
 	
 }

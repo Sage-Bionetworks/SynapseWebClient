@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -12,10 +13,13 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
+import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
-import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
-import org.sagebionetworks.web.shared.provenance.ExpandTreeNode;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ProvGraph;
+import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
+import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -33,7 +37,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;		
-	private ProvTreeNode tree;
+	private ProvGraph graph;
 	private List<Connection> connections;
 	private LayoutContainer debug;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -60,8 +64,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	}
 
 	@Override
-	public void setTree(ProvTreeNode root) {
-		this.tree = root;
+	public void setGraph(ProvGraph graph) {
+		this.graph = graph;
 		if(this.isRendered()) {
 			createGraph();
 		}
@@ -107,34 +111,26 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		prov.setHeight(height);		
 		connections = new ArrayList<ProvenanceWidgetViewImpl.Connection>();		
 		
-		if(tree != null) {			
-			addNodeTree(tree, prov);
+		if(graph != null) {
+			// add nodes to graph
+			Set<ProvGraphNode> nodes = graph.getNodes();
+			Iterator<ProvGraphNode> itrN = nodes.iterator();
+			while(itrN.hasNext()) {
+				prov.add(getNodeContainer(itrN.next()));
+			}
+			
+			// make connections (assure DOM elements are in before asking jsPlumb to connect them)
+			Set<ProvGraphEdge> edges = graph.getEdges();
+			Iterator<ProvGraphEdge> itrE = edges.iterator();
+			while(itrE.hasNext()) {
+				ProvGraphEdge edge = itrE.next();
+				connect(edge.getSource().getId(), edge.getSink().getId());
+			}
 		}
 		
 		this.add(prov, new MarginData(5));
 		this.addStyleName("scroll-auto");
-		this.layout(true);
-		
-		// assure DOM elements are in before asking jsPlumb to connect them
-		for(Connection connection : connections) {
-			connect(connection.getParentId(), connection.getChildId());
-		}
-	}
-	
-	/**
-	 * Add node and it's children to the tree
-	 * @param root
-	 * @param prov
-	 */
-	private void addNodeTree(ProvTreeNode root, LayoutContainer prov) {
-		if(root == null) return;
-		prov.add(getNodeContainer(root));
-		Iterator<ProvTreeNode> itr = root.iterator();
-		while(itr.hasNext()) {
-			ProvTreeNode child = itr.next();
-			addNodeTree(child, prov);
-			connections.add(new Connection(root.getId(), child.getId()));
-		}
+		this.layout(true);			
 	}
 	
 	/**
@@ -142,27 +138,27 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	 * @param node
 	 * @return
 	 */
-	private LayoutContainer getNodeContainer(final ProvTreeNode node) {
-		if(node instanceof EntityTreeNode) {
-			LayoutContainer container = ProvViewUtil.createEntityContainer((EntityTreeNode)node, iconsImageBundle);
+	private LayoutContainer getNodeContainer(final ProvGraphNode node) {
+		if(node instanceof EntityGraphNode) {
+			LayoutContainer container = ProvViewUtil.createEntityContainer((EntityGraphNode)node, iconsImageBundle);
 			addToolTipToContainer(node, container, DisplayConstants.ENTITY);			
 			return container;
-		} else if(node instanceof ActivityTreeNode) {
-			LayoutContainer container = ProvViewUtil.createActivityContainer((ActivityTreeNode)node, iconsImageBundle);
+		} else if(node instanceof ActivityGraphNode) {
+			LayoutContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle);
 			// create tool tip for defined activities only
-			if(((ActivityTreeNode) node).getType() == ActivityType.UNDEFINED) {
+			if(((ActivityGraphNode) node).getType() == ActivityType.UNDEFINED) {
 				addUndefinedToolTip(container);
 			} else {
 				addToolTipToContainer(node, container, DisplayConstants.ACTIVITY);				
 			}
 			return container;
-		} else if(node instanceof ExpandTreeNode) {
-			return ProvViewUtil.createExpandContainer((ExpandTreeNode)node, sageImageBundle, presenter);
+		} else if(node instanceof ExpandGraphNode) {
+			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, sageImageBundle, presenter);
 		}
 		return null;
 	}
 
-	private void addToolTipToContainer(final ProvTreeNode node, final LayoutContainer container, final String title) {		
+	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer container, final String title) {		
 		container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayUtils.getLoadingHtml(sageImageBundle)));			
 		container.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
 			@Override

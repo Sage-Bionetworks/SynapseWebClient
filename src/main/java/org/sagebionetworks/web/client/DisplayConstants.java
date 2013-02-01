@@ -307,6 +307,7 @@ public class DisplayConstants {
 	public static final String NOT_VERSIONED = "not versioned";
 	public static final String ERROR_LAYOUT = "An error occured laying out the Provenance view.";
 	public static final String ERROR_PROVENANCE = "An error occured creating the Provenance view.";
+	public static final String ERROR_PROVENANCE_RELOAD = "Loading Error. Reload.";
 	public static final String ENTITY = "Entity";
 	public static final String LOADING = "Loading";
 	public static final String ACTIVITY = "Activity";

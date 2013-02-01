@@ -9,9 +9,9 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.Presenter;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
-import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
-import org.sagebionetworks.web.shared.provenance.ExpandTreeNode;
+import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.extjs.gxt.ui.client.Style.AnchorPosition;
@@ -47,7 +47,7 @@ public class ProvViewUtil {
 	private static final int MAX_ACT_MANUAL_NAME_CHAR = 17;
 	private static LayoutContainer UNDEFINED_SUB_NODE;
 		
-	public static LayoutContainer createActivityContainer(ActivityTreeNode node, IconsImageBundle iconsImageBundle) {
+	public static LayoutContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle) {
 		LayoutContainer container = new LayoutContainer();
 		container.setId(node.getId());
 		container.setStyleName(PROV_ACTIVITY_NODE_STYLE);
@@ -87,7 +87,7 @@ public class ProvViewUtil {
 		return container;		
 	}
 	
-	public static LayoutContainer createEntityContainer(EntityTreeNode node, IconsImageBundle iconsImageBundle) {
+	public static LayoutContainer createEntityContainer(EntityGraphNode node, IconsImageBundle iconsImageBundle) {
 		LayoutContainer container = createEntityContainer(node.getId(), node.getEntityId(),
 				node.getName(), node.getVersionLabel(),
 				node.getVersionNumber(), node.getEntityType(),
@@ -96,7 +96,7 @@ public class ProvViewUtil {
 		return container;
 	}
 	
-	public static LayoutContainer createExpandContainer(final ExpandTreeNode node, SageImageBundle sageImageBundle, final Presenter presenter) {
+	public static LayoutContainer createExpandContainer(final ExpandGraphNode node, SageImageBundle sageImageBundle, final Presenter presenter) {
 		LayoutContainer container = new LayoutContainer();
 		container.setId(node.getId());
 		container.setStyleName(PROV_ENTTITY_NODE_STYLE + " " + PROV_EXPAND_NODE_STYLE);

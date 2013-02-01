@@ -41,8 +41,8 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
-import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
+import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -102,15 +102,15 @@ public class ProvUtilsTest {
 		ProvTreeNode root = ProvUtils.buildProvTree(activities, entity, idToNode, refToHeader, false, synapseJsniUtils);		
 		
 		assertEquals(root, idToNode.get(root.getId()));
-		assertEquals(entity.getId(), ((EntityTreeNode)root).getEntityId());
+		assertEquals(entity.getId(), ((EntityGraphNode)root).getEntityId());
 		assertTrue(root.iterator().hasNext());
 
-		ActivityTreeNode actNode = (ActivityTreeNode)root.iterator().next();
+		ActivityGraphNode actNode = (ActivityGraphNode)root.iterator().next();
 		assertEquals(actNode, idToNode.get(actNode.getId()));
 		assertEquals(act.getId(), actNode.getActivityId());
 		assertTrue(actNode.iterator().hasNext());
 		
-		EntityTreeNode entity2Node = (EntityTreeNode)actNode.iterator().next();
+		EntityGraphNode entity2Node = (EntityGraphNode)actNode.iterator().next();
 		assertEquals(entity2Node, idToNode.get(entity2Node.getId()));
 		assertEquals(entity2.getId(), entity2Node.getEntityId());
 		assertFalse(entity2Node.iterator().hasNext());		

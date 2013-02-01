@@ -7,9 +7,9 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
-import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
+import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
-import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 
@@ -29,10 +29,10 @@ public class LayoutServiceImplTest {
 	
 	@Test
 	public void testLayoutProvTree() {
-		ProvTreeNode root = new EntityTreeNode("rand123", "syn123", "root", "2", (long)2, Data.class.getName());
-		ProvTreeNode activity = new ActivityTreeNode("rand456", "123", "act name", ActivityType.CODE_EXECUTION, "syn1234", "Normaliztion", "1", (long)1, Code.class.getName());
+		ProvTreeNode root = new EntityGraphNode("rand123", "syn123", "root", "2", (long)2, Data.class.getName());
+		ProvTreeNode activity = new ActivityGraphNode("rand456", "123", "act name", ActivityType.CODE_EXECUTION, "syn1234", "Normaliztion", "1", (long)1, Code.class.getName());
 		root.addChild(activity);
-		ProvTreeNode oldVersion = new EntityTreeNode("rand789", "syn123", "oldVersion", "1", (long)1, Data.class.getName());
+		ProvTreeNode oldVersion = new EntityGraphNode("rand789", "syn123", "oldVersion", "1", (long)1, Data.class.getName());
 		activity.addChild(oldVersion);
 		
 		ProvTreeNode layoutRoot = layoutService.layoutProvTree(root);

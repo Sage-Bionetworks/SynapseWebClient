@@ -2,10 +2,10 @@ package org.sagebionetworks.web.server.servlet.layout;
 
 import org.abego.treelayout.NodeExtentProvider;
 import org.sagebionetworks.web.client.widget.provenance.Dimension;
-import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
+import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
-import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
-import org.sagebionetworks.web.shared.provenance.ExpandTreeNode;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 public class ProvTreeNodeExtentProvider implements NodeExtentProvider<ProvTreeNode> {
@@ -27,16 +27,16 @@ public class ProvTreeNodeExtentProvider implements NodeExtentProvider<ProvTreeNo
 	}
 	
 	private static Dimension getProvNodeDimenion(ProvTreeNode node) {
-		if(node instanceof EntityTreeNode) {
+		if(node instanceof EntityGraphNode) {
 			return ENTITY_DIMENSION;
-		} else if(node instanceof ActivityTreeNode) {
-			if(((ActivityTreeNode) node).getType() == ActivityType.CODE_EXECUTION)
+		} else if(node instanceof ActivityGraphNode) {
+			if(((ActivityGraphNode) node).getType() == ActivityType.CODE_EXECUTION)
 				return ACTIVITY_ENTITY_DIMENSION;
-			else if(((ActivityTreeNode) node).getType() == ActivityType.MANUAL)
+			else if(((ActivityGraphNode) node).getType() == ActivityType.MANUAL)
 				return ACTIVITY_MANUAL_DIMENSION;
-			else if(((ActivityTreeNode) node).getType() == ActivityType.UNDEFINED)					
+			else if(((ActivityGraphNode) node).getType() == ActivityType.UNDEFINED)					
 				return ACTIVITY_UNDEFINED_DIMENSION;
-		} else if(node instanceof ExpandTreeNode) {
+		} else if(node instanceof ExpandGraphNode) {
 			return EXPAND_DIMENSION;
 		}
 		return null;

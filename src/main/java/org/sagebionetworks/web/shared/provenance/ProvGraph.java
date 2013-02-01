@@ -13,12 +13,22 @@ public class ProvGraph implements IsSerializable {
 
 	public ProvGraph() {
 		nodes = new HashSet<ProvGraphNode>();
+		edges = new HashSet<ProvGraphEdge>();
+	}
+	
+	public ProvGraph(Set<ProvGraphNode> nodes, Set<ProvGraphEdge> edges) {
+		this.nodes = nodes;
+		this.edges = edges;
 	}
 	
 	public boolean hasNode(ProvGraphNode node) {
 		return nodes.contains(node);
 	}
 
+	public boolean hasEdge(ProvGraphEdge edge) {
+		return edges.contains(edge);
+	}
+	
 	public boolean addNode(ProvGraphNode node) {
 		return nodes.add(node);
 	}
@@ -28,7 +38,7 @@ public class ProvGraph implements IsSerializable {
 		if(!nodes.contains(edge.getSink())) nodes.add(edge.getSink());
 		edges.add(edge);
 	}
-
+	
 	public Set<ProvGraphNode> getNodes() {
 		return nodes;
 	}

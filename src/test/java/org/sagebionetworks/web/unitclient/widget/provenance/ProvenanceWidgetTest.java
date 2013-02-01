@@ -45,7 +45,7 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -105,7 +105,7 @@ public class ProvenanceWidgetTest {
 		referenceHeaders = new BatchResults<EntityHeader>();
 		referenceHeaders.setResults(new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header })));
 		
-		root = new EntityTreeNode("someid", null, null, null, null, null);
+		root = new EntityGraphNode("someid", null, null, null, null, null);
 		
 		activityJSON = act.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		referenceListJSON = referenceList.writeToJSONObject(adapterFactory.createNew()).toJSONString();
@@ -134,7 +134,7 @@ public class ProvenanceWidgetTest {
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(entity.getId()), eq(entity.getVersionNumber()), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceListJSON), any(AsyncCallback.class));
 		verify(mockLayoutService).layoutProvTree(any(ProvTreeNode.class), any(AsyncCallback.class));
-		verify(mockView).setTree(root);
+		verify(mockView).setGraph(root);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -156,7 +156,7 @@ public class ProvenanceWidgetTest {
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(entity.getId()), eq(entity.getVersionNumber()), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
 		verify(mockLayoutService).layoutProvTree(any(ProvTreeNode.class), any(AsyncCallback.class));
-		verify(mockView).setTree(root);
+		verify(mockView).setGraph(root);
 	}
 	
 	
@@ -169,7 +169,7 @@ public class ProvenanceWidgetTest {
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(entity.getId()), eq(entity.getVersionNumber()), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceListJSON), any(AsyncCallback.class));
 		verify(mockLayoutService).layoutProvTree(any(ProvTreeNode.class), any(AsyncCallback.class));
-		verify(mockView).setTree(root);
+		verify(mockView).setGraph(root);
 	}
 
 	@SuppressWarnings("unchecked")

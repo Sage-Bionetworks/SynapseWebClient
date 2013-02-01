@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -373,7 +377,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    // the headers for properties.
 		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();		
 		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);
-	    provenanceWidget.buildTree(bundle.getEntity(), 1, false);
+		
+		Map<String,String> configMap = new HashMap<String,String>();
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY, bundle.getEntity().getId());
+		if(bundle.getEntity() instanceof Versionable) 
+			configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_VERSION_NUMBER_KEY, Long.toString(((Versionable)bundle.getEntity()).getVersionNumber()));
+		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(false));
+		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
+	    provenanceWidget.configure(bundle.getEntity().getId(), configMap);
 	    LayoutContainer border = new LayoutContainer();
 	    border.setBorders(true);	    
 	    border.add(provenanceWidget.asWidget());
