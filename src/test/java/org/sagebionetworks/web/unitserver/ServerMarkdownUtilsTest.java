@@ -43,13 +43,14 @@ public class ServerMarkdownUtilsTest {
 	}
 	
 	@Test
-	public void testRemoveAllHTML(){
+	public void testRemoveHTML(){
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
-		String testString = "<table><tr><td>this is a test</td><td>column 2</td></tr></table><iframe width=\"420\" height=\"315\" src=\"http://www.youtube.com/embed/AOjaQ7Vl7SM\" frameborder=\"0\" allowfullscreen></iframe><embed>";
+		String testString = "<table><tr><td>this is a test</td><td>column 2</td></tr></table>\n<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/m4Pvq4sldbQ\" frameborder=\"0\" allowfullscreen></iframe><embed><sCriPt>document.write(\"Danger!\")</sCriPt>";
 		String actualResult = ServerMarkdownUtils.markdown2Html(testString, "http://mySynapse/attachment", false, new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS));
-		assertTrue(!actualResult.contains("<table>"));
-		assertTrue(!actualResult.contains("<iframe>"));
-		assertTrue(!actualResult.contains("<embed>"));
+		assertTrue(actualResult.contains("<table"));
+		assertTrue(actualResult.contains("<iframe"));
+		assertTrue(!actualResult.contains("<embed"));
+		assertTrue(!actualResult.contains("<script"));
 	}
 	
 	@Test
