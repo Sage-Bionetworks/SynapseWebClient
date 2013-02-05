@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.Set;
 
@@ -15,7 +17,6 @@ import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -26,13 +27,9 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.entity.Attachments;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
-import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
-import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog.Callback;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 
 /**
  * Unit test for the entity editor.
@@ -41,12 +38,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class EntityEditorTest {
 
-	EntityEditorDialog mockDialog;
+	EntityPropertyForm mockDialog;
 	EntitySchemaCache schemaCache;
 	AdapterFactory factory;
 	ClientLogger mockLogger;
 	GlobalApplicationState mockGlobal;
 	PlaceChanger mockPlaceChanger;
+	Attachments mockAttachmentsWidget;
 	SynapseClientAsync mockSynapseClient;
 	AutoGenFactory autoGenFactory;
 	ObjectSchema versionableSchema;
@@ -58,7 +56,7 @@ public class EntityEditorTest {
 	public void before() throws JSONObjectAdapterException{
 
 		
-		mockDialog = Mockito.mock(EntityEditorDialog.class);
+		mockDialog = Mockito.mock(EntityPropertyForm.class);
 		factory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();
 		schemaCache = new EntitySchemaCacheImpl(factory);
@@ -66,7 +64,7 @@ public class EntityEditorTest {
 		mockLogger = Mockito.mock(ClientLogger.class);
 		mockGlobal = Mockito.mock(GlobalApplicationState.class);
 		when(mockGlobal.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		
+		mockAttachmentsWidget= Mockito.mock(Attachments.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		// setup the entity editor with 
 		editor = new EntityEditor(schemaCache, factory, autoGenFactory, mockDialog, mockLogger, mockGlobal, mockSynapseClient);

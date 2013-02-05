@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
@@ -23,6 +24,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
+import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -40,9 +42,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private NodeModelCreator nodeModelCreator;
 	private CookieProvider cookies;
 	private GWTWrapper gwtWrapper;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper){
+	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils){
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -50,6 +53,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.nodeModelCreator = nodeModelCreator;
 		this.cookies = cookies;
 		this.gwtWrapper = gwtWrapper;
+		this.synapseJSNIUtils=synapseJSNIUtils;
 		view.setPresenter(this);
 	} 
 
@@ -67,8 +71,13 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		view.setPresenter(this);
 		view.clear();
 		openIdActionUrl = WebConstants.OPEN_ID_URI;
-		openIdReturnUrl = "/#"+LOGIN_PLACE; // note, this is now a relative URL
+		// note, this is now a relative URL
+		openIdReturnUrl = synapseJSNIUtils.getLocationPath()+synapseJSNIUtils.getLocationQueryString()+"#"+LOGIN_PLACE; 
 		showView(place);
+	}
+	
+	public String getOpenIdReturnUrl() {
+		return openIdReturnUrl;
 	}
 
 	public void showView(final LoginPlace place) {

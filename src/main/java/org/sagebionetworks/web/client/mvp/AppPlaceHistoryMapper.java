@@ -1,24 +1,14 @@
 package org.sagebionetworks.web.client.mvp;
 
-import org.sagebionetworks.web.client.place.AnalysesHome;
-import org.sagebionetworks.web.client.place.Analysis;
 import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.place.ComingSoon;
-import org.sagebionetworks.web.client.place.Dataset;
-import org.sagebionetworks.web.client.place.DatasetsHome;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.Layer;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Lookup;
-import org.sagebionetworks.web.client.place.PhenoEdit;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Project;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Settings;
-import org.sagebionetworks.web.client.place.Step;
-import org.sagebionetworks.web.client.place.StepsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -33,16 +23,12 @@ import com.google.gwt.place.shared.WithTokenizers;
  * annotation or by extending PlaceHistoryMapperWithFactory and creating a
  * separate TokenizerFactory.
  */
-@WithTokenizers({ Home.Tokenizer.class, DatasetsHome.Tokenizer.class,
-		Dataset.Tokenizer.class, Layer.Tokenizer.class,
-		LoginPlace.Tokenizer.class, PasswordReset.Tokenizer.class,
-		RegisterAccount.Tokenizer.class, ProjectsHome.Tokenizer.class,
-		Project.Tokenizer.class, Profile.Tokenizer.class,
-		AnalysesHome.Tokenizer.class, StepsHome.Tokenizer.class,
-		Analysis.Tokenizer.class, Step.Tokenizer.class,
-		ComingSoon.Tokenizer.class, PhenoEdit.Tokenizer.class,
-		Lookup.Tokenizer.class, Synapse.Tokenizer.class,
+@WithTokenizers({ Home.Tokenizer.class, LoginPlace.Tokenizer.class,
+		PasswordReset.Tokenizer.class, RegisterAccount.Tokenizer.class,
+		ProjectsHome.Tokenizer.class, Profile.Tokenizer.class,
+		ComingSoon.Tokenizer.class, Synapse.Tokenizer.class,
 		Search.Tokenizer.class, Settings.Tokenizer.class,
-		BCCOverview.Tokenizer.class, Governance.Tokenizer.class,WikiPlace.Tokenizer.class})
+		BCCOverview.Tokenizer.class, Governance.Tokenizer.class,
+		WikiPlace.Tokenizer.class })
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

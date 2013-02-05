@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
@@ -29,7 +30,7 @@ public class Portal implements EntryPoint {
 	public void onModuleLoad() {
 	    EventBus eventBus = ginjector.getEventBus();
 	    PlaceController placeController = new PlaceController(eventBus);
-
+	    
 		// Start ActivityManager for the main widget with our ActivityMapper
 		AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl());
 		ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
@@ -53,6 +54,5 @@ public class Portal implements EntryPoint {
 		
 		// Goes to place represented on URL or default place
 		historyHandler.handleCurrentHistory();
-		
 	}
 }

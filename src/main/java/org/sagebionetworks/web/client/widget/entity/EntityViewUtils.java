@@ -88,7 +88,7 @@ public class EntityViewUtils {
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.RIGHT);
+		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
 		div.add(htmlPanel);
 		
 		LayoutContainer lc = new HorizontalPanel();
@@ -143,7 +143,7 @@ public class EntityViewUtils {
 			}
 		});		
 		lc.add(flagLink);
-		DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, DisplayConstants.FLAG_TOOL_TIP, TOOLTIP_POSITION.RIGHT);
+		DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, DisplayConstants.FLAG_TOOL_TIP, TOOLTIP_POSITION.BOTTOM);
 	    
 	    lc.layout();
 		return lc;

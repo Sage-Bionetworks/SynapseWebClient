@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BaseModelData;
@@ -210,7 +210,7 @@ public class StaticTableViewImpl extends LayoutContainer implements
         List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
         int count = 0;
         for(String colName : columnsInOrder) {
-        	if(count >= DisplayConstants.MAX_COLUMNS_IN_GRID) break; // stop displaying columns above a certain number        	
+        	if(count >= WebConstants.MAX_COLUMNS_IN_GRID) break; // stop displaying columns above a certain number        	
         	columns.add(createColumn(colName, colName, null, null));
         	count++;
         }        
@@ -221,7 +221,7 @@ public class StaticTableViewImpl extends LayoutContainer implements
         List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
         int count = 0;
         for(StaticTableColumn stColumn : columnsInOrder) {
-        	if(count >= DisplayConstants.MAX_COLUMNS_IN_GRID) break; // stop displaying columns above a certain number        	
+        	if(count >= WebConstants.MAX_COLUMNS_IN_GRID) break; // stop displaying columns above a certain number        	
         	columns.add(createColumn(stColumn.getId(), stColumn.getName(), stColumn.getTooltip(), stColumn.getUnits()));
         	count++;
         }        

@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -93,7 +95,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					@Override
 					public void onSuccess(String userProfileJson) {
 						try {
-							final UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
+							final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
 							ownerProfile = profile;
 							ownerProfile.setFirstName(firstName);
 							ownerProfile.setLastName(lastName);
@@ -109,45 +111,40 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 								ownerProfile.setPic(pic);
 							
 							JSONObjectAdapter adapter;
-							try {
-								adapter = ownerProfile.writeToJSONObject(JSONObjectGwt.createNewAdapter());
-								userProfileJson = adapter.toJSONString();
-							
-								synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
-									@Override
-									public void onSuccess(Void result) {
-										view.showUserUpdateSuccess();
-										view.showInfo("Success", "Your profile has been updated.");
-										
-										AsyncCallback<String> callback = new AsyncCallback<String>() {
-											@Override
-											public void onFailure(Throwable caught) { }
-
-											@Override
-											public void onSuccess(String result) {
-												view.refreshHeader();
-											}
-										};
-										
-										if(currentUser.getIsSSO()) {
-											authenticationController.loginUserSSO(currentUser.getSessionToken(), callback);
-										} else {
-											authenticationController.loginUser(currentUser.getSessionToken(), callback);
-										}
-									}
+							adapter = ownerProfile.writeToJSONObject(JSONObjectGwt.createNewAdapter());
+							userProfileJson = adapter.toJSONString();
+						
+							synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
+								@Override
+								public void onSuccess(Void result) {
+									view.showUserUpdateSuccess();
+									view.showInfo("Success", "Your profile has been updated.");
 									
-									@Override
-									public void onFailure(Throwable caught) {
-										view.userUpdateFailed();
-										view.showErrorMessage("An error occurred. Please try reloading the page.");
-									}
-								});
-							} catch (JSONObjectAdapterException e) {
-								DisplayUtils.handleJSONAdapterException(e, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
-							}
+									AsyncCallback<String> callback = new AsyncCallback<String>() {
+										@Override
+										public void onFailure(Throwable caught) { }
 
-						} catch (RestServiceException e) {
-							onFailure(e);
+										@Override
+										public void onSuccess(String result) {
+											view.refreshHeader();
+										}
+									};
+									
+									if(currentUser.getIsSSO()) {
+										authenticationController.loginUserSSO(currentUser.getSessionToken(), callback);
+									} else {
+										authenticationController.loginUser(currentUser.getSessionToken(), callback);
+									}
+								}
+								
+								@Override
+								public void onFailure(Throwable caught) {
+									view.userUpdateFailed();
+									view.showErrorMessage("An error occurred. Please try reloading the page.");
+								}
+							});
+						} catch (JSONObjectAdapterException e) {
+							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 						}    				
 					}
 					@Override
@@ -215,13 +212,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					//parse the LinkedIn UserProfile json
 					UserProfile linkedInProfile;
 					try {
-						linkedInProfile = nodeModelCreator.createEntity(result, UserProfile.class);
+						linkedInProfile = nodeModelCreator.createJSONEntity(result, UserProfile.class);
 						 updateProfile(linkedInProfile.getFirstName(), linkedInProfile.getLastName(), 
 						    		linkedInProfile.getSummary(), linkedInProfile.getPosition(), 
 						    		linkedInProfile.getLocation(), linkedInProfile.getIndustry(), 
 						    		linkedInProfile.getCompany(), null, linkedInProfile.getPic());
-					} catch (RestServiceException e) {
-						onFailure(e);
+					} catch (JSONObjectAdapterException e) {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
 				}
 				
@@ -244,12 +241,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				@Override
 				public void onSuccess(String userProfileJson) {
 					try {
-						final UserProfile profile = nodeModelCreator.createEntity(userProfileJson, UserProfile.class);
+						final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
 						if (isOwner)
 							ownerProfile = profile;
 						view.updateView(profile, editable, isOwner);
-					} catch (RestServiceException e) {
-						onFailure(e);
+					} catch (JSONObjectAdapterException e) {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}    				
 				}
 				@Override

@@ -9,28 +9,29 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("synapse")	
 public interface SynapseClient extends RemoteService {
 
-	public EntityWrapper getEntity(String entityId);
+	public EntityWrapper getEntity(String entityId) throws RestServiceException;
 	
-	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber);
+	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException;
 		
 	public String getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
-	
-	public void deleteEntity(String entityId) throws RestServiceException;
 
-	public String getEntityTypeRegistryJSON();
+	public void deleteEntityById(String entityId) throws RestServiceException;
+
+	public void deleteEntityVersionById(String entityId, Long versionNumber) throws RestServiceException;
 	
-	public EntityWrapper getEntityPath(String entityId);
+	public EntityWrapper getEntityPath(String entityId) throws RestServiceException;
 	
-	public EntityWrapper search(String searchQueryJson); 
+	public EntityWrapper search(String searchQueryJson) throws RestServiceException; 
 	
 	public String getEntityTypeBatch(List<String> entityIds) throws RestServiceException;
+	
+	public String getEntityHeaderBatch(String referenceList) throws RestServiceException;
 	
 	public SerializableWhitelist junk(SerializableWhitelist l);
 	
@@ -169,7 +170,17 @@ public interface SynapseClient extends RemoteService {
 	 * @param markdown
 	 * @return
 	 */
-	public String markdown2Html(String markdown, String attachmentUrl);
+	public String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview) throws RestServiceException;
 	
 	public Long getStorageUsage(String entityId) throws RestServiceException;
+
+	public String getActivityForEntity(String entityId) throws RestServiceException;
+	
+	public String getActivityForEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
+	
+	public String getActivity(String activityId) throws RestServiceException;
+	
+	String promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
+	public EntityWrapper removeAttachmentFromEntity(String entityId, String attachmentName) throws RestServiceException;
+	public String getJSONEntity(String repoUri) throws RestServiceException;
 }

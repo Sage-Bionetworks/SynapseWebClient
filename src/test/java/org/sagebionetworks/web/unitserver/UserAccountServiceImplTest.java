@@ -242,7 +242,8 @@ public class UserAccountServiceImplTest {
 		UserSessionData userData = EntityFactory.createEntityFromJSONString(userdataJson, UserSessionData.class);
 		Assert.assertNotNull(userData.getSessionToken());
 	}
-		
+	
+	@Ignore
 	@Test
 	public void testSendPasswordResetEmail(){
 		try {
@@ -252,6 +253,7 @@ public class UserAccountServiceImplTest {
 		}
 	}
 	
+	@Ignore
 	@Test
 	public void testSendSetApiPasswordEmail() {
 		try {

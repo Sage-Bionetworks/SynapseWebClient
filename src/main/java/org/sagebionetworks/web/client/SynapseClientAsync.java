@@ -7,6 +7,8 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
@@ -22,8 +24,6 @@ public interface SynapseClientAsync {
 	void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<String> callback);
 
 	void updateEntity(String entityJson, AsyncCallback<EntityWrapper> callback);
-
-	void getEntityTypeRegistryJSON(AsyncCallback<String> callback);
 
 	void getEntityPath(String entityId, AsyncCallback<EntityWrapper> callback);
 
@@ -45,10 +45,14 @@ public interface SynapseClientAsync {
 	void createOrUpdateEntity(String entityJson, String annoJson,
 			boolean isNew, AsyncCallback<String> callback);
 	
-	void getEntityTypeBatch(List<String> entityIds,
+	void getEntityTypeBatch(List<String> entityIds, AsyncCallback<String> callback);
+	
+	void getEntityHeaderBatch(String referenceList,
 			AsyncCallback<String> callback);
 
-	void deleteEntity(String entityId, AsyncCallback<Void> callback);
+	void deleteEntityById(String entityId, AsyncCallback<Void> callback);
+
+	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void getUserProfile(AsyncCallback<String> callback);
 	
@@ -84,7 +88,19 @@ public interface SynapseClientAsync {
 
 	public void updateExternalLocationable(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback);
 
-	public void markdown2Html(String markdown, String attachmentUrl, AsyncCallback<String> callback);
+	public void markdown2Html(String markdown, String attachmentUrl, Boolean isPreview, AsyncCallback<String> callback);
 	
 	public void getStorageUsage(String entityId, AsyncCallback<Long> callback);
+
+	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
+
+	void getActivityForEntity(String entityId, AsyncCallback<String> callback);
+
+	void getActivity(String activityId, AsyncCallback<String> callback);
+	
+	void promoteEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
+	
+	void removeAttachmentFromEntity(String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	
+	public void getJSONEntity(String repoUri, AsyncCallback<String> callback);
 }

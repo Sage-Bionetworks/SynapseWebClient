@@ -121,15 +121,15 @@
 							<div class="span-4 last">
 								<div class="span-4 notopmargin">
 									<div class="left red-shield"></div>
-								    	<h5 class="left service-tipsy north" style="margin-right: 5px; margin-left: 7px;">Controlled Access</h5>
+								    	<h5 class="left service-tipsy north" style="margin-right: 5px; margin-left: 7px;">Controlled Use</h5>
 								</div>
 								<div class="span-4 notopmargin">
 									<div class="left yellow-shield"></div>
-								    	<h5 class="left service-tipsy north" style="margin-right: 5px; margin-left: 7px;">Restricted Access</h5>
+								    	<h5 class="left service-tipsy north" style="margin-right: 5px; margin-left: 7px;">Restricted Use</h5>
 								</div>
 								<div class="span-4 notopmargin">
 									<div class="left green-shield"></div>
-										<h5 class="left service-tipsy north" style="margin-right: 5px; margin-left: 7px;">Open Access</h5>
+										<h5 class="left service-tipsy north" style="margin-right: 5px; margin-left: 7px;">Open Use</h5>
 								</div>
 							</div>
 							<div class="span-7 notopmargin last" style="width: 290px;">

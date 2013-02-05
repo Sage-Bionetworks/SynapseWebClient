@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,20 +21,28 @@ import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RObject;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.CancelEvent;
+import org.sagebionetworks.web.client.events.CancelHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -41,6 +50,8 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -50,17 +61,22 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -81,6 +97,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
@@ -125,13 +142,17 @@ public class DisplayUtils {
 	
 	public static final String DEFAULT_PLACE_TOKEN = "0";
 	
-	public static final String R_CLIENT_DOWNLOAD_CODE = "source('http://sage.fhcrc.org/CRAN.R')<br/>pkgInstall(c(\"synapseClient\"))";
+	public static final String R_CLIENT_DOWNLOAD_CODE = "source('http://depot.sagebase.org/CRAN.R')<br/>pkgInstall(c(\"synapseClient\"))";
+	public static final String PYTHON_CLIENT_DOWNLOAD_CODE = "# From Terminal Prompt:<br/>pip install synapseclient<br/><br/># or<br/>easy_install synapseclient";
+	
+
 	
 	private static final String ERROR_OBJ_REASON_KEY = "reason";
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
+	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
 	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
 	public static final String WAIT_FOR_URL = "waitForUrl";
@@ -144,6 +165,9 @@ public class DisplayUtils {
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
 	public static final int BIG_BUTTON_HEIGHT_PX = 36;
+	
+	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
+	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
 	
 	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
@@ -383,6 +407,8 @@ public class DisplayUtils {
 				int firstQuestionMark = path.indexOf("?", lastSlash);
 				if (firstQuestionMark > -1) {
 					fileName = path.substring(lastSlash+1, firstQuestionMark);
+				} else {
+					fileName = path.substring(lastSlash+1);
 				}
 			}
 		}
@@ -446,7 +472,7 @@ public class DisplayUtils {
 		button.setText(DisplayConstants.BUTTON_SAVING);
 		button.setIcon(AbstractImagePrototype.create(sageImageBundle.loading16()));
 	}
-
+	
 	/**
 	 * Check if an Annotation key is valid with the repository service
 	 * @param key
@@ -502,6 +528,11 @@ public class DisplayUtils {
 		cp.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()))));		
 		return cp;
 	}
+	
+	public static String getLoadingHtml(SageImageBundle sageImageBundle) {
+		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " " + DisplayConstants.LOADING + "...";
+	}
+
 
 	/**
 	 * Shows an info message to the user in the "Global Alert area".
@@ -558,16 +589,6 @@ public class DisplayUtils {
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}
-	
-	public static SafeHtml getRClientEntityLoad(String id) {
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("# " + DisplayConstants.LABEL_R_CLIENT_GET_ENTITY + " <br/>")  
-		.appendEscaped(id).appendHtmlConstant(" &lt;- getEntity('").appendEscaped(id).appendHtmlConstant("')")
-		.appendHtmlConstant("<br/><br/># " + DisplayConstants.LABEL_R_CLIENT_LOAD_ENTITY + " <br/>")
-		.appendEscaped(id).appendHtmlConstant(" &lt;- loadEntity('")
-		.appendEscaped(id).appendHtmlConstant("')");
-		return shb.toSafeHtml();
-	}	
 	
 	public static String convertDateToString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
@@ -755,7 +776,11 @@ public class DisplayUtils {
 		} else if(Study.class.getName().equals(className)) {
 			// Study
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStudy16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStudy24();			
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStudy24();
+		} else if(Page.class.getName().equals(className)) {
+			// Page
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();			
 		} else {
 			// default to Model
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
@@ -872,22 +897,6 @@ public class DisplayUtils {
 		return builder.toString();
 	}
 	
-	
-	/**
-	 * Does this entity have attachment previews?
-	 * @param entity
-	 * @return
-	 */
-	public static boolean hasAttachmentPreviews(Entity entity){
-		if(entity == null) return false;
-		if(entity.getAttachments() == null) return false;
-		if(entity.getAttachments().size() < 1) return false;
-		for(AttachmentData data: entity.getAttachments()){
-			if(data.getPreviewId() != null) return true;
-		}
-		return false;
-	}
-	
 	/**
 	 * Does this entity have attachmet previews?
 	 * @param entity
@@ -960,9 +969,10 @@ public class DisplayUtils {
 		optionsMap.put("title", tooltipText);
 		optionsMap.put("data-placement", pos.toString().toLowerCase());
 		optionsMap.put("data-animation", "false");
+		optionsMap.put("data-html", "true");
 		addTooltip(util, widget, optionsMap);
 	}
-	
+		
 	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
 
@@ -970,7 +980,7 @@ public class DisplayUtils {
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "tooltip");
 
-		if (el.getNodeType() == 1 && ! isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
+		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
 			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
 			
 			applyAttributes(el, optionsMap);
@@ -988,19 +998,31 @@ public class DisplayUtils {
 		}
 	}
 
+	public static void addClickPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
+		Map<String, String> optionsMap = new TreeMap<String, String>();
+		optionsMap.put("data-html", "true");
+		optionsMap.put("data-animation", "true");
+		optionsMap.put("title", title);
+		optionsMap.put("data-placement", pos.toString().toLowerCase());
+		optionsMap.put("trigger", "click");		
+		addPopover(util, widget, content, optionsMap);
+	}
+
+	
 	/**
 	 * Adds a popover to a target widget
 	 * 
 	 * Same warnings apply as to {@link #addTooltip(SynapseJSNIUtils, Widget, String) addTooltip}
 	 */
-	public static void addPopover(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
+	public static void addPopover(final SynapseJSNIUtils util, Widget widget, String content, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
+		el.setAttribute("data-content", content);
 
 		String id = isNullOrEmpty(el.getId()) ? "sbn-popover-"+(popoverCount++) : el.getId();
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "popover");
 
-		if (el.getNodeType() == 1 && ! isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
+		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
 			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
 
 			applyAttributes(el, optionsMap);
@@ -1016,7 +1038,7 @@ public class DisplayUtils {
 		}
 	}
 
-	private static void applyAttributes(final Element el,
+	public static void applyAttributes(final Element el,
 			Map<String, String> optionsMap) {
 		for (Entry<String, String> option : optionsMap.entrySet()) {
 			DOM.setElementAttribute(el, option.getKey(), option.getValue());
@@ -1049,7 +1071,7 @@ public class DisplayUtils {
 		Element container = DOM.getElementById(ALERT_CONTAINER_ID);
 		DOM.insertChild(container, alert.getElement(), 0);
 	}
-
+	
 	public static String getVersionDisplay(Versionable versionable) {		
 		String version = "";
 		if(versionable == null || versionable.getVersionNumber() == null) return version;
@@ -1061,8 +1083,7 @@ public class DisplayUtils {
 		}
 		return version;
 	}
-	
-	
+
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	public static native JavaScriptObject newWindow(String url, String name, String features)/*-{
     	var window = $wnd.open(url, name, features);
@@ -1102,6 +1123,26 @@ public class DisplayUtils {
 		}
 		return html;
 	}
+	
+	public static String getYouTubeVideoUrl(String videoId) {
+		return "http://www.youtube.com/watch?v=" + videoId;
+	}
+	
+	public static String getYouTubeVideoId(String videoUrl) {
+		String videoId = null;
+		//parse out the video id from the url
+		int start = videoUrl.indexOf("v=");
+		if (start > -1) {
+			int end = videoUrl.indexOf("&", start);
+			if (end == -1)
+				end = videoUrl.length();
+			videoId = videoUrl.substring(start + "v=".length(), end);
+		}
+		if (videoId == null || videoId.trim().length() == 0) {
+			throw new IllegalArgumentException("Could not determine the video ID from the given URL.");
+		}
+		return videoId;
+	}
 
 	public static Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
 		Anchor anchor = new Anchor();
@@ -1109,4 +1150,127 @@ public class DisplayUtils {
 		anchor.addClickHandler(clickHandler);
 		return anchor;
 	}
+
+	public static String getVersionDisplay(Reference ref) {
+		if (ref == null) return null;
+		return getVersionDisplay(ref.getTargetId(), ref.getTargetVersionNumber());
+	}
+	
+	public static String getVersionDisplay(String id, Long versionNumber) {
+		String version = id;
+		if(versionNumber != null) {
+			version += " (#" + versionNumber + ")";
+		}
+		return version;		
+	}
+	
+	public static SafeHtml get404Html() {
+		return SafeHtmlUtils
+				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">404</p><h1>"
+						+ DisplayConstants.PAGE_NOT_FOUND
+						+ "</h1>"
+						+ "<p>"
+						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
+	}
+	
+	public static String getWidgetMD(String attachmentName) {
+		if (attachmentName == null)
+			return null;
+		StringBuilder sb = new StringBuilder();
+		sb.append(WidgetConstants.WIDGET_START_MARKDOWN);
+		sb.append(attachmentName);
+		sb.append("}");
+		return sb.toString();
+	}
+	
+	public static SafeHtml get403Html() {
+		return SafeHtmlUtils
+				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">403</p><h1>"
+						+ DisplayConstants.UNAUTHORIZED
+						+ "</h1>"
+						+ "<p>"
+						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div>");
+	}
+	
+	/**
+	 * 'Upload File' button
+	 * @param entity 
+	 * @param entityType 
+	 */
+	public static Widget getUploadButton(final EntityBundle entityBundle,
+			EntityType entityType, final LocationableUploader locationableUploader,
+			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
+		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
+		uploadButton.setHeight(25);
+		final Window window = new Window();  
+		locationableUploader.clearHandlers();
+		// add user defined handler
+		locationableUploader.addPersistSuccessHandler(handler);
+		
+		// add handlers for closing the window
+		locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				window.hide();
+			}
+		});
+		locationableUploader.addCancelHandler(new CancelHandler() {				
+			@Override
+			public void onCancel(CancelEvent event) {
+				window.hide();
+			}
+		});
+		
+		uploadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.removeAll();
+				window.setSize(400, 320);
+				window.setPlain(true);
+				window.setModal(true);		
+				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
+				window.setLayout(new FitLayout());			
+				window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+				window.show();
+			}
+		});
+		return uploadButton;
+	}
+	
+	/**
+	 * Provides same functionality as java.util.Pattern.quote().
+	 * @param pattern
+	 * @return
+	 */
+	public static String quotePattern(String pattern) {
+		StringBuilder output = new StringBuilder();
+	    for (int i = 0; i < pattern.length(); i++) {
+	      if (ESCAPE_CHARACTERS_SET.contains(pattern.charAt(i)))
+	    	output.append("\\");
+	      output.append(pattern.charAt(i));
+	    }
+	    return output.toString();
+	  }
+	
+	public static void updateTextArea(TextArea textArea, String newValue) {
+		textArea.setValue(newValue);
+		DomEvent.fireNativeEvent(Document.get().createChangeEvent(), textArea);
+	}
+
+	public static boolean isInTestWebsite(CookieProvider cookies) {
+		return cookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY) != null;
+	}
+
+	public static void setTestWebsite(boolean testWebsite, CookieProvider cookies) {
+		if (testWebsite && !isInTestWebsite(cookies)) {
+			//set the cookie
+			cookies.setCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, "true");
+		} else{
+			cookies.removeCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY);
+		}
+			
+		
+	}
+
+	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
 }

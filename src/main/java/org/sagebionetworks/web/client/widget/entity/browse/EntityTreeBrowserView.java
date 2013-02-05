@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.resources.client.ImageResource;
@@ -22,7 +21,7 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseWidgetView {
 	 * 
 	 * @param rootEntities list of entities to make root level nodes for in the tree
 	 */
-	public void setRootEntities(List<EntityHeader> rootEntities);
+	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort);
 	
 	/**
 	 * Remove an entity from the view identified by entityId

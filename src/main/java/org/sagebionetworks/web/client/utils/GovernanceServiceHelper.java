@@ -27,7 +27,7 @@ public class GovernanceServiceHelper {
 			onFailure.invoke(e);
 			return;
 		}
-		EntityWrapper ew = new EntityWrapper(approvalJson.toJSONString(), agreement.getClass().getName(), null);
+		EntityWrapper ew = new EntityWrapper(approvalJson.toJSONString(), agreement.getClass().getName());
 		synapseClient.createAccessApproval(ew, new AsyncCallback<EntityWrapper>(){
 			@Override
 			public void onSuccess(EntityWrapper result) {

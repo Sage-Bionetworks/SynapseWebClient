@@ -11,6 +11,7 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_
 
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -19,11 +20,12 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -37,7 +39,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private EntityView view;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	private NodeServiceAsync nodeService;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private String entityId;
@@ -48,11 +49,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			NodeServiceAsync nodeService, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.nodeService = nodeService;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 	
@@ -98,8 +98,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
 		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override
-			public void onSuccess(EntityBundleTransport transport) {
-				
+			public void onSuccess(EntityBundleTransport transport) {				
 				EntityBundle bundle = null;
 				try {
 					bundle = nodeModelCreator.createEntityBundle(transport);
@@ -109,26 +108,32 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						Reference ref = ((Link)bundle.getEntity()).getLinksTo();
 						entityId = null;
 						if(ref != null){
+							// redefine where the page is and refresh
 							entityId = ref.getTargetId();
 							versionNumber = ref.getTargetVersionNumber();
+							refresh();
+							return;
+						} else {
+							// show error and then allow entity bundle to go to view
+							view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 						}
-						refresh();
-						return;
 					} 					
 					
 					view.setEntityBundle(bundle, readOnly);					
-				} catch (RestServiceException ex) {					
-					onFailure(null);					
-					globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+				} catch (JSONObjectAdapterException ex) {					
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
 				}				
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(caught instanceof NotFoundException) {
+					view.show404();
+				} else if(caught instanceof ForbiddenException) {
+					view.show403();
+				} else if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
 				}
-				globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			}			
 		};
 		

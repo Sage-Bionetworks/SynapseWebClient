@@ -94,5 +94,4 @@ public class JSONEntityFactoryImpl implements JSONEntityFactory {
 		entity.initializeFromJSONObject(adapter);
 		return entity;
 	}
-
 }

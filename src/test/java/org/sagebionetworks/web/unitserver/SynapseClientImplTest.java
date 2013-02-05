@@ -26,8 +26,8 @@ import java.util.Set;
 
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.Synapse;
@@ -49,6 +49,7 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.storage.StorageUsage;
@@ -87,6 +88,7 @@ public class SynapseClientImplTest {
 	
 	String entityId = "123";
 	ExampleEntity entity;
+	AttachmentData attachment1, attachment2;
 	Annotations annos;
 	UserEntityPermissions eup;
 	EntityPath path;
@@ -116,6 +118,14 @@ public class SynapseClientImplTest {
 		entity = new ExampleEntity();
 		entity.setId(entityId);
 		entity.setEntityType(ExampleEntity.class.getName());
+		List<AttachmentData> attachments = new ArrayList<AttachmentData>();
+		attachment1 = new AttachmentData();
+		attachment1.setName("attachment1");
+		attachment2 = new AttachmentData();
+		attachment2.setName("attachment2");
+		attachments.add(attachment1);
+		attachments.add(attachment2);
+		entity.setAttachments(attachments);
 		// the mock synapse should return this object
 		when(mockSynapse.getEntityById(entityId)).thenReturn(entity);
 		// Setup the annotations
@@ -449,4 +459,37 @@ public class SynapseClientImplTest {
 		Long actual = synapseClient.getStorageUsage(entityId);
 		assertEquals(expectedSize, actual);
 	}
+	
+	@Test
+	public void testRemoveAttachmentFromEntity() throws Exception {
+
+		Mockito.when(mockSynapse.putEntity(any(ExampleEntity.class))).thenReturn(entity);
+		
+		ArgumentCaptor<ExampleEntity> arg = ArgumentCaptor.forClass(ExampleEntity.class);
+		
+		synapseClient.removeAttachmentFromEntity(entityId, attachment2.getName());
+	    
+		//test to see if attachment has been removed
+		verify(mockSynapse).getEntityById(entityId);
+		verify(mockSynapse).putEntity(arg.capture());
+		
+		 //verify that attachment2 has been removed
+		ExampleEntity updatedEntity = arg.getValue();
+		List<AttachmentData> attachments = updatedEntity.getAttachments();
+		assertTrue(attachments.size() == 1 && attachments.get(0).equals(attachment1));
+	}
+	
+	@Test
+	public void testGetJSONEntity() throws Exception {
+
+		JSONObject json = EntityFactory.createJSONObjectForEntity(entity);
+		Mockito.when(mockSynapse.getEntity(anyString())).thenReturn(json);
+		
+		String testRepoUri = "/testservice";
+		
+		synapseClient.getJSONEntity(testRepoUri);
+		//verify that this call uses Synapse.getEntity(testRepoUri)
+	    verify(mockSynapse).getEntity(testRepoUri);
+	}	
+
 }

@@ -132,7 +132,6 @@ public class ModalWindowViewImpl extends LayoutContainer implements ModalWindowV
 		window.setSize(width, height);
 		window.setPlain(true);
 		window.setModal(isModal);
-		window.setBlinkModal(true);
 		window.setHeading(heading);
 		window.setLayout(new FitLayout());
 		window.setResizable(false);		

@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -15,14 +18,13 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
@@ -33,11 +35,11 @@ import com.google.inject.Inject;
 public class LocationableUploader implements LocationableUploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable {
 	
 	private LocationableUploaderView view;
-	private NodeServiceAsync nodeService;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager;
-	private EntityBundle entityBundle;
+	private Entity entity;
+	private List<AccessRequirement> accessRequirements;
 	private EntityTypeProvider entityTypeProvider;
 	private GlobalApplicationState globalApplicationState;
 	private JSONObjectAdapter jsonObjectAdapter;
@@ -47,8 +49,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	
 	@Inject
 	public LocationableUploader(
-			LocationableUploaderView view, 
-			NodeServiceAsync nodeService, 
+			LocationableUploaderView view, 			
 			NodeModelCreator nodeModelCreator, 
 			AuthenticationController authenticationController, 
 			EntityTypeProvider entityTypeProvider,
@@ -57,8 +58,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 			JSONObjectAdapter jsonObjectAdapter
 			) {
 	
-		this.view = view;
-		this.nodeService = nodeService;
+		this.view = view;		
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
@@ -70,9 +70,10 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		clearHandlers();
 	}		
 		
-	public Widget asWidget(EntityBundle entityBundle) {
+	public Widget asWidget(Entity entity, List<AccessRequirement> accessRequirements) {
 		this.view.setPresenter(this);
-		this.entityBundle = entityBundle;
+		this.entity = entity;
+		this.accessRequirements = accessRequirements;
 		this.view.createUploadForm();
 		return this.view.asWidget();
 	}
@@ -83,7 +84,7 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		view.clear();
 		// remove handlers
 		handlerManager = new HandlerManager(this);		
-		this.entityBundle = null;		
+		this.entity = null;		
 	}
 
 	@Override
@@ -91,26 +92,30 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		return null;
 	}
 
+	public Entity getEntity() {
+		return entity;
+	}
+	
 	@Override
 	public String getUploadActionUrl(boolean isRestricted) {
 		return GWT.getModuleBaseURL() + "upload" + "?" + 
-			DisplayUtils.ENTITY_PARAM_KEY + "=" + entityBundle.getEntity().getId() + "&" +
+			DisplayUtils.ENTITY_PARAM_KEY + "=" + entity.getId() + "&" +
 			DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
 	}
 
 	@Override
 	public void setExternalLocation(String path, final boolean isNewlyRestricted) {
-		String entityId = entityBundle.getEntity().getId();
+		String entityId = entity.getId();
 		
 		synapseClient.updateExternalLocationable(entityId, path, new AsyncCallback<EntityWrapper>() {
 			
 			public void onSuccess(EntityWrapper result) {
 				try {
-					Entity entity = nodeModelCreator.createEntity(result, entityBundle.getEntity().getClass());
+					Entity updatedEntity = nodeModelCreator.createJSONEntity(result.getEntityJson(), entity.getClass());
 					if (isNewlyRestricted) {
 						EntityWrapper arEW = null;
 						try {
-							arEW=EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(entity.getId(), jsonObjectAdapter);
+							arEW=EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(updatedEntity.getId(), jsonObjectAdapter);
 						} catch (JSONObjectAdapterException caught) {
 							view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);							
 						}
@@ -131,8 +136,8 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 						view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
 						entityUpdated();						
 					}
-				} catch (RestServiceException e) {
-					onFailure(null);					
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			};
 			@Override
@@ -186,7 +191,8 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	
 	@Override
 	public boolean isRestricted() {
-		return entityBundle.getAccessRequirements().size() > 0;
+		if(accessRequirements == null) return false;
+		return accessRequirements.size() > 0;
 	}
 	
 	
@@ -195,6 +201,6 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		UserProfile userProfile = authenticationController.getLoggedInUser().getProfile();
 		if (userProfile==null) throw new NullPointerException("User profile cannot be null.");
 		return jiraURLHelper.createAccessRestrictionIssue(
-				userProfile.getUserName(), userProfile.getDisplayName(), entityBundle.getEntity().getId());
+				userProfile.getUserName(), userProfile.getDisplayName(), entity.getId());
 	}
 }

@@ -10,24 +10,15 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.AnalysesHome;
-import org.sagebionetworks.web.client.place.Analysis;
 import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.place.ComingSoon;
-import org.sagebionetworks.web.client.place.Dataset;
-import org.sagebionetworks.web.client.place.DatasetsHome;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.Layer;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Lookup;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Project;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Settings;
-import org.sagebionetworks.web.client.place.Step;
-import org.sagebionetworks.web.client.place.StepsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -38,7 +29,6 @@ import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
-import org.sagebionetworks.web.client.presenter.LookupPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
@@ -78,20 +68,11 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(LoginPlace.class);
 		openAccessPlaces.add(PasswordReset.class);
 		openAccessPlaces.add(RegisterAccount.class);
-		openAccessPlaces.add(DatasetsHome.class);
 		openAccessPlaces.add(Synapse.class);
-		openAccessPlaces.add(Dataset.class);
-		openAccessPlaces.add(Layer.class);
 		openAccessPlaces.add(ProjectsHome.class);
-		openAccessPlaces.add(Project.class);
 		openAccessPlaces.add(ComingSoon.class);
 		openAccessPlaces.add(Governance.class);
 		openAccessPlaces.add(BCCOverview.class);
-		openAccessPlaces.add(Lookup.class);
-		openAccessPlaces.add(Step.class);
-		openAccessPlaces.add(StepsHome.class);
-		openAccessPlaces.add(Analysis.class);
-		openAccessPlaces.add(AnalysesHome.class);
 		openAccessPlaces.add(Search.class);
 		openAccessPlaces.add(WikiPlace.class);
 	}
@@ -113,10 +94,7 @@ public class AppActivityMapper implements ActivityMapper {
 		}
 		
 		globalApplicationState.setCurrentPlace(place);
-		
-		// check for demo
-		authenticationController.loadShowDemo();
-		
+				
 		// If the user is not logged in then we redirect them to the login screen
 		// except for the fully public places
 		if(!openAccessPlaces.contains(place.getClass())) {
@@ -181,11 +159,6 @@ public class AppActivityMapper implements ActivityMapper {
 			// user's profile page
 			BCCOverviewPresenter presenter = ginjector.getBCCOverviewPresenter();
 			presenter.setPlace((BCCOverview)place);
-			return presenter;
-		}else if (place instanceof Lookup) {
-			// user's profile page
-			LookupPresenter presenter = ginjector.getLookupPresenter();
-			presenter.setPlace((Lookup)place);
 			return presenter;
 		} else if (place instanceof Search) {
 			// search results page

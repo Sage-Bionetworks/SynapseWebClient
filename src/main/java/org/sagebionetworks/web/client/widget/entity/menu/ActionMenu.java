@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
@@ -22,7 +23,6 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.NodeServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
@@ -52,7 +52,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private boolean readOnly = false;
 	
 	@Inject
-	public ActionMenu(ActionMenuView view, NodeServiceAsync nodeService, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor, AutoGenFactory entityFactory) {
+	public ActionMenu(ActionMenuView view, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor, AutoGenFactory entityFactory) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
@@ -157,7 +157,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		final String parentId = entityBundle.getEntity().getParentId();
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
-		synapseClient.deleteEntity(entityBundle.getEntity().getId(), new AsyncCallback<Void>() {			
+		synapseClient.deleteEntityById(entityBundle.getEntity().getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {				
 				view.showInfo(entityTypeDisplay + " Deleted", "The " + entityTypeDisplay + " was successfully deleted."); 
@@ -188,9 +188,15 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		
 		List<EntityType> ignore = new ArrayList<EntityType>();
 		
-		// ignore self type children (except for Folders)
-		if (entityType != entityTypeProvider.getEntityTypeForClassName(Folder.class.getName()))			
+		// ignore self type children (except for Folders and Pages)
+		boolean isFolderType = entityType == entityTypeProvider.getEntityTypeForClassName(Folder.class.getName());
+		boolean isPageType = entityType == entityTypeProvider.getEntityTypeForClassName(Page.class.getName());
+		if (!(isFolderType || isPageType))
 			ignore.add(entityType);
+		
+		if (isFolderType)
+			//if Folder, ignore Page (we will create the root Wiki folder on-the-fly)
+			ignore.add(entityTypeProvider.getEntityTypeForClassName(Page.class.getName()));
 
 		// ignore certain types
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Project.class.getName()));

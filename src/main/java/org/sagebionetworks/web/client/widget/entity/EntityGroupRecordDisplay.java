@@ -13,7 +13,7 @@ public class EntityGroupRecordDisplay {
 	private SafeHtml version;
 	private Date modifienOn;
 	private SafeHtml contact;
-	private SafeHtml note;
+	private SafeHtml note;	
 		
 	public EntityGroupRecordDisplay() {
 		
