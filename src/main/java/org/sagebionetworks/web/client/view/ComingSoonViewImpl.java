@@ -12,6 +12,10 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ProvGraph;
+import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
+import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.extjs.gxt.ui.client.Style.AnchorPosition;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -91,6 +95,13 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
 	@Override
 	public void setEntity(Entity entity) {
+
 	}
 
+	
+	
+	
+	
+	
+	
 }

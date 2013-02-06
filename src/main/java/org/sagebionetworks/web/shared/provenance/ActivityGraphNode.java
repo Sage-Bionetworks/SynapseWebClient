@@ -23,8 +23,8 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 		this.activityName = activityName;
 		this.type = type;
 	}
-
-	@Deprecated
+	
+	// deprecated
 	public ActivityGraphNode(String id, String activityId, String activityName, ActivityType type, String subEntityId, String subName,
 			String subVersionLabel, Long subVersionNumber, String subEntityType) {
 		super();

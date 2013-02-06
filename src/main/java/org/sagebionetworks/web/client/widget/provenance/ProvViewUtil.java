@@ -12,6 +12,7 @@ import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.extjs.gxt.ui.client.Style.AnchorPosition;
@@ -116,7 +117,7 @@ public class ProvViewUtil {
 	/*
 	 * Private utils
 	 */
-	private static void setPosition(ProvTreeNode node, LayoutContainer container) {
+	private static void setPosition(ProvGraphNode node, LayoutContainer container) {
 		container.setStyleAttribute("top", node.getyPos() + "px");
 		container.setStyleAttribute("left", node.getxPos() + "px");
 	}

@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.BatchResults;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -29,13 +27,10 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -62,7 +57,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	Map<Reference,String> generatedByActivityId = new HashMap<Reference, String>();
 	Map<String,Activity> processedActivities = new HashMap<String, Activity>();
 	Set<Reference> references = new HashSet<Reference>();
-	Set<Activity> toProcess = new HashSet<Activity>();
+	Set<Activity> activitiesToProcess = new HashSet<Activity>();
+	Set<Reference> refToProcess = new HashSet<Reference>();
 	Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
 	boolean showExpand;
 	int maxDepth = 1; 
@@ -143,10 +139,14 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private void processUsed(final Reference ref, final int depth, final ProcessCallback processCallback) {
 		// add entry to referenceToHeader		
 		references.add(ref);
+		refToProcess.remove(ref);
 		
-		// check to see if we are all done 
-		if(depth >= maxDepth && toProcess.size() == 0) {
+		// check to see if we are all done or just at a leaf 
+		if(depth >= maxDepth && activitiesToProcess.size() == 0 && refToProcess.size() == 0) {
 			processCallback.onComplete();
+			return;
+		} else if(depth >= maxDepth) {
+			return;
 		}
 		
 		// lookup generatedBy activity for ref
@@ -164,17 +164,18 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				return;
 				// Display empty, fake provenance record
-				Activity activity = new Activity();
-				activity.setId(FAKE_ID_PREFIX + synapseJSNIUtils.randomNextInt());
-				if(caught instanceof NotFoundException) {
-					activity.setName(DisplayConstants.ACTIVITY + " " + DisplayConstants.NOT_FOUND);
-				} else if(caught instanceof ForbiddenException) {
-					activity.setName(DisplayConstants.ACTIVITY + " " + DisplayConstants.UNAUTHORIZED);
-				} else {
-					activity.setName(DisplayConstants.ERROR_PROVENANCE_RELOAD);
-				}
-				nextSteps(activity);
+//				Activity activity = new Activity();
+//				activity.setId(FAKE_ID_PREFIX + synapseJSNIUtils.randomNextInt());
+//				if(caught instanceof NotFoundException) {
+//					activity.setName(DisplayConstants.ACTIVITY + " " + DisplayConstants.NOT_FOUND);
+//				} else if(caught instanceof ForbiddenException) {
+//					activity.setName(DisplayConstants.ACTIVITY + " " + DisplayConstants.UNAUTHORIZED);
+//				} else {
+//					activity.setName(DisplayConstants.ERROR_PROVENANCE_RELOAD);
+//				}
+//				nextSteps(activity);
 			}
 			
 			private void nextSteps(Activity activity) {
@@ -182,7 +183,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				generatedByActivityId.put(ref, activity.getId());
 
 				// add activity to toProcess and process it as next level in the depth of graph
-				toProcess.add(activity);
+				activitiesToProcess.add(activity);
 				processActivity(activity, depth+1, processCallback);				
 			}			
 		});
@@ -192,7 +193,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private void processActivity(final Activity activity, final int depth, final ProcessCallback processCallback) {
 		// check if activity has already been processed
 		if(processedActivities.containsKey(activity.getId())) {
-			if(toProcess.contains(activity)) toProcess.remove(activity);
+			if(activitiesToProcess.contains(activity)) activitiesToProcess.remove(activity);
 			return;
 		}
 		
@@ -228,18 +229,27 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 
 			private void nextSteps() {
 				// remove activity from toProcess set
-				toProcess.remove(activity);
+				activitiesToProcess.remove(activity);
 				
-				// call processUsed for each Reference in the used list
+				// first preload the process list of references
 				if(activity.getUsed() != null) {
 					Set<UsedEntity> set = activity.getUsed();
 					Iterator<UsedEntity> itr = set.iterator();
 					while(itr.hasNext()) {
 						UsedEntity ue = itr.next();
 						if(ue.getReference() != null) {
-							processUsed(ue.getReference(), depth, processCallback);
+							refToProcess.add(ue.getReference());
 						}
 					}
+
+					// now call processUsed for each Reference in the used list
+					itr = set.iterator();
+					while(itr.hasNext()) {
+						UsedEntity ue = itr.next();
+						if(ue.getReference() != null) {
+							processUsed(ue.getReference(), depth, processCallback);
+						}
+					}					
 				}
 			}
 		});

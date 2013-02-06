@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import com.google.gwt.core.client.JavaScriptObject;
+
 public interface SynapseJSNIUtils {
 
 	public void recordPageVisit(String token);
@@ -27,4 +29,5 @@ public interface SynapseJSNIUtils {
 	public String getLocationPath();
 	
 	public String getLocationQueryString();
+	
 }

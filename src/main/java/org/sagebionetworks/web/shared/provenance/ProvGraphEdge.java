@@ -7,8 +7,9 @@ public class ProvGraphEdge implements IsSerializable {
 	private ProvGraphNode source;
 	private ProvGraphNode sink;
 
+	public ProvGraphEdge() {	}
+	
 	public ProvGraphEdge(ProvGraphNode source, ProvGraphNode sink) {
-		super();
 		this.source = source;
 		this.sink = sink;
 	}

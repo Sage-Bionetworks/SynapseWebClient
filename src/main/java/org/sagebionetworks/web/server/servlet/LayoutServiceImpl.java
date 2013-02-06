@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
@@ -114,19 +115,16 @@ public class LayoutServiceImpl extends RemoteServiceServlet implements LayoutSer
 	public ProvGraph dagLayout(ProvGraph provGraph) {
 		// convert provGraph into JUNG dag graph
 		DirectedGraph<ProvGraphNode, ProvGraphEdge> graph = new DirectedSparseGraph<ProvGraphNode, ProvGraphEdge>();
-		Set<ProvGraphEdge> edges = provGraph.getEdges();
-		Iterator<ProvGraphEdge> itr = edges.iterator();
-		while(itr.hasNext()) {
-			ProvGraphEdge edge = itr.next();
+		Map<ProvGraphEdge,Void> edges = provGraph.getEdges();
+		for(ProvGraphEdge edge : edges.keySet()) {
 			graph.addEdge(edge, edge.getSource(), edge.getSink());
 		}
 		
 		// layout graph and copy values into nodes
-		DAGLayout<ProvGraphNode, ProvGraphEdge> dagLayout = new DAGLayout<ProvGraphNode, ProvGraphEdge>(graph);		
-		Set<ProvGraphNode> nodes = provGraph.getNodes();
-		Iterator<ProvGraphNode> nodeItr = nodes.iterator();
-		while(nodeItr.hasNext()) {
-			ProvGraphNode node = nodeItr.next();			
+		DAGLayout<ProvGraphNode, ProvGraphEdge> dagLayout = new DAGLayout<ProvGraphNode, ProvGraphEdge>(graph);
+		dagLayout.setSize(new Dimension(200, 250));
+		Map<ProvGraphNode,Void> nodes = provGraph.getNodes();
+		for(ProvGraphNode node : nodes.keySet()) {			
 			Point2D pt = dagLayout.transform(node);
 			node.setxPos(pt.getX());
 			node.setyPos(pt.getY());

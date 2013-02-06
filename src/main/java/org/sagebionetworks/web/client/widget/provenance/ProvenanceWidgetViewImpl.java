@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -113,18 +114,15 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		
 		if(graph != null) {
 			// add nodes to graph
-			Set<ProvGraphNode> nodes = graph.getNodes();
-			Iterator<ProvGraphNode> itrN = nodes.iterator();
-			while(itrN.hasNext()) {
-				prov.add(getNodeContainer(itrN.next()));
+			Map<ProvGraphNode,Void> nodes = graph.getNodes();
+			for(ProvGraphNode node : nodes.keySet()) {			
+				prov.add(getNodeContainer(node));
 			}
 			
 			// make connections (assure DOM elements are in before asking jsPlumb to connect them)
-			Set<ProvGraphEdge> edges = graph.getEdges();
-			Iterator<ProvGraphEdge> itrE = edges.iterator();
-			while(itrE.hasNext()) {
-				ProvGraphEdge edge = itrE.next();
-				connect(edge.getSource().getId(), edge.getSink().getId());
+			Map<ProvGraphEdge,Void> edges = graph.getEdges();
+			for(ProvGraphEdge edge : edges.keySet()) {
+				//connect(edge.getSource().getId(), edge.getSink().getId());
 			}
 		}
 		

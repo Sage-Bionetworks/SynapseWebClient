@@ -44,6 +44,8 @@ public class ProvUtils {
 			Map<Reference, EntityHeader> refToHeader, boolean showExpand,
 			SynapseJSNIUtils synapseJSNIUtils) {
 		ProvGraph graph = new ProvGraph();
+		
+		// maps for local building retrieval
 		Map<Reference,EntityGraphNode> entityNodes = new HashMap<Reference,EntityGraphNode>();
 		Map<Activity,ActivityGraphNode> activityNodes = new HashMap<Activity,ActivityGraphNode>();
 		
@@ -57,6 +59,7 @@ public class ProvUtils {
 					header.getVersionNumber(), header.getType(), false);
 			idToNode.put(entityNode.getId(), entityNode);
 			graph.addNode(entityNode);
+			entityNodes.put(ref, entityNode);
 		}
 		
 		// create ProvGraphNodes for the activities
@@ -71,6 +74,7 @@ public class ProvUtils {
 						type);			
 			idToNode.put(activityNode.getId(), activityNode);
 			graph.addNode(activityNode);
+			activityNodes.put(act, activityNode);
 			
 			// add used edges
 			if(act.getUsed() != null) {

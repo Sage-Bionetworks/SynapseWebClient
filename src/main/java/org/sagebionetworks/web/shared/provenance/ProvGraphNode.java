@@ -27,9 +27,9 @@ public abstract class ProvGraphNode implements IsSerializable {
 		final int prime = 31;
 		int result = 1;
 		long temp;
-		temp = Double.doubleToLongBits(xPos);
+		temp = Double.toString(xPos).hashCode();
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(yPos);
+		temp = Double.toString(yPos).hashCode();
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
@@ -43,11 +43,11 @@ public abstract class ProvGraphNode implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ProvGraphNode other = (ProvGraphNode) obj;
-		if (Double.doubleToLongBits(xPos) != Double
-				.doubleToLongBits(other.xPos))
+		if (!Double.toString(xPos).equals(Double
+				.toString(other.xPos)))
 			return false;
-		if (Double.doubleToLongBits(yPos) != Double
-				.doubleToLongBits(other.yPos))
+		if (!Double.toString(yPos).equals(Double
+				.toString(other.yPos)))
 			return false;
 		return true;
 	}
