@@ -43,8 +43,6 @@ public class ServerMarkdownUtils {
 		ServerMarkdownUtils.sendAllLinksToNewWindow(doc);
 		Elements anchors = doc.getElementsByTag("a");
 		anchors.addClass("link");
-		//suppress html tags associated with code injection and cross-site scripting
-		removePotentiallyDangerousTags(doc);
 		
 		//TODO: remove old attachment image syntax support (now that we have widgets)?
 		ServerMarkdownUtils.resolveAttachmentImages(doc, attachmentUrl);
@@ -55,22 +53,6 @@ public class ServerMarkdownUtils {
 		return returnHtml;
 	}
 
-	public static void removePotentiallyDangerousTags(Document doc){
-		removeAll(doc, "object");
-		removeAll(doc, "script");
-		removeAll(doc, "applet");
-		removeAll(doc, "embed");
-		removeAll(doc, "form");
-	}
-	
-	public static void removeAll(Document doc, String tagName){
-		Elements elements = doc.getElementsByTag(tagName);
-		for (int i = 0; i < elements.size(); i++) {
-			elements.get(i).remove();
-		}
-		
-	}
-	
 	public static void sendAllLinksToNewWindow(Document doc) {
 		Elements elements = doc.getElementsByTag("a");
 		elements.attr("target", "_blank");
