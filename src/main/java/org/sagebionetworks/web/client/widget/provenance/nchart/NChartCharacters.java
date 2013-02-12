@@ -1,17 +1,7 @@
 package org.sagebionetworks.web.client.widget.provenance.nchart;
 
-import com.google.gwt.core.client.JavaScriptObject;
+public interface NChartCharacters {
 
-public class NChartCharacters extends JavaScriptObject {
-
-	protected NChartCharacters() { }
+	public void addCharacter(String characterId);
 	
-	public static NChartCharacters newInstance() {
-		return (NChartCharacters) JavaScriptObject.createObject();
-	}
-	
-	public final native void addCharacter(String characterId) /*-{
-		this[characterId] = {color:'#ffffff'};
-	}-*/;
-
 }

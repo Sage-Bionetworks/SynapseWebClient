@@ -1,17 +1,9 @@
 package org.sagebionetworks.web.client.widget.provenance.nchart;
 
-import com.google.gwt.core.client.JavaScriptObject;
+public interface XYPoint {
 
-/**
- * Overlay type for dimension
- * @author dburdick
- *
- */
-public class XYPoint extends JavaScriptObject {
+	public int getX();
 	
-	protected XYPoint() { }
+	public int getY();
 	
-	public final native int getX() /*-{ return this.x }-*/;
-	
-	public final native int getY() /*-{ return this.y }-*/;
 }

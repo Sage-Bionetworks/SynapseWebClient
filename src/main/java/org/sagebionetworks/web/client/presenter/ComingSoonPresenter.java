@@ -5,14 +5,16 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
+import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
+import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartUtil;
 import org.sagebionetworks.web.client.widget.provenance.nchart.XYPoint;
@@ -24,8 +26,6 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -38,17 +38,25 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	LayoutServiceAsync layoutService;
+	JsoProvider jsoProvider;
+	SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public ComingSoonPresenter(ComingSoonView view,
 			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, LayoutServiceAsync layoutService) {
+			SynapseClientAsync synapseClient,
+			NodeModelCreator nodeModelCreator,
+			LayoutServiceAsync layoutService,
+			JsoProvider jsoProvider,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.layoutService = layoutService;
-
+		this.jsoProvider = jsoProvider;
+		this.jsniUtils = jsniUtils;
+		
 		view.setPresenter(this);
 	}
 
@@ -82,13 +90,13 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		graphNodes.add(d3);
 		graphNodes.add(d4);
 		graphNodes.add(a);
-		NChartCharacters characters = NChartUtil.createNChartCharacters(graphNodes);
+		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graphNodes);
 		
 		// create NChart nodes for each entity individually
-		NChartLayerNode lnD1 = NChartUtil.createEntityLayerNode(d1);
-		NChartLayerNode lnD2 = NChartUtil.createEntityLayerNode(d2);
-		NChartLayerNode lnD3 = NChartUtil.createEntityLayerNode(d3);
-		NChartLayerNode lnD4 = NChartUtil.createEntityLayerNode(d4);
+		NChartLayerNode lnD1 = NChartUtil.createEntityLayerNode(jsoProvider, d1);
+		NChartLayerNode lnD2 = NChartUtil.createEntityLayerNode(jsoProvider, d2);
+		NChartLayerNode lnD3 = NChartUtil.createEntityLayerNode(jsoProvider, d3);
+		NChartLayerNode lnD4 = NChartUtil.createEntityLayerNode(jsoProvider, d4);
 		
 		// create NChart nodes for each activity with their connected nodes
 		List<ProvGraphNode> aConnectedNodes = new ArrayList<ProvGraphNode>();
@@ -96,7 +104,7 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		aConnectedNodes.add(d2);
 		aConnectedNodes.add(d3);
 		aConnectedNodes.add(d4);
-		NChartLayerNode lnA = NChartUtil.createActivityLayerNode(a, aConnectedNodes);		
+		NChartLayerNode lnA = NChartUtil.createActivityLayerNode(jsoProvider, a, aConnectedNodes);		
 				
 		// define NChart layers
 		List<NChartLayer> layers = new ArrayList<NChartLayer>();
@@ -106,24 +114,32 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		layerNodes = new ArrayList<NChartLayerNode>();
 		layerNodes.add(lnD1);
 		layerNodes.add(lnD2);
-		layer = NChartLayer.newInstance(layerNodes, 10);
+		layer = jsoProvider.newNChartLayer();
+		layer.setDuration(10);
+		layer.setNodes(layerNodes);
 		layers.add(layer);
 		// 1 - activity
 		layerNodes = new ArrayList<NChartLayerNode>();
 		layerNodes.add(lnA);
-		layer = NChartLayer.newInstance(layerNodes, 10);
+		layer = jsoProvider.newNChartLayer();
+		layer.setDuration(10);
+		layer.setNodes(layerNodes);
 		layers.add(layer);
 		// 2 outputs
 		layerNodes = new ArrayList<NChartLayerNode>();
 		layerNodes.add(lnD3);
 		layerNodes.add(lnD4);
-		layer = NChartLayer.newInstance(layerNodes, 10);
+		layer = jsoProvider.newNChartLayer();
+		layer.setDuration(10);
+		layer.setNodes(layerNodes);
 		layers.add(layer);	
 		
 		// form array
-		NChartLayersArray ncLayersArray = NChartLayersArray.newInstance(layers);
-		LayoutResult result = NChartUtil.layoutGraph(ncLayersArray, characters);
+		NChartLayersArray ncLayersArray = jsoProvider.newNChartLayersArray();
+		ncLayersArray.setLayers(layers);		
+		LayoutResult result = jsniUtils.nChartlayout(ncLayersArray, characters);
 				
+		// TODO : translate LayoutResult back into the ProvGraph 
 		String s = "";
 		for(ProvGraphNode n : graphNodes) {
 			String id = n.getId();
