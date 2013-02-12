@@ -128,7 +128,7 @@ public class APITableWidgetTest {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 		
 		widget.configure(testWikiKey, descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 	}
 	
 	@Test

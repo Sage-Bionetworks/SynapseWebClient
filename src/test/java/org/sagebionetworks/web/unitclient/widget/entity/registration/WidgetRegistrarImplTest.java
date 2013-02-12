@@ -76,7 +76,7 @@ public class WidgetRegistrarImplTest {
 	@Test
 	public void testGetWidgetDescriptorNoParams() throws JSONObjectAdapterException {
 		//from MD representation, verify that various widget descriptors can be constructed
-		widgetRegistrar.getWidgetDescriptorFromDecoded(WidgetConstants.TOC_CONTENT_TYPE);
+		widgetRegistrar.getWidgetDescriptor(WidgetConstants.TOC_CONTENT_TYPE);
 	}
 	
 	@Test
@@ -86,7 +86,7 @@ public class WidgetRegistrarImplTest {
 		String actualResult = widgetRegistrar.getMDRepresentation(WidgetConstants.IMAGE_CONTENT_TYPE, testImageWidgetDescriptor);
 		//there's a single key/value pair, so there isn't an ordering problem in this test.  If another key/value were added to the Image WidgetDescriptor, 
 		//then this equality test would be fragile (since the keys are not necessarily in order)
-		Assert.assertEquals(WidgetConstants.IMAGE_CONTENT_TYPE+"?fileName="+aTestFilename, actualResult);
+		Assert.assertEquals(WidgetConstants.IMAGE_CONTENT_TYPE+"?fileName=getMDRepresentationDecodedTest%2Epng", actualResult);
 	}
 	
 	@Test
