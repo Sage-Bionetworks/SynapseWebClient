@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -20,7 +21,7 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 	}		
 
 	@Override
-	public void configure(String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
 		String provEntityId = descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY);
 		

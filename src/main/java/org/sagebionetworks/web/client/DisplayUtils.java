@@ -31,9 +31,7 @@ import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -47,6 +45,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
@@ -78,7 +77,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -151,6 +149,11 @@ public class DisplayUtils {
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
+	public static final String WIKI_OWNER_ID_PARAM_KEY = "ownerId";
+	public static final String WIKI_OWNER_TYPE_PARAM_KEY = "ownerType";
+	public static final String WIKI_ID_PARAM_KEY = "wikiId";
+	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
+	public static final String WIKI_PREVIEW_PARAM_KEY = "preview";
 	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
 	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
@@ -620,6 +623,10 @@ public class DisplayUtils {
 		return dt.toDate();
 	}
 	
+	public static String getSynapseWikiHistoryToken(String ownerId, String objectType, String wikiPageId) {
+		Wiki place = new Wiki(ownerId, objectType, wikiPageId);
+		return "#" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
+	}
 	
 	public static String getSynapseHistoryToken(String entityId) {
 		return "#" + getSynapseHistoryTokenNoHash(entityId, null);
@@ -658,6 +665,13 @@ public class DisplayUtils {
 		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
 		return fullPlaceName;
 	}
+	
+	private static String getWikiPlaceString(Class<Wiki> place) {
+		String fullPlaceName = place.getName();		
+		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
+		return fullPlaceName;
+	}
+
 
 	/**
 	 * Returns the offending character given a regex string
@@ -1236,7 +1250,7 @@ public class DisplayUtils {
 		});
 		return uploadButton;
 	}
-	
+
 	/**
 	 * Provides same functionality as java.util.Pattern.quote().
 	 * @param pattern

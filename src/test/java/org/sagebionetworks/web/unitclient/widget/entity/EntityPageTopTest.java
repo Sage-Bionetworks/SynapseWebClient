@@ -1,11 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -13,9 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -26,7 +20,6 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -37,13 +30,9 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.HTMLPanel;
 
 public class EntityPageTopTest {
 
@@ -102,47 +91,6 @@ public class EntityPageTopTest {
 		entity.setAttachments(entityAttachments);
 		when(mockJsonObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
-		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(anyString(), anyString(), any(Map.class))).thenReturn(testWidgetRenderer);
+		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class))).thenReturn(testWidgetRenderer);
 	}
-
-	@Test
-	public void testMarkdownToHtmlWiring() {
-		final String testHtml = "<h1>HTML Returns</h1>";
-		final String testMarkdown = "HTML Returns\n----------";
-		AsyncMockStubber
-				.callSuccessWith(testHtml)
-				.when(mockSynapseClient)
-				.markdown2Html(any(String.class), any(String.class), any(Boolean.class),
-						any(AsyncCallback.class));
-		AsyncCallback<String> callback = new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				assertEquals("unexpected markdown to html conversion",
-						testHtml, result);
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				fail("unexpected failure in test: " + caught.getMessage());
-			}
-		};
-		pageTop.getHtmlFromMarkdown(testMarkdown, "", callback);
-
-		verify(mockSynapseClient).markdown2Html(any(String.class),
-				any(String.class), any(Boolean.class), any(AsyncCallback.class));
-	}
-	
-	@Test
-	@Ignore //ignoring due to GWT.create() failure when mocking HTMLPanel
-	public void testLoadWidgets() throws Exception{
-		HTMLPanel htmlPanel = Mockito.mock(HTMLPanel.class);
-		Element testElement = DOM.createDiv();
-		when(htmlPanel.getElementById(anyString())).thenReturn(testElement);
-		EntityBundle bundle = new EntityBundle(entity, null, null, null, null, null, null);
-		ExampleEntity entity = new ExampleEntity();
-		bundle.setEntity(entity);
-		pageTop.setBundle(bundle, false);
-		pageTop.loadWidgets(htmlPanel);
-	}
-
 }

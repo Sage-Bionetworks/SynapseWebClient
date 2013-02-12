@@ -463,7 +463,7 @@ a.shortBtn {
 	margin-left: 5px;
 }
 .margin-top-5 {
-	margin-top: 5px;
+	margin-top: 5px !important;
 }
 .margin-top-10 {
 	margin-top: 10px;
@@ -473,10 +473,17 @@ a.shortBtn {
 	margin-left: 180px;
 }
 
+.margin-left-490 {
+	margin-left: 490px;
+}
+
+
 .margin-bottom-40 {
 	margin-bottom: 40px;
 }
-
+.margin-bottom-10 {
+	margin-bottom: 10px;
+}
 
 .margin-left-725 {
 	margin-left: 725px;
@@ -484,6 +491,7 @@ a.shortBtn {
 .markdown {
 	word-wrap:break-word;
 	overflow: hidden;
+	text-align: justify;
 }
 
 .markdown ol { 
@@ -534,6 +542,12 @@ a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
 .inline-block {
 	display:inline-block;
 }
+
+.font-size-32 {
+	font-size: 32px;
+	font-family: Yanone Kaffeesatz;
+}
+
 
 .vertical-align-bottom {
 	vertical-align: bottom;
@@ -681,7 +695,17 @@ h1, h2, h3, h4, h5, h6 {
 .image{
 	max-width: 940px;
 }
+
+.wikifilepreview {
+	width: 940px;
+}
+
 /**********************************/
+
+.wikifilepreviewimg {
+	margin:auto; 
+	display:block;
+}
 	
 .whiteBackground {
 	background-color: #fff;
@@ -707,4 +731,27 @@ h1, h2, h3, h4, h5, h6 {
 	text-decoration:none; 
 }
 
-	
+
+
+.gwt-TreeItem-selected {
+  background: #ffffff !important;
+  text-decoration:underline;
+}
+
+/**table of contents styling **/
+/** .8em to 1.2em **/
+.toc-small {
+	font-size: .8em;
+}
+.toc-h1 {
+	font-size: 1.2em;
+}
+.toc-h2 {
+	font-size: 1.1em;
+}
+.toc-h3 {
+	font-size: 1.0em;
+}
+.toc-h4 {
+	font-size: 0.9em;
+}	

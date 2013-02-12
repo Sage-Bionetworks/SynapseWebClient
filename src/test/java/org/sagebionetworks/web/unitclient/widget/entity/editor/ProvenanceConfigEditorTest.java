@@ -12,11 +12,13 @@ import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class ProvenanceConfigEditorTest {
 		
 	ProvenanceConfigEditor editor;
 	ProvenanceConfigView mockView;
+	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
 	
 	@Before
 	public void setup(){
@@ -38,7 +40,7 @@ public class ProvenanceConfigEditorTest {
 		descriptor.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, d);
 		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY, entityToGraph);
 		descriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, showExpand);
-		editor.configure("", descriptor);
+		editor.configure(wikiKey, descriptor);
 		verify(mockView).setEntityId(eq(entityToGraph));
 		verify(mockView).setIsExpanded(eq(Boolean.valueOf(showExpand)));
 		verify(mockView).setDepth(eq(Long.parseLong(d)));

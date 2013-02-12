@@ -1,18 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import java.util.Iterator;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -20,44 +13,19 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	
 	private ImageWidgetView view;
 	private Map<String,String> descriptor;
-	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	
 	@Inject
-	public ImageWidget(ImageWidgetView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public ImageWidget(ImageWidgetView view) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}
 	
 	@Override
-	public void configure(final String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor) {
+		this.descriptor = widgetDescriptor;
+		view.configure(wikiKey, descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY), descriptor.get(WidgetConstants.IMAGE_WIDGET_WIDTH_KEY), descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
-			@Override
-			public void onSuccess(EntityWrapper result) {
-				Entity entity;
-				try {
-					entity = nodeModelCreator.createEntity(result);
-					if (entity.getAttachments() != null && entity.getAttachments().size() > 0) {
-						for (Iterator iterator = entity.getAttachments().iterator(); iterator
-								.hasNext();) {
-							AttachmentData data = (AttachmentData) iterator.next();
-							if (descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY).equals(data.getName()))
-								view.configure(entityId, data, descriptor.get(WidgetConstants.IMAGE_WIDGET_WIDTH_KEY));				
-						}
-					}
-				} catch (JSONObjectAdapterException e) {
-//					view.showError(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION); 
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-//				view.showError(caught.getMessage());
-			}			
-		});
 	}
 	
 	@SuppressWarnings("unchecked")
