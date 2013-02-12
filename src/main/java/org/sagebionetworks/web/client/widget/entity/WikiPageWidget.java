@@ -48,6 +48,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -411,7 +412,9 @@ public class WikiPageWidget extends LayoutContainer {
         window.setHideOnButtonClick(true);
 
         window.setLayout(new FitLayout());
-	    window.add(wikiAttachments.asWidget());
+        ScrollPanel scrollPanelWrapper = new ScrollPanel();
+        scrollPanelWrapper.add(wikiAttachments.asWidget());
+	    window.add(scrollPanelWrapper);
 	    window.show();		
 	}
 }

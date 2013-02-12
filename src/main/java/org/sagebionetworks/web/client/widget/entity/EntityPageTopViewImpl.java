@@ -421,8 +421,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Add the description body
 	    if(description != null && !("".equals(description))) {
 	    	//TODO: markdown to be removed from entity (and only exist in it's associated wiki)
-	    	lc.add(markdownWidget);
-	    	markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false);
+	    	if (!DisplayUtils.isInTestWebsite(cookies)) {
+	    		lc.add(markdownWidget);
+	    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false);
+	    	}
 	    }
 	    
    		return lc;

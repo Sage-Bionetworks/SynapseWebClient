@@ -42,7 +42,7 @@ import com.google.inject.Inject;
 
 public class WikiAttachmentsViewImpl extends LayoutContainer implements WikiAttachmentsView {
 	
-	private static final int ATTACHMENT_COLUMN_WIDTH_PX = 210;
+	private static final int ATTACHMENT_COLUMN_WIDTH_PX = 380;
 	private static final String LINK_KEY = "link";
 	private static final String ATTACHMENT_FILE_HANDLE_ID_KEY = "fileHandleIdKey";
 	private static final String TOOLTIP_TEXT_KEY = "tooltip";
