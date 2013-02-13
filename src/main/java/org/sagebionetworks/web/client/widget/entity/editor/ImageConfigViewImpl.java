@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -10,6 +9,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -30,26 +30,27 @@ import com.google.inject.Inject;
 public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigView {
 
 	private Presenter presenter;
+	SageImageBundle sageImageBundle;
 	private UploadFormPanel uploadPanel;
-	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private TextField<String> urlField;
 	private TextField<String> nameField;
 	private HorizontalPanel externalLinkPanel;
-	private AttachmentData uploadedAttachmentData;
 	TabItem externalTab,uploadTab;
 	private HTMLPanel uploadStatusPanel;
+	private String uploadedFileHandleName;
 	
 	TabPanel tabPanel;
 	@Inject
-	public ImageConfigViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
-		this.sageImageBundle = sageImageBundle;
+	public ImageConfigViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
 		this.iconsImageBundle = iconsImageBundle;
+		this.sageImageBundle = sageImageBundle;
 	}
 	
 	@Override
 	public void initView() {
 		setLayout(new FitLayout());
+		uploadedFileHandleName = null;
 		VerticalPanel externalLinkPanel = new VerticalPanel();
 		externalLinkPanel.add(getExternalLinkPanel());
 		externalLinkPanel.add(getExternalAltTextPanel());
@@ -73,17 +74,12 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		this.layout(true);
 	}
 	
+	
 	@Override
-	public String getUploadedDataName() {
-		return uploadPanel.getFileUploadField().getValue();
+	public String getUploadedFileHandleName() {
+		return uploadedFileHandleName;
 	}
 
-	@Override
-	public void setUploadedAttachmentData(AttachmentData uploadedAttachmentData) {
-		this.uploadedAttachmentData = uploadedAttachmentData;
-		if (uploadedAttachmentData != null && uploadPanel != null)
-			uploadPanel.getFileUploadField().setEmptyText(uploadedAttachmentData.getName());
-	}
 	private HorizontalPanel getExternalLinkPanel() {
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
@@ -117,20 +113,24 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	}
 	
 	@Override
-	public void setEntityId(String entityId) {
+	public void configure(WikiPageKey wikiKey) {
 		uploadTab.removeAll();
 		//update the uploadPanel
-		uploadPanel = getUploadPanel(entityId);
-		uploadTab.add(uploadPanel);
+		initUploadPanel(wikiKey);
 		
 		this.setHeight(150);
 		this.layout(true);
 	}
 	
-	private UploadFormPanel getUploadPanel(String entityId) {
-		final String baseURl = GWT.getModuleBaseURL()+"attachment";
-		final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + entityId;
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(actionUrl,sageImageBundle,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,25,new AddAttachmentDialog.Callback() {
+	private void initUploadPanel(WikiPageKey wikiKey) {
+		
+		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + DisplayUtils.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+		String baseURl = GWT.getModuleBaseURL()+"filehandle?" +
+				DisplayUtils.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
+				DisplayUtils.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + 
+				wikiIdParam;
+		
+		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, 25, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				if(result != null){
@@ -146,10 +146,11 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 					uploadTab.add(uploadStatusPanel);
 					layout(true);
 				}
-				uploadedAttachmentData = result.getAttachmentData();
+				uploadedFileHandleName = uploadPanel.getFileUploadField().getValue();
 			}
 		}, null);
-		return uploadPanel;
+		uploadTab.add(uploadPanel);
+		layout(true);
 	}
 	
 	@Override
@@ -161,8 +162,8 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 				throw new IllegalArgumentException(nameField.getErrorMessage());
 
 		} else {
-			//attachment must have been uploaded
-			if (uploadedAttachmentData == null)
+			//must have been uploaded
+			if (uploadedFileHandleName == null)
 				throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE);
 		}
 	}

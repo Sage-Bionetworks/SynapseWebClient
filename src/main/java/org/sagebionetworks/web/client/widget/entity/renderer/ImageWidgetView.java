@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -12,7 +12,7 @@ public interface ImageWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(String entityId, AttachmentData uploadedAttachmentData, String explicitWidth);
+	public void configure(WikiPageKey wikiKey, String fileName, String explicitWidth, String alignment);
 	
 	/**
 	 * Presenter interface

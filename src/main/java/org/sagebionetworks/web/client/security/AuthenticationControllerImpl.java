@@ -6,12 +6,10 @@ import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -25,7 +23,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;
 	private NodeModelCreator nodeModelCreator;
-
+	
 	@Inject
 	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, NodeModelCreator nodeModelCreator){
 		this.cookies = cookies;

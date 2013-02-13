@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -20,10 +21,10 @@ public class YouTubeWidget implements YouTubeWidgetView.Presenter, WidgetRendere
 	}
 	
 	@Override
-	public void configure(String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		view.configure(entityId, descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY));
+		view.configure(descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY));
 	}
 	
 	@SuppressWarnings("unchecked")
