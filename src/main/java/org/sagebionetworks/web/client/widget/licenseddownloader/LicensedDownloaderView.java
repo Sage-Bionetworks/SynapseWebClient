@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -19,10 +20,15 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	public void setPresenter(Presenter presenter);
 	
 	/**
+	 *
+	 */
+	public void setRestrictionLevel(RESTRICTION_LEVEL restrictionLevel);
+	
+	/**
 	 * Make the view show the License acceptance view first
 	 * @param licenseRequired
 	 */
-	public void setApprovalRequired(APPROVAL_REQUIRED approvalRequired);
+	public void setApprovalType(APPROVAL_TYPE approvalType);
 	
 	/**
 	 * Set the license text to display
