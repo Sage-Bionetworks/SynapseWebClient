@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
@@ -42,7 +43,8 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.JiraGovernanceConstants;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
@@ -75,7 +77,7 @@ public class LicensedDownloaderTest {
 	Entity parentEntity;
 	UserSessionData user1;
 	LicenseAgreement licenseAgreement;
-	AccessRequirement accessRequirement;
+	List<AccessRequirement> accessRequirements;
 	List<LocationData> locations;	
 	EntityPath entityPath;
 	EntityWrapper StudyEntityWrapper;
@@ -164,7 +166,10 @@ public class LicensedDownloaderTest {
 		licenseAgreement = new LicenseAgreement();		
 		licenseAgreement.setLicenseHtml("some agreement");
 		
-		accessRequirement = new TermsOfUseAccessRequirement();
+		this.accessRequirements = new ArrayList<AccessRequirement>();
+		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
+		accessRequirement.setTermsOfUse("some agreement");
+		accessRequirements.add(accessRequirement);
 		licensedDownloader.setAccessRequirement(accessRequirement);
 
 		// create a DownloadLocation model for this test
@@ -224,7 +229,7 @@ public class LicensedDownloaderTest {
 	@Test 
 	public void testSetLicenseAgreement() {		
 		// test license only
-		licensedDownloader.setLicenseAgreement(licenseAgreement, accessRequirement);				
+		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);				
 		verify(mockView).setLicenseHtml(licenseAgreement.getLicenseHtml());
 		
 		reset(mockView);
@@ -232,7 +237,7 @@ public class LicensedDownloaderTest {
 		// test license and citation
 		String citationHtml = "citation";
 		licenseAgreement.setCitationHtml(citationHtml);
-		licensedDownloader.setLicenseAgreement(licenseAgreement, accessRequirement);
+		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);
 		verify(mockView).setLicenseHtml(licenseAgreement.getLicenseHtml());		
 	}
 	
@@ -241,9 +246,10 @@ public class LicensedDownloaderTest {
 	public void testSetLicenseAccepted() {
 		// without callback
 
-		licensedDownloader.setLicenseAgreement(licenseAgreement, accessRequirement);
+		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);
 		licensedDownloader.setLicenseAccepted();		
-		verify(mockView).setApprovalRequired(APPROVAL_REQUIRED.LICENSE_ACCEPTANCE);
+		verify(mockView).setApprovalType(APPROVAL_TYPE.USER_AGREEMENT);
+		verify(mockView).setRestrictionLevel(RESTRICTION_LEVEL.RESTRICTED);
 
 		// with callback
 		resetMocks();		

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.licenseddownloader;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
@@ -20,7 +21,8 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
@@ -113,31 +115,11 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private void extractBundle(EntityBundle entityBundle, UserProfile userProfile) {
 		Entity entity = entityBundle.getEntity();
 		loadDownloadLocations(entity);		
-		List<AccessRequirement> ars = entityBundle.getUnmetAccessRequirements();
+		List<AccessRequirement> ars = entityBundle.getAccessRequirements();
+		List<AccessRequirement> unmetARs = entityBundle.getUnmetAccessRequirements();
 		this.userProfile = userProfile;
 		// first, clear license agreement.  then, if there is an agreement required, set it below
-		setLicenseAgreement(null, null);
-		for (AccessRequirement ar : ars) {
-			if (ar instanceof TermsOfUseAccessRequirement) {
-				// for tier 2 requirements, set license agreement
-				String touContent = ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
-				LicenseAgreement licenseAgreement = new LicenseAgreement();
-				// TODO support option in which TOU is in a location
-				licenseAgreement.setLicenseHtml(touContent);
-				setLicenseAgreement(licenseAgreement, ar);
-				break;
-			} else if (ar instanceof ACTAccessRequirement) {
-				// for tier 3 requirements, set ACT contact instructions
-				String actContactInfo = ((ACTAccessRequirement)ar).getActContactInfo();
-				LicenseAgreement licenseAgreement = new LicenseAgreement();
-				// TODO support option in which ACT contact info is in a location
-				licenseAgreement.setLicenseHtml(actContactInfo);
-				setLicenseAgreement(licenseAgreement, ar);
-				break;
-		} else {
-			view.showInfo("Error", ar.getClass().toString());
-			}
-		}		
+		setLicenseAgreement(ars, unmetARs);
 	}
 	
 	/**
@@ -200,19 +182,25 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.view.showWindow();
 	}
 	
-	public void setLicenseAgreement(LicenseAgreement agreement, AccessRequirement ar) {
-		accessRequirement = ar;
-		if (agreement != null && accessRequirement!=null) {
-			view.setLicenseHtml(agreement.getLicenseHtml());
-			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
-				this.setRequireApproval(APPROVAL_REQUIRED.LICENSE_ACCEPTANCE);
-			} else if (accessRequirement instanceof ACTAccessRequirement) {
-				this.setRequireApproval(APPROVAL_REQUIRED.ACT_APPROVAL);
+	public void setLicenseAgreement(Collection<AccessRequirement> allARs, Collection<AccessRequirement> unmetARs) {
+		AccessRequirement arToDisplay = GovernanceServiceHelper.selectAccessRequirement(allARs, unmetARs);
+		setRestrictionLevel(GovernanceServiceHelper.entityRestrictionLevel(allARs));
+		setApprovalType(GovernanceServiceHelper.accessRequirementApprovalType(arToDisplay));
+		
+		if (arToDisplay!=null) {
+			String licenseAgreementText = null;
+			if (arToDisplay instanceof TermsOfUseAccessRequirement) {
+				// for tier 2 requirements, set license agreement
+				licenseAgreementText = ((TermsOfUseAccessRequirement)arToDisplay).getTermsOfUse();
+			} else if (arToDisplay instanceof ACTAccessRequirement) {
+				// for tier 3 requirements, set ACT contact instructions
+				licenseAgreementText = ((ACTAccessRequirement)arToDisplay).getActContactInfo();
 			} else {
-				throw new IllegalArgumentException(ar.getClass().toString());
+				view.showInfo("Error", arToDisplay.getClass().toString());
 			}
-		} else {
-			this.setRequireApproval(APPROVAL_REQUIRED.NONE);
+			LicenseAgreement licenseAgreement = new LicenseAgreement();
+			licenseAgreement.setLicenseHtml(licenseAgreementText);
+			view.setLicenseHtml(licenseAgreement.getLicenseHtml());
 		}
 	}
 	
@@ -224,8 +212,12 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		view.clear();
 	}
 	
-	public void setRequireApproval(APPROVAL_REQUIRED licenseApproval) {
-		this.view.setApprovalRequired(licenseApproval);
+	public void setRestrictionLevel(RESTRICTION_LEVEL restrictionLevel) {
+		this.view.setRestrictionLevel(restrictionLevel);
+	}
+	
+	public void setApprovalType(APPROVAL_TYPE approvalType) {
+		this.view.setApprovalType(approvalType);
 	}
 	
 	@Override

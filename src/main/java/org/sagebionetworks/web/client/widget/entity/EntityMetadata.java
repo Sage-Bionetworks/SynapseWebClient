@@ -21,10 +21,11 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.shared.EntityUtil;
@@ -35,7 +36,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -158,10 +158,13 @@ public class EntityMetadata implements Presenter {
 	}
 
 	@Override
-	public APPROVAL_REQUIRED getRestrictionLevel() {
-		if (bundle.getAccessRequirements().size()==0L) return APPROVAL_REQUIRED.NONE;
-		if (isTermsOfUseAccessRequirement()) return APPROVAL_REQUIRED.LICENSE_ACCEPTANCE;
-		return APPROVAL_REQUIRED.ACT_APPROVAL;
+	public RESTRICTION_LEVEL getRestrictionLevel() {
+		return GovernanceServiceHelper.entityRestrictionLevel(bundle.getAccessRequirements());
+	}
+
+	@Override
+	public APPROVAL_TYPE getApprovalType() {
+		return GovernanceServiceHelper.accessRequirementApprovalType(getAccessRequirement());
 	}
 
 	@Override
@@ -176,8 +179,8 @@ public class EntityMetadata implements Presenter {
 
 	@Override
 	public String accessRequirementText() {
-		if (bundle.getAccessRequirements().size()==0) throw new IllegalStateException("There is no access requirement.");
-		AccessRequirement ar = bundle.getAccessRequirements().get(0);
+		AccessRequirement ar = getAccessRequirement();
+		if (ar==null) throw new IllegalStateException("There is no access requirement.");
 		if (ar instanceof TermsOfUseAccessRequirement) {
 			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
 		} else if (ar instanceof ACTAccessRequirement) {
@@ -188,13 +191,13 @@ public class EntityMetadata implements Presenter {
 	}
 	
 	private AccessRequirement getAccessRequirement() {
-		return bundle.getAccessRequirements().get(0);
+		return GovernanceServiceHelper.selectAccessRequirement(bundle.getAccessRequirements(), bundle.getUnmetAccessRequirements());
 	}
 
 	@Override
 	public boolean isTermsOfUseAccessRequirement() {
-		if (bundle.getAccessRequirements().size()==0) throw new IllegalStateException("There is no access requirement.");
 		AccessRequirement ar = getAccessRequirement();
+		if (ar==null) throw new IllegalStateException("There is no access requirement.");
 		if (ar instanceof TermsOfUseAccessRequirement) {
 			return true;		
 		} else {
