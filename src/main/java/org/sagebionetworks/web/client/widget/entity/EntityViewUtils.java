@@ -1,61 +1,46 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
-import org.sagebionetworks.web.shared.users.AclUtils;
 
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.ColumnLayout;
-import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class EntityViewUtils {
 
-	public static String restrictionDescriptor(APPROVAL_REQUIRED restrictionLevel) {
+	public static String restrictionDescriptor(RESTRICTION_LEVEL restrictionLevel) {
 		switch (restrictionLevel) {
-		case NONE:
+		case OPEN:
 			return DisplayConstants.OPEN;
-		case LICENSE_ACCEPTANCE:
+		case RESTRICTED:
 			return DisplayConstants.RESTRICTED;
-		case ACT_APPROVAL:
+		case CONTROLLED:
 			return DisplayConstants.CONTROLLED;
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}
 	}
 	
-	public static String shieldStyleName(APPROVAL_REQUIRED restrictionLevel) {
+	public static String shieldStyleName(RESTRICTION_LEVEL restrictionLevel) {
 		switch (restrictionLevel) {
-		case NONE:
+		case OPEN:
 			return "green-shield";
-		case LICENSE_ACCEPTANCE:
+		case RESTRICTED:
 			return "yellow-shield";
-		case ACT_APPROVAL:
+		case CONTROLLED:
 			return "red-shield";
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
@@ -71,7 +56,8 @@ public class EntityViewUtils {
 			final Callback requestACTCallback,
 			final Callback imposeRestrictionsCallback,
 			final Callback loginCallback,
-			final APPROVAL_REQUIRED restrictionLevel, 
+			final RESTRICTION_LEVEL restrictionLevel, 
+			final APPROVAL_TYPE approvalType,
 			final boolean hasFulfilledAccessRequirements,
 			final IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
@@ -98,7 +84,7 @@ public class EntityViewUtils {
 		lc.add(div);
 		shb = new SafeHtmlBuilder();
 		String infoHyperlinkText = DisplayConstants.INFO;
-		if (restrictionLevel==APPROVAL_REQUIRED.NONE) { // OPEN data
+		if (restrictionLevel==RESTRICTION_LEVEL.OPEN) { // OPEN data
 			if (hasAdministrativeAccess) {
 				infoHyperlinkText=DisplayConstants.MODIFY;
 			} // else default to 'info', i.e. you can find out details, but can't change anything
@@ -117,6 +103,7 @@ public class EntityViewUtils {
 			public void onClick(ClickEvent event) {
 				GovernanceDialogHelper.showAccessRequirement(
 						restrictionLevel,
+						approvalType,
 						isAnonymous,
 						hasAdministrativeAccess,
 						hasFulfilledAccessRequirements,
