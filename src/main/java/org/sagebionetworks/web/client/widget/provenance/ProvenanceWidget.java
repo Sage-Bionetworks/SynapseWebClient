@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,9 +22,14 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
+import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
+import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
+import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
+import org.sagebionetworks.web.client.widget.provenance.nchart.NChartUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -49,6 +55,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private AdapterFactory adapterFactory;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private Map<String, String> descriptor;
+	private JsoProvider jsoProvider;
 	
 
 	private interface ProcessCallback {
@@ -60,6 +67,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	Set<Activity> activitiesToProcess = new HashSet<Activity>();
 	Set<Reference> refToProcess = new HashSet<Reference>();
 	Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
+	Set<Reference> startRefs;
 	boolean showExpand;
 	int maxDepth = 1; 
 
@@ -70,7 +78,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			AuthenticationController authenticationController, 
 			LayoutServiceAsync layoutService, 
 			AdapterFactory adapterFactory,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			JsoProvider jsoProvider) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -79,6 +88,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		this.layoutService = layoutService;
 		this.adapterFactory = adapterFactory;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.jsoProvider = jsoProvider;
 		view.setPresenter(this);
 	}	
 	
@@ -92,21 +102,42 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		showExpand = descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY)) : false;
 		Reference startRef = new Reference();
 		startRef.setTargetId(entityId);
-		startRef.setTargetVersionNumber(versionNumber);		
-
-		// call processUsed with depth 0 to start graph creation
-		processUsed(startRef, 0, new ProcessCallback() {			
+		startRef.setTargetVersionNumber(versionNumber);
+		
+		startRefs = new HashSet<Reference>();
+		startRefs.add(startRef);
+		Reference syn3562 = new Reference();
+		syn3562.setTargetId("syn3562");
+		syn3562.setTargetVersionNumber(1L);
+		//startRefs.add(syn3562);
+		
+		List<Reference> list = new ArrayList<Reference>(startRefs);
+		final ProcessCallback doneCallback = new ProcessCallback() {			
 			@Override
-			public void onComplete() {
-				// TODO : 
+			public void onComplete() { 
 				lookupReferencesThenBuildGraph();
-				// layout graph
-				// send to view				
+			}
+		};
+		// call processUsed for each starting node with depth 0 to start graph creation
+		final int maxIdx = list.size()-1;
+		final int thisIdx = 0;
+		run(list, thisIdx, maxIdx, doneCallback);
+		
+	}
+
+	private void run(final List<Reference> list, final int thisIdx, final int maxIdx, final ProcessCallback doneCallback) {	
+		processUsed(list.get(thisIdx), 0, new ProcessCallback() {				
+			@Override
+			public void onComplete() {				
+				if(thisIdx == maxIdx) {
+					doneCallback.onComplete();
+				} else {
+					run(list, thisIdx+1, maxIdx, doneCallback);
+				}
 			}
 		});
-
 	}
-	
+
 	public void setHeight(int height) {
 		view.setHeight(height);
 	}
@@ -266,7 +297,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 					try {
 						headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
 						refToHeader = ProvUtils.mapReferencesToHeaders(headers);
-						buildGraphThenLayout();
+						buildGraphLayoutSendToView();
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
@@ -274,7 +305,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				
 				@Override
 				public void onFailure(Throwable caught) {					
-					buildGraphThenLayout();
+					buildGraphLayoutSendToView();
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
@@ -283,28 +314,18 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}
 
 	
-	private void buildGraphThenLayout() {
+	private void buildGraphLayoutSendToView() {
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvGraphNode>();
 
-		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, synapseJSNIUtils);					
-		layoutGraphThenSendToView(graph);
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, synapseJSNIUtils, startRefs);					
+
+		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());
+		NChartLayersArray layerArray = NChartUtil.createLayers(jsoProvider, graph);
+		LayoutResult layoutResult = synapseJSNIUtils.nChartlayout(layerArray, characters);
+		NChartUtil.fillPositions(layoutResult, graph);
+		view.setGraph(graph);
 	}
 
-	private void layoutGraphThenSendToView(ProvGraph graph) {
-		// layout tree
-		layoutService.dagLayout(graph, new AsyncCallback<ProvGraph>() {
-			
-			@Override
-			public void onSuccess(ProvGraph graphLayedOut) {
-				view.setGraph(graphLayedOut);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_LAYOUT);
-			}
-		});
-	}
 
 }

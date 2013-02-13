@@ -42,7 +42,7 @@ public class ProvUtils {
 			Map<String, Activity> processedActivities,
 			Map<String, ProvGraphNode> idToNode,
 			Map<Reference, EntityHeader> refToHeader, boolean showExpand,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils, Set<Reference> startRefs) {
 		ProvGraph graph = new ProvGraph();
 		
 		// maps for local building retrieval
@@ -53,10 +53,11 @@ public class ProvUtils {
 		for(Reference ref : refToHeader.keySet()) {
 			EntityHeader header = refToHeader.get(ref);
 			if(header == null) header = new EntityHeader();
+			boolean isStartNode = startRefs.contains(ref) ? true : false;
 			EntityGraphNode entityNode = new EntityGraphNode(createUniqueNodeId(
 					idToNode, synapseJSNIUtils), ref.getTargetId(),
 					header.getName(), header.getVersionLabel(),
-					header.getVersionNumber(), header.getType(), false);
+					header.getVersionNumber(), header.getType(), false, isStartNode);
 			idToNode.put(entityNode.getId(), entityNode);
 			graph.addNode(entityNode);
 			entityNodes.put(ref, entityNode);
@@ -71,7 +72,8 @@ public class ProvUtils {
 						createUniqueNodeId(idToNode, synapseJSNIUtils), 
 						act.getId(),
 						act.getName(), 
-						type);			
+						type,
+						false);			
 			idToNode.put(activityNode.getId(), activityNode);
 			graph.addNode(activityNode);
 			activityNodes.put(act, activityNode);

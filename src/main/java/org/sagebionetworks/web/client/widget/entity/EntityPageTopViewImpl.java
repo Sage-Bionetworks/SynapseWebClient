@@ -383,7 +383,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if(bundle.getEntity() instanceof Versionable) 
 			configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_VERSION_NUMBER_KEY, Long.toString(((Versionable)bundle.getEntity()).getVersionNumber()));
 		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(false));
-		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
+		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(3));		
 	    provenanceWidget.configure(bundle.getEntity().getId(), configMap);
 	    LayoutContainer border = new LayoutContainer();
 	    border.setBorders(true);	    

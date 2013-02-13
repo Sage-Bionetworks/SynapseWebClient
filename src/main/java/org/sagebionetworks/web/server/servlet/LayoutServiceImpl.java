@@ -105,33 +105,7 @@ public class LayoutServiceImpl extends RemoteServiceServlet implements LayoutSer
 			transferTreeProcessNode(tree, child);
 		}
 	}
-
 	
-	
-	/*
-	 * DAG Layout for ProvGraph
-	 */	
-	@Override
-	public ProvGraph dagLayout(ProvGraph provGraph) {
-		// convert provGraph into JUNG dag graph
-		DirectedGraph<ProvGraphNode, ProvGraphEdge> graph = new DirectedSparseGraph<ProvGraphNode, ProvGraphEdge>();
-		Map<ProvGraphEdge,Void> edges = provGraph.getEdges();
-		for(ProvGraphEdge edge : edges.keySet()) {
-			graph.addEdge(edge, edge.getSource(), edge.getSink());
-		}
-		
-		// layout graph and copy values into nodes
-		DAGLayout<ProvGraphNode, ProvGraphEdge> dagLayout = new DAGLayout<ProvGraphNode, ProvGraphEdge>(graph);
-		dagLayout.setSize(new Dimension(200, 250));
-		Map<ProvGraphNode,Void> nodes = provGraph.getNodes();
-		for(ProvGraphNode node : nodes.keySet()) {			
-			Point2D pt = dagLayout.transform(node);
-			node.setxPos(pt.getX());
-			node.setyPos(pt.getY());
-		}
-		return provGraph;
-	}
-
 }
 
 

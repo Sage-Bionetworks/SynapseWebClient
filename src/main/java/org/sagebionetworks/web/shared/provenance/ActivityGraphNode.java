@@ -16,17 +16,18 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 
 	public ActivityGraphNode() {	}
 	
-	public ActivityGraphNode(String id, String activityId, String activityName, ActivityType type) {
+	public ActivityGraphNode(String id, String activityId, String activityName, ActivityType type, Boolean startingNode) {
 		super();
 		this.id = id;
 		this.activityId = activityId;
 		this.activityName = activityName;
 		this.type = type;
+		this.setStartingNode(startingNode);
 	}
 	
 	// deprecated
 	public ActivityGraphNode(String id, String activityId, String activityName, ActivityType type, String subEntityId, String subName,
-			String subVersionLabel, Long subVersionNumber, String subEntityType) {
+			String subVersionLabel, Long subVersionNumber, String subEntityType, Boolean startingNode) {
 		super();
 		this.id = id;
 		this.activityId = activityId;
@@ -37,6 +38,7 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 		this.subVersionLabel = subVersionLabel;
 		this.subVersionNumber = subVersionNumber;
 		this.subEntityType = subEntityType;
+		this.setStartingNode(startingNode);
 	}
 
 	@Override

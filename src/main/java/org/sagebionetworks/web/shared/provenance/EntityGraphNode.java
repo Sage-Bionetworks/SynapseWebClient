@@ -17,7 +17,7 @@ public class EntityGraphNode extends ProvGraphNode implements IsSerializable {
 
 	public EntityGraphNode(String id, String entityId, String name,
 			String versionLabel, Long versionNumber, String entityType,
-			Boolean wasExecuted) {
+			Boolean wasExecuted, Boolean startingNode) {
 		super();
 		this.id = id;
 		this.entityId = entityId;
@@ -26,6 +26,7 @@ public class EntityGraphNode extends ProvGraphNode implements IsSerializable {
 		this.versionNumber = versionNumber;
 		this.entityType = entityType;
 		this.wasExecuted = wasExecuted;
+		this.setStartingNode(startingNode);
 	}
 
 	public String getId() {

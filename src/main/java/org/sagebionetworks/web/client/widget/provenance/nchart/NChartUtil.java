@@ -1,26 +1,142 @@
 package org.sagebionetworks.web.client.widget.provenance.nchart;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ProvGraph;
+import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
 
 public class NChartUtil {
 
 	private static final int DEFULT_DURATION = 10;
+
+	
+	
+	public static NChartLayersArray createLayers(JsoProvider jsoProvider, ProvGraph graph) {
+		Map<ProvGraphNode,Integer> nodeToLayer = new HashMap<ProvGraphNode, Integer>();	
+		
+		// identify start nodes
+		List<ProvGraphNode> startNodes = new ArrayList<ProvGraphNode>();
+		for(ProvGraphNode n : graph.getNodes()) {
+			if(n.isStartingNode()) startNodes.add(n);			
+		} 
+				
+		// depth first traverse graph for each start node. Prioritize deeper placement in layers
+		for(ProvGraphNode startNode : startNodes) {
+			processLayer(0, startNode, nodeToLayer, graph);
+		}
+		
+		// build reverse lookup
+		int maxLayer = 0;
+		Map<Integer,List<ProvGraphNode>> layerToNode = new HashMap<Integer,List<ProvGraphNode>>();
+		for(ProvGraphNode node : nodeToLayer.keySet()) {
+			int layer = nodeToLayer.get(node);
+			if(layer > maxLayer) maxLayer = layer;
+			if(!layerToNode.containsKey(layer)) layerToNode.put(layer, new ArrayList<ProvGraphNode>());
+			layerToNode.get(layer).add(node);
+		}
+		
+		// build layers in order
+		List<NChartLayer> layers = new ArrayList<NChartLayer>();
+		for(int i=0; i<=maxLayer; i++) {
+			List<NChartLayerNode> layerNodes = new ArrayList<NChartLayerNode>();
+			// process ProvGraphNodes into a list of NChartLayerNodes
+			for(ProvGraphNode node : layerToNode.get(i)) {
+				if(node instanceof ActivityGraphNode) {					
+					List<ProvGraphNode> connectedNodes = getConnectedNodes(graph.getEdges(), node);					
+					layerNodes.add(createActivityLayerNode(jsoProvider, (ActivityGraphNode) node, connectedNodes));
+				} else if(node instanceof EntityGraphNode) {
+					layerNodes.add(createEntityLayerNode(jsoProvider, (EntityGraphNode) node));
+				}
+			}			
+			// build NChartLayer 
+			NChartLayer layer = jsoProvider.newNChartLayer();
+			layer.setDuration(DEFULT_DURATION);
+			layer.setNodes(layerNodes);
+			layers.add(layer);
+		}
+		
+		NChartLayersArray layersArray = jsoProvider.newNChartLayersArray();
+		layersArray.setLayers(layers);
+		return layersArray;
+	}	
+
+	private static List<ProvGraphNode> getConnectedNodes(Set<ProvGraphEdge> edges, ProvGraphNode node) {
+		List<ProvGraphNode> connected = new ArrayList<ProvGraphNode>();
+		EdgesForNode nodeEdges = getEdgesForNode(edges, node);
+		for(ProvGraphEdge edge : nodeEdges.in) {
+			connected.add(edge.getSource());
+		}
+		for(ProvGraphEdge edge : nodeEdges.out) {
+			connected.add(edge.getSink());
+		}
+		return connected;
+	}
+
+	private static void processLayer(int layer, ProvGraphNode node, Map<ProvGraphNode,Integer> nodeToLayer, ProvGraph graph) {		
+		// set layer for this node
+		setLayerValue(layer, node, nodeToLayer);
+
+		EdgesForNode nodeEdges = getEdgesForNode(graph.getEdges(), node);
+		
+		// assign layer for leafs and also maximal layer depth for incoming edges 
+		for(ProvGraphEdge incomingEdge : nodeEdges.in) {
+			setLayerValue(layer-1, incomingEdge.getSource(), nodeToLayer);
+		}
+		
+		// process outgoing edges
+		for(ProvGraphEdge outgoingEdge : nodeEdges.out) {
+			processLayer(layer+1, outgoingEdge.getSink(), nodeToLayer, graph);
+		}
+		
+	}
+
+	private static void setLayerValue(int layer, ProvGraphNode node,
+			Map<ProvGraphNode, Integer> nodeToLayer) {
+		Integer existingLayer = nodeToLayer.get(node);
+		if(existingLayer == null || existingLayer < layer) {
+			nodeToLayer.put(node, layer);
+		}
+	}
+	
+	/**
+	 * can improve performance
+	 * @param edges
+	 * @param node
+	 * @return
+	 */
+	private static EdgesForNode getEdgesForNode(Set<ProvGraphEdge> edges, ProvGraphNode node) {
+		EdgesForNode edgesForNode = new EdgesForNode();
+		edgesForNode.in = new ArrayList<ProvGraphEdge>();
+		edgesForNode.out = new ArrayList<ProvGraphEdge>();		
+		for(ProvGraphEdge edge : edges) {
+			if(edge.getSource().equals(node)) 
+				edgesForNode.out.add(edge);
+			if(edge.getSink().equals(node)) {
+				edgesForNode.in.add(edge);
+			}
+		}		
+		return edgesForNode;
+	}
+	
+	private static class EdgesForNode {
+		List<ProvGraphEdge> in;
+		List<ProvGraphEdge> out;	
+	}
 	
 	/**
 	 * Create a list of 'Chatacters' for NChart
 	 * @param graphNodes
 	 * @return 
 	 */
-	public static NChartCharacters createNChartCharacters(JsoProvider jsoProvider, List<ProvGraphNode> graphNodes) {
+	public static NChartCharacters createNChartCharacters(JsoProvider jsoProvider, Set<ProvGraphNode> graphNodes) {
 		NChartCharacters characters = jsoProvider.newNChartCharacters();
 		for(ProvGraphNode node : graphNodes) {
 			characters.addCharacter(node.getId());
@@ -59,9 +175,20 @@ public class NChartUtil {
 		return ln;
 	}
 
-	public final static native JsArray<XYPointJso> _getPointsForId(JavaScriptObject obj, String nodeId) /*-{
-		return obj[nodeId]; 
-	}-*/;
-
+	/**
+	 * Fills the positions in LayoutResult back into the graph
+	 * @param layoutResult
+	 * @param graph
+	 */
+	public static void fillPositions(LayoutResult layoutResult, ProvGraph graph) {
+		for(ProvGraphNode node : graph.getNodes()) {			
+			List<XYPoint> xyPoints = layoutResult.getPointsForId(node.getId());
+			if(xyPoints != null && xyPoints.size() > 0) {
+				XYPoint pt = xyPoints.get(0);
+				node.setxPos(pt.getX());
+				node.setyPos(pt.getY());
+			}
+		}
+	}
 	
 }

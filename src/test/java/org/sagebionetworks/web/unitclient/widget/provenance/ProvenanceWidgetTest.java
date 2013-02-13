@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
+import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
@@ -46,6 +47,7 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -64,13 +66,14 @@ public class ProvenanceWidgetTest {
 	SynapseJSNIUtils synapseJsniUtils = implJSNIUtils();	
 	
 	Data entity;
-	ProvTreeNode root;
+	ProvGraphNode root;
 	BatchResults<EntityHeader> referenceHeaders;
 	String activityJSON;
 	String referenceListJSON;
 	String referenceHeadersJSON;
 	Exception someException = new Exception();
 	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
+	JsoProvider jsoProvider;
 	
 	@Before
 	public void setup() throws Exception {		
@@ -80,8 +83,9 @@ public class ProvenanceWidgetTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockLayoutService = mock(LayoutServiceAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
+		jsoProvider = mock(JsoProvider.class);
 
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthController, mockLayoutService, adapterFactory, synapseJsniUtils);
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthController, mockLayoutService, adapterFactory, synapseJsniUtils, jsoProvider);
 		verify(mockView).setPresenter(provenanceWidget);
 		
 		entity = new Data();
@@ -105,7 +109,7 @@ public class ProvenanceWidgetTest {
 		referenceHeaders = new BatchResults<EntityHeader>();
 		referenceHeaders.setResults(new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header })));
 		
-		root = new EntityGraphNode("someid", null, null, null, null, null);
+		root = new EntityGraphNode("someid", null, null, null, null, null, false, true);
 		
 		activityJSON = act.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		referenceListJSON = referenceList.writeToJSONObject(adapterFactory.createNew()).toJSONString();

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -34,13 +34,14 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
+import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
+import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
+import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-
-import com.google.gwt.dev.util.collect.HashSet;
 
 public class ProvUtilsTest {
 		
@@ -108,20 +109,22 @@ public class ProvUtilsTest {
 		Map<String, Activity> processedActivities = new HashMap<String, Activity>();
 		processedActivities.put(act.getId(), act);		
 		
+		Set<Reference> startRefs = new HashSet<Reference>();
+		startRefs.add(ref1);
 		
-		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, false, synapseJsniUtils);		
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, false, synapseJsniUtils, startRefs);		
 		
 		assertNotNull(graph.getNodes());
 		assertNotNull(graph.getEdges());		
-		Map<ProvGraphNode,Void> nodes = graph.getNodes();
-		Map<ProvGraphEdge,Void> edges = graph.getEdges();
+		Set<ProvGraphNode> nodes = graph.getNodes();
+		Set<ProvGraphEdge> edges = graph.getEdges();
 		
 		// verify all nodes created
 		
 		EntityGraphNode entity1Node = null;
 		EntityGraphNode entity2Node = null;
 		ActivityGraphNode actNode = null;
-		for(ProvGraphNode node : nodes.keySet()) {			
+		for(ProvGraphNode node : nodes) {			
 			if(node instanceof EntityGraphNode) {
 				if(((EntityGraphNode)node).getEntityId().equals(entity1.getId())) entity1Node = (EntityGraphNode) node;
 				if(((EntityGraphNode)node).getEntityId().equals(entity2.getId())) entity2Node = (EntityGraphNode) node;
@@ -135,9 +138,9 @@ public class ProvUtilsTest {
 		
 		// verify all edges created
 		ProvGraphEdge generatedByEdge = new ProvGraphEdge(entity1Node, actNode);
-		assertTrue(edges.containsKey(generatedByEdge));
+		assertTrue(edges.contains(generatedByEdge));
 		ProvGraphEdge usedEdge = new ProvGraphEdge(actNode, entity2Node);
-		assertTrue(edges.containsKey(usedEdge));
+		assertTrue(edges.contains(usedEdge));
 	}
 
 	public void testCreateUniqueNodeId() throws Exception {		
@@ -265,9 +268,12 @@ public class ProvUtilsTest {
 			public String getLocationQueryString() {
 				return "?foo=bar";
 			}
-			
 			@Override
 			public String getBaseFileHandleUrl() {
+
+			@Override
+			public LayoutResult nChartlayout(NChartLayersArray layers,
+					NChartCharacters characters) {
 				// TODO Auto-generated method stub
 				return null;
 			}

@@ -114,14 +114,14 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		
 		if(graph != null) {
 			// add nodes to graph
-			Map<ProvGraphNode,Void> nodes = graph.getNodes();
-			for(ProvGraphNode node : nodes.keySet()) {			
+			Set<ProvGraphNode> nodes = graph.getNodes();
+			for(ProvGraphNode node : nodes) {			
 				prov.add(getNodeContainer(node));
 			}
 			
 			// make connections (assure DOM elements are in before asking jsPlumb to connect them)
-			Map<ProvGraphEdge,Void> edges = graph.getEdges();
-			for(ProvGraphEdge edge : edges.keySet()) {
+			Set<ProvGraphEdge> edges = graph.getEdges();
+			for(ProvGraphEdge edge : edges) {
 				//connect(edge.getSource().getId(), edge.getSink().getId());
 			}
 		}
