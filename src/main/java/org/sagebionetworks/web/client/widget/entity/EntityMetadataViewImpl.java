@@ -600,6 +600,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		return lc;
 	}
+	
 	private Widget createRestrictionWidget() {
 		if (!presenter.includeRestrictionWidget()) return null;
 		boolean isAnonymous = presenter.isAnonymous();

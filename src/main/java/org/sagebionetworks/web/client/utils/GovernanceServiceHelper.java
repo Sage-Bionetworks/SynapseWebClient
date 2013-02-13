@@ -56,10 +56,10 @@ public class GovernanceServiceHelper {
 	 * @return
 	 */
 	public static AccessRequirement selectAccessRequirement(Collection<AccessRequirement> allARs, Collection<AccessRequirement> unfulfilledARs) {
-		if (allARs.isEmpty()) {
+		if (allARs==null || allARs.isEmpty()) {
 			 return null;
 		}
-		if (unfulfilledARs.isEmpty()) {
+		if (unfulfilledARs==null || unfulfilledARs.isEmpty()) {
 			return allARs.iterator().next();
 		} else {
 			return unfulfilledARs.iterator().next();
@@ -97,5 +97,16 @@ public class GovernanceServiceHelper {
 			} 
 		}
 		return ans;
+	}
+	
+	public static String getAccessRequirementText(AccessRequirement ar) {
+		if (ar==null) return "";
+		if (ar instanceof TermsOfUseAccessRequirement) {
+			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
+		} else if (ar instanceof ACTAccessRequirement) {
+			return ((ACTAccessRequirement)ar).getActContactInfo();
+		} else {
+			throw new RuntimeException("Unexpected class "+ar.getClass().getName());
+		}
 	}
 }

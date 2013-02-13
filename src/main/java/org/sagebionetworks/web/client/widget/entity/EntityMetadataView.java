@@ -56,8 +56,6 @@ public interface EntityMetadataView extends IsWidget {
 
 		String accessRequirementText();
 
-		boolean isTermsOfUseAccessRequirement();
-
 		Callback getLoginCallback();
 
 		void fireEntityUpdatedEvent();

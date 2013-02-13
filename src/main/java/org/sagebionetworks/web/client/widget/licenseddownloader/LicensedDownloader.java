@@ -50,7 +50,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
 	
-	private AccessRequirement accessRequirement;
+	private AccessRequirement accessRequirementToDisplay;
 	private String entityId;
 	private UserProfile userProfile;
 	
@@ -61,7 +61,6 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	// for testing
 	public void setUserProfile(UserProfile userProfile) {this.userProfile=userProfile;}
-	public void setAccessRequirement(AccessRequirement accessRequirement) {this.accessRequirement=accessRequirement;}
 
 	@Inject
 	public LicensedDownloader(LicensedDownloaderView view,
@@ -183,21 +182,12 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	}
 	
 	public void setLicenseAgreement(Collection<AccessRequirement> allARs, Collection<AccessRequirement> unmetARs) {
-		AccessRequirement arToDisplay = GovernanceServiceHelper.selectAccessRequirement(allARs, unmetARs);
+		accessRequirementToDisplay = GovernanceServiceHelper.selectAccessRequirement(allARs, unmetARs);
 		setRestrictionLevel(GovernanceServiceHelper.entityRestrictionLevel(allARs));
-		setApprovalType(GovernanceServiceHelper.accessRequirementApprovalType(arToDisplay));
+		setApprovalType(GovernanceServiceHelper.accessRequirementApprovalType(accessRequirementToDisplay));
 		
-		if (arToDisplay!=null) {
-			String licenseAgreementText = null;
-			if (arToDisplay instanceof TermsOfUseAccessRequirement) {
-				// for tier 2 requirements, set license agreement
-				licenseAgreementText = ((TermsOfUseAccessRequirement)arToDisplay).getTermsOfUse();
-			} else if (arToDisplay instanceof ACTAccessRequirement) {
-				// for tier 3 requirements, set ACT contact instructions
-				licenseAgreementText = ((ACTAccessRequirement)arToDisplay).getActContactInfo();
-			} else {
-				view.showInfo("Error", arToDisplay.getClass().toString());
-			}
+		if (accessRequirementToDisplay!=null) {
+			String licenseAgreementText = GovernanceServiceHelper.getAccessRequirementText(accessRequirementToDisplay);
 			LicenseAgreement licenseAgreement = new LicenseAgreement();
 			licenseAgreement.setLicenseHtml(licenseAgreementText);
 			view.setLicenseHtml(licenseAgreement.getLicenseHtml());
@@ -241,7 +231,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		};
 		GovernanceServiceHelper.signTermsOfUse(
 				userProfile.getOwnerId(), 
-				accessRequirement.getId(), 
+				accessRequirementToDisplay.getId(), 
 				onSuccess, 
 				onFailure, 
 				synapseClient, 
@@ -255,7 +245,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 				userProfile.getDisplayName(), 
 				userProfile.getUserName(), 
 				entityId, 
-				accessRequirement.getId().toString());
+				accessRequirementToDisplay.getId().toString());
 		
 		return new Callback() {
 			@Override
