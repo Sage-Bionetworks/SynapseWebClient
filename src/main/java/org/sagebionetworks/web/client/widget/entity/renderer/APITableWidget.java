@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -40,7 +41,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	}
 	
 	@Override
-	public void configure(String entityId, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey,
+			Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		uri = descriptor.get(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);

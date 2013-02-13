@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
@@ -69,6 +70,7 @@ public class ProvenanceWidgetTest {
 	String referenceListJSON;
 	String referenceHeadersJSON;
 	Exception someException = new Exception();
+	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
 	
 	@Before
 	public void setup() throws Exception {		
@@ -194,7 +196,7 @@ public class ProvenanceWidgetTest {
 		widgetDescriptor.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, "42");
 		widgetDescriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY, entity.getId());
 		widgetDescriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, "true");
-		provenanceWidget.configure("bad entity id", widgetDescriptor);
+		provenanceWidget.configure(wikiKey,  widgetDescriptor);
 		verifyBuildTreeCalls();
 	}
 	

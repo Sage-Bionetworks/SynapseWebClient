@@ -1,121 +1,65 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Page;
+import org.sagebionetworks.repo.model.wiki.WikiHeader;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
-import org.sagebionetworks.web.shared.WhereCondition;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private PagesBrowserView view;
-	private HandlerManager handlerManager = new HandlerManager(this);
-	private String configuredEntityId;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AdapterFactory adapterFactory;
-	private AutoGenFactory autogenFactory;
-	private SearchServiceAsync searchService;
-	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	private boolean canEdit;
+	private WikiPageKey wikiKey; 
+	private String ownerObjectName, ownerObjectLink;
+	private WikiPageWidget.Callback callback;
 	
 	@Inject
 	public PagesBrowser(PagesBrowserView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
-			AdapterFactory adapterFactory, AutoGenFactory autogenFactory, SearchServiceAsync searchService, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
+			AdapterFactory adapterFactory) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
-		this.autogenFactory = autogenFactory;
-		this.searchService = searchService;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		
 		view.setPresenter(this);
 	}	
 	
-	public void configure(final String entityId, final String title, boolean canEdit, boolean isProject) {
+	public void configure(final WikiPageKey wikiKey, final String ownerObjectName, final String ownerObjectLink, final String title, final boolean canEdit, WikiPageWidget.Callback callback) {
 		this.canEdit = canEdit;
-		if (isProject) {
-			//find the root wiki folder
-			searchService.searchEntities("entity", Arrays
-					.asList(new WhereCondition[] { 
-							new WhereCondition("parentId", WhereOperator.EQUALS, entityId), 
-							new WhereCondition("name",WhereOperator.EQUALS, DisplayConstants.PROJECT_WIKI_NAME) 
-							}), 1, 1, null,
-					false, new AsyncCallback<List<String>>() {
-					@Override
-					public void onSuccess(List<String> result) {
-						if (result == null || result.size() == 0) {
-							//it wasn't found.  create the root wiki
-							createRootWiki(entityId);
-						} else {
-							//grab the wiki entity header
-							try {
-								EntityHeader wikiHeader = nodeModelCreator.createJSONEntity(result.get(0), EntityHeader.class);
-								configuredEntityId = wikiHeader.getId();
-								refreshChildren(wikiHeader.getId());
-							} catch (JSONObjectAdapterException e) {
-								onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-							}
-						}
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage(caught.getMessage());
-					}
-				});					
-		}
-		else {
-			//this is a Page, so the configured entityid is the given
-			this.configuredEntityId = entityId;
-			refreshChildren(configuredEntityId);
-		}
+		this.wikiKey = wikiKey;
+		this.callback = callback;
+		this.ownerObjectName = ownerObjectName;
+		this.ownerObjectLink = ownerObjectLink;
+		//refresh the table of contents
+		refreshTableOfContents();
 	}
 	
 	public void clearState() {
 		view.clear();
-		// remove handlers
-		handlerManager = new HandlerManager(this);		
 	}
-	
-	@Override
-	public void fireEntityUpdatedEvent() {
-		handlerManager.fireEvent(new EntityUpdatedEvent());
-	}
-	
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
-	}
-
 	
 	@Override
 	public Widget asWidget() {
@@ -125,95 +69,99 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void createPage(final String name) {
-		Entity page = createNewEntity(Page.class.getName(), configuredEntityId);
-		page.setName(name);
-		String entityJson;
+		WikiPage page = new WikiPage();
+		//if this is creating the root wiki, then refresh the full page
+		final boolean isCreatingWiki = wikiKey.getWikiPageId() ==null;
+		page.setParentWikiId(wikiKey.getWikiPageId());
+		page.setTitle(name);
+		String wikiPageJson;
 		try {
-			entityJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.createOrUpdateEntity(entityJson, null, true, new AsyncCallback<String>() {
+			wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			synapseClient.createWikiPage(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
 				@Override
-				public void onSuccess(String newId) {
-					view.showInfo("Page '" + name + "' Added", "");
-					refreshChildren(configuredEntityId);
-					//or should it go to the new page after creation?
-					//globalApplicationState.getPlaceChanger().goTo(new Synapse(newId));
+				public void onSuccess(String result) {
+					if (isCreatingWiki) {
+						view.showInfo("Wiki Created", "");
+						callback.pageUpdated();
+					}
+					else
+						view.showInfo("Page '" + name + "' Added", "");	
+					refreshTableOfContents();
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
 					view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
-				}			
-			});
-		} catch (JSONObjectAdapterException e) {			
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
-		}
-	}
-	
-	/*
-	 * private methods
-	 */
-	
-	private void createRootWiki(String projectEntityId) {
-		Entity pageRoot = createNewEntity(Folder.class.getName(), projectEntityId);
-		pageRoot.setName(DisplayConstants.PROJECT_WIKI_NAME);
-		String entityJson;
-		try {
-			entityJson = pageRoot.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.createOrUpdateEntity(entityJson, null, true, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String newId) {
-					configuredEntityId = newId;
-					refreshChildren(newId);
 				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
-				}			
 			});
 		} catch (JSONObjectAdapterException e) {			
 			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
 		}
 	}
-
-	private Entity createNewEntity(String className, String parentId) {
-		Entity entity = (Entity) autogenFactory.newInstance(className);
-		entity.setParentId(parentId);
-		entity.setEntityType(className);		
-		return entity;
-	}
 	
-	public void refreshChildren(String entityId) {
-		searchService.searchEntities("entity", Arrays
-				.asList(new WhereCondition[] { 
-						new WhereCondition("parentId", WhereOperator.EQUALS, entityId), 
-						}), 1, 500, null,
-				false, new AsyncCallback<List<String>>() {
-				@Override
-				public void onSuccess(List<String> result) {
-					List<EntityHeader> headers = new ArrayList<EntityHeader>();
-					for(String entityHeaderJson : result) {
-						try {
-							headers.add(nodeModelCreator.createJSONEntity(entityHeaderJson, EntityHeader.class));
-						} catch (JSONObjectAdapterException e) {
-							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+	public void refreshTableOfContents() {
+		synapseClient.getWikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String results) {
+				try {
+					PaginatedResults<JSONEntity> wikiHeaders = nodeModelCreator.createPaginatedResults(results, WikiHeader.class);
+					Map<String, TreeItem> wikiId2TreeItem = new HashMap<String, TreeItem>(); 
+					
+					//now grab all of the headers associated with this level
+					for (Iterator iterator = wikiHeaders.getResults().iterator(); iterator
+							.hasNext();) {
+						WikiHeader header = (WikiHeader) iterator.next();
+						boolean isCurrentPage = header.getId().equals(wikiKey.getWikiPageId());
+						String href, title;
+						if (header.getParentId() == null) {
+							href = ownerObjectLink;
+							title = ownerObjectName;
+						}
+						else {
+							href = DisplayUtils.getSynapseWikiHistoryToken(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), header.getId());
+							title = header.getTitle();
+						}
+						TreeItem item = new TreeItem(view.getHTML(href, title, isCurrentPage));
+						wikiId2TreeItem.put(header.getId(), item);
+					}
+					//now set up the relationships
+					TreeItem root = null;
+					for (Iterator iterator = wikiHeaders.getResults().iterator(); iterator
+							.hasNext();) {
+						WikiHeader header = (WikiHeader) iterator.next();
+						if (header.getParentId() != null){
+							//add this as a child
+							wikiId2TreeItem.get(header.getParentId()).addItem(wikiId2TreeItem.get(header.getId()));
+						} else {
+							root = wikiId2TreeItem.get(header.getId());
 						}
 					}
-
-					//sort the pages in some logical order
-					Collections.sort(headers, new Comparator<EntityHeader>() {
-						public int compare(EntityHeader o1, EntityHeader o2) {return o1.getName().compareToIgnoreCase(o2.getName());};
-					});
 					
-					view.configure(headers, canEdit);
+					//finally, expand all nodes to the current wiki page.
+					if (root != null && wikiKey.getWikiPageId() != null) {
+						TreeItem currentItem =  wikiId2TreeItem.get(wikiKey.getWikiPageId());
+						while(currentItem != null) {
+							currentItem.setState(true);
+							currentItem = currentItem.getParentItem();
+						}
+					}
+					
+					view.configure(canEdit, root);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
-				@Override
-				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());				
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				//if this is because the wiki header root was not found, and the parent wiki id is null, and this user can edit the wiki then
+				if (caught instanceof NotFoundException && canEdit) {
+					//add the Create Wiki button
+					view.configure(canEdit, null);
+				}
+				else
 					view.showErrorMessage(caught.getMessage());
-				}
-			});					
+			}
+		});
 	}
-
-
 }
