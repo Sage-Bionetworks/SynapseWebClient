@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -10,9 +12,10 @@ import com.google.inject.Inject;
 public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements AttachmentPreviewWidgetView {
 
 	private Presenter presenter;
-	
+	private SynapseJSNIUtils synapseJsniUtils;
 	@Inject
-	public AttachmentPreviewWidgetViewImpl() {
+	public AttachmentPreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils) {
+		this.synapseJsniUtils= synapseJsniUtils;
 	}
 	
 	@Override
@@ -23,10 +26,10 @@ public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements 
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("<a href=\"");
-		sb.append(ImageWidgetViewImpl.createWikiAttachmentUrl(wikiKey, fileName,false));
+		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
 		sb.append("\"><img class=\"imageDescriptor\" ");
 		sb.append(" src=\"");
-		sb.append(ImageWidgetViewImpl.createWikiAttachmentUrl(wikiKey, fileName, true));
+		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
 		sb.append("\"></img></a>");
 		add(new HTMLPanel(sb.toString()));
 		this.layout(true);

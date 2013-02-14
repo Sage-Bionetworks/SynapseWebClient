@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -915,9 +914,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				Synapse client = createSynapseClient();
 				Entity e = client.getEntityById(entityId);
 				if (e.getAttachments() != null) {
-					for (Iterator<AttachmentData> iterator = e.getAttachments().iterator(); iterator
-							.hasNext();) {
-						AttachmentData data = iterator.next();
+					for (AttachmentData data : e.getAttachments()) {
 						if (data.getName().equals(attachmentName)) {
 							e.getAttachments().remove(data);
 							break;
@@ -1012,8 +1009,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	private String getRootWikiId(String ownerId, ObjectType ownerType) throws RestServiceException{
 		PaginatedResults<WikiHeader> results = getWikiHeaderTree(ownerId, ownerType);
-		for (Iterator iterator = results.getResults().iterator(); iterator.hasNext();) {
-			WikiHeader header = (WikiHeader) iterator.next();
+		for (WikiHeader header : results.getResults()) {
 			if (header.getParentId() == null) {
 				return header.getId();
 			}

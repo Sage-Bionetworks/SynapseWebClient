@@ -53,6 +53,7 @@ import org.sagebionetworks.web.client.widget.entity.download.LocationableUploade
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -1287,4 +1288,30 @@ public class DisplayUtils {
 	}
 
 	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
+
+	/**
+		 * Create the url to a wiki filehandle.
+		 * @param baseURl
+		 * @param id
+		 * @param tokenId
+		 * @param fileName
+		 * @return
+		 */
+		public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
+			//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
+	//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
+	//		return repoServicesUrl 
+	//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
+	//				+"/"+ wikiKey.getOwnerObjectId()
+	//				+"/wiki/" 
+	//				+wikiKey.getWikiPageId()
+	//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
+			String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+			return baseFileHandleUrl + "?" +
+					WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
+					WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
+					WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
+					WIKI_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+					wikiIdParam;
+		}
 }
