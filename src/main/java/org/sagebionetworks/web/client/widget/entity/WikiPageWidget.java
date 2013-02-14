@@ -263,8 +263,7 @@ public class WikiPageWidget extends LayoutContainer {
 			commandBar.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
 		}
 		
-		editButton.setEnabled(canEdit);
-		addPageButton.setEnabled(canEdit);
+		commandBarWrapper.setVisible(canEdit);
 		configureEditButton();
 		
 		return commandBarWrapper;
