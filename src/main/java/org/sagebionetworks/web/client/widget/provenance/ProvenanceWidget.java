@@ -37,8 +37,12 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ActivityType;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
+import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -108,10 +112,10 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 		startRefs = new HashSet<Reference>();
 		startRefs.add(startRef);
-		Reference syn3562 = new Reference();
-		syn3562.setTargetId("syn3562");
-		syn3562.setTargetVersionNumber(1L);
-		startRefs.add(syn3562);
+		Reference secondOutputRef = new Reference();
+		secondOutputRef.setTargetId("syn4623");
+		secondOutputRef.setTargetVersionNumber(1L);
+		startRefs.add(secondOutputRef);
 		
 		// load stack with starting nodes at depth 0
 		toProcess = new Stack<ProvenanceWidget.ProcessItem>();
@@ -303,12 +307,76 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		idToNode = new HashMap<String, ProvGraphNode>();
 
 		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, synapseJSNIUtils, startRefs);					
-
+		//ProvGraph graph = makeTestGraph();
+		
 		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());
 		NChartLayersArray layerArray = NChartUtil.createLayers(jsoProvider, graph);
 		LayoutResult layoutResult = synapseJSNIUtils.nChartlayout(layerArray, characters);
 		NChartUtil.fillPositions(layoutResult, graph);
 		view.setGraph(graph);
+	}
+
+	private ProvGraph makeTestGraph() {
+		ProvGraph graph = new ProvGraph();		
+		EntityGraphNode d1;
+		EntityGraphNode d2;
+		EntityGraphNode d3;
+		EntityGraphNode d4;
+		EntityGraphNode d5;
+		EntityGraphNode d6;
+		EntityGraphNode d7;
+		EntityGraphNode d8;
+		EntityGraphNode d9;
+		EntityGraphNode d10;
+		EntityGraphNode d11;
+		ActivityGraphNode a;
+		ActivityGraphNode b;
+		ActivityGraphNode c;
+		ActivityGraphNode d;
+		d1 = new EntityGraphNode("d1","","","",1L,"",false,false);		
+		d2 = new EntityGraphNode("d2","","","",1L,"",false,false);
+		d3 = new EntityGraphNode("d3","","","",1L,"",false,false);
+		d4 = new EntityGraphNode("d4","","","",1L,"",false,false);
+		d5 = new EntityGraphNode("d5","","","",1L,"",false,false);
+		d6 = new EntityGraphNode("d6","","","",1L,"",false,false);
+		d7 = new EntityGraphNode("d7","","","",1L,"",false,false);
+		d8 = new EntityGraphNode("d8","","","",1L,"",false,false);
+		d9 = new EntityGraphNode("d9","","","",1L,"",false,false);
+		d10 = new EntityGraphNode("d10","","","",1L,"",false,false);
+		d11 = new EntityGraphNode("d11","","","",1L,"",false,false);
+		a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,false);
+		b = new ActivityGraphNode("B","2","Step B", ActivityType.MANUAL,false);
+		c = new ActivityGraphNode("C","2","Step C", ActivityType.MANUAL,false);
+		d = new ActivityGraphNode("D","4","Step D", ActivityType.MANUAL,false);
+		graph.addNode(d1);
+		graph.addNode(d2);
+		graph.addNode(d3);
+		graph.addNode(d4);		
+		graph.addNode(d5);
+		graph.addNode(d6);
+		graph.addNode(d7);
+		graph.addNode(d8);
+		graph.addNode(d9);
+		graph.addNode(d10);
+		graph.addNode(d11);
+		graph.addEdge(new ProvGraphEdge(d1, a));
+		graph.addEdge(new ProvGraphEdge(d2, a));
+		graph.addEdge(new ProvGraphEdge(a, d3));
+		graph.addEdge(new ProvGraphEdge(a, d4));
+		graph.addEdge(new ProvGraphEdge(a, d5));
+		graph.addEdge(new ProvGraphEdge(a, d6));
+		graph.addEdge(new ProvGraphEdge(d4, b));		
+		graph.addEdge(new ProvGraphEdge(d7, b));		
+		graph.addEdge(new ProvGraphEdge(d6, d));		
+		graph.addEdge(new ProvGraphEdge(b, d8));		
+		graph.addEdge(new ProvGraphEdge(d5, c));		
+		graph.addEdge(new ProvGraphEdge(d8, c));		
+		graph.addEdge(new ProvGraphEdge(c, d9));		
+		graph.addEdge(new ProvGraphEdge(c, d10));		
+		graph.addEdge(new ProvGraphEdge(d, d11));		
+		d10.setStartingNode(true);
+		d11.setStartingNode(true);
+		return graph;
 	}
 	
 	private Activity createErrorActivity(Throwable caught) {

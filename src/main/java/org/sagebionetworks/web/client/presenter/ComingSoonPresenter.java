@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.mockito.Mockito.mock;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartUtil;
 import org.sagebionetworks.web.client.widget.provenance.nchart.XYPoint;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
@@ -32,6 +33,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
@@ -76,23 +78,22 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		this.view.setPresenter(this);
 		final String token = place.toToken();
 
-		view.setEntity(null);
-
-//		ProvGraph graph = new ProvGraph();		
-//		EntityGraphNode d1 = new EntityGraphNode("d1",null,null,null,null,null,false,true);		
-//		EntityGraphNode d2 = new EntityGraphNode("d2",null,null,null,null,null,false,false);
-//		EntityGraphNode d3 = new EntityGraphNode("d3",null,null,null,null,null,false,false);
-//		EntityGraphNode d4 = new EntityGraphNode("d4",null,null,null,null,null,false,false);
-//		ActivityGraphNode a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,false);
-//		graph.addNode(d1);
-//		graph.addNode(d2);
-//		graph.addNode(d3);
-//		graph.addNode(d4);
-//		graph.addEdge(new ProvGraphEdge(d1, a));
-//		graph.addEdge(new ProvGraphEdge(d2, a));
-//		graph.addEdge(new ProvGraphEdge(a, d3));
-//		graph.addEdge(new ProvGraphEdge(a, d4));
-
+		synapseClient.getEntity(token, new AsyncCallback<EntityWrapper>() {			
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				try {
+					Entity entity = nodeModelCreator.createEntity(result);
+					view.setEntity(entity);
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				}
+			}			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showInfo("Error", "error getting: " + token);
+			}
+		});
+		
 		ProvGraph graph = new ProvGraph();		
 		EntityGraphNode d1;
 		EntityGraphNode d2;
@@ -100,6 +101,11 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		EntityGraphNode d4;
 		EntityGraphNode d5;
 		EntityGraphNode d6;
+		EntityGraphNode d7;
+		EntityGraphNode d8;
+		EntityGraphNode d9;
+		EntityGraphNode d10;
+		EntityGraphNode d11;
 		ActivityGraphNode a;
 		ActivityGraphNode b;
 		ActivityGraphNode c;
@@ -110,6 +116,11 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		d4 = new EntityGraphNode("d4",null,null,null,null,null,false,false);
 		d5 = new EntityGraphNode("d5",null,null,null,null,null,false,false);
 		d6 = new EntityGraphNode("d6",null,null,null,null,null,false,false);
+		d7 = new EntityGraphNode("d7",null,null,null,null,null,false,false);
+		d8 = new EntityGraphNode("d8",null,null,null,null,null,false,false);
+		d9 = new EntityGraphNode("d9",null,null,null,null,null,false,false);
+		d10 = new EntityGraphNode("d10",null,null,null,null,null,false,false);
+		d11 = new EntityGraphNode("d11",null,null,null,null,null,false,false);
 		a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,false);
 		b = new ActivityGraphNode("B","2","Step B", ActivityType.MANUAL,false);
 		c = new ActivityGraphNode("C","2","Step C", ActivityType.MANUAL,false);
@@ -120,17 +131,28 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		graph.addNode(d4);		
 		graph.addNode(d5);
 		graph.addNode(d6);
+		graph.addNode(d7);
+		graph.addNode(d8);
+		graph.addNode(d9);
+		graph.addNode(d10);
+		graph.addNode(d11);
 		graph.addEdge(new ProvGraphEdge(d1, a));
-		graph.addEdge(new ProvGraphEdge(a, d2));
-		graph.addEdge(new ProvGraphEdge(d2, b));
-		graph.addEdge(new ProvGraphEdge(b, d3));		
-		graph.addEdge(new ProvGraphEdge(d3, c));		
-		graph.addEdge(new ProvGraphEdge(d4, c));
-		graph.addEdge(new ProvGraphEdge(c, d6));
-		graph.addEdge(new ProvGraphEdge(d5, d));		
-		graph.addEdge(new ProvGraphEdge(d, d4));		
-		d1.setStartingNode(true);
-		d5.setStartingNode(true);
+		graph.addEdge(new ProvGraphEdge(d2, a));
+		graph.addEdge(new ProvGraphEdge(a, d3));
+		graph.addEdge(new ProvGraphEdge(a, d4));
+		graph.addEdge(new ProvGraphEdge(a, d5));
+		graph.addEdge(new ProvGraphEdge(a, d6));
+		graph.addEdge(new ProvGraphEdge(d4, b));		
+		graph.addEdge(new ProvGraphEdge(d7, b));		
+		graph.addEdge(new ProvGraphEdge(d6, d));		
+		graph.addEdge(new ProvGraphEdge(b, d8));		
+		graph.addEdge(new ProvGraphEdge(d5, c));		
+		graph.addEdge(new ProvGraphEdge(d8, c));		
+		graph.addEdge(new ProvGraphEdge(c, d9));		
+		graph.addEdge(new ProvGraphEdge(c, d10));		
+		graph.addEdge(new ProvGraphEdge(d, d11));		
+		d10.setStartingNode(true);
+		d11.setStartingNode(true);
 
 		
 		// create characters
@@ -141,6 +163,11 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		graphNodes.add(d4);
 		graphNodes.add(d5);
 		graphNodes.add(d6);
+		graphNodes.add(d7);
+		graphNodes.add(d8);
+		graphNodes.add(d9);
+		graphNodes.add(d10);
+		graphNodes.add(d11);
 		graphNodes.add(a);
 		graphNodes.add(b);
 		graphNodes.add(c);
@@ -151,21 +178,9 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		NChartLayersArray ncLayersArray = NChartUtil.createLayers(jsoProvider, graph);
 		
 		LayoutResult layoutResult = jsniUtils.nChartlayout(ncLayersArray, characters);
-				
-		// TODO : translate LayoutResult back into the ProvGraph 
-		String s = "";
-		for(ProvGraphNode n : graphNodes) {
-			String id = n.getId();
-			List<XYPoint> points = layoutResult.getPointsForId(id);
-			s+= id + ": ";
-			for(XYPoint pt : points) {
-				s+= pt.getX() + "," + pt.getY() + "   ";
-			}
-			s+= "<br>\n";
-		}
-		view.showErrorMessage(s);
-		
+						
 		NChartUtil.fillPositions(layoutResult, graph);
+
 	}
 
 	private NChartLayersArray createFakeLayersArray(EntityGraphNode d1,

@@ -16,7 +16,6 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 public class NChartUtil {
 
 	private static final int DEFULT_DURATION = 10;
-
 	
 	
 	public static NChartLayersArray createLayers(JsoProvider jsoProvider, ProvGraph graph) {
@@ -184,9 +183,10 @@ public class NChartUtil {
 		for(ProvGraphNode node : graph.getNodes()) {			
 			List<XYPoint> xyPoints = layoutResult.getPointsForId(node.getId());
 			if(xyPoints != null && xyPoints.size() > 0) {
+				// swap X and Y to transpose graph
 				XYPoint pt = xyPoints.get(0);
-				node.setxPos(pt.getX());
-				node.setyPos(pt.getY());
+				node.setyPos(pt.getX());
+				node.setxPos(pt.getY());
 			}
 		}
 	}

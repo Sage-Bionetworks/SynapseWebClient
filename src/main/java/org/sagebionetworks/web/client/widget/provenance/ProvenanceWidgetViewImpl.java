@@ -117,18 +117,21 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			Set<ProvGraphNode> nodes = graph.getNodes();
 			for(ProvGraphNode node : nodes) {			
 				prov.add(getNodeContainer(node));
-			}
-			
-			// make connections (assure DOM elements are in before asking jsPlumb to connect them)
-			Set<ProvGraphEdge> edges = graph.getEdges();
-			for(ProvGraphEdge edge : edges) {
-				//connect(edge.getSource().getId(), edge.getSink().getId());
-			}
+			}			
 		}
 		
 		this.add(prov, new MarginData(5));
 		this.addStyleName("scroll-auto");
-		this.layout(true);			
+		this.layout(true);
+		
+		// make connections (assure DOM elements are in before asking jsPlumb to connect them)
+		if(graph != null) {			
+			Set<ProvGraphEdge> edges = graph.getEdges();
+			for(ProvGraphEdge edge : edges) {
+				connect(edge.getSink().getId(), edge.getSource().getId());
+			}
+		}
+
 	}
 	
 	/**
@@ -196,11 +199,17 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	
 	private static native void connect(String parentId, String childId) /*-{
 		var jsPlumb = $wnd.jsPlumb;		
-		jsPlumb.connect({source:parentId, target:childId, overlays:$wnd.overlays});
+		jsPlumb.connect({source:parentId, target:childId, overlays:jsP_overlays	});
 	}-*/;
 	
 	private static native void initJsPlumb() /*-{
-		;(function() {		
+		;(function() {
+//			$wnd.jsP_arrowCommon = { foldback:0.7, fillStyle:color, length:10, width:10 };
+//			// use three-arg spec to create two different arrows with the common values:
+//			$wnd.jsP_overlays = [
+//				[ "Arrow", { location:0.001, direction:-1 }, jsP_arrowCommon ]
+//			];
+					
 			$wnd.jsPlumbDemo = {					
 				init : function() {					
 					var color = "gray";
@@ -218,11 +227,17 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 					});				
 						
 					// declare some common values:
-					var arrowCommon = { foldback:0.7, fillStyle:color, length:10, width:10 },
+					jsP_arrowCommon = { foldback:0.7, fillStyle:color, length:10, width:10 };
 						// use three-arg spec to create two different arrows with the common values:
-						overlays = [
-							[ "Arrow", { location:0.5, direction:1 }, arrowCommon ]
-						];				
+					jsP_overlays = [
+							[ "Arrow", { location:0.6, direction:1 }, jsP_arrowCommon ]
+						];
+					
+//					var arrowCommon = { foldback:0.7, fillStyle:color, length:10, width:10 },
+//						// use three-arg spec to create two different arrows with the common values:
+//						overlays = [
+//							[ "Arrow", { location:0.5, direction:1 }, arrowCommon ]
+//						];				
 				}
 			};
 			
