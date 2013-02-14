@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.download;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityViewUtils;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -290,10 +290,10 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		radioButtonPanel.setFieldWidth(PANEL_WIDTH);
 		
 		radioButtonPanel.add(radioField(openRadio, new Widget[]{
-				createRestrictionLabel(APPROVAL_REQUIRED.NONE)}));
+				createRestrictionLabel(RESTRICTION_LEVEL.OPEN)}));
 		radioButtonPanel.add(radioField(restrictedRadio, new Widget[]{
-				createRestrictionLabel(APPROVAL_REQUIRED.LICENSE_ACCEPTANCE),
-				createRestrictionLabel(APPROVAL_REQUIRED.ACT_APPROVAL)}));
+				createRestrictionLabel(RESTRICTION_LEVEL.RESTRICTED),
+				createRestrictionLabel(RESTRICTION_LEVEL.CONTROLLED)}));
 
 		layoutContainer.add(radioButtonPanel);
 	}
@@ -343,7 +343,7 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		return !isInitiallyRestricted && restrictedModeChosen()==RADIO_SELECTED.RESTRICTED_RADIO_SELECTED;
 	}
 	
-	private static Widget createRestrictionLabel(APPROVAL_REQUIRED restrictionLevel) {
+	private static Widget createRestrictionLabel(RESTRICTION_LEVEL restrictionLevel) {
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant(
 				"<div class=\"left "+EntityViewUtils.shieldStyleName(restrictionLevel)+

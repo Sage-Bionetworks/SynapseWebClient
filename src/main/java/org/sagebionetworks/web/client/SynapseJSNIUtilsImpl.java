@@ -68,6 +68,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	@Override
+	public String getBaseFileHandleUrl() {
+		return GWT.getModuleBaseURL()+"filehandle";
+	}
+	
+	@Override
 	public String getBaseProfileAttachmentUrl() {
 		return GWT.getModuleBaseURL() + "profileAttachment";
 	}

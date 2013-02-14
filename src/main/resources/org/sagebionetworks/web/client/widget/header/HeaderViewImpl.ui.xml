@@ -12,6 +12,7 @@
 				<a href="#">
 					<g:Image resource="{sageImages.sageLogoAndTitle}" />
 				</a>
+				<g:SimplePanel ui:field="testSiteHeading" />
 			</div>
 			<g:HorizontalPanel ui:field="commandBar" />
 			<div class="span-24 notopmargin">

@@ -462,8 +462,30 @@ a.shortBtn {
 .margin-left-5 {
 	margin-left: 5px;
 }
+.margin-top-5 {
+	margin-top: 5px !important;
+}
+.margin-top-10 {
+	margin-top: 10px;
+}
+
 .margin-left-180 {
 	margin-left: 180px;
+}
+
+.margin-left-490 {
+	margin-left: 490px;
+}
+
+
+.margin-bottom-40 {
+	margin-bottom: 40px;
+}
+.margin-bottom-20 {
+	margin-bottom: 20px;
+}
+.margin-bottom-10 {
+	margin-bottom: 10px;
 }
 
 .margin-left-725 {
@@ -472,6 +494,7 @@ a.shortBtn {
 .markdown {
 	word-wrap:break-word;
 	overflow: hidden;
+	text-align: justify;
 }
 
 .markdown ol { 
@@ -523,6 +546,12 @@ a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
 	display:inline-block;
 }
 
+.font-size-32 {
+	font-size: 32px;
+	font-family: Yanone Kaffeesatz;
+}
+
+
 .vertical-align-bottom {
 	vertical-align: bottom;
 }
@@ -570,12 +599,19 @@ h1, h2, h3, h4, h5, h6 {
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
-.markdown table th,
+
 .markdown table td {
   border-left: 1px solid #dddddd;
   border-top: 1px solid #dddddd;
   padding: 2px 4px;
 }
+.markdown table th {
+  border-left: 1px solid #dddddd;
+  border-top: 1px solid #dddddd;
+  padding: 2px 4px;
+  font-weight: bold;
+}
+
 .markdown table caption + thead tr:first-child th,
 .markdown table caption + tbody tr:first-child th,
 .markdown table caption + tbody tr:first-child td,
@@ -614,6 +650,32 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom-right-radius: 4px;
   -moz-border-radius-bottomright: 4px;
 }
+
+/** a minimalist table style **/
+.mintable table {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: left;
+    border: 0 none;
+    outline: 0 none;
+    vertical-align: baseline;
+}
+
+.mintable table th {
+    border-bottom: 2px solid #DDDDDD;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 10px 8px;
+    border-left: 0 none;
+}
+
+.mintable table td {
+	border-left: 0 none;
+	border-top: 0 none;
+	padding: 9px 8px 0;	
+}
+
 .attachments-widget-row {
 	font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;
 }
@@ -636,7 +698,17 @@ h1, h2, h3, h4, h5, h6 {
 .image{
 	max-width: 940px;
 }
+
+.wikifilepreview {
+	width: 940px;
+}
+
 /**********************************/
+
+.wikifilepreviewimg {
+	margin:auto; 
+	display:block;
+}
 	
 .whiteBackground {
 	background-color: #fff;
@@ -662,4 +734,27 @@ h1, h2, h3, h4, h5, h6 {
 	text-decoration:none; 
 }
 
-	
+
+
+.gwt-TreeItem-selected {
+  background: #ffffff !important;
+  text-decoration:underline;
+}
+
+/**table of contents styling **/
+/** .8em to 1.2em **/
+.toc-small {
+	font-size: .8em;
+}
+.toc-h1 {
+	font-size: 1.2em;
+}
+.toc-h2 {
+	font-size: 1.1em;
+}
+.toc-h3 {
+	font-size: 1.0em;
+}
+.toc-h4 {
+	font-size: 0.9em;
+}	

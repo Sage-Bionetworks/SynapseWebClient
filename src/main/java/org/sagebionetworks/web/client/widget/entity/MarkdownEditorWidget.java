@@ -1,0 +1,419 @@
+package org.sagebionetworks.web.client.widget.entity;
+
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
+import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
+import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
+
+import com.extjs.gxt.ui.client.Style.VerticalAlignment;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.widget.Dialog;
+import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.Label;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.FormData;
+import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.inject.Inject;
+
+/**
+ * Lightweight widget used to resolve markdown
+ * 
+ * @author Jay
+ *
+ */
+public class MarkdownEditorWidget extends LayoutContainer {
+	
+	private SynapseClientAsync synapseClient;
+	private SynapseJSNIUtils synapseJSNIUtils;
+	private WidgetRegistrar widgetRegistrar;
+	private IconsImageBundle iconsImageBundle;
+	BaseEditWidgetDescriptorPresenter widgetDescriptorEditor;
+	CookieProvider cookies;
+	private TextArea markdownTextArea;
+	private HTML descriptionFormatInfo;
+	private WikiPageKey wikiKey;
+	
+	public interface CloseHandler{
+		public void saveClicked();
+		public void cancelClicked();
+	}
+	
+	public interface ManagementHandler{
+		public void attachmentsClicked();
+		public void deleteClicked();
+	}
+	
+	
+	
+	@Inject
+	public MarkdownEditorWidget(SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor, CookieProvider cookies) {
+		super();
+		this.synapseClient = synapseClient;
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.widgetRegistrar = widgetRegistrar;
+		this.iconsImageBundle = iconsImageBundle;
+		this.widgetDescriptorEditor = widgetDescriptorEditor;
+		this.cookies = cookies;
+	}
+	
+	/**
+	 * 
+	 * @param ownerId
+	 * @param ownerType
+	 * @param markdownTextArea
+	 * @param formPanel
+	 * @param callback
+	 * @param saveHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
+	 */
+	public void configure(final WikiPageKey wikiKey, final TextArea markdownTextArea, LayoutContainer formPanel, boolean showFieldLabel, final WidgetDescriptorUpdatedHandler callback, final CloseHandler saveHandler, final ManagementHandler managementHandler) {
+		this.markdownTextArea = markdownTextArea;
+		this.wikiKey = wikiKey;
+		descriptionFormatInfo = new HTML(WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
+		//Toolbar
+		HorizontalPanel mdCommands = new HorizontalPanel();
+		mdCommands.setVerticalAlign(VerticalAlignment.MIDDLE);
+		mdCommands.addStyleName("view header-inner-commands-container");
+		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.addSquareGrey16()));
+		insertButton.setWidth(55);
+		insertButton.setMenu(createWidgetMenu(callback));
+		FormData descriptionLabelFormData = new FormData();
+		descriptionLabelFormData.setMargins(new Margins(0,15,0,17));
+		if (showFieldLabel)
+			formPanel.add(new Label("Description:"),descriptionLabelFormData);
+		FormData mdCommandFormData = new FormData();
+		mdCommandFormData.setMargins(new Margins(0,15,0,10));
+		formPanel.add(mdCommands,mdCommandFormData);
+		
+		// followed by description.
+		SimplePanel descriptionWrapper= new SimplePanel();
+		descriptionWrapper.add(markdownTextArea);
+		
+		FormData descriptionData = new FormData("-5");
+		//descriptionData.setHeight(310);
+		descriptionData.setMargins(new Margins(0, 10, 0, 10));
+        formPanel.add(descriptionWrapper, descriptionData);
+		
+		//Preview
+		final com.google.gwt.user.client.ui.Button previewButton =  new com.google.gwt.user.client.ui.Button();
+		previewButton.setText(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT);
+		previewButton.addStyleName("btn");
+		previewButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showPreview(markdownTextArea.getValue());
+			}
+		});
+		
+		FormData previewFormData = new FormData("-5");
+		previewFormData.setMargins(new Margins(10,10,0,10));
+		
+		HorizontalPanel mdCommandsLower = new HorizontalPanel();
+		mdCommandsLower.setVerticalAlign(VerticalAlignment.MIDDLE);
+		formPanel.add(mdCommandsLower, previewFormData);
+		//mdCommandsLower.addStyleName("");
+		
+		if (managementHandler != null) {
+			final com.google.gwt.user.client.ui.Button deleteButton =  new com.google.gwt.user.client.ui.Button();
+			deleteButton.setHTML(DisplayConstants.BUTTON_DELETE_WIKI);
+			deleteButton.addStyleName("btn");
+			deleteButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					managementHandler.deleteClicked();
+				}
+			});
+			mdCommandsLower.add(deleteButton);
+			mdCommandsLower.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
+			final com.google.gwt.user.client.ui.Button attachmentsButton =  new com.google.gwt.user.client.ui.Button();
+			attachmentsButton.setText(DisplayConstants.BUTTON_WIKI_ATTACHMENTS);
+			attachmentsButton.addStyleName("btn");
+			attachmentsButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					managementHandler.attachmentsClicked();
+				}
+			});
+			mdCommandsLower.add(attachmentsButton);
+			mdCommandsLower.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
+		}
+		mdCommandsLower.add(previewButton);
+		formPanel.add(mdCommandsLower, previewFormData);
+		if (saveHandler != null) {
+			SimplePanel space = new SimplePanel();
+			space.addStyleName("margin-left-490");
+			mdCommandsLower.add(space);
+			
+			//also add a save button to the lower command bar
+			final com.google.gwt.user.client.ui.Button saveButton =  new com.google.gwt.user.client.ui.Button();
+			saveButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
+			saveButton.addStyleName("btn");
+			saveButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					saveHandler.saveClicked();
+				}
+			});
+			mdCommandsLower.add(saveButton);
+			
+			mdCommandsLower.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
+			
+			final com.google.gwt.user.client.ui.Button cancelButton =  new com.google.gwt.user.client.ui.Button();
+			cancelButton.setText(DisplayConstants.BUTTON_CANCEL);
+			cancelButton.addStyleName("btn");
+			cancelButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					saveHandler.cancelClicked();
+				}
+			});
+			mdCommandsLower.add(cancelButton);
+		}
+		
+		
+		//Formatting Guide
+		final Button formatLink = new Button(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT);
+		formatLink.setIcon(AbstractImagePrototype.create(iconsImageBundle.slideInfo16()));
+		formatLink.setWidth(120);
+		mdCommands.add(formatLink);
+		mdCommands.add(insertButton);
+		formatLink.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				//pop up format guide
+				showFormattingGuideDialog();
+			}
+		});
+		
+		Image image = getNewCommand("Insert Image", iconsImageBundle.imagePlus16(),new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
+			}
+		}); 
+		mdCommands.add(image);
+		
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			Image attachment = getNewCommand("Insert Attachment", iconsImageBundle.attachment16(),new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					handleInsertWidgetCommand(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, callback);
+				}
+			}); 
+			mdCommands.add(attachment);
+		}
+
+		
+		Image link = getNewCommand("Insert Link", iconsImageBundle.link16(),new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleInsertWidgetCommand( WidgetConstants.LINK_CONTENT_TYPE, callback);
+			}
+		}); 
+		mdCommands.add(link);
+				
+	}
+	
+	public void showPreview(String descriptionMarkdown) {
+	    //get the html for the markdown
+	    synapseClient.markdown2Html(descriptionMarkdown, true, new AsyncCallback<String>() {
+	    	@Override
+			public void onSuccess(String result) {
+	    		try {
+					showPreviewHTML(result);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				//preview failed
+				showErrorMessage(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT + caught.getMessage());
+			}
+		});	
+	}
+
+	public void showPreviewHTML(String result) throws JSONObjectAdapterException {
+		final Dialog window = new Dialog();
+		window.setMaximizable(false);
+	    window.setSize(650, 500);
+	    window.setPlain(true);  
+	    window.setModal(true);  
+	    window.setHeading("Preview Description");
+	    window.setLayout(new FitLayout());
+	    window.setButtons(Dialog.OK);
+	    window.setHideOnButtonClick(true);
+
+		HTMLPanel panel;
+		if(result == null || "".equals(result)) {
+	    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>"));
+		}
+		else{
+			panel = new HTMLPanel(result);
+		}
+		MarkdownWidget.loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, true);
+		FlowPanel f = new FlowPanel();
+		f.setStyleName("entity-description-preview-wrapper");
+		f.add(panel);
+		window.add(new ScrollPanel(f));
+		window.show();
+	}
+	
+	public void showFormattingGuideDialog() {
+        final Dialog window = new Dialog();
+        window.setMaximizable(false);
+        window.setSize(550, 600);
+        window.setPlain(true); 
+        window.setModal(true); 
+
+        window.setHeading(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT); 
+        window.setButtons(Dialog.OK);
+        window.setHideOnButtonClick(true);
+
+        window.setLayout(new FitLayout());
+        ScrollPanel wrapper = new ScrollPanel();
+        wrapper.add(descriptionFormatInfo);
+	    window.add(wrapper);
+        // show the window
+	    window.show();		
+	}
+
+	private Menu createWidgetMenu(final WidgetDescriptorUpdatedHandler callback) {
+	    Menu menu = new Menu();
+	    menu.add(getNewCommand("Image", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
+	    	};
+		}));
+	    menu.add(getNewCommand("Link", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.LINK_CONTENT_TYPE, callback);
+	    	};
+		}));
+	    menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	
+	    	};
+		}));
+	    menu.add(getNewCommand("Provenance Graph", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.PROVENANCE_CONTENT_TYPE, callback);
+	    	};
+		}));
+	    if (DisplayUtils.isInTestWebsite(cookies)) {
+		    menu.add(getNewCommand("Attachment", new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		handleInsertWidgetCommand(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, callback);
+		    	};
+			}));
+	    	menu.add(getNewCommand("Table Of Contents", new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TOC_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
+		    	};
+			}));
+	    	
+	    	menu.add(getNewCommand("Wiki Files Preview", new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
+		    	};
+			}));
+
+		    
+	    	menu.add(getNewCommand("Synapse API SuperTable", new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		handleInsertWidgetCommand(WidgetConstants.API_TABLE_CONTENT_TYPE, callback);
+		    	};
+			}));
+	    }
+
+	    return menu;
+	  }
+	
+	public void handleInsertWidgetCommand(String contentTypeKey, final WidgetDescriptorUpdatedHandler callback){
+		BaseEditWidgetDescriptorPresenter.editNewWidget(widgetDescriptorEditor, wikiKey, contentTypeKey, new WidgetDescriptorUpdatedHandler() {
+			@Override
+		public void onUpdate(WidgetDescriptorUpdatedEvent event) {
+			if (event.getInsertValue()!=null) {
+				insertMarkdown(event.getInsertValue());
+			}
+			callback.onUpdate(event);
+		}
+		});
+	}
+	
+	public void insertMarkdown(String md) {
+		String currentValue = markdownTextArea.getValue();
+		if (currentValue == null)
+			currentValue = "";
+		int cursorPos = markdownTextArea.getCursorPos();
+		if (cursorPos < 0)
+			cursorPos = 0;
+		else if (cursorPos > currentValue.length())
+			cursorPos = currentValue.length();
+		DisplayUtils.updateTextArea(markdownTextArea, currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
+	}
+	
+	/**
+	 * Deletes all instances of the given markdown from the editor
+	 * @param md
+	 */
+	public void deleteMarkdown(String md) {
+		//replace all instances of the md with the empty string
+		StringBuilder newValue = new StringBuilder(markdownTextArea.getValue());
+        
+		int idx = 0;
+        while((idx = newValue.indexOf(md, idx)) != -1) {
+            newValue.replace(idx, idx + md.length(), "");
+        }
+		
+		DisplayUtils.updateTextArea(markdownTextArea, newValue.toString());
+	}
+
+	
+	public Image getNewCommand(String tooltipText, ImageResource image, ClickHandler clickHandler){
+		Image command = new Image(image);
+		command.addStyleName("imageButton");
+		command.addClickHandler(clickHandler);
+		DisplayUtils.addTooltip(this.synapseJSNIUtils, command, tooltipText, TOOLTIP_POSITION.BOTTOM);
+		return command;
+	}
+	
+	public MenuItem getNewCommand(String text, SelectionListener selectionListener){
+		MenuItem item = new MenuItem(text);
+		item.addSelectionListener(selectionListener);
+		return item;
+	}
+	
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+}

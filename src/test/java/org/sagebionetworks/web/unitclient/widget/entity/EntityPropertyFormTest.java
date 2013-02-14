@@ -110,22 +110,6 @@ public class EntityPropertyFormTest {
 		verify(mockView, Mockito.times(2)).refresh();
 	}
 
-	@Test
-	public void testPreview() throws Exception {
-		final String testHtml = "<h1>HTML Returns</h1>";
-		final String testMarkdown = "HTML Returns\n----------";
-		AsyncMockStubber
-				.callSuccessWith(testHtml)
-				.when(mockSynapseClient)
-				.markdown2Html(any(String.class), any(String.class), any(Boolean.class),
-						any(AsyncCallback.class));
-		
-		presenter.showPreview(testMarkdown,  "");
-		verify(mockSynapseClient).markdown2Html(any(String.class),
-				any(String.class), any(Boolean.class), any(AsyncCallback.class));
-		verify(mockView).showPreview(anyString(), any(EntityBundle.class),any(WidgetRegistrar.class), any(SynapseClientAsync.class), any(NodeModelCreator.class), any(JSONObjectAdapter.class));
-	}
-	
 	
 	@Test
 	public void testAttachmentRefresh() {

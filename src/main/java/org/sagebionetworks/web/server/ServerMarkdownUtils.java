@@ -27,7 +27,7 @@ public class ServerMarkdownUtils {
 	 * *resolve Widgets!
 	 * @param panel
 	 */
-	public static String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview, PegDownProcessor markdownProcessor) {
+	public static String markdown2Html(String markdown, Boolean isPreview, PegDownProcessor markdownProcessor) {
 		if (markdown == null) return "";
 		//before processing, replace all '\n' with '  \n' so that all newlines are correctly interpreted as manual breaks!
 		if (markdown != null) {
@@ -40,11 +40,10 @@ public class ServerMarkdownUtils {
 		}
 		//using jsoup, since it's already in this project!
 		Document doc = Jsoup.parse(html);
+		ServerMarkdownUtils.assignIdsToHeadings(doc);
 		ServerMarkdownUtils.sendAllLinksToNewWindow(doc);
 		Elements anchors = doc.getElementsByTag("a");
 		anchors.addClass("link");
-		//TODO: remove old attachment image syntax support (now that we have widgets)?
-		ServerMarkdownUtils.resolveAttachmentImages(doc, attachmentUrl);
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
 		ServerMarkdownUtils.addSynapseLinks(doc);
 		//URLs are automatically resolved from the markdown processor
@@ -52,6 +51,14 @@ public class ServerMarkdownUtils {
 		return returnHtml;
 	}
 
+	public static void assignIdsToHeadings(Document doc) {
+		Elements hTags = doc.select("h0, h1, h2, h3, h4, h5, h6");
+		for (int i = 0; i < hTags.size(); i++) {
+			hTags.get(i).attr("id", WidgetConstants.MARKDOWN_HEADING_ID_PREFIX+i);
+			hTags.get(i).attr("level", hTags.get(i).tag().getName());
+		}
+	}
+	
 	public static void sendAllLinksToNewWindow(Document doc) {
 		Elements elements = doc.getElementsByTag("a");
 		elements.attr("target", "_blank");
