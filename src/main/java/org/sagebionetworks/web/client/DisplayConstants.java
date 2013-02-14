@@ -172,6 +172,9 @@ public class DisplayConstants {
 	public static final String BUTTON_TOOLS_MENU = "Tools";
 	public static final String BUTTON_ADD = "Add";
 	public static final String BUTTON_EDIT = "Edit";
+	public static final String BUTTON_EDIT_WIKI = "Edit Wiki";
+	public static final String BUTTON_DELETE_WIKI = "Delete&nbspPage";
+	public static final String BUTTON_WIKI_ATTACHMENTS = "Attachments";
 	public static final String BUTTON_SHARE = "Share";
 	public static final String BUTTON_DOWNLOAD = "Download";
 	public static final String LABEL_DELETE = "Delete";
@@ -229,6 +232,7 @@ public class DisplayConstants {
 	public static final String EMPTY = "Empty";
 	public static final String NONE_FOUND = "None Found";
 	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
+	public static final String LABEL_NO_MARKDOWN = "Please add more information by clicking the \"Edit Wiki\" button.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you cannot save a Link to the requested spot.";
@@ -241,6 +245,8 @@ public class DisplayConstants {
 	public static final String ERROR_DELETING_ATTACHMENT = "An error occurred deleting the Attachment. Please try again.";
 	public static final String LABEL_DELETED = "deleted";
 	public static final String ERROR_LOADING_DESCRIPTION_FAILED = "Failed to load the description: ";
+	public static final String ERROR_LOADING_MARKDOWN_FAILED = "Failed to load the markdown: ";
+	public static final String ERROR_LOADING_WIKI_FAILED = "Failed to load the wiki page: ";
 	public static final String ERRROR_ATTACHMENT_FAILED = "Failed to upload attachment: ";
 	public static final String ERROR_PROFILE_PICTURE_FAILED = "Failed to upload photo: ";
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
@@ -443,7 +449,9 @@ public class DisplayConstants {
 	public static final String FILES = "Files";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
 	public static final String PAGES = "Pages";
-	public static final String ADD_PAGE = "Add a new page";
+	public static final String ADD_PAGE = "Add a new Page";
+	public static final String CREATE_WIKI = "Insert Wiki";
+	public static final String DEFAULT_ROOT_WIKI_NAME = "Root";
 	public static final String PROJECT_WIKI_NAME = "Wiki";
 	public static final String ERROR_PAGE_CREATION_FAILED = "Page creation failed. Please try again";
 	public static final String UNAUTHORIZED = "Unauthorized";
@@ -470,5 +478,7 @@ public class DisplayConstants {
 	public static final String SWITCH_TO_STANDARD_WEBSITE = "Switch back to the release version";
 	public static final String SWITCH_TO_TEST_WEBSITE = "Try an alpha test version of the website";
 	public static final String TEST_MODE_WARNING = "This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade. Are you sure you want to switch into this mode?";
+	
+	public static final String UNSUPPORTED_FOR_OWNER_TYPE = "This operation is not currently supported for the given owner type: ";
 }
 

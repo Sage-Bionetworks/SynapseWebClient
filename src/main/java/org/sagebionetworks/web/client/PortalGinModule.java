@@ -38,6 +38,8 @@ import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.view.SearchViewImpl;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.view.SettingsViewImpl;
+import org.sagebionetworks.web.client.view.SynapseWikiView;
+import org.sagebionetworks.web.client.view.SynapseWikiViewImpl;
 import org.sagebionetworks.web.client.view.WikiView;
 import org.sagebionetworks.web.client.view.WikiViewImpl;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
@@ -65,6 +67,8 @@ import org.sagebionetworks.web.client.widget.entity.PropertyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
+import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
@@ -81,8 +85,12 @@ import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloa
 import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderView;
 import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
@@ -97,10 +105,18 @@ import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuViewImpl;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
@@ -267,6 +283,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiViewImpl.class).in(Singleton.class);
 		bind(WikiView.class).to(WikiViewImpl.class);	
 
+		//Synapse Wiki Pages
+		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
 		
 		/*
 		 * Widgets
@@ -354,6 +372,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// Attachments		
 		bind(AttachmentsView.class).to(AttachmentsViewImpl.class);
 
+		// Wiki Attachments		
+		bind(WikiAttachmentsView.class).to(WikiAttachmentsViewImpl.class);
+
 		// SnapshotWidget		
 		bind(SnapshotWidgetView.class).to(SnapshotWidgetViewImpl.class);
 
@@ -372,15 +393,22 @@ public class PortalGinModule extends AbstractGinModule {
 		// UI Widget Descriptor editor
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
 		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
+		bind(OldImageConfigView.class).to(OldImageConfigViewImpl.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
+		bind(AttachmentConfigView.class).to(AttachmentConfigViewImpl.class);
 		bind(ProvenanceConfigView.class).to(ProvenanceConfigViewImpl.class);
 		bind(LinkConfigView.class).to(LinkConfigViewImpl.class);
 		bind(APITableConfigView.class).to(APITableConfigViewImpl.class);
 		
 		// UI Widget Renderers
 		bind(YouTubeWidgetView.class).to(YouTubeWidgetViewImpl.class);
+		bind(OldImageWidgetView.class).to(OldImageWidgetViewImpl.class);
 		bind(ImageWidgetView.class).to(ImageWidgetViewImpl.class);
+		bind(AttachmentPreviewWidgetView.class).to(AttachmentPreviewWidgetViewImpl.class);
 		bind(APITableWidgetView.class).to(APITableWidgetViewImpl.class);
+		bind(TableOfContentsWidgetView.class).to(TableOfContentsWidgetViewImpl.class);
+		bind(WikiFilesPreviewWidgetView.class).to(WikiFilesPreviewWidgetViewImpl.class);
+		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
 		

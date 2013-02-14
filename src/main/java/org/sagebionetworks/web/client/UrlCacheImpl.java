@@ -28,5 +28,4 @@ public class UrlCacheImpl implements UrlCache {
 	public String getRepositoryServiceUrl() {
 		return repoUrl;
 	}
-
 }

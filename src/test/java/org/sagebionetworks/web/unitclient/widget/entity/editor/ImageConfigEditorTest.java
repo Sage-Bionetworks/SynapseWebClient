@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,12 +11,12 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class ImageConfigEditorTest {
 		
@@ -24,6 +24,8 @@ public class ImageConfigEditorTest {
 	ImageConfigView mockView;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
+	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
+	
 	@Before
 	public void setup(){
 		mockView = mock(ImageConfigView.class);
@@ -41,24 +43,15 @@ public class ImageConfigEditorTest {
 	@Test
 	public void testConfigure() {
 		Map<String,String> descriptor = new HashMap<String, String>();
-		AttachmentData testImage = new AttachmentData();
-		testImage.setName("test name");
-		testImage.setTokenId("test token");
-		testImage.setMd5("test md5");
-		
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
-		editor.configure("", descriptor);
-		verify(mockView).setEntityId(anyString());
-		//verify(mockView).setExternalVisible(anyBoolean());
-		when(mockView.getUploadedDataName()).thenReturn(testImage.getName());
+		editor.configure(wikiKey, descriptor);
+		verify(mockView).configure(any(WikiPageKey.class));
+		when(mockView.getUploadedFileHandleName()).thenReturn("a test file name");
 		
 		when(mockView.isExternal()).thenReturn(false);
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
-		verify(mockView).getUploadedDataName();
+		verify(mockView).getUploadedFileHandleName();
 	}
-	
-	
 	
 	@Test
 	public void testTextToInsert() {

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -14,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.pegdown.PegDownProcessor;
+import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -37,11 +37,16 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.storage.StorageUsage;
+import org.sagebionetworks.repo.model.wiki.WikiHeader;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -731,6 +736,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		ObjectType ownerObjectType = ObjectType.valueOf(ownerType);
+		if (ObjectType.ENTITY.equals(ownerObjectType))
+			return hasAccess(ownerId, accessType);
+		//TODO: support other object type access queries.  Like Competition
+//		else if (ObjectType.COMPETITION.equals(ownerObjectType))
+//			return hasAccessToCompetition(ownerId, accessType);
+		throw new IllegalArgumentException(DisplayConstants.UNSUPPORTED_FOR_OWNER_TYPE + ownerType);
+	}
+	
+	@Override
 	public EntityWrapper getAllUsers() throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
@@ -851,8 +868,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview) {
-		return ServerMarkdownUtils.markdown2Html(markdown, attachmentUrl, isPreview, markdownProcessor);
+	public String markdown2Html(String markdown, Boolean isPreview) {
+		return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
 	}
 
 	@Override
@@ -897,9 +914,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				Synapse client = createSynapseClient();
 				Entity e = client.getEntityById(entityId);
 				if (e.getAttachments() != null) {
-					for (Iterator<AttachmentData> iterator = e.getAttachments().iterator(); iterator
-							.hasNext();) {
-						AttachmentData data = iterator.next();
+					for (AttachmentData data : e.getAttachments()) {
 						if (data.getName().equals(attachmentName)) {
 							e.getAttachments().remove(data);
 							break;
@@ -942,5 +957,124 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public String createWikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			@SuppressWarnings("unchecked")
+			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,WikiPage.class);
+			WikiPage returnPage = synapseClient.createWikiPage(ownerId, ObjectType.valueOf(ownerType), page);
+			return EntityFactory.createJSONStringForEntity(returnPage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public void deleteWikiPage(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+			synapseClient.deleteWikiPage(properKey);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public String getWikiHeaderTree(String ownerId, String ownerType) throws RestServiceException {
+		try {
+			PaginatedResults<WikiHeader> results = getWikiHeaderTree(ownerId, ObjectType.valueOf(ownerType));
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	private PaginatedResults<WikiHeader> getWikiHeaderTree(String ownerId, ObjectType ownerType)  throws RestServiceException{
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<WikiHeader> results = synapseClient.getWikiHeaderTree(ownerId, ownerType);
+			return results;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	private String getRootWikiId(String ownerId, ObjectType ownerType) throws RestServiceException{
+		PaginatedResults<WikiHeader> results = getWikiHeaderTree(ownerId, ownerType);
+		for (WikiHeader header : results.getResults()) {
+			if (header.getParentId() == null) {
+				return header.getId();
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public String getWikiPage(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException{
+		Synapse synapseClient = createSynapseClient();
+		try {
+			if (key.getWikiPageId() == null) {
+				//asking for the root.  find the root id first
+				String rootWikiPage = getRootWikiId(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+				key.setWikiPageId(rootWikiPage);
+			}
+			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+			WikiPage returnPage = synapseClient.getWikiPage(properKey);
+			return EntityFactory.createJSONStringForEntity(returnPage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public String updateWikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException{
+		Synapse synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			@SuppressWarnings("unchecked")
+			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,WikiPage.class);
+			WikiPage returnPage = synapseClient.updateWikiPage(ownerId, ObjectType.valueOf(ownerType), page);
+			return EntityFactory.createJSONStringForEntity(returnPage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 
+	@Override
+	public String getFileEndpoint() throws RestServiceException{
+//		Synapse synapseClient = createSynapseClient();
+//		return synapseClient.getFileEndpoint();
+		return StackConfiguration.getFileServiceEndpoint();
+	}
+	@Override
+	public String getWikiAttachmentHandles(org.sagebionetworks.web.shared.WikiPageKey key)
+			throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			if (key.getWikiPageId() == null) {
+				//asking for the root.  find the root id first
+				String rootWikiPage = getRootWikiId(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+				key.setWikiPageId(rootWikiPage);
+			}
+			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+			FileHandleResults results = synapseClient.getWikiAttachmenthHandles(properKey);
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 }

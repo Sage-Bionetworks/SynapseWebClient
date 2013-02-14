@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -47,6 +48,7 @@ public class APITableWidgetTest {
 	String testJSON = "{totalNumberOfResults=10,results={}}";
 	Map<String, String> descriptor;
 	JSONObjectAdapter testReturnJSONObject;
+	WikiPageKey testWikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
@@ -103,7 +105,7 @@ public class APITableWidgetTest {
 	
 	@Test
 	public void testConfigure() {
-		widget.configure("", descriptor);
+		widget.configure(testWikiKey, descriptor);
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
@@ -125,7 +127,7 @@ public class APITableWidgetTest {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY);
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 		
-		widget.configure("", descriptor);
+		widget.configure(testWikiKey, descriptor);
 		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 	}
 	
@@ -140,7 +142,8 @@ public class APITableWidgetTest {
 		};
 		//return our renderer that always fails to initialize when asked for the Synapse ID column renderer
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(failColumnRenderer);
-		widget.configure("", descriptor);
+		widget.configure(testWikiKey, descriptor);
+		
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
@@ -151,7 +154,7 @@ public class APITableWidgetTest {
 	@Test
 	public void testMissingServiceURI() throws JSONObjectAdapterException {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
-		widget.configure("", descriptor);
+		widget.configure(testWikiKey, descriptor);
 		verify(mockView).showError(anyString());
 	}
 	
@@ -160,22 +163,21 @@ public class APITableWidgetTest {
 	public void testServiceCallFailure() throws JSONObjectAdapterException {
 		String errorMessage = "service response error message";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		widget.configure("", descriptor);
+		widget.configure(testWikiKey, descriptor);
 		verify(mockView).showError(eq(errorMessage));
 	}
 	
 	@Test
 	public void testNoPaging() throws JSONObjectAdapterException {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
-		widget.configure("", descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
-		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
+		widget.configure(testWikiKey, descriptor);
+		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
 	@Test
 	public void testPagerNotNecessary() throws JSONObjectAdapterException {
 		testReturnJSONObject.put("totalNumberOfResults", 2);
-		widget.configure("", descriptor);
+		widget.configure(testWikiKey, descriptor);
 		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
@@ -185,7 +187,7 @@ public class APITableWidgetTest {
 	public void testInvalidColumnList2() throws JSONObjectAdapterException {
 		//different length than renderers and display names
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_COLUMNS_KEY, "field1");
-		widget.configure("", descriptor);
+		widget.configure(testWikiKey, descriptor);
 		verify(mockView).showError(anyString());
 	}
 	
@@ -193,7 +195,7 @@ public class APITableWidgetTest {
 	public void testInvalidDisplayColumnList() throws JSONObjectAdapterException {
 		//different length than renderers and display names
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY, "Field 1");
-		widget.configure("", descriptor);
+		widget.configure(testWikiKey, descriptor);
 		verify(mockView).showError(anyString());
 	}
 	
