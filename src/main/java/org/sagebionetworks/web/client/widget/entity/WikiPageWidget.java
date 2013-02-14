@@ -258,12 +258,11 @@ public class WikiPageWidget extends LayoutContainer {
 		}
 		
 		editButton.setEnabled(canEdit);
+		addPageButton.setEnabled(canEdit);
 		configureEditButton();
 		
 		return commandBarWrapper;
 	}
-	
-	
 	
 	private Button getInsertPageButton(final boolean isFirstPage) {
 		String buttonText = isFirstPage ? DisplayConstants.CREATE_WIKI : DisplayConstants.ADD_PAGE;
