@@ -12,7 +12,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -599,6 +600,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		return lc;
 	}
+	
 	private Widget createRestrictionWidget() {
 		if (!presenter.includeRestrictionWidget()) return null;
 		boolean isAnonymous = presenter.isAnonymous();
@@ -609,17 +611,18 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			hasAdministrativeAccess = presenter.hasAdministrativeAccess();
 			jiraFlagLink = presenter.getJiraFlagUrl();
 		}
-		APPROVAL_REQUIRED restrictionLevel = presenter.getRestrictionLevel();
+		RESTRICTION_LEVEL restrictionLevel = presenter.getRestrictionLevel();
+		APPROVAL_TYPE approvalType = presenter.getApprovalType();
 		String accessRequirementText = null;
 		Callback touAcceptanceCallback = null;
 		Callback requestACTCallback = null;
 		Callback imposeRestrictionsCallback = presenter.getImposeRestrictionsCallback();
 		Callback loginCallback = presenter.getLoginCallback();
-		if (restrictionLevel!=APPROVAL_REQUIRED.NONE) {
+		if (approvalType!=APPROVAL_TYPE.NONE) {
 			accessRequirementText = presenter.accessRequirementText();
-			if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
+			if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
 				touAcceptanceCallback = presenter.accessRequirementCallback();
-			} else {
+			} else { // APPROVAL_TYPE.ACT_APPROVAL
 				// get the Jira link for ACT approval
 				if (!isAnonymous) {
 					requestACTCallback = new Callback() {
@@ -643,6 +646,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				imposeRestrictionsCallback,
 				loginCallback,
 				restrictionLevel,
+				approvalType,
 				hasFulfilledAccessRequirements,
 				icons,
 				synapseJSNIUtils);

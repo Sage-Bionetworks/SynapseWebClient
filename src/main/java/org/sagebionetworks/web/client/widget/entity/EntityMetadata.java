@@ -21,10 +21,11 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.shared.EntityUtil;
@@ -35,7 +36,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -131,7 +131,7 @@ public class EntityMetadata implements Presenter {
 				bundle.getEntity().getId());
 	}
 
-	private String getJiraRestrictionUrl() {
+	public String getJiraRestrictionUrl() {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		return jiraURLHelper.createAccessRestrictionIssue(
@@ -158,10 +158,13 @@ public class EntityMetadata implements Presenter {
 	}
 
 	@Override
-	public APPROVAL_REQUIRED getRestrictionLevel() {
-		if (bundle.getAccessRequirements().size()==0L) return APPROVAL_REQUIRED.NONE;
-		if (isTermsOfUseAccessRequirement()) return APPROVAL_REQUIRED.LICENSE_ACCEPTANCE;
-		return APPROVAL_REQUIRED.ACT_APPROVAL;
+	public RESTRICTION_LEVEL getRestrictionLevel() {
+		return GovernanceServiceHelper.entityRestrictionLevel(bundle.getAccessRequirements());
+	}
+
+	@Override
+	public APPROVAL_TYPE getApprovalType() {
+		return GovernanceServiceHelper.accessRequirementApprovalType(getAccessRequirement());
 	}
 
 	@Override
@@ -176,37 +179,17 @@ public class EntityMetadata implements Presenter {
 
 	@Override
 	public String accessRequirementText() {
-		if (bundle.getAccessRequirements().size()==0) throw new IllegalStateException("There is no access requirement.");
-		AccessRequirement ar = bundle.getAccessRequirements().get(0);
-		if (ar instanceof TermsOfUseAccessRequirement) {
-			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
-		} else if (ar instanceof ACTAccessRequirement) {
-			return ((ACTAccessRequirement)ar).getActContactInfo();			
-		} else {
-			throw new IllegalStateException("Unexpected access requirement type "+ar.getClass());
-		}
+		return GovernanceServiceHelper.getAccessRequirementText(getAccessRequirement());
 	}
 	
 	private AccessRequirement getAccessRequirement() {
-		return bundle.getAccessRequirements().get(0);
-	}
-
-	@Override
-	public boolean isTermsOfUseAccessRequirement() {
-		if (bundle.getAccessRequirements().size()==0) throw new IllegalStateException("There is no access requirement.");
-		AccessRequirement ar = getAccessRequirement();
-		if (ar instanceof TermsOfUseAccessRequirement) {
-			return true;		
-		} else {
-			return false;
-		}
+		return GovernanceServiceHelper.selectAccessRequirement(bundle.getAccessRequirements(), bundle.getUnmetAccessRequirements());
 	}
 
 	@Override
 	public Callback accessRequirementCallback() {
-		if (!isTermsOfUseAccessRequirement()) throw new IllegalStateException("not a TOU Access Requirement");
-		AccessRequirement ar = getAccessRequirement();
-		TermsOfUseAccessRequirement tou = (TermsOfUseAccessRequirement)ar;
+		if (APPROVAL_TYPE.USER_AGREEMENT!=GovernanceServiceHelper.accessRequirementApprovalType(getAccessRequirement())) 
+			throw new IllegalStateException("not a 'User Agreement' requirement type");
 		return new Callback() {
 			@Override
 			public void invoke() {
