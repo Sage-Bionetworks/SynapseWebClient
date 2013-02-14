@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHandler;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowser;
+import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -71,7 +72,7 @@ public class WikiPageWidget extends LayoutContainer {
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private Button editButton;
+	private Button editButton, addPageButton;
 	private HorizontalPanel commandBar;
 	private SimplePanel commandBarWrapper;
 	private WikiPageKey wikiKey;
@@ -122,7 +123,7 @@ public class WikiPageWidget extends LayoutContainer {
 				public void pageUpdated() {
 				}
 			};
-		final Callback finalCallback = this.callback;
+		
 		setOwnerObjectName(new OwnerObjectNameCallback() {
 			@Override
 			public void ownerObjectNameInitialized() {
@@ -134,7 +135,7 @@ public class WikiPageWidget extends LayoutContainer {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
 							markdownWidget.setMarkdown(currentPage.getMarkdown(), wikiKey, false);
-							pagesBrowser.configure(wikiKey, ownerObjectName, ownerHistoryToken, DisplayConstants.PAGES, canEdit,finalCallback);
+							pagesBrowser.configure(wikiKey, ownerObjectName, ownerHistoryToken, DisplayConstants.PAGES, canEdit);
 							showDefaultViewWithWiki();
 						} catch (JSONObjectAdapterException e) {
 							onFailure(e);
@@ -144,8 +145,10 @@ public class WikiPageWidget extends LayoutContainer {
 					public void onFailure(Throwable caught) {
 						//if it is because of a missing root (and we have edit permission), then the pages browser should have a Create Wiki button
 						if (caught instanceof NotFoundException) {
-							pagesBrowser.configure(wikiKey, ownerObjectName, ownerHistoryToken, DisplayConstants.PAGES, canEdit,finalCallback);
-							add(pagesBrowser.asWidget());
+							SimplePanel createWikiButtonWrapper = new SimplePanel();
+							createWikiButtonWrapper.addStyleName("margin-bottom-20");
+							createWikiButtonWrapper.add(getInsertPageButton(true));
+							add(createWikiButtonWrapper);
 							layout(true);
 						}
 						else {
@@ -163,14 +166,14 @@ public class WikiPageWidget extends LayoutContainer {
 		topBarWrapper.addStyleName("span-24 margin-top-5");
 		HorizontalPanel topBar = new HorizontalPanel();
 		String titleString = isEmbeddedInOwnerPage ? "" : currentPage.getTitle();
-		topBar.add(new HTMLPanel("<h2 style=\"width:865px\">"+titleString+"</h2>"));
+		topBar.add(new HTMLPanel("<h2 style=\"width:750px; margin-bottom:0px;\">"+titleString+"</h2>"));
 		topBar.add(getCommands(canEdit));
 		topBarWrapper.add(topBar);
 		add(topBarWrapper);
 		
 		FlowPanel mainPanel = new FlowPanel();
 		mainPanel.addStyleName("span-24 notopmargin");
-		//mainPanel.add(getBreadCrumbs());
+		mainPanel.add(getBreadCrumbs());
 		mainPanel.add(markdownWidget.asWidget());
 		mainPanel.add(pagesBrowser.asWidget());
 		
@@ -247,6 +250,13 @@ public class WikiPageWidget extends LayoutContainer {
 			commandBar.add(editButton);
 			commandBar.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
 		}
+		
+		if(addPageButton == null) {
+			addPageButton = getInsertPageButton(false);
+			commandBar.add(addPageButton);
+			commandBar.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
+		}
+		
 		editButton.setEnabled(canEdit);
 		configureEditButton();
 		
@@ -254,6 +264,30 @@ public class WikiPageWidget extends LayoutContainer {
 	}
 	
 	
+	
+	private Button getInsertPageButton(final boolean isFirstPage) {
+		String buttonText = isFirstPage ? DisplayConstants.CREATE_WIKI : DisplayConstants.ADD_PAGE;
+		Button insertButton = new Button(buttonText, AbstractImagePrototype.create(iconsImageBundle.addSquareGrey16()));
+		insertButton.setWidth(115);
+		insertButton.setHeight(25);
+		insertButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				if (isFirstPage) {
+					createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
+				}
+				else {
+					NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
+						@Override
+						public void onSave(String name, String description) {
+							createPage(name);
+						}
+					});
+				}
+			}
+		});
+		return insertButton;
+	}
 	
 	private void configureEditButton() {
 		editButton.removeAllListeners();
@@ -305,8 +339,8 @@ public class WikiPageWidget extends LayoutContainer {
 			@Override
 			public void deleteClicked() {
 				//delete wiki
-				MessageBox.confirm(DisplayConstants.LABEL_DELETE + " Wiki",
-						DisplayConstants.PROMPT_SURE_DELETE + " Wiki?",
+				MessageBox.confirm(DisplayConstants.LABEL_DELETE + " Page",
+						DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?",
 						new Listener<MessageBoxEvent>() {
 					@Override
 					public void handleEvent(MessageBoxEvent be) {
@@ -316,15 +350,8 @@ public class WikiPageWidget extends LayoutContainer {
 								
 								@Override
 								public void onSuccess(Void result) {
-									//if there's a parent wiki page, then go there after delete.  otherwise, just refresh the page (to get the Create Wiki option)
-									if (currentPage.getParentWikiId() != null) {
-										wikiKey.setWikiPageId(currentPage.getParentWikiId());
-									}
-									else {
-										//clear out the wiki page id (since it's now deleted
-										wikiKey.setWikiPageId(null);
-									}
-									refresh();
+									//go to the owner object
+									breadcrumb.goTo(new Synapse(wikiKey.getOwnerObjectId()));
 								}
 								
 								@Override
@@ -392,6 +419,37 @@ public class WikiPageWidget extends LayoutContainer {
 		};
 	}
 
+	public void createPage(final String name) {
+		WikiPage page = new WikiPage();
+		//if this is creating the root wiki, then refresh the full page
+		final boolean isCreatingWiki = wikiKey.getWikiPageId() ==null;
+		page.setParentWikiId(wikiKey.getWikiPageId());
+		page.setTitle(name);
+		String wikiPageJson;
+		try {
+			wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			synapseClient.createWikiPage(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					if (isCreatingWiki)
+						DisplayUtils.showInfo("Wiki Created", "");
+					else
+						DisplayUtils.showInfo("Page '" + name + "' Added", "");
+					
+					refresh();
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
+				}
+			});
+		} catch (JSONObjectAdapterException e) {			
+			showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
+		}
+	}
+	
+	
 	private void refresh() {
 		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
 	}

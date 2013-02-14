@@ -18,6 +18,8 @@ public interface SynapseJSNIUtils {
 	
 	public String convertDateToSmallString(Date toFormat);
 	
+	public String getBaseFileHandleUrl();
+	
 	public String getBaseProfileAttachmentUrl();
 
 	public int randomNextInt();

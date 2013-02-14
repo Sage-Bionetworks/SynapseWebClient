@@ -284,6 +284,11 @@ public class ProvenanceWidgetTest {
 				return "?foo=bar";
 			}
 			
+			@Override
+			public String getBaseFileHandleUrl() {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		};
 	}
 

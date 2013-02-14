@@ -33,6 +33,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
 
+import com.google.common.io.Files;
 import com.google.inject.Inject;
 
 /**
@@ -156,16 +157,13 @@ public class FileHandleServlet extends HttpServlet {
 				String name = item.getFieldName();
 				InputStream stream = item.openStream();
 				String fileName = item.getName();
-				File temp = ServiceUtils.writeToTempFile(stream, MAX_ATTACHMENT_SIZE_IN_BYTES);
+                File tempDir = Files.createTempDir();
+				File temp = new File(tempDir.getAbsolutePath() + File.separator + fileName);
+
+				ServiceUtils.writeToFile(temp, stream, MAX_ATTACHMENT_SIZE_IN_BYTES);
 				try{
 					// Now upload the file
 					List<File> files = new ArrayList<File>();
-					File renamedFile = new File(fileName);
-					//wait until we can have this file name
-					while (!temp.renameTo(renamedFile)){
-						Thread.sleep(1000);
-					}
-					temp = renamedFile;
 					files.add(temp);
 					client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
 					results = client.createFileHandles(files);

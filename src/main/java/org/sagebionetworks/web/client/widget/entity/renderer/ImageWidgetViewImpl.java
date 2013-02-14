@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -13,9 +14,11 @@ import com.google.inject.Inject;
 public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetView {
 
 	private Presenter presenter;
+	private SynapseJSNIUtils synapseJsniUtils;
 	
 	@Inject
-	public ImageWidgetViewImpl() {
+	public ImageWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils) {
+		this.synapseJsniUtils = synapseJsniUtils;
 	}
 	
 	@Override
@@ -38,37 +41,11 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 		}
 		
 		sb.append(" src=\"");
-		sb.append(createWikiAttachmentUrl(wikiKey, fileName,false));
+		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
 		sb.append("\"></img>");
 		
 		add(new HTMLPanel(sb.toString()));
 		this.layout(true);
-	}
-	
-	/**
-	 * Create the url to a wiki filehandle.
-	 * @param baseURl
-	 * @param id
-	 * @param tokenId
-	 * @param fileName
-	 * @return
-	 */
-	public static String createWikiAttachmentUrl(WikiPageKey wikiKey, String fileName, boolean preview){
-		//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
-//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
-//		return repoServicesUrl 
-//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
-//				+"/"+ wikiKey.getOwnerObjectId()
-//				+"/wiki/" 
-//				+wikiKey.getWikiPageId()
-//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
-		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + DisplayUtils.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
-		return GWT.getModuleBaseURL()+"filehandle?" +
-				DisplayUtils.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
-				DisplayUtils.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
-				DisplayUtils.WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
-				DisplayUtils.WIKI_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
-				wikiIdParam;
 	}
 	
 	@Override

@@ -7,7 +7,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -54,10 +54,12 @@ public class WikiAttachmentsViewImpl extends LayoutContainer implements WikiAtta
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private int attachmentColumnWidth;
+	private SynapseJSNIUtils synapseJsniUtils;
 	
 	@Inject
-	public WikiAttachmentsViewImpl(IconsImageBundle iconsImageBundle) {
+	public WikiAttachmentsViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJsniUtils) {
 		this.iconsImageBundle = iconsImageBundle;
+		this.synapseJsniUtils = synapseJsniUtils;
 		gridStore = new ListStore<BaseModelData>();
 		setAttachmentColumnWidth(ATTACHMENT_COLUMN_WIDTH_PX);
 	}
@@ -141,7 +143,7 @@ public class WikiAttachmentsViewImpl extends LayoutContainer implements WikiAtta
 			SafeHtml previewToolip = SafeHtmlUtils.fromSafeConstant("<div class=\"preview-image-loading\" >"
 			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_START
 			    		+ "<img style=\"background: white; margin:auto; display:block;\" src=\"" 
-			    		+ ImageWidgetViewImpl.createWikiAttachmentUrl(wikiKey, data.getFileName(),true) + "\"/>"
+			    		+ DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, data.getFileName(),true) + "\"/>"
 			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_END
 			    		+ "</div>");  
 		    

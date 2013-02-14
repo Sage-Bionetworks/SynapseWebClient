@@ -173,7 +173,7 @@ public class DisplayConstants {
 	public static final String BUTTON_ADD = "Add";
 	public static final String BUTTON_EDIT = "Edit";
 	public static final String BUTTON_EDIT_WIKI = "Edit Wiki";
-	public static final String BUTTON_DELETE_WIKI = "Delete&nbspWiki";
+	public static final String BUTTON_DELETE_WIKI = "Delete&nbspPage";
 	public static final String BUTTON_WIKI_ATTACHMENTS = "Attachments";
 	public static final String BUTTON_SHARE = "Share";
 	public static final String BUTTON_DOWNLOAD = "Download";
@@ -232,6 +232,7 @@ public class DisplayConstants {
 	public static final String EMPTY = "Empty";
 	public static final String NONE_FOUND = "None Found";
 	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
+	public static final String LABEL_NO_MARKDOWN = "Please add more information by clicking the \"Edit Wiki\" button.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you cannot save a Link to the requested spot.";
