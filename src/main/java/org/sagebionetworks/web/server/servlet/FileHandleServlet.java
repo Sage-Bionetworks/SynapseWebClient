@@ -183,8 +183,7 @@ public class FileHandleServlet extends HttpServlet {
 					WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
 					WikiPage page = client.getWikiPage(properKey);
 					List<String> fileHandleIds = page.getAttachmentFileHandleIds();
-					for (Iterator<FileHandle> iterator = results.getList().iterator(); iterator.hasNext();) {
-						FileHandle handle = iterator.next();
+					for (FileHandle handle : results.getList()) {
 						if (!fileHandleIds.contains(handle.getId()))
 							fileHandleIds.add(handle.getId());
 					}

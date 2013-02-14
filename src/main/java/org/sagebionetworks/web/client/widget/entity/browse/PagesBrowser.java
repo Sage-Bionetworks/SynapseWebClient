@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
@@ -68,9 +67,8 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 					Map<String, TreeItem> wikiId2TreeItem = new HashMap<String, TreeItem>(); 
 					
 					//now grab all of the headers associated with this level
-					for (Iterator iterator = wikiHeaders.getResults().iterator(); iterator
-							.hasNext();) {
-						WikiHeader header = (WikiHeader) iterator.next();
+					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
+						WikiHeader header = (WikiHeader) headerEntity;
 						boolean isCurrentPage = header.getId().equals(wikiKey.getWikiPageId());
 						String href, title;
 						if (header.getParentId() == null) {
@@ -86,9 +84,8 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 					}
 					//now set up the relationships
 					TreeItem root = null;
-					for (Iterator iterator = wikiHeaders.getResults().iterator(); iterator
-							.hasNext();) {
-						WikiHeader header = (WikiHeader) iterator.next();
+					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
+						WikiHeader header = (WikiHeader) headerEntity;
 						if (header.getParentId() != null){
 							//add this as a child
 							wikiId2TreeItem.get(header.getParentId()).addItem(wikiId2TreeItem.get(header.getId()));

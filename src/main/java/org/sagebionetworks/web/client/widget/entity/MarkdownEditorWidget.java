@@ -381,6 +381,22 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			cursorPos = currentValue.length();
 		DisplayUtils.updateTextArea(markdownTextArea, currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
 	}
+	
+	/**
+	 * Deletes all instances of the given markdown from the editor
+	 * @param md
+	 */
+	public void deleteMarkdown(String md) {
+		//replace all instances of the md with the empty string
+		StringBuilder newValue = new StringBuilder(markdownTextArea.getValue());
+        
+		int idx = 0;
+        while((idx = newValue.indexOf(md, idx)) != -1) {
+            newValue.replace(idx, idx + md.length(), "");
+        }
+		
+		DisplayUtils.updateTextArea(markdownTextArea, newValue.toString());
+	}
 
 	
 	public Image getNewCommand(String tooltipText, ImageResource image, ClickHandler clickHandler){

@@ -283,8 +283,8 @@ public class WikiAttachmentsViewImpl extends LayoutContainer implements WikiAtta
 		final BaseModelData model = grid.getStore().getAt(rowIndex);
 		if (model != null) {
 			String name = (String) model.get(ATTACHMENT_NAME_KEY);
-			String tokenId = (String) model.get(ATTACHMENT_FILE_HANDLE_ID_KEY);
-			//presenter.attachmentClicked(name, tokenId);
+			presenter.attachmentClicked(name);
+//			String tokenId = (String) model.get(ATTACHMENT_FILE_HANDLE_ID_KEY);
 		}
 	}
 

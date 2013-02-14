@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -26,6 +28,8 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.Managem
 import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -83,6 +87,7 @@ public class WikiPageWidget extends LayoutContainer {
 	private AdapterFactory adapterFactory;
 	private String ownerObjectName, ownerHistoryToken; //used for linking back to the owner object
 	private WikiAttachments wikiAttachments;
+	private WidgetRegistrar widgetRegistrar;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -94,7 +99,7 @@ public class WikiPageWidget extends LayoutContainer {
 	
 	
 	@Inject
-	public WikiPageWidget(SynapseClientAsync synapseClient, MarkdownWidget markdownWidget, PagesBrowser pagesBrowser, NodeModelCreator nodeModelCreator, MarkdownEditorWidget markdownEditorWidget, IconsImageBundle iconsImageBundle, JSONObjectAdapter jsonObjectAdapter, Breadcrumb breadcrumb, AdapterFactory adapterFactory, WikiAttachments wikiAttachments) {
+	public WikiPageWidget(SynapseClientAsync synapseClient, MarkdownWidget markdownWidget, PagesBrowser pagesBrowser, NodeModelCreator nodeModelCreator, MarkdownEditorWidget markdownEditorWidget, IconsImageBundle iconsImageBundle, JSONObjectAdapter jsonObjectAdapter, Breadcrumb breadcrumb, AdapterFactory adapterFactory, WikiAttachments wikiAttachments, WidgetRegistrar widgetRegistrar) {
 		super();
 		this.synapseClient = synapseClient;
 		this.markdownWidget = markdownWidget;
@@ -106,6 +111,7 @@ public class WikiPageWidget extends LayoutContainer {
 		this.breadcrumb = breadcrumb;
 		this.adapterFactory = adapterFactory;
 		this.wikiAttachments = wikiAttachments;
+		this.widgetRegistrar = widgetRegistrar;
 	}
 	
 	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage) {
@@ -332,7 +338,35 @@ public class WikiPageWidget extends LayoutContainer {
 		return new ManagementHandler() {
 			@Override
 			public void attachmentsClicked() {
-				wikiAttachments.configure(wikiKey, currentPage);
+				wikiAttachments.configure(wikiKey, currentPage, new WikiAttachments.Callback() {
+					@Override
+					public void attachmentDeleted(String fileName) {
+						//when an attachment is deleted from the wiki attachments dialog, let's delete references from the markdown editor
+						//delete previews, and image references
+						Map<String, String> descriptor = new HashMap<String, String>();
+						descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
+						try {
+							String imageMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.IMAGE_CONTENT_TYPE, descriptor , widgetRegistrar);
+							markdownEditorWidget.deleteMarkdown(imageMD);
+							//works because AttachmentPreviewWidget looks for the same parameter ImageWidget
+							String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
+							markdownEditorWidget.deleteMarkdown(previewMD);
+						} catch (JSONObjectAdapterException e) {
+						}
+					}
+					
+					@Override
+					public void attachmentClicked(String fileName) {
+						//when an attachment is clicked in the wiki attachments dialog, let's add a reference in the markdown editor
+						Map<String, String> descriptor = new HashMap<String, String>();
+						descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
+						try {
+							String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
+							markdownEditorWidget.insertMarkdown(previewMD);
+						} catch (JSONObjectAdapterException e) {
+						}						
+					}
+				});
 				showDialog(wikiAttachments);
 			}
 			@Override
