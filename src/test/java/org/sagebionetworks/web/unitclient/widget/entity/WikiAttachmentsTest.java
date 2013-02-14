@@ -74,20 +74,20 @@ public class WikiAttachmentsTest {
 
 	@Test
 	public void testConfigure() {
-		presenter.configure(new WikiPageKey("syn1234",WidgetConstants.WIKI_OWNER_ID_ENTITY,""), new WikiPage());
+		presenter.configure(new WikiPageKey("syn1234",WidgetConstants.WIKI_OWNER_ID_ENTITY,""), new WikiPage(), null);
 		verify(mockView).configure(any(WikiPageKey.class), any(List.class));
 	}
 	
 	@Test
 	public void testConfigureFail() {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("syn1234",WidgetConstants.WIKI_OWNER_ID_ENTITY,""), new WikiPage());
+		presenter.configure(new WikiPageKey("syn1234",WidgetConstants.WIKI_OWNER_ID_ENTITY,""), new WikiPage(), null);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testDelete(){
-		presenter.configure(new WikiPageKey("syn1234",WidgetConstants.WIKI_OWNER_ID_ENTITY,""), new WikiPage());
+		presenter.configure(new WikiPageKey("syn1234",WidgetConstants.WIKI_OWNER_ID_ENTITY,""), new WikiPage(), null);
 		presenter.deleteAttachment("a file");
 		verify(mockSynapseClient).updateWikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}

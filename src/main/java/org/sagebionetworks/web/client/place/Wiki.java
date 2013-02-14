@@ -4,7 +4,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 
 public class Wiki extends Place{
-	private static final String DELIMITER = "/"; 
+	public static final String DELIMITER = "/"; 
 	
 	private String token;
 	private String ownerId, ownerType, wikiId;

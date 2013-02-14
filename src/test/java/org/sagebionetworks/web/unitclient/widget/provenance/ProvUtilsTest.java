@@ -241,6 +241,12 @@ public class ProvUtilsTest {
 			public String getLocationQueryString() {
 				return "?foo=bar";
 			}
+			
+			@Override
+			public String getBaseFileHandleUrl() {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		};
 	}
 

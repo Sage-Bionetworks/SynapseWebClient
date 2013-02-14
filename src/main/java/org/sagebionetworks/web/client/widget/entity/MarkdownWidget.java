@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -50,7 +51,14 @@ public class MarkdownWidget extends LayoutContainer {
 			@Override
 			public void onSuccess(String result) {
 				try {
-					HTMLPanel panel = new HTMLPanel(result);
+					HTMLPanel panel;
+					if(result == null || "".equals(result)) {
+				    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%;margin-bottom:30px\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>"));
+					}
+					else{
+						panel = new HTMLPanel(result);
+					}
+
 					add(panel);
 					layout();
 					synapseJSNIUtils.highlightCodeBlocks();

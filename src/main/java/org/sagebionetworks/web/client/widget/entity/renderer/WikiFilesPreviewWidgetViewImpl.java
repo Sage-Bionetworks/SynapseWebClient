@@ -6,7 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.UrlCache;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -17,9 +17,11 @@ import com.google.inject.Inject;
 public class WikiFilesPreviewWidgetViewImpl extends LayoutContainer implements WikiFilesPreviewWidgetView {
 
 	private Presenter presenter;
+	private SynapseJSNIUtils synapseJsniUtils;
 	
 	@Inject
-	public WikiFilesPreviewWidgetViewImpl() {
+	public WikiFilesPreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils) {
+		this.synapseJsniUtils = synapseJsniUtils;
 	}
 	
 	@Override
@@ -44,10 +46,10 @@ public class WikiFilesPreviewWidgetViewImpl extends LayoutContainer implements W
 				sb.append("<div class=\"preview-image-loading view\" >");
 				sb.append(DisplayUtils.IMAGE_CENTERING_TABLE_START);
 				sb.append("<a class=\"item-preview spec-border-ie\" href=\"");
-				sb.append(ImageWidgetViewImpl.createWikiAttachmentUrl(wikiKey, fileHandle.getFileName(),false));
+				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),false));
 				sb.append("\"><img class=\"wikifilepreviewimg\" ");
 				sb.append(" src=\"");
-				sb.append(ImageWidgetViewImpl.createWikiAttachmentUrl(wikiKey, fileHandle.getFileName(),true));
+				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),true));
 				sb.append("\"></img></a>");
 				sb.append(DisplayUtils.IMAGE_CENTERING_TABLE_END);
 				sb.append("</div>");

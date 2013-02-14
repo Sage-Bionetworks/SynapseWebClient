@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -14,7 +11,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -30,27 +26,22 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 	private PagesBrowserView view;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private AdapterFactory adapterFactory;
 	private boolean canEdit;
 	private WikiPageKey wikiKey; 
 	private String ownerObjectName, ownerObjectLink;
-	private WikiPageWidget.Callback callback;
 	
 	@Inject
-	public PagesBrowser(PagesBrowserView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
-			AdapterFactory adapterFactory) {
+	public PagesBrowser(PagesBrowserView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.adapterFactory = adapterFactory;
 		
 		view.setPresenter(this);
 	}	
 	
-	public void configure(final WikiPageKey wikiKey, final String ownerObjectName, final String ownerObjectLink, final String title, final boolean canEdit, WikiPageWidget.Callback callback) {
+	public void configure(final WikiPageKey wikiKey, final String ownerObjectName, final String ownerObjectLink, final String title, final boolean canEdit) {
 		this.canEdit = canEdit;
 		this.wikiKey = wikiKey;
-		this.callback = callback;
 		this.ownerObjectName = ownerObjectName;
 		this.ownerObjectLink = ownerObjectLink;
 		//refresh the table of contents
@@ -66,38 +57,6 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 		view.setPresenter(this);		
 		return view.asWidget();
 	}
-
-	@Override
-	public void createPage(final String name) {
-		WikiPage page = new WikiPage();
-		//if this is creating the root wiki, then refresh the full page
-		final boolean isCreatingWiki = wikiKey.getWikiPageId() ==null;
-		page.setParentWikiId(wikiKey.getWikiPageId());
-		page.setTitle(name);
-		String wikiPageJson;
-		try {
-			wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.createWikiPage(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					if (isCreatingWiki) {
-						view.showInfo("Wiki Created", "");
-						callback.pageUpdated();
-					}
-					else
-						view.showInfo("Page '" + name + "' Added", "");	
-					refreshTableOfContents();
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
-				}
-			});
-		} catch (JSONObjectAdapterException e) {			
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
-		}
-	}
 	
 	public void refreshTableOfContents() {
 		synapseClient.getWikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<String>() {
@@ -108,9 +67,8 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 					Map<String, TreeItem> wikiId2TreeItem = new HashMap<String, TreeItem>(); 
 					
 					//now grab all of the headers associated with this level
-					for (Iterator iterator = wikiHeaders.getResults().iterator(); iterator
-							.hasNext();) {
-						WikiHeader header = (WikiHeader) iterator.next();
+					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
+						WikiHeader header = (WikiHeader) headerEntity;
 						boolean isCurrentPage = header.getId().equals(wikiKey.getWikiPageId());
 						String href, title;
 						if (header.getParentId() == null) {
@@ -126,9 +84,8 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 					}
 					//now set up the relationships
 					TreeItem root = null;
-					for (Iterator iterator = wikiHeaders.getResults().iterator(); iterator
-							.hasNext();) {
-						WikiHeader header = (WikiHeader) iterator.next();
+					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
+						WikiHeader header = (WikiHeader) headerEntity;
 						if (header.getParentId() != null){
 							//add this as a child
 							wikiId2TreeItem.get(header.getParentId()).addItem(wikiId2TreeItem.get(header.getId()));

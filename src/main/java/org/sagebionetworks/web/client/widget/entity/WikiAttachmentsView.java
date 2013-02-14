@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.widget.entity.WikiAttachments.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -21,12 +22,12 @@ public interface WikiAttachmentsView extends IsWidget, SynapseWidgetView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void configure(WikiPageKey wikiKey, WikiPage wikiPage);
+		void configure(WikiPageKey wikiKey, WikiPage wikiPage, Callback callback);
 		/**
 		 * Delete attachment
 		 */
 		void deleteAttachment(String fileName);
-		
+		void attachmentClicked(final String fileName);
 		void setAttachmentColumnWidth(int width);
 	}
 

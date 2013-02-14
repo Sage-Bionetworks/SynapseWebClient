@@ -3,16 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -64,34 +58,6 @@ public class PagesBrowserViewImpl extends LayoutContainer implements PagesBrowse
 			files.add(t);
 			lc.add(titleBar);
 			lc.add(files);
-		}
-		
-		if (canEdit) {
-			final boolean isCreatingWiki = root == null;
-			String buttonText = isCreatingWiki ? DisplayConstants.CREATE_WIKI : DisplayConstants.ADD_PAGE;
-			Button insertButton = new Button(buttonText, AbstractImagePrototype.create(iconsImageBundle.add16()));
-			insertButton.setWidth(115);
-			insertButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					if (isCreatingWiki) {
-						presenter.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
-					}
-					else {
-						NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
-							@Override
-							public void onSave(String name, String description) {
-								presenter.createPage(name);
-							}
-						});
-					}
-				}
-			});
-			
-			FlowPanel addPageBar = new FlowPanel();		
-			addPageBar.setStyleName("left margin-top-10 margin-bottom-40");
-			addPageBar.add(insertButton);
-			lc.add(addPageBar);
 		}
 			
 		lc.layout(true);

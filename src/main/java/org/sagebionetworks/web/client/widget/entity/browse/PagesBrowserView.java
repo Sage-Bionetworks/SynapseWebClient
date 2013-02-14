@@ -27,7 +27,5 @@ public interface PagesBrowserView extends IsWidget, SynapseWidgetView {
 	 */
 	public interface Presenter {
 
-		void createPage(String name);
-
 	}
 }

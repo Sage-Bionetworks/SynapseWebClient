@@ -36,6 +36,12 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	private WikiPage wikiPage;
 	private WikiPageKey wikiKey;
 	private List<FileHandle> allFileHandles;
+	private Callback callback;
+	
+	public interface Callback{
+		public void attachmentClicked(String fileName);
+		public void attachmentDeleted(String fileName);
+	}
 	
 	@Inject
 	public WikiAttachments(WikiAttachmentsView view, SynapseClientAsync synapseClient,
@@ -52,9 +58,22 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, WikiPage wikiPage) {
+	public void configure(final WikiPageKey wikiKey, WikiPage wikiPage, Callback callback) {
 		this.wikiPage = wikiPage;
 		this.wikiKey = wikiKey;
+		if (callback == null) {
+			this.callback = new Callback() {
+				
+				@Override
+				public void attachmentDeleted(String fileName) {
+				}
+				@Override
+				public void attachmentClicked(String fileName) {
+				}
+			};
+		}
+		else
+			this.callback = callback;	
 		synapseClient.getWikiAttachmentHandles(wikiKey, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String results) {
@@ -63,9 +82,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 					allFileHandles = fileHandleResults.getList();
 					//only include non-preview file handles
 					List<FileHandle> workingSet = new ArrayList<FileHandle>();
-					for (Iterator<FileHandle> iterator = fileHandleResults.getList().iterator(); iterator
-							.hasNext();) {
-						FileHandle fileHandle = iterator.next();
+					for (FileHandle fileHandle : fileHandleResults.getList()) {
 						if (!(fileHandle instanceof PreviewFileHandle)){
 							workingSet.add(fileHandle);
 						}
@@ -94,9 +111,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		if(fileName != null) {
 			List<String> attachmentFileHandleIds = wikiPage.getAttachmentFileHandleIds();
 			//find all file handles with this file name
-			for (Iterator<FileHandle> iterator = allFileHandles.iterator(); iterator
-					.hasNext();) {
-				FileHandle fileHandle = iterator.next();
+			for (FileHandle fileHandle : allFileHandles) {
 				if (fileHandle.getFileName().equals(fileName))
 					attachmentFileHandleIds.remove(fileHandle.getId());
 			}
@@ -115,7 +130,8 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				public void onSuccess(String result) {
 					try{
 						WikiPage updatedPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
-						configure(wikiKey, updatedPage);
+						configure(wikiKey, updatedPage, callback);
+						callback.attachmentDeleted(fileName);
 					} catch (JSONObjectAdapterException e) {
 						view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 						return;
@@ -130,6 +146,13 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 			});
 		} else {
 			view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
+		}
+	}
+
+	@Override
+	public void attachmentClicked(final String fileName) {
+		if(fileName != null) {
+			callback.attachmentClicked(fileName);
 		}
 	}
 	
