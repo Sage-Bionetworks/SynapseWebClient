@@ -132,6 +132,10 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		this.restrictionLevel = restrictionLevel;		
 	}
 
+	/**
+	 * set the approval type (USER_AGREEMENT or ACT_APPROVAL) or NONE if access is allowed with no add'l approval
+	 * @param approvalType
+	 */
 	@Override
 	public void setApprovalType(APPROVAL_TYPE approvalType) {
 		this.approvalType = approvalType;		

@@ -184,7 +184,11 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	public void setLicenseAgreement(Collection<AccessRequirement> allARs, Collection<AccessRequirement> unmetARs) {
 		accessRequirementToDisplay = GovernanceServiceHelper.selectAccessRequirement(allARs, unmetARs);
 		setRestrictionLevel(GovernanceServiceHelper.entityRestrictionLevel(allARs));
-		setApprovalType(GovernanceServiceHelper.accessRequirementApprovalType(accessRequirementToDisplay));
+		if (unmetARs==null || unmetARs.isEmpty()) {
+			setApprovalType(APPROVAL_TYPE.NONE);
+		} else {
+			setApprovalType(GovernanceServiceHelper.accessRequirementApprovalType(accessRequirementToDisplay));
+		}
 		
 		if (accessRequirementToDisplay!=null) {
 			String licenseAgreementText = GovernanceServiceHelper.getAccessRequirementText(accessRequirementToDisplay);
@@ -206,6 +210,10 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.view.setRestrictionLevel(restrictionLevel);
 	}
 	
+	/**
+	 * set the approval type (USER_AGREEMENT or ACT_APPROVAL) or NONE if access is allowed with no add'l approval
+	 * @param approvalType
+	 */
 	public void setApprovalType(APPROVAL_TYPE approvalType) {
 		this.view.setApprovalType(approvalType);
 	}
