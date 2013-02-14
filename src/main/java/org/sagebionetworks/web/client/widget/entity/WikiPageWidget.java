@@ -166,6 +166,30 @@ public class WikiPageWidget extends LayoutContainer {
 		});
 	}
 	
+	public void refreshWikiAttachments(final String updatedTitle, final String updatedMarkdown, final Callback pageUpdatedCallback) {
+		//get the wiki page
+		synapseClient.getWikiPage(wikiKey, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				try {
+					currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
+					//update with the most current markdown and title
+					currentPage.setMarkdown(updatedMarkdown);
+					if (updatedTitle != null && updatedTitle.length() > 0)
+						currentPage.setTitle(updatedTitle);
+					if (pageUpdatedCallback != null)
+						pageUpdatedCallback.pageUpdated();
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+			}
+		});				
+	}
+	
 	private void showDefaultViewWithWiki() {
 		removeAll(true);
 		SimplePanel topBarWrapper = new SimplePanel();
@@ -302,16 +326,15 @@ public class WikiPageWidget extends LayoutContainer {
 				//change to edit mode
 				removeAll(true);
 				//create the editor textarea, and configure the editor widget
-				TextArea mdField = new TextArea();
+				final TextArea mdField = new TextArea();
 				mdField.setValue(currentPage.getMarkdown());
 				mdField.setWidth("910px");
 				mdField.setHeight("400px");
 
 				LayoutContainer form = new LayoutContainer();
 				form.addStyleName("span-24");
-				TextBox titleField = null;
+				final TextBox titleField = new TextBox();
 				if (!isEmbeddedInOwnerPage) {
-					titleField = new TextBox();
 					titleField.setValue(currentPage.getTitle());
 					titleField.addStyleName("font-size-32 margin-left-10 margin-bottom-10");
 					titleField.setWidth("910px");
@@ -324,6 +347,8 @@ public class WikiPageWidget extends LayoutContainer {
 				markdownEditorWidget.configure(wikiKey, mdField, form, false, new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
+						//update wiki attachments
+						refreshWikiAttachments(titleField.getValue(), mdField.getValue(), null);
 					}
 				}, getCloseHandler(titleField, mdField), getManagementHandler());
 				form.addStyleName("margin-bottom-40");
@@ -404,49 +429,34 @@ public class WikiPageWidget extends LayoutContainer {
 			@Override
 			public void saveClicked() {
 				//before saving, we need to update the page first (widgets may have added/removed file handles from the list, like ImageConfigEditor)
-				synapseClient.getWikiPage(wikiKey, new AsyncCallback<String>() {
+				refreshWikiAttachments(titleField.getValue(), mdField.getValue(), new Callback() {
 					@Override
-					public void onSuccess(String result) {
+					public void pageUpdated() {
+						//after page attachments have been refreshed, send the update
+						JSONObjectAdapter json = jsonObjectAdapter.createNew();
 						try {
-							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
-							wikiKey.setWikiPageId(currentPage.getId());
-							//page updated, now apply our updates
-							if (titleField != null)
-								currentPage.setTitle(titleField.getValue());
-							currentPage.setMarkdown(mdField.getValue());
-							
-							JSONObjectAdapter json = jsonObjectAdapter.createNew();
-							try {
-								currentPage.writeToJSONObject(json);
-								synapseClient.updateWikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
-									@Override
-									public void onSuccess(String result) {
-										//showDefaultViewWithWiki();
-										refresh();
-									}
-									@Override
-									public void onFailure(Throwable caught) {
-										showErrorMessage(caught.getMessage());
-									}
-								});
-							} catch (JSONObjectAdapterException e) {
-								showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-							}
-							
+							currentPage.writeToJSONObject(json);
+							synapseClient.updateWikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
+								@Override
+								public void onSuccess(String result) {
+									//showDefaultViewWithWiki();
+									refresh();
+								}
+								@Override
+								public void onFailure(Throwable caught) {
+									showErrorMessage(caught.getMessage());
+								}
+							});
 						} catch (JSONObjectAdapterException e) {
-							onFailure(e);
+							showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 						}
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 					}
 				});
 			}
 			
 			@Override
 			public void cancelClicked() {
-				showDefaultViewWithWiki();
+				refresh();
 			}
 		};
 	}
