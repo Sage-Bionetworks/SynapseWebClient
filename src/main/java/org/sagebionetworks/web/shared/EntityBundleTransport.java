@@ -36,6 +36,7 @@ public class EntityBundleTransport implements IsSerializable {
 	private String aclJson;
 	private String accessRequirementsJson;
 	private String unmetAccessRequirementsJson;
+	private String fileHandleJson;
 	
 	public Boolean getHasChildren() {
 		return hasChildren;
@@ -91,6 +92,14 @@ public class EntityBundleTransport implements IsSerializable {
 	public void setUnmetAccessRequirementsJson(String unmetAccessRequirementsJson) {
 		this.unmetAccessRequirementsJson = unmetAccessRequirementsJson;
 	}
+	
+	public String getFileHandleJson() {
+		return fileHandleJson;
+	}
+	public void setFileHandleJson(String fileHandleJson) {
+		this.fileHandleJson = fileHandleJson;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -110,6 +119,8 @@ public class EntityBundleTransport implements IsSerializable {
 				* result
 				+ ((entityReferencedByJson == null) ? 0
 						: entityReferencedByJson.hashCode());
+		result = prime * result
+				+ ((fileHandleJson == null) ? 0 : fileHandleJson.hashCode());
 		result = prime * result
 				+ ((hasChildren == null) ? 0 : hasChildren.hashCode());
 		result = prime * result
@@ -159,6 +170,11 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!entityReferencedByJson.equals(other.entityReferencedByJson))
 			return false;
+		if (fileHandleJson == null) {
+			if (other.fileHandleJson != null)
+				return false;
+		} else if (!fileHandleJson.equals(other.fileHandleJson))
+			return false;
 		if (hasChildren == null) {
 			if (other.hasChildren != null)
 				return false;
@@ -186,7 +202,9 @@ public class EntityBundleTransport implements IsSerializable {
 				+ ", hasChildren=" + hasChildren + ", aclJson=" + aclJson
 				+ ", accessRequirementsJson=" + accessRequirementsJson
 				+ ", unmetAccessRequirementsJson="
-				+ unmetAccessRequirementsJson + "]";
+				+ unmetAccessRequirementsJson + ", fileHandleJson="
+				+ fileHandleJson + "]";
 	}
+	
 	
 }

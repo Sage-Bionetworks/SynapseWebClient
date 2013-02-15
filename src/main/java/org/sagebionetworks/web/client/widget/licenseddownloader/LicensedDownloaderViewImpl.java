@@ -9,9 +9,8 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.GovernanceDialogHelper;
 
 import com.extjs.gxt.ui.client.Style;
@@ -143,6 +142,35 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	}
 	
 	@Override
+	public void setDownloadLocation(String fileName, String entityId,
+			Long versionNumber, String md5) {
+		// build a list of links in HTML
+		SafeHtmlBuilder sb = new SafeHtmlBuilder();
+		String displayString = "Download";
+		String url = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
+		sb.appendHtmlConstant("<a href=\"" + url + "\" target=\"_blank\">")
+		.appendEscaped(displayString)
+		.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
+		downloadWindowWidth = 300;
+		if(md5 != null) {
+			sb.appendHtmlConstant("&nbsp;<small>md5 checksum: ")
+			.appendEscaped(md5)
+			.appendHtmlConstant("</small>");
+			sb.appendHtmlConstant("<br/>");
+			downloadWindowWidth = 600;
+		}
+		safeDownloadHtml = sb.toSafeHtml();
+		
+		// replace the view content if this is after initialization
+		if(downloadContentContainer != null) {
+			safeDownloadHtml = sb.toSafeHtml();
+			fillDownloadContentContainer();
+		}
+
+	}
+	
+	@Override
+	@Deprecated
 	public void setDownloadLocations(List<LocationData> locations, String md5) {
 		this.locations = locations;
 		if(locations != null && locations.size() > 0) {
@@ -277,7 +305,6 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		downloadWindow.add(panel);		
 		downloadWindow.layout(true);
 	}
-
 	
 	private void fillDownloadContentContainer() {
 		if(downloadContentContainer != null) {

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.licenseddownloader;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -50,7 +51,10 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	 * Sets the content of the download pane
 	 * @param downloads
 	 */
+	@Deprecated
 	public void setDownloadLocations(List<LocationData> locations, String md5);
+	
+	public void setDownloadLocation(String fileName, String entityId, Long versionNumber, String md5);
 	
 	
 	/**

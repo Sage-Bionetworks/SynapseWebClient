@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -10,6 +11,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -30,16 +32,17 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private NodeModelCreator nodeModelCreator;
 	private AdapterFactory adapterFactory;
 	private AutoGenFactory autogenFactory;
+	private CookieProvider cookies;
 	
 	@Inject
 	public FilesBrowser(FilesBrowserView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
-			AdapterFactory adapterFactory, AutoGenFactory autogenFactory) {
+			AdapterFactory adapterFactory, AutoGenFactory autogenFactory, CookieProvider cookies) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
 		this.autogenFactory = autogenFactory;
-		
+		this.cookies = cookies;
 		view.setPresenter(this);
 	}	
 	
@@ -105,7 +108,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void createEntityForUpload(final AsyncCallback<Entity> asyncCallback) {
-		final Entity file = createNewEntity(Data.class.getName(), configuredEntityId);
+		String newFileType = DisplayUtils.isInTestWebsite(cookies) ? FileEntity.class.getName() : Data.class.getName();
+		final Entity file = createNewEntity(newFileType, configuredEntityId);
 		try {
 			String entityJson = file.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 			synapseClient.createOrUpdateEntity(entityJson, null, true, new AsyncCallback<String>() {
@@ -125,6 +129,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	}
 
 	@Override
+	@Deprecated
 	public void renameChildToFilename(String entityId) {
 		// TODO : rename given child to its uploaded file name
 		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {

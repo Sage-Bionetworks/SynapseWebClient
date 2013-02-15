@@ -1,19 +1,17 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.LocationData;
-import org.sagebionetworks.repo.model.LocationTypeNames;
-import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.events.CancelEvent;
-import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -27,13 +25,7 @@ import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -41,7 +33,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -51,7 +42,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class LocationableTitleBarViewImpl extends Composite implements LocationableTitleBarView {
+public class FileTitleBarViewImpl extends Composite implements FileTitleBarView {
 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -88,14 +79,14 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	SpanElement fileSize;
 	
 	
-	interface LocationableTitleBarViewImplUiBinder extends UiBinder<Widget, LocationableTitleBarViewImpl> {
+	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
 
-	private static LocationableTitleBarViewImplUiBinder uiBinder = GWT
-			.create(LocationableTitleBarViewImplUiBinder.class);
+	private static FileTitleBarViewImplUiBinder uiBinder = GWT
+			.create(FileTitleBarViewImplUiBinder.class);
 	
 	@Inject
-	public LocationableTitleBarViewImpl(SageImageBundle sageImageBundle,
+	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
@@ -119,14 +110,6 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 				downloadButton.fireEvent(event);
 			}
 		});
-	}
-	public static String getLocationablePath(EntityBundle bundle) {
-		String locationPath = null;
-		if (!(bundle.getEntity() instanceof Locationable))
-			throw new IllegalArgumentException("Bundle must reference a Locationable entity");
-		if (((Locationable)bundle.getEntity()).getLocations() != null && ((Locationable)bundle.getEntity()).getLocations().size() > 0)
-			locationPath = ((Locationable)bundle.getEntity()).getLocations().get(0).getPath();
-		return locationPath;
 	}
 	
 	@Override
@@ -152,69 +135,51 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
 		
-		if (entity instanceof Locationable) {
-			//configure this view based on if this entity has locations to download
-			Locationable locationable = (Locationable)entity;
-			boolean isDataPossiblyWithinLocationable = LocationableTitleBar.isDataPossiblyWithinLocationable(entityBundle, authenticationController.isLoggedIn());
-			noFileFoundContainer.setVisible(!isDataPossiblyWithinLocationable);
-			fileFoundContainer.setVisible(isDataPossiblyWithinLocationable);
-			if (isDataPossiblyWithinLocationable) {
-				//add an anchor with the file name, that redirects to the download button for functionality
-				entityLink.setText(entity.getName());
-				entityId.setInnerText(entity.getId());
-				AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
-				synapseIconForEntity.applyTo(entityIcon);
-				
-				boolean isFilenamePanelVisible = locationable.getLocations() != null && locationable.getLocations().size() > 0;
-				fileNameContainer.setVisible(isFilenamePanelVisible);
-				if (isFilenamePanelVisible) {
-					//if entity name is not shown, we might have a locationable filename to show
-					String locationPath = LocationableTitleBarViewImpl.getLocationablePath(entityBundle);
-					fileName.setInnerText(locationPath != null ? DisplayUtils.getFileNameFromLocationPath(locationPath) : "");
-					LocationData locationData = locationable.getLocations().get(0);
-					LocationTypeNames locationTypeName = locationData.getType();
-					//don't ask for the size if it's external, just display that this is external data
-					boolean isExternal = locationTypeName == LocationTypeNames.external;
-					if (isExternal) {
-						fileSize.setInnerText("(External Storage)");
-					}
-					else {
-						presenter.updateNodeStorageUsage(new AsyncCallback<Long>() {
-							@Override
-							public void onSuccess(Long result) {
-								fileSize.setInnerText("("+DisplayUtils.getFriendlySize(result.doubleValue(), true) + " - Synapse Storage)");
-							}
-							
-							@Override
-							public void onFailure(Throwable caught) {
-								//could not determine the size, leave it blank.
-							}
-						});
-					}
-					md5Link.setVisible(!isExternal);
-					if (!isExternal) {
-						//also add md5 if not external
-						final String md5 = locationable.getMd5();
-						md5Link.addClickHandler(new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								showMd5Dialog(md5);
-							}
-						});
-						DisplayUtils.addTooltip(synapseJSNIUtils, md5Link, md5, TOOLTIP_POSITION.BOTTOM);
-					}
+		//configure this view based on if this entity has locations to download
+		boolean isDataWithin = FileTitleBar.isDataPossiblyWithin((FileEntity)entity);
+		noFileFoundContainer.setVisible(!isDataWithin);
+		fileFoundContainer.setVisible(isDataWithin);
+		if (isDataWithin) {
+			//add an anchor with the file name, that redirects to the download button for functionality
+			entityLink.setText(entity.getName());
+			entityId.setInnerText(entity.getId());
+			AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
+			synapseIconForEntity.applyTo(entityIcon);
+			//fileHandle is null if user can't access the filehandle associated with this fileentity
+			boolean isFilenamePanelVisible = entityBundle.getFileHandle() != null;
+			fileNameContainer.setVisible(isFilenamePanelVisible);
+			if (isFilenamePanelVisible) {
+				fileName.setInnerText(entityBundle.getFileHandle().getFileName());
+				//don't ask for the size if it's external, just display that this is external data
+				md5Link.setVisible(false);
+				if (entityBundle.getFileHandle() instanceof ExternalFileHandle) {
+					fileSize.setInnerText("(External Storage)");
+				}
+				else if (entityBundle.getFileHandle() instanceof S3FileHandleInterface){
+					md5Link.setVisible(true);
+					S3FileHandleInterface fileHandle = (S3FileHandleInterface)entityBundle.getFileHandle();
+					
+					fileSize.setInnerText("("+DisplayUtils.getFriendlySize(fileHandle.getContentSize().doubleValue(), true) + " - Synapse Storage)");
+					final String md5 = fileHandle.getContentMd5();
+					md5Link.addClickHandler(new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							showMd5Dialog(md5);
+						}
+					});
+					DisplayUtils.addTooltip(synapseJSNIUtils, md5Link, md5, TOOLTIP_POSITION.BOTTOM);
 				}
 			}
-			else {
-				uploadButtonContainer.clear();
-				if (canEdit)
-					uploadButtonContainer.add(DisplayUtils.getUploadButton(entityBundle, entityType, locationableUploader, iconsImageBundle, new EntityUpdatedHandler() {				
-						@Override
-						public void onPersistSuccess(EntityUpdatedEvent event) {
-							presenter.fireEntityUpdatedEvent();
-						}
-					}));
-			}
+		}
+		else {
+			uploadButtonContainer.clear();
+			if (canEdit)
+				uploadButtonContainer.add(DisplayUtils.getUploadButton(entityBundle, entityType, locationableUploader, iconsImageBundle, new EntityUpdatedHandler() {				
+					@Override
+					public void onPersistSuccess(EntityUpdatedEvent event) {
+						presenter.fireEntityUpdatedEvent();
+					}
+				}));
 		}
 		
 		// Configure the button

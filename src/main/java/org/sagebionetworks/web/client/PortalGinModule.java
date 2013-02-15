@@ -81,38 +81,38 @@ import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderView;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableDownloaderViewImpl;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderView;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableUploaderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
+import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigViewImpl;
-import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigViewImpl;
-import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
+import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuViewImpl;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetView;
@@ -349,9 +349,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
 		bind(LocationableTitleBarView.class).to(LocationableTitleBarViewImpl.class);
 		
-		// EntityChildBrowser (not singleton as you may want multiple)
-		bind(LocationableDownloaderView.class).to(LocationableDownloaderViewImpl.class);
-
+		// FileBox
+		bind(FileTitleBarViewImpl.class).in(Singleton.class);
+		bind(FileTitleBarView.class).to(FileTitleBarViewImpl.class);
+				
 		// Search Box
 		bind(SearchBoxViewImpl.class).in(Singleton.class);
 		bind(SearchBoxView.class).to(SearchBoxViewImpl.class);
@@ -361,7 +362,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(HomeSearchBoxView.class).to(HomeSearchBoxViewImpl.class);
 
 		// LocationableUploader
-		bind(LocationableUploaderView.class).to(LocationableUploaderViewImpl.class);
+		bind(UploaderView.class).to(UploaderViewImpl.class);
 
 		// EntityTreeBrowser
 		bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);

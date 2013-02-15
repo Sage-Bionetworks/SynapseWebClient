@@ -26,6 +26,7 @@ import org.sagebionetworks.web.shared.EntityUtil;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
 
+@Deprecated
 public class FileUpload extends HttpServlet {
 
 	private static Logger logger = Logger.getLogger(FileUpload.class.getName());

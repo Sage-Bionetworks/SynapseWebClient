@@ -375,11 +375,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		if (currentValue == null)
 			currentValue = "";
 		int cursorPos = markdownTextArea.getCursorPos();
-		if (cursorPos < 0)
-			cursorPos = 0;
-		else if (cursorPos > currentValue.length())
+		//SWC-406: insert at the end of the markdown
+		if (cursorPos <= 0 || cursorPos > currentValue.length())
 			cursorPos = currentValue.length();
 		DisplayUtils.updateTextArea(markdownTextArea, currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
+		markdownTextArea.setCursorPos(cursorPos + md.length());
 	}
 	
 	/**

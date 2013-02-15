@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -22,6 +21,9 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
@@ -32,6 +34,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.shared.EntityUtil;
 
 import com.google.common.io.Files;
 import com.google.inject.Inject;
@@ -113,25 +116,47 @@ public class FileHandleServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String token = getSessionToken(request);
 		Synapse client = createNewClient(token);
+		
+		String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
+		String entityVersion = request.getParameter(DisplayUtils.ENTITY_VERSION_PARAM_KEY);
+		
 		String ownerId = request.getParameter(DisplayUtils.WIKI_OWNER_ID_PARAM_KEY);
 		String ownerType = request.getParameter(DisplayUtils.WIKI_OWNER_TYPE_PARAM_KEY);
 		String fileName = request.getParameter(DisplayUtils.WIKI_FILENAME_PARAM_KEY);
-		Boolean isPreview = Boolean.parseBoolean(request.getParameter(DisplayUtils.WIKI_PREVIEW_PARAM_KEY));
+		Boolean isPreview = Boolean.parseBoolean(request.getParameter(DisplayUtils.FILE_HANDLE_PREVIEW_PARAM_KEY));
+		URL resolvedUrl = null;
 		if (ownerId != null && ownerType != null) {
 			ObjectType type = ObjectType.valueOf(ownerType);
 			String wikiId = request.getParameter(DisplayUtils.WIKI_ID_PARAM_KEY);
 			WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
 
 			// Redirect the user to the temp preview url
-			URL resolvedUrl;
+			
 			if (isPreview)
 				resolvedUrl = client.getWikiAttachmentPreviewTemporaryUrl(properKey, fileName);
 			else
 				resolvedUrl = client.getWikiAttachmentTemporaryUrl(properKey, fileName);
-			
-			response.sendRedirect(resolvedUrl.toString());
-		    //Done
+			//Done
 		}
+		else if (entityId != null) {
+			if (entityVersion == null) {
+				if (isPreview)
+					resolvedUrl = client.getFileEntityPreviewTemporaryUrlForCurrentVersion(entityId);
+				else
+					resolvedUrl = client.getFileEntityTemporaryUrlForCurrentVersion(entityId);
+			}
+				
+			else {
+				Long versionNumber = Long.parseLong(entityVersion);
+				if (isPreview)
+					resolvedUrl = client.getFileEntityPreviewTemporaryUrlForVersion(entityId, versionNumber);
+				else
+					resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
+			}
+		}
+		
+		if (resolvedUrl != null)
+			response.sendRedirect(resolvedUrl.toString());
 	}
 
 	
@@ -140,7 +165,7 @@ public class FileHandleServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		ServletFileUpload upload = new ServletFileUpload();
 		FileHandleResults results = null;
-		// Before we do aything make sure we can get the users token
+		// Before we do anything make sure we can get the users token
 		String token = getSessionToken(request);
 		if (token == null) {
 			setForbiddenMessage(response);
@@ -148,7 +173,7 @@ public class FileHandleServlet extends HttpServlet {
 		}
 
 		try {
-			// Connect to syanpse
+			// Connect to synapse
 			Synapse client = createNewClient(token);
 			FileItemIterator iter = upload.getItemIterator(request);
 			while (iter.hasNext()) {
@@ -173,8 +198,10 @@ public class FileHandleServlet extends HttpServlet {
 				}
 			}
 
-			//and update the wiki page (if the wiki key info was given as parameters).
-			if (results != null) {
+			//and update the wiki page (if the wiki key info was given as parameters) or FileEntity (if entity id was given)
+			if (results != null && results.getList() != null && results.getList().size() > 0) {
+				String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
+
 				String ownerId = request.getParameter(DisplayUtils.WIKI_OWNER_ID_PARAM_KEY);
 				String ownerType = request.getParameter(DisplayUtils.WIKI_OWNER_TYPE_PARAM_KEY);
 				if (ownerId != null && ownerType != null) {
@@ -188,6 +215,26 @@ public class FileHandleServlet extends HttpServlet {
 							fileHandleIds.add(handle.getId());
 					}
 					client.updateWikiPage(ownerId, type, page);
+				}
+				else if (entityId != null) {
+					String restrictedParam = request.getParameter(DisplayUtils.IS_RESTRICTED_PARAM_KEY);
+					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
+					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
+
+					FileEntity fileEntity = (FileEntity) client.getEntityById(entityId);
+					fileEntity.setName(results.getList().get(0).getFileName());
+					fileEntity.setDataFileHandleId(results.getList().get(0).getId());
+					client.putEntity(fileEntity);
+					
+					// now lock down restricted data
+					if (isRestricted) {
+						// we only proceed if there aren't currently any access restrictions
+						VariableContentPaginatedResults<AccessRequirement> currentARs = client.getAccessRequirements(entityId);
+						if (currentARs.getTotalNumberOfResults()==0L) {
+							AccessRequirement ar = EntityUtil.createLockDownDataAccessRequirement(entityId);
+							client.createAccessRequirement(ar);
+						}
+					}
 				}
 			}
 			

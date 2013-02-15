@@ -3,13 +3,12 @@ package org.sagebionetworks.web.client.widget.licenseddownloader;
 import java.util.Collection;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -22,10 +21,10 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.shared.LicenseAgreement;
@@ -112,8 +111,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	}
 	
 	private void extractBundle(EntityBundle entityBundle, UserProfile userProfile) {
-		Entity entity = entityBundle.getEntity();
-		loadDownloadLocations(entity);		
+		loadDownloadUrl(entityBundle);		
 		List<AccessRequirement> ars = entityBundle.getAccessRequirements();
 		List<AccessRequirement> unmetARs = entityBundle.getUnmetAccessRequirements();
 		this.userProfile = userProfile;
@@ -144,14 +142,31 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		
 	
 	/**
-	 * Loads the download locations for the given Layer 
-	 * @param entity Layer model object
+	 * Loads the download url 
 	 */
-	public void loadDownloadLocations(final Entity entity) {		
-		if(entity != null) {
+	public void loadDownloadUrl(final EntityBundle entityBundle) {		
+		if(entityBundle != null && entityBundle.getEntity() != null) {
 			view.showDownloadsLoading();
-			if(entity instanceof Locationable) {
-				Locationable locationable = (Locationable)entity;
+			if (entityBundle.getEntity() instanceof FileEntity) {
+				FileEntity fileEntity = (FileEntity)entityBundle.getEntity();
+				if (this.authenticationController.isLoggedIn()) {
+					if (entityBundle.getFileHandle() != null) {
+						String md5 = null;
+						if (entityBundle.getFileHandle() instanceof S3FileHandleInterface) {
+							md5 = ((S3FileHandleInterface)entityBundle.getFileHandle()).getContentMd5();
+						}
+						this.view.setDownloadLocation(entityBundle.getFileHandle().getFileName(), fileEntity.getId(), fileEntity.getVersionNumber(), md5);
+					}
+					else {
+						this.view.setNoDownloads();
+					}
+				} else {
+					this.view.setNeedToLogIn();
+				}
+			}
+			//TODO: next block to be deleted
+			else if(entityBundle.getEntity() instanceof Locationable) {
+				Locationable locationable = (Locationable)entityBundle.getEntity();
 				List<LocationData> locations = locationable.getLocations();				
 				if (this.authenticationController.isLoggedIn()) {
 					if(locations != null && locations.size() > 0) {

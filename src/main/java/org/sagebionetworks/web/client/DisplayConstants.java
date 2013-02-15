@@ -46,6 +46,8 @@ public class DisplayConstants {
 	public static final String PASSWORD_RESET_TEXT = "Your password has been reset.";
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
 	
+	public static final String PREVIEW_UNAVAILABLE="No Preview Available";	//text shown when FileEntity preview can't be shown
+	
 	public static final String NEWS_UNAVAILABLE_TEXT = "The Synapse news service is currently unavailable.";
 	public static final String SUPPORT_FEED_UNAVAILABLE_TEXT = "The Synapse support feed service is currently unavailable.";
 	
@@ -200,7 +202,7 @@ public class DisplayConstants {
 	public static final String LABEL_SEARCH = "Search";
 	public static final String LABEL_PROJECT_NAME = "Project Name";
 	public static final String LABEL_PROJECT_CREATED = "Project Created";
-	public static final String TEXT_UPLOAD_FILE = "Upload or Link to File";
+	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
 	public static final String TEXT_USER_SETTINGS = "Settings";
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
 	public static final String LABEL_UPLOAD_TO_SYNAPSE = "To Synapse";

@@ -11,6 +11,9 @@ import org.sagebionetworks.repo.model.EntityClassHelper;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -92,6 +95,8 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		PaginatedResults<EntityHeader> referencedBy = null;
 		List<AccessRequirement> accessRequirements = null;
 		List<AccessRequirement> unmetAccessRequirements = null;
+		FileHandle fileHandle = null;
+		Long version = null;
 		// entity?
 		if(transport.getEntityJson() != null){
 			entity = factory.createEntity(transport.getEntityJson());
@@ -131,10 +136,17 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 				unmetAccessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
 			}
 		}
+		// file handle?
+		if(transport.getFileHandleJson() != null){
+			try {
+				fileHandle = createJSONEntity(transport.getFileHandleJson(), S3FileHandle.class);
+			} catch (Throwable e) {}//unable to get the file handle
+		}
+		
 		// put it all together.
 		EntityBundle eb =  new EntityBundle(entity, annotations, 
 				permissions, path, referencedBy,
-				accessRequirements, unmetAccessRequirements);
+				accessRequirements, unmetAccessRequirements, fileHandle);
 		// Set the child count when there.
 		if(transport.getHasChildren() != null){
 			eb.setChildCount(transport.getHasChildren());

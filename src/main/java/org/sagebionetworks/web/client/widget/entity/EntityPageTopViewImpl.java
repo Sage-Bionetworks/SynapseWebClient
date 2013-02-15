@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -24,6 +26,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -48,6 +51,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -75,6 +79,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private IconsImageBundle iconsImageBundle;
 	private ActionMenu actionMenu;
 	private LocationableTitleBar locationableTitleBar;
+	private FileTitleBar fileTitleBar;
 	private PortalGinInjector ginInjector;
 	private EntityTreeBrowser entityTreeBrowser;
 	private Breadcrumb breadcrumb;
@@ -98,6 +103,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			AccessMenuButton accessMenuButton,
 			ActionMenu actionMenu,
 			LocationableTitleBar locationableTitleBar,
+			FileTitleBar fileTitleBar,
 			EntityTreeBrowser entityTreeBrowser, Breadcrumb breadcrumb,
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
@@ -114,6 +120,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.locationableTitleBar = locationableTitleBar;
+		this.fileTitleBar = fileTitleBar;
 		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
 		this.cookies = cookies;
@@ -179,6 +186,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		};
 		actionMenu.addEntityUpdatedHandler(handler);
 		locationableTitleBar.addEntityUpdatedHandler(handler);
+		fileTitleBar.addEntityUpdatedHandler(handler);
 		filesBrowser.addEntityUpdatedHandler(handler);
 	}
 
@@ -199,6 +207,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public void clear() {
 		actionMenu.clearState();
 		locationableTitleBar.clearState();
+		fileTitleBar.clearState();
 		if (colLeftContainer != null)
 			colLeftContainer.removeAll();
 		if (colRightContainer != null)
@@ -215,10 +224,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly, MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
-		colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
+		if (bundle.getEntity() instanceof FileEntity)
+			colLeftContainer.add(fileTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
+		else
+			colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
-//		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);	
+//		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);
+
+		if (bundle.getEntity() instanceof FileEntity) {
+			//also add a preview
+			colLeftContainer.add(getFilePreview(bundle.getEntity()));
+		}
+
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 
@@ -243,6 +261,21 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			colLeftContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
 		}
 		// ************************************************************************************************		
+	}
+	
+	private HTMLPanel getFilePreview(Entity fileEntity) {
+		//add a html panel that contains the image src from the attachments server (to pull asynchronously)
+		//create img
+		StringBuilder sb = new StringBuilder();
+		sb.append("<a href=\"");
+		
+		sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false));
+		sb.append("\"><img alt=\""+DisplayConstants.PREVIEW_UNAVAILABLE+"\" class=\"imageDescriptor\" ");
+		sb.append(" src=\"");
+		sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
+		sb.append("\"></img></a>");
+		return new HTMLPanel(sb.toString());
+
 	}
 	
 	// Render the Folder entity
@@ -282,7 +315,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
-		fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
+		//fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
 
@@ -343,7 +376,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
-		colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
+		//colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description

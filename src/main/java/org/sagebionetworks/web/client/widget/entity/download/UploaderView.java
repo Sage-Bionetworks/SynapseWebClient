@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface LocationableUploaderView extends IsWidget, SynapseWidgetView {
+public interface UploaderView extends IsWidget, SynapseWidgetView {
 
 	/**
 	 * Set the presenter.
@@ -13,7 +12,7 @@ public interface LocationableUploaderView extends IsWidget, SynapseWidgetView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void createUploadForm();
+	public void createUploadForm(boolean isExternalSupported);
 	
 	public void openNewBrowserTab(String url);
 	

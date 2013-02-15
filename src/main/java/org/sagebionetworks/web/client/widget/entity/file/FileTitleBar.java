@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -15,10 +15,10 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-@Deprecated
-public class LocationableTitleBar implements LocationableTitleBarView.Presenter, SynapseWidgetPresenter {
+
+public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPresenter {
 	
-	private LocationableTitleBarView view;
+	private FileTitleBarView view;
 	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager = new HandlerManager(this);
 	private EntityBundle entityBundle;
@@ -27,7 +27,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 	private EntityEditor entityEditor;
 	
 	@Inject
-	public LocationableTitleBar(LocationableTitleBarView view, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, SynapseClientAsync synapseClient, EntityEditor entityEditor) {
+	public FileTitleBar(FileTitleBarView view, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, SynapseClientAsync synapseClient, EntityEditor entityEditor) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
@@ -37,7 +37,6 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 	}	
 	
 	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit, boolean readOnly) {		
-		//if this isn't locationable, then return an empty panel
 		view.setPresenter(this);
 		this.entityBundle = bundle; 		
 		
@@ -45,9 +44,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
 		view.createTitlebar(bundle, entityType, authenticationController, isAdministrator, canEdit, readOnly);
-		Widget widget =  view.asWidget();
-		widget.setVisible(bundle.getEntity() instanceof Locationable);
-		return widget;
+		return view.asWidget();
 	}
 	
 	/**
@@ -98,21 +95,9 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		synapseClient.getStorageUsage(entityBundle.getEntity().getId(), callback);
 	}
 
-	public static boolean isDataPossiblyWithinLocationable(EntityBundle bundle, boolean isLoggedIn) {
-		if (!(bundle.getEntity() instanceof Locationable))
-			throw new IllegalArgumentException("Bundle must reference a Locationable entity");
-		
-		boolean hasData = false;
-		//if user isn't logged in, then there might be something here
-		if (!isLoggedIn)
-			hasData = true;
-		//if it has unmet access requirements, then there might be something here
-		else if (bundle.getUnmetAccessRequirements() != null && bundle.getUnmetAccessRequirements().size() > 0)
-			hasData = true;
-		//else, if it has a locations list whose size is > 0
-		else if (((Locationable)bundle.getEntity()).getLocations() != null && ((Locationable)bundle.getEntity()).getLocations().size() > 0)
-			hasData = true;
-		return hasData;
+	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
+		String dataFileHandleId = fileEntity.getDataFileHandleId();
+		return (dataFileHandleId != null && dataFileHandleId.length() > 0);
 	}
 	
 	/*

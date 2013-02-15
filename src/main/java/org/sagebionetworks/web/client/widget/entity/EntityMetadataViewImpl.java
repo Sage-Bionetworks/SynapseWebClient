@@ -13,15 +13,14 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.IconMenu;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -246,9 +245,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setEntityName(e.getName());
 		setEntityId(e.getId());
 		boolean isLocationable = (e instanceof Locationable);
-		//show the entity name if this isn't locationable, or if it has no data.
-		boolean isEntityNamePanelVisible = !isLocationable || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !presenter.isAnonymous());
-		this.entityNamePanel.setVisible(isEntityNamePanelVisible);
 		
 		this.readOnly.setVisible(readOnly);
 		
@@ -294,6 +290,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setDetailedMetadataVisible(boolean visible) {
 		detailedMetadata.setVisible(visible);
 	}
+	
+	@Override
+	public void setEntityNameVisible(boolean visible) {
+		this.entityNamePanel.setVisible(visible);
+	}
+	
 	
 	@Override
 	public void showInfo(String title, String message) {
