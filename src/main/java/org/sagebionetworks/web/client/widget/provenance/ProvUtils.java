@@ -42,7 +42,7 @@ public class ProvUtils {
 			Map<String, Activity> processedActivities,
 			Map<String, ProvGraphNode> idToNode,
 			Map<Reference, EntityHeader> refToHeader, boolean showExpand,
-			SynapseJSNIUtils synapseJSNIUtils, Set<Reference> startRefs) {
+			SynapseJSNIUtils synapseJSNIUtils, Set<Reference> startRefs, Set<Reference> noExpandNode) {
 		ProvGraph graph = new ProvGraph();
 		
 		// maps for local building retrieval
@@ -87,7 +87,8 @@ public class ProvUtils {
 					EntityGraphNode entityNode = entityNodes.get(ref);
 					graph.addEdge(new ProvGraphEdge(activityNode, entityNode));				
 					
-					if(showExpand) {
+					// create expand nodes for those that don't have generatedBy activities defined
+					if(showExpand && !generatedByActivityId.containsKey(ref) && !noExpandNode.contains(ref)) {
 						ProvGraphNode expandNode = new ExpandGraphNode(createUniqueNodeId(idToNode, synapseJSNIUtils), ref.getTargetId(), ref.getTargetVersionNumber());
 						idToNode.put(expandNode.getId(), expandNode);
 						graph.addEdge(new ProvGraphEdge(entityNode, expandNode));

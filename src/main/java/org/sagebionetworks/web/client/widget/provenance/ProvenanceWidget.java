@@ -10,7 +10,6 @@ import java.util.Stack;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
@@ -70,9 +69,11 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
 	Set<Reference> startRefs;
 	boolean showExpand;
+	boolean showUndefinedAndErrorActivity;
 	int maxDepth = 1; 
 	Stack<ProcessItem> toProcess;
 	ProcessCallback doneCallback;
+	Set<Reference> noExpandNode;
 	
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
@@ -106,8 +107,11 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		if(entityListStr != null) {
 			String[] refs = entityListStr.split(WidgetConstants.PROV_WIDGET_ENTITY_LIST_DELIMETER);
 			if(refs !=null) {
-				for(String refString : refs) {					
-					startRefs.add(DisplayUtils.parseEntityVersionString(refString));
+				for(String refString : refs) {
+					// Only add valid References
+					Reference ref = DisplayUtils.parseEntityVersionString(refString);
+					if(ref != null && ref.getTargetId() != null)
+						startRefs.add(ref);
 				}
 			}
 		}
@@ -118,10 +122,14 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			startRefs.add(ref);
 		}
 		
-		// Set max depth (default 1) and expand		
-		maxDepth = descriptor.containsKey(WidgetConstants.PROV_WIDGET_DEPTH_KEY) ? Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY)) : 1;
+		// Set max depth (default 1), undefined (false) and expand (false)		
+		maxDepth = descriptor.containsKey(WidgetConstants.PROV_WIDGET_DEPTH_KEY) ? Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY)) : 1; 
+		showUndefinedAndErrorActivity = descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY)) : false;
 		showExpand = descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY)) : false;
-				
+		
+		// do not create expand nodes for these (generally for previously expanded/discovered nodes without an activity)
+		noExpandNode = new HashSet<Reference>();
+		
 		// load stack with starting nodes at depth 0
 		toProcess = new Stack<ProvenanceWidget.ProcessItem>();
 		for(Reference ref : startRefs) {			
@@ -160,7 +168,13 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	
 	@Override
 	public void expand(ExpandGraphNode node) {
-		
+		showUndefinedAndErrorActivity = false; // don't show when in expand mode after first expand
+		maxDepth = 1;
+		Reference ref = new Reference();
+		ref.setTargetId(node.getEntityId());
+		ref.setTargetVersionNumber(node.getVersionNumber());		
+		toProcess.push(new ReferenceProcessItem(ref, 0));
+		processNext();		
 	}
 
 	
@@ -210,8 +224,13 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				// Display empty, fake provenance record
-				Activity activity = createErrorActivity(caught);
+				if(caught instanceof NotFoundException) {
+					noExpandNode.add(item.getReference());
+				}
+				
+				Activity activity = null;
+				if(showUndefinedAndErrorActivity)
+					activity = createErrorActivity(caught); // Display empty, fake provenance record				
 				addActivityToStack(activity);
 			}
 			
@@ -229,11 +248,12 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}
 	
 	private void processActivity(final ActivityProcessItem item) { 
-//		// check if activity has already been processed
-//		if(processedActivities.containsKey(item.getActivity().getId())) {			
-//			processNext();
-//			return;
-//		}
+		//  TODO : remove this check if depth becomes specified for each entity in the start list
+		// check if activity has already been processed
+		if(processedActivities.containsKey(item.getActivity().getId())) {			
+			processNext();
+			return;
+		}
 		
 		// add activity to processedActivites
 		processedActivities.put(item.getActivity().getId(), item.getActivity());
@@ -316,7 +336,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvGraphNode>();
 
-		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, synapseJSNIUtils, startRefs);					
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, synapseJSNIUtils, startRefs, noExpandNode);					
 		
 		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());
 		NChartLayersArray layerArray = NChartUtil.createLayers(jsoProvider, graph);

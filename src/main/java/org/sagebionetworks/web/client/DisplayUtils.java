@@ -1324,8 +1324,9 @@ public class DisplayUtils {
 	}
 	public static Reference parseEntityVersionString(String entityVersion) {
 		String[] parts = entityVersion.split(ENTITY_VERSION_STRING);
+		Reference ref = null;
 		if(parts.length > 0) {
-			Reference ref = new Reference();
+			ref = new Reference();
 			ref.setTargetId(parts[0]);
 			if(parts.length > 1) {
 				try {
@@ -1333,6 +1334,6 @@ public class DisplayUtils {
 				} catch(NumberFormatException e) {}
 			}
 		}		
-		return null;		
+		return ref;		
 	}
 }

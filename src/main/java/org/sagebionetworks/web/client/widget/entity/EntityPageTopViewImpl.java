@@ -234,7 +234,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colRightContainer.add(createProgrammaticClientsWidget(bundle));
 		// Provenance Widget for anything other than projects of folders
 		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) 
-			colLeftContainer.add(createProvenanceWidget(bundle), widgetMargin);
+			colRightContainer.add(createProvenanceWidget(bundle), widgetMargin);
 		// Annotation Editor widget
 		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
@@ -370,18 +370,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Widget createProvenanceWidget(EntityBundle bundle) {
 		LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
-		lc.addStyleName("span-17 notopmargin right last");
+		lc.addStyleName("span-7 notopmargin right last");
 		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.PROVENANCE + "</h4>")));
 
 	    // Create the property body
 	    // the headers for properties.
 		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();		
-		provenanceWidget.setHeight(400);
+		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);
 		
 		Map<String,String> configMap = new HashMap<String,String>();
 		Long version = bundle.getEntity() instanceof Versionable ? ((Versionable)bundle.getEntity()).getVersionNumber() : null; 
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(bundle.getEntity().getId(), version));
-		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(false));
+		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
+		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
 	    provenanceWidget.configure(bundle.getEntity().getId(), configMap);
 	    LayoutContainer border = new LayoutContainer();

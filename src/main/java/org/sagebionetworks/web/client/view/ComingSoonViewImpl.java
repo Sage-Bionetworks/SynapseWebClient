@@ -5,35 +5,20 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
-import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
-import org.sagebionetworks.web.shared.provenance.ProvGraph;
-import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
-import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
-import com.extjs.gxt.ui.client.Style.AnchorPosition;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
-import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -112,12 +97,13 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		if(entity instanceof Versionable) 
 			version = ((Versionable)entity).getVersionNumber();			
 		Map<String,String> configMap = new HashMap<String,String>();
-		String entityList = DisplayUtils.createEntityVersionString(entity.getId(), version) +","+"syn4623";
+		String entityList = DisplayUtils.createEntityVersionString(entity.getId(), version) +","+"syn4623/version/1";
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entityList);
-		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(false));
-		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(2));		
+		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
+		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(false));
+		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
 	    provenanceWidget.configure(entity.getId(), configMap);
-	    
+	    provenanceWidget.setHeight(800);
 	    entityView.setWidget(provenanceWidget.asWidget());
 	}
 

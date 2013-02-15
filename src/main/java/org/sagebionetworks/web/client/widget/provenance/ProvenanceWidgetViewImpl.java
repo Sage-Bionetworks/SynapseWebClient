@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -21,7 +19,6 @@ import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Events;
@@ -204,11 +201,6 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	
 	private static native void initJsPlumb() /*-{
 		;(function() {
-//			$wnd.jsP_arrowCommon = { foldback:0.7, fillStyle:color, length:10, width:10 };
-//			// use three-arg spec to create two different arrows with the common values:
-//			$wnd.jsP_overlays = [
-//				[ "Arrow", { location:0.001, direction:-1 }, jsP_arrowCommon ]
-//			];
 					
 			$wnd.jsPlumbDemo = {					
 				init : function() {					
@@ -223,21 +215,15 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 						EndpointStyle : { radius:0.01, fillStyle:color },
 						HoverPaintStyle : {strokeStyle:"#ec9f2e" },
 						EndpointHoverStyle : {fillStyle:"#ec9f2e" },			
-						Anchors :  [ "TopCenter", "BottomCenter" ]
+						Anchors :  [ "BottomCenter", "TopCenter" ]
 					});				
 						
 					// declare some common values:
-					jsP_arrowCommon = { foldback:0.7, fillStyle:color, length:10, width:10 };
+					jsP_arrowCommon = { foldback:0.7, fillStyle:color, length:7, width:7 };
 						// use three-arg spec to create two different arrows with the common values:
 					jsP_overlays = [
-							[ "Arrow", { location:0.6, direction:1 }, jsP_arrowCommon ]
-						];
-					
-//					var arrowCommon = { foldback:0.7, fillStyle:color, length:10, width:10 },
-//						// use three-arg spec to create two different arrows with the common values:
-//						overlays = [
-//							[ "Arrow", { location:0.5, direction:1 }, arrowCommon ]
-//						];				
+							[ "Arrow", { location:0.7, direction:1 }, jsP_arrowCommon ]
+						];					
 				}
 			};
 			

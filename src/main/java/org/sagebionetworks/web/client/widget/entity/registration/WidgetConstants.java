@@ -44,6 +44,7 @@ public class WidgetConstants {
 	public static final String PROV_WIDGET_ENTITY_LIST_DELIMETER = ",";
 	public static final String PROV_WIDGET_DEPTH_KEY = "depth";
 	public static final String PROV_WIDGET_EXPAND_KEY = "showExpand";
+	public static final String PROV_WIDGET_UNDEFINED_KEY = "showUndefined";
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
 	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
 	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";

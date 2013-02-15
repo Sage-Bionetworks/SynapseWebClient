@@ -9,6 +9,7 @@ import java.util.Set;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
@@ -53,6 +54,8 @@ public class NChartUtil {
 					layerNodes.add(createActivityLayerNode(jsoProvider, (ActivityGraphNode) node, connectedNodes));
 				} else if(node instanceof EntityGraphNode) {
 					layerNodes.add(createEntityLayerNode(jsoProvider, (EntityGraphNode) node));
+				} else if(node instanceof ExpandGraphNode) {
+					layerNodes.add(createExpandLayerNode(jsoProvider, (ExpandGraphNode) node));
 				}
 			}			
 			// build NChartLayer 
@@ -173,20 +176,47 @@ public class NChartUtil {
 		ln.setEvent(entityNode.getId());
 		return ln;
 	}
-
+	
+	/**
+	 * Create an entity node for an NChartLayer
+	 * @param entityNode
+	 * @return
+	 */
+	public static NChartLayerNode createExpandLayerNode(JsoProvider jsoProvider, ExpandGraphNode entityNode) {
+		List<String> subnodes = new ArrayList<String>();
+		subnodes.add(entityNode.getId());
+		NChartLayerNode ln = jsoProvider.newNChartLayerNode();
+		ln.setSubnodes(subnodes);
+		ln.setEvent(entityNode.getId());
+		return ln;
+	}
+	
 	/**
 	 * Fills the positions in LayoutResult back into the graph
 	 * @param layoutResult
 	 * @param graph
 	 */
 	public static void fillPositions(LayoutResult layoutResult, ProvGraph graph) {
+		// find min and max Y for mirror transform
+		int minY = Integer.MAX_VALUE;
+		int maxY = 0;
+		for(ProvGraphNode node : graph.getNodes()) {			
+			List<XYPoint> xyPoints = layoutResult.getPointsForId(node.getId());
+			if(xyPoints != null && xyPoints.size() > 0) {
+				XYPoint pt = xyPoints.get(0);
+				if(pt.getX() < minY) minY = pt.getX();
+				if(pt.getX() > maxY) maxY = pt.getX();
+			}
+		}
+		int range = minY+maxY;
 		for(ProvGraphNode node : graph.getNodes()) {			
 			List<XYPoint> xyPoints = layoutResult.getPointsForId(node.getId());
 			if(xyPoints != null && xyPoints.size() > 0) {
 				// swap X and Y to transpose graph
-				XYPoint pt = xyPoints.get(0);
-				node.setyPos(pt.getX());
+				XYPoint pt = xyPoints.get(0);				
 				node.setxPos(pt.getY());
+				// reflect y axis 
+				node.setyPos((-1*pt.getX()) + range);
 			}
 		}
 	}

@@ -97,18 +97,25 @@ public class ProvViewUtil {
 		return container;
 	}
 	
-	public static LayoutContainer createExpandContainer(final ExpandGraphNode node, SageImageBundle sageImageBundle, final Presenter presenter) {
-		LayoutContainer container = new LayoutContainer();
-		container.setId(node.getId());
-		container.setStyleName(PROV_ENTTITY_NODE_STYLE + " " + PROV_EXPAND_NODE_STYLE);
-		Anchor content = new Anchor(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML());
-		content.addClickHandler(new ClickHandler() {			
+	public static LayoutContainer createExpandContainer(final ExpandGraphNode node, final SageImageBundle sageImageBundle, final Presenter presenter) {
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();		
+		builder.appendHtmlConstant(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML());
+		
+		final Anchor link = new Anchor();
+		link.setHTML(builder.toSafeHtml());
+		link.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
+				link.setHTML(AbstractImagePrototype.create(sageImageBundle.loading16()).getHTML());
 				presenter.expand(node);
 			}
 		});
-		container.add(content);
+
+		LayoutContainer container = new LayoutContainer();
+		container.setId(node.getId());
+		container.setStyleName(PROV_ENTTITY_NODE_STYLE + " " + PROV_EXPAND_NODE_STYLE);
+		container.add(link);
+		container.layout();
 		setPosition(node, container);
 		return container;
 	}	
@@ -129,8 +136,7 @@ public class ProvViewUtil {
 			link.setHref(DisplayUtils.getSynapseHistoryToken(entityId, versionNumber));
 		} else {
 			link.setHref(DisplayUtils.getSynapseHistoryToken(entityId));
-		}
-			
+		}			
 		
 		// icon
 		ImageResource icon = DisplayUtils.getSynapseIconForEntityClassName(entityType, IconSize.PX16, iconsImageBundle);
