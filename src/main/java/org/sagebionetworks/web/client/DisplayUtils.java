@@ -165,6 +165,7 @@ public class DisplayUtils {
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
 	public static final String ETAG_KEY = "etag";
+	public static final String ENTITY_VERSION_STRING = "/version/";
 	
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
@@ -1314,4 +1315,24 @@ public class DisplayUtils {
 					WIKI_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
 					wikiIdParam;
 		}
+
+	public static String createEntityVersionString(String id, Long version) {
+		if(version != null)
+			return id+ENTITY_VERSION_STRING+version;
+		else 
+			return id;		
+	}
+	public static Reference parseEntityVersionString(String entityVersion) {
+		String[] parts = entityVersion.split(ENTITY_VERSION_STRING);
+		if(parts.length > 0) {
+			Reference ref = new Reference();
+			ref.setTargetId(parts[0]);
+			if(parts.length > 1) {
+				try {
+					ref.setTargetVersionNumber(Long.parseLong(parts[1]));
+				} catch(NumberFormatException e) {}
+			}
+		}		
+		return null;		
+	}
 }

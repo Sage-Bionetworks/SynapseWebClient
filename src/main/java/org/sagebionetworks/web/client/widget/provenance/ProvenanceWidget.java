@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.widget.provenance;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -12,12 +10,14 @@ import java.util.Stack;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -37,12 +37,8 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
-import org.sagebionetworks.web.shared.provenance.ActivityType;
-import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
-import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -102,21 +98,30 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;		
-		if(descriptor.containsKey(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY)) entityId = descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY);
-		final Long versionNumber = descriptor.containsKey(WidgetConstants.PROV_WIDGET_ENTITY_VERSION_NUMBER_KEY) ? Long.parseLong(descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_VERSION_NUMBER_KEY)) : null;
+
+		// parse referenced entities and put into start refs
+		startRefs = new HashSet<Reference>();		
+		String entityListStr = null;
+		if(descriptor.containsKey(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY)) entityListStr = descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY);
+		if(entityListStr != null) {
+			String[] refs = entityListStr.split(WidgetConstants.PROV_WIDGET_ENTITY_LIST_DELIMETER);
+			if(refs !=null) {
+				for(String refString : refs) {					
+					startRefs.add(DisplayUtils.parseEntityVersionString(refString));
+				}
+			}
+		}
+		// backwards compatibility for original ProvenanceWidget API
+		if(descriptor.containsKey(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY)) {
+			Reference ref = new Reference();
+			ref.setTargetId(descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY));
+			startRefs.add(ref);
+		}
+		
+		// Set max depth (default 1) and expand		
 		maxDepth = descriptor.containsKey(WidgetConstants.PROV_WIDGET_DEPTH_KEY) ? Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY)) : 1;
 		showExpand = descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY)) : false;
-		Reference startRef = new Reference();
-		startRef.setTargetId(entityId);
-		startRef.setTargetVersionNumber(versionNumber);
-		
-		startRefs = new HashSet<Reference>();
-		startRefs.add(startRef);
-		Reference secondOutputRef = new Reference();
-		secondOutputRef.setTargetId("syn4623");
-		secondOutputRef.setTargetVersionNumber(1L);
-		startRefs.add(secondOutputRef);
-		
+				
 		// load stack with starting nodes at depth 0
 		toProcess = new Stack<ProvenanceWidget.ProcessItem>();
 		for(Reference ref : startRefs) {			
@@ -177,6 +182,10 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}
 
 	private void processUsed(final ReferenceProcessItem item) {
+		if(item.getReference() == null) {
+			processNext();
+			return;
+		}
 		// add entry to references		
 		references.add(item.getReference());
 		
@@ -185,6 +194,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			processNext();
 			return;
 		}
+		
 		
 		// lookup generatedBy activity for ref
 		synapseClient.getActivityForEntityVersion(item.getReference().getTargetId(), item.getReference().getTargetVersionNumber(), new AsyncCallback<String>() {
@@ -219,11 +229,11 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}
 	
 	private void processActivity(final ActivityProcessItem item) { 
-		// check if activity has already been processed
-		if(processedActivities.containsKey(item.getActivity().getId())) {			
-			processNext();
-			return;
-		}
+//		// check if activity has already been processed
+//		if(processedActivities.containsKey(item.getActivity().getId())) {			
+//			processNext();
+//			return;
+//		}
 		
 		// add activity to processedActivites
 		processedActivities.put(item.getActivity().getId(), item.getActivity());
@@ -307,76 +317,12 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		idToNode = new HashMap<String, ProvGraphNode>();
 
 		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, synapseJSNIUtils, startRefs);					
-		//ProvGraph graph = makeTestGraph();
 		
 		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());
 		NChartLayersArray layerArray = NChartUtil.createLayers(jsoProvider, graph);
 		LayoutResult layoutResult = synapseJSNIUtils.nChartlayout(layerArray, characters);
 		NChartUtil.fillPositions(layoutResult, graph);
 		view.setGraph(graph);
-	}
-
-	private ProvGraph makeTestGraph() {
-		ProvGraph graph = new ProvGraph();		
-		EntityGraphNode d1;
-		EntityGraphNode d2;
-		EntityGraphNode d3;
-		EntityGraphNode d4;
-		EntityGraphNode d5;
-		EntityGraphNode d6;
-		EntityGraphNode d7;
-		EntityGraphNode d8;
-		EntityGraphNode d9;
-		EntityGraphNode d10;
-		EntityGraphNode d11;
-		ActivityGraphNode a;
-		ActivityGraphNode b;
-		ActivityGraphNode c;
-		ActivityGraphNode d;
-		d1 = new EntityGraphNode("d1","","","",1L,"",false,false);		
-		d2 = new EntityGraphNode("d2","","","",1L,"",false,false);
-		d3 = new EntityGraphNode("d3","","","",1L,"",false,false);
-		d4 = new EntityGraphNode("d4","","","",1L,"",false,false);
-		d5 = new EntityGraphNode("d5","","","",1L,"",false,false);
-		d6 = new EntityGraphNode("d6","","","",1L,"",false,false);
-		d7 = new EntityGraphNode("d7","","","",1L,"",false,false);
-		d8 = new EntityGraphNode("d8","","","",1L,"",false,false);
-		d9 = new EntityGraphNode("d9","","","",1L,"",false,false);
-		d10 = new EntityGraphNode("d10","","","",1L,"",false,false);
-		d11 = new EntityGraphNode("d11","","","",1L,"",false,false);
-		a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,false);
-		b = new ActivityGraphNode("B","2","Step B", ActivityType.MANUAL,false);
-		c = new ActivityGraphNode("C","2","Step C", ActivityType.MANUAL,false);
-		d = new ActivityGraphNode("D","4","Step D", ActivityType.MANUAL,false);
-		graph.addNode(d1);
-		graph.addNode(d2);
-		graph.addNode(d3);
-		graph.addNode(d4);		
-		graph.addNode(d5);
-		graph.addNode(d6);
-		graph.addNode(d7);
-		graph.addNode(d8);
-		graph.addNode(d9);
-		graph.addNode(d10);
-		graph.addNode(d11);
-		graph.addEdge(new ProvGraphEdge(d1, a));
-		graph.addEdge(new ProvGraphEdge(d2, a));
-		graph.addEdge(new ProvGraphEdge(a, d3));
-		graph.addEdge(new ProvGraphEdge(a, d4));
-		graph.addEdge(new ProvGraphEdge(a, d5));
-		graph.addEdge(new ProvGraphEdge(a, d6));
-		graph.addEdge(new ProvGraphEdge(d4, b));		
-		graph.addEdge(new ProvGraphEdge(d7, b));		
-		graph.addEdge(new ProvGraphEdge(d6, d));		
-		graph.addEdge(new ProvGraphEdge(b, d8));		
-		graph.addEdge(new ProvGraphEdge(d5, c));		
-		graph.addEdge(new ProvGraphEdge(d8, c));		
-		graph.addEdge(new ProvGraphEdge(c, d9));		
-		graph.addEdge(new ProvGraphEdge(c, d10));		
-		graph.addEdge(new ProvGraphEdge(d, d11));		
-		d10.setStartingNode(true);
-		d11.setStartingNode(true);
-		return graph;
 	}
 	
 	private Activity createErrorActivity(Throwable caught) {

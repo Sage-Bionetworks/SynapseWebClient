@@ -108,12 +108,14 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
 	@Override
 	public void setEntity(Entity entity) {
-		Map<String,String> configMap = new HashMap<String,String>();
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY, entity.getId());
+		Long version = null;
 		if(entity instanceof Versionable) 
-			configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_VERSION_NUMBER_KEY, Long.toString(((Versionable)entity).getVersionNumber()));
+			version = ((Versionable)entity).getVersionNumber();			
+		Map<String,String> configMap = new HashMap<String,String>();
+		String entityList = DisplayUtils.createEntityVersionString(entity.getId(), version) +","+"syn4623";
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entityList);
 		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(false));
-		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(3));		
+		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(2));		
 	    provenanceWidget.configure(entity.getId(), configMap);
 	    
 	    entityView.setWidget(provenanceWidget.asWidget());

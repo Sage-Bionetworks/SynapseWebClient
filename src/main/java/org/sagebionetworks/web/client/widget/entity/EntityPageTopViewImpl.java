@@ -379,11 +379,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		provenanceWidget.setHeight(400);
 		
 		Map<String,String> configMap = new HashMap<String,String>();
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY, bundle.getEntity().getId());
-		if(bundle.getEntity() instanceof Versionable) 
-			configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_VERSION_NUMBER_KEY, Long.toString(((Versionable)bundle.getEntity()).getVersionNumber()));
+		Long version = bundle.getEntity() instanceof Versionable ? ((Versionable)bundle.getEntity()).getVersionNumber() : null; 
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(bundle.getEntity().getId(), version));
 		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(false));
-		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(3));		
+		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
 	    provenanceWidget.configure(bundle.getEntity().getId(), configMap);
 	    LayoutContainer border = new LayoutContainer();
 	    border.setBorders(true);	    

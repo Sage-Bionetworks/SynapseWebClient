@@ -37,8 +37,11 @@ public class WidgetConstants {
 	public static final String IMAGE_WIDGET_FILE_NAME_KEY = "fileName";
 	public static final String IMAGE_WIDGET_WIDTH_KEY = "width";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
+
+	@Deprecated
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
-	public static final String PROV_WIDGET_ENTITY_VERSION_NUMBER_KEY = "versionNumber";
+	public static final String PROV_WIDGET_ENTITY_LIST_KEY = "entityList";
+	public static final String PROV_WIDGET_ENTITY_LIST_DELIMETER = ",";
 	public static final String PROV_WIDGET_DEPTH_KEY = "depth";
 	public static final String PROV_WIDGET_EXPAND_KEY = "showExpand";
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
