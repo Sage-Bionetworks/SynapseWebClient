@@ -470,6 +470,7 @@ public class DisplayConstants {
 	public static final String CURRENT = "Current";
 	public static final String CURRENTLY_SELCTED = "Currently Selected";
 	public static final String PLEASE_MAKE_SELECTION = "Please make a selection";
+	public static final String CLOSE = "Close";
 	
 	public static final String API_TABLE_COLUMN_COUNT_MISMATCH = "SuperTable: The number of columns must be the same as the number of renderers and column header titles.";
 	public static final String API_TABLE_MISSING_URI = "SuperTable: Endpoint path not specified.";

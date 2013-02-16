@@ -97,7 +97,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		if(entity instanceof Versionable) 
 			version = ((Versionable)entity).getVersionNumber();			
 		Map<String,String> configMap = new HashMap<String,String>();
-		String entityList = DisplayUtils.createEntityVersionString(entity.getId(), version) +","+"syn4623/version/1";
+		String entityList = DisplayUtils.createEntityVersionString(entity.getId(), version) +","+"syn114241/version/1";
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entityList);
 		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(false));

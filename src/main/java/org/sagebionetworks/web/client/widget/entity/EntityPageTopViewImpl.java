@@ -6,6 +6,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -35,12 +36,20 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Padding;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.Window;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
+import com.extjs.gxt.ui.client.widget.layout.FitData;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.GWT;
@@ -61,7 +70,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
 
-	private static final int PROVENANCE_HEIGHT_PX = 250;
+	private static final int PROVENANCE_HEIGHT_PX = 255;
+	private static final int PROVENANCE_WIDTH_PX = 254;
 
 	@UiField
 	SimplePanel colLeftPanel;
@@ -147,7 +157,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenuPanel.clear();
 		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator,
 				canEdit, readOnly));
-
+		
 		MarginData widgetMargin = new MarginData(0, 0, 20, 0);
 
 		// Custom layouts for certain entities
@@ -368,15 +378,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private Widget createProvenanceWidget(EntityBundle bundle) {
-		LayoutContainer lc = new LayoutContainer();
+		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.addStyleName("span-7 notopmargin right last");
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.PROVENANCE + "</h4>")));
-
+		LayoutContainer topbar = new LayoutContainer();
+		HTML html = new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.PROVENANCE + "</h4>"));
+		html.addStyleName("floatleft");
+		topbar.add(html);
+		lc.add(topbar);
+		
 	    // Create the property body
 	    // the headers for properties.
-		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();		
-		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);
+		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();				
+		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);		
 		
 		Map<String,String> configMap = new HashMap<String,String>();
 		Long version = bundle.getEntity() instanceof Versionable ? ((Versionable)bundle.getEntity()).getVersionNumber() : null; 
@@ -385,12 +399,54 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
 	    provenanceWidget.configure(bundle.getEntity().getId(), configMap);
-	    LayoutContainer border = new LayoutContainer();
-	    border.setBorders(true);	    
-	    border.add(provenanceWidget.asWidget());
+	    final Widget provViewWidget = provenanceWidget.asWidget(); 
+	    final LayoutContainer border = new LayoutContainer();
+	    border.addStyleName("span-7 notopmargin");
+	    border.setBorders(true);
+	    border.add(provViewWidget);
+
+		LayoutContainer menu = new LayoutContainer();		
+		menu.addStyleName("floatleft");
+		Anchor fullSizeButton = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.applicationResize16())));
+		fullSizeButton.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				border.remove(provViewWidget);
+				border.layout(true);
+				final Window window = new Window();
+				// 90% h/w
+				window.setSize(
+						new Double(com.google.gwt.user.client.Window.getClientWidth() * .9).intValue(),
+						new Double(com.google.gwt.user.client.Window.getClientHeight() * .9).intValue()); 
+				window.setPlain(true);
+				window.setModal(true);
+				window.setClosable(false);
+				window.setHeading(DisplayConstants.PROVENANCE);
+				//window.setBodyStyle("background-color: white;");
+				window.setLayout(new FitLayout());
+				LayoutContainer white = new LayoutContainer(new FitLayout());
+				white.addStyleName("whiteBackground");
+				white.add(provViewWidget, new FitData(4));
+				window.add(white);				
+				window.addButton(new Button(DisplayConstants.CLOSE, new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						border.add(provViewWidget);
+						provViewWidget.setSize(PROVENANCE_WIDTH_PX+"px", PROVENANCE_HEIGHT_PX+"px");
+						border.layout(true);
+						window.hide();
+					}
+				}));
+				window.setButtonAlign(HorizontalAlignment.RIGHT);
+				window.show();
+			}
+		});		
+		menu.add(fullSizeButton);		
+		topbar.add(menu, new MarginData(8,0,0,5));
+		
 	    lc.add(border);
 	    lc.layout();
-	    return lc;
+		return lc;
 	}
 
 	private Widget createProgrammaticClientsWidget(EntityBundle bundle) {		

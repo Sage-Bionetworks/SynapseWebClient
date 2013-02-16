@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -187,27 +186,27 @@ public class ProvUtils {
 		}
 		
 		String used = null;
-		Iterator<UsedEntity> itr = activity.getUsed().iterator();
-		while(itr.hasNext()) {
-			Reference ref = itr.next().getReference();
-			if(used == null) {
-				used = DisplayUtils.getVersionDisplay(ref);
-			} else {
-				used += ", " + DisplayUtils.getVersionDisplay(ref);
+		if(activity.getUsed() != null) {
+			for(UsedEntity ue : activity.getUsed()) {
+				Reference ref = ue.getReference();
+				if(used == null) {
+					used = DisplayUtils.getVersionDisplay(ref);
+				} else {
+					used += ", " + DisplayUtils.getVersionDisplay(ref);
+				}
 			}
+			order.add("Entities Used");
+			map.put("Entities Used", used);
+			
+			order.add("Modified By");
+			map.put("Modified By", activity.getModifiedBy());
+			
+			order.add("Modified On");
+			map.put("Modified On", DisplayUtils.converDataToPrettyString(activity.getModifiedOn()));		
+			
+			order.add("Description");
+			map.put("Description", activity.getDescription());				
 		}
-		order.add("Entities Used");
-		map.put("Entities Used", used);
-		
-		order.add("Modified By");
-		map.put("Modified By", activity.getModifiedBy());
-		
-		order.add("Modified On");
-		map.put("Modified On", DisplayUtils.converDataToPrettyString(activity.getModifiedOn()));		
-		
-		order.add("Description");
-		map.put("Description", activity.getDescription());				
-		
 		return new KeyValueDisplay<String>(map, order);
 	}
 
