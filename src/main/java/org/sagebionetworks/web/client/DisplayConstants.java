@@ -304,7 +304,6 @@ public class DisplayConstants {
 	public static final String CODE_EXECUTION = "Code Execution";
 	public static final String MANUAL = "Manual";
 	public static final String UNDEFINED = "Undefined";
-	public static final String NOT_VERSIONED = "not versioned";
 	public static final String ERROR_LAYOUT = "An error occured laying out the Provenance view.";
 	public static final String ERROR_PROVENANCE = "An error occured creating the Provenance view.";
 	public static final String ERROR_PROVENANCE_RELOAD = "Loading Error. Reload.";

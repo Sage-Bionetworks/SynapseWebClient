@@ -150,12 +150,17 @@ public class ProvViewUtil {
 		
 		// version
 		HTML versionHtml;
-		if(versionNumber != null) {			
-			String versionNumberStr = " (#" + versionNumber + ")";
-			String versionLabelStub = stubEntityString(versionLabel, ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length());			
-			versionHtml = new HTML(SafeHtmlUtils.fromString(versionLabelStub + versionNumberStr));
+		if(versionNumber != null) {					
+			String versionNumberStr = "v." + versionNumber;			
+			String versionDisplay; 			
+			if(versionNumber.toString().equals(versionLabel)) {
+				versionDisplay = versionNumberStr;
+			} else {
+				versionDisplay = stubEntityString(versionLabel + " (" + versionNumberStr + ")", ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length());
+			}			
+			versionHtml = new HTML(SafeHtmlUtils.fromString(stubEntityString(versionDisplay, ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length())));
 		} else {
-			versionHtml = new HTML(DisplayConstants.NOT_VERSIONED);			
+			versionHtml = new HTML("");			
 		}
 		versionHtml.setStyleName(PROV_VERSION_DISPLAY_STYLE);
 		builder.appendHtmlConstant(versionHtml.toString());		
