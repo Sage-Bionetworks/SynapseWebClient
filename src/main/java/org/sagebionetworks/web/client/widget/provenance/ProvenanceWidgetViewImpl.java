@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
@@ -40,9 +41,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	private LayoutContainer debug;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private HashMap<String,String> filledPopoverIds;
-	
-	private static final int DEFAULT_HEIGHT_PX = 275;
-	private int height = DEFAULT_HEIGHT_PX;
+		
+	private int height = WidgetConstants.PROV_WIDGET_HEIGHT_DEFAULT;
 	
 	@Inject
 	public ProvenanceWidgetViewImpl(SageImageBundle sageImageBundle,

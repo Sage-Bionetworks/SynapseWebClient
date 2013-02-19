@@ -45,6 +45,8 @@ public class WidgetConstants {
 	public static final String PROV_WIDGET_DEPTH_KEY = "depth";
 	public static final String PROV_WIDGET_EXPAND_KEY = "showExpand";
 	public static final String PROV_WIDGET_UNDEFINED_KEY = "showUndefined";
+	public static final String PROV_WIDGET_DISPLAY_HEIGHT_KEY = "displayHeightPx";
+	public static final int PROV_WIDGET_HEIGHT_DEFAULT = 275;
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
 	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
 	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";
@@ -69,4 +71,5 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
 	public static final String MARKDOWN_HEADING_ID_PREFIX = "synapseheading";
+
 }

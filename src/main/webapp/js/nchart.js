@@ -19,7 +19,6 @@
 // What if you disappear while dead?
 // Beginning the story in a non-default state
 
-(function(window) {
 
     goog.require('goog.array');
     goog.require('goog.object');
@@ -2604,4 +2603,3 @@
     }
 
     window.NChart = NChart;
-})(window);

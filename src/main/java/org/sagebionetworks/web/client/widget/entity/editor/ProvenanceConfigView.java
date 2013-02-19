@@ -10,14 +10,16 @@ public interface ProvenanceConfigView extends IsWidget, WidgetEditorView {
 	 * Set the presenter.
 	 * @param presenter
 	 */
-	public void setPresenter(Presenter presenter);
-
-	public void setEntityId(String entityId);
-	public String getEntityId();
-	public void setDepth(Long depth);
-	public Long getDepth();
-	public void setIsExpanded(boolean b);
-	public boolean isExpanded();
+	void setPresenter(Presenter presenter);
+	
+	void setEntityList(String entityList);
+	String getEntityList();
+	void setDepth(Long depth);
+	Long getDepth();
+	void setProvDisplayHeight(int provDisplayHeight);
+	Integer getProvDisplayHeight();
+	void setIsExpanded(boolean b);
+	boolean isExpanded();
 	
 	/**
 	 * Presenter interface
@@ -25,4 +27,5 @@ public interface ProvenanceConfigView extends IsWidget, WidgetEditorView {
 	public interface Presenter {
 
 	}
+
 }

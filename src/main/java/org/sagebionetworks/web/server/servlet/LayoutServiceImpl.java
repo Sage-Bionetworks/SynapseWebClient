@@ -1,11 +1,8 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.awt.Dimension;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.abego.treelayout.Configuration.Location;
@@ -14,16 +11,9 @@ import org.abego.treelayout.util.DefaultConfiguration;
 import org.abego.treelayout.util.DefaultTreeForTreeLayout;
 import org.sagebionetworks.web.client.services.LayoutService;
 import org.sagebionetworks.web.server.servlet.layout.ProvTreeNodeExtentProvider;
-import org.sagebionetworks.web.shared.provenance.ProvGraph;
-import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
-import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-
-import edu.uci.ics.jung.algorithms.layout.DAGLayout;
-import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
 
 /**
  * The server-side implementation of the DatasetService. This serverlet will
