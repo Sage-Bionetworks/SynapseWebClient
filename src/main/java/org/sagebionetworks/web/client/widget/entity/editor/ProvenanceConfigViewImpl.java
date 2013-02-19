@@ -203,9 +203,11 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 	 */
 	private void appendEntityListValue(Reference selected) {		
 		String str = entityListField.getValue();
-		if(str != null && !str.equals("")) 
+		if(str == null) str = "";
+		if(!str.equals("")) 
 			str += ",";
-		str += DisplayUtils.getVersionDisplay(selected);
+		str += DisplayUtils.createEntityVersionString(selected);
+		entityListField.setValue(str);
 	}
 
 

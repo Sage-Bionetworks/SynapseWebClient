@@ -1298,24 +1298,28 @@ public class DisplayUtils {
 		 * @param fileName
 		 * @return
 		 */
-		public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
-			//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
-	//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
-	//		return repoServicesUrl 
-	//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
-	//				+"/"+ wikiKey.getOwnerObjectId()
-	//				+"/wiki/" 
-	//				+wikiKey.getWikiPageId()
-	//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
-			String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
-			return baseFileHandleUrl + "?" +
-					WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
-					WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
-					WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
-					WIKI_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
-					wikiIdParam;
-		}
+	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
+		//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
+//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
+//		return repoServicesUrl 
+//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
+//				+"/"+ wikiKey.getOwnerObjectId()
+//				+"/wiki/" 
+//				+wikiKey.getWikiPageId()
+//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
+		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+		return baseFileHandleUrl + "?" +
+				WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
+				WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
+				WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
+				WIKI_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+				wikiIdParam;
+	}
 
+	public static String createEntityVersionString(Reference ref) {
+		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
+	}
+	
 	public static String createEntityVersionString(String id, Long version) {
 		if(version != null)
 			return id+ENTITY_VERSION_STRING+version;

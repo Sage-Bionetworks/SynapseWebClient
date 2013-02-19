@@ -112,7 +112,9 @@ public class ProvUtilsTest {
 		Set<Reference> startRefs = new HashSet<Reference>();
 		startRefs.add(ref1);
 		
-		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, false, synapseJsniUtils, startRefs);		
+		Set<Reference> noExpandNodes = new HashSet<Reference>();
+		
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, false, synapseJsniUtils, startRefs, noExpandNodes);		
 		
 		assertNotNull(graph.getNodes());
 		assertNotNull(graph.getEdges());		
@@ -270,11 +272,11 @@ public class ProvUtilsTest {
 			}
 			@Override
 			public String getBaseFileHandleUrl() {
-
+				return "";
+			}
+			
 			@Override
-			public LayoutResult nChartlayout(NChartLayersArray layers,
-					NChartCharacters characters) {
-				// TODO Auto-generated method stub
+			public LayoutResult nChartlayout(NChartLayersArray layers, NChartCharacters characters) {
 				return null;
 			}
 		};
