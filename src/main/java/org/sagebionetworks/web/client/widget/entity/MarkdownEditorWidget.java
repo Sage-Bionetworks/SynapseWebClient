@@ -95,7 +95,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	 * @param callback
 	 * @param saveHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
 	 */
-	public void configure(final WikiPageKey wikiKey, final TextArea markdownTextArea, LayoutContainer formPanel, boolean showFieldLabel, final WidgetDescriptorUpdatedHandler callback, final CloseHandler saveHandler, final ManagementHandler managementHandler) {
+	public void configure(final WikiPageKey wikiKey, final TextArea markdownTextArea, LayoutContainer formPanel, boolean showFieldLabel, final WidgetDescriptorUpdatedHandler callback, final CloseHandler saveHandler, final ManagementHandler managementHandler, int spanWidth) {
 		this.markdownTextArea = markdownTextArea;
 		this.wikiKey = wikiKey;
 		descriptionFormatInfo = new HTML(WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
@@ -111,7 +111,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		if (showFieldLabel)
 			formPanel.add(new Label("Description:"),descriptionLabelFormData);
 		FormData mdCommandFormData = new FormData();
-		mdCommandFormData.setMargins(new Margins(0,15,0,10));
+		mdCommandFormData.setMargins(new Margins(0,-15,0,10));
 		formPanel.add(mdCommands,mdCommandFormData);
 		
 		// followed by description.
@@ -170,7 +170,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		formPanel.add(mdCommandsLower, previewFormData);
 		if (saveHandler != null) {
 			SimplePanel space = new SimplePanel();
-			space.addStyleName("margin-left-490");
+			space.addStyleName("span-" + (spanWidth-12) + " margin-left-35");
 			mdCommandsLower.add(space);
 			
 			//also add a save button to the lower command bar

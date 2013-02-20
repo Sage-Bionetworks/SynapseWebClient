@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
@@ -41,7 +42,8 @@ import com.google.inject.Inject;
 public class EntityPropertyFormViewImpl extends FormPanel implements EntityPropertyFormView {
 	Presenter presenter;
 	TextField<String> nameField;
-	TextArea descriptionField;
+	TextField<String> descriptionField;
+	TextArea markdownDescriptionField;
 	List<Field<?>> propertyFields;
 	List<Field<?>> annotationFields;
 	FormFieldFactory formFactory;
@@ -54,15 +56,17 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	SageImageBundle sageImageBundle;
 	SynapseJSNIUtils synapseJSNIUtils;
 	Window loading;
-	MarkdownEditorWidget markdownEditorWidget;
+	private MarkdownEditorWidget markdownEditorWidget;
+	private CookieProvider cookies;
 	
 	@Inject
-	public EntityPropertyFormViewImpl(FormFieldFactory formFactory, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,SynapseJSNIUtils synapseJSNIUtils, MarkdownEditorWidget markdownEditorWidget) {
+	public EntityPropertyFormViewImpl(FormFieldFactory formFactory, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,SynapseJSNIUtils synapseJSNIUtils, MarkdownEditorWidget markdownEditorWidget, CookieProvider cookies) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle= sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.markdownEditorWidget= markdownEditorWidget;
+		this.cookies = cookies;
 		loading = DisplayUtils.createLoadingWindow(sageImageBundle, "Updating...");
 	}
 	
@@ -185,13 +189,18 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		
 		//TODO: markdown widget to be removed from entity property form
 		//only reconfigure the md editor if the entity id is set
-		if (presenter.getEntity().getId() != null) {
-			markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), descriptionField, formPanel, true, new WidgetDescriptorUpdatedHandler() {
-				@Override
-				public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-					presenter.refreshEntityAttachments();
-				}
-			}, null, null);
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			formPanel.add(descriptionField, basicFormData);
+		}
+		else {
+			if (presenter.getEntity().getId() != null) {
+				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), markdownDescriptionField, formPanel, true, new WidgetDescriptorUpdatedHandler() {
+					@Override
+					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
+						presenter.refreshEntityAttachments();
+					}
+				}, null, null, 6);
+			}
 		}
 		// Add them to the form
 		for (Field<?> formField : propertyFields) {
@@ -219,9 +228,15 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		nameField.setAllowBlank(false);
 		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
 		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
-		descriptionField = formFactory.createTextAreaField(model.getDescription());
-		descriptionField.setWidth("796px");
-		descriptionField.setHeight("300px");
+		
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			descriptionField = (TextField<String>) formFactory.createField(model.getDescription());
+		}
+		else {
+			markdownDescriptionField = formFactory.createTextAreaField(model.getDescription());
+			markdownDescriptionField.setWidth("796px");
+			markdownDescriptionField.setHeight("300px");
+		}
 
 		// Create the list of fields
 		propertyFields = formFactory.createFormFields(model.getProperties());

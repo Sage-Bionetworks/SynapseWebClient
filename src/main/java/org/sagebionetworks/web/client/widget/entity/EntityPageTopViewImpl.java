@@ -241,7 +241,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 
 		// Wiki
-		addWikiPageWidget(colLeftContainer, bundle, canEdit);
+		addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
 
 		// ** RIGHT **
 		// Programmatic Clients
@@ -297,7 +297,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 
-		addWikiPageWidget(fullWidthContainer, bundle, canEdit);
+		addWikiPageWidget(fullWidthContainer, bundle, canEdit, 24);
 		
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -327,7 +327,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 
 		// Wiki
-		addWikiPageWidget(fullWidthContainer, bundle, canEdit);
+		addWikiPageWidget(fullWidthContainer, bundle, canEdit, 24);
 			
 		// Child File Browser
 		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
@@ -349,7 +349,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.add(threeCol, widgetMargin);
 	}
 
-	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit) {
+	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, int spanWidth) {
 		// Child Page Browser
 		if (DisplayUtils.isInTestWebsite(cookies)) {
 			container.add(wikiPageWidget);
@@ -358,7 +358,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				public void pageUpdated() {
 					presenter.fireEntityUpdatedEvent();
 				}
-			}, true);
+			}, true, spanWidth);
 		}
 
 	}
@@ -382,7 +382,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 
-		addWikiPageWidget(colLeftContainer, bundle, canEdit);
+		addWikiPageWidget(colLeftContainer, bundle, canEdit, 24);
 		
 		// ** RIGHT **
 		// Annotation Editor widget

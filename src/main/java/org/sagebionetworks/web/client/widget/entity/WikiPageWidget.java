@@ -88,6 +88,7 @@ public class WikiPageWidget extends LayoutContainer {
 	private String ownerObjectName, ownerHistoryToken; //used for linking back to the owner object
 	private WikiAttachments wikiAttachments;
 	private WidgetRegistrar widgetRegistrar;
+	private int spanWidth;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -114,10 +115,11 @@ public class WikiPageWidget extends LayoutContainer {
 		this.widgetRegistrar = widgetRegistrar;
 	}
 	
-	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage) {
+	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage, int spanWidth) {
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		this.spanWidth = spanWidth;
 		this.removeAll(true);
 		
 		//set up callback
@@ -193,16 +195,16 @@ public class WikiPageWidget extends LayoutContainer {
 	private void showDefaultViewWithWiki() {
 		removeAll(true);
 		SimplePanel topBarWrapper = new SimplePanel();
-		topBarWrapper.addStyleName("span-24 margin-top-5");
+		topBarWrapper.addStyleName("span-"+spanWidth + " margin-top-5");
 		HorizontalPanel topBar = new HorizontalPanel();
 		String titleString = isEmbeddedInOwnerPage ? "" : currentPage.getTitle();
-		topBar.add(new HTMLPanel("<h2 style=\"width:750px; margin-bottom:0px;\">"+titleString+"</h2>"));
+		topBar.add(new HTMLPanel("<h2 class=\"span-"+(spanWidth-5)+"\" style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
 		topBar.add(getCommands(canEdit));
 		topBarWrapper.add(topBar);
 		add(topBarWrapper);
 		
 		FlowPanel mainPanel = new FlowPanel();
-		mainPanel.addStyleName("span-24 notopmargin");
+		mainPanel.addStyleName("span-"+spanWidth + " notopmargin");
 		mainPanel.add(getBreadCrumbs());
 		mainPanel.add(markdownWidget.asWidget());
 		mainPanel.add(pagesBrowser.asWidget());
@@ -328,16 +330,15 @@ public class WikiPageWidget extends LayoutContainer {
 				//create the editor textarea, and configure the editor widget
 				final TextArea mdField = new TextArea();
 				mdField.setValue(currentPage.getMarkdown());
-				mdField.setWidth("910px");
+				mdField.addStyleName("span-"+spanWidth);
 				mdField.setHeight("400px");
 
 				LayoutContainer form = new LayoutContainer();
-				form.addStyleName("span-24");
+				form.addStyleName("span-" + spanWidth);
 				final TextBox titleField = new TextBox();
 				if (!isEmbeddedInOwnerPage) {
 					titleField.setValue(currentPage.getTitle());
-					titleField.addStyleName("font-size-32 margin-left-10 margin-bottom-10");
-					titleField.setWidth("910px");
+					titleField.addStyleName("font-size-32 margin-left-10 margin-bottom-10 span-"+spanWidth);
 					titleField.setHeight("35px");
 					
 					form.add(titleField);
@@ -350,7 +351,7 @@ public class WikiPageWidget extends LayoutContainer {
 						//update wiki attachments
 						refreshWikiAttachments(titleField.getValue(), mdField.getValue(), null);
 					}
-				}, getCloseHandler(titleField, mdField), getManagementHandler());
+				}, getCloseHandler(titleField, mdField), getManagementHandler(), spanWidth);
 				form.addStyleName("margin-bottom-40");
 				add(form);
 				layout(true);
@@ -493,7 +494,7 @@ public class WikiPageWidget extends LayoutContainer {
 	
 	
 	private void refresh() {
-		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
+		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage, spanWidth);
 	}
 	
 	public void showErrorMessage(String message) {
