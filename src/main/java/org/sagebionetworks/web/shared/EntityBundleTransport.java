@@ -24,6 +24,7 @@ public class EntityBundleTransport implements IsSerializable {
 	public static int ACL						= EntityBundle.ACL;
 	public static int ACCESS_REQUIREMENTS		= EntityBundle.ACCESS_REQUIREMENTS;
 	public static int UNMET_ACCESS_REQUIREMENTS	= EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+	public static int FILE_HANDLES				= EntityBundle.FILE_HANDLES;
 	
 	public static String HELLO = ":)";
 
@@ -36,7 +37,7 @@ public class EntityBundleTransport implements IsSerializable {
 	private String aclJson;
 	private String accessRequirementsJson;
 	private String unmetAccessRequirementsJson;
-	private String fileHandleJson;
+	private String fileHandlesJson;
 	
 	public Boolean getHasChildren() {
 		return hasChildren;
@@ -93,11 +94,11 @@ public class EntityBundleTransport implements IsSerializable {
 		this.unmetAccessRequirementsJson = unmetAccessRequirementsJson;
 	}
 	
-	public String getFileHandleJson() {
-		return fileHandleJson;
+	public String getFileHandlesJson() {
+		return fileHandlesJson;
 	}
-	public void setFileHandleJson(String fileHandleJson) {
-		this.fileHandleJson = fileHandleJson;
+	public void setFileHandlesJson(String fileHandlesJson) {
+		this.fileHandlesJson = fileHandlesJson;
 	}
 	
 	@Override
@@ -120,7 +121,7 @@ public class EntityBundleTransport implements IsSerializable {
 				+ ((entityReferencedByJson == null) ? 0
 						: entityReferencedByJson.hashCode());
 		result = prime * result
-				+ ((fileHandleJson == null) ? 0 : fileHandleJson.hashCode());
+				+ ((fileHandlesJson == null) ? 0 : fileHandlesJson.hashCode());
 		result = prime * result
 				+ ((hasChildren == null) ? 0 : hasChildren.hashCode());
 		result = prime * result
@@ -170,10 +171,10 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!entityReferencedByJson.equals(other.entityReferencedByJson))
 			return false;
-		if (fileHandleJson == null) {
-			if (other.fileHandleJson != null)
+		if (fileHandlesJson == null) {
+			if (other.fileHandlesJson != null)
 				return false;
-		} else if (!fileHandleJson.equals(other.fileHandleJson))
+		} else if (!fileHandlesJson.equals(other.fileHandlesJson))
 			return false;
 		if (hasChildren == null) {
 			if (other.hasChildren != null)
@@ -202,8 +203,8 @@ public class EntityBundleTransport implements IsSerializable {
 				+ ", hasChildren=" + hasChildren + ", aclJson=" + aclJson
 				+ ", accessRequirementsJson=" + accessRequirementsJson
 				+ ", unmetAccessRequirementsJson="
-				+ unmetAccessRequirementsJson + ", fileHandleJson="
-				+ fileHandleJson + "]";
+				+ unmetAccessRequirementsJson + ", fileHandlesJson="
+				+ fileHandlesJson + "]";
 	}
 	
 	

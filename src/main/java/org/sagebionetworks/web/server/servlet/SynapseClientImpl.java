@@ -12,11 +12,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.pegdown.PegDownProcessor;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -28,7 +26,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
@@ -40,7 +37,6 @@ import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -69,7 +65,6 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -77,6 +72,8 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
+
+import eu.henkelmann.actuarius.ActuariusTransformer;
 
 @SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -90,7 +87,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
-	PegDownProcessor markdownProcessor = new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS);
+	ActuariusTransformer markdownProcessor = new ActuariusTransformer();
 	
 	/**
 	 * Injected with Gin
@@ -182,8 +179,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		try {			
 			Synapse synapseClient = createSynapseClient();			
-			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);
-			return convertBundleToTransport(entityId, eb, partsMask, getFileHandle(synapseClient, eb, partsMask));
+			EntityBundle eb;
+			try {
+				eb = synapseClient.getEntityBundle(entityId, partsMask);
+			} catch(SynapseException e) {
+				//if we're trying to get the filehandles, then give another try without the filehandles
+				if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0) {
+					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES) & partsMask;
+					eb = synapseClient.getEntityBundle(entityId, newPartsMask);
+				}
+				else throw e;
+			}
+			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -194,23 +201,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			Long versionNumber, int partsMask) throws RestServiceException {
 		try {			
 			Synapse synapseClient = createSynapseClient();
-			EntityBundle eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
-			return convertBundleToTransport(entityId, eb, partsMask, getFileHandle(synapseClient, eb, partsMask));
+			EntityBundle eb;			
+			try {
+				eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
+			} catch(SynapseException e) {
+				//if we're trying to get the filehandles, then give another try without the filehandles
+				if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0) {
+					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES) & partsMask;
+					eb = synapseClient.getEntityBundle(entityId, versionNumber, newPartsMask);
+				}
+				else throw e;
+			}
+			
+			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
-	}
-	
-	//TODO: remove when this is available from the backend entitybundle
-	private FileHandle getFileHandle(Synapse synapseClient, EntityBundle eb, int partsMask) throws SynapseException {
-		FileHandle fileHandle = null;
-		if (eb.getEntity() instanceof FileEntity) {
-			//try to get the file handle
-			try {
-				fileHandle = synapseClient.getRawFileHandle(((FileEntity)eb.getEntity()).getDataFileHandleId());
-			} catch (SynapseNotFoundException e) {}//keep going if it failed due to being missing
-		}
-		return fileHandle;
 	}
 	
 	@Override
@@ -289,7 +295,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	// Convert repo-side EntityBundle to serializable EntityBundleTransport
 	private EntityBundleTransport convertBundleToTransport(String entityId, 
-			EntityBundle eb, int partsMask, FileHandle fileHandle) throws RestServiceException {
+			EntityBundle eb, int partsMask) throws RestServiceException {
 		EntityBundleTransport ebt = new EntityBundleTransport();
 		try {
 			if ((EntityBundleTransport.ENTITY & partsMask) > 0) {
@@ -309,7 +315,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				ebt.setEntityPathJson(EntityFactory.createJSONStringForEntity(path));
 			}
 			if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
-				PaginatedResults<EntityHeader> rb = eb.getReferencedBy();
+				List<EntityHeader> rbList = eb.getReferencedBy();
+				PaginatedResults<EntityHeader> rb = new PaginatedResults<EntityHeader>();
+				rb.setResults(rbList);
 				ebt.setEntityReferencedByJson(EntityFactory.createJSONStringForEntity(rb));
 			}
 			if ((EntityBundleTransport.HAS_CHILDREN & partsMask) > 0) {
@@ -334,8 +342,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask)!=0) {
 				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb.getUnmetAccessRequirements()));
 			}
-			if (fileHandle != null)
-				ebt.setFileHandleJson(EntityFactory.createJSONStringForEntity(fileHandle));
+			if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0 && eb.getFileHandles() != null)
+				ebt.setFileHandlesJson(createJSONStringFromArray(eb.getFileHandles()));
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());			
 		}
@@ -906,8 +914,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 //	}
 
 	@Override
-	public String markdown2Html(String markdown, Boolean isPreview) {
-		return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException{
+		try {
+			return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+		} catch (IOException e) {
+			throw new RestServiceException(e.getMessage());
+		}
 	}
 
 	@Override

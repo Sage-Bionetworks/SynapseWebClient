@@ -95,7 +95,7 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		PaginatedResults<EntityHeader> referencedBy = null;
 		List<AccessRequirement> accessRequirements = null;
 		List<AccessRequirement> unmetAccessRequirements = null;
-		FileHandle fileHandle = null;
+		List<FileHandle> fileHandles = null;
 		Long version = null;
 		// entity?
 		if(transport.getEntityJson() != null){
@@ -136,17 +136,21 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 				unmetAccessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
 			}
 		}
-		// file handle?
-		if(transport.getFileHandleJson() != null){
-			try {
-				fileHandle = createJSONEntity(transport.getFileHandleJson(), S3FileHandle.class);
-			} catch (Throwable e) {}//unable to get the file handle
+		// file handles?
+		if(transport.getFileHandlesJson() != null){
+			fileHandles =  new ArrayList<FileHandle>();
+			JSONArrayAdapter aa = jsonObjectAdapter.createNewArray(transport.getFileHandlesJson());
+			for (int i=0; i<aa.length(); i++) {
+				JSONObjectAdapter joa = aa.getJSONObject(i);
+				String concreteClassName = (String)joa.get("concreteType");
+				fileHandles.add((FileHandle)factory.createEntity(joa.toJSONString(), concreteClassName));
+			}
 		}
 		
 		// put it all together.
 		EntityBundle eb =  new EntityBundle(entity, annotations, 
 				permissions, path, referencedBy,
-				accessRequirements, unmetAccessRequirements, fileHandle);
+				accessRequirements, unmetAccessRequirements, fileHandles);
 		// Set the child count when there.
 		if(transport.getHasChildren() != null){
 			eb.setChildCount(transport.getHasChildren());

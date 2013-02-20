@@ -8,6 +8,7 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_REFERE
 import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
 
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
@@ -95,7 +96,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		// TODO : add REFERENCED_BY
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | 
 		ENTITY_PATH | ENTITY_REFERENCEDBY | HAS_CHILDREN |
-			ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
+			ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES;
 		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override
 			public void onSuccess(EntityBundleTransport transport) {				

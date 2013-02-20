@@ -13,13 +13,15 @@ public class WidgetConstants {
 	public static final String IMAGE_CONTENT_TYPE = "image";
 	public static final String IMAGE_FRIENDLY_NAME ="Image";
 	
-	public static final String ATTACHMENT_PREVIEW_CONTENT_TYPE = "preview";
-	public static final String ATTACHMENT_PREVIEW_FRIENDLY_NAME ="Attachment Preview";
-
+	public static final String ATTACHMENT_PREVIEW_CONTENT_TYPE = "previewattachment";
+	public static final String ATTACHMENT_PREVIEW_FRIENDLY_NAME ="Attachment";
 	
 	public static final String LINK_CONTENT_TYPE = "link";
 	public static final String LINK_FRIENDLY_NAME ="Link";
 
+	public static final String TABBED_TABLE_CONTENT_TYPE = "tabbedtable";
+	public static final String TABBED_TABLE_FRIENDLY_NAME ="Table";
+	
 	public static final String API_TABLE_CONTENT_TYPE = "supertable";
 	public static final String API_TABLE_FRIENDLY_NAME = "Super Table (Synapse API Based)";
 	

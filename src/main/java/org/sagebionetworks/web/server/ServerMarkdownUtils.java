@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.server;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,14 +10,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
-import org.pegdown.PegDownProcessor;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
+import eu.henkelmann.actuarius.ActuariusTransformer;
+
 public class ServerMarkdownUtils {
-	
 	/**
 	 * This converts the given markdown to html using the given markdown processor.
 	 * It also post processes the output html, including:
@@ -26,30 +28,58 @@ public class ServerMarkdownUtils {
 	 * *auto detects generic urls (and creates links out of them)
 	 * *resolve Widgets!
 	 * @param panel
+	 * @throws IOException 
 	 */
-	public static String markdown2Html(String markdown, Boolean isPreview, PegDownProcessor markdownProcessor) {
+	public static String markdown2Html(String markdown, Boolean isPreview, ActuariusTransformer markdownProcessor) throws IOException {
+		String originalMarkdown = markdown;
 		if (markdown == null) return "";
-		//before processing, replace all '\n' with '  \n' so that all newlines are correctly interpreted as manual breaks!
+		String tempDelimiter = "%^&1_9d";	//trick to maintain newlines when supressing all html
 		if (markdown != null) {
-			markdown = markdown.replace("\n", "  \n");
+			markdown = markdown.replace("\n", tempDelimiter);
 		}
-		String html = markdownProcessor.markdownToHtml(markdown);
-		if (html == null) {
+//		lastTime = System.currentTimeMillis();
+//		markdown = StringEscapeUtils.escapeHtml(markdown);
+		//suppress html
+//		Whitelist wl = new Whitelist();
+//		wl.addTags("br");
+//		markdown = Jsoup.clean(markdown, wl);
+		markdown = Jsoup.parse(markdown).text();
+		markdown = markdown.replace(tempDelimiter, "  \n");
+		
+//		reportTime("suppress/escape html");
+		markdown = resolveTables(markdown);
+//		reportTime("resolved tables");
+		markdown = markdownProcessor.apply(markdown);
+//		reportTime("markdownToHtml");
+		if (markdown == null) {
 			//if the markdown processor fails to convert the md to html (will return null in this case), return the raw markdown instead. (as ugly as it might be, it's better than no information).
-			return markdown; 
+			return originalMarkdown; 
 		}
 		//using jsoup, since it's already in this project!
-		Document doc = Jsoup.parse(html);
+		Document doc = Jsoup.parse(markdown);
+//		reportTime("Jsoup parse");
 		ServerMarkdownUtils.assignIdsToHeadings(doc);
+//		reportTime("Assign IDs to Headings");
 		ServerMarkdownUtils.sendAllLinksToNewWindow(doc);
+//		reportTime("sendAllLinksToNewWindow");
 		Elements anchors = doc.getElementsByTag("a");
 		anchors.addClass("link");
+//		reportTime("add link class");
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
+//		reportTime("addWidgets");
 		ServerMarkdownUtils.addSynapseLinks(doc);
+//		reportTime("addSynapseLinks");
 		//URLs are automatically resolved from the markdown processor
 		String returnHtml = "<div class=\"markdown\">" + doc.html() + "</div>";
 		return returnHtml;
 	}
+	
+//	private static long lastTime;
+//	private static void reportTime(String descriptor) {
+//		long currentTime = System.currentTimeMillis();
+//		System.out.println(descriptor + ": " + (currentTime-lastTime));
+//		lastTime = currentTime;
+//	}
 
 	public static void assignIdsToHeadings(Document doc) {
 		Elements hTags = doc.select("h0, h1, h2, h3, h4, h5, h6");
@@ -134,6 +164,46 @@ public class ServerMarkdownUtils {
 				}
 			}
 		}
+	}
+	
+	public static String resolveTables(String rawMarkdown) {
+		//find all tables, and replace the raw text with html table
+		String regEx = ".*[|]{1}.+[|]{1}.*";
+		String[] lines = rawMarkdown.split("  \n");
+		StringBuilder sb = new StringBuilder();
+		//eat before
+		int i = 0;
+		while (i < lines.length) {
+			boolean looksLikeTable = lines[i].matches(regEx);
+			if (looksLikeTable) {
+				//create a table, and consume until the regEx stops
+				i = appendNewTableHtml(sb, regEx, lines, i);
+			} else {
+				//just add the line and move on
+				sb.append(lines[i] + "  \n");
+				i++;
+			}
+		}
+		
+		return sb.toString();
+	}
+	
+	public static int appendNewTableHtml(StringBuilder builder, String regEx, String[] lines, int i) {
+		builder.append("<table>");
+		while (i < lines.length && lines[i].matches(regEx)) {
+			builder.append("<tr>");
+			String[] cells = lines[i].split("\\|");
+			for (int j = 0; j < cells.length; j++) {
+				builder.append("<td>");
+				builder.append(cells[j]);
+				builder.append("</td>");
+			}
+			builder.append("</tr>");
+			i++;
+		}
+		builder.append("</table>");
+		
+		return i;
 	}
 	
 	public static void addWidgets(Document doc, Boolean isPreview) {

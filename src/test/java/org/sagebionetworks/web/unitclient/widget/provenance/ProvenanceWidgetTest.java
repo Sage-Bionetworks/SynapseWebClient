@@ -189,7 +189,7 @@ public class ProvenanceWidgetTest {
 	public void testConfigure() throws Exception {
 		//verify that calling configure eventually does the same thing as buildTree
 		EntityBundleTransport ebt = new EntityBundleTransport();
-		when(mockNodeModelCreator.createEntityBundle(ebt)).thenReturn(new EntityBundle(entity, null, null, null, null, null, null));
+		when(mockNodeModelCreator.createEntityBundle(ebt)).thenReturn(new EntityBundle(entity, null, null, null, null, null, null, null));
 		
 		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		Map<String, String> widgetDescriptor = new HashMap<String, String>();

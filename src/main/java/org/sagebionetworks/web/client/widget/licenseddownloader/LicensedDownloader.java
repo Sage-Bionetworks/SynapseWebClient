@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -27,6 +28,7 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -150,12 +152,13 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			if (entityBundle.getEntity() instanceof FileEntity) {
 				FileEntity fileEntity = (FileEntity)entityBundle.getEntity();
 				if (this.authenticationController.isLoggedIn()) {
-					if (entityBundle.getFileHandle() != null) {
+					FileHandle fileHandle = FileTitleBar.getFileHandle(entityBundle);
+					if (fileHandle != null) {
 						String md5 = null;
-						if (entityBundle.getFileHandle() instanceof S3FileHandleInterface) {
-							md5 = ((S3FileHandleInterface)entityBundle.getFileHandle()).getContentMd5();
+						if (fileHandle instanceof S3FileHandleInterface) {
+							md5 = ((S3FileHandleInterface)fileHandle).getContentMd5();
 						}
-						this.view.setDownloadLocation(entityBundle.getFileHandle().getFileName(), fileEntity.getId(), fileEntity.getVersionNumber(), md5);
+						this.view.setDownloadLocation(fileHandle.getFileName(), fileEntity.getId(), fileEntity.getVersionNumber(), md5);
 					}
 					else {
 						this.view.setNoDownloads();

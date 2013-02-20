@@ -28,13 +28,13 @@ public class EntityBundle {
 	private List<AccessRequirement> accessRequirements;
 	private List<AccessRequirement> unmetAccessRequirements;
 	private Boolean hasChildren;
-	private FileHandle fileHandle;
+	private List<FileHandle> fileHandles;
 	
 	public EntityBundle(Entity entity, Annotations annotations,
 			UserEntityPermissions permissions, EntityPath path, 
 			PaginatedResults<EntityHeader> referencedBy,
 			List<AccessRequirement> accessRequirements,
-		List<AccessRequirement> unmetAccessRequirements, FileHandle fileHandle
+		List<AccessRequirement> unmetAccessRequirements, List<FileHandle> fileHandles
 	) {
 		super();
 		this.entity = entity;
@@ -44,7 +44,7 @@ public class EntityBundle {
 		this.referencedBy = referencedBy;
 		this.accessRequirements=accessRequirements;
 		this.unmetAccessRequirements=unmetAccessRequirements;
-		this.fileHandle = fileHandle;
+		this.fileHandles = fileHandles;
 	}
 	public Entity getEntity() {
 		return entity;
@@ -98,12 +98,12 @@ public class EntityBundle {
 		this.unmetAccessRequirements = unmetAccessRequirements;
 	}
 	
-	public FileHandle getFileHandle() {
-		return fileHandle;
+	public List<FileHandle> getFileHandles() {
+		return fileHandles;
 	}
 	
-	public void setFileHandle(FileHandle fileHandle) {
-		this.fileHandle = fileHandle;
+	public void setFileHandles(List<FileHandle> fileHandles) {
+		this.fileHandles = fileHandles;
 	}
 	@Override
 	public int hashCode() {
@@ -117,7 +117,7 @@ public class EntityBundle {
 				+ ((annotations == null) ? 0 : annotations.hashCode());
 		result = prime * result + ((entity == null) ? 0 : entity.hashCode());
 		result = prime * result
-				+ ((fileHandle == null) ? 0 : fileHandle.hashCode());
+				+ ((fileHandles == null) ? 0 : fileHandles.hashCode());
 		result = prime * result
 				+ ((hasChildren == null) ? 0 : hasChildren.hashCode());
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
@@ -155,10 +155,10 @@ public class EntityBundle {
 				return false;
 		} else if (!entity.equals(other.entity))
 			return false;
-		if (fileHandle == null) {
-			if (other.fileHandle != null)
+		if (fileHandles == null) {
+			if (other.fileHandles != null)
 				return false;
-		} else if (!fileHandle.equals(other.fileHandle))
+		} else if (!fileHandles.equals(other.fileHandles))
 			return false;
 		if (hasChildren == null) {
 			if (other.hasChildren != null)
@@ -195,7 +195,7 @@ public class EntityBundle {
 				+ path + ", referencedBy=" + referencedBy
 				+ ", accessRequirements=" + accessRequirements
 				+ ", unmetAccessRequirements=" + unmetAccessRequirements
-				+ ", hasChildren=" + hasChildren + ", fileHandle=" + fileHandle
+				+ ", hasChildren=" + hasChildren + ", fileHandles=" + fileHandles
 				+ "]";
 	}
 	

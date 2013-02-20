@@ -58,7 +58,7 @@ public class FileTitleBarTest {
 	public void testUpdateNodeStorageUsage() {
 		//updating node storage usage is wired to synapse client getStorageUsage (and result is completely based on the return of that call)
 		final Long testSize = 1234l;
-		fileTitleBar.setEntityBundle(new EntityBundle(new Project(), null, null, null, null, null, null));
+		fileTitleBar.setEntityBundle(new EntityBundle(new Project(), null, null, null, null, null, null, null));
 		AsyncMockStubber.callSuccessWith(testSize).when(mockSynapseClient).getStorageUsage(anyString(), any(AsyncCallback.class));
 		fileTitleBar.updateNodeStorageUsage(new AsyncCallback<Long>() {
 			@Override

@@ -5,6 +5,8 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -146,21 +148,22 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
 			synapseIconForEntity.applyTo(entityIcon);
 			//fileHandle is null if user can't access the filehandle associated with this fileentity
-			boolean isFilenamePanelVisible = entityBundle.getFileHandle() != null;
+			FileHandle fileHandle = FileTitleBar.getFileHandle(entityBundle);
+			boolean isFilenamePanelVisible = fileHandle != null;
 			fileNameContainer.setVisible(isFilenamePanelVisible);
 			if (isFilenamePanelVisible) {
-				fileName.setInnerText(entityBundle.getFileHandle().getFileName());
+				fileName.setInnerText(fileHandle.getFileName());
 				//don't ask for the size if it's external, just display that this is external data
 				md5Link.setVisible(false);
-				if (entityBundle.getFileHandle() instanceof ExternalFileHandle) {
+				if (fileHandle instanceof ExternalFileHandle) {
 					fileSize.setInnerText("(External Storage)");
 				}
-				else if (entityBundle.getFileHandle() instanceof S3FileHandleInterface){
+				else if (fileHandle instanceof S3FileHandleInterface){
 					md5Link.setVisible(true);
-					S3FileHandleInterface fileHandle = (S3FileHandleInterface)entityBundle.getFileHandle();
+					S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
 					
-					fileSize.setInnerText("("+DisplayUtils.getFriendlySize(fileHandle.getContentSize().doubleValue(), true) + " - Synapse Storage)");
-					final String md5 = fileHandle.getContentMd5();
+					fileSize.setInnerText("("+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true) + " - Synapse Storage)");
+					final String md5 = s3FileHandle.getContentMd5();
 					md5Link.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {

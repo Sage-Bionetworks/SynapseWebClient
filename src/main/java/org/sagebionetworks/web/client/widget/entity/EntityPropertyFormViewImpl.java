@@ -79,7 +79,10 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	public void showEditEntityDialog(String windowTitle) {
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
-	    window.setSize(880, 660);
+		boolean isInTestMode = DisplayUtils.isInTestWebsite(cookies);
+		int width = isInTestMode ? 670 : 880;
+		int height = isInTestMode ? 400 : 660;
+		window.setSize(width, height);
 	    window.setPlain(true);  
 	    window.setModal(true);  
 	    window.setHeading(windowTitle);
@@ -111,7 +114,8 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		this.setScrollMode(Scroll.AUTO);
 		this.vp = new VerticalPanel();
 		this.add(vp);
-		int width = 850;
+		boolean isInTestMode = DisplayUtils.isInTestWebsite(cookies);
+		int width = isInTestMode ? 640 : 850;
 		// This is the property panel
 		propPanel = new ContentPanel();
 		propPanel.setCollapsible(true);

@@ -28,6 +28,7 @@ import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -220,7 +221,7 @@ public class LicensedDownloaderTest {
 		// Null locations
 		resetMocks();			
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		entityBundle.setFileHandle(null);		
+		entityBundle.setFileHandles(null);		
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();
 		verify(mockView).setNoDownloads();	
@@ -237,7 +238,9 @@ public class LicensedDownloaderTest {
 		S3FileHandle fileHandle = new S3FileHandle();
 		fileHandle.setContentMd5("myContentMd5");
 		fileHandle.setFileName("myFileName.png");
-		entityBundle.setFileHandle(fileHandle);
+		List fileHandles = new ArrayList<FileHandle>();
+		fileHandles.add(fileHandle);
+		entityBundle.setFileHandles(fileHandles);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
