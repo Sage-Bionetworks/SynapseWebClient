@@ -9,16 +9,22 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -39,6 +45,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private Header headerWidget;
 	private Footer footerWidget;
 	ProvenanceWidget provenanceWidget;
+	SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
@@ -49,7 +56,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		
 		this.provenanceWidget = provenanceWidget;
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
@@ -103,7 +111,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(false));
 		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
 	    provenanceWidget.configure(null, configMap);
-	    provenanceWidget.setHeight(800);
+	    provenanceWidget.setHeight(800);	
 	    entityView.setWidget(provenanceWidget.asWidget());
 	}
 

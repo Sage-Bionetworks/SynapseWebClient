@@ -197,6 +197,7 @@ public class NChartUtil {
 	 * @param graph
 	 */
 	public static void fillPositions(LayoutResult layoutResult, ProvGraph graph) {
+		final double scaleX = 1.4; // scale x by 
 		// find min and max Y for mirror transform
 		int minY = Integer.MAX_VALUE;
 		int maxY = 0;
@@ -212,11 +213,12 @@ public class NChartUtil {
 		for(ProvGraphNode node : graph.getNodes()) {			
 			List<XYPoint> xyPoints = layoutResult.getPointsForId(node.getId());
 			if(xyPoints != null && xyPoints.size() > 0) {
-				// swap X and Y to transpose graph
-				XYPoint pt = xyPoints.get(0);				
-				node.setxPos(pt.getY());
-				// reflect y axis 
-				node.setyPos((-1*pt.getX()) + range);
+				// swap X and Y, scale X and transpose graph
+				XYPoint pt = xyPoints.get(0);
+				int x = (int) (pt.getY() * scaleX);
+				int y = (-1*pt.getX()) + range; // reflect y axis
+				node.setxPos(x); 
+				node.setyPos(y);
 			}
 		}
 	}

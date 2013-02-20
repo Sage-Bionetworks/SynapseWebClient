@@ -1024,6 +1024,16 @@ public class DisplayUtils {
 		addPopover(util, widget, content, optionsMap);
 	}
 
+	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
+		Map<String, String> optionsMap = new TreeMap<String, String>();
+		optionsMap.put("data-html", "true");
+		optionsMap.put("data-animation", "true");
+		optionsMap.put("title", title);
+		optionsMap.put("data-placement", pos.toString().toLowerCase());
+		optionsMap.put("data-trigger", "hover");		
+		addPopover(util, widget, content, optionsMap);
+	}
+
 	
 	/**
 	 * Adds a popover to a target widget
