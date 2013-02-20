@@ -165,6 +165,7 @@ public class DisplayUtils {
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
 	public static final String ETAG_KEY = "etag";
+	public static final String ENTITY_VERSION_STRING = "/version/";
 	
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
@@ -1023,6 +1024,16 @@ public class DisplayUtils {
 		addPopover(util, widget, content, optionsMap);
 	}
 
+	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
+		Map<String, String> optionsMap = new TreeMap<String, String>();
+		optionsMap.put("data-html", "true");
+		optionsMap.put("data-animation", "true");
+		optionsMap.put("title", title);
+		optionsMap.put("data-placement", pos.toString().toLowerCase());
+		optionsMap.put("data-trigger", "hover");		
+		addPopover(util, widget, content, optionsMap);
+	}
+
 	
 	/**
 	 * Adds a popover to a target widget
@@ -1297,21 +1308,46 @@ public class DisplayUtils {
 		 * @param fileName
 		 * @return
 		 */
-		public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
-			//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
-	//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
-	//		return repoServicesUrl 
-	//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
-	//				+"/"+ wikiKey.getOwnerObjectId()
-	//				+"/wiki/" 
-	//				+wikiKey.getWikiPageId()
-	//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
-			String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
-			return baseFileHandleUrl + "?" +
-					WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
-					WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
-					WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
-					WIKI_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
-					wikiIdParam;
-		}
+	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
+		//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
+//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
+//		return repoServicesUrl 
+//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
+//				+"/"+ wikiKey.getOwnerObjectId()
+//				+"/wiki/" 
+//				+wikiKey.getWikiPageId()
+//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
+		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+		return baseFileHandleUrl + "?" +
+				WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
+				WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
+				WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
+				WIKI_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+				wikiIdParam;
+	}
+
+	public static String createEntityVersionString(Reference ref) {
+		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
+	}
+	
+	public static String createEntityVersionString(String id, Long version) {
+		if(version != null)
+			return id+ENTITY_VERSION_STRING+version;
+		else 
+			return id;		
+	}
+	public static Reference parseEntityVersionString(String entityVersion) {
+		String[] parts = entityVersion.split(ENTITY_VERSION_STRING);
+		Reference ref = null;
+		if(parts.length > 0) {
+			ref = new Reference();
+			ref.setTargetId(parts[0]);
+			if(parts.length > 1) {
+				try {
+					ref.setTargetVersionNumber(Long.parseLong(parts[1]));
+				} catch(NumberFormatException e) {}
+			}
+		}		
+		return ref;		
+	}
 }

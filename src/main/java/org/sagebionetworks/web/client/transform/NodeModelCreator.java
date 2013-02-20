@@ -37,5 +37,5 @@ public interface NodeModelCreator {
 	
 	@Deprecated
 	EntityTypeResponse createEntityTypeResponse(String json) throws RestServiceException;
-	
+		
 }
