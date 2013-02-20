@@ -16,8 +16,8 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 public class NChartUtil {
 
-	private static final int DEFULT_DURATION = 10;
-	
+	public static final int DEFULT_DURATION = 10;
+	public static final double SCALE_X = 1.4; // scale x by	
 	
 	public static NChartLayersArray createLayers(JsoProvider jsoProvider, ProvGraph graph) {
 		Map<ProvGraphNode,Integer> nodeToLayer = new HashMap<ProvGraphNode, Integer>();	
@@ -70,69 +70,6 @@ public class NChartUtil {
 		return layersArray;
 	}	
 
-	private static List<ProvGraphNode> getConnectedNodes(Set<ProvGraphEdge> edges, ProvGraphNode node) {
-		List<ProvGraphNode> connected = new ArrayList<ProvGraphNode>();
-		EdgesForNode nodeEdges = getEdgesForNode(edges, node);
-		for(ProvGraphEdge edge : nodeEdges.in) {
-			connected.add(edge.getSource());
-		}
-		for(ProvGraphEdge edge : nodeEdges.out) {
-			connected.add(edge.getSink());
-		}
-		return connected;
-	}
-
-	private static void processLayer(int layer, ProvGraphNode node, Map<ProvGraphNode,Integer> nodeToLayer, ProvGraph graph) {		
-		// set layer for this node
-		setLayerValue(layer, node, nodeToLayer);
-
-		EdgesForNode nodeEdges = getEdgesForNode(graph.getEdges(), node);
-		
-		// assign layer for leafs and also maximal layer depth for incoming edges 
-		for(ProvGraphEdge incomingEdge : nodeEdges.in) {
-			setLayerValue(layer-1, incomingEdge.getSource(), nodeToLayer);
-		}
-		
-		// process outgoing edges
-		for(ProvGraphEdge outgoingEdge : nodeEdges.out) {
-			processLayer(layer+1, outgoingEdge.getSink(), nodeToLayer, graph);
-		}
-		
-	}
-
-	private static void setLayerValue(int layer, ProvGraphNode node,
-			Map<ProvGraphNode, Integer> nodeToLayer) {
-		Integer existingLayer = nodeToLayer.get(node);
-		if(existingLayer == null || existingLayer < layer) {
-			nodeToLayer.put(node, layer);
-		}
-	}
-	
-	/**
-	 * can improve performance
-	 * @param edges
-	 * @param node
-	 * @return
-	 */
-	private static EdgesForNode getEdgesForNode(Set<ProvGraphEdge> edges, ProvGraphNode node) {
-		EdgesForNode edgesForNode = new EdgesForNode();
-		edgesForNode.in = new ArrayList<ProvGraphEdge>();
-		edgesForNode.out = new ArrayList<ProvGraphEdge>();		
-		for(ProvGraphEdge edge : edges) {
-			if(edge.getSource().equals(node)) 
-				edgesForNode.out.add(edge);
-			if(edge.getSink().equals(node)) {
-				edgesForNode.in.add(edge);
-			}
-		}		
-		return edgesForNode;
-	}
-	
-	private static class EdgesForNode {
-		List<ProvGraphEdge> in;
-		List<ProvGraphEdge> out;	
-	}
-	
 	/**
 	 * Create a list of 'Chatacters' for NChart
 	 * @param graphNodes
@@ -197,7 +134,7 @@ public class NChartUtil {
 	 * @param graph
 	 */
 	public static void fillPositions(LayoutResult layoutResult, ProvGraph graph) {
-		final double scaleX = 1.4; // scale x by 
+		 
 		// find min and max Y for mirror transform
 		int minY = Integer.MAX_VALUE;
 		int maxY = 0;
@@ -215,12 +152,78 @@ public class NChartUtil {
 			if(xyPoints != null && xyPoints.size() > 0) {
 				// swap X and Y, scale X and transpose graph
 				XYPoint pt = xyPoints.get(0);
-				int x = (int) (pt.getY() * scaleX);
+				int x = (int) (pt.getY() * SCALE_X);
 				int y = (-1*pt.getX()) + range; // reflect y axis
 				node.setxPos(x); 
 				node.setyPos(y);
 			}
 		}
 	}
+
+	/*
+	 * Private Methods
+	 */
+	private static List<ProvGraphNode> getConnectedNodes(Set<ProvGraphEdge> edges, ProvGraphNode node) {
+		List<ProvGraphNode> connected = new ArrayList<ProvGraphNode>();
+		EdgesForNode nodeEdges = getEdgesForNode(edges, node);
+		for(ProvGraphEdge edge : nodeEdges.in) {
+			connected.add(edge.getSource());
+		}
+		for(ProvGraphEdge edge : nodeEdges.out) {
+			connected.add(edge.getSink());
+		}
+		return connected;
+	}
+
+	private static void processLayer(int layer, ProvGraphNode node, Map<ProvGraphNode,Integer> nodeToLayer, ProvGraph graph) {		
+		// set layer for this node
+		setLayerValue(layer, node, nodeToLayer);
+
+		EdgesForNode nodeEdges = getEdgesForNode(graph.getEdges(), node);
+		
+		// assign layer for leafs and also maximal layer depth for incoming edges 
+		for(ProvGraphEdge incomingEdge : nodeEdges.in) {
+			setLayerValue(layer-1, incomingEdge.getSource(), nodeToLayer);
+		}
+		
+		// process outgoing edges
+		for(ProvGraphEdge outgoingEdge : nodeEdges.out) {
+			processLayer(layer+1, outgoingEdge.getSink(), nodeToLayer, graph);
+		}
+		
+	}
+
+	private static void setLayerValue(int layer, ProvGraphNode node,
+			Map<ProvGraphNode, Integer> nodeToLayer) {
+		Integer existingLayer = nodeToLayer.get(node);
+		if(existingLayer == null || existingLayer < layer) {
+			nodeToLayer.put(node, layer);
+		}
+	}
 	
+	/**
+	 * can improve performance
+	 * @param edges
+	 * @param node
+	 * @return
+	 */
+	private static EdgesForNode getEdgesForNode(Set<ProvGraphEdge> edges, ProvGraphNode node) {
+		EdgesForNode edgesForNode = new EdgesForNode();
+		edgesForNode.in = new ArrayList<ProvGraphEdge>();
+		edgesForNode.out = new ArrayList<ProvGraphEdge>();		
+		for(ProvGraphEdge edge : edges) {
+			if(edge.getSource().equals(node)) 
+				edgesForNode.out.add(edge);
+			if(edge.getSink().equals(node)) {
+				edgesForNode.in.add(edge);
+			}
+		}		
+		return edgesForNode;
+	}
+	
+	private static class EdgesForNode {
+		List<ProvGraphEdge> in;
+		List<ProvGraphEdge> out;	
+	}
+		
 }

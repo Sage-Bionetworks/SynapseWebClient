@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartUtil;
 import org.sagebionetworks.web.client.widget.provenance.nchart.XYPoint;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
@@ -89,7 +89,7 @@ public class NChartUtilTest {
 		d2.setStartingNode(true);
 		
 		// execute
-		NChartLayersArrayImpl ncLayersArray = (NChartLayersArrayImpl) NChartUtil.createLayers(jsoProvider, graph);
+		NChartLayersArrayTestImpl ncLayersArray = (NChartLayersArrayTestImpl) NChartUtil.createLayers(jsoProvider, graph);
 		
 		// verify
 		List<NChartLayer> layers = ncLayersArray.getLayers();		
@@ -102,28 +102,28 @@ public class NChartUtilTest {
 		aConnectedNodes.add(d2);
 		aConnectedNodes.add(d3);
 		aConnectedNodes.add(d4);
-		NChartLayerNodeImpl lnA = (NChartLayerNodeImpl) NChartUtil.createActivityLayerNode(jsoProvider, a, aConnectedNodes);		
+		NChartLayerNodeTestImpl lnA = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(jsoProvider, a, aConnectedNodes);		
 
 		int layerIdx;
 		List<NChartLayerNode> layerNodes;		
 		
 		// layer 0
 		layerIdx = 0;
-		layerNodes = ((NChartLayerImpl) layers.get(layerIdx)).getNodes();		
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();		
 		assertTrue(layerNodes.contains(lnD1));
 		assertTrue(layerNodes.contains(lnD2));
-		assertEquals(DEFAULT_DURATION, ((NChartLayerImpl) layers.get(layerIdx)).getDuration());
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		// layer 1
 		layerIdx = 1;
-		layerNodes = ((NChartLayerImpl) layers.get(layerIdx)).getNodes();		
-		assertChartLayerNodeEqual(lnA, (NChartLayerNodeImpl) layerNodes.get(0));		
-		assertEquals(DEFAULT_DURATION, ((NChartLayerImpl) layers.get(layerIdx)).getDuration());
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();		
+		assertChartLayerNodeEqual(lnA, (NChartLayerNodeTestImpl) layerNodes.get(0));		
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		// layer 2
 		layerIdx = 2;
-		layerNodes = ((NChartLayerImpl) layers.get(layerIdx)).getNodes();
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();
 		assertTrue(layerNodes.contains(lnD3));
 		assertTrue(layerNodes.contains(lnD4));
-		assertEquals(DEFAULT_DURATION, ((NChartLayerImpl) layers.get(layerIdx)).getDuration());
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		
 	}
 
@@ -159,7 +159,7 @@ public class NChartUtilTest {
 		d5.setStartingNode(true);
 		
 		// execute
-		NChartLayersArrayImpl ncLayersArray = (NChartLayersArrayImpl) NChartUtil.createLayers(jsoProvider, graph);
+		NChartLayersArrayTestImpl ncLayersArray = (NChartLayersArrayTestImpl) NChartUtil.createLayers(jsoProvider, graph);
 		
 		// verify
 		List<NChartLayer> layers = ncLayersArray.getLayers();		
@@ -172,74 +172,74 @@ public class NChartUtilTest {
 		List<ProvGraphNode> aConnectedNodes = new ArrayList<ProvGraphNode>();
 		aConnectedNodes.add(d1);
 		aConnectedNodes.add(d2);
-		NChartLayerNodeImpl lnA = (NChartLayerNodeImpl) NChartUtil.createActivityLayerNode(jsoProvider, a, aConnectedNodes);		
+		NChartLayerNodeTestImpl lnA = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(jsoProvider, a, aConnectedNodes);		
 		
 		List<ProvGraphNode> bConnectedNodes = new ArrayList<ProvGraphNode>();
 		aConnectedNodes.add(d2);
 		aConnectedNodes.add(d3);
-		NChartLayerNodeImpl lnB = (NChartLayerNodeImpl) NChartUtil.createActivityLayerNode(jsoProvider, b, bConnectedNodes);
+		NChartLayerNodeTestImpl lnB = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(jsoProvider, b, bConnectedNodes);
 		
 		List<ProvGraphNode> cConnectedNodes = new ArrayList<ProvGraphNode>();
 		aConnectedNodes.add(d3);
 		aConnectedNodes.add(d4);
 		aConnectedNodes.add(d6);
-		NChartLayerNodeImpl lnC = (NChartLayerNodeImpl) NChartUtil.createActivityLayerNode(jsoProvider, c, cConnectedNodes);		
+		NChartLayerNodeTestImpl lnC = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(jsoProvider, c, cConnectedNodes);		
 		
 		List<ProvGraphNode> dConnectedNodes = new ArrayList<ProvGraphNode>();
 		aConnectedNodes.add(d5);
 		aConnectedNodes.add(d4);
-		NChartLayerNodeImpl lnD = (NChartLayerNodeImpl) NChartUtil.createActivityLayerNode(jsoProvider, d, dConnectedNodes);		
+		NChartLayerNodeTestImpl lnD = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(jsoProvider, d, dConnectedNodes);		
 
 		int layerIdx;
 		List<NChartLayerNode> layerNodes;
 		
 		// layer 0
 		layerIdx = 0;
-		layerNodes = ((NChartLayerImpl) layers.get(layerIdx)).getNodes();		
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();		
 		assertEquals(2, layerNodes.size());
 		assertTrue(layerNodes.contains(lnD1));
 		assertTrue(layerNodes.contains(lnD5));
-		assertEquals(DEFAULT_DURATION, ((NChartLayerImpl) layers.get(layerIdx)).getDuration());
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		// layer 1
 		layerIdx = 1;
-		layerNodes = ((NChartLayerImpl) layers.get(layerIdx)).getNodes(); 
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes(); 
 		assertEquals(2, layerNodes.size());
-		Integer lnAidx = ((NChartLayerNodeImpl) layerNodes.get(0)).getEvent().equals(lnA.getEvent()) ? 0 : 1;
+		Integer lnAidx = ((NChartLayerNodeTestImpl) layerNodes.get(0)).getEvent().equals(lnA.getEvent()) ? 0 : 1;
 		Integer lnDidx = lnAidx == 0 ? 1 : 0;
-		assertChartLayerNodeEqual(lnA, (NChartLayerNodeImpl) layerNodes.get(lnAidx));		
-		assertChartLayerNodeEqual(lnD, (NChartLayerNodeImpl) layerNodes.get(lnDidx));		
-		assertEquals(DEFAULT_DURATION, ((NChartLayerImpl) layers.get(layerIdx)).getDuration());
+		assertChartLayerNodeEqual(lnA, (NChartLayerNodeTestImpl) layerNodes.get(lnAidx));		
+		assertChartLayerNodeEqual(lnD, (NChartLayerNodeTestImpl) layerNodes.get(lnDidx));		
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		// layer 2
 		layerIdx = 2;
-		layerNodes = ((NChartLayerImpl) layers.get(layerIdx)).getNodes();
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();
 		assertEquals(1, layerNodes.size());
 		assertTrue(layerNodes.contains(lnD2));
-		assertEquals(DEFAULT_DURATION, ((NChartLayerImpl) layers.get(layerIdx)).getDuration());
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		// layer 3
 		layerIdx = 3;
-		layerNodes = ((NChartLayerImpl) layers.get(layerIdx)).getNodes();		
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();		
 		assertEquals(1, layerNodes.size());
-		assertChartLayerNodeEqual(lnB, (NChartLayerNodeImpl) layerNodes.get(0));
-		assertEquals(DEFAULT_DURATION, ((NChartLayerImpl) layers.get(layerIdx)).getDuration());
+		assertChartLayerNodeEqual(lnB, (NChartLayerNodeTestImpl) layerNodes.get(0));
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		// layer 4
 		layerIdx = 4;
-		layerNodes = ((NChartLayerImpl) layers.get(layerIdx)).getNodes();
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();
 		assertEquals(2, layerNodes.size());
 		assertTrue(layerNodes.contains(lnD3));
 		assertTrue(layerNodes.contains(lnD4));
-		assertEquals(DEFAULT_DURATION, ((NChartLayerImpl) layers.get(layerIdx)).getDuration());
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		// layer 5
 		layerIdx = 5;
-		layerNodes = ((NChartLayerImpl) layers.get(layerIdx)).getNodes(); 
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes(); 
 		assertEquals(1, layerNodes.size());
-		assertChartLayerNodeEqual(lnC, (NChartLayerNodeImpl) layerNodes.get(0));		
-		assertEquals(DEFAULT_DURATION, ((NChartLayerImpl) layers.get(layerIdx)).getDuration());
+		assertChartLayerNodeEqual(lnC, (NChartLayerNodeTestImpl) layerNodes.get(0));		
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		// layer 6
 		layerIdx = 6;
-		layerNodes = ((NChartLayerImpl) layers.get(layerIdx)).getNodes();
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();
 		assertEquals(1, layerNodes.size());
 		assertTrue(layerNodes.contains(lnD6));
-		assertEquals(DEFAULT_DURATION, ((NChartLayerImpl) layers.get(layerIdx)).getDuration());
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		
 	}
 
@@ -310,269 +310,44 @@ public class NChartUtilTest {
 		assertEquals(subnodes,subnodeArg.getValue());
 	}
 
-	
+	@Test
+	public void testFillPositions() {
+		jsoProvider = new JsoProviderTestImpl(); // use real classes
+		ProvGraph graph = new ProvGraph();		
+		graph.addNode(d1);
+		graph.addNode(d2);
+		graph.addEdge(new ProvGraphEdge(d1, a));
+		graph.addEdge(new ProvGraphEdge(a, d2));
+		d1.setStartingNode(true);
+		
+		Map<String,List<XYPoint>> idToPoints = new HashMap<String, List<XYPoint>>();
+		idToPoints.put(d2.getId(), Arrays.asList(new XYPoint[] {new XYPointTestImpl(200, 1)} ));
+		idToPoints.put(a.getId(), Arrays.asList(new XYPoint[] {new XYPointTestImpl(100, 1)} ));
+		idToPoints.put(d1.getId(), Arrays.asList(new XYPoint[] {new XYPointTestImpl(0, 1)} ));
+		
+		LayoutResultTestImpl layoutResult = new LayoutResultTestImpl(idToPoints);
+		
+		NChartUtil.fillPositions(layoutResult, graph);
+		
+		// verify transforms and position changes in graph
+		assertTrue((int)(1*NChartUtil.SCALE_X) == d2.getxPos());
+		assertTrue((int)(1*NChartUtil.SCALE_X) == a.getxPos());
+		assertTrue((int)(1*NChartUtil.SCALE_X) == d1.getxPos());
+		
+		assertTrue(0 == d2.getyPos());
+		assertTrue(100 == a.getyPos());
+		assertTrue(200 == d1.getyPos());
+	}
 	
 	/*
 	 * Private Methods
 	 */
-	private void assertChartLayerNodeEqual(NChartLayerNodeImpl expected,
-			NChartLayerNodeImpl actual) {
+	private void assertChartLayerNodeEqual(NChartLayerNodeTestImpl expected,
+			NChartLayerNodeTestImpl actual) {
 		for(String id : expected.getSubnodes()) {
 			assertTrue(actual.getSubnodes().contains(id));
 		}
 		assertEquals(expected.getEvent(), actual.getEvent());
-	}
-
-	
-	/*
-	 * Test implementations
-	 */
-	private class JsoProviderTestImpl implements JsoProvider {
-
-		@Override
-		public LayoutResult newLayerResult() {
-			return new LayoutResultImpl();
-		}
-
-		@Override
-		public NChartCharacters newNChartCharacters() {
-			return new NChartCharactersImpl();
-		}
-
-		@Override
-		public NChartLayer newNChartLayer() {
-			return new NChartLayerImpl();
-		}
-
-		@Override
-		public NChartLayerNode newNChartLayerNode() {
-			return new NChartLayerNodeImpl();
-		}
-
-		@Override
-		public NChartLayersArray newNChartLayersArray() {
-			return new NChartLayersArrayImpl();
-		}
-		
-	}
-	
-	private class NChartLayerNodeImpl implements NChartLayerNode {
-		List<String> subnodes;
-		String event;
-		
-		@Override
-		public void setSubnodes(List<String> subnodes) {
-			this.subnodes = subnodes;
-		}
-
-		@Override
-		public void setEvent(String event) {
-			this.event = event;
-		}
-
-		public List<String> getSubnodes() {
-			return subnodes;
-		}
-
-		public String getEvent() {
-			return event;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + ((event == null) ? 0 : event.hashCode());
-			result = prime * result
-					+ ((subnodes == null) ? 0 : subnodes.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			NChartLayerNodeImpl other = (NChartLayerNodeImpl) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (event == null) {
-				if (other.event != null)
-					return false;
-			} else if (!event.equals(other.event))
-				return false;
-			if (subnodes == null) {
-				if (other.subnodes != null)
-					return false;
-			} else if (!subnodes.equals(other.subnodes))
-				return false;
-			return true;
-		}
-
-		private NChartUtilTest getOuterType() {
-			return NChartUtilTest.this;
-		}
-		
-	}
-	
-	private class NChartLayerImpl implements NChartLayer {
-		List<NChartLayerNode> nodes;
-		int duration;		
-		
-		@Override
-		public void setNodes(List<NChartLayerNode> nodes) {
-			this.nodes = nodes;
-		}
-
-		@Override
-		public void setDuration(int duration) {
-			this.duration = duration;
-		}
-
-		public List<NChartLayerNode> getNodes() {
-			return nodes;
-		}
-
-		public int getDuration() {
-			return duration;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + duration;
-			result = prime * result + ((nodes == null) ? 0 : nodes.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			NChartLayerImpl other = (NChartLayerImpl) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (duration != other.duration)
-				return false;
-			if (nodes == null) {
-				if (other.nodes != null)
-					return false;
-			} else if (!nodes.equals(other.nodes))
-				return false;
-			return true;
-		}
-
-		private NChartUtilTest getOuterType() {
-			return NChartUtilTest.this;
-		}		
-		
-	}
-	
-	private class NChartLayersArrayImpl implements NChartLayersArray {
-		List<NChartLayer> layers;
-		@Override
-		public void setLayers(List<NChartLayer> layers) {
-			this.layers = layers;
-		}
-		public List<NChartLayer> getLayers() {
-			return layers;
-		}
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result
-					+ ((layers == null) ? 0 : layers.hashCode());
-			return result;
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			NChartLayersArrayImpl other = (NChartLayersArrayImpl) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (layers == null) {
-				if (other.layers != null)
-					return false;
-			} else if (!layers.equals(other.layers))
-				return false;
-			return true;
-		}
-		private NChartUtilTest getOuterType() {
-			return NChartUtilTest.this;
-		}
-		
-	}
-	
-	private class NChartCharactersImpl implements NChartCharacters {
-		List<String> characters = new ArrayList<String>();
-		
-		@Override
-		public void addCharacter(String characterId) {
-			characters.add(characterId);
-		}
-		
-	}
-
-	private class LayoutResultImpl implements LayoutResult {
-		Map<String,List<XYPoint>> nodeToPoints;
-		
-		@Override
-		public List<XYPoint> getPointsForId(String provGraphNodeId) {
-			return new ArrayList<XYPoint>();
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result
-					+ ((nodeToPoints == null) ? 0 : nodeToPoints.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			LayoutResultImpl other = (LayoutResultImpl) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (nodeToPoints == null) {
-				if (other.nodeToPoints != null)
-					return false;
-			} else if (!nodeToPoints.equals(other.nodeToPoints))
-				return false;
-			return true;
-		}
-
-		private NChartUtilTest getOuterType() {
-			return NChartUtilTest.this;
-		}		
-	
-	}
-	
-	
+	}	
 	
 }

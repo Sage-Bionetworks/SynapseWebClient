@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
+import org.sagebionetworks.web.client.widget.provenance.nchart.XYPoint;
 
 /**
  * Provider interface for objects that have implementations that subclass JavaScriptObject.
@@ -16,7 +17,7 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
  */
 public interface JsoProvider {
 
-	LayoutResult newLayerResult();
+	LayoutResult newLayoutResult();
 
 	NChartCharacters newNChartCharacters();
 	
@@ -26,5 +27,6 @@ public interface JsoProvider {
 
 	NChartLayersArray newNChartLayersArray();
 	
-	//<T> JsoArray<T> newJsArray(List<T> list);
+	XYPoint newXYPoint();
+	
 }

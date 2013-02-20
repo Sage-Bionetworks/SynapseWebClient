@@ -29,10 +29,16 @@ public class ProvGraph implements IsSerializable {
 	}
 	
 	public void addNode(ProvGraphNode node) {
+		if(node == null) {
+			throw new IllegalArgumentException("Node can not be null");
+		}		
 		nodes.add(node);
 	}
 
 	public void addEdge(ProvGraphEdge edge) {
+		if(edge.getSink() == null || edge.getSource() == null) {
+			throw new IllegalArgumentException("Edge is not fully specified");
+		}
 		if(!nodes.contains(edge.getSource())) nodes.add(edge.getSource());
 		if(!nodes.contains(edge.getSink())) nodes.add(edge.getSink());
 		edges.add(edge);

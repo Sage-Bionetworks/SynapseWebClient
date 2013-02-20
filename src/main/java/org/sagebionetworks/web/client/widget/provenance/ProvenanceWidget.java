@@ -394,6 +394,16 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 
 	
 	private void buildGraphLayoutSendToView() {
+		// make sure that any references that were not returned in the header list are incorporated in the map
+		for(Reference ref : references) {
+			if(!refToHeader.containsKey(ref)) {
+				EntityHeader header = new EntityHeader();
+				header.setId(ref.getTargetId());
+				header.setVersionNumber(ref.getTargetVersionNumber());
+				refToHeader.put(ref, header);
+			}
+		}
+		
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvGraphNode>();
 

@@ -1,5 +1,6 @@
-package org.sagebionetworks.web.client.transform;
+package org.sagebionetworks.web.unitclient.widget.provenance.nchart;
 
+import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
@@ -7,38 +8,36 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.client.widget.provenance.nchart.XYPoint;
 
-import com.google.gwt.core.client.JavaScriptObject;
-
-public class JsoProviderImpl implements JsoProvider {
+public class JsoProviderTestImpl implements JsoProvider {
 
 	@Override
 	public LayoutResult newLayoutResult() {
-		return (LayoutResult) JavaScriptObject.createObject();
+		return new LayoutResultTestImpl();
 	}
 
 	@Override
 	public NChartCharacters newNChartCharacters() {
-		return (NChartCharacters) JavaScriptObject.createObject();
+		return new NChartCharactersTestImpl();
 	}
 
 	@Override
 	public NChartLayer newNChartLayer() {
-		return (NChartLayer) JavaScriptObject.createObject();
+		return new NChartLayerTestImpl();
 	}
 
 	@Override
 	public NChartLayerNode newNChartLayerNode() {
-		return (NChartLayerNode) JavaScriptObject.createObject();
+		return new NChartLayerNodeTestImpl();
 	}
 
 	@Override
 	public NChartLayersArray newNChartLayersArray() {
-		return (NChartLayersArray) JavaScriptObject.createArray();
+		return new NChartLayersArrayTestImpl();
 	}
 
 	@Override
 	public XYPoint newXYPoint() {
-		return (XYPoint) JavaScriptObject.createObject();
+		return new XYPointTestImpl(0,0);
 	}
-
+	
 }

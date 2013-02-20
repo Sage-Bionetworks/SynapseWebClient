@@ -51,12 +51,14 @@ public class ProvUtils {
 		// create ProvGraphNodes for the entities
 		for(Reference ref : refToHeader.keySet()) {
 			EntityHeader header = refToHeader.get(ref);
-			if(header == null) header = new EntityHeader();
+			if(header == null) { 
+				header = new EntityHeader();
+			}
 			boolean isStartNode = startRefs.contains(ref) ? true : false;
 			EntityGraphNode entityNode = new EntityGraphNode(createUniqueNodeId(
 					idToNode, synapseJSNIUtils), ref.getTargetId(),
 					header.getName(), header.getVersionLabel(),
-					header.getVersionNumber(), header.getType(), false, isStartNode);
+					ref.getTargetVersionNumber(), header.getType(), false, isStartNode);
 			idToNode.put(entityNode.getId(), entityNode);
 			graph.addNode(entityNode);
 			entityNodes.put(ref, entityNode);
