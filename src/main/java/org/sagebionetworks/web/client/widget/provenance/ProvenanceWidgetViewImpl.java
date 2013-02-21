@@ -37,7 +37,6 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;		
 	private ProvGraph graph;
-	private List<Connection> connections;
 	private LayoutContainer debug;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private HashMap<String,String> filledPopoverIds;
@@ -106,8 +105,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		this.filledPopoverIds = new HashMap<String,String>();
 		LayoutContainer prov = new LayoutContainer();
 		prov.setStyleAttribute("position", "relative");		
-		prov.setHeight(height);		
-		connections = new ArrayList<ProvenanceWidgetViewImpl.Connection>();		
+		prov.setHeight(height);				
 		
 		if(graph != null) {
 			// add nodes to graph
@@ -240,22 +238,6 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 	
 	}-*/;
-
-	private class Connection {
-		private String parentId;
-		private String childId;
-		public Connection(String parentId, String childId) {
-			super();
-			this.parentId = parentId;
-			this.childId = childId;
-		}
-		public String getParentId() {
-			return parentId;
-		}
-		public String getChildId() {
-			return childId;
-		}		
-	}
 
 	@Override
 	public void setHeight(int height) {

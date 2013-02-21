@@ -128,9 +128,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 		// backwards compatibility for original ProvenanceWidget API
 		if(descriptor.containsKey(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY)) {
-			Reference ref = new Reference();
-			ref.setTargetId(descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY));
-			startRefs.add(ref);
+			lookupVersion.add(descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY));
 		}
 		
 		// Set max depth (default 1), undefined (false) and expand (false)		
@@ -269,8 +267,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			processNext();
 			return;
 		}
-		
-		
+				
 		// lookup generatedBy activity for ref
 		synapseClient.getActivityForEntityVersion(item.getReference().getTargetId(), item.getReference().getTargetVersionNumber(), new AsyncCallback<String>() {
 			@Override
@@ -285,7 +282,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(caught instanceof NotFoundException) {
+				if(caught instanceof NotFoundException && showExpand) {
 					noExpandNode.add(item.getReference());
 				}
 				
@@ -407,7 +404,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvGraphNode>();
 
-		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, synapseJSNIUtils, startRefs, noExpandNode);					
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, startRefs, noExpandNode);					
 		
 		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());
 		NChartLayersArray layerArray = NChartUtil.createLayers(jsoProvider, graph);
