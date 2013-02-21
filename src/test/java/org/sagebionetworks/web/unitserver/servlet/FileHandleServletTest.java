@@ -66,6 +66,9 @@ public class FileHandleServletTest {
 
 		when(mockSynapse.getFileEntityPreviewTemporaryUrlForVersion(anyString(), anyLong())).thenReturn(resolvedUrl);
 		when(mockSynapse.getFileEntityTemporaryUrlForVersion(anyString(), anyLong())).thenReturn(resolvedUrl);
+		when(mockSynapse.getFileEntityPreviewTemporaryUrlForCurrentVersion(anyString())).thenReturn(resolvedUrl);
+		when(mockSynapse.getFileEntityTemporaryUrlForCurrentVersion(anyString())).thenReturn(resolvedUrl);
+
 
 		mockUrlProvider = mock(ServiceUrlProvider.class);
 		mockTokenProvider = mock(TokenProvider.class);
@@ -139,6 +142,31 @@ public class FileHandleServletTest {
 		verify(mockSynapse).getFileEntityTemporaryUrlForVersion(anyString(), anyLong());
 		verify(mockResponse).sendRedirect(anyString());
 	}
+	
+	@Test
+	public void testDoGetLoggedInFileEntityPreviewCurrentVersion() throws Exception {
+		setupFileEntity();
+		when(mockRequest.getParameter(DisplayUtils.ENTITY_VERSION_PARAM_KEY)).thenReturn(null);
+		when(mockRequest.getParameter(DisplayUtils.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getFileEntityPreviewTemporaryUrlForCurrentVersion(anyString());
+		verify(mockResponse).sendRedirect(anyString());
+	}
+	
+	@Test
+	public void testDoGetLoggedInFileEntityCurrentVersion() throws Exception {
+		setupFileEntity();
+		when(mockRequest.getParameter(DisplayUtils.ENTITY_VERSION_PARAM_KEY)).thenReturn(null);
+		when(mockRequest.getParameter(DisplayUtils.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("false");
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getFileEntityTemporaryUrlForCurrentVersion(anyString());
+		verify(mockResponse).sendRedirect(anyString());
+	}
+
 	
 	@Test
 	public void testDoGetLoggedOut() throws Exception {

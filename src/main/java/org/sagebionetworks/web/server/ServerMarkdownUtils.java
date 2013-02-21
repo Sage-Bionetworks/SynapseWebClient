@@ -10,7 +10,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -19,6 +18,9 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import eu.henkelmann.actuarius.ActuariusTransformer;
 
 public class ServerMarkdownUtils {
+	
+	private static final String NEWLINE_WITH_SPACES = "  \n";
+	private static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
 	/**
 	 * This converts the given markdown to html using the given markdown processor.
 	 * It also post processes the output html, including:
@@ -33,19 +35,13 @@ public class ServerMarkdownUtils {
 	public static String markdown2Html(String markdown, Boolean isPreview, ActuariusTransformer markdownProcessor) throws IOException {
 		String originalMarkdown = markdown;
 		if (markdown == null) return "";
-		String tempDelimiter = "%^&1_9d";	//trick to maintain newlines when supressing all html
+		//trick to maintain newlines when suppressing all html
 		if (markdown != null) {
-			markdown = markdown.replace("\n", tempDelimiter);
+			markdown = markdown.replace("\n", TEMP_NEWLINE_DELIMITER);
 		}
 //		lastTime = System.currentTimeMillis();
-//		markdown = StringEscapeUtils.escapeHtml(markdown);
-		//suppress html
-//		Whitelist wl = new Whitelist();
-//		wl.addTags("br");
-//		markdown = Jsoup.clean(markdown, wl);
 		markdown = Jsoup.parse(markdown).text();
-		markdown = markdown.replace(tempDelimiter, "  \n");
-		
+		markdown = markdown.replace(TEMP_NEWLINE_DELIMITER, NEWLINE_WITH_SPACES);
 //		reportTime("suppress/escape html");
 		markdown = resolveTables(markdown);
 //		reportTime("resolved tables");
@@ -75,9 +71,9 @@ public class ServerMarkdownUtils {
 	}
 	
 //	private static long lastTime;
-//	private static void reportTime(String descriptor) {
+//	private static void reportTime(String description) {
 //		long currentTime = System.currentTimeMillis();
-//		System.out.println(descriptor + ": " + (currentTime-lastTime));
+//		System.out.println(description + ": " + (currentTime-lastTime));
 //		lastTime = currentTime;
 //	}
 
@@ -169,9 +165,8 @@ public class ServerMarkdownUtils {
 	public static String resolveTables(String rawMarkdown) {
 		//find all tables, and replace the raw text with html table
 		String regEx = ".*[|]{1}.+[|]{1}.*";
-		String[] lines = rawMarkdown.split("  \n");
+		String[] lines = rawMarkdown.split(NEWLINE_WITH_SPACES);
 		StringBuilder sb = new StringBuilder();
-		//eat before
 		int i = 0;
 		while (i < lines.length) {
 			boolean looksLikeTable = lines[i].matches(regEx);
@@ -180,7 +175,7 @@ public class ServerMarkdownUtils {
 				i = appendNewTableHtml(sb, regEx, lines, i);
 			} else {
 				//just add the line and move on
-				sb.append(lines[i] + "  \n");
+				sb.append(lines[i] + NEWLINE_WITH_SPACES);
 				i++;
 			}
 		}
