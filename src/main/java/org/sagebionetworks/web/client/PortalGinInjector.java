@@ -115,4 +115,5 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableColumnRendererDate getAPITableColumnRendererDate();
 	public APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
 	public APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
+
 }

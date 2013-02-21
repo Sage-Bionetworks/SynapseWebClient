@@ -7,15 +7,19 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.Presenter;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
-import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
-import org.sagebionetworks.web.shared.provenance.ExpandTreeNode;
+import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.extjs.gxt.ui.client.Style.AnchorPosition;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -44,7 +48,7 @@ public class ProvViewUtil {
 	private static final int MAX_ACT_MANUAL_NAME_CHAR = 17;
 	private static LayoutContainer UNDEFINED_SUB_NODE;
 		
-	public static LayoutContainer createActivityContainer(ActivityTreeNode node, IconsImageBundle iconsImageBundle) {
+	public static LayoutContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle) {
 		LayoutContainer container = new LayoutContainer();
 		container.setId(node.getId());
 		container.setStyleName(PROV_ACTIVITY_NODE_STYLE);
@@ -84,7 +88,7 @@ public class ProvViewUtil {
 		return container;		
 	}
 	
-	public static LayoutContainer createEntityContainer(EntityTreeNode node, IconsImageBundle iconsImageBundle) {
+	public static LayoutContainer createEntityContainer(EntityGraphNode node, IconsImageBundle iconsImageBundle) {
 		LayoutContainer container = createEntityContainer(node.getId(), node.getEntityId(),
 				node.getName(), node.getVersionLabel(),
 				node.getVersionNumber(), node.getEntityType(),
@@ -93,11 +97,25 @@ public class ProvViewUtil {
 		return container;
 	}
 	
-	public static LayoutContainer createExpandContainer(ExpandTreeNode node, SageImageBundle sageImageBundle) {
+	public static LayoutContainer createExpandContainer(final ExpandGraphNode node, final SageImageBundle sageImageBundle, final Presenter presenter) {
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();		
+		builder.appendHtmlConstant(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML());
+		
+		final Anchor link = new Anchor();
+		link.setHTML(builder.toSafeHtml());
+		link.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				link.setHTML(AbstractImagePrototype.create(sageImageBundle.loading16()).getHTML());
+				presenter.expand(node);
+			}
+		});
+
 		LayoutContainer container = new LayoutContainer();
 		container.setId(node.getId());
 		container.setStyleName(PROV_ENTTITY_NODE_STYLE + " " + PROV_EXPAND_NODE_STYLE);
-		container.add(new HTML(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML()));
+		container.add(link);
+		container.layout();
 		setPosition(node, container);
 		return container;
 	}	
@@ -106,7 +124,7 @@ public class ProvViewUtil {
 	/*
 	 * Private utils
 	 */
-	private static void setPosition(ProvTreeNode node, LayoutContainer container) {
+	private static void setPosition(ProvGraphNode node, LayoutContainer container) {
 		container.setStyleAttribute("top", node.getyPos() + "px");
 		container.setStyleAttribute("left", node.getxPos() + "px");
 	}
@@ -118,8 +136,7 @@ public class ProvViewUtil {
 			link.setHref(DisplayUtils.getSynapseHistoryToken(entityId, versionNumber));
 		} else {
 			link.setHref(DisplayUtils.getSynapseHistoryToken(entityId));
-		}
-			
+		}			
 		
 		// icon
 		ImageResource icon = DisplayUtils.getSynapseIconForEntityClassName(entityType, IconSize.PX16, iconsImageBundle);
@@ -133,12 +150,17 @@ public class ProvViewUtil {
 		
 		// version
 		HTML versionHtml;
-		if(versionNumber != null) {			
-			String versionNumberStr = " (#" + versionNumber + ")";
-			String versionLabelStub = stubEntityString(versionLabel, ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length());			
-			versionHtml = new HTML(SafeHtmlUtils.fromString(versionLabelStub + versionNumberStr));
+		if(versionNumber != null) {					
+			String versionNumberStr = "v." + versionNumber;			
+			String versionDisplay; 			
+			if(versionNumber.toString().equals(versionLabel)) {
+				versionDisplay = versionNumberStr;
+			} else {
+				versionDisplay = stubEntityString(versionLabel + " (" + versionNumberStr + ")", ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length());
+			}			
+			versionHtml = new HTML(SafeHtmlUtils.fromString(stubEntityString(versionDisplay, ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length())));
 		} else {
-			versionHtml = new HTML(DisplayConstants.NOT_VERSIONED);			
+			versionHtml = new HTML("");			
 		}
 		versionHtml.setStyleName(PROV_VERSION_DISPLAY_STYLE);
 		builder.appendHtmlConstant(versionHtml.toString());		

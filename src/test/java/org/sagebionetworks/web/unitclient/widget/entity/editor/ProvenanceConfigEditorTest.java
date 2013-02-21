@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -37,18 +38,22 @@ public class ProvenanceConfigEditorTest {
 		String d = "5";
 		String entityToGraph = "syn1234555";
 		String showExpand = "true";
+		String displayHeight = "500";
 		descriptor.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, d);
-		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_ID_KEY, entityToGraph);
+		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entityToGraph);
 		descriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, showExpand);
+		descriptor.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, displayHeight);
 		editor.configure(wikiKey, descriptor);
-		verify(mockView).setEntityId(eq(entityToGraph));
+		verify(mockView).setEntityList(eq(entityToGraph));
 		verify(mockView).setIsExpanded(eq(Boolean.valueOf(showExpand)));
 		verify(mockView).setDepth(eq(Long.parseLong(d)));
+		verify(mockView).setProvDisplayHeight(Integer.parseInt(displayHeight));
 		
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
-		//verify(mockView).getDepth();
-		verify(mockView).getEntityId();
-		//verify(mockView).isExpanded();
+		verify(mockView).getDepth();
+		verify(mockView).getEntityList();
+		verify(mockView).isExpanded();
+		verify(mockView, atLeastOnce()).getProvDisplayHeight();
 	}
 }
