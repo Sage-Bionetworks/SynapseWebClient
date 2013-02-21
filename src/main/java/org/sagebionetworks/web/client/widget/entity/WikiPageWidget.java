@@ -154,7 +154,7 @@ public class WikiPageWidget extends LayoutContainer {
 						//if it is because of a missing root (and we have edit permission), then the pages browser should have a Create Wiki button
 						if (caught instanceof NotFoundException) {
 							SimplePanel createWikiButtonWrapper = new SimplePanel();
-							createWikiButtonWrapper.addStyleName("margin-bottom-20");
+							createWikiButtonWrapper.addStyleName("span-24 notopmargin margin-bottom-20");
 							createWikiButtonWrapper.add(getInsertPageButton(true));
 							add(createWikiButtonWrapper);
 							layout(true);
