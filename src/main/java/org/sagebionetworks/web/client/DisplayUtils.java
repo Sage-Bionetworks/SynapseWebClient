@@ -167,6 +167,7 @@ public class DisplayUtils {
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
 	public static final String ETAG_KEY = "etag";
+	public static final String ENTITY_VERSION_STRING = "/version/";
 	
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
@@ -769,7 +770,7 @@ public class DisplayUtils {
 		} else if(Folder.class.getName().equals(className)) {
 			// Folder
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();			
 		} else if(FileEntity.class.getName().equals(className)) {
 			// File
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
@@ -801,7 +802,7 @@ public class DisplayUtils {
 		} else if(Page.class.getName().equals(className)) {
 			// Page
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();			
 		} else {
 			// default to Model
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
@@ -1026,6 +1027,16 @@ public class DisplayUtils {
 		optionsMap.put("title", title);
 		optionsMap.put("data-placement", pos.toString().toLowerCase());
 		optionsMap.put("trigger", "click");		
+		addPopover(util, widget, content, optionsMap);
+	}
+
+	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
+		Map<String, String> optionsMap = new TreeMap<String, String>();
+		optionsMap.put("data-html", "true");
+		optionsMap.put("data-animation", "true");
+		optionsMap.put("title", title);
+		optionsMap.put("data-placement", pos.toString().toLowerCase());
+		optionsMap.put("data-trigger", "hover");		
 		addPopover(util, widget, content, optionsMap);
 	}
 
@@ -1303,41 +1314,65 @@ public class DisplayUtils {
 		 * @param fileName
 		 * @return
 		 */
-		public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
-			//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
-	//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
-	//		return repoServicesUrl 
-	//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
-	//				+"/"+ wikiKey.getOwnerObjectId()
-	//				+"/wiki/" 
-	//				+wikiKey.getWikiPageId()
-	//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
-			String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
+		//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
+//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
+//		return repoServicesUrl 
+//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
+//				+"/"+ wikiKey.getOwnerObjectId()
+//				+"/wiki/" 
+//				+wikiKey.getWikiPageId()
+//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
+		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
 
 			//if preview, then avoid cache
 			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
-			return baseFileHandleUrl + "?" +
-					WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
-					WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
-					WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
+		return baseFileHandleUrl + "?" +
+				WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
+				WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
+				WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
 					FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
 					wikiIdParam + nocacheParam;
-		}
+	}
 		
-		/**
-		 * Create the url to a FileEntity filehandle.
-		 * @param baseURl
-		 * @param entityid
-		 * @return
-		 */
-		public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
-			String versionParam = versionNumber == null ? "" : "&" + ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
-			//if preview, then avoid cache
-			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
-			return baseFileHandleUrl + "?" +
-					ENTITY_PARAM_KEY + "=" + entityId + "&" +
-					FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
-					versionParam + nocacheParam;
-		}
+	/**
+	 * Create the url to a FileEntity filehandle.
+	 * @param baseURl
+	 * @param entityid
+	 * @return
+	 */
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+		String versionParam = versionNumber == null ? "" : "&" + ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
+		//if preview, then avoid cache
+		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+		return baseFileHandleUrl + "?" +
+				ENTITY_PARAM_KEY + "=" + entityId + "&" +
+				FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+				versionParam + nocacheParam;
+	}
 
+	public static String createEntityVersionString(Reference ref) {
+		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
+	}
+	
+	public static String createEntityVersionString(String id, Long version) {
+		if(version != null)
+			return id+ENTITY_VERSION_STRING+version;
+		else 
+			return id;		
+	}
+	public static Reference parseEntityVersionString(String entityVersion) {
+		String[] parts = entityVersion.split(ENTITY_VERSION_STRING);
+		Reference ref = null;
+		if(parts.length > 0) {
+			ref = new Reference();
+			ref.setTargetId(parts[0]);
+			if(parts.length > 1) {
+				try {
+					ref.setTargetVersionNumber(Long.parseLong(parts[1]));
+				} catch(NumberFormatException e) {}
+			}
+		}		
+		return ref;		
+	}
 }

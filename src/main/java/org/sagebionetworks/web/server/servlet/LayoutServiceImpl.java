@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.Rectangle2D.Double;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -96,5 +95,13 @@ public class LayoutServiceImpl extends RemoteServiceServlet implements LayoutSer
 			transferTreeProcessNode(tree, child);
 		}
 	}
-
+	
 }
+
+
+
+
+
+
+
+

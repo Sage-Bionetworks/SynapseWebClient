@@ -26,8 +26,8 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	public void setRestrictionLevel(RESTRICTION_LEVEL restrictionLevel);
 	
 	/**
-	 * Make the view show the License acceptance view first
-	 * @param licenseRequired
+	 * set the approval type (USER_AGREEMENT or ACT_APPROVAL) or NONE if access is allowed with no add'l approval
+	 * @param approvalType
 	 */
 	public void setApprovalType(APPROVAL_TYPE approvalType);
 	

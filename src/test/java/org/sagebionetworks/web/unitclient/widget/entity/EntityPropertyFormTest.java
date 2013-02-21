@@ -166,5 +166,4 @@ public class EntityPropertyFormTest {
 		handler.onPersistSuccess(testEvent);
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 	}
-	
 }

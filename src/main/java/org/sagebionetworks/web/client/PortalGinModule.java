@@ -12,6 +12,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
+import org.sagebionetworks.web.client.transform.JsoProvider;
+import org.sagebionetworks.web.client.transform.JsoProviderImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.view.BCCOverviewView;
@@ -160,6 +162,10 @@ public class PortalGinModule extends AbstractGinModule {
 	protected void configure() {
 		// Event Bus
 		bind(EventBus.class).to(SimpleEventBus.class).in(Singleton.class);
+		
+		// JsoProvider
+		bind(JsoProvider.class).to(JsoProviderImpl.class);
+		bind(JsoProviderImpl.class).in(Singleton.class);
 		
 		// AuthenticationController
 		bind(AuthenticationControllerImpl.class).in(Singleton.class);
@@ -423,7 +429,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(PagesBrowserView.class).to(PagesBrowserViewImpl.class);
 
 		// Entity Finder
-		bind(EntityFinderView.class).to(EntityFinderViewImpl.class);
+		bind(EntityFinderView.class).to(EntityFinderViewImpl.class);		
+	
 	}
 
 }

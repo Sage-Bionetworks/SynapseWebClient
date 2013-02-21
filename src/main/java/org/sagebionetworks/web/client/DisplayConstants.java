@@ -306,9 +306,9 @@ public class DisplayConstants {
 	public static final String CODE_EXECUTION = "Code Execution";
 	public static final String MANUAL = "Manual";
 	public static final String UNDEFINED = "Undefined";
-	public static final String NOT_VERSIONED = "not versioned";
 	public static final String ERROR_LAYOUT = "An error occured laying out the Provenance view.";
 	public static final String ERROR_PROVENANCE = "An error occured creating the Provenance view.";
+	public static final String ERROR_PROVENANCE_RELOAD = "Loading Error. Reload.";
 	public static final String ENTITY = "Entity";
 	public static final String LOADING = "Loading";
 	public static final String ACTIVITY = "Activity";
@@ -344,7 +344,7 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
 	
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
-	public static final String SHOW_EXPANDED_LABEL = "Show Expanded?";
+	public static final String SHOW_EXPAND = "Show Expand";
 	public static final String INVALID_NUMBER_MESSAGE = "Please enter a valid number";
 	public static final String DEPTH_LABEL = "Depth";
 	public static final String INVALID_SYNAPSE_ID_MESSAGE = "Please enter a valid Synapse ID";
@@ -472,6 +472,12 @@ public class DisplayConstants {
 	public static final String CURRENT = "Current";
 	public static final String CURRENTLY_SELCTED = "Currently Selected";
 	public static final String PLEASE_MAKE_SELECTION = "Please make a selection";
+	public static final String CLOSE = "Close";
+	public static final String DISPLAY_HEIGHT = "Display Height";
+	public static final String DEFAULT = "Default";
+	public static final String ENTITY_LIST = "Entity List";
+	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
+	public static final String FIND_ENTITIES = "Find Entities";
 	
 	public static final String API_TABLE_COLUMN_COUNT_MISMATCH = "SuperTable: The number of columns must be the same as the number of renderers and column header titles.";
 	public static final String API_TABLE_MISSING_URI = "SuperTable: Endpoint path not specified.";
