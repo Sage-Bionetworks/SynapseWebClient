@@ -25,7 +25,7 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 		this.setStartingNode(startingNode);
 	}
 	
-	// deprecated
+	@Deprecated
 	public ActivityGraphNode(String id, String activityId, String activityName, ActivityType type, String subEntityId, String subName,
 			String subVersionLabel, Long subVersionNumber, String subEntityType, Boolean startingNode) {
 		super();

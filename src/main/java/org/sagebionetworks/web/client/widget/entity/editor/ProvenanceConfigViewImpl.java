@@ -72,7 +72,6 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 		entityListField.setAllowBlank(false);
 		panel.add(entityListField, basicFormData);
 		
-		TriggerField<String> a = new TriggerField<String>();
 		Button findEntitiesButton = new Button(DisplayConstants.FIND_ENTITIES, AbstractImagePrototype.create(iconsImageBundle.magnify16()));
 		findEntitiesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
 			@Override

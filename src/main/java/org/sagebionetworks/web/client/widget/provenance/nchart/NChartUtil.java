@@ -133,8 +133,7 @@ public class NChartUtil {
 	 * @param layoutResult
 	 * @param graph
 	 */
-	public static void fillPositions(LayoutResult layoutResult, ProvGraph graph) {
-		 
+	public static void fillPositions(LayoutResult layoutResult, ProvGraph graph) {		 
 		// find min and max Y for mirror transform
 		int minY = Integer.MAX_VALUE;
 		int maxY = 0;
