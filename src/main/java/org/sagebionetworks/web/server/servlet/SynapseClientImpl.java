@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -907,7 +908,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	
+	@Override
+	public String getEntitiesGeneratedBy(String activityId, Integer limit,
+			Integer offset) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<Reference> refs = synapseClient.getEntitiesGeneratedBy(activityId, limit, offset);
+			return EntityFactory.createJSONStringForEntity(refs);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 	@Override
 	public EntityWrapper removeAttachmentFromEntity(String entityId,
 			String attachmentName) throws RestServiceException {

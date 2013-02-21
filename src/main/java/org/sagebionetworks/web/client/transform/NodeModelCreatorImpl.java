@@ -17,6 +17,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -38,7 +39,7 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 	
 	JSONEntityFactory factory;
 	JSONObjectAdapter jsonObjectAdapter;
-	
+				
 	@Inject
 	public NodeModelCreatorImpl(JSONEntityFactory factory, JSONObjectAdapter jsonObjectAdapter) {
 		this.factory = factory;
