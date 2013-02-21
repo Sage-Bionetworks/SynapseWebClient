@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -140,9 +141,24 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 								for (String key : columnData.keySet()) {
 									String value = "";
 									if (row.has(key)) {
-										Object objValue = row.get(key);
-										if (objValue != null)
-											value = objValue.toString();
+										try {
+											Object objValue = row.get(key);
+											if (objValue != null)
+												value = objValue.toString();
+										} catch (JSONObjectAdapterException e) {
+											//try to get it as an array
+											JSONArrayAdapter valueArray = row.getJSONArray(key);
+											StringBuilder valueArraySB = new StringBuilder();
+											for (int j = 0; j < valueArray.length(); j++) {
+												Object objValue = valueArray.get(j);
+												if (objValue != null)
+													valueArraySB.append(objValue.toString() + ",");
+											}
+											if (valueArraySB.length() > 0) {
+												valueArraySB.deleteCharAt(valueArraySB.length()-1);
+												value = valueArraySB.toString();
+											}
+										}
 									}
 									List<String> col = columnData.get(key);
 									col.add(value);
