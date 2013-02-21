@@ -10,7 +10,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -171,7 +170,6 @@ public class ServerMarkdownUtils {
 		String regEx = ".*[|]{1}.+[|]{1}.*";
 		String[] lines = rawMarkdown.split("  \n");
 		StringBuilder sb = new StringBuilder();
-		//eat before
 		int i = 0;
 		while (i < lines.length) {
 			boolean looksLikeTable = lines[i].matches(regEx);
