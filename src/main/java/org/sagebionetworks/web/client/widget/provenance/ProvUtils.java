@@ -18,7 +18,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
@@ -36,13 +35,16 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ProvUtils {
 
+	private static int sequence = 0;
+	
 	public static ProvGraph buildProvGraph(
 			Map<Reference, String> generatedByActivityId,
 			Map<String, Activity> processedActivities,
 			Map<String, ProvGraphNode> idToNode,
 			Map<Reference, EntityHeader> refToHeader, boolean showExpand,
-			SynapseJSNIUtils synapseJSNIUtils, Set<Reference> startRefs, Set<Reference> noExpandNode) {
+			Set<Reference> startRefs, Set<Reference> noExpandNode) {
 		ProvGraph graph = new ProvGraph();
+		Integer sequence = 0;
 		
 		// maps for local building retrieval
 		Map<Reference,EntityGraphNode> entityNodes = new HashMap<Reference,EntityGraphNode>();
@@ -55,10 +57,11 @@ public class ProvUtils {
 				header = new EntityHeader();
 			}
 			boolean isStartNode = startRefs.contains(ref) ? true : false;
-			EntityGraphNode entityNode = new EntityGraphNode(createUniqueNodeId(
-					idToNode, synapseJSNIUtils), ref.getTargetId(),
-					header.getName(), header.getVersionLabel(),
-					ref.getTargetVersionNumber(), header.getType(), false, isStartNode);
+			String name = header.getName() == null ? ref.getTargetId() : header.getName();
+			EntityGraphNode entityNode = new EntityGraphNode(
+					createUniqueNodeId(), ref.getTargetId(), name,
+					header.getVersionLabel(), ref.getTargetVersionNumber(),
+					header.getType(), false, isStartNode);
 			idToNode.put(entityNode.getId(), entityNode);
 			graph.addNode(entityNode);
 			entityNodes.put(ref, entityNode);
@@ -70,7 +73,7 @@ public class ProvUtils {
 		for(Activity act : processedActivities.values()) {			
 			ActivityType type = ActivityTypeUtil.get(act);
 			ActivityGraphNode activityNode = new ActivityGraphNode(
-						createUniqueNodeId(idToNode, synapseJSNIUtils), 
+						createUniqueNodeId(), 
 						act.getId(),
 						act.getName(), 
 						type,
@@ -90,7 +93,7 @@ public class ProvUtils {
 					
 					// create expand nodes for those that don't have generatedBy activities defined
 					if(showExpand && !generatedByActivityId.containsKey(ref) && !noExpandNode.contains(ref)) {
-						ProvGraphNode expandNode = new ExpandGraphNode(createUniqueNodeId(idToNode, synapseJSNIUtils), ref.getTargetId(), ref.getTargetVersionNumber());
+						ProvGraphNode expandNode = new ExpandGraphNode(createUniqueNodeId(), ref.getTargetId(), ref.getTargetVersionNumber());
 						idToNode.put(expandNode.getId(), expandNode);
 						graph.addEdge(new ProvGraphEdge(entityNode, expandNode));
 					}
@@ -115,12 +118,8 @@ public class ProvUtils {
 	/**
 	 * Creates a random id that is not in use yet 
 	 */
-	public static String createUniqueNodeId(Map<String, ProvGraphNode> idToNode, SynapseJSNIUtils synapseJSNIUtils) {
-		String id;
-		do{
-			id = "provNode" + String.valueOf(synapseJSNIUtils.randomNextInt());
-		} while(idToNode.containsKey(id));
-		return id;
+	public static String createUniqueNodeId() {
+		return "provNode" + sequence++;
 	}
 
 	public static List<Reference> extractReferences(List<Activity> activities) {
@@ -129,9 +128,7 @@ public class ProvUtils {
 		for(Activity act : activities) {
 			if(act.getUsed() == null) continue;
 		
-			Iterator<UsedEntity> itr = act.getUsed().iterator();
-			while(itr.hasNext()) {
-				UsedEntity ue = itr.next();
+			for(UsedEntity ue : act.getUsed()) {
 				if(ue != null && ue.getReference() != null) {
 					allRefs.add(ue.getReference());
 				}

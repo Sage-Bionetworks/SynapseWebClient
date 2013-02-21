@@ -114,7 +114,7 @@ public class ProvUtilsTest {
 		
 		Set<Reference> noExpandNodes = new HashSet<Reference>();
 		
-		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, false, synapseJsniUtils, startRefs, noExpandNodes);		
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, false, startRefs, noExpandNodes);		
 		
 		assertNotNull(graph.getNodes());
 		assertNotNull(graph.getEdges());		
@@ -145,10 +145,11 @@ public class ProvUtilsTest {
 		assertTrue(edges.contains(usedEdge));
 	}
 
-	public void testCreateUniqueNodeId() throws Exception {		
+	public void testCreateUniqueNodeId() throws Exception {
+		Integer sequence = 0;
 		Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
 		for(int i=0; i<10; i++) {
-			String next = ProvUtils.createUniqueNodeId(idToNode, synapseJsniUtils);
+			String next = ProvUtils.createUniqueNodeId();
 			assertFalse(idToNode.containsKey(next));
 			idToNode.put(next, null);
 		}		
