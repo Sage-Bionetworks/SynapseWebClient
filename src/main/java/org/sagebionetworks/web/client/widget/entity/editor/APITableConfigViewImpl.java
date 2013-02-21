@@ -16,7 +16,7 @@ import com.google.inject.Inject;
 public class APITableConfigViewImpl extends LayoutContainer implements APITableConfigView {
 
 	private Presenter presenter;
-	private TextField<String> urlField, columnNamesField, friendlyColumnNamesField, renderersField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField, widthField;
+	private TextField<String> urlField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField, widthField;
 	private CheckBox isPagingField, isRowVisibleField;
 	@Inject
 	public APITableConfigViewImpl() {
@@ -27,9 +27,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		//build the view
 		FlowPanel hp = new FlowPanel();
 		urlField = new TextField<String>();
-		columnNamesField = new TextField<String>();
-		friendlyColumnNamesField = new TextField<String>();
-		renderersField = new TextField<String>();
 		isRowVisibleField = new CheckBox();
 		rowNumbersColumnNameField = new TextField<String>();
 		isPagingField = new CheckBox();
@@ -40,9 +37,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_URL_LABEL, urlField, hp);
 		urlField.setAllowBlank(false);
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_COLUMNS_LABEL, columnNamesField, hp);
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_COLUMN_HEADERS_LABEL,friendlyColumnNamesField, hp);
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_RENDERERS_LABEL, renderersField, hp);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL, isRowVisibleField, hp);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME, rowNumbersColumnNameField, hp);
 		
@@ -82,19 +76,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	@Override
 	public void setApiUrl(String url) {
 		urlField.setValue(url);
-	}
-	
-	@Override
-	public String getFriendlyColumnNames() {
-		return friendlyColumnNamesField.getValue();
-	}
-	@Override
-	public String getColumnsToDisplay() {
-		return columnNamesField.getValue();
-	}
-	@Override
-	public String getRendererNames() {
-		return renderersField.getValue();
 	}
 	
 	@Override

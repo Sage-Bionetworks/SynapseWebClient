@@ -24,7 +24,6 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRenderer;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
@@ -86,9 +85,6 @@ public class APITableWidgetTest {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, "Row Number");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, "results");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE, "myTableStyle");
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_COLUMNS_KEY, "field1,field2");
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY, "Field 1,Field 2");
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_RENDERERS_KEY, WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE +","+ WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
 	}
 	
 	private void fillInResult(JSONObjectAdapter result, String[] fieldNames, String[] fieldValues) throws JSONObjectAdapterException {
@@ -113,10 +109,6 @@ public class APITableWidgetTest {
 	
 	@Test
 	public void testEmptyColumnSpecification() throws JSONObjectAdapterException {
-		//if no column info is specified, it should display all
-		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_RENDERERS_KEY);
-		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY);
-		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_COLUMNS_KEY);
 		//remove everything but the uri
 		
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY);
@@ -181,23 +173,5 @@ public class APITableWidgetTest {
 		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
-	
-	
-	@Test
-	public void testInvalidColumnList2() throws JSONObjectAdapterException {
-		//different length than renderers and display names
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_COLUMNS_KEY, "field1");
-		widget.configure(testWikiKey, descriptor);
-		verify(mockView).showError(anyString());
-	}
-	
-	@Test
-	public void testInvalidDisplayColumnList() throws JSONObjectAdapterException {
-		//different length than renderers and display names
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY, "Field 1");
-		widget.configure(testWikiKey, descriptor);
-		verify(mockView).showError(anyString());
-	}
-	
 	
 }

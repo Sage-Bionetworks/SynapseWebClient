@@ -30,7 +30,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private String uri;
 	private int offset, total, pageSize, rowCount;
 	private Boolean isPaging,isShowRowNumber;
-	private String rowNumberColName, jsonResultsArrayKeyName, cssStyleName, tableWidth, columnNames, displayColumnNames, rendererNames;
+	private String rowNumberColName, jsonResultsArrayKeyName, cssStyleName, tableWidth;
 	
 	@Inject
 	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector) {
@@ -81,10 +81,6 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE)){
 				cssStyleName = descriptor.get(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 			}
-			
-			columnNames = descriptor.get(WidgetConstants.API_TABLE_WIDGET_COLUMNS_KEY);
-			displayColumnNames = descriptor.get(WidgetConstants.API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY);
-			rendererNames = descriptor.get(WidgetConstants.API_TABLE_WIDGET_RENDERERS_KEY);
 			
 			refreshData();
 		}
@@ -167,28 +163,18 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 							
 							//define the column names
 							String[] columnNamesArray = new String[]{};
-							if (columnNames != null && columnNames.length() > 0) {
-								columnNamesArray = columnNames.split(",");
-							} else {
-								int i = 0;
-								columnNamesArray = new String[columnData.keySet().size()];
-								for (Iterator<String> iterator = columnData.keySet().iterator(); iterator.hasNext();) {
-									String columnName = iterator.next();
-									columnNamesArray[i] = columnName;
-									i++;
-								}
+							columnNamesArray = new String[columnData.keySet().size()];
+							int colNamesIndex = 0;
+							for (Iterator<String> iterator = columnData.keySet().iterator(); iterator.hasNext();) {
+								String columnName = iterator.next();
+								columnNamesArray[colNamesIndex] = columnName;
+								colNamesIndex++;
 							}
 							String[] displayColumnNamesArray = columnNamesArray;
-							if (displayColumnNames != null)
-								displayColumnNamesArray = displayColumnNames.split(",");;
 							String[] rendererNamesArray;
-							if (rendererNames != null && rendererNames.length() > 0) {
-								rendererNamesArray = rendererNames.split(",");
-							} else {
-								rendererNamesArray = new String[columnNamesArray.length];
-								for (int i = 0; i < rendererNamesArray.length; i++) {
-									rendererNamesArray[i] = WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE;
-								}
+							rendererNamesArray = new String[columnNamesArray.length];
+							for (int i = 0; i < rendererNamesArray.length; i++) {
+								rendererNamesArray[i] = WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE;
 							}
 							APITableColumnRenderer[] renderers = new APITableColumnRenderer[rendererNamesArray.length];
 							//we should not render until all of the column renderers have had a chance to initialize

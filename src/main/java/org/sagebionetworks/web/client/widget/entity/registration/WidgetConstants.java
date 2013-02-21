@@ -58,10 +58,6 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY = "rowNumberDisplayName";
 	public static final String API_TABLE_WIDGET_WIDTH_KEY = "width";
 	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
-	public static final String API_TABLE_WIDGET_COLUMNS_KEY = "columns";
-	public static final String API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY = "displayNames";
-	public static final String API_TABLE_WIDGET_RENDERERS_KEY = "renderers";
-	
 	
 	
 	/**
