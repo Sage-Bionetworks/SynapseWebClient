@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -181,9 +182,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {			
 			Synapse synapseClient = createSynapseClient();			
 			EntityBundle eb;
+			//TODO:remove the try catch when PLFM-1752 is fixed
 			try {
 				eb = synapseClient.getEntityBundle(entityId, partsMask);
-			} catch(SynapseException e) {
+				} catch(SynapseNotFoundException e) {
 				//if we're trying to get the filehandles, then give another try without the filehandles
 				if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0) {
 					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES) & partsMask;
@@ -202,10 +204,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			Long versionNumber, int partsMask) throws RestServiceException {
 		try {			
 			Synapse synapseClient = createSynapseClient();
-			EntityBundle eb;			
+			EntityBundle eb;
+			//TODO:remove the try catch when PLFM-1752 is fixed
 			try {
 				eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
-			} catch(SynapseException e) {
+			} catch(SynapseNotFoundException e) {
 				//if we're trying to get the filehandles, then give another try without the filehandles
 				if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0) {
 					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES) & partsMask;
