@@ -294,7 +294,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				ebt.setEntityPathJson(EntityFactory.createJSONStringForEntity(path));
 			}
 			if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
-				PaginatedResults<EntityHeader> rb = eb.getReferencedBy();
+				List<EntityHeader> rbList = eb.getReferencedBy();
+				PaginatedResults<EntityHeader> rb = new PaginatedResults<EntityHeader>();
+				rb.setResults(rbList);
 				ebt.setEntityReferencedByJson(EntityFactory.createJSONStringForEntity(rb));
 			}
 			if ((EntityBundleTransport.HAS_CHILDREN & partsMask) > 0) {
