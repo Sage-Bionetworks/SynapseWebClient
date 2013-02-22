@@ -79,9 +79,25 @@ public class ServerMarkdownUtils {
 
 	public static void assignIdsToHeadings(Document doc) {
 		Elements hTags = doc.select("h0, h1, h2, h3, h4, h5, h6");
+		int headingIndex = 0;
 		for (int i = 0; i < hTags.size(); i++) {
-			hTags.get(i).attr("id", WidgetConstants.MARKDOWN_HEADING_ID_PREFIX+i);
-			hTags.get(i).attr("level", hTags.get(i).tag().getName());
+			Element hTag = hTags.get(i);
+			boolean skip = false;
+			for (Node node : hTag.childNodes()) {
+				if (node instanceof TextNode) {
+					TextNode textNode = (TextNode) node;
+					String text = textNode.getWholeText();
+					if (text.startsWith("!")) {
+						skip=true;
+						textNode.replaceWith(TextNode.createFromEncoded(text.substring(1), textNode.baseUri()));
+					}
+				}
+			}
+			if (!skip) {
+				hTag.attr("id", WidgetConstants.MARKDOWN_HEADING_ID_PREFIX+headingIndex);
+				hTag.attr("level", hTag.tag().getName());
+				headingIndex++;
+			}
 		}
 	}
 	

@@ -1375,4 +1375,14 @@ public class DisplayUtils {
 		}		
 		return ref;		
 	}
+	
+	public static boolean hasRecognizedImageExtension(String fileName) {
+		String lowerFileName = fileName.toLowerCase();
+		return lowerFileName.endsWith(".png") ||
+				lowerFileName.endsWith(".jpg") ||
+				lowerFileName.endsWith(".jpeg") ||
+				lowerFileName.endsWith(".tiff") ||
+				lowerFileName.endsWith(".gif") ||
+				lowerFileName.endsWith(".bmp");
+	}
 }

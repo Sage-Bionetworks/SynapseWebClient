@@ -36,7 +36,7 @@ public class TableOfContentsWidgetViewImpl extends LayoutContainer implements Ta
 		if (!hasLoaded) {
 			hasLoaded = true;
 			FlowPanel linkContainer = new FlowPanel();
-			linkContainer.add(new HTML("<h5>Table Of Contents</h5>"));
+			linkContainer.add(new HTML("<h4>Table Of Contents</h4>"));
 			HTMLPanel parentPanel = (HTMLPanel)this.getParent();
 			//look for these special header ids (that were added by the markdown processor for us), and create links to them
 			String id = WidgetConstants.MARKDOWN_HEADING_ID_PREFIX;

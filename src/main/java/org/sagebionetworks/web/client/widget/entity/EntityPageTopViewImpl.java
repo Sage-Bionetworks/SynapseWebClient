@@ -280,7 +280,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if (handle != null) {
 			String fileName = handle.getFileName();
 			if (fileName != null) {
-				boolean looksLikeAnImage = hasRecognizedImageExtension(fileName);
+				boolean looksLikeAnImage = DisplayUtils.hasRecognizedImageExtension(fileName);
 				if (looksLikeAnImage) {
 					FileEntity fileEntity = (FileEntity)bundle.getEntity();
 					//add a html panel that contains the image src from the attachments server (to pull asynchronously)
@@ -296,16 +296,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		}
 		return new HTMLPanel(sb.toString());
-	}
-	
-	private boolean hasRecognizedImageExtension(String fileName) {
-		String lowerFileName = fileName.toLowerCase();
-		return lowerFileName.endsWith(".png") ||
-				lowerFileName.endsWith(".jpg") ||
-				lowerFileName.endsWith(".jpeg") ||
-				lowerFileName.endsWith(".tiff") ||
-				lowerFileName.endsWith(".gif") ||
-				lowerFileName.endsWith(".bmp");
 	}
 	
 	// Render the Folder entity
