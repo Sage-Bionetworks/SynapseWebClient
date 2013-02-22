@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
