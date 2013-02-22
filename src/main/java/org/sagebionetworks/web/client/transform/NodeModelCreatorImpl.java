@@ -42,7 +42,9 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 	
 	JSONEntityFactory factory;
 	JSONObjectAdapter jsonObjectAdapter;
-				
+
+	private static final String FILE_HANDLE_TYPE_FIELD_NAME = "concreteType";
+	
 	@Inject
 	public NodeModelCreatorImpl(JSONEntityFactory factory, JSONObjectAdapter jsonObjectAdapter) {
 		this.factory = factory;
@@ -143,7 +145,7 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 			JSONArrayAdapter aa = jsonObjectAdapter.createNewArray(transport.getFileHandlesJson());
 			for (int i=0; i<aa.length(); i++) {
 				JSONObjectAdapter joa = aa.getJSONObject(i);
-				String concreteClassName = (String)joa.get("concreteType");
+				String concreteClassName = (String)joa.get(FILE_HANDLE_TYPE_FIELD_NAME);
 				fileHandles.add((FileHandle)factory.createEntity(joa.toJSONString(), concreteClassName));
 			}
 		}
