@@ -110,8 +110,10 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	public static FileHandle getFileHandle(EntityBundle bundle) {
 		FileHandle fileHandle = null;
 		if (bundle.getFileHandles() != null) {
+			FileEntity entity = (FileEntity)bundle.getEntity();
+			String targetId = entity.getDataFileHandleId();
 			for (FileHandle fh : bundle.getFileHandles()) {
-				if (!(fh instanceof PreviewFileHandle)) {
+				if (fh.getId().equals(targetId)) {
 					fileHandle = fh;
 					break;
 				}

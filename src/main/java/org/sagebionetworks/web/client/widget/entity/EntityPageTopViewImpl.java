@@ -7,13 +7,13 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -47,11 +47,10 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
-import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
-import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
+import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.GWT;
@@ -243,11 +242,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
-//		colLeftContainer.add(createPreviewWidget(bundle), widgetMargin);
 
 		if (bundle.getEntity() instanceof FileEntity) {
 			//also add a preview
-			colLeftContainer.add(getFilePreview(bundle.getEntity()));
+			colLeftContainer.add(getFilePreview(bundle));
 		}
 
 		// Description
@@ -276,19 +274,38 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ************************************************************************************************		
 	}
 	
-	private HTMLPanel getFilePreview(Entity fileEntity) {
-		//add a html panel that contains the image src from the attachments server (to pull asynchronously)
-		//create img
+	private HTMLPanel getFilePreview(EntityBundle bundle) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<a href=\"");
-		
-		sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false));
-		sb.append("\"><img alt=\""+DisplayConstants.PREVIEW_UNAVAILABLE+"\" class=\"imageDescriptor\" ");
-		sb.append(" src=\"");
-		sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
-		sb.append("\"></img></a>");
+		FileHandle handle = FileTitleBar.getFileHandle(bundle);
+		if (handle != null) {
+			String fileName = handle.getFileName();
+			if (fileName != null) {
+				boolean looksLikeAnImage = hasRecognizedImageExtension(fileName);
+				if (looksLikeAnImage) {
+					FileEntity fileEntity = (FileEntity)bundle.getEntity();
+					//add a html panel that contains the image src from the attachments server (to pull asynchronously)
+					//create img
+					sb.append("<a href=\"");
+					
+					sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false));
+					sb.append("\"><img alt=\""+DisplayConstants.PREVIEW_UNAVAILABLE+"\" class=\"imageDescriptor\" ");
+					sb.append(" src=\"");
+					sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
+					sb.append("\"></img></a>");
+				}
+			}
+		}
 		return new HTMLPanel(sb.toString());
-
+	}
+	
+	private boolean hasRecognizedImageExtension(String fileName) {
+		String lowerFileName = fileName.toLowerCase();
+		return lowerFileName.endsWith(".png") ||
+				lowerFileName.endsWith(".jpg") ||
+				lowerFileName.endsWith(".jpeg") ||
+				lowerFileName.endsWith(".tiff") ||
+				lowerFileName.endsWith(".gif") ||
+				lowerFileName.endsWith(".bmp");
 	}
 	
 	// Render the Folder entity
@@ -296,8 +313,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly2,
 			MarginData widgetMargin) {
 		// ** LEFT **
-		//Folder is not Locationable, so locationableTitleBar.asWidget is not visible
-		//fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		fullWidthContainer.add(entityMetadata.asWidget(), new MarginData(0));
 		
@@ -328,7 +343,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
-		//fullWidthContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
 
@@ -389,7 +403,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
-		//colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description
