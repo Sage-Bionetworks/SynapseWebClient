@@ -235,11 +235,14 @@ public class LicensedDownloaderTest {
 
 		// Success Test: Download
 		resetMocks();			
+		String fileHandleId = "22";
 		S3FileHandle fileHandle = new S3FileHandle();
 		fileHandle.setContentMd5("myContentMd5");
 		fileHandle.setFileName("myFileName.png");
+		fileHandle.setId(fileHandleId);
 		List fileHandles = new ArrayList<FileHandle>();
 		fileHandles.add(fileHandle);
+		((FileEntity)entityBundle.getEntity()).setDataFileHandleId(fileHandleId);
 		entityBundle.setFileHandles(fileHandles);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
