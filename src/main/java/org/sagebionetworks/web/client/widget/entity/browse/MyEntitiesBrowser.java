@@ -1,10 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -134,6 +140,43 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 
 	public EntityTreeBrowser getEntityTreeBrowser() {
 		return view.getEntityTreeBrowser();
+	}
+
+	@Override
+	public void loadFavorites() {
+		UserSessionData sessionData = authenticationController.getLoggedInUser();
+		if(sessionData != null) {
+			UserProfile userProfile = sessionData.getProfile();
+			if(userProfile != null && userProfile.getFavorites() != null && userProfile.getFavorites().size() > 0) {							
+				List<Reference> refs = new ArrayList<Reference>();
+				for(String entityId : userProfile.getFavorites()) {
+					Reference ref = new Reference();
+					ref.setTargetId(entityId);
+					refs.add(ref);
+				}								
+				ReferenceList list = new ReferenceList();
+				list.setReferences(refs);
+				try {
+					synapseClient.getEntityHeaderBatch(list.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString(), new AsyncCallback<String>() {
+						@Override
+						public void onSuccess(String result) {
+							BatchResults<EntityHeader> headers;
+							try {
+								headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
+								view.setFavoriteEntities(headers.getResults());
+							} catch (JSONObjectAdapterException e) {
+								view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+							}							
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+						}
+					});
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				}
+			}
+		}
 	}
 
 	

@@ -3,15 +3,22 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.TabPanelEvent;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.TabItem;
+import com.extjs.gxt.ui.client.widget.TabPanel;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -23,37 +30,68 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
-	private EntityTreeBrowser entityTreeBrowser;
-	private EntitySelectedHandler entitySelectedHandler;
+	private EntityTreeBrowser myTreeBrowser;
+	private EntityTreeBrowser favoritesTreeBrowser;
+	private EntitySelectedHandler mySelectedHandler;
+	private EntitySelectedHandler favoritesSelectedHandler;
+	private PortalGinInjector ginInjector;
 	
-	private ContentPanel cp;
+	private TabPanel panel;
 			
 	@Inject
 	public MyEntitiesBrowserViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, EntityTreeBrowser entityTreeBrowser) {
+			IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
-		this.entityTreeBrowser = entityTreeBrowser;			
+		this.myTreeBrowser = ginInjector.getEntityTreeBrowser();		
+		this.favoritesTreeBrowser = ginInjector.getEntityTreeBrowser();
+		this.ginInjector = ginInjector;
 	}
 	
 	@Override
 	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
 		super.onRender(parent, index);		
-
-		cp = new ContentPanel();
-		cp.setHeaderVisible(false);
-		cp.setHeight(HEIGHT_PX);
-		cp.setAutoWidth(true);
-		cp.setScrollMode(Scroll.AUTO);				
+		panel = new TabPanel();
+		panel.setPlain(true);
+		panel.setHeight(HEIGHT_PX);
+		panel.setAutoWidth(true);
 		
-		cp.add(entityTreeBrowser.asWidget());
+		final String MY_TAB_ID = "myTab";
+		final String FAVORITE_TAB_ID = "favoriteTab";
 		
-		add(cp);
+		TabItem myTab = new TabItem(DisplayConstants.MY_PROJECTS);
+		myTab.add(myTreeBrowser.asWidget());
+		myTab.setScrollMode(Scroll.AUTO);	
+		panel.add(myTab);
+			
+		TabItem favoritesTab = new TabItem(DisplayConstants.FAVORITES);
+		favoritesTab.add(favoritesTreeBrowser.asWidget());
+		favoritesTab.setScrollMode(Scroll.AUTO);
+		favoritesTab.setIcon(AbstractImagePrototype.create(iconsImageBundle.star16()));
+		panel.add(favoritesTab);
+		
+		panel.addListener(Events.Select, new Listener<TabPanelEvent>() {
+			public void handleEvent(TabPanelEvent be) {
+				String tabId = be.getItem().getId();
+				if(MY_TAB_ID.equals(tabId)) {
+					
+				} else if(FAVORITE_TAB_ID.equals(tabId)) {
+					presenter.loadFavorites();
+				}
+			}
+		});
+		
+		add(panel);
 	}
 
 	@Override
 	public void setUpdatableEntities(List<EntityHeader> rootEntities) {
-		entityTreeBrowser.configure(rootEntities, true);		
+		myTreeBrowser.configure(rootEntities, true);		
+	}
+	
+	@Override
+	public void setFavoriteEntities(List<EntityHeader> favoriteEntities) {
+		favoritesTreeBrowser.configure(favoriteEntities, true);
 	}
 	
 	@Override
@@ -62,12 +100,15 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 	}	
 
 	@Override 
-	public void setPresenter(Presenter presenter) {
+	public void setPresenter(Presenter presenter) {		
 		// create a new handler for this presenter
-		if(entitySelectedHandler != null) {
-			entityTreeBrowser.removeEntitySelectedHandler(entitySelectedHandler);
+		if(mySelectedHandler != null) {
+			myTreeBrowser.removeEntitySelectedHandler(mySelectedHandler);
 		}
-		createSelectedHandler();
+		if(favoritesSelectedHandler != null) {
+			favoritesTreeBrowser.removeEntitySelectedHandler(favoritesSelectedHandler);
+		}
+		createSelectedHandlers();
 		this.presenter = presenter;
 	}
 		
@@ -91,19 +132,28 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 
 	@Override
 	public EntityTreeBrowser getEntityTreeBrowser() {
-		return entityTreeBrowser;
+		return myTreeBrowser;
 	}
 	
 	/*
 	 * Private Methods
 	 */
-	private void createSelectedHandler() {
-		entitySelectedHandler = new EntitySelectedHandler() {			
+	private void createSelectedHandlers() {
+		mySelectedHandler = new EntitySelectedHandler() {			
 			@Override
 			public void onSelection(EntitySelectedEvent event) {
-				presenter.entitySelected(entityTreeBrowser.getSelected());
+				presenter.entitySelected(myTreeBrowser.getSelected());
 			}
 		};
-		entityTreeBrowser.addEntitySelectedHandler(entitySelectedHandler);
+		myTreeBrowser.addEntitySelectedHandler(mySelectedHandler);
+
+		favoritesSelectedHandler = new EntitySelectedHandler() {			
+			@Override
+			public void onSelection(EntitySelectedEvent event) {
+				presenter.entitySelected(favoritesTreeBrowser.getSelected());
+			}
+		};
+		favoritesTreeBrowser.addEntitySelectedHandler(favoritesSelectedHandler);
 	}
+
 }

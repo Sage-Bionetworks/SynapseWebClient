@@ -66,6 +66,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -87,6 +88,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private static final int VERSION_LIMIT = 100;
 	private static final int NAME_TIME_STUB_LENGTH = 7;
+	
+	private static String favoriteStarOffHtml;
+	private static String favoriteStarHtml;
+	
 
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
@@ -128,6 +133,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	HTMLPanel modifiedBy;
 	@UiField
 	SpanElement label;
+	@UiField
+	Anchor favoriteAnchor;
 
 	@UiField
 	LayoutContainer previousVersions;
@@ -160,6 +167,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private PagingToolBar vToolbar;
 	private Grid<BaseModelData> vGrid;
 	private AnimationProtector versionAnimation;
+	boolean isFavorite = false;
 
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
@@ -229,7 +237,20 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		cp.add(vGrid);
 
 		setPreviousVersions(cp);
-
+		
+		favoriteStarHtml = AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML();
+		favoriteStarOffHtml = AbstractImagePrototype.create(iconsImageBundle.starEmpty16()).getHTML();
+		
+		favoriteAnchor = new Anchor();
+		favoriteAnchor.setHTML(favoriteStarOffHtml);
+		favoriteAnchor.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				setFavoriteIcon();
+				presenter.setIsFavorite(isFavorite);
+			}
+		});
+		
 		previousVersions.setLayout(new FlowLayout(10));
 	}
 
@@ -271,6 +292,16 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			setEntityVersions(vb);
 			versionAnimation.hide();
 		}
+		
+		isFavorite = presenter.isFavorite();
+		setFavoriteIcon();
+	}
+
+	private void setFavoriteIcon() {
+		if(isFavorite)
+			favoriteAnchor.setHTML(favoriteStarHtml);
+		else 
+			favoriteAnchor.setHTML(favoriteStarOffHtml);
 	}
 
 	private void clear() {
@@ -664,4 +695,5 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		if(userTime.length() > NAME_TIME_STUB_LENGTH) stub += "...";
 		return stub;
 	}
+
 }

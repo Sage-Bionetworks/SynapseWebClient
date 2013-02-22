@@ -14,7 +14,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,13 +60,15 @@ public class EntityMetadataTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	EntityMetadataView mockView;
 	EntitySchemaCache mockSchemaCache;
-	JSONObjectAdapter mockJsonObjectAdapter;
+	JSONObjectAdapter jsonObjectAdapter;
 	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	EventBus mockEventBus;
 	JiraURLHelper mockJiraURLHelper;
 	EntityMetadata entityMetadata;
 	Versionable vb;
+	String entityId = "syn123";
+	EntityBundle bundle;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -81,33 +85,32 @@ public class EntityMetadataTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityMetadataView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
-		mockJsonObjectAdapter = mock(JSONObjectAdapter.class);
+		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockEventBus = mock(EventBus.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 
-		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, mockJsonObjectAdapter, mockGlobalApplicationState, mockEntityTypeProvider, mockJiraURLHelper, mockEventBus);
+		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, jsonObjectAdapter, mockGlobalApplicationState, mockEntityTypeProvider, mockJiraURLHelper, mockEventBus);
 
 		vb = new Data();
-		vb.setId("syn123");
+		vb.setId(entityId);
 		vb.setVersionNumber(new Long(1));
 		vb.setVersionLabel("");
 		vb.setVersionComment("");
-		EntityBundle mockBundle = mock(EntityBundle.class, RETURNS_DEEP_STUBS);
-		when(mockBundle.getPermissions().getCanEdit()).thenReturn(true);
-		when(mockBundle.getEntity()).thenReturn(vb);
+		bundle = mock(EntityBundle.class, RETURNS_DEEP_STUBS);
+		when(bundle.getPermissions().getCanEdit()).thenReturn(true);
+		when(bundle.getEntity()).thenReturn(vb);
 
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
 		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
 		accessRequirement.setId(101L);
 		accessRequirement.setTermsOfUse("terms of use");
 		accessRequirements.add(accessRequirement);
-		when(mockBundle.getAccessRequirements()).thenReturn(accessRequirements);
-		when(mockBundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
-		
-		when(mockJsonObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
-		entityMetadata.setEntityBundle(mockBundle, false);
+		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
+		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
+				
+		entityMetadata.setEntityBundle(bundle, false);
 
 	}
 
@@ -215,4 +218,51 @@ public class EntityMetadataTest {
 	public void testGetApprovalType() {
 		assertEquals(APPROVAL_TYPE.USER_AGREEMENT, entityMetadata.getApprovalType());
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSetIsFavorite() throws Exception {
+		UserProfile userProfile = new UserProfile();
+		
+		String userProfileJson = userProfile.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
+		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(userProfile);
+				
+		entityMetadata.setIsFavorite(true);
+		
+		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);		
+		verify(mockSynapseClient).updateUserProfile(arg.capture(), any(AsyncCallback.class));
+		verify(mockAuthenticationController).reloadUserSessionData();
+		String updatedProfileJson = arg.getValue();
+		UserProfile updatedUserProfile = new UserProfile(jsonObjectAdapter.createNew(updatedProfileJson));
+		
+		assertTrue(updatedUserProfile.getFavorites().contains(entityId));		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSetIsFavoriteUnset() throws Exception {				
+		UserProfile userProfile = new UserProfile();
+		Set<String> favorites = new HashSet<String>();
+		favorites.add(entityId);
+		userProfile.setFavorites(favorites);
+		
+		String userProfileJson = userProfile.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
+		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(userProfile);
+				
+		entityMetadata.setEntityBundle(bundle, false);
+		entityMetadata.setIsFavorite(false);
+		
+		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);		
+		verify(mockSynapseClient).updateUserProfile(arg.capture(), any(AsyncCallback.class));
+		verify(mockAuthenticationController).reloadUserSessionData();
+		String updatedProfileJson = arg.getValue();
+		UserProfile updatedUserProfile = new UserProfile(jsonObjectAdapter.createNew(updatedProfileJson));
+		
+		assertEquals(0, updatedUserProfile.getFavorites().size());		
+	}
+	
 }

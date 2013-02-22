@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -49,8 +52,7 @@ public class EntityMetadata implements Presenter {
 	private JiraURLHelper jiraURLHelper;
 	private EventBus bus;
 	private GlobalApplicationState globalApplicationState;
-	
-	private EntityBundle bundle;
+	private EntityBundle bundle;	
 
 	@Inject
 	public EntityMetadata(EntityMetadataView view,
@@ -359,6 +361,54 @@ public class EntityMetadata implements Presenter {
 				fireEntityUpdatedEvent();
 			}
 		});
+	}
+
+	@Override
+	public void setIsFavorite(final boolean isFavorite) {
+		synapseClient.getUserProfile(new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String profileJson) {
+				try {
+					UserProfile userProfile = nodeModelCreator.createJSONEntity(profileJson, UserProfile.class);
+					if(userProfile.getFavorites() == null) 
+						userProfile.setFavorites(new HashSet<String>());
+					Set<String> favorites = userProfile.getFavorites();
+					if(isFavorite)  
+						favorites.add(bundle.getEntity().getId());
+					else 
+						favorites.remove(bundle.getEntity().getId());
+					// save profile					
+					synapseClient.updateUserProfile(userProfile.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString(), new AsyncCallback<Void>() {
+						@Override
+						public void onSuccess(Void result) {
+							// reload the sessiondata (which contains the profile) and store it back in memory
+							authenticationController.reloadUserSessionData();
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showErrorMessage(DisplayConstants.ERROR_FAVORITE_CHANGE_NOT_SAVED);
+						}						
+					});
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.ERROR_FAVORITE_CHANGE_NOT_SAVED);
+			}
+		});
+	}
+
+	@Override
+	public boolean isFavorite() {
+		UserProfile userProfile = getUserProfile();
+		boolean isFavorite;
+		if(userProfile.getFavorites() != null)  
+			isFavorite = userProfile.getFavorites().contains(bundle.getEntity().getId()) ? true : false;
+		else
+			isFavorite = false;
+		return isFavorite;
 	}
 
 
