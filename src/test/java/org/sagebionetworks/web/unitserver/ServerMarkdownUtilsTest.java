@@ -1,14 +1,17 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
-import org.pegdown.PegDownProcessor;
-import org.sagebionetworks.web.client.MarkdownUtils;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
-import org.sagebionetworks.web.shared.WebConstants;
+
+import eu.henkelmann.actuarius.ActuariusTransformer;
 
 public class ServerMarkdownUtilsTest {
 
@@ -23,31 +26,31 @@ public class ServerMarkdownUtilsTest {
 	}
 	
 	@Test
-	public void testMarkdown2HtmlEscapeControlCharacters(){
+	public void testMarkdown2HtmlEscapeControlCharacters() throws IOException{
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
 		String testString = "& ==> &amp;\" ==> &quot;> ==> &gt;< ==> &lt;' =";
 		
-		String actualResult = ServerMarkdownUtils.markdown2Html(testString, false, new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS));
-		assertTrue(actualResult.contains("&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt;&lt; ==&gt; &lt;"));
+		String actualResult = ServerMarkdownUtils.markdown2Html(testString, false, new ActuariusTransformer());
+		assertTrue(actualResult.contains("&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt; &lt; ==&gt; &lt;' ="));
 	}
 	
 	@Test
-	public void testRemoveAllHTML(){
+	public void testRemoveAllHTML() throws IOException{
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
 		String testString = "<table><tr><td>this is a test</td><td>column 2</td></tr></table><iframe width=\"420\" height=\"315\" src=\"http://www.youtube.com/embed/AOjaQ7Vl7SM\" frameborder=\"0\" allowfullscreen></iframe><embed>";
-		String actualResult = ServerMarkdownUtils.markdown2Html(testString, false, new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS));
+		String actualResult = ServerMarkdownUtils.markdown2Html(testString, false, new ActuariusTransformer());
 		assertTrue(!actualResult.contains("<table>"));
 		assertTrue(!actualResult.contains("<iframe>"));
 		assertTrue(!actualResult.contains("<embed>"));
 	}
 	
 	@Test
-	public void testTableSupport(){
+	public void testTableSupport() throws IOException{
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
 		String testString = 
 				"|             |          Grouping           ||\nFirst Header  | Second Header | Third Header |\n ------------ | :-----------: | -----------: |\nContent       |          *Long Cell*        ||\nContent       |   **Cell**    |         Cell |\n";
 		
-		PegDownProcessor processor = new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS);
+		ActuariusTransformer processor = new ActuariusTransformer();
 		String actualResult = ServerMarkdownUtils.markdown2Html(testString, false, processor);
 		assertTrue(actualResult.contains("<table>"));
 		assertTrue(actualResult.contains("<tr>"));
@@ -62,5 +65,17 @@ public class ServerMarkdownUtilsTest {
 		ServerMarkdownUtils.addWidgets(htmlDoc, false);
 		String actualResult = htmlDoc.html();
 		assertEquals(expectedResult, actualResult);
+	}
+	
+	@Test
+	public void testResolveTables(){
+		String testString = "${image?fileName=bill%5Fgates%2Egif}  | Second Header | Third Header  \nContent Cell1a  | Content Cell2a  | Content Cell3a  \nContent Cell1b  | Content Cell2b   Content Cell3b";
+		String result = ServerMarkdownUtils.resolveTables(testString);
+		assertTrue(result.contains("<table>"));
+		
+		testString = "|Content Cell1a  | Content Cell2a  | Content Cell3a|  \n|Content Cell1b  | Content Cell2b   Content Cell3b|  \n  \nMore text below";
+		result = ServerMarkdownUtils.resolveTables(testString);
+		assertTrue(result.contains("<table>"));
+		assertTrue(result.contains("More text below"));
 	}
 }

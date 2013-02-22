@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
@@ -62,6 +64,12 @@ public class FileHandleServletTest {
 		when(mockSynapse.getWikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString())).thenReturn(resolvedUrl);
 		when(mockSynapse.getWikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString())).thenReturn(resolvedUrl);
 
+		when(mockSynapse.getFileEntityPreviewTemporaryUrlForVersion(anyString(), anyLong())).thenReturn(resolvedUrl);
+		when(mockSynapse.getFileEntityTemporaryUrlForVersion(anyString(), anyLong())).thenReturn(resolvedUrl);
+		when(mockSynapse.getFileEntityPreviewTemporaryUrlForCurrentVersion(anyString())).thenReturn(resolvedUrl);
+		when(mockSynapse.getFileEntityTemporaryUrlForCurrentVersion(anyString())).thenReturn(resolvedUrl);
+
+
 		mockUrlProvider = mock(ServiceUrlProvider.class);
 		mockTokenProvider = mock(TokenProvider.class);
 
@@ -76,30 +84,96 @@ public class FileHandleServletTest {
 
 		// Setup request
 		mockRequest = mock(HttpServletRequest.class);
-
+	}
+	
+	private void setupWiki() {
 		when(mockRequest.getParameter(DisplayUtils.WIKI_OWNER_ID_PARAM_KEY)).thenReturn("syn296531");
 		when(mockRequest.getParameter(DisplayUtils.WIKI_OWNER_TYPE_PARAM_KEY)).thenReturn(WidgetConstants.WIKI_OWNER_ID_ENTITY);
 		when(mockRequest.getParameter(DisplayUtils.WIKI_ID_PARAM_KEY)).thenReturn("2");
 		when(mockRequest.getParameter(DisplayUtils.WIKI_FILENAME_PARAM_KEY)).thenReturn("file.png");
 	}
+	
+	private void setupFileEntity() {
+		when(mockRequest.getParameter(DisplayUtils.ENTITY_PARAM_KEY)).thenReturn("syn296531");
+		when(mockRequest.getParameter(DisplayUtils.ENTITY_VERSION_PARAM_KEY)).thenReturn("20");
+	}
 
 	@Test
-	public void testDoGetLoggedIn() throws Exception {
+	public void testDoGetLoggedInWikiAttachmentPreview() throws Exception {
+		setupWiki();
+		when(mockRequest.getParameter(DisplayUtils.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
 		when(mockRequest.getCookies()).thenReturn(cookies);
-		when(mockRequest.getParameter(DisplayUtils.WAIT_FOR_URL)).thenReturn("true");
 		servlet.doGet(mockRequest, mockResponse);
-
+		verify(mockSynapse).getWikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString());
+		verify(mockResponse).sendRedirect(anyString());
+	}
+	
+	@Test
+	public void testDoGetLoggedInWikiAttachment() throws Exception {
+		setupWiki();
+		when(mockRequest.getParameter(DisplayUtils.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("false");
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getWikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString());
 		verify(mockResponse).sendRedirect(anyString());
 	}
 
+
+	@Test
+	public void testDoGetLoggedInFileEntityPreview() throws Exception {
+		setupFileEntity();
+		when(mockRequest.getParameter(DisplayUtils.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getFileEntityPreviewTemporaryUrlForVersion(anyString(), anyLong());
+		verify(mockResponse).sendRedirect(anyString());
+	}
+	
+	@Test
+	public void testDoGetLoggedInFileEntity() throws Exception {
+		setupFileEntity();
+		when(mockRequest.getParameter(DisplayUtils.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("false");
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getFileEntityTemporaryUrlForVersion(anyString(), anyLong());
+		verify(mockResponse).sendRedirect(anyString());
+	}
+	
+	@Test
+	public void testDoGetLoggedInFileEntityPreviewCurrentVersion() throws Exception {
+		setupFileEntity();
+		when(mockRequest.getParameter(DisplayUtils.ENTITY_VERSION_PARAM_KEY)).thenReturn(null);
+		when(mockRequest.getParameter(DisplayUtils.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getFileEntityPreviewTemporaryUrlForCurrentVersion(anyString());
+		verify(mockResponse).sendRedirect(anyString());
+	}
+	
+	@Test
+	public void testDoGetLoggedInFileEntityCurrentVersion() throws Exception {
+		setupFileEntity();
+		when(mockRequest.getParameter(DisplayUtils.ENTITY_VERSION_PARAM_KEY)).thenReturn(null);
+		when(mockRequest.getParameter(DisplayUtils.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("false");
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getFileEntityTemporaryUrlForCurrentVersion(anyString());
+		verify(mockResponse).sendRedirect(anyString());
+	}
+
+	
 	@Test
 	public void testDoGetLoggedOut() throws Exception {
 		Cookie[] cookies = {};
 		when(mockRequest.getCookies()).thenReturn(cookies);
-		when(mockRequest.getParameter(DisplayUtils.WAIT_FOR_URL)).thenReturn("true");
 		servlet.doGet(mockRequest, mockResponse);
 
-		verify(mockResponse).sendRedirect(anyString());
+		verify(mockResponse, Mockito.times(0)).sendRedirect(anyString());
 	}
 }	//

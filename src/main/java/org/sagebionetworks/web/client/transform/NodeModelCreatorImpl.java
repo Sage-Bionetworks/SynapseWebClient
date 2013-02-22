@@ -11,6 +11,9 @@ import org.sagebionetworks.repo.model.EntityClassHelper;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -39,7 +42,9 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 	
 	JSONEntityFactory factory;
 	JSONObjectAdapter jsonObjectAdapter;
-				
+
+	private static final String FILE_HANDLE_TYPE_FIELD_NAME = "concreteType";
+	
 	@Inject
 	public NodeModelCreatorImpl(JSONEntityFactory factory, JSONObjectAdapter jsonObjectAdapter) {
 		this.factory = factory;
@@ -93,6 +98,8 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		PaginatedResults<EntityHeader> referencedBy = null;
 		List<AccessRequirement> accessRequirements = null;
 		List<AccessRequirement> unmetAccessRequirements = null;
+		List<FileHandle> fileHandles = null;
+		Long version = null;
 		// entity?
 		if(transport.getEntityJson() != null){
 			entity = factory.createEntity(transport.getEntityJson());
@@ -132,10 +139,21 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 				unmetAccessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
 			}
 		}
+		// file handles?
+		if(transport.getFileHandlesJson() != null){
+			fileHandles =  new ArrayList<FileHandle>();
+			JSONArrayAdapter aa = jsonObjectAdapter.createNewArray(transport.getFileHandlesJson());
+			for (int i=0; i<aa.length(); i++) {
+				JSONObjectAdapter joa = aa.getJSONObject(i);
+				String concreteClassName = (String)joa.get(FILE_HANDLE_TYPE_FIELD_NAME);
+				fileHandles.add((FileHandle)factory.createEntity(joa.toJSONString(), concreteClassName));
+			}
+		}
+		
 		// put it all together.
 		EntityBundle eb =  new EntityBundle(entity, annotations, 
 				permissions, path, referencedBy,
-				accessRequirements, unmetAccessRequirements);
+				accessRequirements, unmetAccessRequirements, fileHandles);
 		// Set the child count when there.
 		if(transport.getHasChildren() != null){
 			eb.setChildCount(transport.getHasChildren());

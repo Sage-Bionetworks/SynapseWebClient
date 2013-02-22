@@ -88,7 +88,7 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 			public void pageUpdated() {
 				presenter.configure(wikiKey);
 			}
-		}, false);
+		}, false, 24);
 		fullWidthContainer.layout(true);
 	}
 

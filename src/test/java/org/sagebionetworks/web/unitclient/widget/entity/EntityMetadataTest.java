@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -62,7 +63,6 @@ public class EntityMetadataTest {
 	IconsImageBundle mockIconsImageBundle;
 	EventBus mockEventBus;
 	JiraURLHelper mockJiraURLHelper;
-
 	EntityMetadata entityMetadata;
 	Versionable vb;
 

@@ -163,7 +163,7 @@ public class AddAttachmentDialog {
 		return panel;
 	}
 	
-	private static UploadResult getUploadResult(String html){
+	public static UploadResult getUploadResult(String html){
 		UploadResult result = new UploadResult();
 		result.setUploadStatus(UploadStatus.SUCCESS);
 		if(html != null){

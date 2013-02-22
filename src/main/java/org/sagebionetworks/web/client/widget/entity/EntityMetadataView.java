@@ -19,6 +19,7 @@ public interface EntityMetadataView extends IsWidget {
 	public void showInfo(String string, String message);
 	
 	public void setDetailedMetadataVisible(boolean visible);
+	public void setEntityNameVisible(boolean visible);
 
 	public void showErrorMessage(String message);
 

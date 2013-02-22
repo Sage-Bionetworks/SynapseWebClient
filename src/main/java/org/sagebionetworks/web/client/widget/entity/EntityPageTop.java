@@ -124,16 +124,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return bus.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
 	
-	@Override
-	public boolean isLocationable() {
-		if(bundle.getEntity() instanceof Locationable) {
-			return true;
-		}
-		return false;
-	}
-
 	@Override 
-
 	public boolean isLoggedIn() {
 		return authenticationController.getLoggedInUser() != null;
 	}

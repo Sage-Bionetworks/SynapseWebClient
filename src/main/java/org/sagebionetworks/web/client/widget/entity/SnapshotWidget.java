@@ -7,6 +7,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityGroup;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -51,6 +53,8 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	private NodeModelCreator nodeModelCreator;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
+	private SynapseJSNIUtils synapseJSNIUtils;
+	
 	private boolean canEdit = false;
 	private boolean readOnly = false;
 	private boolean isLoggedIn = false;
@@ -66,7 +70,8 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			SnapshotWidgetView propertyView, SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			SynapseJSNIUtils synapseJSNIUtils) {
 		super();
 		this.factory = factory;
 		this.view = propertyView;
@@ -74,6 +79,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		this.nodeModelCreator = nodeModelCreator;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.setPresenter(this);
 	}
 	
@@ -468,7 +474,13 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 
 		// download
 		String downloadUrl = null;
-		if(referencedEntity instanceof Locationable) {
+		if (referencedEntity instanceof FileEntity) {
+			if(!isLoggedIn)
+				downloadUrl = "#" + nameLinkUrl;
+			else
+				downloadUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), referencedEntity.getId(), ((Versionable)referencedEntity).getVersionNumber(), false);
+		}
+		else if(referencedEntity instanceof Locationable) {
 			List<LocationData> locations = ((Locationable) referencedEntity).getLocations();
 			if(locations != null && locations.size() > 0) {
 				downloadUrl = locations.get(0).getPath();

@@ -5,13 +5,16 @@ import java.util.List;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -23,6 +26,7 @@ import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -33,30 +37,33 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class LocationableUploader implements LocationableUploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable {
+public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable {
 	
-	private LocationableUploaderView view;
+	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager;
 	private Entity entity;
 	private List<AccessRequirement> accessRequirements;
 	private EntityTypeProvider entityTypeProvider;
-	private GlobalApplicationState globalApplicationState;
 	private JSONObjectAdapter jsonObjectAdapter;
 
 	private SynapseClientAsync synapseClient;
 	private JiraURLHelper jiraURLHelper;
+	private CookieProvider cookies;
+	private SynapseJSNIUtils synapseJsniUtils;
 	
 	@Inject
-	public LocationableUploader(
-			LocationableUploaderView view, 			
+	public Uploader(
+			UploaderView view, 			
 			NodeModelCreator nodeModelCreator, 
 			AuthenticationController authenticationController, 
 			EntityTypeProvider entityTypeProvider,
 			SynapseClientAsync synapseClient,
 			JiraURLHelper jiraURLHelper,
-			JSONObjectAdapter jsonObjectAdapter
+			JSONObjectAdapter jsonObjectAdapter,
+			SynapseJSNIUtils synapseJsniUtils,
+			CookieProvider cookies
 			) {
 	
 		this.view = view;		
@@ -66,7 +73,8 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		this.synapseClient = synapseClient;
 		this.jiraURLHelper = jiraURLHelper;
 		this.jsonObjectAdapter=jsonObjectAdapter;
-		this.globalApplicationState = globalApplicationState;
+		this.synapseJsniUtils = synapseJsniUtils;
+		this.cookies= cookies;
 		view.setPresenter(this);		
 		clearHandlers();
 	}		
@@ -75,7 +83,9 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 		this.view.setPresenter(this);
 		this.entity = entity;
 		this.accessRequirements = accessRequirements;
-		this.view.createUploadForm();
+		//do not enable the External, until External FileEntity is supported on the backend
+		boolean isExternalSupported = !DisplayUtils.isInTestWebsite(cookies);
+		this.view.createUploadForm(isExternalSupported);
 		return this.view.asWidget();
 	}
 		
@@ -99,7 +109,8 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	
 	@Override
 	public String getUploadActionUrl(boolean isRestricted) {
-		return GWT.getModuleBaseURL() + "upload" + "?" + 
+		String uploadUrl = DisplayUtils.isInTestWebsite(cookies) ? synapseJsniUtils.getBaseFileHandleUrl() : GWT.getModuleBaseURL() + "upload";
+		return uploadUrl + "?" + 
 			DisplayUtils.ENTITY_PARAM_KEY + "=" + entity.getId() + "&" +
 			DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
 	}
@@ -177,17 +188,37 @@ public class LocationableUploader implements LocationableUploaderView.Presenter,
 	@Override
 	public void handleSubmitResult(String resultHtml, boolean isNewlyRestricted) {
 		if(resultHtml == null) resultHtml = "";
-		// response from server 
-		if(!resultHtml.contains(DisplayUtils.UPLOAD_SUCCESS)) {
-			view.showErrorMessage(DisplayConstants.ERROR_UPLOAD);
-			handlerManager.fireEvent(new CancelEvent());
-		} else {
-			view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE, DisplayConstants.TEXT_UPLOAD_SUCCESS);
-			if (isNewlyRestricted) {
-				view.openNewBrowserTab(getJiraRestrictionLink());
+		// response from server
+		//try to parse
+		UploadResult uploadResult = null;
+		try{
+			uploadResult = AddAttachmentDialog.getUploadResult(resultHtml);
+			if (uploadResult.getUploadStatus() == UploadStatus.SUCCESS) {
+				uploadSuccess(isNewlyRestricted);
+			}else {
+				uploadError();
 			}
-			handlerManager.fireEvent(new EntityUpdatedEvent());
+		} catch (Throwable th) {};//wasn't an UplaodResult
+		
+		if (uploadResult == null) {
+			if(!resultHtml.contains(DisplayUtils.UPLOAD_SUCCESS)) {
+				uploadError();
+			} else {
+				uploadSuccess(isNewlyRestricted);
+			}
 		}
+	}
+	
+	private void uploadError() {
+		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD);
+		handlerManager.fireEvent(new CancelEvent());
+	}
+	private void uploadSuccess(boolean isNewlyRestricted) {
+		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+		if (isNewlyRestricted) {
+			view.openNewBrowserTab(getJiraRestrictionLink());
+		}
+		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 	
 	@Override
