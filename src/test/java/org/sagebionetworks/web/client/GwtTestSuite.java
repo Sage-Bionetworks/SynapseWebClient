@@ -24,6 +24,8 @@ import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
@@ -302,6 +304,14 @@ public class GwtTestSuite extends GWTTestCase {
 		header.setName("RomperRuuuu");
 		path.getPath().add(header);
 		
+		//File Handles
+		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
+		FileHandle fh=new S3FileHandle();
+		fh.setConcreteType(S3FileHandle.class.getName());
+		fh.setFileName("not-a-virus.exe");
+		fh.setId("20");
+		fileHandles.add(fh);
+		
 		List<AccessRequirement> ars = new ArrayList<AccessRequirement>();
 		TermsOfUseAccessRequirement ar = new TermsOfUseAccessRequirement();
 		ar.setEntityType(TermsOfUseAccessRequirement.class.getName());
@@ -315,6 +325,7 @@ public class GwtTestSuite extends GWTTestCase {
 		transport.setAnnotationsJson(factory.createJsonStringForEntity(annos));
 		transport.setPermissionsJson(factory.createJsonStringForEntity(uep));
 		transport.setEntityPathJson(factory.createJsonStringForEntity(path));
+		transport.setFileHandlesJson(entityListToString(fileHandles));
 	
 		transport.setAccessRequirementsJson(entityListToString(ars));
 		transport.setUnmetAccessRequirementsJson(entityListToString(ars));
@@ -329,6 +340,7 @@ public class GwtTestSuite extends GWTTestCase {
 		assertEquals(uep, results.getPermissions());
 		assertEquals(ars, results.getAccessRequirements());
 		assertEquals(ars, results.getUnmetAccessRequirements());
+		assertEquals(fileHandles, results.getFileHandles());
 	}
 	
 	public static String entityListToString(List<? extends JSONEntity> list) throws JSONObjectAdapterException {		
