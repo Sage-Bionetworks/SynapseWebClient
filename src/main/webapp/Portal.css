@@ -473,8 +473,8 @@ a.shortBtn {
 	margin-left: 180px;
 }
 
-.margin-left-490 {
-	margin-left: 490px;
+.margin-left-35 {
+	margin-left: 35px;
 }
 
 
@@ -520,7 +520,13 @@ a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
 }
 
 .markdown code {
-	color: #1a0084;
+	background-clip: padding-box;
+    border: 1px solid #DDDDDD;
+    border-radius: 3px 3px 3px 3px;
+    color: #666666;
+    font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
+    font-family: Courier,monospace;
+    padding: 0 5px 2px
 }
 
 .entity-description-preview-wrapper {
@@ -704,7 +710,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /**********************************/
-
+	
 .wikifilepreviewimg {
 	margin:auto; 
 	display:block;
@@ -734,7 +740,7 @@ h1, h2, h3, h4, h5, h6 {
 	text-decoration:none; 
 }
 
-
+	
 
 .gwt-TreeItem-selected {
   background: #ffffff !important;

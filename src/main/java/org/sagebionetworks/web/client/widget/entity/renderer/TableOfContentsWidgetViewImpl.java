@@ -6,6 +6,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -64,7 +65,7 @@ public class TableOfContentsWidgetViewImpl extends LayoutContainer implements Ta
 				a.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
-						scrollToElement.scrollIntoView();
+						Window.scrollTo(0, scrollToElement.getOffsetTop());
 					}
 				});
 				wrapper.add(a);

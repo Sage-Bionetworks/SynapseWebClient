@@ -12,10 +12,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.pegdown.PegDownProcessor;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -67,7 +67,6 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -75,6 +74,8 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
+
+import eu.henkelmann.actuarius.ActuariusTransformer;
 
 @SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -88,7 +89,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
-	PegDownProcessor markdownProcessor = new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS);
+	ActuariusTransformer markdownProcessor = new ActuariusTransformer();
 	
 	/**
 	 * Injected with Gin
@@ -180,7 +181,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		try {			
 			Synapse synapseClient = createSynapseClient();			
-			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);
+			EntityBundle eb;
+			//TODO:remove the try catch when PLFM-1752 is fixed
+			try {
+				eb = synapseClient.getEntityBundle(entityId, partsMask);
+				} catch(SynapseNotFoundException e) {
+				//if we're trying to get the filehandles, then give another try without the filehandles
+				if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0) {
+					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES) & partsMask;
+					eb = synapseClient.getEntityBundle(entityId, newPartsMask);
+				}
+				else throw e;
+			}
 			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -191,8 +203,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public EntityBundleTransport getEntityBundleForVersion(String entityId,
 			Long versionNumber, int partsMask) throws RestServiceException {
 		try {			
-			Synapse synapseClient = createSynapseClient();			
-			EntityBundle eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
+			Synapse synapseClient = createSynapseClient();
+			EntityBundle eb;
+			//TODO:remove the try catch when PLFM-1752 is fixed
+			try {
+				eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
+			} catch(SynapseNotFoundException e) {
+				//if we're trying to get the filehandles, then give another try without the filehandles
+				if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0) {
+					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES) & partsMask;
+					eb = synapseClient.getEntityBundle(entityId, versionNumber, newPartsMask);
+				}
+				else throw e;
+			}
+			
 			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -322,6 +346,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask)!=0) {
 				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb.getUnmetAccessRequirements()));
 			}
+			if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0 && eb.getFileHandles() != null)
+				ebt.setFileHandlesJson(createJSONStringFromArray(eb.getFileHandles()));
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());			
 		}
@@ -350,6 +376,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
+		synapseClient.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
 		return synapseClient;
 	}
 
@@ -853,6 +880,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} 
 	}
 	@Override
+	@Deprecated
 	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
@@ -870,9 +898,32 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} 
 	}
 	
+//	@Override
+//	public EntityWrapper updateExternalFile(String entityId, String externalUrl) throws RestServiceException {
+//		Synapse synapseClient = createSynapseClient();
+//		try {
+//			Entity entity = synapseClient.getEntityById(entityId);
+//			if(!(entity instanceof FileEntity)) {
+//				throw new RuntimeException("Upload failed. Entity id: " + entity.getId() + " is not a File.");
+//			}
+//			
+//			Locationable result = synapseClient.updateExternalLocationableToSynapse((Locationable)locationable, externalUrl);
+//			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());
+//			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+//		} catch (JSONObjectAdapterException e) {
+//			throw new UnknownErrorException(e.getMessage());
+//		} 
+//	}
+
 	@Override
-	public String markdown2Html(String markdown, Boolean isPreview) {
-		return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException{
+		try {
+			return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+		} catch (IOException e) {
+			throw new RestServiceException(e.getMessage());
+		}
 	}
 
 	@Override
@@ -1023,14 +1074,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	private String getRootWikiId(String ownerId, ObjectType ownerType) throws RestServiceException{
-		PaginatedResults<WikiHeader> results = getWikiHeaderTree(ownerId, ownerType);
-		for (WikiHeader header : results.getResults()) {
-			if (header.getParentId() == null) {
-				return header.getId();
-			}
+	private String getRootWikiId(Synapse synapseClient, String ownerId, ObjectType ownerType) throws RestServiceException{
+		try{
+			WikiPage rootPage = synapseClient.getRootWikiPage(ownerId, ownerType);
+			if (rootPage != null)
+				return rootPage.getId();
+			else return null;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		}
-		return null;
 	}
 	
 	@Override
@@ -1039,7 +1093,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			if (key.getWikiPageId() == null) {
 				//asking for the root.  find the root id first
-				String rootWikiPage = getRootWikiId(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+				String rootWikiPage = getRootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
 			}
 			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
@@ -1081,7 +1135,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			if (key.getWikiPageId() == null) {
 				//asking for the root.  find the root id first
-				String rootWikiPage = getRootWikiId(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+				String rootWikiPage = getRootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
 			}
 			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());

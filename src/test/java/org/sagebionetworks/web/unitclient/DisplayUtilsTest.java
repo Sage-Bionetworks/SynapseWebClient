@@ -8,9 +8,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.MarkdownUtils;
 
 public class DisplayUtilsTest {
 	
@@ -101,13 +99,6 @@ public class DisplayUtilsTest {
 		DisplayUtils.getYouTubeVideoId(testVideoUrl);
 	}
 	
-	@Test
-	public void testAttachmentLinkMarkdown(){
-		String expectedResult = "![Example](Attachment/entity/syn12345/tokenId/tokenA/1234/previewTokenId/previewA/5678 \"my title\")";
-		String actualResult = MarkdownUtils.getAttachmentLinkMarkdown("Example", "syn12345", "tokenA/1234", "previewA/5678", "my title");
-		Assert.assertEquals(actualResult, expectedResult);
-	}
-
 	@Test
 	public void testGetFileNameFromLocationPath() {
 		String name = "filename.txt";

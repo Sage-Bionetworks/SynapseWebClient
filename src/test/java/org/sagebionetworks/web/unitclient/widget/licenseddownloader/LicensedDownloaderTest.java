@@ -21,12 +21,15 @@ import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -37,6 +40,7 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
@@ -71,6 +75,7 @@ public class LicensedDownloaderTest {
 	JSONObjectAdapter jsonObjectAdapterProvider;
 	EntityTypeProvider entityTypeProvider;
 	Locationable entity;
+	EntityBundle entityBundle;
 	Entity parentEntity;
 	UserSessionData user1;
 	List<LocationData> locations;	
@@ -125,7 +130,9 @@ public class LicensedDownloaderTest {
 		entity.setParentId(parentEntity.getId());
 		entity.setMd5(md5sum);
 		entity.setContentType(contentType);
-
+		
+		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
+		
 		// path for entity
 		entityPath = new EntityPath();
 		List<EntityHeader> path = new ArrayList<EntityHeader>();
@@ -169,21 +176,19 @@ public class LicensedDownloaderTest {
 		
 	}
 	
-
-	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadDownloadLocations() throws RestServiceException {
 				
 		// null model
 		resetMocks();
-		licensedDownloader.loadDownloadLocations(null);
+		licensedDownloader.loadDownloadUrl(null);
 		
 		// Null locations
 		resetMocks();			
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		((Locationable)entity).setLocations(null);		
-		licensedDownloader.loadDownloadLocations(entity);
+		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();
 		verify(mockView).setNoDownloads();	
 
@@ -191,7 +196,7 @@ public class LicensedDownloaderTest {
 		resetMocks();
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false); // not logged in
 		entity.setLocations(locations);
-		licensedDownloader.loadDownloadLocations(entity);
+		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setNeedToLogIn();
 
@@ -199,10 +204,52 @@ public class LicensedDownloaderTest {
 		resetMocks();			
 		entity.setLocations(locations);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		licensedDownloader.loadDownloadLocations(entity);
+		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setDownloadLocations(locations, entity.getMd5());
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadFileDownloadUrl() throws RestServiceException {
+		FileEntity entity = new FileEntity();
+		entity.setId("myFileEntityId");
+		entity.setVersionNumber(4l);
+		resetMocks();
+		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
+		
+		// Null locations
+		resetMocks();			
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		entityBundle.setFileHandles(null);		
+		licensedDownloader.loadDownloadUrl(entityBundle);
+		verify(mockView).showDownloadsLoading();
+		verify(mockView).setNoDownloads();	
+
+		// Not Logged in Test: Download
+		resetMocks();
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false); // not logged in
+		licensedDownloader.loadDownloadUrl(entityBundle);
+		verify(mockView).showDownloadsLoading();		
+		verify(mockView).setNeedToLogIn();
+
+		// Success Test: Download
+		resetMocks();			
+		String fileHandleId = "22";
+		S3FileHandle fileHandle = new S3FileHandle();
+		fileHandle.setContentMd5("myContentMd5");
+		fileHandle.setFileName("myFileName.png");
+		fileHandle.setId(fileHandleId);
+		List fileHandles = new ArrayList<FileHandle>();
+		fileHandles.add(fileHandle);
+		((FileEntity)entityBundle.getEntity()).setDataFileHandleId(fileHandleId);
+		entityBundle.setFileHandles(fileHandles);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		licensedDownloader.loadDownloadUrl(entityBundle);
+		verify(mockView).showDownloadsLoading();		
+		verify(mockView).setDownloadLocation(fileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), fileHandle.getContentMd5());
+	}
+
 
 	@Test
 	public void testAsWidget(){

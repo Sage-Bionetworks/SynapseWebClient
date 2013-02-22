@@ -142,17 +142,4 @@ public class EntityEditorTest {
 		
 //		verify(mockPlaceChanger).goTo(any(Place.class));
 	}
-	
-	
-	private EntityBundle createNewBundle(){
-		ExampleEntity entity = new ExampleEntity();
-		entity.setEntityType(ExampleEntity.class.getName());
-		entity.setName("My Name");
-		entity.setCreatedBy("ByGeorge!");
-		Annotations annos = new Annotations();
-		annos.addAnnotation("stringKey", "a big string");
-		return  new EntityBundle(entity, annos, null, null, null, null, null);
-	}
-	
-
 }

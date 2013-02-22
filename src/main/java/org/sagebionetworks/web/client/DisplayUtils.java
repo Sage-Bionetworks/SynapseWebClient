@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ExpressionData;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
@@ -49,7 +50,7 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
@@ -150,11 +151,12 @@ public class DisplayUtils {
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
+	public static final String ENTITY_VERSION_PARAM_KEY = "version";
 	public static final String WIKI_OWNER_ID_PARAM_KEY = "ownerId";
 	public static final String WIKI_OWNER_TYPE_PARAM_KEY = "ownerType";
 	public static final String WIKI_ID_PARAM_KEY = "wikiId";
 	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
-	public static final String WIKI_PREVIEW_PARAM_KEY = "preview";
+	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
 	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
 	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
@@ -769,6 +771,10 @@ public class DisplayUtils {
 			// Folder
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();			
+		} else if(FileEntity.class.getName().equals(className)) {
+			// File
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
 //		} else if(Model.class.getName().equals(className)) {
 			// Model
 //			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
@@ -1224,9 +1230,9 @@ public class DisplayUtils {
 	 * @param entityType 
 	 */
 	public static Widget getUploadButton(final EntityBundle entityBundle,
-			EntityType entityType, final LocationableUploader locationableUploader,
+			EntityType entityType, final Uploader locationableUploader,
 			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
-		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
+		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
 		final Window window = new Window();  
 		locationableUploader.clearHandlers();
@@ -1254,7 +1260,7 @@ public class DisplayUtils {
 				window.setSize(400, 320);
 				window.setPlain(true);
 				window.setModal(true);		
-				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
+				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 				window.setLayout(new FitLayout());			
 				window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
 				window.show();
@@ -1318,12 +1324,31 @@ public class DisplayUtils {
 //				+wikiKey.getWikiPageId()
 //				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
 		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+
+			//if preview, then avoid cache
+			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
 		return baseFileHandleUrl + "?" +
 				WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
 				WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
 				WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
-				WIKI_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
-				wikiIdParam;
+					FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+					wikiIdParam + nocacheParam;
+	}
+		
+	/**
+	 * Create the url to a FileEntity filehandle.
+	 * @param baseURl
+	 * @param entityid
+	 * @return
+	 */
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+		String versionParam = versionNumber == null ? "" : "&" + ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
+		//if preview, then avoid cache
+		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+		return baseFileHandleUrl + "?" +
+				ENTITY_PARAM_KEY + "=" + entityId + "&" +
+				FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+				versionParam + nocacheParam;
 	}
 
 	public static String createEntityVersionString(Reference ref) {

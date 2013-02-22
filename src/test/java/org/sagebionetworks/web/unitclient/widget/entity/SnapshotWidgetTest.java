@@ -30,6 +30,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
@@ -58,7 +60,8 @@ public class SnapshotWidgetTest {
 	PlaceChanger mockPlaceChanger;
 	SynapseClientAsync mockSynapseClient;
 	AutoGenFactory autoGenFactory;
-	
+	CookieProvider mockCookies;
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	SnapshotWidget snapshotWidget;
 	SnapshotWidgetView mockView;
 	Summary snapshot;
@@ -79,8 +82,9 @@ public class SnapshotWidgetTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockView = mock(SnapshotWidgetView.class);
-		
-		snapshotWidget = new SnapshotWidget(factory, mockView, mockSynapseClient, mockNodeModelCreator, mockGlobal, mockAuthenticationController);
+		mockCookies = mock(CookieProvider.class);
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
+		snapshotWidget = new SnapshotWidget(factory, mockView, mockSynapseClient, mockNodeModelCreator, mockGlobal, mockAuthenticationController, mockSynapseJSNIUtils);
 		snapshot = createDefaultSnapshot();
 	}
 	

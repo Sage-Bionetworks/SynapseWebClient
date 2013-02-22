@@ -35,8 +35,8 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class LocationableUploaderViewImpl extends LayoutContainer implements
-		LocationableUploaderView {
+public class UploaderViewImpl extends LayoutContainer implements
+		UploaderView {
 
 	private Presenter presenter;
 
@@ -58,7 +58,7 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 	private JavaScriptObject window;
 
 	@Inject
-	public LocationableUploaderViewImpl() {
+	public UploaderViewImpl() {
 		// initialize graphic elements
 		this.fileUploadOpenRadio = new Radio();
 		this.fileUploadRestrictedRadio = new Radio();	
@@ -103,10 +103,9 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 	}
 	
 	@Override
-	public void createUploadForm() {
+	public void createUploadForm(boolean isExternalSupported) {
 		initializeControls();
-		
-		createTabPanel();
+		createTabPanel(isExternalSupported);
 	}
 	
 	@Override
@@ -122,8 +121,7 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 	 * Private Methods
 	 */
 	
-	private void createTabPanel() {
-		
+	private void createTabPanel(boolean isExternalSupported) {
 		this.removeAll();
 		setLayout(new FitLayout());
 		
@@ -132,17 +130,15 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		this.add(tabPanel);
 		
 		TabItem tab = new TabItem(DisplayConstants.LABEL_UPLOAD_TO_SYNAPSE);
-		tab.addStyleName("pad-text");		
-		tab.setLayout(new FlowLayout());
-		addWarningToTab(tab);
-		addRadioButtonsToLayoutContainer(tab, fileUploadOpenRadio, fileUploadRestrictedRadio);
-		tab.add(formPanel);
+		addUploadComponentsToLayoutContainer(tab);
 		tabPanel.add(tab);
 
 		tab = new TabItem(DisplayConstants.LABEL_TO_EXTERNAL);
+		if (!isExternalSupported)
+			tab.setEnabled(false);
 		tab.addStyleName("pad-text");		
 		tab.setLayout(new FlowLayout());
-		addWarningToTab(tab);
+		addWarningToLayoutContainer(tab);
 		addRadioButtonsToLayoutContainer(tab, linkExternalOpenRadio, linkExternalRestrictedRadio);
 		tab.add(createExternalPanel());
 		
@@ -151,6 +147,14 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 		
 		this.setSize(PANEL_WIDTH+200, PANEL_HEIGHT);
 		this.layout(true);
+	}
+	
+	private void addUploadComponentsToLayoutContainer(LayoutContainer uploadContainer) {
+		uploadContainer.addStyleName("pad-text");
+		uploadContainer.setLayout(new FlowLayout());
+		addWarningToLayoutContainer(uploadContainer);
+		addRadioButtonsToLayoutContainer(uploadContainer, fileUploadOpenRadio, fileUploadRestrictedRadio);
+		uploadContainer.add(formPanel);
 	}
 
 	
@@ -174,13 +178,15 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 	
 	private void openSelected() {
 		uploadBtn.setEnabled(true);
-		saveExternalLinkButton.setEnabled(true);
+		if (saveExternalLinkButton != null)
+			saveExternalLinkButton.setEnabled(true);
 		formPanel.setAction(presenter.getUploadActionUrl(/*isRestricted*/false));		
 	}
 	
 	private void restrictedSelected() {
 		uploadBtn.setEnabled(true);
-		saveExternalLinkButton.setEnabled(true);
+		if(saveExternalLinkButton != null)
+			saveExternalLinkButton.setEnabled(true);
 		formPanel.setAction(presenter.getUploadActionUrl(/*isRestricted*/true));		
 	}
 	
@@ -270,11 +276,11 @@ public class LocationableUploaderViewImpl extends LayoutContainer implements
 
 }
 
-	private static void addWarningToTab(TabItem tabItem) {
+	private static void addWarningToLayoutContainer(LayoutContainer container) {
 		Label lf = new Label(DisplayConstants.FILE_DOWNLOAD_NOTE);
 		lf.setWidth(PANEL_WIDTH);
 		lf.setAutoHeight(true);
-		tabItem.add(lf);
+		container.add(lf);
 	}
 	
 	private void addRadioButtonsToLayoutContainer(

@@ -2,13 +2,13 @@ package org.sagebionetworks.web.client.model;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 /**
@@ -28,12 +28,13 @@ public class EntityBundle {
 	private List<AccessRequirement> accessRequirements;
 	private List<AccessRequirement> unmetAccessRequirements;
 	private Boolean hasChildren;
+	private List<FileHandle> fileHandles;
 	
 	public EntityBundle(Entity entity, Annotations annotations,
 			UserEntityPermissions permissions, EntityPath path, 
 			PaginatedResults<EntityHeader> referencedBy,
 			List<AccessRequirement> accessRequirements,
-		List<AccessRequirement> unmetAccessRequirements
+		List<AccessRequirement> unmetAccessRequirements, List<FileHandle> fileHandles
 	) {
 		super();
 		this.entity = entity;
@@ -43,6 +44,7 @@ public class EntityBundle {
 		this.referencedBy = referencedBy;
 		this.accessRequirements=accessRequirements;
 		this.unmetAccessRequirements=unmetAccessRequirements;
+		this.fileHandles = fileHandles;
 	}
 	public Entity getEntity() {
 		return entity;
@@ -96,6 +98,13 @@ public class EntityBundle {
 		this.unmetAccessRequirements = unmetAccessRequirements;
 	}
 	
+	public List<FileHandle> getFileHandles() {
+		return fileHandles;
+	}
+	
+	public void setFileHandles(List<FileHandle> fileHandles) {
+		this.fileHandles = fileHandles;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -107,6 +116,8 @@ public class EntityBundle {
 		result = prime * result
 				+ ((annotations == null) ? 0 : annotations.hashCode());
 		result = prime * result + ((entity == null) ? 0 : entity.hashCode());
+		result = prime * result
+				+ ((fileHandles == null) ? 0 : fileHandles.hashCode());
 		result = prime * result
 				+ ((hasChildren == null) ? 0 : hasChildren.hashCode());
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
@@ -144,6 +155,11 @@ public class EntityBundle {
 				return false;
 		} else if (!entity.equals(other.entity))
 			return false;
+		if (fileHandles == null) {
+			if (other.fileHandles != null)
+				return false;
+		} else if (!fileHandles.equals(other.fileHandles))
+			return false;
 		if (hasChildren == null) {
 			if (other.hasChildren != null)
 				return false;
@@ -179,7 +195,10 @@ public class EntityBundle {
 				+ path + ", referencedBy=" + referencedBy
 				+ ", accessRequirements=" + accessRequirements
 				+ ", unmetAccessRequirements=" + unmetAccessRequirements
-				+ ", hasChildren=" + hasChildren + "]";
+				+ ", hasChildren=" + hasChildren + ", fileHandles=" + fileHandles
+				+ "]";
 	}
+	
+	
 
 }

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.menu;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
@@ -15,6 +16,7 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -23,7 +25,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
@@ -57,10 +59,11 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private AccessControlListEditor accessControlListEditor;
-	private LocationableUploader locationableUploader;
+	private Uploader locationableUploader;
 	private EntityTypeProvider typeProvider;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityFinder entityFinder;
+	private CookieProvider cookies;
 	
 	private boolean readOnly;	
 	private Button editButton;
@@ -74,16 +77,17 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			IconsImageBundle iconsImageBundle, 
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
-			LocationableUploader locationableUploader, 
+			Uploader locationableUploader, 
 			EntityTypeProvider typeProvider,
 			SynapseJSNIUtils synapseJSNIUtils,
-			EntityFinder entityFinder) {
+			EntityFinder entityFinder, CookieProvider cookies) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.locationableUploader = locationableUploader;
 		this.typeProvider = typeProvider;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.entityFinder = entityFinder;
+		this.cookies = cookies;
 		this.setHorizontalAlign(HorizontalAlignment.RIGHT);
 		this.setTableWidth("100%");
 	}
@@ -134,10 +138,11 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			this.add(addButton);
 			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
+		
 		if (canEdit && !readOnly) addButton.enable();
 		else addButton.disable();
 		configureAddMenu(entity, entityType);
-
+		
 		if(toolsButton == null) {
 			toolsButton = new Button(DisplayConstants.BUTTON_TOOLS_MENU, AbstractImagePrototype.create(iconsImageBundle.adminToolsGrey16()));
 			toolsButton.setHeight(25);
@@ -369,8 +374,10 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	 * @param entityType 
 	 */
 	private void addUploadItem(Menu menu, final EntityBundle entityBundle, EntityType entityType) {
-		if(entityBundle.getEntity() instanceof Locationable) {
-			MenuItem item = new MenuItem(DisplayConstants.TEXT_UPLOAD_FILE);
+		//if this is a FileEntity, then only show the upload item if we're in the test website
+		boolean isFileEntity = DisplayUtils.isInTestWebsite(cookies) && entityBundle.getEntity() instanceof FileEntity;
+		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
+			MenuItem item = new MenuItem(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 			item.setIcon(AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 			final Window window = new Window();  
 			locationableUploader.clearHandlers();
@@ -394,7 +401,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 					window.setSize(400, 320);
 					window.setPlain(true);
 					window.setModal(true);		
-					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
+					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 					window.setLayout(new FitLayout());			
 					window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
 					window.show();
