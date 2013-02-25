@@ -85,8 +85,8 @@ public class AppActivityMapper implements ActivityMapper {
 	public Activity getActivity(Place place) {
 		synapseJSNIUtils.recordPageVisit(synapseJSNIUtils.getCurrentHistoryToken());
 	    
-		DisplayUtils.setPageTitle(DisplayConstants.DEFAULT_PAGE_TITLE);
-	    DisplayUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
+		synapseJSNIUtils.setPageTitle(DisplayConstants.DEFAULT_PAGE_TITLE);
+		synapseJSNIUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
 	    
 	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();

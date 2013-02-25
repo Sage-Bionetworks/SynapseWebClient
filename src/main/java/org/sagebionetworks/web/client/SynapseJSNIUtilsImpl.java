@@ -9,6 +9,9 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.MetaElement;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
@@ -128,5 +131,25 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return layoutResult;
 	}-*/;
 
+	@Override
+	public void setPageTitle(String newTitle) {
+	    if (Document.get() != null) {
+	        Document.get().setTitle (newTitle);
+	    }
+	}
+	
+	@Override
+	public void setPageDescription(String newDescription) {
+		if (Document.get() != null) {
+			NodeList<com.google.gwt.dom.client.Element> tags = Document.get().getElementsByTagName("meta");
+		    for (int i = 0; i < tags.getLength(); i++) {
+		        MetaElement metaTag = ((MetaElement) tags.getItem(i));
+		        if (metaTag.getName().equals("description")) {
+		            metaTag.setContent(newDescription);	//doesn't seem to work
+		            break;
+		        }
+		    }
+		}
+	}
 	
 }
