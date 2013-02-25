@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.server;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,7 +79,24 @@ public class ServerMarkdownUtils {
 //		lastTime = currentTime;
 //	}
 
+	private static int getLargestHeadingLevel(Document doc){
+		int i = 0; //start at 0
+		for (; i < 7; i++) {
+			if (!(doc.getElementsByTag("h"+i).isEmpty()))
+				break;
+		}
+		return i;
+	}
+	
 	public static void assignIdsToHeadings(Document doc) {
+		//find the biggest heading level
+		int largestHeadingLevel = getLargestHeadingLevel(doc);
+		Map<String, String> headingLevel2StyleName = new HashMap<String, String>();
+		int indentLevel = 0;
+		for (int i = largestHeadingLevel; i < 7; i++, indentLevel++) {
+			headingLevel2StyleName.put("h" + i, "toc-indent"+indentLevel);
+		}
+		
 		Elements hTags = doc.select("h0, h1, h2, h3, h4, h5, h6");
 		int headingIndex = 0;
 		for (int i = 0; i < hTags.size(); i++) {
@@ -96,6 +115,7 @@ public class ServerMarkdownUtils {
 			if (!skip) {
 				hTag.attr("id", WidgetConstants.MARKDOWN_HEADING_ID_PREFIX+headingIndex);
 				hTag.attr("level", hTag.tag().getName());
+				hTag.addClass(headingLevel2StyleName.get(hTag.tag().getName()));
 				headingIndex++;
 			}
 		}

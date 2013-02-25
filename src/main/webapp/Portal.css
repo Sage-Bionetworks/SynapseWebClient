@@ -749,23 +749,23 @@ h1, h2, h3, h4, h5, h6 {
 
 /**table of contents styling **/
 /** .8em to 1.2em **/
-.toc-small {
+.toc-indent4 {
 	font-size: .8em;
 	margin-left: 40px;
 }
-.toc-h1 {
+.toc-indent0 {
 	font-size: 1.2em;
 	margin-left: 0px;
 }
-.toc-h2 {
+.toc-indent1 {
 	font-size: 1.1em;
 	margin-left: 10px;
 }
-.toc-h3 {
+.toc-indent2 {
 	font-size: 1.0em;
 	margin-left: 20px;
 }
-.toc-h4 {
+.toc-indent3 {
 	font-size: 0.9em;
 	margin-left: 30px;
 }	
