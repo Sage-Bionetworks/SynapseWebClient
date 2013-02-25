@@ -371,6 +371,13 @@ public class ProvenanceWidgetTest {
 					NChartCharacters characters) {
 				return jsoProvider.newLayoutResult();
 			}
+			@Override
+			public void setPageDescription(String newDescription) {
+				
+			}
+			
+			@Override
+			public void setPageTitle(String newTitle) {};
 		};
 	}
 

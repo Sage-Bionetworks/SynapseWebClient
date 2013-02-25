@@ -280,6 +280,16 @@ public class ProvUtilsTest {
 			public LayoutResult nChartlayout(NChartLayersArray layers, NChartCharacters characters) {
 				return null;
 			}
+			@Override
+			public void setPageDescription(String newDescription) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void setPageTitle(String newTitle) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 

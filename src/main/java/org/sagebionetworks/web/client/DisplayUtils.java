@@ -74,6 +74,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -1300,10 +1301,8 @@ public class DisplayUtils {
 		} else{
 			cookies.removeCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY);
 		}
-			
-		
 	}
-
+	
 	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
 
 	/**
@@ -1374,5 +1373,15 @@ public class DisplayUtils {
 			}
 		}		
 		return ref;		
+	}
+	
+	public static boolean hasRecognizedImageExtension(String fileName) {
+		String lowerFileName = fileName.toLowerCase();
+		return lowerFileName.endsWith(".png") ||
+				lowerFileName.endsWith(".jpg") ||
+				lowerFileName.endsWith(".jpeg") ||
+				lowerFileName.endsWith(".tiff") ||
+				lowerFileName.endsWith(".gif") ||
+				lowerFileName.endsWith(".bmp");
 	}
 }

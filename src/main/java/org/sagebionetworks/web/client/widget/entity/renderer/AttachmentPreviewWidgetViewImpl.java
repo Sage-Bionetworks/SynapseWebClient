@@ -24,12 +24,20 @@ public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements 
 		//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 		//create img
 		StringBuilder sb = new StringBuilder();
-		sb.append("<a href=\"");
+		sb.append("<a class=\"link\" href=\"");
 		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
-		sb.append("\"><img class=\"imageDescriptor\" ");
-		sb.append(" src=\"");
-		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
-		sb.append("\"></img></a>");
+		sb.append("\">");
+		if (DisplayUtils.hasRecognizedImageExtension(fileName)) {
+			sb.append("<img class=\"imageDescriptor\" ");
+			sb.append(" src=\"");
+			sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
+			sb.append("\"></img>");
+		}
+		else {
+			sb.append(fileName);
+		}
+		sb.append("</a>");
+	
 		add(new HTMLPanel(sb.toString()));
 		this.layout(true);
 	}
