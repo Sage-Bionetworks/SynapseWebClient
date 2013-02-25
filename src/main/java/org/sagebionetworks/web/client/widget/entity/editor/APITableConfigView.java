@@ -21,6 +21,7 @@ public interface APITableConfigView extends IsWidget, WidgetEditorView {
 	public String getRowNumberColumnName();
 	public String getJsonResultsKeyName();
 	public String getCssStyle();
+	public String getColumnConfigs();
 	
 	/**
 	 * Presenter interface

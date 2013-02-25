@@ -342,6 +342,7 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_WIDTH = "Width (% or pixels)";
 	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
 	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
+	public static final String SYNAPSE_API_CALL_COL_CONFIGS_COL_NAME = "Column Configurations:";
 	
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
 	public static final String SHOW_EXPAND = "Show Expand";

@@ -51,6 +51,7 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, view.getRowNumberColumnName());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, view.getJsonResultsKeyName());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE, view.getCssStyle());
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIGS, view.getColumnConfigs());
 	}
 	
 	private void updateDescriptor(String key, String value) {
