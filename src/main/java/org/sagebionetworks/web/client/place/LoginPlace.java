@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
+import com.google.gwt.place.shared.Prefix;
 
 public class LoginPlace extends Place {
 	
@@ -21,6 +22,7 @@ public class LoginPlace extends Place {
 		return token;
 	}
 	
+	@Prefix("!LoginPlace")
 	public static class Tokenizer implements PlaceTokenizer<LoginPlace> {
         @Override
         public String getToken(LoginPlace place) {

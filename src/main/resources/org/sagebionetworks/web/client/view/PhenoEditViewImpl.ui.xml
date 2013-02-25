@@ -27,7 +27,7 @@
 	<!-- end header -->
 
 					<ul class="breadcrumbs">
-						<li class="breadcrumb"><a href="#">Home</a> > <a href="#DatasetsHome:0">All Datasets</a> > <span ui:field="breadcrumbDatasetSpan" /> > <span ui:field="breadcrumbLayerSpan" /> > <span ui:field="breadcrumbTitleSpan" /></li>
+						<li class="breadcrumb"><a href="#">Home</a> > <a href="#!DatasetsHome:0">All Datasets</a> > <span ui:field="breadcrumbDatasetSpan" /> > <span ui:field="breadcrumbLayerSpan" /> > <span ui:field="breadcrumbTitleSpan" /></li>
 					</ul>
 					<h2>Clinical / Phenotype Editor</h2>
 					<div class="info">

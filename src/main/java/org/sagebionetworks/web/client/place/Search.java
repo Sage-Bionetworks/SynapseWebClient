@@ -2,19 +2,48 @@ package org.sagebionetworks.web.client.place;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
+import com.google.gwt.place.shared.Prefix;
 
 public class Search extends Place{
 	
-	private String token;
-
+	public static final String START_DELIMITER = "/start/";
+	private String token, searchTerm;
+	private Long start;
+	
 	public Search(String token) {
 		this.token = token;
+		if(token.contains(START_DELIMITER)) {
+			String[] parts = token.split(START_DELIMITER);
+			if(parts.length == 2) {				
+				searchTerm = parts[0];
+				start = Long.parseLong(parts[1]);
+				return;
+			} 		
+		} 
+		//default
+		searchTerm = token;
+	}
+	
+	public Search(String searchTerm, Long start) {		
+		this.token = searchTerm;
+		if(start != null) 
+			this.token += START_DELIMITER + start;
+		this.searchTerm = searchTerm;
+		this.start = start;
+	}
+	
+	public String getSearchTerm() {
+		return searchTerm;
+	}
+	
+	public Long getStart() {
+		return start;
 	}
 
 	public String toToken() {
 		return token;
 	}
-	
+	@Prefix("!Search")
 	public static class Tokenizer implements PlaceTokenizer<Search> {
         @Override
         public String getToken(Search place) {

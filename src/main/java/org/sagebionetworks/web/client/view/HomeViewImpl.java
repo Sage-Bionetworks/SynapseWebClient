@@ -126,9 +126,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		sp.add(new HTML(SafeHtmlUtils.fromSafeConstant(
 				"<div class=\"span-6 inner-6 view notopmargin\">" +
-				"<h5><a class=\"link\" href=\"#BCCOverview:0\">Sage / DREAM Breast Cancer Prognosis Challenge</a></h5>"+
+				"<h5><a class=\"link\" href=\"#!BCCOverview:0\">Sage / DREAM Breast Cancer Prognosis Challenge</a></h5>"+
 				description+
-				"<a class=\"button_readmore\" href=\"#BCCOverview:0\"></a></div>")));
+				"<a class=\"button_readmore\" href=\"#!BCCOverview:0\"></a></div>")));
 		bccSignup.clear();
 		bccSignup.add(sp);
 	}

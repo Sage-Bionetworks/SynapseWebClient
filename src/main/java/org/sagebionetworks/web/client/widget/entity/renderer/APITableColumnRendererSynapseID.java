@@ -33,7 +33,7 @@ public class APITableColumnRendererSynapseID implements APITableColumnRenderer {
 	}
 	
 	public static String getSynapseLinkHTML(String value) {
-		return "<a class=\"link\" href=\"#Synapse:"+value+"\">"+value+"</a>";
+		return "<a class=\"link\" href=\"#!Synapse:"+value+"\">"+value+"</a>";
 	}
 
 }

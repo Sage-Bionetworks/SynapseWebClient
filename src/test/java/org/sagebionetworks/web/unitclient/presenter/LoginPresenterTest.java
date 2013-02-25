@@ -60,7 +60,7 @@ public class LoginPresenterTest {
 		when(mockJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
 		when(mockJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
 		loginPresenter.setPlace(place);
-		Assert.assertEquals("/Portal.html?foo=bar#LoginPlace", loginPresenter.getOpenIdReturnUrl());
+		Assert.assertEquals("/Portal.html?foo=bar#!LoginPlace", loginPresenter.getOpenIdReturnUrl());
 	}
 	
 	@Test

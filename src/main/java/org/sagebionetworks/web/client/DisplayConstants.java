@@ -409,7 +409,7 @@ public class DisplayConstants {
 	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to these data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
 	
-	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
+	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
 	public static String GOVERNANCE_REFERENCE = "For more information on data access conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
 	
