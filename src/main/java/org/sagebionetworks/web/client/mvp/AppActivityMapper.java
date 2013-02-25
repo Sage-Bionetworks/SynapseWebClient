@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -83,8 +84,11 @@ public class AppActivityMapper implements ActivityMapper {
 	@Override
 	public Activity getActivity(Place place) {
 		synapseJSNIUtils.recordPageVisit(synapseJSNIUtils.getCurrentHistoryToken());
-		
-		AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
+	    
+		DisplayUtils.setPageTitle(DisplayConstants.DEFAULT_PAGE_TITLE);
+	    DisplayUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
+	    
+	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
 		
 		// set current and last places

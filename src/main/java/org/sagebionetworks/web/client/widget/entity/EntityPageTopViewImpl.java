@@ -176,6 +176,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			// default entity view
 			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		}
+		DisplayUtils.setPageTitle(bundle.getEntity().getId() + ": " + bundle.getEntity().getName());
+		DisplayUtils.setPageDescription(bundle.getEntity().getDescription());
 
 		colLeftContainer.layout(true);
 		colRightContainer.layout(true);

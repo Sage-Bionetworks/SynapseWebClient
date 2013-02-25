@@ -74,6 +74,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -1300,8 +1301,25 @@ public class DisplayUtils {
 		} else{
 			cookies.removeCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY);
 		}
-			
-		
+	}
+	
+	public static void setPageTitle(String newTitle) {
+	    if (Document.get() != null) {
+	        Document.get().setTitle (newTitle);
+	    }
+	}
+	
+	public static void setPageDescription(String newDescription) {
+		if (Document.get() != null) {
+			NodeList<com.google.gwt.dom.client.Element> tags = Document.get().getElementsByTagName("meta");
+		    for (int i = 0; i < tags.getLength(); i++) {
+		        MetaElement metaTag = ((MetaElement) tags.getItem(i));
+		        if (metaTag.getName().equals("description")) {
+		            metaTag.setContent(newDescription);	//doesn't seem to work
+		            break;
+		        }
+		    }
+		}
 	}
 
 	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
