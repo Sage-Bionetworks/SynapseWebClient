@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -63,7 +62,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private EntityTypeProvider typeProvider;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityFinder entityFinder;
-	private CookieProvider cookies;
 	
 	private boolean readOnly;	
 	private Button editButton;
@@ -80,14 +78,13 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			Uploader locationableUploader, 
 			EntityTypeProvider typeProvider,
 			SynapseJSNIUtils synapseJSNIUtils,
-			EntityFinder entityFinder, CookieProvider cookies) {
+			EntityFinder entityFinder) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.locationableUploader = locationableUploader;
 		this.typeProvider = typeProvider;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.entityFinder = entityFinder;
-		this.cookies = cookies;
 		this.setHorizontalAlign(HorizontalAlignment.RIGHT);
 		this.setTableWidth("100%");
 	}
@@ -375,7 +372,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	 */
 	private void addUploadItem(Menu menu, final EntityBundle entityBundle, EntityType entityType) {
 		//if this is a FileEntity, then only show the upload item if we're in the test website
-		boolean isFileEntity = DisplayUtils.isInTestWebsite(cookies) && entityBundle.getEntity() instanceof FileEntity;
+		boolean isFileEntity = entityBundle.getEntity() instanceof FileEntity;
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
 			MenuItem item = new MenuItem(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 			item.setIcon(AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));

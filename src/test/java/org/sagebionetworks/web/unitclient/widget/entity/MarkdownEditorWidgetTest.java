@@ -53,7 +53,7 @@ public class MarkdownEditorWidgetTest {
 				.markdown2Html(any(String.class), any(Boolean.class),
 						any(AsyncCallback.class));
 		
-		presenter.showPreview(testMarkdown);
+		presenter.showPreview(testMarkdown, true);
 		verify(mockSynapseClient).markdown2Html(any(String.class), any(Boolean.class), any(AsyncCallback.class));
 	}
 }

@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
@@ -22,7 +21,6 @@ public class WidgetRegistrarImplTest {
 		
 	WidgetRegistrarImpl widgetRegistrar;
 	PortalGinInjector mockGinInjector;
-	CookieProvider mockCookies;
 	NodeModelCreator mockNodeModelCreator;
 	Map<String, String> testImageWidgetDescriptor;
 	String testFileName = "testfile.png";
@@ -30,27 +28,30 @@ public class WidgetRegistrarImplTest {
 	public void setup(){	
 		mockGinInjector = mock(PortalGinInjector.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		mockCookies = mock(CookieProvider.class);
-		widgetRegistrar= new WidgetRegistrarImpl(mockGinInjector,mockNodeModelCreator, new JSONObjectAdapterImpl(),mockCookies);
+		widgetRegistrar= new WidgetRegistrarImpl(mockGinInjector,mockNodeModelCreator, new JSONObjectAdapterImpl());
 		testImageWidgetDescriptor = new HashMap<String, String>();
 	}
 	
 	@Test
 	public void testCreateWidgets() {
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, true);
 		verify(mockGinInjector).getYouTubeRenderer();
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, false);
 		verify(mockGinInjector).getOldImageRenderer();
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, true);
+		verify(mockGinInjector).getImageRenderer();
+		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, true);
 		verify(mockGinInjector).getProvenanceRenderer();
 	}
 	@Test
 	public void testCreateWidgetEditors() {
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, true);
 		verify(mockGinInjector).getYouTubeConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, false);
 		verify(mockGinInjector).getOldImageConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, true);
+		verify(mockGinInjector).getImageConfigEditor();
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, true);
 		verify(mockGinInjector).getProvenanceConfigEditor();
 	}
 	
