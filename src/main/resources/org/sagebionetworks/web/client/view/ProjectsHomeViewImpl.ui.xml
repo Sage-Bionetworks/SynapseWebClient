@@ -28,7 +28,7 @@
 		            <div class="span-24 separator"></div>
 
 					<ul class="breadcrumbs">
-						<li class="breadcrumb"><a href="#Home:0">Home</a> > All Projects</li>
+						<li class="breadcrumb"><a href="#!Home:0">Home</a> > All Projects</li>
 					</ul>
 					
 					<div class="span-24 separator-inner"></div>
