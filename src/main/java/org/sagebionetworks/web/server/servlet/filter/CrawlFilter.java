@@ -85,7 +85,7 @@ public class CrawlFilter implements Filter {
 			// dev mode
 			String gwt = decoded.replace("gwt", "?gwt");
 			String unescapedAmp = gwt.replace("&" + ESCAPED_FRAGMENT, "#!");
-			String result = unescapedAmp.replace("?" + ESCAPED_FRAGMENT, "#!");
+			String result = unescapedAmp.replace(ESCAPED_FRAGMENT, "#!");
 			return result;
 		} catch (UnsupportedEncodingException e) {
 			return "";
