@@ -1,19 +1,26 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Calendar;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.IOUtils;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.IncorrectnessListener;
@@ -31,10 +38,13 @@ public class CrawlFilter implements Filter {
 
 	public static final String ESCAPED_FRAGMENT = "_escaped_fragment_=";
 	private WebClient webClient;
-	
+	private ServletContext sc;
+	long cacheTimeout = 1000*60*60*24*14; //2 weeks
+
 	@Override
 	public void destroy() {
-		// nothing to do
+		this.sc = null;
+		webClient=null;
 	}
 	
 	@Override
@@ -48,32 +58,66 @@ public class CrawlFilter implements Filter {
 			int port = request.getServerPort();
 			String domain = request.getServerName();
 			String scheme = request.getScheme();
-			String fixedQueryString = uri + rewriteQueryString(queryString);
-			URL url = new URL(scheme, domain, port, fixedQueryString);
-
-			HtmlPage page = null;
+			
+			//check the cache
+			String id = uri + queryString;
+			File tempDir = (File) sc.getAttribute("javax.servlet.context.tempdir");
+			String temp = tempDir.getAbsolutePath();
+			File file = new File(temp + id);
+			FileWriter fw = null;
 			try {
-				//url = new URL("http://localhost:8080/portal-develop-SNAPSHOT/Portal.html#!Home:0");
-				page = webClient.getPage(url);
-				
-				int n = webClient.waitForBackgroundJavaScript(15000);
-				webClient.getJavaScriptEngine().pumpEventLoop(15000);
-			} catch (ScriptException e) {
+				long now = Calendar.getInstance().getTimeInMillis();
+				// set timestamp check
+				if (!file.exists() || cacheTimeout < now - file.lastModified()) {
+					//not in the cache, or it has expired.  make sure the file exists
+					String name = file.getAbsolutePath();
+					name = name.substring(0, name.lastIndexOf("/"));
+					new File(name).mkdirs();
+					
+					//get html page, and write it out
+					String fixedQueryString = uri + rewriteQueryString(queryString);
+					URL url = new URL(scheme, domain, port, fixedQueryString);
+					HtmlPage page = null;
+					try {
+						//url = new URL("http://localhost:8080/portal-develop-SNAPSHOT/Portal.html#!Home:0");
+						page = webClient.getPage(url);
+						
+						int n = webClient.waitForBackgroundJavaScript(15000);
+						webClient.getJavaScriptEngine().pumpEventLoop(15000);
+					} catch (ScriptException e) {
+					}
+					if (page != null) {
+						String xml = page.asXml();
+						//replace all relative links with full links due to this Google AJAX crawler support chicken-dance
+						String originalUrl = url.toString();
+						String toPage = originalUrl.substring(0, originalUrl.indexOf("#")+1);
+						String replacedWithFullHrefs = xml.replace("href=\"#", "href=\""+toPage);
+						fw = new FileWriter(file);
+						fw.write(replacedWithFullHrefs);
+						webClient.closeAllWindows();
+					}
+				}
+			} catch (IOException e) {
+				if (!file.exists()) {
+					throw e;
+				}
 			}
-			if (page != null) {
-				HttpServletResponse httpResponse = (HttpServletResponse) response;
-				httpResponse.setStatus(HttpServletResponse.SC_OK);
-				httpResponse.setContentType("text/html;charset=UTF-8");
-				ServletOutputStream out = httpResponse.getOutputStream();
-				String xml = page.asXml();
-				//replace all relative links with full links due to this Google AJAX crawler support chicken-dance
-				String originalUrl = url.toString();
-				String toPage = originalUrl.substring(0, originalUrl.indexOf("#")+1);
-				String replacedWithFullHrefs = xml.replace("href=\"#", "href=\""+toPage);
-				out.println(replacedWithFullHrefs);
-				out.flush();
-				webClient.closeAllWindows();
+			finally {
+				if (fw != null) {
+					fw.flush();
+					fw.close();
+				}
 			}
+			//now read from the cache
+			FileInputStream fis = new FileInputStream(file);
+			String mt = sc.getMimeType(uri);
+			response.setContentType(mt);
+			HttpServletResponse httpResponse = (HttpServletResponse) response;
+			httpResponse.setStatus(HttpServletResponse.SC_OK);
+			ServletOutputStream out = httpResponse.getOutputStream();
+			IOUtils.copy(fis, out);
+			out.flush();
+			out.close();
 		} else {
 			chain.doFilter(request, response);
 		}
@@ -116,5 +160,6 @@ public class CrawlFilter implements Filter {
 	    //even setting these to false, it throws a ScriptException (even if the page fully loads)
 	    webClient.setThrowExceptionOnFailingStatusCode(false);
 	    webClient.setThrowExceptionOnScriptError(false);
+	    this.sc = config.getServletContext();
     }
 }
