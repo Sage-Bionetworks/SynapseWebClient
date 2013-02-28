@@ -20,6 +20,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -40,7 +41,7 @@ public class CrawlFilter implements Filter {
 	private WebClient webClient;
 	private ServletContext sc;
 	long cacheTimeout = 1000*60*60*24*14; //2 weeks
-
+	
 	@Override
 	public void destroy() {
 		this.sc = null;
@@ -63,8 +64,10 @@ public class CrawlFilter implements Filter {
 			String id = uri + queryString;
 			File tempDir = (File) sc.getAttribute("javax.servlet.context.tempdir");
 			String temp = tempDir.getAbsolutePath();
-			File file = new File(temp + id);
+			String filename = DigestUtils.md5Hex(temp + id);
+			File file = new File(filename+".crawlcache");
 			FileWriter fw = null;
+			
 			try {
 				long now = Calendar.getInstance().getTimeInMillis();
 				// set timestamp check
