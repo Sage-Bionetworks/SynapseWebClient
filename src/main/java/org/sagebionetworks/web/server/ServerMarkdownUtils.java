@@ -286,7 +286,7 @@ public class ServerMarkdownUtils {
 
 	public static String getSynAnchorHtml(String synId){
 		StringBuilder sb = new StringBuilder();
-		sb.append("<a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#Synapse:");
+		sb.append("<a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#!Synapse:");
 	    sb.append(synId.toLowerCase().trim());
 	    sb.append("\">");
 	    sb.append(synId);

@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.view;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.gwttime.time.DateTime;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -166,8 +164,11 @@ public class SearchViewImpl extends Composite implements SearchView {
 		}
 
 		// show existing facets			
-		createShownFacets(searchResults);
-		
+		String facetNames = createShownFacets(searchResults);
+		Long start = presenter.getStart();
+		String pageTitleStartNumber = start != null && start > 0 ? " (from result " + (start+1) + ")" : ""; 
+		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? "'"+searchTerm + "' " : "";
+		synapseJSNIUtils.setPageTitle("Search: " + pageTitleSearchTerm + facetNames + pageTitleStartNumber);
 
 		resultsPanel.clear();
 		resultsPanel.add(new HTML(resultsHtml));
@@ -184,12 +185,13 @@ public class SearchViewImpl extends Composite implements SearchView {
 		ul.setStyleName("pagination");
 				
 		List<PaginationEntry> entries = presenter.getPaginationEntries(MAX_RESULTS_PER_PAGE, MAX_PAGES_IN_PAGINATION);
+		String currentSearchJSON = presenter.getCurrentSearchJSON();
 		if(entries != null) {
 			for(PaginationEntry pe : entries) {
 				if(pe.isCurrent())
-					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()), "current");
+					ul.add(createPaginationAnchor(pe.getLabel(), currentSearchJSON, pe.getStart()), "current");
 				else
-					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()));
+					ul.add(createPaginationAnchor(pe.getLabel(), currentSearchJSON, pe.getStart()));
 			}
 		}
 		
@@ -199,7 +201,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 
 
-	private void createShownFacets(SearchResults searchResults) {
+	private String createShownFacets(SearchResults searchResults) {
+		StringBuilder facetNames = new StringBuilder();
 		LayoutContainer currentFacets = new LayoutContainer();
 
 		// add size
@@ -212,7 +215,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		currentFacets.setAutoHeight(true);
 		for(final KeyValue facet : presenter.getAppliedFacets()) {
 			// Don't display the !link node_type facet
-			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()) && facet.getNot() == Boolean.TRUE)
+			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()) && Boolean.TRUE.equals(facet.getNot()))
 				continue;
 			String text = facet.getValue();
 			if(text.contains("..")) {				
@@ -224,6 +227,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 					text = formatFacetName(facet.getKey()) + " >= " + facet.getValue().replaceAll("\\.\\.", "");
 				}
 			}
+			facetNames.append(text);
+			facetNames.append(" ");
 			Button btn = new Button(text, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
 			btn.addStyleName("floatleft");
 			btn.setIconAlign(IconAlign.RIGHT);
@@ -244,6 +249,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		currentFacets.layout(true);
 		currentFacetsPanel.clear();
 		currentFacetsPanel.add(currentFacets);
+		return facetNames.toString();
 	}
 
 	private void createFacetWidgets(SearchResults searchResults) {
@@ -593,16 +599,10 @@ public class SearchViewImpl extends Composite implements SearchView {
 		return DisplayUtils.uppercaseFirstLetter(name.replace("_", " "));
 	}
 
-	private Anchor createPaginationAnchor(String anchorName, final int newStart) {
+	private Anchor createPaginationAnchor(String anchorName, String currentSearchJSON, final long newStart) {
 		Anchor a = new Anchor();
-		a.setHTML(anchorName);	
-		a.addClickHandler(new ClickHandler() {					
-			@Override
-			public void onClick(ClickEvent event) {
-				Window.scrollTo(0, 0);
-				presenter.setStart(newStart);				
-			}
-		});
+		a.setHTML(anchorName);
+		a.setHref(DisplayUtils.getSearchHistoryToken(currentSearchJSON, newStart));
 		return a;
 	}	
 

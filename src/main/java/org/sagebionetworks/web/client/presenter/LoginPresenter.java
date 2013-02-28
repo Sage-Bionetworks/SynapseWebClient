@@ -72,7 +72,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		view.clear();
 		openIdActionUrl = WebConstants.OPEN_ID_URI;
 		// note, this is now a relative URL
-		openIdReturnUrl = synapseJSNIUtils.getLocationPath()+synapseJSNIUtils.getLocationQueryString()+"#"+LOGIN_PLACE; 
+		openIdReturnUrl = synapseJSNIUtils.getLocationPath()+synapseJSNIUtils.getLocationQueryString()+"#!"+LOGIN_PLACE; 
 		showView(place);
 	}
 	

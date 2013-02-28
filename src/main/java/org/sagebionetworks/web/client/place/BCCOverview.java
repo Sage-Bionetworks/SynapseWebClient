@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.place;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
+import com.google.gwt.place.shared.Prefix;
 
 public class BCCOverview extends Place{
 	
@@ -15,6 +16,7 @@ public class BCCOverview extends Place{
 		return token;
 	}
 	
+	@Prefix("!BCCOverview")
 	public static class Tokenizer implements PlaceTokenizer<BCCOverview> {
         @Override
         public String getToken(BCCOverview place) {

@@ -36,9 +36,6 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 	private Button typeDropdown;
 	private TextBox searchField;
 	private LayoutContainer searchButtonContainer;
-	private Boolean currentIsLarge;
-		
-	
 	
 	@Inject
 	public HomeSearchBoxViewImpl(SageImageBundle sageImageBundle,
@@ -51,7 +48,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 				
 		horizontalTable = new FlexTable();
 		horizontalTable.setWidth("600px");
-		createSearchBox();
+		
 		this.add(horizontalTable);
 	}
 		
@@ -109,12 +106,8 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Projects";
 				}
 			});
-		    a.addClickHandler(new ClickHandler() {				
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.searchAllProjects();
-				}
-			});
+		    
+		    a.setHref(presenter.getSearchAllProjectsLink());
 		    hp.add(a, tableData);
 		    
 		    a = new Anchor(new SafeHtml() {				
@@ -123,12 +116,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Data";
 				}
 			});
-		    a.addClickHandler(new ClickHandler() {				
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.searchAllData();
-				}
-			});
+		    a.setHref(presenter.getSearchAllDataLink());
 		    hp.add(a, tableData);
 		    
 		    a = new Anchor(new SafeHtml() {				
@@ -137,13 +125,8 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Studies";
 				}
 			});
-
-		    a.addClickHandler(new ClickHandler() {				
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.searchAllStudies();
-				}
-			});
+		    a.setHref(presenter.getSearchAllStudiesLink());
+		    
 		    hp.add(a, tableData);
 		    
 		    a = new Anchor(new SafeHtml() {				
@@ -152,12 +135,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Code";
 				}
 			});
-		    a.addClickHandler(new ClickHandler() {				
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.searchAllCode();
-				}
-			});
+		    a.setHref(presenter.getSearchAllCodeLink());
 		    hp.add(a, tableData);
 		    
 		    horizontalTable.setWidget(1, 1, hp); 
@@ -204,6 +182,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 	@Override 
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+		createSearchBox();
 	}
 		
 	@Override
