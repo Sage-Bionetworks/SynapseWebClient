@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -58,7 +57,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private boolean newQuery = false;
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
 	private DateTime searchStartTime;
-	
 	private Place redirect; 
 	
 	
@@ -94,7 +92,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		this.place = place;
 		view.setPresenter(this);
 		redirect = null;
-		String queryTerm = place.toToken();
+		String queryTerm = place.getSearchTerm();
 		if (queryTerm == null) queryTerm = "";
 		
 		if (willRedirect(queryTerm)) {
@@ -103,6 +101,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		}
 
 		currentSearch = checkForJson(queryTerm);
+		if (place.getStart() != null)
+			currentSearch.setStart(place.getStart());
 		executeSearch();
 	}
 
@@ -215,6 +215,11 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		currentSearch.setStart(new Long(newStart));
 		executeNewSearch();
 	}
+	
+	@Override
+	public Long getStart() {
+		return currentSearch.getStart();
+	}
 
 	@Override
 	public DateTime getSearchStartTime() {
@@ -255,6 +260,19 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public String getCurrentSearchJSON() {
+		String searchJSON = "";
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		try {
+			currentSearch.writeToJSONObject(adapter);
+			searchJSON = adapter.toJSONString();
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+		}
+		return searchJSON;
 	}
 
 	private SearchQuery checkForJson(String queryString) {

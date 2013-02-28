@@ -90,7 +90,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@Override
 	public void showAccountCreated() {
 		this.clear();		
-		contentHtml.setInnerHTML(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) + " Your Synapse account has been created. We have sent you an email with instructions on how to setup a password for your account. Follow the directions in the email, and then <a href=\"#LoginPlace:0\">login here</a>.");				
+		contentHtml.setInnerHTML(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) + " Your Synapse account has been created. We have sent you an email with instructions on how to setup a password for your account. Follow the directions in the email, and then <a href=\"#!LoginPlace:0\">login here</a>.");				
 	}
 
 	@Override

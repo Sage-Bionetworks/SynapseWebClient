@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.place;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
+import com.google.gwt.place.shared.Prefix;
 
 public class Synapse extends Place{
 	private static final String VERSION_DELIMITER = "/version/"; 
@@ -19,7 +20,7 @@ public class Synapse extends Place{
 				versionNumber = Long.parseLong(parts[1]);
 				return;
 			} 		
-		} 
+		}
 		// default
 		entityId = token;		
 	}
@@ -44,6 +45,7 @@ public class Synapse extends Place{
 		return versionNumber;
 	}
 
+	@Prefix("!Synapse")
 	public static class Tokenizer implements PlaceTokenizer<Synapse> {
         @Override
         public String getToken(Synapse place) {

@@ -65,23 +65,23 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public void searchAllProjects() {		
-		search(getSearchQueryForType("project"));	
+	public String getSearchAllProjectsLink() {		
+		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("project"));	
 	}
 
 	@Override
-	public void searchAllData() {
-		search(getSearchQueryForType("data"));
+	public String getSearchAllDataLink() {
+		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("data"));
 	}
 
 	@Override
-	public void searchAllStudies() {
-		search(getSearchQueryForType("study"));
+	public String getSearchAllStudiesLink() {
+		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("study"));
 	}
 
 	@Override
-	public void searchAllCode() {
-		search(getSearchQueryForType("code"));
+	public String getSearchAllCodeLink() {
+		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("code"));
 	}
 	
 	/*

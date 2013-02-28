@@ -476,7 +476,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		String downloadUrl = null;
 		if (referencedEntity instanceof FileEntity) {
 			if(!isLoggedIn)
-				downloadUrl = "#" + nameLinkUrl;
+				downloadUrl = "#!" + nameLinkUrl;
 			else
 				downloadUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), referencedEntity.getId(), ((Versionable)referencedEntity).getVersionNumber(), false);
 		}
@@ -485,7 +485,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			if(locations != null && locations.size() > 0) {
 				downloadUrl = locations.get(0).getPath();
 			} else if(!isLoggedIn) {				
-				downloadUrl = "#" + nameLinkUrl;
+				downloadUrl = "#!" + nameLinkUrl;
 			}
 		}
 		

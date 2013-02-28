@@ -126,9 +126,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		sp.add(new HTML(SafeHtmlUtils.fromSafeConstant(
 				"<div class=\"span-6 inner-6 view notopmargin\">" +
-				"<h5><a class=\"link\" href=\"#BCCOverview:0\">Sage / DREAM Breast Cancer Prognosis Challenge</a></h5>"+
+				"<h5><a class=\"link\" href=\"#!BCCOverview:0\">Sage / DREAM Breast Cancer Prognosis Challenge</a></h5>"+
 				description+
-				"<a class=\"button_readmore\" href=\"#BCCOverview:0\"></a></div>")));
+				"<a class=\"button_readmore\" href=\"#!BCCOverview:0\"></a></div>")));
 		bccSignup.clear();
 		bccSignup.add(sp);
 	}
@@ -175,7 +175,7 @@ public class HomeViewImpl extends Composite implements HomeView {
    					"	<p>Get started using Synapse today by creating your own Project. Projects provide an organizational structure for you to interact with your data, code and analyses.</p>" +
    					"<ul class=\"list arrow-list\"><li>Organize your work</li><li>Store Data, Code & Results</li><li>Set Sharing Level</li><li>Custom, Searchable Annotations </li><li>Full Programmatic API & R Integration </li><li>Attach Figures and Documents</li><li>Describe & Version </li><li>Create Links & See Usage </li></ul>" + 
 					" 	<div class=\"mega-button\" style=\"margin-top: 10px;\">" +
-					" 		<a id=\"" + DisplayConstants.ID_BTN_START_PROJECT + "\" href=\"#ProjectsHome:0\">Start a Project</a>" +
+					" 		<a id=\"" + DisplayConstants.ID_BTN_START_PROJECT + "\" href=\"#!ProjectsHome:0\">Start a Project</a>" +
 					" 	</div>" +
 					"</div>")));
 

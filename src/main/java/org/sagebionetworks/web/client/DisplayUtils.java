@@ -45,6 +45,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
@@ -630,11 +631,21 @@ public class DisplayUtils {
 	
 	public static String getSynapseWikiHistoryToken(String ownerId, String objectType, String wikiPageId) {
 		Wiki place = new Wiki(ownerId, objectType, wikiPageId);
-		return "#" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
+		return "#!" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
+	}
+	
+	public static String getSearchHistoryToken(String searchQuery) {
+		Search place = new Search(searchQuery);
+		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
+	}
+	
+	public static String getSearchHistoryToken(String searchQuery, Long start) {
+		Search place = new Search(searchQuery, start);
+		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
 	}
 	
 	public static String getSynapseHistoryToken(String entityId) {
-		return "#" + getSynapseHistoryTokenNoHash(entityId, null);
+		return "#!" + getSynapseHistoryTokenNoHash(entityId, null);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId) {
@@ -642,7 +653,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryToken(String entityId, Long versionNumber) {
-		return "#" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
+		return "#!" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
@@ -672,6 +683,12 @@ public class DisplayUtils {
 	}
 	
 	private static String getWikiPlaceString(Class<Wiki> place) {
+		String fullPlaceName = place.getName();		
+		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
+		return fullPlaceName;
+	}
+	
+	private static String getSearchPlaceString(Class<Search> place) {
 		String fullPlaceName = place.getName();		
 		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
 		return fullPlaceName;

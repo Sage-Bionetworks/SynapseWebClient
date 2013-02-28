@@ -24,7 +24,7 @@
 					<div class="span-24 last" style="margin-top: 10px">
 						<h3>
 							Welcome to
-							<a class="link" href="#Home:0">SYNAPSE</a>
+							<a class="link" href="#!Home:0">SYNAPSE</a>
 						</h3>
 						<p>Synapse is a collaborative compute space that allows scientists to share and analyze data together.</p>
 					</div>
@@ -101,14 +101,14 @@
 					</div>
 					<div class="span-6 inner-6 view notopmargin last">
 						<h5>
-							<a class="link" href="#Synapse:syn150935">Synapse Commons Repository</a>
+							<a class="link" href="#!Synapse:syn150935">Synapse Commons Repository</a>
 						</h5>
 						<p>The Synapse Commons Repository is the place to access publicly
 							available data sets. To build this project we have developed a
 							system to crawl repositories, like GEO, ArrayExpress, and TCGA,
 							and
 							to manage contributions from users.</p>
-						<a class="button_readmore" href="#Synapse:syn150935"></a>
+						<a class="button_readmore" href="#!Synapse:syn150935"></a>
 					</div>								
 				</div>
 				<!-- Access tutorial -->
@@ -133,7 +133,7 @@
 								</div>
 							</div>
 							<div class="span-7 notopmargin last" style="width: 290px;">
-								<h4><a href="#WikiPlace:dataAccessLevelsContent" class="service-tipsy north link">Learn the Rules for Sharing And Using Human Data</a></h4>
+								<h4><a href="#!WikiPlace:dataAccessLevelsContent" class="service-tipsy north link">Learn the Rules for Sharing And Using Human Data</a></h4>
 								<p>There are times where human data can only be shared with certain restrictions.  Learn what the rules are and how to apply and comply with data privacy levels.</p>
 							</div>
 						</div>
@@ -163,11 +163,11 @@
 									<img src="static/images/people/weiyi_tai-hsien.jpg" />
 								</div>
 							</div>
-							<h5><a class="link" href="#Profile:317809">Wei-Yi Cheng</a> and <a class="link" href="#Profile:323618">Tai-Hsien Ou Yang</a></h5>
+							<h5><a class="link" href="#!Profile:317809">Wei-Yi Cheng</a> and <a class="link" href="#!Profile:323618">Tai-Hsien Ou Yang</a></h5>
 							<p class="notopmargin small-italic">The “Attractor Metagenes” team topped the October 1 Leaderboard in the Sage Bionetworks/DREAM Breast Cancer Prognosis Challenge.</p>
 						</div>
 						<div class="span-12 last serv">
-							<a href="#Synapse:syn160764">
+							<a href="#!Synapse:syn160764">
 								<div class="big-rounded-icon-white left">
 									<div class="icon-white-big">
 										<img src="static/images/people/Carlos_Caldas.jpg" />
