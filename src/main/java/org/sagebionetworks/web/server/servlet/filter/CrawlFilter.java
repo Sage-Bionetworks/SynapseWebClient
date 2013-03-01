@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.IOUtils;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -64,8 +66,12 @@ public class CrawlFilter implements Filter {
 			String id = uri + queryString;
 			File tempDir = (File) sc.getAttribute("javax.servlet.context.tempdir");
 			String temp = tempDir.getAbsolutePath();
-			String filename = DigestUtils.md5Hex(temp + id);
+			String filename = temp+id;
+
 			File file = new File(filename+".crawlcache");
+			if (file.getName().length() > 70) {
+				file = new File(DigestUtils.md5Hex(filename)+".crawlcache");
+			}
 			FileWriter fw = null;
 			
 			try {
@@ -82,8 +88,9 @@ public class CrawlFilter implements Filter {
 					URL url = new URL(scheme, domain, port, fixedQueryString);
 					HtmlPage page = null;
 					try {
+						System.out.println("requesting url: " + url.toString());
 						//url = new URL("http://localhost:8080/portal-develop-SNAPSHOT/Portal.html#!Home:0");
-						page = webClient.getPage(url);
+						page = webClient.getPage(url.toString());
 						
 						int n = webClient.waitForBackgroundJavaScript(15000);
 						webClient.getJavaScriptEngine().pumpEventLoop(15000);
@@ -128,13 +135,14 @@ public class CrawlFilter implements Filter {
 
 	public String rewriteQueryString(String uglyUrl) {
 		try {
-			String decoded = URLDecoder.decode(uglyUrl, "UTF-8");
+			String decoded = URIUtil.decode(uglyUrl, "UTF-8");
 			// dev mode
-			String gwt = decoded.replace("gwt", "?gwt");
-			String unescapedAmp = gwt.replace("&" + ESCAPED_FRAGMENT, "#!");
-			String result = unescapedAmp.replace(ESCAPED_FRAGMENT, "#!");
+			String result = decoded.replace("gwt", "?gwt");
+			result = result.replace("&"+ESCAPED_FRAGMENT, "#!");
+			result = result.replace("?"+ESCAPED_FRAGMENT, "#!");
+			result = result.replace(ESCAPED_FRAGMENT, "#!");
 			return result;
-		} catch (UnsupportedEncodingException e) {
+		} catch (URIException e) {
 			return "";
 		}
 	}

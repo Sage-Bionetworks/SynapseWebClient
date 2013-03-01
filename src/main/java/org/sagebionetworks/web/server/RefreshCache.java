@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,21 +26,28 @@ public class RefreshCache {
 		if (args.length == 0) {
 			throw new IllegalArgumentException("Please provide the website url");
 		}
-		urlQueue.add(fixUrl(args[0]));
+		String firstUrl = fixUrl(args[0]);
+		urlQueue.add(firstUrl);
+		seenUrls.add(firstUrl);
 		//go!
 		while(!urlQueue.isEmpty()) {
-			processNext();
+			try {
+				processNext();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
 	protected static void processNext() throws Exception{
 		URL url = new URL(urlQueue.remove());
+		System.out.println("processing: " +url.toString());
 		URLConnection c = url.openConnection();
 		BufferedReader in = new BufferedReader(new InputStreamReader(c.getInputStream()));
 		String inputLine;
 		StringBuilder fullHtml = new StringBuilder();
 		while ((inputLine = in.readLine()) != null)
-			fullHtml.append(inputLine);
+			fullHtml.append(inputLine+"\n");
 		in.close();
 		Document doc = Jsoup.parse(fullHtml.toString());
 		Elements elements = doc.getElementsByTag("a");
@@ -55,8 +64,14 @@ public class RefreshCache {
 		}
 	}
 	
-	protected static String fixUrl(String url){
-		return url.replace("#!", "?_escaped_fragment_=");
+	protected static String fixUrl(String url) throws URIException{
+		String delimiter = "?";
+		if (url.indexOf("?") > -1) {
+			delimiter = "&";
+		}
+		String newUrl =  url.replace("#!", delimiter+"_escaped_fragment_=");
+		return URIUtil.encodeQuery(newUrl);
+		
 	}
 	
 
