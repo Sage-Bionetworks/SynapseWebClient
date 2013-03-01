@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Favorite;
+import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -118,4 +120,11 @@ public interface SynapseClientAsync {
 	public void getFileEndpoint(AsyncCallback<String> callback);
 
 	void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<String> callback);
+
+	void addFavorite(String entityId, AsyncCallback<String> callback);
+
+	void removeFavorite(String entityId, AsyncCallback<Void> callback);
+
+	void getFavorites(Integer limit, Integer offset,
+			AsyncCallback<String> callback);
 }

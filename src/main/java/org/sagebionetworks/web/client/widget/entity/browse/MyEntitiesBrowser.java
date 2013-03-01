@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -144,39 +145,22 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 
 	@Override
 	public void loadFavorites() {
-		UserSessionData sessionData = authenticationController.getLoggedInUser();
-		if(sessionData != null) {
-			UserProfile userProfile = sessionData.getProfile();
-			if(userProfile != null && userProfile.getFavorites() != null && userProfile.getFavorites().size() > 0) {							
-				List<Reference> refs = new ArrayList<Reference>();
-				for(String entityId : userProfile.getFavorites()) {
-					Reference ref = new Reference();
-					ref.setTargetId(entityId);
-					refs.add(ref);
-				}								
-				ReferenceList list = new ReferenceList();
-				list.setReferences(refs);
+		synapseClient.getFavorites(Integer.MAX_VALUE, 0, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
 				try {
-					synapseClient.getEntityHeaderBatch(list.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString(), new AsyncCallback<String>() {
-						@Override
-						public void onSuccess(String result) {
-							BatchResults<EntityHeader> headers;
-							try {
-								headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
-								view.setFavoriteEntities(headers.getResults());
-							} catch (JSONObjectAdapterException e) {
-								view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-							}							
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-						}
-					});
+					PaginatedResults<EntityHeader> favorites = nodeModelCreator.createPaginatedResults(result, EntityHeader.class);
+					globalApplicationState.setFavorites(favorites.getResults());
+					view.setFavoriteEntities(favorites.getResults());
 				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+					onFailure(e);
 				}
 			}
-		}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+			}
+		});
 	}
 
 	

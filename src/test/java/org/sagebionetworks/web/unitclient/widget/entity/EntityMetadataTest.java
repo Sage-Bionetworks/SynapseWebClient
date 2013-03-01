@@ -21,8 +21,11 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -49,8 +52,10 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gdata.data.Kind.Adaptable;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.sun.grizzly.tcp.Adapter;
 
 public class EntityMetadataTest {
 
@@ -222,47 +227,41 @@ public class EntityMetadataTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSetIsFavorite() throws Exception {
-		UserProfile userProfile = new UserProfile();
-		
-		String userProfileJson = userProfile.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(userProfile);
+		PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
+		List<EntityHeader> results = new ArrayList<EntityHeader>();
+		favorites.setResults(results);
+		EntityHeader added = new EntityHeader();
+		String getFavoritesJson = favorites.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
+		String addedJson = added.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
+		AsyncMockStubber.callSuccessWith(getFavoritesJson).when(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(addedJson).when(mockSynapseClient).addFavorite(anyString(), any(AsyncCallback.class));
+		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(EntityHeader.class))).thenReturn(favorites);
 				
 		entityMetadata.setIsFavorite(true);
-		
-		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);		
-		verify(mockSynapseClient).updateUserProfile(arg.capture(), any(AsyncCallback.class));
-		verify(mockAuthenticationController).reloadUserSessionData();
-		String updatedProfileJson = arg.getValue();
-		UserProfile updatedUserProfile = new UserProfile(jsonObjectAdapter.createNew(updatedProfileJson));
-		
-		assertTrue(updatedUserProfile.getFavorites().contains(entityId));		
+				
+		verify(mockSynapseClient).addFavorite(eq(entityId), any(AsyncCallback.class));
+		verify(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockGlobalApplicationState).setFavorites(results);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testSetIsFavoriteUnset() throws Exception {				
-		UserProfile userProfile = new UserProfile();
-		Set<String> favorites = new HashSet<String>();
-		favorites.add(entityId);
-		userProfile.setFavorites(favorites);
-		
-		String userProfileJson = userProfile.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(userProfile);
+	public void testSetIsFavoriteUnset() throws Exception {
+		PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
+		List<EntityHeader> results = new ArrayList<EntityHeader>();
+		favorites.setResults(results);
+		EntityHeader added = new EntityHeader();
+		String getFavoritesJson = favorites.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
+		String addedJson = added.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
+		AsyncMockStubber.callSuccessWith(getFavoritesJson).when(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeFavorite(anyString(), any(AsyncCallback.class));
+		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(EntityHeader.class))).thenReturn(favorites);
 				
-		entityMetadata.setEntityBundle(bundle, false);
 		entityMetadata.setIsFavorite(false);
-		
-		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);		
-		verify(mockSynapseClient).updateUserProfile(arg.capture(), any(AsyncCallback.class));
-		verify(mockAuthenticationController).reloadUserSessionData();
-		String updatedProfileJson = arg.getValue();
-		UserProfile updatedUserProfile = new UserProfile(jsonObjectAdapter.createNew(updatedProfileJson));
-		
-		assertEquals(0, updatedUserProfile.getFavorites().size());		
+				
+		verify(mockSynapseClient).removeFavorite(eq(entityId), any(AsyncCallback.class));
+		verify(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockGlobalApplicationState).setFavorites(results);
 	}
 	
 }

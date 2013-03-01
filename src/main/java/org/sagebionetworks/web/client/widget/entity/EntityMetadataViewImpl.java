@@ -297,6 +297,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setFavoriteIcon();
 	}
 
+	@Override
+	public void setIsFavorite(boolean isFavorite) {
+		this.isFavorite = isFavorite;
+		setFavoriteIcon();		
+	}
+
 	private void setFavoriteIcon() {
 		if(isFavorite)
 			favoriteAnchor.setHTML(favoriteStarHtml);

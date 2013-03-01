@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -365,51 +365,62 @@ public class EntityMetadata implements Presenter {
 
 	@Override
 	public void setIsFavorite(final boolean isFavorite) {
-		synapseClient.getUserProfile(new AsyncCallback<String>() {
+		if(isFavorite) {
+			synapseClient.addFavorite(bundle.getEntity().getId(), new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					updateStoredFavorites();
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					// revert view
+					view.setIsFavorite(false);
+					view.showErrorMessage(DisplayConstants.ERROR_SAVE_FAVORITE_MESSAGE);
+				}
+			});
+		} else {
+			synapseClient.removeFavorite(bundle.getEntity().getId(), new AsyncCallback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					updateStoredFavorites();
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					// revert view
+					view.setIsFavorite(true);
+					view.showErrorMessage(DisplayConstants.ERROR_SAVE_FAVORITE_MESSAGE);
+				}
+			});			
+		}
+	}
+
+	private void updateStoredFavorites() {
+		synapseClient.getFavorites(Integer.MAX_VALUE, 0, new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(String profileJson) {
+			public void onSuccess(String result) {
 				try {
-					UserProfile userProfile = nodeModelCreator.createJSONEntity(profileJson, UserProfile.class);
-					if(userProfile.getFavorites() == null) 
-						userProfile.setFavorites(new HashSet<String>());
-					Set<String> favorites = userProfile.getFavorites();
-					if(isFavorite)  
-						favorites.add(bundle.getEntity().getId());
-					else 
-						favorites.remove(bundle.getEntity().getId());
-					// save profile					
-					synapseClient.updateUserProfile(userProfile.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString(), new AsyncCallback<Void>() {
-						@Override
-						public void onSuccess(Void result) {
-							// reload the sessiondata (which contains the profile) and store it back in memory
-							authenticationController.reloadUserSessionData();
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							view.showErrorMessage(DisplayConstants.ERROR_FAVORITE_CHANGE_NOT_SAVED);
-						}						
-					});
+					PaginatedResults<EntityHeader> favorites = nodeModelCreator.createPaginatedResults(result, EntityHeader.class);
+					globalApplicationState.setFavorites(favorites.getResults());
 				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+					onFailure(e);
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_FAVORITE_CHANGE_NOT_SAVED);
+				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		});
 	}
-
 	@Override
 	public boolean isFavorite() {
-		UserProfile userProfile = getUserProfile();
-		boolean isFavorite;
-		if(userProfile.getFavorites() != null)  
-			isFavorite = userProfile.getFavorites().contains(bundle.getEntity().getId()) ? true : false;
-		else
-			isFavorite = false;
-		return isFavorite;
+		List<EntityHeader> favorites = globalApplicationState.getFavorites();
+		if(favorites != null) {
+			for(EntityHeader eh : favorites) {
+				if(eh.getId().equals(bundle.getEntity().getId()))
+					return true;
+			}
+		}
+		return false;
 	}
-
 
 }

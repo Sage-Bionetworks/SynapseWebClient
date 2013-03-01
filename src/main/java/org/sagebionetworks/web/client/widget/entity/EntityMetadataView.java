@@ -73,4 +73,6 @@ public interface EntityMetadataView extends IsWidget {
 
 	}
 
+	public void setIsFavorite(boolean isFavorite);
+
 }
