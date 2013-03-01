@@ -1,13 +1,17 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Calendar;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -64,15 +68,14 @@ public class CrawlFilter implements Filter {
 			
 			//check the cache
 			String id = uri + queryString;
+			if (id.length()>100) {
+				id = DigestUtils.md5Hex(id);
+			}
 			File tempDir = (File) sc.getAttribute("javax.servlet.context.tempdir");
 			String temp = tempDir.getAbsolutePath();
 			String filename = temp+id;
 
-			File file = new File(filename+".crawlcache");
-			if (file.getName().length() > 70) {
-				file = new File(DigestUtils.md5Hex(filename)+".crawlcache");
-			}
-			FileWriter fw = null;
+			File file = new File(filename+".crawl.html.gz");
 			
 			try {
 				long now = Calendar.getInstance().getTimeInMillis();
@@ -102,8 +105,11 @@ public class CrawlFilter implements Filter {
 						String originalUrl = url.toString();
 						String toPage = originalUrl.substring(0, originalUrl.indexOf("#")+1);
 						String replacedWithFullHrefs = xml.replace("href=\"#", "href=\""+toPage);
-						fw = new FileWriter(file);
-						fw.write(replacedWithFullHrefs);
+						FileOutputStream fos = new FileOutputStream(file);
+						OutputStreamWriter writer = new OutputStreamWriter(new GZIPOutputStream(new BufferedOutputStream(fos)));
+						writer.write(replacedWithFullHrefs);
+						writer.flush();
+						writer.close();
 						webClient.closeAllWindows();
 					}
 				}
@@ -112,22 +118,21 @@ public class CrawlFilter implements Filter {
 					throw e;
 				}
 			}
-			finally {
-				if (fw != null) {
-					fw.flush();
-					fw.close();
-				}
-			}
+			
 			//now read from the cache
+			
 			FileInputStream fis = new FileInputStream(file);
+			InputStreamReader reader = new InputStreamReader(new GZIPInputStream(new BufferedInputStream(fis)));
+			
 			String mt = sc.getMimeType(uri);
 			response.setContentType(mt);
 			HttpServletResponse httpResponse = (HttpServletResponse) response;
 			httpResponse.setStatus(HttpServletResponse.SC_OK);
 			ServletOutputStream out = httpResponse.getOutputStream();
-			IOUtils.copy(fis, out);
+			IOUtils.copy(reader, out);
 			out.flush();
 			out.close();
+			reader.close();
 		} else {
 			chain.doFilter(request, response);
 		}
