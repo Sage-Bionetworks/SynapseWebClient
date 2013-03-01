@@ -16,6 +16,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+/**
+ * This is a crawler to simulate an AJAX crawl from Google/Bing
+ * @author jayhodgson
+ *
+ */
 public class CrawlTester {
 	public static Set<String> seenUrls = new HashSet<String>();
 	public static Queue<String> urlQueue = new LinkedList<String>();

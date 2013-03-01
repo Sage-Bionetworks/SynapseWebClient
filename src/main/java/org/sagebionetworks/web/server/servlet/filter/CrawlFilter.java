@@ -1,9 +1,13 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -18,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.search.Hit;
@@ -29,6 +34,7 @@ import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -114,8 +120,11 @@ public class CrawlFilter implements Filter {
 	}
 	
 	private String getEntityHtml(String entityId) throws RestServiceException, JSONObjectAdapterException{
-		EntityWrapper entityWrapper = synapseClient.getEntity(entityId);
-		Entity entity = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), Entity.class);
+		int mask = ENTITY | ANNOTATIONS;
+		EntityBundleTransport entityTransport = synapseClient.getEntityBundle(entityId, mask);
+		Entity entity = EntityFactory.createEntityFromJSONString(entityTransport.getEntityJson(), Entity.class);
+		Annotations annotations = EntityFactory.createEntityFromJSONString(entityTransport.getAnnotationsJson(), Annotations.class);
+		
 		String name = entity.getName();
 		String description = entity.getDescription();
 		String markdown = null;
@@ -127,14 +136,43 @@ public class CrawlFilter implements Filter {
 		} catch (Exception e) {}
 		
 		StringBuilder html = new StringBuilder();
-		html.append("<html><head><title>"+entity.getId()+": "+name+"</title><meta name=\"description\" content=\""+description+"\" /></head>");
-		html.append("Name: " + name + "<br />");
+		
+		//note: can't set description meta tag, since it might be markdown.
+		html.append("<html><head><title>"+entity.getId()+": "+name+"</title><meta name=\"description\" content=\"\" /></head>");
+		
+		html.append("<h5>Name</h5> " + name + "<br />");
 		if (description != null)
-			html.append("Description: " + description + "<br />");
+			html.append("<h5>Description</h5> " + description + "<br />");
 		if (markdown != null)
-			html.append("Wiki: " + markdown + "<br />");
+			html.append("<h5>Wiki</h5> " + markdown + "<br />");
+		html.append("<h5>Annotations</h5> <br />");
+		for (String key : annotations.getStringAnnotations().keySet()) {
+			List<String> value = annotations.getStringAnnotations().get(key);
+			html.append(key + getValueString(value) + "<br />");
+		}
+		for (String key : annotations.getLongAnnotations().keySet()) {
+			List<Long> value = annotations.getLongAnnotations().get(key);
+			html.append(key + getValueString(value) + "<br />");
+		}
+		for (String key : annotations.getDoubleAnnotations().keySet()) {
+			List<Double> value = annotations.getDoubleAnnotations().get(key);
+			html.append(key + getValueString(value) + "<br />");
+		}
+		
 		html.append("</html>");
 		return html.toString();
+	}
+	
+	private String getValueString(List value) {
+		StringBuilder valueBuilder = new StringBuilder();
+		if (value != null) {
+			valueBuilder.append(": ");
+			for (Object object : value) {
+				if (object != null)
+					valueBuilder.append(object.toString() + " ");
+			}
+		}
+		return valueBuilder.toString();
 	}
 	
 	private String getAllProjectsHtml(String searchQueryJson) throws RestServiceException, JSONObjectAdapterException{
