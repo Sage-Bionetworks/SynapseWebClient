@@ -112,10 +112,10 @@ public class CrawlFilter implements Filter {
 
 	private String getHomePageHtml(){
 		StringBuilder html = new StringBuilder();
-		html.append("<html><head><title>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</title><meta name=\"description\" content=\""+DisplayConstants.DEFAULT_PAGE_DESCRIPTION+"\" /></head>");
+		html.append("<html><head><title>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</title><meta name=\"description\" content=\""+DisplayConstants.DEFAULT_PAGE_DESCRIPTION+"\" /></head><body>");
 		//add Search Projects link
 		html.append("<a href=\"#!Search:{%22returnFields%22:[%22name%22,%22description%22,%22id%22,%22node_type_r%22,%22created_by_r%22,%22created_on%22,%22modified_by_r%22,%22modified_on%22,%22path%22],%20%22facet%22:[%22node_type%22,%22species%22,%22disease%22,%22modified_on%22,%22created_on%22,%22tissue%22,%22num_samples%22,%22created_by%22],%20%22booleanQuery%22:[{%22value%22:%22project%22,%20%22key%22:%22node_type%22}],%20%22queryTerm%22:[%22%22]}\">All Projects</a>");
-		html.append("</html>");
+		html.append("</body></html>");
 		return html.toString();
 	}
 	
@@ -138,7 +138,7 @@ public class CrawlFilter implements Filter {
 		StringBuilder html = new StringBuilder();
 		
 		//note: can't set description meta tag, since it might be markdown.
-		html.append("<html><head><title>"+entity.getId()+": "+name+"</title><meta name=\"description\" content=\"\" /></head>");
+		html.append("<html><head><title>"+entity.getId()+": "+name+"</title><meta name=\"description\" content=\"\" /></head><body>");
 		
 		html.append("<h5>Name</h5> " + name + "<br />");
 		if (description != null)
@@ -159,7 +159,7 @@ public class CrawlFilter implements Filter {
 			html.append(key + getValueString(value) + "<br />");
 		}
 		
-		html.append("</html>");
+		html.append("</body></html>");
 		return html.toString();
 	}
 	
@@ -181,7 +181,7 @@ public class CrawlFilter implements Filter {
 		SearchQuery inputQuery = EntityFactory.createEntityFromJSONString(searchQueryJson, SearchQuery.class);
 		//append this set to the list
 		StringBuilder html = new StringBuilder();
-		html.append("<html><head><title>Sage Synapse: All Projects - starting from "+inputQuery.getStart()+"</title><meta name=\"description\" content=\"\" /></head>");
+		html.append("<html><head><title>Sage Synapse: All Projects - starting from "+inputQuery.getStart()+"</title><meta name=\"description\" content=\"\" /></head><body>");
 		for (Hit hit : results.getHits()) {
 			//add links
 			html.append("<a href=\"#!Synapse:"+hit.getId()+"\">"+hit.getName()+"</a><br />");
@@ -192,7 +192,7 @@ public class CrawlFilter implements Filter {
 		String newJson = EntityFactory.createJSONStringForEntity(inputQuery);
 		html.append("<a href=\"#!Search:"+URLEncoder.encode(newJson)+"\">Next Page</a><br />");
 		
-		html.append("</html>");
+		html.append("</body></html>");
 		return html.toString();
 	}
 	
