@@ -1,17 +1,9 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -24,18 +16,22 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
-import org.apache.commons.io.IOUtils;
-
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.IncorrectnessListener;
-import com.gargoylesoftware.htmlunit.ScriptException;
-import com.gargoylesoftware.htmlunit.UrlFetchWebConnection;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HTMLParserListener;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.search.Hit;
+import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
+import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 /**
  * This filter detects ajax crawler (Google).  If so, it takes over the renders the javascript page and handles the response.
@@ -44,14 +40,16 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 public class CrawlFilter implements Filter {
 
 	public static final String ESCAPED_FRAGMENT = "_escaped_fragment_=";
-	private WebClient webClient;
-	private ServletContext sc;
-	long cacheTimeout = 1000*60*60*24*14; //2 weeks
+	ServletContext sc;
 	
+	/**
+	 * Injected with Gin
+	 */
+	private SynapseClientImpl synapseClient;
+
 	@Override
 	public void destroy() {
-		this.sc = null;
-		webClient=null;
+		sc = null;
 	}
 	
 	@Override
@@ -61,83 +59,105 @@ public class CrawlFilter implements Filter {
 		// Is this an ugly url that we need to convert/handle?
 		String queryString = httpRqst.getQueryString();
 		if (queryString != null && queryString.contains(ESCAPED_FRAGMENT)) {
-			String uri = httpRqst.getRequestURI();
-			int port = request.getServerPort();
-			String domain = request.getServerName();
-			String scheme = request.getScheme();
-			
-			//check the cache
-			String id = uri + queryString;
-			if (id.length()>100) {
-				id = DigestUtils.md5Hex(id);
-			}
-			File tempDir = (File) sc.getAttribute("javax.servlet.context.tempdir");
-			String temp = tempDir.getAbsolutePath();
-			String filename = temp+id;
-
-			File file = new File(filename+".crawl.html.gz");
-			
 			try {
-				long now = Calendar.getInstance().getTimeInMillis();
-				// set timestamp check
-				if (!file.exists() || cacheTimeout < now - file.lastModified()) {
-					//not in the cache, or it has expired.  make sure the file exists
-					String name = file.getAbsolutePath();
-					name = name.substring(0, name.lastIndexOf("/"));
-					new File(name).mkdirs();
+				String uri = httpRqst.getRequestURI();
+				int port = request.getServerPort();
+				String domain = request.getServerName();
+				String scheme = request.getScheme();
+				//build an html page for this request
+				String html = "";
+				String fixedQueryString = uri + rewriteQueryString(queryString);
+				if (fixedQueryString.contains("#!Home")) {
+					//send back info about the site
+					html = getHomePageHtml();
 					
-					//get html page, and write it out
-					String fixedQueryString = uri + rewriteQueryString(queryString);
-					URL url = new URL(scheme, domain, port, fixedQueryString);
-					HtmlPage page = null;
-					try {
-						System.out.println("requesting url: " + url.toString());
-						//url = new URL("http://localhost:8080/portal-develop-SNAPSHOT/Portal.html#!Home:0");
-						page = webClient.getPage(url.toString());
-						
-						int n = webClient.waitForBackgroundJavaScript(15000);
-						webClient.getJavaScriptEngine().pumpEventLoop(15000);
-					} catch (ScriptException e) {
-					}
-					if (page != null) {
-						String xml = page.asXml();
-						//replace all relative links with full links due to this Google AJAX crawler support chicken-dance
-						String originalUrl = url.toString();
-						String toPage = originalUrl.substring(0, originalUrl.indexOf("#")+1);
-						String replacedWithFullHrefs = xml.replace("href=\"#", "href=\""+toPage);
-						FileOutputStream fos = new FileOutputStream(file);
-						OutputStreamWriter writer = new OutputStreamWriter(new GZIPOutputStream(new BufferedOutputStream(fos)));
-						writer.write(replacedWithFullHrefs);
-						writer.flush();
-						writer.close();
-						webClient.closeAllWindows();
-					}
+				} else if (fixedQueryString.contains("#!Synapse")) {
+					//index information about the synapse entity
+					String entityId = fixedQueryString.substring(fixedQueryString.indexOf(":",fixedQueryString.indexOf("#!"))+1);
+					html=getEntityHtml(entityId);
+					
+				} else if (fixedQueryString.contains("#!Search")) {
+					//index all projects
+					String searchQueryJson = fixedQueryString.substring(fixedQueryString.indexOf(":",fixedQueryString.indexOf("#!"))+1);
+					html=getAllProjectsHtml(URLDecoder.decode(searchQueryJson));
 				}
-			} catch (IOException e) {
-				if (!file.exists()) {
-					throw e;
-				}
+				
+				URL url = new URL(scheme, domain, port, fixedQueryString);
+				//replace all relative links with full links due to this Google AJAX crawler support chicken-dance
+				String originalUrl = url.toString();
+				String toPage = originalUrl.substring(0, originalUrl.indexOf("#")+1);
+				String replacedWithFullHrefs = html.replace("href=\"#", "href=\""+toPage);
+				
+				String mt = sc.getMimeType(uri);
+				response.setContentType(mt);
+				HttpServletResponse httpResponse = (HttpServletResponse) response;
+				httpResponse.setStatus(HttpServletResponse.SC_OK);
+				ServletOutputStream out = httpResponse.getOutputStream();
+				out.println(replacedWithFullHrefs);
+				out.flush();
+				out.close();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			
-			//now read from the cache
-			
-			FileInputStream fis = new FileInputStream(file);
-			InputStreamReader reader = new InputStreamReader(new GZIPInputStream(new BufferedInputStream(fis)));
-			
-			String mt = sc.getMimeType(uri);
-			response.setContentType(mt);
-			HttpServletResponse httpResponse = (HttpServletResponse) response;
-			httpResponse.setStatus(HttpServletResponse.SC_OK);
-			ServletOutputStream out = httpResponse.getOutputStream();
-			IOUtils.copy(reader, out);
-			out.flush();
-			out.close();
-			reader.close();
 		} else {
 			chain.doFilter(request, response);
 		}
 	}
 
+	private String getHomePageHtml(){
+		StringBuilder html = new StringBuilder();
+		html.append("<html><head><title>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</title><meta name=\"description\" content=\""+DisplayConstants.DEFAULT_PAGE_DESCRIPTION+"\" /></head>");
+		//add Search Projects link
+		html.append("<a href=\"#!Search:{%22returnFields%22:[%22name%22,%22description%22,%22id%22,%22node_type_r%22,%22created_by_r%22,%22created_on%22,%22modified_by_r%22,%22modified_on%22,%22path%22],%20%22facet%22:[%22node_type%22,%22species%22,%22disease%22,%22modified_on%22,%22created_on%22,%22tissue%22,%22num_samples%22,%22created_by%22],%20%22booleanQuery%22:[{%22value%22:%22project%22,%20%22key%22:%22node_type%22}],%20%22queryTerm%22:[%22%22]}\">All Projects</a>");
+		html.append("</html>");
+		return html.toString();
+	}
+	
+	private String getEntityHtml(String entityId) throws RestServiceException, JSONObjectAdapterException{
+		EntityWrapper entityWrapper = synapseClient.getEntity(entityId);
+		Entity entity = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), Entity.class);
+		String name = entity.getName();
+		String description = entity.getDescription();
+		String markdown = null;
+		
+		try{
+			String wikiPageJson = synapseClient.getWikiPage(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
+			WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, WikiPage.class);
+			markdown = rootPage.getMarkdown();
+		} catch (Exception e) {}
+		
+		StringBuilder html = new StringBuilder();
+		html.append("<html><head><title>"+entity.getId()+": "+name+"</title><meta name=\"description\" content=\""+description+"\" /></head>");
+		html.append("Name: " + name + "<br />");
+		if (description != null)
+			html.append("Description: " + description + "<br />");
+		if (markdown != null)
+			html.append("Wiki: " + markdown + "<br />");
+		html.append("</html>");
+		return html.toString();
+	}
+	
+	private String getAllProjectsHtml(String searchQueryJson) throws RestServiceException, JSONObjectAdapterException{
+		EntityWrapper entityWrapper = synapseClient.search(searchQueryJson);
+		SearchResults results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
+		SearchQuery inputQuery = EntityFactory.createEntityFromJSONString(searchQueryJson, SearchQuery.class);
+		//append this set to the list
+		StringBuilder html = new StringBuilder();
+		html.append("<html><head><title>Sage Synapse: All Projects - starting from "+inputQuery.getStart()+"</title><meta name=\"description\" content=\"\" /></head>");
+		for (Hit hit : results.getHits()) {
+			//add links
+			html.append("<a href=\"#!Synapse:"+hit.getId()+"\">"+hit.getName()+"</a><br />");
+		}
+		//add another link for the next page of results
+		long newStart = results.getStart() + results.getHits().size();
+		inputQuery.setStart(newStart);
+		String newJson = EntityFactory.createJSONStringForEntity(inputQuery);
+		html.append("<a href=\"#!Search:"+URLEncoder.encode(newJson)+"\">Next Page</a><br />");
+		
+		html.append("</html>");
+		return html.toString();
+	}
+	
 	public String rewriteQueryString(String uglyUrl) {
 		try {
 			String decoded = URIUtil.decode(uglyUrl, "UTF-8");
@@ -154,28 +174,8 @@ public class CrawlFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig config) throws ServletException {
-		webClient = new WebClient(BrowserVersion.FIREFOX_3_6);
-	    webClient.setWebConnection(new UrlFetchWebConnection(webClient));
-		//and configure it to chill out
-		webClient.setCssEnabled(false);
-	    webClient.setIncorrectnessListener(new IncorrectnessListener() {
-			@Override
-			public void notify(String arg0, Object arg1) {
-			}
-		});
-	    webClient.setHTMLParserListener(new HTMLParserListener() {
-			
-			@Override
-			public void warning(String arg0, URL arg1, int arg2, int arg3, String arg4) {
-			}
-			
-			@Override
-			public void error(String arg0, URL arg1, int arg2, int arg3, String arg4) {
-			}
-		});
-	    //even setting these to false, it throws a ScriptException (even if the page fully loads)
-	    webClient.setThrowExceptionOnFailingStatusCode(false);
-	    webClient.setThrowExceptionOnScriptError(false);
-	    this.sc = config.getServletContext();
+		this.sc = config.getServletContext();
+		synapseClient = new SynapseClientImpl();
+		synapseClient.setServiceUrlProvider(new ServiceUrlProvider());
     }
 }

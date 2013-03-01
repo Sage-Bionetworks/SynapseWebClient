@@ -16,7 +16,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class RefreshCache {
+public class CrawlTester {
 	public static Set<String> seenUrls = new HashSet<String>();
 	public static Queue<String> urlQueue = new LinkedList<String>();
 	/**
