@@ -32,6 +32,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -282,12 +283,19 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 
 		// if query parses into SearchQuery, use that, otherwise use it as a
 		// search Term
-		if (queryString != null && queryString.startsWith("{")) {
-			try {
-				query = new SearchQuery(jsonObjectAdapter.createNew(queryString));
-				// passed a searchQuery
-			} catch (JSONObjectAdapterException e) {
-				// fall through to a use as search term
+		if (queryString != null) {
+			String fixedQueryString = queryString;
+			//check for url encoded
+			if (queryString.startsWith("%7B")) {
+				fixedQueryString = URL.decode(queryString);
+			}
+			if (fixedQueryString.startsWith("{")) {
+				try {
+					query = new SearchQuery(jsonObjectAdapter.createNew(fixedQueryString));
+					// passed a searchQuery
+				} catch (JSONObjectAdapterException e) {
+					// fall through to a use as search term
+				}
 			}
 		} 
 

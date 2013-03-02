@@ -244,7 +244,7 @@ jQuery.noConflict()(function($) {
 // Activating tabs
 jQuery.noConflict()(function($){
 	$(document).ready(function() {
-		implement_tabs();
+		//implement_tabs();
 	});
 });
 
