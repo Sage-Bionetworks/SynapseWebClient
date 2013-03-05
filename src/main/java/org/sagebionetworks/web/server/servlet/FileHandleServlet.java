@@ -237,9 +237,17 @@ public class FileHandleServlet extends HttpServlet {
 					String restrictedParam = request.getParameter(DisplayUtils.IS_RESTRICTED_PARAM_KEY);
 					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
 					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
-					fileEntity.setName(results.getList().get(0).getFileName());
 					fileEntity.setDataFileHandleId(results.getList().get(0).getId());
-					client.putEntity(fileEntity);
+					fileEntity = client.putEntity(fileEntity);
+					String originalFileEntityName = fileEntity.getName();
+					try{
+						//and try to set the name to the filename
+						fileEntity.setName(results.getList().get(0).getFileName());
+						fileEntity = client.putEntity(fileEntity);
+					} catch(Throwable t){
+						fileEntity.setName(originalFileEntityName);
+					};
+					
 					
 					// now lock down restricted data
 					if (isRestricted) {
