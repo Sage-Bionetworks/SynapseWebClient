@@ -67,12 +67,8 @@ public interface EntityMetadataView extends IsWidget {
 
 		void deleteVersion(String entityId, Long versionNumber);
 		
-		void setIsFavorite(boolean isFavorite);
-		
-		boolean isFavorite();
-
 	}
 
-	public void setIsFavorite(boolean isFavorite);
+
 
 }

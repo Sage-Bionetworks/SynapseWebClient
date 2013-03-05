@@ -91,6 +91,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	public Widget asWidget() {
 		view.setPresenter(this);
 		loadUserUpdateable();
+		loadFavorites();
 		return view.asWidget();
 	}
 

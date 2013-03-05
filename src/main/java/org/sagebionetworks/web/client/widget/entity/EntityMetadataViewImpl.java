@@ -88,11 +88,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private static final int VERSION_LIMIT = 100;
 	private static final int NAME_TIME_STUB_LENGTH = 7;
+	private FavoriteWidget favoriteWidget;
 	
-	private static String favoriteStarOffHtml;
-	private static String favoriteStarHtml;
-	
-
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
 
@@ -134,7 +131,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SpanElement label;
 	@UiField
-	Anchor favoriteAnchor;
+	SimplePanel favoritePanel;
 
 	@UiField
 	LayoutContainer previousVersions;
@@ -167,14 +164,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private PagingToolBar vToolbar;
 	private Grid<BaseModelData> vGrid;
 	private AnimationProtector versionAnimation;
-	boolean isFavorite = false;
-
+	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget) {
 		this.icons = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-
+		this.favoriteWidget = favoriteWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 
 		versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(allVersions, previousVersions));
@@ -238,20 +234,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		setPreviousVersions(cp);
 		
-		favoriteStarHtml = AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML();
-		favoriteStarOffHtml = AbstractImagePrototype.create(iconsImageBundle.starEmpty16()).getHTML();
-		
-		favoriteAnchor = new Anchor();
-		favoriteAnchor.setHTML(favoriteStarOffHtml);
-		favoriteAnchor.setHref("");
-		favoriteAnchor.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				setFavoriteIcon();
-				presenter.setIsFavorite(isFavorite);
-			}
-		});
-		
+		favoritePanel.addStyleName("inline-block");
+		favoritePanel.setWidget(favoriteWidget.asWidget());
+				
 		previousVersions.setLayout(new FlowLayout(10));
 	}
 
@@ -293,22 +278,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			setEntityVersions(vb);
 			versionAnimation.hide();
 		}
-		
-		isFavorite = presenter.isFavorite();
-		setFavoriteIcon();
-	}
-
-	@Override
-	public void setIsFavorite(boolean isFavorite) {
-		this.isFavorite = isFavorite;
-		setFavoriteIcon();		
-	}
-
-	private void setFavoriteIcon() {
-		if(isFavorite)
-			favoriteAnchor.setHTML(favoriteStarHtml);
-		else 
-			favoriteAnchor.setHTML(favoriteStarOffHtml);
+		favoriteWidget.configure(bundle.getEntity().getId());
 	}
 
 	private void clear() {

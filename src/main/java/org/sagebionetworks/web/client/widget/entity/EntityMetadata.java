@@ -1,11 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -361,66 +358,6 @@ public class EntityMetadata implements Presenter {
 				fireEntityUpdatedEvent();
 			}
 		});
-	}
-
-	@Override
-	public void setIsFavorite(final boolean isFavorite) {
-		if(isFavorite) {
-			synapseClient.addFavorite(bundle.getEntity().getId(), new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					updateStoredFavorites();
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					// revert view
-					view.setIsFavorite(false);
-					view.showErrorMessage(DisplayConstants.ERROR_SAVE_FAVORITE_MESSAGE);
-				}
-			});
-		} else {
-			synapseClient.removeFavorite(bundle.getEntity().getId(), new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					updateStoredFavorites();
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					// revert view
-					view.setIsFavorite(true);
-					view.showErrorMessage(DisplayConstants.ERROR_SAVE_FAVORITE_MESSAGE);
-				}
-			});			
-		}
-	}
-
-	private void updateStoredFavorites() {
-		synapseClient.getFavorites(Integer.MAX_VALUE, 0, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				try {
-					PaginatedResults<EntityHeader> favorites = nodeModelCreator.createPaginatedResults(result, EntityHeader.class);
-					globalApplicationState.setFavorites(favorites.getResults());
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-			}
-		});
-	}
-	@Override
-	public boolean isFavorite() {
-		List<EntityHeader> favorites = globalApplicationState.getFavorites();
-		if(favorites != null) {
-			for(EntityHeader eh : favorites) {
-				if(eh.getId().equals(bundle.getEntity().getId()))
-					return true;
-			}
-		}
-		return false;
 	}
 
 }

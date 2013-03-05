@@ -224,44 +224,4 @@ public class EntityMetadataTest {
 		assertEquals(APPROVAL_TYPE.USER_AGREEMENT, entityMetadata.getApprovalType());
 	}
 	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testSetIsFavorite() throws Exception {
-		PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
-		List<EntityHeader> results = new ArrayList<EntityHeader>();
-		favorites.setResults(results);
-		EntityHeader added = new EntityHeader();
-		String getFavoritesJson = favorites.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-		String addedJson = added.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-		AsyncMockStubber.callSuccessWith(getFavoritesJson).when(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(addedJson).when(mockSynapseClient).addFavorite(anyString(), any(AsyncCallback.class));
-		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(EntityHeader.class))).thenReturn(favorites);
-				
-		entityMetadata.setIsFavorite(true);
-				
-		verify(mockSynapseClient).addFavorite(eq(entityId), any(AsyncCallback.class));
-		verify(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockGlobalApplicationState).setFavorites(results);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testSetIsFavoriteUnset() throws Exception {
-		PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
-		List<EntityHeader> results = new ArrayList<EntityHeader>();
-		favorites.setResults(results);
-		EntityHeader added = new EntityHeader();
-		String getFavoritesJson = favorites.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-		String addedJson = added.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-		AsyncMockStubber.callSuccessWith(getFavoritesJson).when(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeFavorite(anyString(), any(AsyncCallback.class));
-		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(EntityHeader.class))).thenReturn(favorites);
-				
-		entityMetadata.setIsFavorite(false);
-				
-		verify(mockSynapseClient).removeFavorite(eq(entityId), any(AsyncCallback.class));
-		verify(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockGlobalApplicationState).setFavorites(results);
-	}
-	
 }
