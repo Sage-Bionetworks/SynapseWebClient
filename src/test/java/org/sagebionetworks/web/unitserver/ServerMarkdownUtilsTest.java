@@ -83,7 +83,7 @@ public class ServerMarkdownUtilsTest {
 	public void testAssignIdsToHeadings(){
 		//should assign h4 as toc-indent0 and id of synapseheading1
 		String testString = "<h6>smallest header</h6><h4 >top header</h4> <p><em>content</em><br></p> <h5>sub header 1</h5>";
-		String expectedResult = "<html>\n <head></head>\n <body>\n  <h6 id=\"synapseheading0\" level=\"h6\" class=\" toc-indent2\">smallest header</h6>\n  <h4 id=\"synapseheading1\" level=\"h4\" class=\" toc-indent0\">top header</h4> \n  <p><em>content</em><br /></p> \n  <h5 id=\"synapseheading2\" level=\"h5\" class=\" toc-indent1\">sub header 1</h5>\n </body>\n</html>";
+		String expectedResult = "<html>\n <head></head>\n <body>\n  <h6 id=\"synapseheading0\" level=\"h6\" toc-style=\"toc-indent2\">smallest header</h6>\n  <h4 id=\"synapseheading1\" level=\"h4\" toc-style=\"toc-indent0\">top header</h4> \n  <p><em>content</em><br /></p> \n  <h5 id=\"synapseheading2\" level=\"h5\" toc-style=\"toc-indent1\">sub header 1</h5>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
 		ServerMarkdownUtils.assignIdsToHeadings(htmlDoc);
 		String actualResult = htmlDoc.html();
