@@ -115,7 +115,7 @@ public class ServerMarkdownUtils {
 			if (!skip) {
 				hTag.attr("id", WidgetConstants.MARKDOWN_HEADING_ID_PREFIX+headingIndex);
 				hTag.attr("level", hTag.tag().getName());
-				hTag.addClass(headingLevel2StyleName.get(hTag.tag().getName()));
+				hTag.attr("toc-style", headingLevel2StyleName.get(hTag.tag().getName()));
 				headingIndex++;
 			}
 		}
