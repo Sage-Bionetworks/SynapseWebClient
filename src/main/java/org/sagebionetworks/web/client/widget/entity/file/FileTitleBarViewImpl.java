@@ -152,13 +152,14 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			boolean isFilenamePanelVisible = fileHandle != null;
 			fileNameContainer.setVisible(isFilenamePanelVisible);
 			if (isFilenamePanelVisible) {
-				fileName.setInnerText(fileHandle.getFileName());
 				//don't ask for the size if it's external, just display that this is external data
-				md5Link.setVisible(false);
 				if (fileHandle instanceof ExternalFileHandle) {
+					fileName.setInnerText("");
+					md5Link.setVisible(false);
 					fileSize.setInnerText("(External Storage)");
 				}
 				else if (fileHandle instanceof S3FileHandleInterface){
+					fileName.setInnerText(fileHandle.getFileName());
 					md5Link.setVisible(true);
 					S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
 					

@@ -23,7 +23,7 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 
 		String getUploadActionUrl(boolean isRestricted);
 
-		void setExternalLocation(String path, boolean isNewlyRestricted);
+		void setExternalFilePath(String path, boolean isNewlyRestricted);
 		
 		public void closeButtonSelected();
 

@@ -63,6 +63,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private TextArea markdownTextArea;
 	private HTML descriptionFormatInfo;
 	private WikiPageKey wikiKey;
+	private boolean isWikiEditor;
 	
 	public interface CloseHandler{
 		public void saveClicked();
@@ -96,9 +97,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	 * @param callback
 	 * @param saveHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
 	 */
-	public void configure(final WikiPageKey wikiKey, final TextArea markdownTextArea, LayoutContainer formPanel, boolean showFieldLabel, final WidgetDescriptorUpdatedHandler callback, final CloseHandler saveHandler, final ManagementHandler managementHandler, int spanWidth) {
+	public void configure(final WikiPageKey wikiKey, final TextArea markdownTextArea, LayoutContainer formPanel, boolean showFieldLabel, final boolean isWikiEditor, final WidgetDescriptorUpdatedHandler callback, final CloseHandler saveHandler, final ManagementHandler managementHandler, int spanWidth) {
 		this.markdownTextArea = markdownTextArea;
 		this.wikiKey = wikiKey;
+		this.isWikiEditor = isWikiEditor;
+		
 		descriptionFormatInfo = new HTML(WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
@@ -131,7 +134,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		previewButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				showPreview(markdownTextArea.getValue());
+				showPreview(markdownTextArea.getValue(), isWikiEditor);
 			}
 		});
 		
@@ -223,7 +226,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}); 
 		mdCommands.add(image);
 		
-		if (DisplayUtils.isInTestWebsite(cookies)) {
+		if (isWikiEditor) {
 			Image attachment = getNewCommand("Insert Attachment", iconsImageBundle.attachment16(),new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -244,13 +247,13 @@ public class MarkdownEditorWidget extends LayoutContainer {
 				
 	}
 	
-	public void showPreview(String descriptionMarkdown) {
+	public void showPreview(String descriptionMarkdown, final boolean isWiki) {
 	    //get the html for the markdown
 	    synapseClient.markdown2Html(descriptionMarkdown, true, new AsyncCallback<String>() {
 	    	@Override
 			public void onSuccess(String result) {
 	    		try {
-					showPreviewHTML(result);
+					showPreviewHTML(result, isWiki);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -263,7 +266,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		});	
 	}
 
-	public void showPreviewHTML(String result) throws JSONObjectAdapterException {
+	public void showPreviewHTML(String result, boolean isWiki) throws JSONObjectAdapterException {
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
 	    window.setSize(650, 500);
@@ -281,7 +284,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		else{
 			panel = new HTMLPanel(result);
 		}
-		MarkdownWidget.loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, true);
+		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
 		f.add(panel);
@@ -310,6 +313,13 @@ public class MarkdownEditorWidget extends LayoutContainer {
 
 	private Menu createWidgetMenu(final WidgetDescriptorUpdatedHandler callback) {
 	    Menu menu = new Menu();
+	    if (isWikiEditor) {
+		    menu.add(getNewCommand("Attachment", new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		handleInsertWidgetCommand(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, callback);
+		    	};
+			}));
+	    }
 	    menu.add(getNewCommand("Image", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
@@ -330,6 +340,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, callback);
 	    	};
 		}));
+    	menu.add(getNewCommand("Table Of Contents", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TOC_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
+	    	};
+		}));
 	    menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	
@@ -341,22 +356,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	     */
 	    if (DisplayUtils.isInTestWebsite(cookies)) {
 	    	menu.add(new SeparatorMenuItem());
-		    menu.add(getNewCommand("Attachment", new SelectionListener<ComponentEvent>() {
-		    	public void componentSelected(ComponentEvent ce) {
-		    		handleInsertWidgetCommand(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, callback);
-		    	};
-			}));
-	    	menu.add(getNewCommand("Synapse API SuperTable", new SelectionListener<ComponentEvent>() {
+		    menu.add(getNewCommand("Synapse API SuperTable", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
 		    		handleInsertWidgetCommand(WidgetConstants.API_TABLE_CONTENT_TYPE, callback);
 		    	};
 			}));
-	    	menu.add(getNewCommand("Table Of Contents", new SelectionListener<ComponentEvent>() {
-		    	public void componentSelected(ComponentEvent ce) {
-		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TOC_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
-		    	};
-			}));
-	    	
 	    	menu.add(getNewCommand("Wiki Files Preview", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
 		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
@@ -376,7 +380,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			}
 			callback.onUpdate(event);
 		}
-		});
+		}, isWikiEditor);
 	}
 	
 	public void insertMarkdown(String md) {

@@ -454,6 +454,7 @@ public class DisplayConstants {
 	public static final String ADD_FILE = "Add File";
 	public static final String FILES = "Files";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
+	public static final String ERROR_FILE_CREATION_FAILED = "File creation failed. Please try again";
 	public static final String PAGES = "Pages";
 	public static final String ADD_PAGE = "Add a new Page";
 	public static final String CREATE_WIKI = "Insert Wiki";

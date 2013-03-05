@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
@@ -39,6 +40,7 @@ import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -898,24 +900,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} 
 	}
 	
-//	@Override
-//	public EntityWrapper updateExternalFile(String entityId, String externalUrl) throws RestServiceException {
-//		Synapse synapseClient = createSynapseClient();
-//		try {
-//			Entity entity = synapseClient.getEntityById(entityId);
-//			if(!(entity instanceof FileEntity)) {
-//				throw new RuntimeException("Upload failed. Entity id: " + entity.getId() + " is not a File.");
-//			}
-//			
-//			Locationable result = synapseClient.updateExternalLocationableToSynapse((Locationable)locationable, externalUrl);
-//			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());
-//			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		} catch (JSONObjectAdapterException e) {
-//			throw new UnknownErrorException(e.getMessage());
-//		} 
-//	}
+	@Override
+	public EntityWrapper updateExternalFile(String entityId, String externalUrl) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			Entity entity = synapseClient.getEntityById(entityId);
+			if(!(entity instanceof FileEntity)) {
+				throw new RuntimeException("Upload failed. Entity id: " + entity.getId() + " is not a File.");
+			}
+			
+			ExternalFileHandle efh = new ExternalFileHandle();
+			efh.setExternalURL(externalUrl);
+			ExternalFileHandle clone = synapseClient.createExternalFileHandle(efh);
+			((FileEntity)entity).setDataFileHandleId(clone.getId());
+			Entity updatedEntity = synapseClient.putEntity(entity);
+			JSONObjectAdapter aaJson = updatedEntity.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
 
 	@Override
 	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException{
