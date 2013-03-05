@@ -104,7 +104,7 @@ public class EntityPageTopTest {
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
 		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class))).thenReturn(testWidgetRenderer);
 		
-		EntityBundle bundle = new EntityBundle(entity, null, null, null, null, null, null);
+		EntityBundle bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		pageTop.setBundle(bundle, false);
 	}
 

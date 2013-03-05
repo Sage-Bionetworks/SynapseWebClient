@@ -27,7 +27,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.Favorite;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
@@ -1153,7 +1152,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String addFavorite(String entityId) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			Favorite favorite = synapseClient.addFavorite(entityId);
+			EntityHeader favorite = synapseClient.addFavorite(entityId);
 			return EntityFactory.createJSONStringForEntity(favorite);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1177,7 +1176,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<Favorite> favorites = synapseClient.getFavorites(limit, offset);
+			PaginatedResults<EntityHeader> favorites = synapseClient.getFavorites(limit, offset);
 			return EntityFactory.createJSONStringForEntity(favorites);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

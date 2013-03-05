@@ -243,6 +243,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		favoriteAnchor = new Anchor();
 		favoriteAnchor.setHTML(favoriteStarOffHtml);
+		favoriteAnchor.setHref("");
 		favoriteAnchor.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
