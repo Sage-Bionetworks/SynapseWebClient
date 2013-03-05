@@ -170,7 +170,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 				if (isFilenamePanelVisible) {
 					//if entity name is not shown, we might have a locationable filename to show
 					String locationPath = LocationableTitleBarViewImpl.getLocationablePath(entityBundle);
-					fileName.setInnerText(locationPath != null ? DisplayUtils.getFileNameFromLocationPath(locationPath) : "");
+					fileName.setInnerText(locationPath != null ? DisplayUtils.getFileNameFromExternalUrl(locationPath) : "");
 					LocationData locationData = locationable.getLocations().get(0);
 					LocationTypeNames locationTypeName = locationData.getType();
 					//don't ask for the size if it's external, just display that this is external data

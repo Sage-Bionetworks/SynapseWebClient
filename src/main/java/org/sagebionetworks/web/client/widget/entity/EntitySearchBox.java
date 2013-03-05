@@ -74,7 +74,7 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 
 	/**
 	 * Default size
-	 * @param width
+	 * @param DIALOG_WIDTH
 	 * @return
 	 */
 	@Override

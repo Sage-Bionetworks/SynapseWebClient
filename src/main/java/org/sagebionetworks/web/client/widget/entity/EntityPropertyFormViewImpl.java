@@ -56,6 +56,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	SynapseJSNIUtils synapseJSNIUtils;
 	Window loading;
 	private MarkdownEditorWidget markdownEditorWidget;
+	public static final int DIALOG_WIDTH = 850;
 	
 	@Inject
 	public EntityPropertyFormViewImpl(FormFieldFactory formFactory, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,SynapseJSNIUtils synapseJSNIUtils, MarkdownEditorWidget markdownEditorWidget) {
@@ -77,9 +78,8 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
 		boolean isWikiEntityEditor = DisplayUtils.isWikiSupportedType(presenter.getEntity());
-		int width = isWikiEntityEditor ? 670 : 880;
 		int height = isWikiEntityEditor ? 400 : 660;
-		window.setSize(width, height);
+		window.setSize(DIALOG_WIDTH, height);
 	    window.setPlain(true);  
 	    window.setModal(true);  
 	    window.setHeading(windowTitle);
@@ -111,15 +111,13 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		this.setScrollMode(Scroll.AUTO);
 		this.vp = new VerticalPanel();
 		this.add(vp);
-		boolean isWikiEntityEditor = DisplayUtils.isWikiSupportedType(presenter.getEntity());
-		int width = isWikiEntityEditor ? 640 : 850;
 		// This is the property panel
 		propPanel = new ContentPanel();
 		propPanel.setCollapsible(true);
 		propPanel.setFrame(false);
 		propPanel.setHeading("Properties");
 		propPanel.setLayout(new AnchorLayout());
-		propPanel.setWidth(width);
+		propPanel.setWidth(DIALOG_WIDTH);
 		// Add a place holder form panel
 		formPanel = new FormPanel();
 		propPanel.add(formPanel);
@@ -152,7 +150,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		annoPanel.setFrame(false);
 		annoPanel.setHeading("Annotations");
 		annoPanel.setLayout(new AnchorLayout());
-		annoPanel.setWidth(width);
+		annoPanel.setWidth(DIALOG_WIDTH);
 		annoPanel.setBottomComponent(toolBar);
 		// Add a place holder form panel
 		annotationFormPanel = new FormPanel();
@@ -182,7 +180,8 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		// formPanel.setSize("100%", "100%");
 		// Basic form data
 		Margins margins = new Margins(10, 10, 0, 10);
-		FormData basicFormData = new FormData("-10"); //anchor layout, -10px from the right edge
+		FormData basicFormData = new FormData(); 
+		basicFormData.setWidth(DIALOG_WIDTH-160);
 		basicFormData.setMargins(margins);
 
 		// Name is the first
@@ -235,7 +234,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		}
 		else {
 			markdownDescriptionField = formFactory.createTextAreaField(model.getDescription());
-			markdownDescriptionField.setWidth("796px");
+			markdownDescriptionField.setWidth((DIALOG_WIDTH-90)+"px");
 			markdownDescriptionField.setHeight("300px");
 		}
 

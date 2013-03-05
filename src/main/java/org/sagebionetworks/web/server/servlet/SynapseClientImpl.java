@@ -60,6 +60,7 @@ import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
@@ -914,6 +915,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			ExternalFileHandle clone = synapseClient.createExternalFileHandle(efh);
 			((FileEntity)entity).setDataFileHandleId(clone.getId());
 			Entity updatedEntity = synapseClient.putEntity(entity);
+			String oldName = updatedEntity.getName();
+			try{
+				//also try to rename to something reasonable, ignore if anything goes wrong
+				updatedEntity.setName(DisplayUtils.getFileNameFromExternalUrl(externalUrl));
+				updatedEntity = synapseClient.putEntity(updatedEntity);
+			} catch(Throwable t) {
+				//if anything goes wrong, send back the actual name
+				updatedEntity.setName(oldName);
+			}
 			JSONObjectAdapter aaJson = updatedEntity.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
 		} catch (SynapseException e) {

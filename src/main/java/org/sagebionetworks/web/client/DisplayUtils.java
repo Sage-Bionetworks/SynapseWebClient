@@ -409,7 +409,7 @@ public class DisplayUtils {
 		}
 	}	
 
-	public static String getFileNameFromLocationPath(String path){
+	public static String getFileNameFromExternalUrl(String path){
 		//grab the text between the last '/' and following '?'
 		String fileName = "";
 		if (path != null) {

@@ -102,10 +102,10 @@ public class DisplayUtilsTest {
 	@Test
 	public void testGetFileNameFromLocationPath() {
 		String name = "filename.txt";
-		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://some.really.long.com/path/to/a/file/" + name));
-		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://some.really.long.com/path/to/a/file/" + name + "?param1=value&param2=value"));
-		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("/root/" + name));
-		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://google.com/" + name));
+		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("http://some.really.long.com/path/to/a/file/" + name));
+		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("http://some.really.long.com/path/to/a/file/" + name + "?param1=value&param2=value"));
+		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("/root/" + name));
+		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("http://google.com/" + name));
 		
 	}
 	
