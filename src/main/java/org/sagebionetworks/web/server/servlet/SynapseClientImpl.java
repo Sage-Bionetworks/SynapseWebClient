@@ -1163,4 +1163,41 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+
+	@Override
+	public String addFavorite(String entityId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			EntityHeader favorite = synapseClient.addFavorite(entityId);
+			return EntityFactory.createJSONStringForEntity(favorite);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public void removeFavorite(String entityId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			synapseClient.removeFavorite(entityId);			
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+
+	@Override
+	public String getFavorites(Integer limit, Integer offset)
+			throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<EntityHeader> favorites = synapseClient.getFavorites(limit, offset);
+			return EntityFactory.createJSONStringForEntity(favorites);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 }

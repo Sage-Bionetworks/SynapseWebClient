@@ -1,10 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -17,6 +23,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -84,6 +91,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	public Widget asWidget() {
 		view.setPresenter(this);
 		loadUserUpdateable();
+		loadFavorites();
 		return view.asWidget();
 	}
 
@@ -134,6 +142,26 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 
 	public EntityTreeBrowser getEntityTreeBrowser() {
 		return view.getEntityTreeBrowser();
+	}
+
+	@Override
+	public void loadFavorites() {
+		synapseClient.getFavorites(Integer.MAX_VALUE, 0, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				try {
+					PaginatedResults<EntityHeader> favorites = nodeModelCreator.createPaginatedResults(result, EntityHeader.class);
+					globalApplicationState.setFavorites(favorites.getResults());
+					view.setFavoriteEntities(favorites.getResults());
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+			}
+		});
 	}
 
 	

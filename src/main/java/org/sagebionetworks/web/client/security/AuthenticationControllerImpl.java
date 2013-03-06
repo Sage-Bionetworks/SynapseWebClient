@@ -57,7 +57,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				try {
 					//automatically expire after a day
 					Date tomorrow = getDayFromNow();
-					cookies.setCookie(CookieKeys.USER_LOGIN_DATA, userSessionJson, tomorrow);
+					setUserSessionDataCookie(userSessionJson, tomorrow);
 					userSessionData = nodeModelCreator.createJSONEntity(userSessionJson, UserSessionData.class);
 					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken(), tomorrow);
 				} catch (JSONObjectAdapterException e) {
@@ -149,6 +149,30 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void getTermsOfUse(AsyncCallback<String> callback) {
 		userAccountService.getTermsOfUse(callback);
+	}
+
+	@Override
+	public void reloadUserSessionData() {
+		String sessionToken = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
+		setUser(sessionToken, new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {				
+			}
+
+			@Override
+			public void onSuccess(String result) {
+			}
+		}, currentUser.getIsSSO());
+		
+	}
+
+	
+	/*
+	 * Private Methods
+	 */
+	private void setUserSessionDataCookie(String userSessionJson,
+			Date tomorrow) {
+		cookies.setCookie(CookieKeys.USER_LOGIN_DATA, userSessionJson, tomorrow);
 	}
 
 }

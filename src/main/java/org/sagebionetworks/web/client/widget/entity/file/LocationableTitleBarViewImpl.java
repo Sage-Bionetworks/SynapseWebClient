@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
@@ -60,7 +61,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	private Widget downloadButton = null;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private Anchor md5Link;
-	//private Anchor md5Link;
+	private FavoriteWidget favoriteWidget;	
 	
 	@UiField
 	HTMLPanel panel;
@@ -86,7 +87,9 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	SpanElement fileName;
 	@UiField
 	SpanElement fileSize;
-	
+	@UiField
+	SimplePanel favoritePanel;
+
 	
 	interface LocationableTitleBarViewImplUiBinder extends UiBinder<Widget, LocationableTitleBarViewImpl> {
 	}
@@ -103,11 +106,14 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloader, 
 			EntityTypeProvider typeProvider,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			FavoriteWidget favoriteWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.locationableUploader = locationableUploader;
 		this.licensedDownloader = licensedDownloader;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.favoriteWidget = favoriteWidget;
+		
 		initWidget(uiBinder.createAndBindUi(this));
 		downloadButtonContainer.addStyleName("inline-block margin-left-5");
 		md5LinkContainer.addStyleName("inline-block font-italic margin-left-5");
@@ -119,6 +125,9 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 				downloadButton.fireEvent(event);
 			}
 		});
+		
+		favoritePanel.addStyleName("inline-block");
+		favoritePanel.setWidget(favoriteWidget.asWidget());
 	}
 	public static String getLocationablePath(EntityBundle bundle) {
 		String locationPath = null;
@@ -140,6 +149,8 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		
 		Entity entity = entityBundle.getEntity();
 
+		favoriteWidget.configure(entity.getId());
+		
 		UserSessionData sessionData = authenticationController.getLoggedInUser();
 		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
 		

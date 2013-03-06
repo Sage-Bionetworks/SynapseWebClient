@@ -11,7 +11,7 @@
 			<h2 style="margin-bottom: 0px;">
 			 	<g:Image ui:field="entityIcon" />
 			 	<g:Anchor ui:field="entityLink"/>
-			 	<g:SimplePanel ui:field="downloadButtonContainer"/>&nbsp;(<span ui:field="entityId"/>)
+			 	<g:SimplePanel ui:field="downloadButtonContainer"/>&nbsp;(<span ui:field="entityId"/>) <g:SimplePanel ui:field="favoritePanel"/>
 			</h2>
 			<g:HTMLPanel ui:field="fileNameContainer">
 				File: <span ui:field="fileName"/><span style="margin-left: 5px;" class="file-size" ui:field="fileSize" /><g:SimplePanel ui:field="md5LinkContainer"/>
