@@ -75,7 +75,6 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -179,6 +178,13 @@ public class DisplayUtils {
 	
 	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
 	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
+	
+	public static final String[] IMAGE_EXTENSIONS = new String[] {".png", ".jpg", ".jpeg",".tiff",".gif",".bmp"};
+	public static final HashSet<String> IMAGE_EXTENSIONS_SET = new HashSet<String>(Arrays.asList(IMAGE_EXTENSIONS));
+	
+	public static final String[] CODE_EXTENSIONS = new String[] {".awk",".bat",".btm",".c",".cmd",".cpp",".cxx",".def",".dlg",".dpc",".dpj",".dtd",".h",".hdl",".hpp",".hrc",".html",".hxx",".inc",".ini",".inl",".ins",".java",".js",".jsp",".l",".lgt",".ll",".par",".pl",".r",".rc",".rdb",".res",".s",".sbl",".scp",".sh",".src",".srs",".xml",".xrb",".y",".yxx"};
+	public static final HashSet<String> CODE_EXTENSIONS_SET = new HashSet<String>(Arrays.asList(CODE_EXTENSIONS));
+	
 	
 	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
@@ -858,7 +864,7 @@ public class DisplayUtils {
 		attachmentMap.put("bmp", DEFAULT_IMAGE_ICON);
 		attachmentMap.put("wbmp", DEFAULT_IMAGE_ICON);
 	}
-
+	
 	/**
 	 * Get the icon to be used with a given file type.
 	 */
@@ -1401,11 +1407,19 @@ public class DisplayUtils {
 	
 	public static boolean hasRecognizedImageExtension(String fileName) {
 		String lowerFileName = fileName.toLowerCase();
-		return lowerFileName.endsWith(".png") ||
-				lowerFileName.endsWith(".jpg") ||
-				lowerFileName.endsWith(".jpeg") ||
-				lowerFileName.endsWith(".tiff") ||
-				lowerFileName.endsWith(".gif") ||
-				lowerFileName.endsWith(".bmp");
+		int lastDot = lowerFileName.lastIndexOf(".");
+		if (lastDot > -1) {
+			return IMAGE_EXTENSIONS_SET.contains(lowerFileName.substring(lastDot));
+		}
+		else return false;
+	}
+	
+	public static boolean hasRecognizedCodeExtension(String fileName) {
+		String lowerFileName = fileName.toLowerCase();
+		int lastDot = lowerFileName.lastIndexOf(".");
+		if (lastDot > -1) {
+			return CODE_EXTENSIONS_SET.contains(lowerFileName.substring(lastDot));
+		}
+		else return false;
 	}
 }
