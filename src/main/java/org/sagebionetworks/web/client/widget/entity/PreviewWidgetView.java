@@ -13,7 +13,7 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setCodePreview(String code);
 	public void setBlockQuotePreview(String text);
 	public void showErrorMessage(String message);
-	public void reset();
+	public void clear();
 	
 	/**
 	 * Presenter interface

@@ -31,7 +31,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 	}
 	
 	public Widget asWidget(EntityBundle bundle) {
-		view.reset();
+		view.clear();
 		PreviewFileHandle handle = FileTitleBar.getPreviewFileHandle(bundle);
 		if (handle != null) {
 			final String contentType = handle.getContentType();

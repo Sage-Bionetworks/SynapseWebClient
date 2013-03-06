@@ -25,19 +25,12 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	
 	@Override
 	public Widget asWidget() {
-		addStyleName("markdown");
 		return this;
 	}
 	
 	@Override
-	public void reset() {
-		if (getWidget() != null)
-			remove(getWidget());
-	}
-	
-	@Override
 	public void setImagePreview(String fullFileUrl, String previewUrl) {
-		reset();
+		clear();
 		StringBuilder sb = new StringBuilder();
 		sb.append("<a href=\"");
 		sb.append(fullFileUrl);
@@ -50,6 +43,8 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	
 	@Override
 	public void setCodePreview(String code) {
+		clear();
+		setStylePrimaryName("markdown");
 		StringBuilder sb = new StringBuilder();
 		sb.append("<pre><code>");
 		sb.append(code);
@@ -60,6 +55,8 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	
 	@Override
 	public void setBlockQuotePreview(String text) {
+		clear();
+		setStylePrimaryName("markdown");
 		StringBuilder sb = new StringBuilder();
 		sb.append("<blockquote>");
 		sb.append(text);
