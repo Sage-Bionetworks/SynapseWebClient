@@ -179,11 +179,11 @@ public class DisplayUtils {
 	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
 	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
 	
-	public static final String[] IMAGE_EXTENSIONS = new String[] {".png", ".jpg", ".jpeg",".tiff",".gif",".bmp"};
-	public static final HashSet<String> IMAGE_EXTENSIONS_SET = new HashSet<String>(Arrays.asList(IMAGE_EXTENSIONS));
+	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/gif","image/png"};
+	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
 	
-	public static final String[] CODE_EXTENSIONS = new String[] {".awk",".bat",".btm",".c",".cmd",".cpp",".cxx",".def",".dlg",".dpc",".dpj",".dtd",".h",".hdl",".hpp",".hrc",".html",".hxx",".inc",".ini",".inl",".ins",".java",".js",".jsp",".l",".lgt",".ll",".par",".pl",".r",".rc",".rdb",".res",".s",".sbl",".scp",".sh",".src",".srs",".xml",".xrb",".y",".yxx"};
-	public static final HashSet<String> CODE_EXTENSIONS_SET = new HashSet<String>(Arrays.asList(CODE_EXTENSIONS));
+	public static final String[] CODE_CONTENT_TYPES = new String[] {".awk",".bat",".btm",".c",".cmd",".cpp",".cxx",".def",".dlg",".dpc",".dpj",".dtd",".h",".hdl",".hpp",".hrc",".html",".hxx",".inc",".ini",".inl",".ins",".java",".js",".jsp",".l",".lgt",".ll",".par",".pl",".r",".rc",".rdb",".res",".s",".sbl",".scp",".sh",".src",".srs",".xml",".xrb",".y",".yxx"};
+	public static final HashSet<String> CODE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(CODE_CONTENT_TYPES));
 	
 	
 	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
@@ -1405,21 +1405,13 @@ public class DisplayUtils {
 		return (entity instanceof FileEntity);
 	}
 	
-	public static boolean hasRecognizedImageExtension(String fileName) {
-		String lowerFileName = fileName.toLowerCase();
-		int lastDot = lowerFileName.lastIndexOf(".");
-		if (lastDot > -1) {
-			return IMAGE_EXTENSIONS_SET.contains(lowerFileName.substring(lastDot));
-		}
-		else return false;
+	public static boolean isRecognizedImageContentType(String contentType) {
+		String lowerContentType = contentType.toLowerCase();
+		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
 	}
 	
-	public static boolean hasRecognizedCodeExtension(String fileName) {
-		String lowerFileName = fileName.toLowerCase();
-		int lastDot = lowerFileName.lastIndexOf(".");
-		if (lastDot > -1) {
-			return CODE_EXTENSIONS_SET.contains(lowerFileName.substring(lastDot));
-		}
-		else return false;
+	public static boolean isRecognizedCodeContentType(String contentType) {
+		String lowerContentType = contentType.toLowerCase();
+		return CODE_CONTENT_TYPES_SET.contains(lowerContentType);
 	}
 }

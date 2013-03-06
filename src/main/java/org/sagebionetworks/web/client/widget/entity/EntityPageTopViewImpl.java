@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -285,12 +286,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Widget getFilePreview(EntityBundle bundle) {
 		final SimplePanel wrapper = new SimplePanel();
 
-		FileHandle handle = FileTitleBar.getFileHandle(bundle);
+		PreviewFileHandle handle = FileTitleBar.getPreviewFileHandle(bundle);
 		if (handle != null) {
-			String fileName = handle.getFileName();
-			if (fileName != null) {
+			String contentType = handle.getContentType();
+			if (contentType != null) {
 				FileEntity fileEntity = (FileEntity)bundle.getEntity();
-				if (DisplayUtils.hasRecognizedImageExtension(fileName)) {
+				if (DisplayUtils.isRecognizedImageContentType(contentType)) {
 					//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 					//create img
 					StringBuilder sb = new StringBuilder();
@@ -302,7 +303,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					sb.append("\"></img></a>");
 					wrapper.add(new HTMLPanel(sb.toString()));
 				}
-				else if (DisplayUtils.hasRecognizedCodeExtension(fileName)) {
+				else if (DisplayUtils.isRecognizedCodeContentType(contentType)) {
 					wrapper.addStyleName("markdown");
 					RequestBuilder rb = new RequestBuilder(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
 					try {

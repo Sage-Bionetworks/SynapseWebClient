@@ -122,6 +122,25 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		return fileHandle;
 	}
 	
+	/**
+	 * Return a preview filehandle associated with this bundle (or null if unavailable)
+	 * @param bundle
+	 * @return
+	 */
+	public static PreviewFileHandle getPreviewFileHandle(EntityBundle bundle) {
+		PreviewFileHandle fileHandle = null;
+		if (bundle.getFileHandles() != null) {
+			for (FileHandle fh : bundle.getFileHandles()) {
+				if (fh instanceof PreviewFileHandle) {
+					fileHandle = (PreviewFileHandle) fh;
+					break;
+				}
+			}
+		}
+		return fileHandle;
+	}
+
+	
 	
 	/*
 	 * Private Methods
