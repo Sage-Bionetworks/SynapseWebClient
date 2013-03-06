@@ -14,13 +14,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -47,8 +52,10 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gdata.data.Kind.Adaptable;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.sun.grizzly.tcp.Adapter;
 
 public class EntityMetadataTest {
 
@@ -58,13 +65,15 @@ public class EntityMetadataTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	EntityMetadataView mockView;
 	EntitySchemaCache mockSchemaCache;
-	JSONObjectAdapter mockJsonObjectAdapter;
+	JSONObjectAdapter jsonObjectAdapter;
 	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	EventBus mockEventBus;
 	JiraURLHelper mockJiraURLHelper;
 	EntityMetadata entityMetadata;
 	Versionable vb;
+	String entityId = "syn123";
+	EntityBundle bundle;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -81,33 +90,32 @@ public class EntityMetadataTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityMetadataView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
-		mockJsonObjectAdapter = mock(JSONObjectAdapter.class);
+		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockEventBus = mock(EventBus.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 
-		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, mockJsonObjectAdapter, mockGlobalApplicationState, mockEntityTypeProvider, mockJiraURLHelper, mockEventBus);
+		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, jsonObjectAdapter, mockGlobalApplicationState, mockEntityTypeProvider, mockJiraURLHelper, mockEventBus);
 
 		vb = new Data();
-		vb.setId("syn123");
+		vb.setId(entityId);
 		vb.setVersionNumber(new Long(1));
 		vb.setVersionLabel("");
 		vb.setVersionComment("");
-		EntityBundle mockBundle = mock(EntityBundle.class, RETURNS_DEEP_STUBS);
-		when(mockBundle.getPermissions().getCanEdit()).thenReturn(true);
-		when(mockBundle.getEntity()).thenReturn(vb);
+		bundle = mock(EntityBundle.class, RETURNS_DEEP_STUBS);
+		when(bundle.getPermissions().getCanEdit()).thenReturn(true);
+		when(bundle.getEntity()).thenReturn(vb);
 
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
 		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
 		accessRequirement.setId(101L);
 		accessRequirement.setTermsOfUse("terms of use");
 		accessRequirements.add(accessRequirement);
-		when(mockBundle.getAccessRequirements()).thenReturn(accessRequirements);
-		when(mockBundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
-		
-		when(mockJsonObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
-		entityMetadata.setEntityBundle(mockBundle, false);
+		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
+		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
+				
+		entityMetadata.setEntityBundle(bundle, false);
 
 	}
 
@@ -215,4 +223,5 @@ public class EntityMetadataTest {
 	public void testGetApprovalType() {
 		assertEquals(APPROVAL_TYPE.USER_AGREEMENT, entityMetadata.getApprovalType());
 	}
+	
 }

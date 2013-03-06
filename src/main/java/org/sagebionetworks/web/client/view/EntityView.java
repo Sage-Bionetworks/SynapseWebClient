@@ -18,7 +18,8 @@ public interface EntityView extends IsWidget, SynapseView {
 		/**
 		 * refreshes the entity from the service and redraws the view
 		 */
-		public void refresh();
+		void refresh();
+			
 	}
 
 	/**

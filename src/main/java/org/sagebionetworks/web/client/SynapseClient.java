@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.Favorite;
+import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -201,4 +203,10 @@ public interface SynapseClient extends RemoteService {
 	public String getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	public String getFileEndpoint() throws RestServiceException;
+	
+	public String addFavorite(String entityId) throws RestServiceException;
+	
+	public void removeFavorite(String entityId) throws RestServiceException;
+	
+	public String getFavorites(Integer limit, Integer offset) throws RestServiceException;
 }
