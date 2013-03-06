@@ -1414,4 +1414,8 @@ public class DisplayUtils {
 		String lowerContentType = contentType.toLowerCase();
 		return CODE_CONTENT_TYPES_SET.contains(lowerContentType);
 	}
+	
+	public static boolean isTextType(String contentType) {
+		return contentType.toLowerCase().startsWith("text/");
+	}
 }

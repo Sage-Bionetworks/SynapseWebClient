@@ -13,8 +13,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -57,17 +55,12 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -112,6 +105,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private FilesBrowser filesBrowser;
 	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
+	private PreviewWidget previewWidget;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -124,7 +118,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget, PreviewWidget previewWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -139,7 +133,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.fileTitleBar = fileTitleBar;
 		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
-
+		this.previewWidget = previewWidget;
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
 		
@@ -284,57 +278,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	private Widget getFilePreview(EntityBundle bundle) {
-		final SimplePanel wrapper = new SimplePanel();
-
-		PreviewFileHandle handle = FileTitleBar.getPreviewFileHandle(bundle);
-		if (handle != null) {
-			String contentType = handle.getContentType();
-			if (contentType != null) {
-				FileEntity fileEntity = (FileEntity)bundle.getEntity();
-				if (DisplayUtils.isRecognizedImageContentType(contentType)) {
-					//add a html panel that contains the image src from the attachments server (to pull asynchronously)
-					//create img
-					StringBuilder sb = new StringBuilder();
-					sb.append("<a href=\"");
-					sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false));
-					sb.append("\"><img class=\"imageDescriptor\" ");
-					sb.append(" src=\"");
-					sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
-					sb.append("\"></img></a>");
-					wrapper.add(new HTMLPanel(sb.toString()));
-				}
-				else if (DisplayUtils.isRecognizedCodeContentType(contentType)) {
-					wrapper.addStyleName("markdown");
-					RequestBuilder rb = new RequestBuilder(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
-					try {
-						rb.sendRequest(null, new RequestCallback() {
-							public void onError(final Request request, final Throwable e) {
-								showErrorMessage(e.getMessage());
-							}
-							public void onResponseReceived(final Request request, final Response response) {
-								//add the response text
-								StringBuilder sb = new StringBuilder();
-								int statusCode = response.getStatusCode();
-								if (statusCode == Response.SC_OK) {
-									String responseText = response.getText();
-									if (responseText != null && responseText.length() > 0) {
-										sb.append("<pre><code>");
-										sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-										sb.append("</code></pre>");
-										wrapper.add(new HTMLPanel(sb.toString()));
-										synapseJSNIUtils.highlightCodeBlocks();
-									}
-								}
-							}
-						});
-					} catch (final Exception e) {
-						showErrorMessage(e.getMessage());
-					}
-					return wrapper;
-				}
-			}
-		}
-		return wrapper;
+		return previewWidget.asWidget(bundle);
 	}
 	
 	// Render the Folder entity
