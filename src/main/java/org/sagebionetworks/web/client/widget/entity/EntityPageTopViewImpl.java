@@ -296,7 +296,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					StringBuilder sb = new StringBuilder();
 					sb.append("<a href=\"");
 					sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false));
-					sb.append("\"><img alt=\""+DisplayConstants.PREVIEW_UNAVAILABLE+"\" class=\"imageDescriptor\" ");
+					sb.append("\"><img class=\"imageDescriptor\" ");
 					sb.append(" src=\"");
 					sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
 					sb.append("\"></img></a>");
@@ -313,11 +313,17 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 							public void onResponseReceived(final Request request, final Response response) {
 								//add the response text
 								StringBuilder sb = new StringBuilder();
-								sb.append("<pre><code>");
-								sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(response.getText()));
-								sb.append("</code></pre>");
-								wrapper.add(new HTMLPanel(sb.toString()));
-								synapseJSNIUtils.highlightCodeBlocks();
+								int statusCode = response.getStatusCode();
+								if (statusCode == Response.SC_OK) {
+									String responseText = response.getText();
+									if (responseText != null && responseText.length() > 0) {
+										sb.append("<pre><code>");
+										sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+										sb.append("</code></pre>");
+										wrapper.add(new HTMLPanel(sb.toString()));
+										synapseJSNIUtils.highlightCodeBlocks();
+									}
+								}
 							}
 						});
 					} catch (final Exception e) {
