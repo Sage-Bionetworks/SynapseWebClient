@@ -43,7 +43,12 @@ public interface AuthenticationController {
 	 * @return the current user
 	 */
 	public UserSessionData getLoggedInUser();
-		
+	
+	/**
+	 * Redownload the user's session data 
+	 */
+	void reloadUserSessionData();
+
 	public void getTermsOfUse(AsyncCallback<String> callback);
 	
 }

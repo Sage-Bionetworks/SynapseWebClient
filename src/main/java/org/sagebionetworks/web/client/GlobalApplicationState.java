@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 
 import com.google.gwt.activity.shared.ActivityMapper;
@@ -62,4 +65,8 @@ public interface GlobalApplicationState {
 	 * @return AppPlaceHistoryMapper
 	 */
 	public AppPlaceHistoryMapper getAppPlaceHistoryMapper();
+	
+	public List<EntityHeader> getFavorites();
+	
+	public void setFavorites(List<EntityHeader> favorites);
 }

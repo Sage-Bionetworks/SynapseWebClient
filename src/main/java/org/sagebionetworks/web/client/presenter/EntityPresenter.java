@@ -10,15 +10,20 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -45,17 +50,20 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String entityId;
 	private Long versionNumber;
 	private boolean readOnly = false;
+	private AdapterFactory adapterFactory;
 	
 	@Inject
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
+		this.adapterFactory = adapterFactory;
 	
 		view.setPresenter(this);
 	}
