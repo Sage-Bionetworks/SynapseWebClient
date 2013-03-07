@@ -68,7 +68,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private boolean readOnly;	
 	private Button editButton;
 	private Button shareButton;
-	private Button addButton;
 	private Button toolsButton;
 	private Button deleteButton;
 	
@@ -129,24 +128,12 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		if (isAdministrator && !readOnly) shareButton.enable();
 		else shareButton.disable();
 		configureShareButton(entity);		
-
-		// add Button
-		if(addButton == null) {
-			addButton = new Button(DisplayConstants.BUTTON_ADD, AbstractImagePrototype.create(iconsImageBundle.add16()));
-			addButton.setId(DisplayConstants.ID_BTN_ADD);
-			addButton.setHeight(25);
-			this.add(addButton);
-			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
-		}
-		
-		if (canEdit && !readOnly) addButton.enable();
-		else addButton.disable();
-		configureAddMenu(entity, entityType);
 		
 		if(toolsButton == null) {
 			toolsButton = new Button(DisplayConstants.BUTTON_TOOLS_MENU, AbstractImagePrototype.create(iconsImageBundle.adminToolsGrey16()));
 			toolsButton.setHeight(25);
 			this.add(toolsButton);	
+			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
 		
 		if(deleteButton == null) {
@@ -277,26 +264,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			}
 		});		
 	}
-	
-	private void configureAddMenu(final Entity entity, final EntityType entityType) {		
-		// create add menu button from children
-		Menu menu = new Menu();
-		
-		List<EntityType> children = entityType.getValidChildTypes();
-		List<EntityType> skipTypes = presenter.getAddSkipTypes();
-		if(children != null) {			 
-			// add child tabs in order
-			for(EntityType child : DisplayUtils.orderForDisplay(children)) {
-				if(skipTypes.contains(child)) continue; // skip some types
-				menu.add(createAddMenuItem(child, entity));
-			}
-		}
-			
-		if(menu.getItemCount() == 0) {
-			addButton.disable();
-		}
-		addButton.setMenu(menu);
-	}
 
 	private MenuItem createAddMenuItem(final EntityType childType, final Entity entity) {
 		String displayName = typeProvider.getEntityDispalyName(childType);			
@@ -349,7 +316,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	 * @param entityType 
 	 */
 	private Button getDeleteButton(EntityType entityType) {
-		Button deleteButton = new Button("", AbstractImagePrototype.create(iconsImageBundle.delete16()));
+		Button deleteButton = new Button("", AbstractImagePrototype.create(iconsImageBundle.trash16()));
 		deleteButton.setHeight(25);
 		DisplayUtils.addTooltip(synapseJSNIUtils, deleteButton, DisplayConstants.LABEL_DELETE, TOOLTIP_POSITION.BOTTOM);
 		return deleteButton;
