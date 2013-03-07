@@ -225,20 +225,23 @@ public class FileHandleServlet extends HttpServlet {
 					fileEntity = new FileEntity();
 					fileEntity.setParentId(parentEntityId);
 					fileEntity.setEntityType(FileEntity.class.getName());
+					//set data file handle id before creation
+					fileEntity.setDataFileHandleId(results.getList().get(0).getId());
 					fileEntity = client.createEntity(fileEntity);
 					entityId = fileEntity.getId();
 				}
 				else if (entityId != null) {
 					//get the file entity to update
 					fileEntity = (FileEntity) client.getEntityById(entityId);
+					//update data file handle id
+					fileEntity.setDataFileHandleId(results.getList().get(0).getId());
+					fileEntity = client.putEntity(fileEntity);
 				}
 				
 				if (fileEntity != null) {
 					String restrictedParam = request.getParameter(DisplayUtils.IS_RESTRICTED_PARAM_KEY);
 					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
 					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
-					fileEntity.setDataFileHandleId(results.getList().get(0).getId());
-					fileEntity = client.putEntity(fileEntity);
 					String originalFileEntityName = fileEntity.getName();
 					try{
 						//and try to set the name to the filename
@@ -247,7 +250,6 @@ public class FileHandleServlet extends HttpServlet {
 					} catch(Throwable t){
 						fileEntity.setName(originalFileEntityName);
 					};
-					
 					
 					// now lock down restricted data
 					if (isRestricted) {

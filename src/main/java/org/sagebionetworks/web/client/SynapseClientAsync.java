@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Favorite;
-import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -94,6 +92,8 @@ public interface SynapseClientAsync {
 	public void updateExternalLocationable(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback);
 	
 	public void updateExternalFile(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	
+	public void createExternalFile(String parentEntityId, String externalUrl, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 
 	public void markdown2Html(String markdown, Boolean isPreview, AsyncCallback<String> callback);
 	

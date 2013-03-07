@@ -915,15 +915,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			ExternalFileHandle clone = synapseClient.createExternalFileHandle(efh);
 			((FileEntity)entity).setDataFileHandleId(clone.getId());
 			Entity updatedEntity = synapseClient.putEntity(entity);
-			String oldName = updatedEntity.getName();
-			try{
-				//also try to rename to something reasonable, ignore if anything goes wrong
-				updatedEntity.setName(DisplayUtils.getFileNameFromExternalUrl(externalUrl));
-				updatedEntity = synapseClient.putEntity(updatedEntity);
-			} catch(Throwable t) {
-				//if anything goes wrong, send back the actual name
-				updatedEntity.setName(oldName);
-			}
+			updatedEntity = updateExternalFileName(updatedEntity, externalUrl, synapseClient);
 			JSONObjectAdapter aaJson = updatedEntity.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
 		} catch (SynapseException e) {
@@ -931,6 +923,40 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		} 
+	}
+	
+	@Override
+	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			FileEntity newEntity = new FileEntity();
+			ExternalFileHandle efh = new ExternalFileHandle();
+			efh.setExternalURL(externalUrl);
+			ExternalFileHandle clone = synapseClient.createExternalFileHandle(efh);
+			newEntity.setDataFileHandleId(clone.getId());
+			newEntity.setParentId(parentEntityId);
+			Entity updatedEntity = synapseClient.createEntity(newEntity);
+			updatedEntity = updateExternalFileName(updatedEntity, externalUrl, synapseClient);
+			JSONObjectAdapter aaJson = updatedEntity.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	private Entity updateExternalFileName(Entity entity, String externalUrl, Synapse synapseClient) {
+		String oldName = entity.getName();
+		try{
+			//also try to rename to something reasonable, ignore if anything goes wrong
+			entity.setName(DisplayUtils.getFileNameFromExternalUrl(externalUrl));
+			entity = synapseClient.putEntity(entity);
+		} catch(Throwable t) {
+			//if anything goes wrong, send back the actual name
+			entity.setName(oldName);
+		}
+		return entity;
 	}
 
 	@Override

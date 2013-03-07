@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -140,7 +141,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			//new data, use the appropriate synapse call
 			//if we haven't created the entity yet, do that first
 			if (entity == null) {
-				createNewFileEntity(path, isNewlyRestricted);
+				createNewExternalFileEntity(path, isNewlyRestricted);
 			}
 			else {
 				updateExternalFileEntity(entity.getId(), path, isNewlyRestricted);
@@ -210,34 +211,24 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
 		}
 	}
-	public void createNewFileEntity(final String path, final boolean isNewlyRestricted) {
-		Entity fileEntity = createNewEntity(FileEntity.class.getName(), parentEntityId);
-		String entityJson;
+	public void createNewExternalFileEntity(final String path, final boolean isNewlyRestricted) {
 		try {
-			entityJson = fileEntity.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.createOrUpdateEntity(entityJson, null, true, new AsyncCallback<String>() {
+			synapseClient.createExternalFile(parentEntityId, path, new AsyncCallback<EntityWrapper>() {
 				@Override
-				public void onSuccess(String newId) {
-					updateExternalFileEntity(newId, path, isNewlyRestricted);
+				public void onSuccess(EntityWrapper result) {
+					externalLinkUpdated(result, isNewlyRestricted, FileEntity.class);
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.ERROR_FILE_CREATION_FAILED);
+					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
 				}			
 			});
-		} catch (JSONObjectAdapterException e) {			
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
+		} catch (RestServiceException e) {			
+			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);	
 		}
 	}
-
-	private Entity createNewEntity(String className, String parentId) {
-		Entity entity = (Entity) autogenFactory.newInstance(className);
-		entity.setParentId(parentId);
-		entity.setEntityType(className);		
-		return entity;
-	}
-
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public void addCancelHandler(CancelHandler handler) {
