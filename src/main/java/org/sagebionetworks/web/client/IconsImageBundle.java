@@ -329,6 +329,9 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/synapse-study-24.png")
 	ImageResource synapseStudy24();
+	
+	@Source("images/icons/trash-16.png")
+	ImageResource trash16();
 		
 	// demo
 	
