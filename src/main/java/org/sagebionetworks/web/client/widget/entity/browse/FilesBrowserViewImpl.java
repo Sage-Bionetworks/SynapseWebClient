@@ -3,16 +3,15 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.ArrayList;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 
@@ -24,7 +23,6 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,17 +34,19 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private EntityTreeBrowser entityTreeBrowser;
-	private Uploader locationableUploader;
-		
+	private Uploader uploader;
+	private CookieProvider cookies;
+	
 	@Inject
 	public FilesBrowserViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle,
-			Uploader locationableUploader,
-			EntityTreeBrowser entityTreeBrowser) {
+			Uploader uploader,
+			EntityTreeBrowser entityTreeBrowser, CookieProvider cookies) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
-		this.locationableUploader = locationableUploader;
+		this.uploader = uploader;
 		this.entityTreeBrowser = entityTreeBrowser;
+		this.cookies = cookies;
 		this.setLayout(new FitLayout());
 	}
 	
@@ -81,7 +81,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		shb.appendHtmlConstant("<h3>" + title + "</h3>");
 		left.add(new HTML(shb.toSafeHtml()));
 
-		Button upload = getUploadButton(); 
+		Button upload = getUploadButton(entityId); 
 		upload.addStyleName("right last");
 		right.add(upload);
 
@@ -150,34 +150,29 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	 * TODO : this should be replaced by DisplayUtils.getUploadButton with the locationable uploader able to create 
 	 * an entity and upload file in a single transaction it modified to create a new 
 	 */
-	private Button getUploadButton() {
+	private Button getUploadButton(final String entityId) {
 		
 		EntityUpdatedHandler handler = new EntityUpdatedHandler() {				
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
-				Entity entity = locationableUploader.getEntity();				
-				if(entity != null)  {					
-					presenter.renameChildToFilename(entity.getId());
-				} else {
-					presenter.fireEntityUpdatedEvent();
-				}
+				presenter.fireEntityUpdatedEvent();
 			}
 		};
 		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
 		final Window window = new Window();  
-		locationableUploader.clearHandlers();
+		uploader.clearHandlers();
 		// add user defined handler
-		locationableUploader.addPersistSuccessHandler(handler);
+		uploader.addPersistSuccessHandler(handler);
 		
 		// add handlers for closing the window
-		locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
+		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				window.hide();
 			}
 		});
-		locationableUploader.addCancelHandler(new CancelHandler() {				
+		uploader.addCancelHandler(new CancelHandler() {				
 			@Override
 			public void onCancel(CancelEvent event) {
 				window.hide();
@@ -187,22 +182,15 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		uploadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				presenter.createEntityForUpload(new AsyncCallback<Entity>() {
-					@Override
-					public void onSuccess(Entity entity) {
-						window.removeAll();
-						window.setSize(400, 320);
-						window.setPlain(true);
-						window.setModal(true);		
-						window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-						window.setLayout(new FitLayout());			
-						window.add(locationableUploader.asWidget(entity, new ArrayList<AccessRequirement>()), new MarginData(5));
-						window.show();
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-					}
-				});
+					//let the uploader create the FileEntity
+					window.removeAll();
+					window.setSize(400, 320);
+					window.setPlain(true);
+					window.setModal(true);		
+					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
+					window.setLayout(new FitLayout());			
+					window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
+					window.show();
 			}
 		});
 		return uploadButton;

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -65,21 +66,21 @@ public class BaseEditWidgetDescriptorPresenterTest {
 	public void testEditNew() {
 		descriptor1.clear();  //should be no arguments passed to the view, since this is editing a new widget
 		
-		presenter.editNew(new WikiPageKey(entity.getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), WidgetConstants.YOUTUBE_CONTENT_TYPE);
-		verify(mockView).setWidgetDescriptor(any(WikiPageKey.class), eq(WidgetConstants.YOUTUBE_CONTENT_TYPE), eq(descriptor1));
+		presenter.editNew(new WikiPageKey(entity.getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), WidgetConstants.YOUTUBE_CONTENT_TYPE, true);
+		verify(mockView).setWidgetDescriptor(any(WikiPageKey.class), eq(WidgetConstants.YOUTUBE_CONTENT_TYPE), eq(descriptor1), anyBoolean());
 		verify(mockView).show(eq(WidgetConstants.YOUTUBE_FRIENDLY_NAME));
 	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testEditNewFailedPreconditions1() {
-		presenter.editNew(null,WidgetConstants.YOUTUBE_CONTENT_TYPE);
+		presenter.editNew(null,WidgetConstants.YOUTUBE_CONTENT_TYPE, true);
 	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testEditNewFailedPreconditions2() {
-		presenter.editNew(new WikiPageKey(entity.getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), null);
+		presenter.editNew(new WikiPageKey(entity.getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), null, true);
 	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testEditNewFailedPreconditions3() {
-		presenter.editNew(new WikiPageKey(entity.getId(), null, null), WidgetConstants.YOUTUBE_CONTENT_TYPE);
+		presenter.editNew(new WikiPageKey(entity.getId(), null, null), WidgetConstants.YOUTUBE_CONTENT_TYPE, true);
 	}
 
 	
@@ -99,7 +100,7 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		//in this case, the descriptor is telling us that we should simply insert some text into the description, and nothing more (examples are external images, and links)
 		when(mockView.getTextToInsert()).thenReturn(null);
 		//set widget by telling it to edit a new one
-		presenter.editNew(new WikiPageKey(entity.getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), WidgetConstants.YOUTUBE_CONTENT_TYPE);
+		presenter.editNew(new WikiPageKey(entity.getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), WidgetConstants.YOUTUBE_CONTENT_TYPE, true);
 		presenter.apply();
 		//verify it updates the descriptor from the view, and updates the entity attachments
 		verify(mockView).updateDescriptorFromView();

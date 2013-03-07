@@ -529,6 +529,10 @@ a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
     padding: 0 5px 2px
 }
 
+.wiki-description {
+	color: #666666;
+}
+
 .entity-description-preview-wrapper {
     background: none repeat scroll 0 0 #FFFFFF;
     padding: 20px;

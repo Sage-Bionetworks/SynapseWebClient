@@ -49,7 +49,7 @@ public class TableOfContentsWidgetViewImpl extends LayoutContainer implements Ta
 				SimplePanel wrapper = new SimplePanel();
 				Anchor a = new Anchor(text);
 				a.addStyleName("link");
-				a.addStyleName(heading.getClassName());
+				a.addStyleName(heading.getAttribute("toc-style"));
 				
 				a.addClickHandler(new ClickHandler() {
 					@Override

@@ -3,18 +3,21 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -29,9 +32,8 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,14 +46,17 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager;
 	private Entity entity;
+	private String parentEntityId;
 	private List<AccessRequirement> accessRequirements;
 	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private AdapterFactory adapterFactory;
+	private AutoGenFactory autogenFactory;
 
 	private SynapseClientAsync synapseClient;
 	private JiraURLHelper jiraURLHelper;
-	private CookieProvider cookies;
 	private SynapseJSNIUtils synapseJsniUtils;
+	private GWTWrapper gwt;
 	
 	@Inject
 	public Uploader(
@@ -63,7 +68,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			JiraURLHelper jiraURLHelper,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseJSNIUtils synapseJsniUtils,
-			CookieProvider cookies
+			AdapterFactory adapterFactory, 
+			AutoGenFactory autogenFactory,
+			GWTWrapper gwt
 			) {
 	
 		this.view = view;		
@@ -74,7 +81,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.jiraURLHelper = jiraURLHelper;
 		this.jsonObjectAdapter=jsonObjectAdapter;
 		this.synapseJsniUtils = synapseJsniUtils;
-		this.cookies= cookies;
+		this.adapterFactory = adapterFactory;
+		this.autogenFactory = autogenFactory;
+		this.gwt = gwt;
 		view.setPresenter(this);		
 		clearHandlers();
 	}		
@@ -83,19 +92,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.view.setPresenter(this);
 		this.entity = entity;
 		this.accessRequirements = accessRequirements;
-		//do not enable the External, until External FileEntity is supported on the backend
-		boolean isExternalSupported = !DisplayUtils.isInTestWebsite(cookies);
-		this.view.createUploadForm(isExternalSupported);
+		this.view.createUploadForm(true);
 		return this.view.asWidget();
 	}
-		
+
+	public Widget asWidget(String parentEntityId, List<AccessRequirement> accessRequirements) {
+		this.parentEntityId = parentEntityId;
+		return asWidget((Entity)null, accessRequirements);
+	}
 	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 		// remove handlers
 		handlerManager = new HandlerManager(this);		
-		this.entity = null;		
+		this.entity = null;
+		this.parentEntityId = null;
 	}
 
 	@Override
@@ -109,57 +121,114 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public String getUploadActionUrl(boolean isRestricted) {
-		String uploadUrl = DisplayUtils.isInTestWebsite(cookies) ? synapseJsniUtils.getBaseFileHandleUrl() : GWT.getModuleBaseURL() + "upload";
-		return uploadUrl + "?" + 
-			DisplayUtils.ENTITY_PARAM_KEY + "=" + entity.getId() + "&" +
-			DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
+		boolean isFileEntity = entity == null || entity instanceof FileEntity;
+		String entityParentString = entity==null && parentEntityId != null ? DisplayUtils.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY + "=" + parentEntityId + "&": "";
+		String entityIdString = entity != null ? DisplayUtils.ENTITY_PARAM_KEY + "=" + entity.getId() + "&" : "";
+		String uploadUrl = isFileEntity ? 
+				//new way
+				synapseJsniUtils.getBaseFileHandleUrl() + "?" + DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted + "&" +
+						DisplayUtils.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY  + "=" + Boolean.toString(entity == null) + "&" + entityParentString + entityIdString: 
+				//old way
+				gwt.getModuleBaseURL() + "upload" + "?" + 
+					entityIdString +
+					DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
+		return uploadUrl;
 	}
-
+	
 	@Override
-	public void setExternalLocation(String path, final boolean isNewlyRestricted) {
-		String entityId = entity.getId();
-		
-		synapseClient.updateExternalLocationable(entityId, path, new AsyncCallback<EntityWrapper>() {
-			
-			public void onSuccess(EntityWrapper result) {
-				try {
-					Entity updatedEntity = nodeModelCreator.createJSONEntity(result.getEntityJson(), entity.getClass());
-					if (isNewlyRestricted) {
-						EntityWrapper arEW = null;
-						try {
-							arEW=EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(updatedEntity.getId(), jsonObjectAdapter);
-						} catch (JSONObjectAdapterException caught) {
-							view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);							
-						}
-						synapseClient.createAccessRequirement(arEW, new AsyncCallback<EntityWrapper>(){
-							@Override
-							public void onSuccess(EntityWrapper result) {
-								view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
-								// open Jira issue
-								view.openNewBrowserTab(getJiraRestrictionLink());
-								entityUpdated();
-							}
-							@Override
-							public void onFailure(Throwable caught) {
-								view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
-							}
-						});
-					} else {
-						view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
-						entityUpdated();						
-					}
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
-			};
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+	public void setExternalFilePath(String path, final boolean isNewlyRestricted) {
+		if (entity==null || entity instanceof FileEntity) {
+			//new data, use the appropriate synapse call
+			//if we haven't created the entity yet, do that first
+			if (entity == null) {
+				createNewExternalFileEntity(path, isNewlyRestricted);
 			}
-		} ); 
-		
+			else {
+				updateExternalFileEntity(entity.getId(), path, isNewlyRestricted);
+			}
+		}
+		else {
+			//old data
+			String entityId = entity.getId();
+			synapseClient.updateExternalLocationable(entityId, path, new AsyncCallback<EntityWrapper>() {
+				
+				public void onSuccess(EntityWrapper result) {
+					externalLinkUpdated(result, isNewlyRestricted, entity.getClass());
+				};
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+				}
+			} );
+		}
 	}
-
+	
+	public void externalLinkUpdated(EntityWrapper result, boolean isNewlyRestricted, Class<? extends Entity> entityClass) {
+		try {
+			entity = nodeModelCreator.createJSONEntity(result.getEntityJson(), entityClass);
+			if (isNewlyRestricted) {
+				EntityWrapper arEW = null;
+				try {
+					arEW=EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(entity.getId(), jsonObjectAdapter);
+				} catch (JSONObjectAdapterException caught) {
+					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);							
+				}
+				synapseClient.createAccessRequirement(arEW, new AsyncCallback<EntityWrapper>(){
+					@Override
+					public void onSuccess(EntityWrapper result) {
+						view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+						// open Jira issue
+						view.openNewBrowserTab(getJiraRestrictionLink());
+						entityUpdated();
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+					}
+				});
+			} else {
+				view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+				entityUpdated();						
+			}
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+		}
+	}
+	
+	public void updateExternalFileEntity(String entityId, String path, final boolean isNewlyRestricted) {
+		try {
+			synapseClient.updateExternalFile(entityId, path, new AsyncCallback<EntityWrapper>() {
+				@Override
+				public void onSuccess(EntityWrapper result) {
+					externalLinkUpdated(result, isNewlyRestricted, FileEntity.class);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+				}
+			});
+		} catch (Throwable t) {
+			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+		}
+	}
+	public void createNewExternalFileEntity(final String path, final boolean isNewlyRestricted) {
+		try {
+			synapseClient.createExternalFile(parentEntityId, path, new AsyncCallback<EntityWrapper>() {
+				@Override
+				public void onSuccess(EntityWrapper result) {
+					externalLinkUpdated(result, isNewlyRestricted, FileEntity.class);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+				}			
+			});
+		} catch (RestServiceException e) {			
+			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);	
+		}
+	}
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public void addCancelHandler(CancelHandler handler) {
@@ -186,7 +255,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	@Override
-	public void handleSubmitResult(String resultHtml, boolean isNewlyRestricted) {
+	public void handleSubmitResult(String resultHtml, final boolean isNewlyRestricted) {
 		if(resultHtml == null) resultHtml = "";
 		// response from server
 		//try to parse
@@ -194,7 +263,25 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		try{
 			uploadResult = AddAttachmentDialog.getUploadResult(resultHtml);
 			if (uploadResult.getUploadStatus() == UploadStatus.SUCCESS) {
-				uploadSuccess(isNewlyRestricted);
+				//upload result has the entity id that was created by the FileHandleServlet
+				String entityId = uploadResult.getMessage();
+				//get the entity, and report success
+				synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+					@Override
+					public void onSuccess(EntityWrapper result) {
+						try {
+							entity = nodeModelCreator.createEntity(result);
+							uploadSuccess(isNewlyRestricted);
+						} catch (JSONObjectAdapterException e) {
+							view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+						}
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(caught.getMessage());
+					}
+				});
+				
 			}else {
 				uploadError();
 			}
