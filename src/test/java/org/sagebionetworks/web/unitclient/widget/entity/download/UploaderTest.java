@@ -82,6 +82,7 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalFile(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createAccessRequirement(any(EntityWrapper.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), any(AsyncCallback.class));
 		uploader=new Uploader(view,nodeModelCreator,authenticationController, entityTypeProvider, synapseClient, jiraURLHelper, jsonObjectAdapter, synapseJsniUtils, adapterFactory, autogenFactory, gwt);
 	}
 	
@@ -111,14 +112,13 @@ public class UploaderTest {
 	}
 	
 	@Test
-	public void testSetExternalPath() throws Exception {
+	public void testSetNewExternalPath() throws Exception {
 		//this is the full success test
-		//if entity is null, it should call synapseClient.createOrUpdateEntity() to create the FileEntity.
+		//if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and associate the path.
 		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId, null);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", true);
-		verify(synapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(synapseClient).updateExternalFile(anyString(), anyString(), any(AsyncCallback.class));
+		verify(synapseClient).createExternalFile(anyString(), anyString(), any(AsyncCallback.class));
 		verify(synapseClient).createAccessRequirement(any(EntityWrapper.class), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 		verify(view).openNewBrowserTab(anyString());
@@ -126,7 +126,7 @@ public class UploaderTest {
 	
 	@Test
 	public void testSetExternalPathFailedCreate() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(synapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(synapseClient).createExternalFile(anyString(), anyString(), any(AsyncCallback.class));
 
 		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId, null);
@@ -137,7 +137,7 @@ public class UploaderTest {
 	
 	@Test
 	public void testSetExternalPathFailedUpdateFile() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).updateExternalFile(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createExternalFile(anyString(), anyString(), any(AsyncCallback.class));
 
 		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId, null);
