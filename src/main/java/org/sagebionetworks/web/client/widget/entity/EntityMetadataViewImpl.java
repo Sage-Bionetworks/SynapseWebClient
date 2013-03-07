@@ -251,7 +251,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		setEntityName(e.getName());
 		setEntityId(e.getId());
-		boolean isLocationable = (e instanceof Locationable);
 		
 		this.readOnly.setVisible(readOnly);
 		

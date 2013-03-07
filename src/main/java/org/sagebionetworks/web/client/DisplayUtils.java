@@ -163,6 +163,8 @@ public class DisplayUtils {
 	public static final String WIKI_ID_PARAM_KEY = "wikiId";
 	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
 	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
+	public static final String FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY = "createFileEntity";
+	public static final String FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY = "fileEntityParentId";
 	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
 	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
@@ -411,7 +413,7 @@ public class DisplayUtils {
 		}
 	}	
 
-	public static String getFileNameFromLocationPath(String path){
+	public static String getFileNameFromExternalUrl(String path){
 		//grab the text between the last '/' and following '?'
 		String fileName = "";
 		if (path != null) {
@@ -1394,6 +1396,11 @@ public class DisplayUtils {
 			}
 		}		
 		return ref;		
+	}
+	
+	public static boolean isWikiSupportedType(Entity entity) {
+		//TODO: add Folder and Project once they are migrated (description goes to Wiki markdown, attachments to wiki FileHandles)
+		return (entity instanceof FileEntity);
 	}
 	
 	public static boolean hasRecognizedImageExtension(String fileName) {

@@ -142,7 +142,7 @@ public class WikiPageWidget extends LayoutContainer {
 						try {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
-							markdownWidget.setMarkdown(currentPage.getMarkdown(), wikiKey, false);
+							markdownWidget.setMarkdown(currentPage.getMarkdown(), wikiKey, true, false);
 							pagesBrowser.configure(wikiKey, ownerObjectName, ownerHistoryToken, DisplayConstants.PAGES, canEdit);
 							showDefaultViewWithWiki();
 						} catch (JSONObjectAdapterException e) {
@@ -345,7 +345,7 @@ public class WikiPageWidget extends LayoutContainer {
 				}
 				//also add commands at the bottom
 				
-				markdownEditorWidget.configure(wikiKey, mdField, form, false, new WidgetDescriptorUpdatedHandler() {
+				markdownEditorWidget.configure(wikiKey, mdField, form, false, true, new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						//update wiki attachments

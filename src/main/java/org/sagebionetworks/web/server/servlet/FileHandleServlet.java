@@ -176,6 +176,7 @@ public class FileHandleServlet extends HttpServlet {
 			// Connect to synapse
 			Synapse client = createNewClient(token);
 			FileItemIterator iter = upload.getItemIterator(request);
+			String entityId = null;
 			while (iter.hasNext()) {
 				FileItemStream item = iter.next();
 
@@ -200,10 +201,12 @@ public class FileHandleServlet extends HttpServlet {
 
 			//and update the wiki page (if the wiki key info was given as parameters) or FileEntity (if entity id was given)
 			if (results != null && results.getList() != null && results.getList().size() > 0) {
-				String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
-
+				entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
+				Boolean isCreateEntity = Boolean.parseBoolean(request.getParameter(DisplayUtils.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY));
 				String ownerId = request.getParameter(DisplayUtils.WIKI_OWNER_ID_PARAM_KEY);
 				String ownerType = request.getParameter(DisplayUtils.WIKI_OWNER_TYPE_PARAM_KEY);
+				FileEntity fileEntity = null;
+				
 				if (ownerId != null && ownerType != null) {
 					ObjectType type = ObjectType.valueOf(ownerType);
 					String wikiId = request.getParameter(DisplayUtils.WIKI_ID_PARAM_KEY);
@@ -216,15 +219,37 @@ public class FileHandleServlet extends HttpServlet {
 					}
 					client.updateWikiPage(ownerId, type, page);
 				}
+				else if (isCreateEntity) {
+					//create the file entity
+					String parentEntityId = request.getParameter(DisplayUtils.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY);
+					fileEntity = new FileEntity();
+					fileEntity.setParentId(parentEntityId);
+					fileEntity.setEntityType(FileEntity.class.getName());
+					//set data file handle id before creation
+					fileEntity.setDataFileHandleId(results.getList().get(0).getId());
+					fileEntity = client.createEntity(fileEntity);
+					entityId = fileEntity.getId();
+				}
 				else if (entityId != null) {
+					//get the file entity to update
+					fileEntity = (FileEntity) client.getEntityById(entityId);
+					//update data file handle id
+					fileEntity.setDataFileHandleId(results.getList().get(0).getId());
+					fileEntity = client.putEntity(fileEntity);
+				}
+				
+				if (fileEntity != null) {
 					String restrictedParam = request.getParameter(DisplayUtils.IS_RESTRICTED_PARAM_KEY);
 					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
 					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
-
-					FileEntity fileEntity = (FileEntity) client.getEntityById(entityId);
-					fileEntity.setName(results.getList().get(0).getFileName());
-					fileEntity.setDataFileHandleId(results.getList().get(0).getId());
-					client.putEntity(fileEntity);
+					String originalFileEntityName = fileEntity.getName();
+					try{
+						//and try to set the name to the filename
+						fileEntity.setName(results.getList().get(0).getFileName());
+						fileEntity = client.putEntity(fileEntity);
+					} catch(Throwable t){
+						fileEntity.setName(originalFileEntityName);
+					};
 					
 					// now lock down restricted data
 					if (isRestricted) {
@@ -235,11 +260,16 @@ public class FileHandleServlet extends HttpServlet {
 							client.createAccessRequirement(ar);
 						}
 					}
+
 				}
 			}
 			
 			UploadResult result = new UploadResult();
-			result.setMessage("File upload successfully");
+			if (entityId != null)
+				result.setMessage(entityId);
+			else
+				result.setMessage("File upload successful");
+			
 			result.setUploadStatus(UploadStatus.SUCCESS);
 //			if (results != null)
 //				result.setFileHandleResults(results);

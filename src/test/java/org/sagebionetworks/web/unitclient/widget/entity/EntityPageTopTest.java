@@ -1,25 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ExampleEntity;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -41,10 +33,8 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityPageTopTest {
 
@@ -102,8 +92,8 @@ public class EntityPageTopTest {
 		entityAttachments.add(attachment1);
 		entity.setAttachments(entityAttachments);
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
-		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class))).thenReturn(testWidgetRenderer);
-		
+		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean())).thenReturn(testWidgetRenderer);
+
 		EntityBundle bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		pageTop.setBundle(bundle, false);
 	}

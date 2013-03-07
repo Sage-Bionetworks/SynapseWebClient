@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -44,6 +43,7 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Padding;
 import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -105,7 +105,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
 	private FilesBrowser filesBrowser;
-	private CookieProvider cookies;
 	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
 	
@@ -120,7 +119,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, CookieProvider cookies, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -135,7 +134,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.fileTitleBar = fileTitleBar;
 		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
-		this.cookies = cookies;
+
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
 		
@@ -244,17 +243,20 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit, readOnly), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
-
-		if (bundle.getEntity() instanceof FileEntity) {
-			//also add a preview
+		
+		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+			//show preview
 			colLeftContainer.add(getFilePreview(bundle));
 		}
-
+		
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
-
-		// Wiki
-		addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
+		
+		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+			// show Wiki
+			addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
+		}
+				
 
 		// ** RIGHT **
 		// Programmatic Clients
@@ -345,7 +347,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 
-		// Wiki
 		addWikiPageWidget(fullWidthContainer, bundle, canEdit, 24);
 			
 		// Child File Browser
@@ -369,8 +370,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, int spanWidth) {
-		// Child Page Browser
-		if (DisplayUtils.isInTestWebsite(cookies)) {
+		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+			// Child Page Browser
 			container.add(wikiPageWidget);
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), canEdit, new WikiPageWidget.Callback() {
 				@Override
@@ -379,7 +380,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				}
 			}, true, spanWidth);
 		}
-
 	}
 
 	private LayoutContainer createSpacer() {
@@ -399,8 +399,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
-
-		addWikiPageWidget(colLeftContainer, bundle, canEdit, 24);
 		
 		// ** RIGHT **
 		// Annotation Editor widget
@@ -514,20 +512,26 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 		String description = bundle.getEntity().getDescription();
-
+	
 		if(!showWhenEmpty) {
 			if(description == null || "".equals(description))
 				return lc;
 		}
 		
 		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"clear: left;\"></div>")));
-
+	
 		// Add the description body
 	    if(description != null && !("".equals(description))) {
-	    	//TODO: markdown to be removed from entity (and only exist in it's associated wiki)
-	    	if (!DisplayUtils.isInTestWebsite(cookies)) {
-	    		lc.add(markdownWidget);
-	    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false);
+	    	if (!DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+				lc.add(markdownWidget);
+		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, false);
+	    	}
+	    	else {
+	    		Label plainDescriptionText = new Label();
+	    		plainDescriptionText.setWidth("100%");
+	    		plainDescriptionText.addStyleName("wiki-description");
+	    		plainDescriptionText.setText(description);
+	    		lc.add(plainDescriptionText);
 	    	}
 	    }
 	    

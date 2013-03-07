@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface FilesBrowserView extends IsWidget, SynapseWidgetView {
@@ -36,11 +34,7 @@ public interface FilesBrowserView extends IsWidget, SynapseWidgetView {
 
 		void createFolder(String name);
 
-		void createEntityForUpload(AsyncCallback<Entity> asyncCallback);
-
 		void fireEntityUpdatedEvent();
-
-		void renameChildToFilename(String entityId);
 
 	}
 
