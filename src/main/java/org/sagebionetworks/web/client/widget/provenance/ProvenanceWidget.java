@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -34,8 +35,8 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -350,10 +351,13 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			private void addUsedToStack() {							
 				// add used references to process stack
 				if(item.getActivity().getUsed() != null) {
-					Set<UsedEntity> used = item.getActivity().getUsed();
-					for(UsedEntity ue : used) {
-						if(ue.getReference() != null) {
-							toProcess.push(new ReferenceProcessItem(ue.getReference(), item.getDepth())); // same depth as activity
+					Set<Used> used = item.getActivity().getUsed();
+					for(Used u : used) {
+						if(u instanceof UsedEntity) { // ignore UsedUrl, nothing to process
+							UsedEntity ue = (UsedEntity) u;
+							if(ue.getReference() != null) {
+								toProcess.push(new ReferenceProcessItem(ue.getReference(), item.getDepth())); // same depth as activity
+							}
 						}
 					}
 				}

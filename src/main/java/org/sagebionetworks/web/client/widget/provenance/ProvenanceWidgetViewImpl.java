@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -17,6 +15,7 @@ import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
@@ -150,6 +149,10 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			return container;
 		} else if(node instanceof ExpandGraphNode) {
 			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, sageImageBundle, presenter);
+		} else if(node instanceof ExternalGraphNode) {			
+			LayoutContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node, iconsImageBundle);
+			addToolTipToContainer(node, container, DisplayConstants.EXTERNAL_URL);
+			return container;
 		}
 		return null;
 	}

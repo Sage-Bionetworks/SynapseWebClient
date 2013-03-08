@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -92,7 +93,7 @@ public class ProvUtilsTest {
 		
 		UsedEntity ue = new UsedEntity();
 		ue.setReference(ref2);
-		Set<UsedEntity> used = new HashSet<UsedEntity>();
+		Set<Used> used = new HashSet<Used>();
 		used.add(ue);
 		act.setUsed(used);
 
@@ -165,7 +166,7 @@ public class ProvUtilsTest {
 		Reference ref2 = new Reference();
 		ref2.setTargetId(entId2);
 
-		Set<UsedEntity> used = new HashSet<UsedEntity>();
+		Set<Used> used = new HashSet<Used>();
 		UsedEntity ue;
 		ue = new UsedEntity();
 		ue.setReference(ref);
