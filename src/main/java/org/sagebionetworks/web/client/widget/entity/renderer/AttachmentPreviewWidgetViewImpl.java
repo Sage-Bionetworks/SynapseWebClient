@@ -27,13 +27,19 @@ public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements 
 		sb.append("<a class=\"link\" href=\"");
 		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
 		sb.append("\">");
-		if (DisplayUtils.hasRecognizedImageExtension(fileName)) {
-			sb.append("<img class=\"imageDescriptor\" ");
-			sb.append(" src=\"");
-			sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
-			sb.append("\"></img>");
+		int lastDotIndex = fileName.lastIndexOf(".");
+		boolean isPreviewed = false;
+		if (lastDotIndex > -1) {
+			String extension = fileName.substring(lastDotIndex+1);
+			if (DisplayUtils.isRecognizedImageContentType("image/"+extension)) {
+				sb.append("<img class=\"imageDescriptor\" ");
+				sb.append(" src=\"");
+				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
+				sb.append("\"></img>");
+				isPreviewed = true;
+			}
 		}
-		else {
+		if (!isPreviewed){
 			sb.append(fileName);
 		}
 		sb.append("</a>");

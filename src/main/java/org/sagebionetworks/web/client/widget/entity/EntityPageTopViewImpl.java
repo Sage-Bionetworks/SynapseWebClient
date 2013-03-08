@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -62,7 +61,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -107,6 +105,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private FilesBrowser filesBrowser;
 	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
+	private PreviewWidget previewWidget;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -119,7 +118,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget, PreviewWidget previewWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -134,7 +133,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.fileTitleBar = fileTitleBar;
 		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
-
+		this.previewWidget = previewWidget;
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
 		
@@ -278,28 +277,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ************************************************************************************************		
 	}
 	
-	private HTMLPanel getFilePreview(EntityBundle bundle) {
-		StringBuilder sb = new StringBuilder();
-		FileHandle handle = FileTitleBar.getFileHandle(bundle);
-		if (handle != null) {
-			String fileName = handle.getFileName();
-			if (fileName != null) {
-				boolean looksLikeAnImage = DisplayUtils.hasRecognizedImageExtension(fileName);
-				if (looksLikeAnImage) {
-					FileEntity fileEntity = (FileEntity)bundle.getEntity();
-					//add a html panel that contains the image src from the attachments server (to pull asynchronously)
-					//create img
-					sb.append("<a href=\"");
-					
-					sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false));
-					sb.append("\"><img alt=\""+DisplayConstants.PREVIEW_UNAVAILABLE+"\" class=\"imageDescriptor\" ");
-					sb.append(" src=\"");
-					sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
-					sb.append("\"></img></a>");
-				}
-			}
-		}
-		return new HTMLPanel(sb.toString());
+	private Widget getFilePreview(EntityBundle bundle) {
+		return previewWidget.asWidget(bundle);
 	}
 	
 	// Render the Folder entity

@@ -78,7 +78,6 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -183,6 +182,13 @@ public class DisplayUtils {
 	
 	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
 	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
+	
+	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/gif","image/png"};
+	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
+	
+	public static final String[] CODE_EXTENSIONS = new String[] {".awk",".bat",".btm",".c",".cmd",".cpp",".cxx",".def",".dlg",".dpc",".dpj",".dtd",".h",".hdl",".hpp",".hrc",".html",".hxx",".inc",".ini",".inl",".ins",".java",".js",".jsp",".l",".lgt",".ll",".par",".pl",".r",".rc",".rdb",".res",".s",".sbl",".scp",".sh",".sql",".src",".srs",".xml",".xrb",".y",".yxx"};
+	public static final HashSet<String> CODE_EXTENSIONS_SET = new HashSet<String>(Arrays.asList(CODE_EXTENSIONS));
+	
 	
 	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
@@ -862,7 +868,7 @@ public class DisplayUtils {
 		attachmentMap.put("bmp", DEFAULT_IMAGE_ICON);
 		attachmentMap.put("wbmp", DEFAULT_IMAGE_ICON);
 	}
-
+	
 	/**
 	 * Get the icon to be used with a given file type.
 	 */
@@ -1403,14 +1409,26 @@ public class DisplayUtils {
 		return (entity instanceof FileEntity);
 	}
 	
-	public static boolean hasRecognizedImageExtension(String fileName) {
-		String lowerFileName = fileName.toLowerCase();
-		return lowerFileName.endsWith(".png") ||
-				lowerFileName.endsWith(".jpg") ||
-				lowerFileName.endsWith(".jpeg") ||
-				lowerFileName.endsWith(".tiff") ||
-				lowerFileName.endsWith(".gif") ||
-				lowerFileName.endsWith(".bmp");
+	public static boolean isRecognizedImageContentType(String contentType) {
+		String lowerContentType = contentType.toLowerCase();
+		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
 	}
 	
+	public static boolean isRecognizedCodeFileName(String fileName) {
+		boolean isCodeFile = false;
+		int lastDot = fileName.lastIndexOf(".");
+		if (lastDot > -1) {
+			isCodeFile = CODE_EXTENSIONS_SET.contains(fileName.substring(lastDot).toLowerCase());
+		}
+		return isCodeFile;
+	}
+	
+	public static boolean isTextType(String contentType) {
+		return contentType.toLowerCase().startsWith("text/");
+	}
+	
+	public static boolean isCSV(String contentType) {
+		return contentType.toLowerCase().startsWith("text/csv");
+	}
+
 }
