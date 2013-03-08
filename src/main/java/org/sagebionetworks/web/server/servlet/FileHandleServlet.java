@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,7 +27,6 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -164,7 +162,7 @@ public class FileHandleServlet extends HttpServlet {
 	public void doPost(final HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		ServletFileUpload upload = new ServletFileUpload();
-		FileHandleResults results = null;
+		FileHandle newFileHandle = null;
 		// Before we do anything make sure we can get the users token
 		String token = getSessionToken(request);
 		if (token == null) {
@@ -179,7 +177,7 @@ public class FileHandleServlet extends HttpServlet {
 			String entityId = null;
 			while (iter.hasNext()) {
 				FileItemStream item = iter.next();
-
+				String contentType = item.getContentType();
 				String name = item.getFieldName();
 				InputStream stream = item.openStream();
 				String fileName = item.getName();
@@ -189,10 +187,8 @@ public class FileHandleServlet extends HttpServlet {
 				ServiceUtils.writeToFile(temp, stream, MAX_ATTACHMENT_SIZE_IN_BYTES);
 				try{
 					// Now upload the file
-					List<File> files = new ArrayList<File>();
-					files.add(temp);
 					client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
-					results = client.createFileHandles(files);
+					newFileHandle = client.createFileHandle(temp, contentType);
 				}finally{
 					// Unconditionally delete the tmp file
 					temp.delete();
@@ -200,7 +196,7 @@ public class FileHandleServlet extends HttpServlet {
 			}
 
 			//and update the wiki page (if the wiki key info was given as parameters) or FileEntity (if entity id was given)
-			if (results != null && results.getList() != null && results.getList().size() > 0) {
+			if (newFileHandle != null) {
 				entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
 				Boolean isCreateEntity = Boolean.parseBoolean(request.getParameter(DisplayUtils.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY));
 				String ownerId = request.getParameter(DisplayUtils.WIKI_OWNER_ID_PARAM_KEY);
@@ -213,10 +209,8 @@ public class FileHandleServlet extends HttpServlet {
 					WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
 					WikiPage page = client.getWikiPage(properKey);
 					List<String> fileHandleIds = page.getAttachmentFileHandleIds();
-					for (FileHandle handle : results.getList()) {
-						if (!fileHandleIds.contains(handle.getId()))
-							fileHandleIds.add(handle.getId());
-					}
+					if (!fileHandleIds.contains(newFileHandle.getId()))
+						fileHandleIds.add(newFileHandle.getId());
 					client.updateWikiPage(ownerId, type, page);
 				}
 				else if (isCreateEntity) {
@@ -226,7 +220,7 @@ public class FileHandleServlet extends HttpServlet {
 					fileEntity.setParentId(parentEntityId);
 					fileEntity.setEntityType(FileEntity.class.getName());
 					//set data file handle id before creation
-					fileEntity.setDataFileHandleId(results.getList().get(0).getId());
+					fileEntity.setDataFileHandleId(newFileHandle.getId());
 					fileEntity = client.createEntity(fileEntity);
 					entityId = fileEntity.getId();
 				}
@@ -234,7 +228,7 @@ public class FileHandleServlet extends HttpServlet {
 					//get the file entity to update
 					fileEntity = (FileEntity) client.getEntityById(entityId);
 					//update data file handle id
-					fileEntity.setDataFileHandleId(results.getList().get(0).getId());
+					fileEntity.setDataFileHandleId(newFileHandle.getId());
 					fileEntity = client.putEntity(fileEntity);
 				}
 				
@@ -245,7 +239,7 @@ public class FileHandleServlet extends HttpServlet {
 					String originalFileEntityName = fileEntity.getName();
 					try{
 						//and try to set the name to the filename
-						fileEntity.setName(results.getList().get(0).getFileName());
+						fileEntity.setName(newFileHandle.getFileName());
 						fileEntity = client.putEntity(fileEntity);
 					} catch(Throwable t){
 						fileEntity.setName(originalFileEntityName);
