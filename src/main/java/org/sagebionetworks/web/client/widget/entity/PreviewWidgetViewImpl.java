@@ -65,6 +65,27 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	}
 	
 	@Override
+	public void setTablePreview(String csv) {
+		clear();
+		setStylePrimaryName("markdown");
+		StringBuilder sb = new StringBuilder();
+		sb.append("<table>");
+		String[] lines = csv.split("\n");
+		for (int i = 0; i < lines.length; i++) {
+			sb.append("<tr>");
+			String[] cells = lines[i].split(",");
+			for (int j = 0; j < cells.length; j++) {
+				sb.append("<td>");
+				sb.append(cells[j]);
+				sb.append("</td>");
+			}
+			sb.append("</tr>");
+		}
+		sb.append("</table>");
+		add(new HTMLPanel(sb.toString()));
+	}
+	
+	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}

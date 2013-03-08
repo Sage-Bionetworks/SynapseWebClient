@@ -182,8 +182,8 @@ public class DisplayUtils {
 	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/gif","image/png"};
 	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
 	
-	public static final String[] CODE_CONTENT_TYPES = new String[] {".awk",".bat",".btm",".c",".cmd",".cpp",".cxx",".def",".dlg",".dpc",".dpj",".dtd",".h",".hdl",".hpp",".hrc",".html",".hxx",".inc",".ini",".inl",".ins",".java",".js",".jsp",".l",".lgt",".ll",".par",".pl",".r",".rc",".rdb",".res",".s",".sbl",".scp",".sh",".src",".srs",".xml",".xrb",".y",".yxx"};
-	public static final HashSet<String> CODE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(CODE_CONTENT_TYPES));
+	public static final String[] CODE_EXTENSIONS = new String[] {".awk",".bat",".btm",".c",".cmd",".cpp",".cxx",".def",".dlg",".dpc",".dpj",".dtd",".h",".hdl",".hpp",".hrc",".html",".hxx",".inc",".ini",".inl",".ins",".java",".js",".jsp",".l",".lgt",".ll",".par",".pl",".r",".rc",".rdb",".res",".s",".sbl",".scp",".sh",".sql",".src",".srs",".xml",".xrb",".y",".yxx"};
+	public static final HashSet<String> CODE_EXTENSIONS_SET = new HashSet<String>(Arrays.asList(CODE_EXTENSIONS));
 	
 	
 	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
@@ -1410,12 +1410,21 @@ public class DisplayUtils {
 		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
 	}
 	
-	public static boolean isRecognizedCodeContentType(String contentType) {
-		String lowerContentType = contentType.toLowerCase();
-		return CODE_CONTENT_TYPES_SET.contains(lowerContentType);
+	public static boolean isRecognizedCodeFileName(String fileName) {
+		boolean isCodeFile = false;
+		int lastDot = fileName.lastIndexOf(".");
+		if (lastDot > -1) {
+			isCodeFile = CODE_EXTENSIONS_SET.contains(fileName.substring(lastDot).toLowerCase());
+		}
+		return isCodeFile;
 	}
 	
 	public static boolean isTextType(String contentType) {
 		return contentType.toLowerCase().startsWith("text/");
 	}
+	
+	public static boolean isCSV(String contentType) {
+		return contentType.toLowerCase().startsWith("text/csv");
+	}
+
 }

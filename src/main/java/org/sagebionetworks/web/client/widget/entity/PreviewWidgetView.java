@@ -12,6 +12,7 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setImagePreview(String fullFileUrl, String previewUrl);
 	public void setCodePreview(String code);
 	public void setBlockQuotePreview(String text);
+	public void setTablePreview(String csvData);
 	public void showErrorMessage(String message);
 	public void clear();
 	
