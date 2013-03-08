@@ -78,7 +78,7 @@ public class PreviewWidgetTest {
 	@Test
 	public void testPreviewCodeContentType(){
 		PreviewFileHandle fh = new PreviewFileHandle();
-		String aCodeContentType = DisplayUtils.CODE_CONTENT_TYPES[0];
+		String aCodeContentType = DisplayUtils.CODE_EXTENSIONS[0];
 		fh.setContentType(aCodeContentType);
 		testFileHandleList.add(fh);
 		previewWidget.asWidget(testBundle);

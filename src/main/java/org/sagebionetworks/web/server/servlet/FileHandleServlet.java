@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -18,7 +19,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.message.AbstractHttpMessage;
+import org.apache.http.util.EntityUtils;
 import org.sagebionetworks.StackConfiguration;
+import org.sagebionetworks.client.HttpClientProviderImpl;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -114,6 +121,10 @@ public class FileHandleServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String token = getSessionToken(request);
 		Synapse client = createNewClient(token);
+		boolean isProxy = false;
+		String proxy = request.getParameter(DisplayUtils.PROXY_PARAM_KEY);
+		if (proxy != null)
+			isProxy = Boolean.parseBoolean(proxy);
 		
 		String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
 		String entityVersion = request.getParameter(DisplayUtils.ENTITY_VERSION_PARAM_KEY);
@@ -153,10 +164,25 @@ public class FileHandleServlet extends HttpServlet {
 			}
 		}
 		
-		if (resolvedUrl != null)
-			response.sendRedirect(resolvedUrl.toString());
+		if (resolvedUrl != null){
+			if (isProxy) {
+				//do the get
+				HttpGet httpGet = new HttpGet(resolvedUrl.toString());
+				//copy headers
+				Enumeration<?> headerValues = request.getHeaders("Cookie");
+				while (headerValues.hasMoreElements()) {
+					String headerValue = (String) headerValues.nextElement();
+					httpGet.addHeader("Cookie", headerValue);
+				}
+				HttpResponse newResponse = new HttpClientProviderImpl().execute(httpGet);
+				HttpEntity responseEntity = (null != newResponse.getEntity()) ? newResponse.getEntity() : null;
+				if (responseEntity != null) {
+					responseEntity.writeTo(response.getOutputStream());
+				}
+			}else
+				response.sendRedirect(resolvedUrl.toString());	
+		}
 	}
-
 	
 	@Override
 	public void doPost(final HttpServletRequest request,
@@ -177,7 +203,6 @@ public class FileHandleServlet extends HttpServlet {
 			String entityId = null;
 			while (iter.hasNext()) {
 				FileItemStream item = iter.next();
-				String contentType = item.getContentType();
 				String name = item.getFieldName();
 				InputStream stream = item.openStream();
 				String fileName = item.getName();
@@ -187,6 +212,12 @@ public class FileHandleServlet extends HttpServlet {
 				ServiceUtils.writeToFile(temp, stream, MAX_ATTACHMENT_SIZE_IN_BYTES);
 				try{
 					// Now upload the file
+					String contentType = item.getContentType();
+					if (Synapse.APPLICATION_OCTET_STREAM.equals(contentType.toLowerCase())){
+						//see if we can make a better guess based on the file stream
+						contentType = Synapse.guessContentTypeFromStream(temp);
+						//some source code files still register as application/octet-stream, but the preview manager in the backend should recognize those specific file extensions
+					}
 					client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
 					newFileHandle = client.createFileHandle(temp, contentType);
 				}finally{

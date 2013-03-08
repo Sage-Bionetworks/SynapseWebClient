@@ -153,6 +153,7 @@ public class DisplayUtils {
 
 	
 	private static final String ERROR_OBJ_REASON_KEY = "reason";
+	public static final String PROXY_PARAM_KEY = "proxy";
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
@@ -1363,19 +1364,24 @@ public class DisplayUtils {
 					wikiIdParam + nocacheParam;
 	}
 		
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
+	}
+
 	/**
 	 * Create the url to a FileEntity filehandle.
 	 * @param baseURl
 	 * @param entityid
 	 * @return
 	 */
-	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
 		String versionParam = versionNumber == null ? "" : "&" + ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
 		//if preview, then avoid cache
 		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
 		return baseFileHandleUrl + "?" +
 				ENTITY_PARAM_KEY + "=" + entityId + "&" +
-				FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+				FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
+				PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
 				versionParam + nocacheParam;
 	}
 
@@ -1418,7 +1424,13 @@ public class DisplayUtils {
 		boolean isCodeFile = false;
 		int lastDot = fileName.lastIndexOf(".");
 		if (lastDot > -1) {
-			isCodeFile = CODE_EXTENSIONS_SET.contains(fileName.substring(lastDot).toLowerCase());
+			//because code file previews have .txt appended, look for the second to last dot
+			int secondToLastDot = fileName.lastIndexOf(".", lastDot-1);
+			if (secondToLastDot > -1){
+				String extension = fileName.substring(secondToLastDot, lastDot).toLowerCase();
+				isCodeFile = CODE_EXTENSIONS_SET.contains(extension);
+			}
+				
 		}
 		return isCodeFile;
 	}

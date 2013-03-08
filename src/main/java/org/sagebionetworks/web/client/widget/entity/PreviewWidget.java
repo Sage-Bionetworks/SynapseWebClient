@@ -50,7 +50,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 					if (isCode || isTextType) {
 						final boolean isCSV = DisplayUtils.isCSV(contentType);
 						//try to load the text of the preview, if available
-						requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
+						//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
+						requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, true));
+						
 						try {
 							requestBuilder.sendRequest(null, new RequestCallback() {
 								public void onError(final Request request, final Throwable e) {

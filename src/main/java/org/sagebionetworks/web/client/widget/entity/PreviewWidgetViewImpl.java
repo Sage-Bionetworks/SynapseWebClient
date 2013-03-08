@@ -46,7 +46,7 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 		clear();
 		setStylePrimaryName("markdown");
 		StringBuilder sb = new StringBuilder();
-		sb.append("<pre><code>");
+		sb.append("<pre style=\"overflow:auto;white-space:pre\"><code>");
 		sb.append(code);
 		sb.append("</code></pre>");
 		add(new HTMLPanel(sb.toString()));
@@ -69,13 +69,13 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 		clear();
 		setStylePrimaryName("markdown");
 		StringBuilder sb = new StringBuilder();
-		sb.append("<table>");
+		sb.append("<h5>Contents</h5><table style=\"overflow:auto;display:block;max-height:200px\">");
 		String[] lines = csv.split("\n");
 		for (int i = 0; i < lines.length; i++) {
 			sb.append("<tr>");
 			String[] cells = lines[i].split(",");
 			for (int j = 0; j < cells.length; j++) {
-				sb.append("<td>");
+				sb.append("<td style=\"border-top:0px\">");
 				sb.append(cells[j]);
 				sb.append("</td>");
 			}
