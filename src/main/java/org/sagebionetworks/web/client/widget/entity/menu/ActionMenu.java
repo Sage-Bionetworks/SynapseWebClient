@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Page;
@@ -202,6 +203,10 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Project.class.getName()));
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Link.class.getName()));
 		ignore.add(entityTypeProvider.getEntityTypeForClassName(Preview.class.getName()));
+		
+		//SWC-442: Do not include File in Add menu.  
+		//NOTE: DO NOT MERGE THIS CHANGE BACK TO DEVELOP (OR TO THE CURRENT RELEASE BRANCH)!  FileEntity will be supported in the next version
+		ignore.add(entityTypeProvider.getEntityTypeForClassName(FileEntity.class.getName()));
 		
 		return ignore;
 	}
