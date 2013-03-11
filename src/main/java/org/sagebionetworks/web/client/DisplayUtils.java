@@ -1398,9 +1398,9 @@ public class DisplayUtils {
 		return ref;		
 	}
 	
-	public static boolean isWikiSupportedType(Entity entity) {
+	public static boolean isWikiSupportedType(Entity entity, CookieProvider cookies) {
 		//TODO: add Folder and Project once they are migrated (description goes to Wiki markdown, attachments to wiki FileHandles)
-		return (entity instanceof FileEntity);
+		return (entity instanceof FileEntity || (isInTestWebsite(cookies) && (entity instanceof Folder || entity instanceof Project)));
 	}
 	
 	public static boolean hasRecognizedImageExtension(String fileName) {

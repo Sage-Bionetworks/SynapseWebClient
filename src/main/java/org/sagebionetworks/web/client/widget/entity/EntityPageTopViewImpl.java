@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -107,6 +108,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private FilesBrowser filesBrowser;
 	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
+	private CookieProvider cookies;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -119,7 +121,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget, CookieProvider cookies) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -134,7 +136,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.fileTitleBar = fileTitleBar;
 		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
-
+		this.cookies = cookies;
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
 		
@@ -244,7 +246,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+		if (DisplayUtils.isWikiSupportedType(bundle.getEntity(), cookies)) {
 			//show preview
 			colLeftContainer.add(getFilePreview(bundle));
 		}
@@ -252,7 +254,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 		
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+		if (DisplayUtils.isWikiSupportedType(bundle.getEntity(), cookies)) {
 			// show Wiki
 			addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
 		}
@@ -370,7 +372,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, int spanWidth) {
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+		if (DisplayUtils.isWikiSupportedType(bundle.getEntity(), cookies)) {
 			// Child Page Browser
 			container.add(wikiPageWidget);
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), canEdit, new WikiPageWidget.Callback() {
@@ -522,7 +524,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 		// Add the description body
 	    if(description != null && !("".equals(description))) {
-	    	if (!DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+	    	if (!DisplayUtils.isWikiSupportedType(bundle.getEntity(), cookies)) {
 				lc.add(markdownWidget);
 		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, false);
 	    	}
