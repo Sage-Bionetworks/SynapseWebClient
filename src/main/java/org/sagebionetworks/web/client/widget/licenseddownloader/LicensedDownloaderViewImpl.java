@@ -8,9 +8,9 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.GovernanceDialogHelper;
 
 import com.extjs.gxt.ui.client.Style;
@@ -40,7 +40,8 @@ import com.google.inject.Inject;
 public class LicensedDownloaderViewImpl extends LayoutContainer implements LicensedDownloaderView {
 
 	private Presenter presenter;
-	private APPROVAL_REQUIRED approvalRequired;	
+	private RESTRICTION_LEVEL restrictionLevel;
+	private APPROVAL_TYPE approvalType;	
 	private String licenseTextHtml;
 	private SafeHtml safeDownloadHtml;
 	private Window downloadWindow;
@@ -78,7 +79,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	public void showWindow() {
 		if (!presenter.isDownloadAllowed()) return;
 		
-		if (approvalRequired==APPROVAL_REQUIRED.NONE) {
+		if (approvalType==APPROVAL_TYPE.NONE) {
 			//if 1, open it
 			if (locations != null && locations.size() == 1){
 				DisplayUtils.newWindow(locations.get(0).getPath(),"","");
@@ -89,7 +90,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		} else {
 			Callback termsOfUseCallback = presenter.getTermsOfUseCallback();
 			GovernanceDialogHelper.showAccessRequirement(
-					approvalRequired, 
+					restrictionLevel,
+					approvalType, 
 					false/*isAnonymous*/, 
 					false/*hasAdministrativeAccess*/,
 					false/*accessApproved*/, 
@@ -125,8 +127,17 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	}
 
 	@Override
-	public void setApprovalRequired(APPROVAL_REQUIRED approvalRequired) {
-		this.approvalRequired = approvalRequired;		
+	public void setRestrictionLevel(RESTRICTION_LEVEL restrictionLevel) {
+		this.restrictionLevel = restrictionLevel;		
+	}
+
+	/**
+	 * set the approval type (USER_AGREEMENT or ACT_APPROVAL) or NONE if access is allowed with no add'l approval
+	 * @param approvalType
+	 */
+	@Override
+	public void setApprovalType(APPROVAL_TYPE approvalType) {
+		this.approvalType = approvalType;		
 	}
 
 	@Override
@@ -135,12 +146,41 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	}
 	
 	@Override
+	public void setDownloadLocation(String fileName, String entityId,
+			Long versionNumber, String md5) {
+		// build a list of links in HTML
+		SafeHtmlBuilder sb = new SafeHtmlBuilder();
+		String displayString = "Download";
+		String url = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
+		sb.appendHtmlConstant("<a href=\"" + url + "\" target=\"_blank\">")
+		.appendEscaped(displayString)
+		.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
+		downloadWindowWidth = 300;
+		if(md5 != null) {
+			sb.appendHtmlConstant("&nbsp;<small>md5 checksum: ")
+			.appendEscaped(md5)
+			.appendHtmlConstant("</small>");
+			sb.appendHtmlConstant("<br/>");
+			downloadWindowWidth = 600;
+		}
+		safeDownloadHtml = sb.toSafeHtml();
+		
+		// replace the view content if this is after initialization
+		if(downloadContentContainer != null) {
+			safeDownloadHtml = sb.toSafeHtml();
+			fillDownloadContentContainer();
+		}
+
+	}
+	
+	@Override
+	@Deprecated
 	public void setDownloadLocations(List<LocationData> locations, String md5) {
 		this.locations = locations;
 		if(locations != null && locations.size() > 0) {
 			// build a list of links in HTML
 			SafeHtmlBuilder sb = new SafeHtmlBuilder();
-			String displayString = "Download";  // TODO : add display to LocationData
+			String displayString = "Download";
 			for(int i=0; i<locations.size(); i++) {
 				LocationData dl = locations.get(i);
 				sb.appendHtmlConstant("<a href=\"" + dl.getPath() + "\" target=\"_blank\">")
@@ -269,7 +309,6 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		downloadWindow.add(panel);		
 		downloadWindow.layout(true);
 	}
-
 	
 	private void fillDownloadContentContainer() {
 		if(downloadContentContainer != null) {
@@ -278,4 +317,6 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 			downloadContentContainer.layout(true);
 		}
 	}
+
+
 }

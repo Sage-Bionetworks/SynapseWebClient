@@ -1,33 +1,57 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.Window;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.CheckBox;
+import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
+import com.extjs.gxt.ui.client.widget.form.LabelField;
+import com.extjs.gxt.ui.client.widget.form.TriggerField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.extjs.gxt.ui.client.widget.layout.FitData;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ProvenanceConfigViewImpl extends LayoutContainer implements ProvenanceConfigView {
 	private Presenter presenter;
 	TextField<String> depthTextField;
-	TextField<String> entityIdTextField;
+	TextField<String> entityListField;
+	TextField<String> displayHeightField;
+	IconsImageBundle iconsImageBundle;
+	EntityFinder entityFinder;
 	
 	CheckBox showExpandCheckbox;
 	@Inject
-	public ProvenanceConfigViewImpl() {
+	public ProvenanceConfigViewImpl(IconsImageBundle iconsImageBundle, EntityFinder entityFinder) {
+		this.iconsImageBundle = iconsImageBundle;
+		this.entityFinder = entityFinder;
 	}
 	
 	@Override
-	public void initView() {
+	public void initView() {		
 		this.setLayout(new FlowLayout());
 		final FormPanel panel = new FormPanel();
 		panel.setHeaderVisible(false);
@@ -36,40 +60,61 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 		panel.setShadow(false);
 		panel.setLabelAlign(LabelAlign.RIGHT);
 		panel.setBodyBorder(false);
-		panel.setLabelWidth(60);
-		
+		panel.setLabelWidth(104);
+				
 		FormData basicFormData = new FormData();
 		basicFormData.setWidth(250);
 		Margins margins = new Margins(10, 10, 0, 10);
 		basicFormData.setMargins(margins);
 		
-		entityIdTextField = new TextField<String>();
-		entityIdTextField.setEmptyText("syn12345 ");
-		entityIdTextField.setFieldLabel(DisplayConstants.SYNAPSE_ID_LABEL);
-		entityIdTextField.setRegex(WebConstants.VALID_ENTITY_ID_REGEX);
-		entityIdTextField.getMessages().setRegexText(DisplayConstants.INVALID_SYNAPSE_ID_MESSAGE);
-		entityIdTextField.setAllowBlank(false);
-	    panel.add(entityIdTextField, basicFormData);
+		entityListField = new TextField<String>(); 
+		entityListField.setFieldLabel(DisplayConstants.ENTITY_LIST);
+		entityListField.setAllowBlank(false);
+		panel.add(entityListField, basicFormData);
 		
+		Button findEntitiesButton = new Button(DisplayConstants.FIND_ENTITIES, AbstractImagePrototype.create(iconsImageBundle.magnify16()));
+		findEntitiesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				entityFinder.configure(true);				
+				final Window window = createEntityFinderWindow();
+				window.show();				
+			}
+		});
+		AdapterField buttonField = new AdapterField(findEntitiesButton);
+		buttonField.setLabelSeparator("");
+		panel.add(buttonField, basicFormData);
+		
+		    		
 		depthTextField = new TextField<String>();
 		depthTextField.setValue("1");
 		depthTextField.setFieldLabel(DisplayConstants.DEPTH_LABEL);
-//		depthTextField.setRegex(WebConstants.VALID_POSITIVE_NUMBER_REGEX);
-//		depthTextField.getMessages().setRegexText(DisplayConstants.INVALID_NUMBER_MESSAGE);
-//		depthTextField.setAllowBlank(false);
-	    //panel.add(depthTextField, basicFormData);
+		depthTextField.setRegex(WebConstants.VALID_POSITIVE_NUMBER_REGEX);
+		depthTextField.getMessages().setRegexText(DisplayConstants.INVALID_NUMBER_MESSAGE);
+		depthTextField.setAllowBlank(false);
+	    panel.add(depthTextField, basicFormData);
 		
+		displayHeightField = new TextField<String>();
+		displayHeightField.setValue(null);
+		displayHeightField.setEmptyText(WidgetConstants.PROV_WIDGET_HEIGHT_DEFAULT + " (" + DisplayConstants.DEFAULT + ")");
+		displayHeightField.setFieldLabel(DisplayConstants.DISPLAY_HEIGHT + " (px)");
+		displayHeightField.setRegex(WebConstants.VALID_POSITIVE_NUMBER_REGEX);
+		displayHeightField.getMessages().setRegexText(DisplayConstants.INVALID_NUMBER_MESSAGE);
+		displayHeightField.setAllowBlank(true);
+	    panel.add(displayHeightField, basicFormData);
+	    	    
 	    showExpandCheckbox = new CheckBox();
-	    showExpandCheckbox.setBoxLabel(DisplayConstants.SHOW_EXPANDED_LABEL);
-	    SimplePanel wrapper = new SimplePanel(showExpandCheckbox);
-	    wrapper.addStyleName("margin-left-10");
+	    showExpandCheckbox.setFieldLabel(DisplayConstants.SHOW_EXPAND);
+	    showExpandCheckbox.setBoxLabel("");
+	    panel.add(showExpandCheckbox, basicFormData);
+	    
 		this.add(panel);
-		//this.add(wrapper);
 	}
+
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!entityIdTextField.isValid())
-			throw new IllegalArgumentException(entityIdTextField.getErrorMessage());
+		if (entityListField.getValue() == null)
+			throw new IllegalArgumentException(DisplayConstants.ERROR_ENTER_AT_LEAST_ONE_ENTITY);
 		if (!depthTextField.isValid())
 			throw new IllegalArgumentException(depthTextField.getErrorMessage());
 	}
@@ -100,51 +145,99 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 
 	@Override
 	public int getDisplayHeight() {
-		return 70;
+		return 150;
 	}
 	@Override
 	public int getAdditionalWidth() {
-		return 0;
+		return 40;
 	}
 	@Override
 	public void clear() {
 	}
 	@Override
 	public Long getDepth() {
-//		Long depth = null;
-//		if (depthTextField.isValid()) {
-//			depth = Long.parseLong(depthTextField.getValue());
-//		}
-//			
-//		return depth;
-		return 1l;
+		Long depth = null;
+		if (depthTextField.isValid()) {
+			depth = Long.parseLong(depthTextField.getValue());
+		}
+			
+		return depth;
 	}
 	@Override
 	public void setDepth(Long depth) {
-//		depthTextField.setValue(depth.toString());
+		depthTextField.setValue(depth.toString());
 	}
 	@Override
-	public String getEntityId() {
-		if (entityIdTextField.isValid())
-			return entityIdTextField.getValue();
-		else return null;
+	public String getEntityList() {
+		if (entityListField.getValue() != null)
+			return entityListField.getValue();
+		else 
+			return null;
 	}
 	@Override
-	public void setEntityId(String entityId) {
-		entityIdTextField.setValue(entityId);
+	public void setEntityList(String entityList) {
+		entityListField.setValue(entityList);
 	}
 	@Override
 	public boolean isExpanded() {
-//		return showExpandCheckbox.getValue();
-		return true;
+		return showExpandCheckbox.getValue();
 	}
 	@Override
 	public void setIsExpanded(boolean b) {
-//		showExpandCheckbox.setValue(b);
+		showExpandCheckbox.setValue(b);
 	}
+
+	@Override
+	public void setProvDisplayHeight(int provDisplayHeight) {
+		displayHeightField.setValue(Integer.toString(provDisplayHeight));
+	}
+	@Override
+	public Integer getProvDisplayHeight() {
+		return displayHeightField.getValue() != null ? Integer.parseInt(displayHeightField.getValue()) : null;		
+	}
+	
 	
 	/*
 	 * Private Methods
 	 */
+	private void appendEntityListValue(Reference selected) {		
+		String str = entityListField.getValue();
+		if(str == null) str = "";
+		if(!str.equals("")) 
+			str += ",";
+		str += DisplayUtils.createEntityVersionString(selected);
+		entityListField.setValue(str);
+	}
+
+
+	private Window createEntityFinderWindow() {
+		final Window window = new Window();  				
+		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
+		window.setPlain(true);
+		window.setModal(true);
+		window.setHeading(DisplayConstants.FIND_ENTITIES);
+		window.setLayout(new FitLayout());
+		window.add(entityFinder.asWidget(), new FitData(4));				
+		window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				Reference selected = entityFinder.getSelectedEntity();
+				if(selected.getTargetId() != null) {					
+					appendEntityListValue(selected);
+					window.hide();
+				} else {
+					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+				}
+			}
+		}));
+		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		}));
+		window.setButtonAlign(HorizontalAlignment.RIGHT);
+		return window;
+	}
 
 }

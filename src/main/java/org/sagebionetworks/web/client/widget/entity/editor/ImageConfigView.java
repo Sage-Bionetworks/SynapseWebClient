@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -22,11 +22,10 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public String getImageUrl();
 	public String getAltText();
 	public void setImageUrl(String url);
-	public String getUploadedDataName();
-	public void setUploadedAttachmentData(AttachmentData uploadedAttachmentData);
+	public String getUploadedFileHandleName();
 	public void setExternalVisible(boolean visible);
 	
-	public void setEntityId(String entityId);
+	public void configure(WikiPageKey wikiKey);
 	
 	/**
 	 * Presenter interface

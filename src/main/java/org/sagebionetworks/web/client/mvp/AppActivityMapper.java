@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -33,6 +35,7 @@ import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
+import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
@@ -69,6 +72,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(PasswordReset.class);
 		openAccessPlaces.add(RegisterAccount.class);
 		openAccessPlaces.add(Synapse.class);
+		openAccessPlaces.add(Wiki.class);
 		openAccessPlaces.add(ProjectsHome.class);
 		openAccessPlaces.add(ComingSoon.class);
 		openAccessPlaces.add(Governance.class);
@@ -80,8 +84,11 @@ public class AppActivityMapper implements ActivityMapper {
 	@Override
 	public Activity getActivity(Place place) {
 		synapseJSNIUtils.recordPageVisit(synapseJSNIUtils.getCurrentHistoryToken());
-		
-		AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
+	    
+		synapseJSNIUtils.setPageTitle(DisplayConstants.DEFAULT_PAGE_TITLE);
+		synapseJSNIUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
+	    
+	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
 		
 		// set current and last places
@@ -173,6 +180,10 @@ public class AppActivityMapper implements ActivityMapper {
 			// wiki page
 			WikiPresenter presenter = ginjector.getWikiPresenter();
 			presenter.setPlace((WikiPlace)place);
+			return presenter;
+		} else if(place instanceof Wiki){
+			SynapseWikiPresenter presenter = ginjector.getSynapseWikiPresenter();
+			presenter.setPlace((Wiki)place);
 			return presenter;
 		} else {
 			// Log that we have an unknown place but send the user to the default

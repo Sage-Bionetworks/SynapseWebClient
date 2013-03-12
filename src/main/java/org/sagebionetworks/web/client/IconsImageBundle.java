@@ -35,6 +35,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/arrow-curve-16.png")
 	ImageResource arrowCurve16();
 
+	@Source("images/icons/paper-clip-16.png")
+	ImageResource attachment16();
+	
 	@Source("images/icons/tick-16.png")
 	ImageResource checkGreen16();
 
@@ -260,6 +263,12 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/synapse-data-24.png")
 	ImageResource synapseData24();
+
+	@Source("images/icons/document-16.png")
+	ImageResource synapseFile16();
+
+	@Source("images/icons/document-24.png")
+	ImageResource synapseFile24();
 	
 	@Source("images/icons/synapse-folder-16.png")
 	ImageResource synapseFolder16();
@@ -284,7 +293,6 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/document-text-24.png")
 	ImageResource synapsePage24();
-
 	
 	@Source("images/icons/synapse-project-16.png")
 	ImageResource synapseProject16();

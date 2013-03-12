@@ -2,11 +2,9 @@ package org.sagebionetworks.web.client.widget.breadcrumb;
 
 import java.util.List;
 
-import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface BreadcrumbView extends IsWidget, SynapseWidgetView {

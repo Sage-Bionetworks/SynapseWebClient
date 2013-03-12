@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ExpressionData;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
@@ -31,9 +32,7 @@ import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -46,14 +45,17 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -73,12 +75,12 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -151,6 +153,12 @@ public class DisplayUtils {
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
+	public static final String ENTITY_VERSION_PARAM_KEY = "version";
+	public static final String WIKI_OWNER_ID_PARAM_KEY = "ownerId";
+	public static final String WIKI_OWNER_TYPE_PARAM_KEY = "ownerType";
+	public static final String WIKI_ID_PARAM_KEY = "wikiId";
+	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
+	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
 	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
 	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
@@ -161,6 +169,7 @@ public class DisplayUtils {
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
 	public static final String ETAG_KEY = "etag";
+	public static final String ENTITY_VERSION_STRING = "/version/";
 	
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
@@ -620,9 +629,23 @@ public class DisplayUtils {
 		return dt.toDate();
 	}
 	
+	public static String getSynapseWikiHistoryToken(String ownerId, String objectType, String wikiPageId) {
+		Wiki place = new Wiki(ownerId, objectType, wikiPageId);
+		return "#!" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
+	}
+	
+	public static String getSearchHistoryToken(String searchQuery) {
+		Search place = new Search(searchQuery);
+		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
+	}
+	
+	public static String getSearchHistoryToken(String searchQuery, Long start) {
+		Search place = new Search(searchQuery, start);
+		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
+	}
 	
 	public static String getSynapseHistoryToken(String entityId) {
-		return "#" + getSynapseHistoryTokenNoHash(entityId, null);
+		return "#!" + getSynapseHistoryTokenNoHash(entityId, null);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId) {
@@ -630,7 +653,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryToken(String entityId, Long versionNumber) {
-		return "#" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
+		return "#!" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
@@ -658,6 +681,19 @@ public class DisplayUtils {
 		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
 		return fullPlaceName;
 	}
+	
+	private static String getWikiPlaceString(Class<Wiki> place) {
+		String fullPlaceName = place.getName();		
+		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
+		return fullPlaceName;
+	}
+	
+	private static String getSearchPlaceString(Class<Search> place) {
+		String fullPlaceName = place.getName();		
+		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
+		return fullPlaceName;
+	}
+
 
 	/**
 	 * Returns the offending character given a regex string
@@ -753,6 +789,10 @@ public class DisplayUtils {
 			// Folder
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();			
+		} else if(FileEntity.class.getName().equals(className)) {
+			// File
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
 //		} else if(Model.class.getName().equals(className)) {
 			// Model
 //			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
@@ -1008,6 +1048,16 @@ public class DisplayUtils {
 		addPopover(util, widget, content, optionsMap);
 	}
 
+	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
+		Map<String, String> optionsMap = new TreeMap<String, String>();
+		optionsMap.put("data-html", "true");
+		optionsMap.put("data-animation", "true");
+		optionsMap.put("title", title);
+		optionsMap.put("data-placement", pos.toString().toLowerCase());
+		optionsMap.put("data-trigger", "hover");		
+		addPopover(util, widget, content, optionsMap);
+	}
+
 	
 	/**
 	 * Adds a popover to a target widget
@@ -1198,9 +1248,9 @@ public class DisplayUtils {
 	 * @param entityType 
 	 */
 	public static Widget getUploadButton(final EntityBundle entityBundle,
-			EntityType entityType, final LocationableUploader locationableUploader,
+			EntityType entityType, final Uploader locationableUploader,
 			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
-		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
+		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
 		final Window window = new Window();  
 		locationableUploader.clearHandlers();
@@ -1228,7 +1278,7 @@ public class DisplayUtils {
 				window.setSize(400, 320);
 				window.setPlain(true);
 				window.setModal(true);		
-				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
+				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 				window.setLayout(new FitLayout());			
 				window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
 				window.show();
@@ -1236,7 +1286,7 @@ public class DisplayUtils {
 		});
 		return uploadButton;
 	}
-	
+
 	/**
 	 * Provides same functionality as java.util.Pattern.quote().
 	 * @param pattern
@@ -1268,9 +1318,87 @@ public class DisplayUtils {
 		} else{
 			cookies.removeCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY);
 		}
-			
+	}
+	
+	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
+
+	/**
+		 * Create the url to a wiki filehandle.
+		 * @param baseURl
+		 * @param id
+		 * @param tokenId
+		 * @param fileName
+		 * @return
+		 */
+	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
+		//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
+//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
+//		return repoServicesUrl 
+//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
+//				+"/"+ wikiKey.getOwnerObjectId()
+//				+"/wiki/" 
+//				+wikiKey.getWikiPageId()
+//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
+		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+
+			//if preview, then avoid cache
+			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+		return baseFileHandleUrl + "?" +
+				WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
+				WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
+				WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
+					FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+					wikiIdParam + nocacheParam;
+	}
 		
+	/**
+	 * Create the url to a FileEntity filehandle.
+	 * @param baseURl
+	 * @param entityid
+	 * @return
+	 */
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+		String versionParam = versionNumber == null ? "" : "&" + ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
+		//if preview, then avoid cache
+		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+		return baseFileHandleUrl + "?" +
+				ENTITY_PARAM_KEY + "=" + entityId + "&" +
+				FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+				versionParam + nocacheParam;
 	}
 
-	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
+	public static String createEntityVersionString(Reference ref) {
+		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
+	}
+	
+	public static String createEntityVersionString(String id, Long version) {
+		if(version != null)
+			return id+ENTITY_VERSION_STRING+version;
+		else 
+			return id;		
+	}
+	public static Reference parseEntityVersionString(String entityVersion) {
+		String[] parts = entityVersion.split(ENTITY_VERSION_STRING);
+		Reference ref = null;
+		if(parts.length > 0) {
+			ref = new Reference();
+			ref.setTargetId(parts[0]);
+			if(parts.length > 1) {
+				try {
+					ref.setTargetVersionNumber(Long.parseLong(parts[1]));
+				} catch(NumberFormatException e) {}
+			}
+		}		
+		return ref;		
+	}
+	
+	public static boolean hasRecognizedImageExtension(String fileName) {
+		String lowerFileName = fileName.toLowerCase();
+		return lowerFileName.endsWith(".png") ||
+				lowerFileName.endsWith(".jpg") ||
+				lowerFileName.endsWith(".jpeg") ||
+				lowerFileName.endsWith(".tiff") ||
+				lowerFileName.endsWith(".gif") ||
+				lowerFileName.endsWith(".bmp");
+	}
 }

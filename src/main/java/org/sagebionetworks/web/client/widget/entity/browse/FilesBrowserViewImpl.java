@@ -14,7 +14,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -36,12 +36,12 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private EntityTreeBrowser entityTreeBrowser;
-	private LocationableUploader locationableUploader;
+	private Uploader locationableUploader;
 		
 	@Inject
 	public FilesBrowserViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle,
-			LocationableUploader locationableUploader,
+			Uploader locationableUploader,
 			EntityTreeBrowser entityTreeBrowser) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
@@ -163,7 +163,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 				}
 			}
 		};
-		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
+		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
 		final Window window = new Window();  
 		locationableUploader.clearHandlers();
@@ -194,7 +194,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 						window.setSize(400, 320);
 						window.setPlain(true);
 						window.setModal(true);		
-						window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
+						window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 						window.setLayout(new FitLayout());			
 						window.add(locationableUploader.asWidget(entity, new ArrayList<AccessRequirement>()), new MarginData(5));
 						window.show();

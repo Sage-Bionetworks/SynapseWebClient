@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.shared.WikiPageKey;
+
 /**
  * To support, add your editor to the PortalGinModule, and add it to the know widgets in the widget registrar.
  * @see org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl
@@ -14,7 +16,7 @@ public interface WidgetEditorPresenter extends SynapseWidgetPresenter {
 	 * @param entityId
 	 * @param widgetDescriptor
 	 */
-	public void configure(String entityId, Map<String, String> widgetDescriptor);
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor);
 	/**
 	 * You should update the parameters stored in your widget descriptor based on the values currently set in the view.
 	 * User parameter validation should occur in this method (throwing an IllegalArgumentException if a problem is found).
@@ -35,7 +37,7 @@ public interface WidgetEditorPresenter extends SynapseWidgetPresenter {
 	
 	/**
 	 * used when you want the editor to simply return text that should be inserted into the description field (instead of updating the descriptor).  
-	 * @see org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor
+	 * @see org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor
 	 * @return
 	 */
 	public String getTextToInsert();

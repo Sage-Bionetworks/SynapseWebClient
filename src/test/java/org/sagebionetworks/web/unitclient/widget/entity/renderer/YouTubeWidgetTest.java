@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -13,11 +12,13 @@ import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class YouTubeWidgetTest {
 		
 	YouTubeWidget widget;
 	YouTubeWidgetView mockView;
+	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
 	
 	@Before
 	public void setup(){
@@ -36,7 +37,7 @@ public class YouTubeWidgetTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String videoId = "my test video id";
 		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, videoId);
-		widget.configure("", descriptor);
-		verify(mockView).configure(anyString(), eq(videoId));
+		widget.configure(wikiKey, descriptor);
+		verify(mockView).configure(eq(videoId));
 	}
 }

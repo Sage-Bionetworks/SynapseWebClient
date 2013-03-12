@@ -2,21 +2,24 @@ package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
+import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
-import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
-import org.sagebionetworks.web.shared.provenance.ExpandTreeNode;
-import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ProvGraph;
+import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
+import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Events;
@@ -33,14 +36,12 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;		
-	private ProvTreeNode tree;
-	private List<Connection> connections;
+	private ProvGraph graph;
 	private LayoutContainer debug;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private HashMap<String,String> filledPopoverIds;
-	
-	private static final int DEFAULT_HEIGHT_PX = 275;
-	private int height = DEFAULT_HEIGHT_PX;
+		
+	private int height = WidgetConstants.PROV_WIDGET_HEIGHT_DEFAULT;
 	
 	@Inject
 	public ProvenanceWidgetViewImpl(SageImageBundle sageImageBundle,
@@ -60,8 +61,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	}
 
 	@Override
-	public void setTree(ProvTreeNode root) {
-		this.tree = root;
+	public void setGraph(ProvGraph graph) {
+		this.graph = graph;
 		if(this.isRendered()) {
 			createGraph();
 		}
@@ -104,37 +105,28 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		this.filledPopoverIds = new HashMap<String,String>();
 		LayoutContainer prov = new LayoutContainer();
 		prov.setStyleAttribute("position", "relative");		
-		prov.setHeight(height);		
-		connections = new ArrayList<ProvenanceWidgetViewImpl.Connection>();		
+		prov.setHeight(height);				
 		
-		if(tree != null) {			
-			addNodeTree(tree, prov);
+		if(graph != null) {
+			// add nodes to graph
+			Set<ProvGraphNode> nodes = graph.getNodes();
+			for(ProvGraphNode node : nodes) {			
+				prov.add(getNodeContainer(node));
+			}			
 		}
 		
 		this.add(prov, new MarginData(5));
 		this.addStyleName("scroll-auto");
 		this.layout(true);
 		
-		// assure DOM elements are in before asking jsPlumb to connect them
-		for(Connection connection : connections) {
-			connect(connection.getParentId(), connection.getChildId());
+		// make connections (assure DOM elements are in before asking jsPlumb to connect them)
+		if(graph != null) {			
+			Set<ProvGraphEdge> edges = graph.getEdges();
+			for(ProvGraphEdge edge : edges) {
+				connect(edge.getSink().getId(), edge.getSource().getId());
+			}
 		}
-	}
-	
-	/**
-	 * Add node and it's children to the tree
-	 * @param root
-	 * @param prov
-	 */
-	private void addNodeTree(ProvTreeNode root, LayoutContainer prov) {
-		if(root == null) return;
-		prov.add(getNodeContainer(root));
-		Iterator<ProvTreeNode> itr = root.iterator();
-		while(itr.hasNext()) {
-			ProvTreeNode child = itr.next();
-			addNodeTree(child, prov);
-			connections.add(new Connection(root.getId(), child.getId()));
-		}
+
 	}
 	
 	/**
@@ -142,27 +134,27 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	 * @param node
 	 * @return
 	 */
-	private LayoutContainer getNodeContainer(final ProvTreeNode node) {
-		if(node instanceof EntityTreeNode) {
-			LayoutContainer container = ProvViewUtil.createEntityContainer((EntityTreeNode)node, iconsImageBundle);
+	private LayoutContainer getNodeContainer(final ProvGraphNode node) {
+		if(node instanceof EntityGraphNode) {
+			LayoutContainer container = ProvViewUtil.createEntityContainer((EntityGraphNode)node, iconsImageBundle);
 			addToolTipToContainer(node, container, DisplayConstants.ENTITY);			
 			return container;
-		} else if(node instanceof ActivityTreeNode) {
-			LayoutContainer container = ProvViewUtil.createActivityContainer((ActivityTreeNode)node, iconsImageBundle);
+		} else if(node instanceof ActivityGraphNode) {
+			LayoutContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle);
 			// create tool tip for defined activities only
-			if(((ActivityTreeNode) node).getType() == ActivityType.UNDEFINED) {
+			if(((ActivityGraphNode) node).getType() == ActivityType.UNDEFINED) {
 				addUndefinedToolTip(container);
 			} else {
 				addToolTipToContainer(node, container, DisplayConstants.ACTIVITY);				
 			}
 			return container;
-		} else if(node instanceof ExpandTreeNode) {
-			return ProvViewUtil.createExpandContainer((ExpandTreeNode)node, sageImageBundle);
+		} else if(node instanceof ExpandGraphNode) {
+			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, sageImageBundle, presenter);
 		}
 		return null;
 	}
 
-	private void addToolTipToContainer(final ProvTreeNode node, final LayoutContainer container, final String title) {		
+	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer container, final String title) {		
 		container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayUtils.getLoadingHtml(sageImageBundle)));			
 		container.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
 			@Override
@@ -202,11 +194,12 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	
 	private static native void connect(String parentId, String childId) /*-{
 		var jsPlumb = $wnd.jsPlumb;		
-		jsPlumb.connect({source:parentId, target:childId, overlays:$wnd.overlays});
+		jsPlumb.connect({source:parentId, target:childId, overlays:jsP_overlays	});
 	}-*/;
 	
 	private static native void initJsPlumb() /*-{
-		;(function() {		
+		;(function() {
+					
 			$wnd.jsPlumbDemo = {					
 				init : function() {					
 					var color = "gray";
@@ -220,15 +213,15 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 						EndpointStyle : { radius:0.01, fillStyle:color },
 						HoverPaintStyle : {strokeStyle:"#ec9f2e" },
 						EndpointHoverStyle : {fillStyle:"#ec9f2e" },			
-						Anchors :  [ "TopCenter", "BottomCenter" ]
+						Anchors :  [ "BottomCenter", "TopCenter" ]
 					});				
 						
 					// declare some common values:
-					var arrowCommon = { foldback:0.7, fillStyle:color, length:10, width:10 },
+					jsP_arrowCommon = { foldback:0.7, fillStyle:color, length:7, width:7 };
 						// use three-arg spec to create two different arrows with the common values:
-						overlays = [
-							[ "Arrow", { location:0.001, direction:-1 }, arrowCommon ]
-						];				
+					jsP_overlays = [
+							[ "Arrow", { location:0.7, direction:1 }, jsP_arrowCommon ]
+						];					
 				}
 			};
 			
@@ -245,22 +238,6 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 	
 	}-*/;
-
-	private class Connection {
-		private String parentId;
-		private String childId;
-		public Connection(String parentId, String childId) {
-			super();
-			this.parentId = parentId;
-			this.childId = childId;
-		}
-		public String getParentId() {
-			return parentId;
-		}
-		public String getChildId() {
-			return childId;
-		}		
-	}
 
 	@Override
 	public void setHeight(int height) {

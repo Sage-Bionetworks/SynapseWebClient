@@ -1,5 +1,4 @@
 package org.sagebionetworks.web.shared;
-import org.pegdown.Extensions;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 
 
@@ -55,25 +54,16 @@ public class WebConstants {
 	// redirect with the sessio token as a request parameter (this is the default)
 	public static final String OPEN_ID_MODE_STANDARD = "STANDARD";
 
-	public static int MARKDOWN_OPTIONS = 
-		//Extensions.ABBREVIATIONS |		//Abbreviations in the way of PHP Markdown Extra.
-		//Extensions.AUTOLINKS |			//Plain (undelimited) autolinks the way Github-flavoured-Markdown implements them.
-		//Extensions.QUOTES |				//Beautifies single quotes, double quotes and double angle quotes
-		//Extensions.SMARTS |				//Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")		
-		Extensions.TABLES;				//Tables similar to MultiMarkdown (which is in turn like the PHP Markdown Extra tables, but with colspan support).
-		//Extensions.SUPPRESS_ALL_HTML;	//Suppresses HTML.  Now we suppress html tags associated with code injection and cross-site scripting
-		//Extensions.WIKILINKS;			//Support [[Wiki-style links]] with a customizable URL rendering logic.
-
 	public static final String ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
 			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br></code></pre><br>" +
-			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>An [example][id]. Then, anywhere else in the description, define the link:<br>  [id]: http://example.com/<br></code></pre><br>" +
-			"<h3>Tables</h3><pre><code>&lt;table&gt;<br>&lt;tr&gt;<br>&lt;td&gt;row 1, cell 1&lt;/td&gt;<br>&lt;td&gt;row 1, cell 2&lt;/td&gt;<br>&lt;/tr&gt;<br>&lt;tr&gt;<br>&lt;td&gt;row 2, cell 1&lt;/td&gt;<br>&lt;td&gt;row 2, cell 2&lt;/td&gt;<br>&lt;/tr&gt;<br>&lt;/table&gt; </code></pre><br>" +
+			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>An [example][id]. Then, anywhere else in the description,<br>define the link:<br>  [id]: http://example.com/<br></code></pre><pre><code>Custom Synapse ID link text:<br>[my text](#Synapse:syn12345)</code></pre><br>" +
+			"<h3>Tables</h3><pre><code>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>Row 2 Content Cell 1  | Row 2 Content Cell 2  | Row 2 Content Cell 3</code></pre><br>" +
 			"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
-			"<h3>Headers</h3><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre><br>" +
+			"<h3>Headers</h3><p><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre></p><p>Exclude a header from the table of contents:<pre><code>#! Header 1 <br>##! Header 2<br>######! Header 6</code></pre></p><br>" +
 			"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
 			"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
-			"<h3>Code Spans</h3><pre><code>`&lt;code&gt;` spans are delimited<br>by backticks.<br>You can include literal backticks<br>like `` `this` ``.<br></code></pre><br>" +
-			"<h3>Preformatted Code Blocks</h3><pre><code>&lt;pre&gt;&lt;code&gt;This is a preformatted<br>code block&lt;/code&gt;&lt;/pre&gt;</code></pre><br>" +
+			"<h3>Inline Code</h3><pre><code>Wrap inline snippets of `code` with backticks.<br>You can include literal backticks<br>like \\`this\\`.<br></code></pre><br>" +
+			"<h3>Preformatted Code Blocks</h3><pre><code>Wrap your code blocks in ```<br><br>This is a normal paragraph.<br><br>```<br>This is a preformatted<br>code block.<br>```</code></pre><br>" +
 			"<h3>Symbols</h3><pre><code>&amp;copy; = copyright sign<br>&amp;mdash; = wide dash<br>&amp;amp; = ampersand<br>&amp;trade; = trademark TM<br>&amp;reg; = reserved mark R</code></pre><br>"+
 			"</div>";
 

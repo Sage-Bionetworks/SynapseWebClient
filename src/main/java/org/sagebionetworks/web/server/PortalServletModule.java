@@ -11,6 +11,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.BCCSignupImpl;
 import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
+import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUpload;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
@@ -100,10 +101,14 @@ public class PortalServletModule extends ServletModule {
 		// setup GWTupload
 		bind(FileUpload.class).in(Singleton.class);
 		serve("/Portal/upload").with(FileUpload.class);
-		
+
 		// Attachments
 		bind(FileAttachmentServlet.class).in(Singleton.class);
 		serve("/Portal/attachment").with(FileAttachmentServlet.class);
+		
+		// FileHandle upload
+		bind(FileHandleServlet.class).in(Singleton.class);
+		serve("/Portal/filehandle").with(FileHandleServlet.class);
 		
 		// User Profile Attachment (photo)
 		bind(UserProfileAttachmentServlet.class).in(Singleton.class);

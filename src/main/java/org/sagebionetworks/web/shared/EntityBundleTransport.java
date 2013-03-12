@@ -24,6 +24,7 @@ public class EntityBundleTransport implements IsSerializable {
 	public static int ACL						= EntityBundle.ACL;
 	public static int ACCESS_REQUIREMENTS		= EntityBundle.ACCESS_REQUIREMENTS;
 	public static int UNMET_ACCESS_REQUIREMENTS	= EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+	public static int FILE_HANDLES				= EntityBundle.FILE_HANDLES;
 	
 	public static String HELLO = ":)";
 
@@ -36,6 +37,7 @@ public class EntityBundleTransport implements IsSerializable {
 	private String aclJson;
 	private String accessRequirementsJson;
 	private String unmetAccessRequirementsJson;
+	private String fileHandlesJson;
 	
 	public Boolean getHasChildren() {
 		return hasChildren;
@@ -91,6 +93,14 @@ public class EntityBundleTransport implements IsSerializable {
 	public void setUnmetAccessRequirementsJson(String unmetAccessRequirementsJson) {
 		this.unmetAccessRequirementsJson = unmetAccessRequirementsJson;
 	}
+	
+	public String getFileHandlesJson() {
+		return fileHandlesJson;
+	}
+	public void setFileHandlesJson(String fileHandlesJson) {
+		this.fileHandlesJson = fileHandlesJson;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -110,6 +120,8 @@ public class EntityBundleTransport implements IsSerializable {
 				* result
 				+ ((entityReferencedByJson == null) ? 0
 						: entityReferencedByJson.hashCode());
+		result = prime * result
+				+ ((fileHandlesJson == null) ? 0 : fileHandlesJson.hashCode());
 		result = prime * result
 				+ ((hasChildren == null) ? 0 : hasChildren.hashCode());
 		result = prime * result
@@ -159,6 +171,11 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!entityReferencedByJson.equals(other.entityReferencedByJson))
 			return false;
+		if (fileHandlesJson == null) {
+			if (other.fileHandlesJson != null)
+				return false;
+		} else if (!fileHandlesJson.equals(other.fileHandlesJson))
+			return false;
 		if (hasChildren == null) {
 			if (other.hasChildren != null)
 				return false;
@@ -186,7 +203,9 @@ public class EntityBundleTransport implements IsSerializable {
 				+ ", hasChildren=" + hasChildren + ", aclJson=" + aclJson
 				+ ", accessRequirementsJson=" + accessRequirementsJson
 				+ ", unmetAccessRequirementsJson="
-				+ unmetAccessRequirementsJson + "]";
+				+ unmetAccessRequirementsJson + ", fileHandlesJson="
+				+ fileHandlesJson + "]";
 	}
+	
 	
 }

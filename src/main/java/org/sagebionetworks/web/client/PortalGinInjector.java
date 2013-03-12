@@ -10,15 +10,19 @@ import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
+import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
@@ -26,7 +30,11 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
@@ -71,6 +79,8 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public SearchPresenter getSearchPresenter();
 	
+	public SynapseWikiPresenter getSynapseWikiPresenter();
+	
 	public BCCSignup getBCCSignup();
 	
 	public WikiPresenter getWikiPresenter();
@@ -83,16 +93,23 @@ public interface PortalGinInjector extends Ginjector {
 	////// Editors
 	public YouTubeConfigEditor getYouTubeConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
+	public OldImageConfigEditor getOldImageConfigEditor();
 	public ImageConfigEditor getImageConfigEditor();
+	public AttachmentConfigEditor getAttachmentConfigEditor();
 	public LinkConfigEditor getLinkConfigEditor();
 	public APITableConfigEditor getSynapseAPICallConfigEditor();
+	public TabbedTableConfigEditor getTabbedTableConfigEditor();
 
 
 	////// Renderers
 	public YouTubeWidget getYouTubeRenderer();
 	public ProvenanceWidget getProvenanceRenderer();
+	public OldImageWidget getOldImageRenderer();
 	public ImageWidget getImageRenderer();
+	public AttachmentPreviewWidget getAttachmentPreviewRenderer();
 	public APITableWidget getSynapseAPICallRenderer();
+	public TableOfContentsWidget getTableOfContentsRenderer();
+	public WikiFilesPreviewWidget getWikiFilesPreviewRenderer();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
@@ -100,4 +117,5 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableColumnRendererDate getAPITableColumnRendererDate();
 	public APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
 	public APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
+
 }

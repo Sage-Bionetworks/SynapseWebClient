@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -123,16 +124,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return bus.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
 	
-	@Override
-	public boolean isLocationable() {
-		if(bundle.getEntity() instanceof Locationable) {
-			return true;
-		}
-		return false;
-	}
-
 	@Override 
-
 	public boolean isLoggedIn() {
 		return authenticationController.getLoggedInUser() != null;
 	}
@@ -178,61 +170,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		}
 	}
 
-	@Override
-	public void getHtmlFromMarkdown(String markdown, String attachmentBaseUrl, final AsyncCallback<String> asyncCallback) {
-		synapseClient.markdown2Html(markdown, attachmentBaseUrl, false, asyncCallback);
-			}
-	@Override
-	public void loadWidgets(final HTMLPanel panel) {
-		try {
-			loadWidgets(panel, bundle, widgetRegistrar, synapseClient, nodeModelCreator, view, jsonObjectAdapter, iconsImageBundle, false);
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(e.getMessage());
-		}
-	}
-	
-	/**
-	 * Shared method for loading the widgets into the html returned by the service (used to render the entity page, and to generate a preview of the description)
-	 * @param panel
-	 * @param bundle
-	 * @param widgetRegistrar
-	 * @param synapseClient
-	 * @param nodeModelCreator
-	 * @param view
-	 * @throws JSONObjectAdapterException 
-	 */
-	public static void loadWidgets(final HTMLPanel panel, final EntityBundle bundle, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, final NodeModelCreator nodeModelCreator, final SynapseWidgetView view, final JSONObjectAdapter jsonObjectAdapter, IconsImageBundle iconsImageBundle, Boolean isPreview) throws JSONObjectAdapterException {
-		final String entityId = bundle.getEntity().getId();
-		final String suffix = isPreview ? DisplayConstants.DIV_ID_PREVIEW_SUFFIX : "";
-		//look for every element that has the right format
-		int i = 0;
-		String currentWidgetDiv = DisplayConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
-		Element el = panel.getElementById(currentWidgetDiv);
-		while (el != null) {
-				//based on the contents of the element, create the correct widget descriptor and renderer
-				String innerText = el.getAttribute("widgetParams");
-				if (innerText != null) {
-					try {
-						innerText = innerText.trim();
-						String contentType = widgetRegistrar.getWidgetContentType(innerText);
-						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
-						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(entityId, contentType, widgetDescriptor);
-						if (presenter == null)
-							throw new IllegalArgumentException("unable to render widget from the specified markdown:" + innerText);
-						panel.add(presenter.asWidget(), currentWidgetDiv);
-					}catch(IllegalArgumentException e) {
-						//try our best to load all of the widgets. if one fails to load, then fail quietly.
-						e.printStackTrace();
-						panel.add(new HTMLPanel(DisplayUtils.getIconHtml(iconsImageBundle.error16()) + innerText), currentWidgetDiv);
-					}
-				}
-			
-			i++;
-			currentWidgetDiv = DisplayConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
-			el = panel.getElementById(currentWidgetDiv);
-		}
-	}
-	
 	/*
 	 * Private Methods
 	 */

@@ -7,8 +7,10 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -147,6 +149,8 @@ public interface SynapseClient extends RemoteService {
 	public EntityWrapper deleteAcl(String ownerEntityId) throws RestServiceException;
 
 	public boolean hasAccess(String ownerEntityId, String accessType) throws RestServiceException;
+	
+	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException;
 
 	public EntityWrapper getAllUsers() throws RestServiceException;
 	
@@ -170,7 +174,7 @@ public interface SynapseClient extends RemoteService {
 	 * @param markdown
 	 * @return
 	 */
-	public String markdown2Html(String markdown, String attachmentUrl, Boolean isPreview) throws RestServiceException;
+	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException;
 	
 	public Long getStorageUsage(String entityId) throws RestServiceException;
 
@@ -180,7 +184,21 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getActivity(String activityId) throws RestServiceException;
 	
+	public String getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset) throws RestServiceException;
+	
 	String promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
 	public EntityWrapper removeAttachmentFromEntity(String entityId, String attachmentName) throws RestServiceException;
 	public String getJSONEntity(String repoUri) throws RestServiceException;
+	
+	//wiki crud
+	public String createWikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
+	public String getWikiPage(WikiPageKey key)  throws RestServiceException;
+	public String updateWikiPage(String ownerId, String ownerType, String wikiPageJson)  throws RestServiceException;
+	public void deleteWikiPage(WikiPageKey key)  throws RestServiceException;
+	
+	public String getWikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
+	
+	public String getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
+	
+	public String getFileEndpoint() throws RestServiceException;
 }

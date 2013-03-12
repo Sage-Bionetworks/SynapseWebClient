@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.provenance;
 
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
+import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -30,10 +32,12 @@ public interface ProvenanceWidgetView extends IsWidget, SynapseWidgetView {
 		 * @param nodeId
 		 */
 		void getInfo(String nodeId, AsyncCallback<KeyValueDisplay<String>> callback);
+
+		void expand(ExpandGraphNode node);
 		
 	}
 
-	public void setTree(ProvTreeNode root);
+	public void setGraph(ProvGraph graph);
 
 	public void setHeight(int height);
 	

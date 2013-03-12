@@ -20,7 +20,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
@@ -55,7 +55,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
-	private LocationableUploader locationableUploader;
+	private Uploader locationableUploader;
 	private LicensedDownloader licensedDownloader;
 	private Widget downloadButton = null;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -99,7 +99,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			IconsImageBundle iconsImageBundle, 
 			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
-			LocationableUploader locationableUploader, 
+			Uploader locationableUploader, 
 			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloader, 
 			EntityTypeProvider typeProvider,

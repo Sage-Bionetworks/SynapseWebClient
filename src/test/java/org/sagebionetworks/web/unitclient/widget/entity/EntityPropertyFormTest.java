@@ -64,7 +64,7 @@ public class EntityPropertyFormTest {
 		mockEventBus = mock(EventBus.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
 		presenter = new EntityPropertyForm(mockView, mockEventBus, mockNodeModelCreator, mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar);
-		EntityBundle bundle = new EntityBundle(new Project(), null, null, null,null,null, null);
+		EntityBundle bundle = new EntityBundle(new Project(), null, null, null,null,null, null, null);
 		
 		String entityId = "123";
 		entity = new ExampleEntity();
@@ -82,7 +82,7 @@ public class EntityPropertyFormTest {
 		EntityBundleTransport ebt = new EntityBundleTransport();
 		ebt.setEntityJson(EntityFactory.createJSONStringForEntity(entity));
 		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null);
+		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		when(mockNodeModelCreator.createEntityBundle(any(EntityBundleTransport.class))).thenReturn(entityBundle);
 		
 		AdapterFactory factory = new AdapterFactoryImpl();
@@ -110,22 +110,6 @@ public class EntityPropertyFormTest {
 		verify(mockView, Mockito.times(2)).refresh();
 	}
 
-	@Test
-	public void testPreview() throws Exception {
-		final String testHtml = "<h1>HTML Returns</h1>";
-		final String testMarkdown = "HTML Returns\n----------";
-		AsyncMockStubber
-				.callSuccessWith(testHtml)
-				.when(mockSynapseClient)
-				.markdown2Html(any(String.class), any(String.class), any(Boolean.class),
-						any(AsyncCallback.class));
-		
-		presenter.showPreview(testMarkdown,  "");
-		verify(mockSynapseClient).markdown2Html(any(String.class),
-				any(String.class), any(Boolean.class), any(AsyncCallback.class));
-		verify(mockView).showPreview(anyString(), any(EntityBundle.class),any(WidgetRegistrar.class), any(SynapseClientAsync.class), any(NodeModelCreator.class), any(JSONObjectAdapter.class));
-	}
-	
 	
 	@Test
 	public void testAttachmentRefresh() {
@@ -182,5 +166,4 @@ public class EntityPropertyFormTest {
 		handler.onPersistSuccess(testEvent);
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 	}
-	
 }

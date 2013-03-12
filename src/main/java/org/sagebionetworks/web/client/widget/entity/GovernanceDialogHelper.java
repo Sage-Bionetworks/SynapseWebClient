@@ -2,7 +2,8 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfilePanel;
 
@@ -23,9 +24,9 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
 
 public class GovernanceDialogHelper {
-
 	
 	private static RowData standardPadding;
+	
 	static {
 		standardPadding = new RowData();
 		int horizontal = 15;
@@ -129,13 +130,13 @@ public class GovernanceDialogHelper {
 		return licenseTextContainer;
 	}
 	
-	public static ImageResource restrictionLevelIcon(APPROVAL_REQUIRED restrictionLevel, IconsImageBundle iconsImageBundle) {
+	public static ImageResource restrictionLevelIcon(RESTRICTION_LEVEL restrictionLevel, IconsImageBundle iconsImageBundle) {
 		switch (restrictionLevel) {
-		case NONE:
+		case OPEN:
 			return iconsImageBundle.sheildGreen16();
-		case LICENSE_ACCEPTANCE:
+		case RESTRICTED:
 			return iconsImageBundle.shieldYellow16();
-		case ACT_APPROVAL:
+		case CONTROLLED:
 			return iconsImageBundle.shieldRed16();
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
@@ -143,7 +144,8 @@ public class GovernanceDialogHelper {
 	}
 	
 	public static void showAccessRequirement(
-			APPROVAL_REQUIRED restrictionLevel, 
+			RESTRICTION_LEVEL restrictionLevel, // this is the overall restriction level of the entity
+			APPROVAL_TYPE approvalType,  // this is the approval type required for the AR being displayed
 			boolean isAnonymous, 
 			boolean hasAdministrativeAccess,
 			boolean accessApproved, 
@@ -154,9 +156,12 @@ public class GovernanceDialogHelper {
 			final Callback requestACTCallback,
 			final Callback loginCallback,
 			final String jiraFlagLink) {
-		if (restrictionLevel!=APPROVAL_REQUIRED.NONE && isAnonymous && accessApproved) 
+		if ((restrictionLevel==RESTRICTION_LEVEL.OPEN && approvalType!=APPROVAL_TYPE.NONE) ||
+				(restrictionLevel!=RESTRICTION_LEVEL.OPEN && approvalType==APPROVAL_TYPE.NONE)) 
+			throw new IllegalArgumentException("restrictionLevel="+restrictionLevel+" but approvalType="+approvalType);
+		if (restrictionLevel!=RESTRICTION_LEVEL.OPEN && isAnonymous && accessApproved) 
 			throw new IllegalArgumentException("restrictionLevel!=APPROVAL_REQUIRED.NONE && isAnonymous && accessApproved");
-		boolean imposeRestrictionsAllowed = (restrictionLevel==APPROVAL_REQUIRED.NONE && hasAdministrativeAccess);
+		boolean imposeRestrictionsAllowed = (restrictionLevel==RESTRICTION_LEVEL.OPEN && hasAdministrativeAccess);
 		final Dialog dialog = new Dialog();
         configureDialog(dialog);
         ContentPanel panel = createTextPanel(dialog);
@@ -165,7 +170,7 @@ public class GovernanceDialogHelper {
         dialog.setHeading(DisplayConstants.DATA_USE + ": " + EntityViewUtils.restrictionDescriptor(restrictionLevel)); 
 		// next comes the restriction descriptor, e.g. "Access to the data is Restricted." (Bold)
       	panel.addText("<p class=\"strong\">" + DisplayConstants.ACCESS_TO_DATA +" "+EntityViewUtils.restrictionDescriptor(restrictionLevel)+".</p>");
-      	if (restrictionLevel==APPROVAL_REQUIRED.NONE) {
+      	if (restrictionLevel==RESTRICTION_LEVEL.OPEN) {
       		panel.addText("<p>"+DisplayConstants.UNRESTRICTED_DESCRIPTION+"</p>");
       	} else {
          	// next, if you are approved, comes "You have access to this data under the following..."
@@ -173,10 +178,12 @@ public class GovernanceDialogHelper {
      		if (accessApproved) {
       			panel.addText(DisplayConstants.RESTRICTION_FULFILLED_STATEMENT);
       		} else {
-      			if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
+      			if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
           			panel.addText(DisplayConstants.TOU_PROMPT);
-     			} else { //restrictionLevel==APPROVAL_REQUIRED.ACT_APPROVAL
+     			} else if (approvalType==APPROVAL_TYPE.ACT_APPROVAL) { //restrictionLevel==APPROVAL_REQUIRED.ACT_APPROVAL
           			panel.addText(DisplayConstants.ACT_PROMPT);
+     			} else {
+     				throw new IllegalArgumentException("Cannot have non-RESTRICTION_LEVEL.OPEN with APPROVAL_TYPE none.");
      			}
       		}
     		// next comes the Terms of Use or ACT info, in its own box
@@ -219,10 +226,9 @@ public class GovernanceDialogHelper {
     			public void componentSelected(ButtonEvent ce) {loginCallback.invoke();}
             });       
      	} else {
-      		if (restrictionLevel==APPROVAL_REQUIRED.NONE) {
+      		if (approvalType==APPROVAL_TYPE.NONE) {
       			if (hasAdministrativeAccess) {
-      				// button to contact act, cancel
-      				// Note:  "contact act" should become "Add Restriction"
+      				// button to add restriction or cancel
       		        dialog.okText = DisplayConstants.BUTTON_TEXT_RESTRICT_DATA;
       		        dialog.setButtons(Dialog.OKCANCEL);
       		        Button okButton = dialog.getButtonById(Dialog.OK);
@@ -241,7 +247,7 @@ public class GovernanceDialogHelper {
      				// just a close button
      		        dialog.setButtons(Dialog.CLOSE);
      			} else {
-	     			if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
+	     			if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
 	     				// agree to TOU, cancel
 	     		        dialog.okText = DisplayConstants.BUTTON_TEXT_ACCEPT_TERMS_OF_USE;
 	     		        dialog.setButtons(Dialog.OKCANCEL);
@@ -252,7 +258,7 @@ public class GovernanceDialogHelper {
 	     						touAcceptanceCallback.invoke();
 	     					}
 	     		        });
-	     			} else { //ACT_APPROVAL
+	     			} else { // APPROVAL_TYPE.ACT_APPROVAL
 	     				// request access, cancel
 	     		        dialog.okText = DisplayConstants.BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT;
 	     		        dialog.setButtons(Dialog.OKCANCEL);

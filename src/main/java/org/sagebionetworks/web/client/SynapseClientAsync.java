@@ -7,6 +7,7 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -75,6 +76,8 @@ public interface SynapseClientAsync {
 	public void deleteAcl(String ownerEntityId, AsyncCallback<EntityWrapper> callback);
 
 	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
+	
+	public void hasAccess(String ownerId, String ownerType, String accessType,AsyncCallback<Boolean> callback);
 
 	public void getAllUsers(AsyncCallback<EntityWrapper> callback);
 	
@@ -88,7 +91,7 @@ public interface SynapseClientAsync {
 
 	public void updateExternalLocationable(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback);
 
-	public void markdown2Html(String markdown, String attachmentUrl, Boolean isPreview, AsyncCallback<String> callback);
+	public void markdown2Html(String markdown, Boolean isPreview, AsyncCallback<String> callback);
 	
 	public void getStorageUsage(String entityId, AsyncCallback<Long> callback);
 
@@ -103,4 +106,16 @@ public interface SynapseClientAsync {
 	void removeAttachmentFromEntity(String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 	
 	public void getJSONEntity(String repoUri, AsyncCallback<String> callback);
+	
+	//wiki crud
+	public void createWikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void getWikiPage(WikiPageKey key, AsyncCallback<String> callback);
+	public void updateWikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void deleteWikiPage(WikiPageKey key, AsyncCallback<Void> callback);
+	
+	public void getWikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
+	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
+	public void getFileEndpoint(AsyncCallback<String> callback);
+
+	void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<String> callback);
 }

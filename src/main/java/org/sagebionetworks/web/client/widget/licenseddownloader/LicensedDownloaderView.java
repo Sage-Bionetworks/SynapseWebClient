@@ -3,9 +3,11 @@ package org.sagebionetworks.web.client.widget.licenseddownloader;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -19,10 +21,15 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	public void setPresenter(Presenter presenter);
 	
 	/**
-	 * Make the view show the License acceptance view first
-	 * @param licenseRequired
+	 *
 	 */
-	public void setApprovalRequired(APPROVAL_REQUIRED approvalRequired);
+	public void setRestrictionLevel(RESTRICTION_LEVEL restrictionLevel);
+	
+	/**
+	 * set the approval type (USER_AGREEMENT or ACT_APPROVAL) or NONE if access is allowed with no add'l approval
+	 * @param approvalType
+	 */
+	public void setApprovalType(APPROVAL_TYPE approvalType);
 	
 	/**
 	 * Set the license text to display
@@ -44,7 +51,10 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	 * Sets the content of the download pane
 	 * @param downloads
 	 */
+	@Deprecated
 	public void setDownloadLocations(List<LocationData> locations, String md5);
+	
+	public void setDownloadLocation(String fileName, String entityId, Long versionNumber, String md5);
 	
 	
 	/**

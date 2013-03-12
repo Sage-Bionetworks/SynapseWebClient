@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
@@ -17,96 +18,108 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
+import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.ActivityTypeUtil;
-import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
-import org.sagebionetworks.web.shared.provenance.ExpandTreeNode;
-import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ProvGraph;
+import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
+import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ProvUtils {
 
-	public static ProvTreeNode buildProvTree(List<Activity> activities, Entity rootEntity, Map<String, ProvTreeNode> idToNode, Map<Reference, EntityHeader> refToHeader, boolean showExpand, SynapseJSNIUtils synapseJSNIUtils) {
-		String versionLabel = null;
-		Long versionNumber = null;
-		if(rootEntity instanceof Versionable) {
-			versionLabel = ((Versionable)rootEntity).getVersionLabel();
-			versionNumber = ((Versionable)rootEntity).getVersionNumber();
-		}
-		ProvTreeNode root = new EntityTreeNode(createUniqueNodeId(idToNode,
-				synapseJSNIUtils), rootEntity.getId(), rootEntity.getName(),
-				versionLabel, versionNumber, rootEntity.getEntityType());
-		idToNode.put(root.getId(), root);		
-		for(Activity act : activities) {			
-			ProvTreeNode activityNode;
-			UsedEntity firstExecuted = null;
-			ActivityType type = ActivityTypeUtil.get(act);
-			if(type == ActivityType.CODE_EXECUTION) {
-				firstExecuted = ActivityTypeUtil.getExecuted(act);				
-				EntityHeader header = firstExecuted != null ? refToHeader.get(firstExecuted.getReference()) : null;
-				if(header == null) header = new EntityHeader();
-				activityNode = new ActivityTreeNode(
-						createUniqueNodeId(idToNode, synapseJSNIUtils), 
-						act.getId(),
-						act.getName(), 
-						type, 
-						header.getId(), 
-						header.getName(),
-						header.getVersionLabel(), 
-						header.getVersionNumber(),
-						header.getType());
-			} else {
-				activityNode = new ActivityTreeNode(
-						createUniqueNodeId(idToNode, synapseJSNIUtils), 
-						act.getId(),
-						act.getName(), 
-						type);
+	private static int sequence = 0;
+	
+	public static ProvGraph buildProvGraph(
+			Map<Reference, String> generatedByActivityId,
+			Map<String, Activity> processedActivities,
+			Map<String, ProvGraphNode> idToNode,
+			Map<Reference, EntityHeader> refToHeader, boolean showExpand,
+			Set<Reference> startRefs, Set<Reference> noExpandNode) {
+		ProvGraph graph = new ProvGraph();
+		Integer sequence = 0;
+		
+		// maps for local building retrieval
+		Map<Reference,EntityGraphNode> entityNodes = new HashMap<Reference,EntityGraphNode>();
+		Map<Activity,ActivityGraphNode> activityNodes = new HashMap<Activity,ActivityGraphNode>();
+		
+		// create ProvGraphNodes for the entities
+		for(Reference ref : refToHeader.keySet()) {
+			EntityHeader header = refToHeader.get(ref);
+			if(header == null) { 
+				header = new EntityHeader();
 			}
+			boolean isStartNode = startRefs.contains(ref) ? true : false;
+			String name = header.getName() == null ? ref.getTargetId() : header.getName();
+			EntityGraphNode entityNode = new EntityGraphNode(
+					createUniqueNodeId(), ref.getTargetId(), name,
+					header.getVersionLabel(), ref.getTargetVersionNumber(),
+					header.getType(), false, isStartNode);
+			idToNode.put(entityNode.getId(), entityNode);
+			graph.addNode(entityNode);
+			entityNodes.put(ref, entityNode);
+		}
+		
+		// create ProvGraphNodes for the activities
+		// add used edges
+		// create Expand nodes and add edges to used nodes if requested
+		for(Activity act : processedActivities.values()) {			
+			ActivityType type = ActivityTypeUtil.get(act);
+			ActivityGraphNode activityNode = new ActivityGraphNode(
+						createUniqueNodeId(), 
+						act.getId(),
+						act.getName(), 
+						type,
+						false);			
 			idToNode.put(activityNode.getId(), activityNode);
-			// add activity to tree
-			root.addChild(activityNode);
+			graph.addNode(activityNode);
+			activityNodes.put(act, activityNode);
 			
+			// add used edges
 			if(act.getUsed() != null) {
 				Iterator<UsedEntity> itr = act.getUsed().iterator();
 				while(itr.hasNext()) {
-					UsedEntity ue = itr.next();
-					if(firstExecuted != null && firstExecuted.equals(ue)) continue; // don't show the first executed in the used list
-					Reference ref = ue.getReference();
-					EntityHeader header = refToHeader.get(ref);
-					if(header == null) header = new EntityHeader();
-					ProvTreeNode usedNode = new EntityTreeNode(createUniqueNodeId(idToNode, synapseJSNIUtils), ref.getTargetId(), header.getName(), header.getVersionLabel(), header.getVersionNumber(), header.getType());
-					idToNode.put(usedNode.getId(), usedNode);
-					// add used to activity in tree
-					activityNode.addChild(usedNode);
+					UsedEntity ue = itr.next();					
+					Reference ref = ue.getReference();			
+					EntityGraphNode entityNode = entityNodes.get(ref);
+					graph.addEdge(new ProvGraphEdge(activityNode, entityNode));				
 					
-					if(showExpand) {
-						ProvTreeNode expandNode = new ExpandTreeNode(createUniqueNodeId(idToNode, synapseJSNIUtils), ref.getTargetId(), ref.getTargetVersionNumber());
+					// create expand nodes for those that don't have generatedBy activities defined
+					if(showExpand && !generatedByActivityId.containsKey(ref) && !noExpandNode.contains(ref)) {
+						ProvGraphNode expandNode = new ExpandGraphNode(createUniqueNodeId(), ref.getTargetId(), ref.getTargetVersionNumber());
 						idToNode.put(expandNode.getId(), expandNode);
-						usedNode.addChild(expandNode);
+						graph.addEdge(new ProvGraphEdge(entityNode, expandNode));
 					}
 				}
+				
 			}
 		}
-		return root;
+		
+		// add generatedBy edges
+		for(Reference ref : generatedByActivityId.keySet()) {			
+			String activityId = generatedByActivityId.get(ref);
+			Activity act = processedActivities.get(activityId);
+			if(act != null) {
+				graph.addEdge(new ProvGraphEdge(entityNodes.get(ref), activityNodes.get(act)));
+			}
+		}
+				
+		return graph;
 	}
+
 	
 	/**
 	 * Creates a random id that is not in use yet 
 	 */
-	public static String createUniqueNodeId(Map<String, ProvTreeNode> idToNode, SynapseJSNIUtils synapseJSNIUtils) {
-		String id;
-		do{
-			id = "provNode" + String.valueOf(synapseJSNIUtils.randomNextInt());
-		} while(idToNode.containsKey(id));
-		return id;
+	public static String createUniqueNodeId() {
+		return "provNode" + sequence++;
 	}
 
 	public static List<Reference> extractReferences(List<Activity> activities) {
@@ -115,9 +128,7 @@ public class ProvUtils {
 		for(Activity act : activities) {
 			if(act.getUsed() == null) continue;
 		
-			Iterator<UsedEntity> itr = act.getUsed().iterator();
-			while(itr.hasNext()) {
-				UsedEntity ue = itr.next();
+			for(UsedEntity ue : act.getUsed()) {
 				if(ue != null && ue.getReference() != null) {
 					allRefs.add(ue.getReference());
 				}
@@ -174,53 +185,53 @@ public class ProvUtils {
 		}
 		
 		String used = null;
-		Iterator<UsedEntity> itr = activity.getUsed().iterator();
-		while(itr.hasNext()) {
-			Reference ref = itr.next().getReference();
-			if(used == null) {
-				used = DisplayUtils.getVersionDisplay(ref);
-			} else {
-				used += ", " + DisplayUtils.getVersionDisplay(ref);
+		if(activity.getUsed() != null) {
+			for(UsedEntity ue : activity.getUsed()) {
+				Reference ref = ue.getReference();
+				if(used == null) {
+					used = DisplayUtils.getVersionDisplay(ref);
+				} else {
+					used += ", " + DisplayUtils.getVersionDisplay(ref);
+				}
 			}
+			order.add("Entities Used");
+			map.put("Entities Used", used);
+			
+			order.add("Modified By");
+			map.put("Modified By", activity.getModifiedBy());
+			
+			order.add("Modified On");
+			map.put("Modified On", DisplayUtils.converDataToPrettyString(activity.getModifiedOn()));		
+			
+			order.add("Description");
+			map.put("Description", activity.getDescription());				
 		}
-		order.add("Entities Used");
-		map.put("Entities Used", used);
-		
-		order.add("Modified By");
-		map.put("Modified By", activity.getModifiedBy());
-		
-		order.add("Modified On");
-		map.put("Modified On", DisplayUtils.converDataToPrettyString(activity.getModifiedOn()));		
-		
-		order.add("Description");
-		map.put("Description", activity.getDescription());				
-		
 		return new KeyValueDisplay<String>(map, order);
 	}
 
 	/**
-	 * Returns a KeyValueDisplay to the callback for the given ProvTreeNode nodeId (NOTE: nodeId is not entity id!)
-	 * @param nodeId ProvTreeNode id
+	 * Returns a KeyValueDisplay to the callback for the given ProvGraphNode nodeId (NOTE: nodeId is not entity id!)
+	 * @param nodeId ProvGraphNode id
 	 * @param callback
 	 * @param synapseClient
 	 * @param nodeModelCreator
-	 * @param idToNode mapping from id to ProvTreeNode
+	 * @param idToNode mapping from id to ProvGraphNode
 	 */
 	public static void getInfo(String nodeId,			
 			SynapseClientAsync synapseClient,
 			final NodeModelCreator nodeModelCreator,
-			Map<String, ProvTreeNode> idToNode,
+			Map<String, ProvGraphNode> idToNode,
 			final AsyncCallback<KeyValueDisplay<String>> callback) {
 		if(callback == null) return;
 		if(nodeId == null) callback.onFailure(null);
 				
-		ProvTreeNode node = idToNode.get(nodeId);
+		ProvGraphNode node = idToNode.get(nodeId);
 		if(node == null) callback.onFailure(null);
 		
-		if(node instanceof EntityTreeNode) {
-			getInfoEntityTreeNode(synapseClient, nodeModelCreator, callback, (EntityTreeNode)node);
-		} else if(node instanceof ActivityTreeNode) { 
-			getInfoActivityTreeNode(synapseClient, nodeModelCreator, callback, (ActivityTreeNode)node);
+		if(node instanceof EntityGraphNode) {
+			getInfoEntityTreeNode(synapseClient, nodeModelCreator, callback, (EntityGraphNode)node);
+		} else if(node instanceof ActivityGraphNode) { 
+			getInfoActivityTreeNode(synapseClient, nodeModelCreator, callback, (ActivityGraphNode)node);
 		}
 	}
 	
@@ -232,7 +243,7 @@ public class ProvUtils {
 			SynapseClientAsync synapseClient,
 			final NodeModelCreator nodeModelCreator,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
-			ActivityTreeNode atNode) {
+			ActivityGraphNode atNode) {
 		synapseClient.getActivity(atNode.getActivityId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -253,7 +264,7 @@ public class ProvUtils {
 	private static void getInfoEntityTreeNode(SynapseClientAsync synapseClient,
 			final NodeModelCreator nodeModelCreator,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
-			EntityTreeNode etNode) {
+			EntityGraphNode etNode) {
 		synapseClient.getEntityForVersion(etNode.getEntityId(), etNode.getVersionNumber(), new AsyncCallback<EntityWrapper>() {
 			@Override
 			public void onSuccess(EntityWrapper result) {
@@ -271,7 +282,6 @@ public class ProvUtils {
 			}
 		});
 	}
-
 	
 }
 

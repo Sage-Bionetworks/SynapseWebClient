@@ -15,7 +15,7 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
+@Deprecated
 public class LocationableTitleBar implements LocationableTitleBarView.Presenter, SynapseWidgetPresenter {
 	
 	private LocationableTitleBarView view;

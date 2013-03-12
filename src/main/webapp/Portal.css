@@ -463,7 +463,7 @@ a.shortBtn {
 	margin-left: 5px;
 }
 .margin-top-5 {
-	margin-top: 5px;
+	margin-top: 5px !important;
 }
 .margin-top-10 {
 	margin-top: 10px;
@@ -473,10 +473,20 @@ a.shortBtn {
 	margin-left: 180px;
 }
 
+.margin-left-35 {
+	margin-left: 35px;
+}
+
+
 .margin-bottom-40 {
 	margin-bottom: 40px;
 }
-
+.margin-bottom-20 {
+	margin-bottom: 20px;
+}
+.margin-bottom-10 {
+	margin-bottom: 10px;
+}
 
 .margin-left-725 {
 	margin-left: 725px;
@@ -484,6 +494,7 @@ a.shortBtn {
 .markdown {
 	word-wrap:break-word;
 	overflow: hidden;
+	text-align: justify;
 }
 
 .markdown ol { 
@@ -509,7 +520,13 @@ a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
 }
 
 .markdown code {
-	color: #1a0084;
+	background-clip: padding-box;
+    border: 1px solid #DDDDDD;
+    border-radius: 3px 3px 3px 3px;
+    color: #666666;
+    font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
+    font-family: Courier,monospace;
+    padding: 0 5px 2px
 }
 
 .entity-description-preview-wrapper {
@@ -534,6 +551,12 @@ a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
 .inline-block {
 	display:inline-block;
 }
+
+.font-size-32 {
+	font-size: 32px;
+	font-family: Yanone Kaffeesatz;
+}
+
 
 .vertical-align-bottom {
 	vertical-align: bottom;
@@ -681,7 +704,17 @@ h1, h2, h3, h4, h5, h6 {
 .image{
 	max-width: 940px;
 }
+
+.wikifilepreview {
+	width: 940px;
+}
+
 /**********************************/
+	
+.wikifilepreviewimg {
+	margin:auto; 
+	display:block;
+}
 	
 .whiteBackground {
 	background-color: #fff;
@@ -708,3 +741,31 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 	
+
+.gwt-TreeItem-selected {
+  background: #ffffff !important;
+  text-decoration:underline;
+}
+
+/**table of contents styling **/
+/** .8em to 1.2em **/
+.toc-indent4 {
+	font-size: .8em;
+	margin-left: 40px;
+}
+.toc-indent0 {
+	font-size: 1.2em;
+	margin-left: 0px;
+}
+.toc-indent1 {
+	font-size: 1.1em;
+	margin-left: 10px;
+}
+.toc-indent2 {
+	font-size: 1.0em;
+	margin-left: 20px;
+}
+.toc-indent3 {
+	font-size: 0.9em;
+	margin-left: 30px;
+}	

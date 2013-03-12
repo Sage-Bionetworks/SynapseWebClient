@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -15,23 +14,27 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowserView;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.TreeItem;
 
 public class PagesBrowserTest {
 
@@ -40,11 +43,11 @@ public class PagesBrowserTest {
 	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
 	AutoGenFactory autoGenFactory;
-	SearchServiceAsync mockSearchServiceAsync;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	PagesBrowser pagesBrowser;
-	
+	List<JSONEntity> wikiHeadersList;
+	WikiHeader testRootHeader;
 	String entityId = "syn123";
 	
 	@Before
@@ -54,94 +57,50 @@ public class PagesBrowserTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		adapterFactory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();		
-		mockSearchServiceAsync = mock(SearchServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		pagesBrowser = new PagesBrowser(mockView, mockSynapseClient, mockNodeModelCreator, adapterFactory, autoGenFactory, mockSearchServiceAsync, mockGlobalApplicationState, mockAuthenticationController);
+		pagesBrowser = new PagesBrowser(mockView, mockSynapseClient, mockNodeModelCreator);
 		verify(mockView).setPresenter(pagesBrowser);
 		ArrayList<String> results = new ArrayList<String>();
 		results.add("A Test Entity Header");
-		AsyncMockStubber.callSuccessWith(results).when(mockSearchServiceAsync).searchEntities(anyString(),any(List.class), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith("entity id 1").when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(EntityHeader.class))).thenReturn(new EntityHeader());
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		PaginatedResults<JSONEntity> wikiHeaders = new PaginatedResults<JSONEntity>();
+		wikiHeadersList = new ArrayList<JSONEntity>();
+		testRootHeader = new WikiHeader();
+		testRootHeader.setId("123");
+		testRootHeader.setParentId(null);
+		testRootHeader.setTitle("my test root wiki header (page)");
+		wikiHeadersList.add(testRootHeader);
+		
+		wikiHeaders.setResults(wikiHeadersList);
+		when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(WikiHeader.class))).thenReturn(wikiHeaders);
 		reset(mockView);
 	}
 	
 	@Test
-	public void testConfigureProjectWithExistingWiki() throws Exception {
-		//it should search for the wiki searchService.searchEntities with a single entity returned (see before for test setup)
-		//create the returned entity header using mockNodeModelCreator.createJSONEntity (see before for test setup)
-		//and then call searchService.searchEntities to refresh the children of the returned entity (see before for test setup).
-		//let's kick it off:
-		pagesBrowser.configure(entityId, DisplayConstants.PAGES, true, true);
-		//after all this, it should call view.configure with the list of entityheaders
-		verify(mockView).configure(any(List.class), anyBoolean());
-	}
-	
-	@Test
-	public void testConfigureProjectFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSearchServiceAsync).searchEntities(anyString(),any(List.class), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		pagesBrowser.configure(entityId, DisplayConstants.PAGES, true, true);
-
+	public void testConfigureProject() throws Exception {
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		pagesBrowser.configure(new WikiPageKey(entityId, WidgetConstants.WIKI_OWNER_ID_ENTITY, null), "syn123", "#!Synapse:syn123", "Project A", true);
+		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
-	public void testConfigureProjectWithoutExistingWiki() {
-		//it should search for the wiki searchService.searchEntities with no entities returned
-		ArrayList<String> results = new ArrayList<String>();
-		AsyncMockStubber.callSuccessWith(results).when(mockSearchServiceAsync).searchEntities(anyString(),any(List.class), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
-
-		//it should try to create the wiki folder synapseClient.createOrUpdateEntity (see before for test setup)
-		
-		//and then call searchService.searchEntities to refresh the children of the returned entity (see before for test setup).
-		//let's kick it off:
-		pagesBrowser.configure(entityId, DisplayConstants.PAGES, true, true);
-		//after all this, it should call view.configure with the list of entityheaders
-
-		verify(mockView).configure(any(List.class), anyBoolean());
-		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-	}
-
-	@Test
-	public void testConfigurePage() {
-		pagesBrowser.configure(entityId, DisplayConstants.PAGES, true, false);
-		verify(mockView).configure(any(List.class), anyBoolean());
-		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+	public void testConfigureProjectRootNotFound() throws Exception {
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		pagesBrowser.configure(new WikiPageKey(entityId, WidgetConstants.WIKI_OWNER_ID_ENTITY, null), "syn123", "#!Synapse:syn123", "Project A", true);
+		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockView).configure(anyBoolean(), any(TreeItem.class));
 	}
 
 	@Test
 	public void testAsWidget() {
 		pagesBrowser.asWidget();
 		verify(mockView).asWidget();
-	}
-	
-	@Test
-	public void testCreatePageSuccess() {
-		pagesBrowser.createPage("test page");
-		//needed to have created the page
-		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		//report that a page was created
-		verify(mockView).showInfo(anyString(), anyString());
-		//and refreshed the children
-		verify(mockSearchServiceAsync).searchEntities(anyString(), any(List.class), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
-	}
-
-	@Test
-	public void testCreatePageFailure() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		pagesBrowser.createPage("test page");
-		verify(mockView).showErrorMessage(anyString());
-	}
-	
-	@Test
-	public void testRefreshChildrenFailure(){
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSearchServiceAsync).searchEntities(anyString(),any(List.class), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		pagesBrowser.refreshChildren(entityId);
-
-		verify(mockView).showErrorMessage(anyString());	
 	}
 }
 

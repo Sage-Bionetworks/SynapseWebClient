@@ -12,15 +12,15 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.IconMenu;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -245,9 +245,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setEntityName(e.getName());
 		setEntityId(e.getId());
 		boolean isLocationable = (e instanceof Locationable);
-		//show the entity name if this isn't locationable, or if it has no data.
-		boolean isEntityNamePanelVisible = !isLocationable || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !presenter.isAnonymous());
-		this.entityNamePanel.setVisible(isEntityNamePanelVisible);
 		
 		this.readOnly.setVisible(readOnly);
 		
@@ -293,6 +290,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setDetailedMetadataVisible(boolean visible) {
 		detailedMetadata.setVisible(visible);
 	}
+	
+	@Override
+	public void setEntityNameVisible(boolean visible) {
+		this.entityNamePanel.setVisible(visible);
+	}
+	
 	
 	@Override
 	public void showInfo(String title, String message) {
@@ -599,6 +602,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		return lc;
 	}
+	
 	private Widget createRestrictionWidget() {
 		if (!presenter.includeRestrictionWidget()) return null;
 		boolean isAnonymous = presenter.isAnonymous();
@@ -609,17 +613,18 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			hasAdministrativeAccess = presenter.hasAdministrativeAccess();
 			jiraFlagLink = presenter.getJiraFlagUrl();
 		}
-		APPROVAL_REQUIRED restrictionLevel = presenter.getRestrictionLevel();
+		RESTRICTION_LEVEL restrictionLevel = presenter.getRestrictionLevel();
+		APPROVAL_TYPE approvalType = presenter.getApprovalType();
 		String accessRequirementText = null;
 		Callback touAcceptanceCallback = null;
 		Callback requestACTCallback = null;
 		Callback imposeRestrictionsCallback = presenter.getImposeRestrictionsCallback();
 		Callback loginCallback = presenter.getLoginCallback();
-		if (restrictionLevel!=APPROVAL_REQUIRED.NONE) {
+		if (approvalType!=APPROVAL_TYPE.NONE) {
 			accessRequirementText = presenter.accessRequirementText();
-			if (restrictionLevel==APPROVAL_REQUIRED.LICENSE_ACCEPTANCE) {
+			if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
 				touAcceptanceCallback = presenter.accessRequirementCallback();
-			} else {
+			} else { // APPROVAL_TYPE.ACT_APPROVAL
 				// get the Jira link for ACT approval
 				if (!isAnonymous) {
 					requestACTCallback = new Callback() {
@@ -643,6 +648,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				imposeRestrictionsCallback,
 				loginCallback,
 				restrictionLevel,
+				approvalType,
 				hasFulfilledAccessRequirements,
 				icons,
 				synapseJSNIUtils);

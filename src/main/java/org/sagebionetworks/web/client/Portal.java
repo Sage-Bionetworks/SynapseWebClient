@@ -11,6 +11,8 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
+import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -28,31 +30,40 @@ public class Portal implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-	    EventBus eventBus = ginjector.getEventBus();
-	    PlaceController placeController = new PlaceController(eventBus);
-	    
-		// Start ActivityManager for the main widget with our ActivityMapper
-		AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl());
-		ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
-		activityManager.setDisplay(appWidget);
-		
-		// All pages get added to the root panel
-		appWidget.addStyleName("rootPanel");
-
-		// Start PlaceHistoryHandler with our PlaceHistoryMapper
-		AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
-		PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
-		historyHandler.register(placeController, eventBus, activityMapper.getDefaultPlace());
-
-		RootPanel.get("rootPanel").add(appWidget);
-
-		GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
-	    globalApplicationState.setPlaceController(placeController);
-	    globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
-	    globalApplicationState.setActivityMapper(activityMapper);
-
-		
-		// Goes to place represented on URL or default place
-		historyHandler.handleCurrentHistory();
+		//we might need to reload using the new token scheme (required for SEO)
+		String initToken = History.getToken();
+		if (initToken.length() > 0 && !initToken.startsWith("!")) {
+			String fullUrl = Window.Location.getHref();
+			fullUrl = fullUrl.replace("#"+initToken, "#!"+initToken);
+			Window.Location.replace(fullUrl);
+			Window.Location.reload();
+		} else {
+			EventBus eventBus = ginjector.getEventBus();
+		    PlaceController placeController = new PlaceController(eventBus);
+		    
+			// Start ActivityManager for the main widget with our ActivityMapper
+			AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl());
+			ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
+			activityManager.setDisplay(appWidget);
+			
+			// All pages get added to the root panel
+			appWidget.addStyleName("rootPanel");
+	
+			// Start PlaceHistoryHandler with our PlaceHistoryMapper
+			AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
+			PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
+			historyHandler.register(placeController, eventBus, activityMapper.getDefaultPlace());
+	
+			RootPanel.get("rootPanel").add(appWidget);
+	
+			GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
+		    globalApplicationState.setPlaceController(placeController);
+		    globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
+		    globalApplicationState.setActivityMapper(activityMapper);
+	
+			
+			// Goes to place represented on URL or default place
+		    historyHandler.handleCurrentHistory();
+		}
 	}
 }

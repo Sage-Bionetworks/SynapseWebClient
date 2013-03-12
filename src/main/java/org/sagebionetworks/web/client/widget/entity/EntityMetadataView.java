@@ -2,8 +2,9 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.utils.APPROVAL_REQUIRED;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -18,6 +19,7 @@ public interface EntityMetadataView extends IsWidget {
 	public void showInfo(String string, String message);
 	
 	public void setDetailedMetadataVisible(boolean visible);
+	public void setEntityNameVisible(boolean visible);
 
 	public void showErrorMessage(String message);
 
@@ -43,7 +45,9 @@ public interface EntityMetadataView extends IsWidget {
 
 		boolean includeRestrictionWidget();
 
-		public APPROVAL_REQUIRED getRestrictionLevel();
+		public RESTRICTION_LEVEL getRestrictionLevel();
+
+		public APPROVAL_TYPE getApprovalType();
 
 		Callback accessRequirementCallback();
 
@@ -52,8 +56,6 @@ public interface EntityMetadataView extends IsWidget {
 		boolean hasFulfilledAccessRequirements();
 
 		String accessRequirementText();
-
-		boolean isTermsOfUseAccessRequirement();
 
 		Callback getLoginCallback();
 

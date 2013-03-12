@@ -193,7 +193,7 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 			oAuthService = new ServiceBuilder().provider(LinkedInApi.class)
 											   .apiKey(StackConfiguration.getPortalLinkedInKey())
 											   .apiSecret(StackConfiguration.getPortalLinkedInSecret())
-											   .callback(portalCallbackUrl + "#Profile:")
+											   .callback(portalCallbackUrl + "#!Profile:")
 											   .build();			
 		}
 	}
