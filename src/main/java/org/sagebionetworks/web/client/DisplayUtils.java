@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -48,6 +49,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
@@ -55,6 +57,7 @@ import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -91,6 +94,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -159,6 +163,8 @@ public class DisplayUtils {
 	public static final String WIKI_ID_PARAM_KEY = "wikiId";
 	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
 	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
+	public static final String FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY = "createFileEntity";
+	public static final String FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY = "fileEntityParentId";
 	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
 	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
@@ -407,7 +413,7 @@ public class DisplayUtils {
 		}
 	}	
 
-	public static String getFileNameFromLocationPath(String path){
+	public static String getFileNameFromExternalUrl(String path){
 		//grab the text between the last '/' and following '?'
 		String fileName = "";
 		if (path != null) {
@@ -1392,6 +1398,11 @@ public class DisplayUtils {
 		return ref;		
 	}
 	
+	public static boolean isWikiSupportedType(Entity entity) {
+		//TODO: add Folder and Project once they are migrated (description goes to Wiki markdown, attachments to wiki FileHandles)
+		return (entity instanceof FileEntity);
+	}
+	
 	public static boolean hasRecognizedImageExtension(String fileName) {
 		String lowerFileName = fileName.toLowerCase();
 		return lowerFileName.endsWith(".png") ||
@@ -1401,4 +1412,5 @@ public class DisplayUtils {
 				lowerFileName.endsWith(".gif") ||
 				lowerFileName.endsWith(".bmp");
 	}
+	
 }

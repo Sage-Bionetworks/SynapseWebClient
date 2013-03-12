@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
@@ -57,16 +56,15 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	SynapseJSNIUtils synapseJSNIUtils;
 	Window loading;
 	private MarkdownEditorWidget markdownEditorWidget;
-	private CookieProvider cookies;
+	public static final int DIALOG_WIDTH = 850;
 	
 	@Inject
-	public EntityPropertyFormViewImpl(FormFieldFactory formFactory, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,SynapseJSNIUtils synapseJSNIUtils, MarkdownEditorWidget markdownEditorWidget, CookieProvider cookies) {
+	public EntityPropertyFormViewImpl(FormFieldFactory formFactory, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,SynapseJSNIUtils synapseJSNIUtils, MarkdownEditorWidget markdownEditorWidget) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle= sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.markdownEditorWidget= markdownEditorWidget;
-		this.cookies = cookies;
 		loading = DisplayUtils.createLoadingWindow(sageImageBundle, "Updating...");
 	}
 	
@@ -79,10 +77,9 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	public void showEditEntityDialog(String windowTitle) {
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
-		boolean isInTestMode = DisplayUtils.isInTestWebsite(cookies);
-		int width = isInTestMode ? 670 : 880;
-		int height = isInTestMode ? 400 : 660;
-		window.setSize(width, height);
+		boolean isWikiEntityEditor = DisplayUtils.isWikiSupportedType(presenter.getEntity());
+		int height = isWikiEntityEditor ? 400 : 660;
+		window.setSize(DIALOG_WIDTH, height);
 	    window.setPlain(true);  
 	    window.setModal(true);  
 	    window.setHeading(windowTitle);
@@ -114,15 +111,13 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		this.setScrollMode(Scroll.AUTO);
 		this.vp = new VerticalPanel();
 		this.add(vp);
-		boolean isInTestMode = DisplayUtils.isInTestWebsite(cookies);
-		int width = isInTestMode ? 640 : 850;
 		// This is the property panel
 		propPanel = new ContentPanel();
 		propPanel.setCollapsible(true);
 		propPanel.setFrame(false);
 		propPanel.setHeading("Properties");
 		propPanel.setLayout(new AnchorLayout());
-		propPanel.setWidth(width);
+		propPanel.setWidth(DIALOG_WIDTH);
 		// Add a place holder form panel
 		formPanel = new FormPanel();
 		propPanel.add(formPanel);
@@ -155,7 +150,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		annoPanel.setFrame(false);
 		annoPanel.setHeading("Annotations");
 		annoPanel.setLayout(new AnchorLayout());
-		annoPanel.setWidth(width);
+		annoPanel.setWidth(DIALOG_WIDTH);
 		annoPanel.setBottomComponent(toolBar);
 		// Add a place holder form panel
 		annotationFormPanel = new FormPanel();
@@ -185,20 +180,21 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		// formPanel.setSize("100%", "100%");
 		// Basic form data
 		Margins margins = new Margins(10, 10, 0, 10);
-		FormData basicFormData = new FormData("-10"); //anchor layout, -10px from the right edge
+		FormData basicFormData = new FormData(); 
+		basicFormData.setWidth(DIALOG_WIDTH-160);
 		basicFormData.setMargins(margins);
 
 		// Name is the first
 		formPanel.add(nameField, basicFormData);
 		
-		//TODO: markdown widget to be removed from entity property form
+		//markdown widget to be removed from entity property form
 		//only reconfigure the md editor if the entity id is set
-		if (DisplayUtils.isInTestWebsite(cookies)) {
+		if (DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
 			formPanel.add(descriptionField, basicFormData);
 		}
 		else {
 			if (presenter.getEntity().getId() != null) {
-				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), markdownDescriptionField, formPanel, true, new WidgetDescriptorUpdatedHandler() {
+				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), markdownDescriptionField, formPanel, true, false, new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						presenter.refreshEntityAttachments();
@@ -233,12 +229,12 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
 		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 		
-		if (DisplayUtils.isInTestWebsite(cookies)) {
+		if (DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
 			descriptionField = (TextField<String>) formFactory.createField(model.getDescription());
 		}
 		else {
 			markdownDescriptionField = formFactory.createTextAreaField(model.getDescription());
-			markdownDescriptionField.setWidth("796px");
+			markdownDescriptionField.setWidth((DIALOG_WIDTH-90)+"px");
 			markdownDescriptionField.setHeight("300px");
 		}
 

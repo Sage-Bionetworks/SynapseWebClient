@@ -454,6 +454,7 @@ public class DisplayConstants {
 	public static final String ADD_FILE = "Add File";
 	public static final String FILES = "Files";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
+	public static final String ERROR_FILE_CREATION_FAILED = "File creation failed. Please try again";
 	public static final String PAGES = "Pages";
 	public static final String ADD_PAGE = "Add a new Page";
 	public static final String CREATE_WIKI = "Insert Wiki";
@@ -492,5 +493,10 @@ public class DisplayConstants {
 	public static final String TEST_MODE_WARNING = "This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade. Are you sure you want to switch into this mode?";
 	
 	public static final String UNSUPPORTED_FOR_OWNER_TYPE = "This operation is not currently supported for the given owner type: ";
+	public static final String MY_PROJECTS = "My Projects";
+	public static final String FAVORITES = "Favorites";
+	public static final String ERROR_LOADING_FAVORITES = "Error loading Favorites.";
+	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
+	
 }
 

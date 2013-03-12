@@ -49,8 +49,7 @@ public class EntityMetadata implements Presenter {
 	private JiraURLHelper jiraURLHelper;
 	private EventBus bus;
 	private GlobalApplicationState globalApplicationState;
-	
-	private EntityBundle bundle;
+	private EntityBundle bundle;	
 
 	@Inject
 	public EntityMetadata(EntityMetadataView view,
@@ -360,6 +359,5 @@ public class EntityMetadata implements Presenter {
 			}
 		});
 	}
-
 
 }

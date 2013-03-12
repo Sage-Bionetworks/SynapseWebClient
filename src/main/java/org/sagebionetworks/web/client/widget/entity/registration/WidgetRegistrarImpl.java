@@ -7,9 +7,7 @@ import java.util.Map;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -27,14 +25,12 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	JSONObjectAdapter adapter;
 	Map<Character, String> c2h = new HashMap<Character, String>();
 	Map<String, Character> h2c = new HashMap<String, Character>();
-	CookieProvider cookies;
 	
 	@Inject
-	public WidgetRegistrarImpl(PortalGinInjector ginInjector, NodeModelCreator nodeModelCreator, JSONObjectAdapter adapter, CookieProvider cookies) {
+	public WidgetRegistrarImpl(PortalGinInjector ginInjector, NodeModelCreator nodeModelCreator, JSONObjectAdapter adapter) {
 		this.ginInjector = ginInjector;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapter = adapter;
-		this.cookies = cookies;
 		initWithKnownWidgets();
 		initCharacter2HexCodeMap();
 	}
@@ -87,7 +83,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model) { 
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
@@ -95,7 +91,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
-			if (DisplayUtils.isInTestWebsite(cookies))
+			if (isWiki)
 				presenter = ginInjector.getImageConfigEditor();
 			else
 				presenter = ginInjector.getOldImageConfigEditor();
@@ -125,7 +121,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model) { 
+	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
@@ -133,7 +129,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
-			if (DisplayUtils.isInTestWebsite(cookies))
+			if (isWiki)
 				presenter = ginInjector.getImageRenderer();
 			else
 				presenter = ginInjector.getOldImageRenderer();

@@ -437,7 +437,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 				if (isNewlyRestricted()) {
 					window = DisplayUtils.newWindow("", "", "");
 				}
-				presenter.setExternalLocation(pathField.getValue(), isNewlyRestricted());
+				presenter.setExternalFilePath(pathField.getValue(), isNewlyRestricted());
 			}
 		});
 		saveExternalLinkButton.setEnabled(isInitiallyRestricted);

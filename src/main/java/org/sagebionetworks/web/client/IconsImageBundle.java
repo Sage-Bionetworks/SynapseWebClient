@@ -212,6 +212,12 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/edit-16.png")
 	ImageResource slideInfo16();	
 	
+	@Source("images/icons/star-16.png")
+	ImageResource star16();	
+	
+	@Source("images/icons/star-empty-16.png")
+	ImageResource starEmpty16();	
+	
 	@Source("images/icons/table-insert-column-16.png")
 	ImageResource tableInsertColumn16();
 	
@@ -323,6 +329,9 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/synapse-study-24.png")
 	ImageResource synapseStudy24();
+	
+	@Source("images/icons/trash-16.png")
+	ImageResource trash16();
 		
 	// demo
 	

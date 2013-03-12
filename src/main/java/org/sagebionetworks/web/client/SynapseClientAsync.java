@@ -90,6 +90,10 @@ public interface SynapseClientAsync {
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
 
 	public void updateExternalLocationable(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback);
+	
+	public void updateExternalFile(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	
+	public void createExternalFile(String parentEntityId, String externalUrl, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 
 	public void markdown2Html(String markdown, Boolean isPreview, AsyncCallback<String> callback);
 	
@@ -118,4 +122,11 @@ public interface SynapseClientAsync {
 	public void getFileEndpoint(AsyncCallback<String> callback);
 
 	void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<String> callback);
+
+	void addFavorite(String entityId, AsyncCallback<String> callback);
+
+	void removeFavorite(String entityId, AsyncCallback<Void> callback);
+
+	void getFavorites(Integer limit, Integer offset,
+			AsyncCallback<String> callback);
 }

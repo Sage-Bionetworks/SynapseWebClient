@@ -66,6 +66,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -87,7 +88,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private static final int VERSION_LIMIT = 100;
 	private static final int NAME_TIME_STUB_LENGTH = 7;
-
+	private FavoriteWidget favoriteWidget;
+	
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
 
@@ -128,6 +130,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	HTMLPanel modifiedBy;
 	@UiField
 	SpanElement label;
+	@UiField
+	SimplePanel favoritePanel;
 
 	@UiField
 	LayoutContainer previousVersions;
@@ -160,13 +164,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private PagingToolBar vToolbar;
 	private Grid<BaseModelData> vGrid;
 	private AnimationProtector versionAnimation;
-
+	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget) {
 		this.icons = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-
+		this.favoriteWidget = favoriteWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 
 		versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(allVersions, previousVersions));
@@ -229,7 +233,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		cp.add(vGrid);
 
 		setPreviousVersions(cp);
-
+		
+		favoritePanel.addStyleName("inline-block");
+		favoritePanel.setWidget(favoriteWidget.asWidget());
+				
 		previousVersions.setLayout(new FlowLayout(10));
 	}
 
@@ -244,7 +251,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		setEntityName(e.getName());
 		setEntityId(e.getId());
-		boolean isLocationable = (e instanceof Locationable);
 		
 		this.readOnly.setVisible(readOnly);
 		
@@ -271,6 +277,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			setEntityVersions(vb);
 			versionAnimation.hide();
 		}
+		favoriteWidget.configure(bundle.getEntity().getId());
 	}
 
 	private void clear() {
@@ -664,4 +671,5 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		if(userTime.length() > NAME_TIME_STUB_LENGTH) stub += "...";
 		return stub;
 	}
+
 }
