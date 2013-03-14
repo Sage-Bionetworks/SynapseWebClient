@@ -1025,7 +1025,8 @@ public class DisplayUtils {
 	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
 
-		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId(); 
+		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId();
+		el.setId(id);
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "tooltip");
 
