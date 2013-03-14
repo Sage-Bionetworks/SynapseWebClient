@@ -102,6 +102,8 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 		FlowPanel wrapperPanel = new FlowPanel();
 		wrapperPanel.add(new HTMLPanel("<h5>Contents</h5>"));
 		final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
+		tree.setBorders(true);
+		tree.addStyleName("max-height-200");
 	    tree.setDisplayProperty("name");
 	    tree.setTrackMouseOver(false);
 	    final ImageResource folderIcon = DisplayUtils.getSynapseIconForEntityClassName(Folder.class.getName(), DisplayUtils.IconSize.PX16, iconsImageBundle);

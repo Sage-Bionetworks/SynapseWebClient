@@ -709,6 +709,10 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 940px;
 }
 
+.max-height-200 {
+	max-height: 200px;
+}
+
 .wikifilepreview {
 	width: 940px;
 }
