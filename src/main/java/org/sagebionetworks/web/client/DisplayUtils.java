@@ -187,10 +187,6 @@ public class DisplayUtils {
 	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/gif","image/png"};
 	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
 	
-	public static final String[] CODE_EXTENSIONS = new String[] {".awk",".bat",".btm",".c",".cmd",".cpp",".cxx",".def",".dlg",".dpc",".dpj",".dtd",".h",".hdl",".hpp",".hrc",".html",".hxx",".inc",".ini",".inl",".ins",".java",".js",".jsp",".l",".lgt",".ll",".par",".pl",".r",".rc",".rdb",".res",".s",".sbl",".scp",".sh",".sql",".src",".srs",".xml",".xrb",".y",".yxx"};
-	public static final HashSet<String> CODE_EXTENSIONS_SET = new HashSet<String>(Arrays.asList(CODE_EXTENSIONS));
-	
-	
 	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
 	/**
@@ -1418,21 +1414,6 @@ public class DisplayUtils {
 	public static boolean isRecognizedImageContentType(String contentType) {
 		String lowerContentType = contentType.toLowerCase();
 		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
-	}
-	
-	public static boolean isRecognizedCodeFileName(String fileName) {
-		boolean isCodeFile = false;
-		int lastDot = fileName.lastIndexOf(".");
-		if (lastDot > -1) {
-			//because code file previews have .txt appended, look for the second to last dot
-			int secondToLastDot = fileName.lastIndexOf(".", lastDot-1);
-			if (secondToLastDot > -1){
-				String extension = fileName.substring(secondToLastDot, lastDot).toLowerCase();
-				isCodeFile = CODE_EXTENSIONS_SET.contains(extension);
-			}
-				
-		}
-		return isCodeFile;
 	}
 	
 	public static boolean isTextType(String contentType) {

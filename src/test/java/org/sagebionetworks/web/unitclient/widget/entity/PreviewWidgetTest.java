@@ -1,12 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +17,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -78,8 +80,8 @@ public class PreviewWidgetTest {
 	@Test
 	public void testPreviewCodeContentType(){
 		PreviewFileHandle fh = new PreviewFileHandle();
-		String aCodeContentType = DisplayUtils.CODE_EXTENSIONS[0];
-		fh.setContentType(aCodeContentType);
+		fh.setContentType(ContentTypeUtils.PLAIN_TEXT);
+		fh.setFileName("myCodeFile.R");
 		testFileHandleList.add(fh);
 		previewWidget.asWidget(testBundle);
 		verify(mockView).setCodePreview(anyString());

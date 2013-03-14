@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -33,6 +35,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 	public Widget asWidget(EntityBundle bundle) {
 		view.clear();
 		PreviewFileHandle handle = FileTitleBar.getPreviewFileHandle(bundle);
+		FileHandle originalFileHandle = FileTitleBar.getFileHandle(bundle);
 		if (handle != null) {
 			final String contentType = handle.getContentType();
 			final String fileName = handle.getFileName();
@@ -45,9 +48,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 										DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
 				}
 				else {
-					final boolean isCode = DisplayUtils.isRecognizedCodeFileName(fileName);
+					final boolean isCode = ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName());
 					final boolean isTextType = DisplayUtils.isTextType(contentType);
-					if (isCode || isTextType) {
+					if (isTextType) {
 						final boolean isCSV = DisplayUtils.isCSV(contentType);
 						//try to load the text of the preview, if available
 						//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
