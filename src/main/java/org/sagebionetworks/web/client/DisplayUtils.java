@@ -34,6 +34,8 @@ import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -1423,6 +1425,44 @@ public class DisplayUtils {
 	
 	public static boolean isCSV(String contentType) {
 		return contentType.toLowerCase().startsWith("text/csv");
+	}
+
+	/**
+	 * Return a preview filehandle associated with this bundle (or null if unavailable)
+	 * @param bundle
+	 * @return
+	 */
+	public static PreviewFileHandle getPreviewFileHandle(EntityBundle bundle) {
+		PreviewFileHandle fileHandle = null;
+		if (bundle.getFileHandles() != null) {
+			for (FileHandle fh : bundle.getFileHandles()) {
+				if (fh instanceof PreviewFileHandle) {
+					fileHandle = (PreviewFileHandle) fh;
+					break;
+				}
+			}
+		}
+		return fileHandle;
+	}
+
+	/**
+	 * Return the filehandle associated with this bundle (or null if unavailable)
+	 * @param bundle
+	 * @return
+	 */
+	public static FileHandle getFileHandle(EntityBundle bundle) {
+		FileHandle fileHandle = null;
+		if (bundle.getFileHandles() != null) {
+			FileEntity entity = (FileEntity)bundle.getEntity();
+			String targetId = entity.getDataFileHandleId();
+			for (FileHandle fh : bundle.getFileHandles()) {
+				if (fh.getId().equals(targetId)) {
+					fileHandle = fh;
+					break;
+				}
+			}
+		}
+		return fileHandle;
 	}
 
 }

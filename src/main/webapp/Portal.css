@@ -491,6 +491,20 @@ a.shortBtn {
 .margin-left-725 {
 	margin-left: 725px;
 }
+
+.file-preview {
+	background-clip: padding-box;
+	background-color: #F4F4F4;
+    border: 1px solid #DDDDDD;
+    border-radius: 3px 3px 3px 3px;
+    color: #666666;
+    font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
+    font-family: Courier,monospace;
+    padding: 0 5px 2px;
+    white-space: pre-wrap;
+}
+
+
 .markdown {
 	word-wrap:break-word;
 	overflow: hidden;

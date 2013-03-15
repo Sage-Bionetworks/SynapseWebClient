@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -100,44 +98,6 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
 		String dataFileHandleId = fileEntity.getDataFileHandleId();
 		return (dataFileHandleId != null && dataFileHandleId.length() > 0);
-	}
-	
-	/**
-	 * Return the filehandle associated with this bundle (or null if unavailable)
-	 * @param bundle
-	 * @return
-	 */
-	public static FileHandle getFileHandle(EntityBundle bundle) {
-		FileHandle fileHandle = null;
-		if (bundle.getFileHandles() != null) {
-			FileEntity entity = (FileEntity)bundle.getEntity();
-			String targetId = entity.getDataFileHandleId();
-			for (FileHandle fh : bundle.getFileHandles()) {
-				if (fh.getId().equals(targetId)) {
-					fileHandle = fh;
-					break;
-				}
-			}
-		}
-		return fileHandle;
-	}
-	
-	/**
-	 * Return a preview filehandle associated with this bundle (or null if unavailable)
-	 * @param bundle
-	 * @return
-	 */
-	public static PreviewFileHandle getPreviewFileHandle(EntityBundle bundle) {
-		PreviewFileHandle fileHandle = null;
-		if (bundle.getFileHandles() != null) {
-			for (FileHandle fh : bundle.getFileHandles()) {
-				if (fh instanceof PreviewFileHandle) {
-					fileHandle = (PreviewFileHandle) fh;
-					break;
-				}
-			}
-		}
-		return fileHandle;
 	}
 
 	

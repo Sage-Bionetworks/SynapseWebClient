@@ -278,7 +278,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	private Widget getFilePreview(EntityBundle bundle) {
-		return previewWidget.asWidget(bundle);
+		previewWidget.configure(bundle);
+		return previewWidget.asWidget();
 	}
 	
 	// Render the Folder entity

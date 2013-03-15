@@ -298,7 +298,7 @@ public class DisplayConstants {
 	public static final String HIDE_VERSIONS = "hide all versions";
 	public static final String NOT_FOUND = "Not Found";
 	public static final String ERROR_LOADING = "Error Loading";
-	public static final String ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT = "Preview failed: ";
+	public static final String PREVIEW_FAILED_TEXT = "Preview failed: ";
 	public static final String ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT = "Preview";
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
 	public static final String ENTITY_DESCRIPTION_TIPS_TEXT = "Formatting Guide";

@@ -10,11 +10,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
@@ -24,12 +21,9 @@ import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
-import org.sagebionetworks.web.client.widget.entity.PreviewWidget.FolderTreeModel;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
-import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.store.TreeStore;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 
@@ -77,7 +71,8 @@ public class PreviewWidgetTest {
 		fh.setContentType("image/png");
 		fh.setFileName("preview.png");
 		testFileHandleList.add(fh);
-		previewWidget.asWidget(testBundle);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
 		verify(mockView, times(0)).setImagePreview(anyString(), anyString());
 	}
 	
@@ -88,7 +83,8 @@ public class PreviewWidgetTest {
 		fh.setFileName("preview.png");
 		fh.setContentType("image/png");
 		testFileHandleList.add(fh);
-		previewWidget.asWidget(testBundle);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
 		verify(mockView).setImagePreview(anyString(), anyString());
 	}
 	
@@ -100,7 +96,8 @@ public class PreviewWidgetTest {
 		fh.setContentType(ContentTypeUtils.PLAIN_TEXT);
 		fh.setFileName("preview.txt");
 		testFileHandleList.add(fh);
-		previewWidget.asWidget(testBundle);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
 		verify(mockView).setCodePreview(anyString());
 	}
 
@@ -111,8 +108,9 @@ public class PreviewWidgetTest {
 		String invalidContentType = "text/other";
 		fh.setContentType(invalidContentType);
 		testFileHandleList.add(fh);
-		previewWidget.asWidget(testBundle);
-		verify(mockView).setBlockQuotePreview(anyString());
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setTextPreview(anyString());
 	}
 	
 	@Test
@@ -122,33 +120,8 @@ public class PreviewWidgetTest {
 		fh.setId("previewFileId");
 		fh.setContentType("text/csv");
 		testFileHandleList.add(fh);
-		previewWidget.asWidget(testBundle);
-		verify(mockView).setTreePreview(any(TreeStore.class));
-	}
-	
-	@Test
-	public void testTreeModel(){
-		FolderTreeModel treeModel = previewWidget.getTreeModel(zipTestString);
-		assertTrue(treeModel.getChildCount() == 2);
-	}
-	
-	@Test
-	public void testTreeModelEmpty(){
-		FolderTreeModel treeModel = previewWidget.getTreeModel("");
-		assertTrue(treeModel.getChildCount() == 0);
-		treeModel = previewWidget.getTreeModel(null);
-		assertTrue(treeModel.getChildCount() == 0);
-	}
-	
-	@Test
-	public void testGetChildFolderWithName(){
-		FolderTreeModel treeModel = previewWidget.getTreeModel(zipTestString);
-		FolderTreeModel targetFolder = previewWidget.getChildFolderWithName(treeModel, "target");
-		assertNotNull(targetFolder);
-		assertEquals("target",targetFolder.getName());
-		
-		//base.jar is a file, so this should return null
-		FolderTreeModel baseFile = previewWidget.getChildFolderWithName(treeModel, "base.jar");
-		assertNull(baseFile);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setTextPreview(anyString());
 	}
 }
