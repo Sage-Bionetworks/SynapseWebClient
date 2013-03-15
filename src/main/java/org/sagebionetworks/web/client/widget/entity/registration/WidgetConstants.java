@@ -61,7 +61,7 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_COLUMNS_KEY = "columns";
 	public static final String API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY = "displayNames";
 	public static final String API_TABLE_WIDGET_RENDERERS_KEY = "renderers";
-	
+	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	
 	
 	/**

@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteConfirmDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog.Callback;
@@ -16,8 +15,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EntityListRenderer;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
@@ -62,32 +61,9 @@ public class EntityListConfigViewImpl extends LayoutContainer implements EntityL
 		addEntityButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				final Dialog window = new Dialog();
-				window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
-				window.setPlain(true);
-				window.setModal(true);
-				window.setHeading(DisplayConstants.ADD_ENTITY);
-				window.setLayout(new FitLayout());			   
-			    
-				// configure buttons
-				window.cancelText = "Cancel";
-			    window.setButtons(Dialog.CANCEL);
-			    window.setButtonAlign(HorizontalAlignment.RIGHT);
-			    window.setHideOnButtonClick(true);
-				window.setResizable(false);						
-
-				
-				entityFinder.configure(true);
-				entityFinder.setEntitySelectedHandler(new SelectedHandler() {					
-					@Override
-					public void onSelection(Reference selected) {
-						presenter.addRecord(selected.getTargetId(), selected.getTargetVersionNumber(), null);
-						window.hide();
-					}
-				});
-				window.add(entityFinder.asWidget(), new FitData(4));			
-				
-				window.show();
+				entityFinder.configure(true);				
+				final Window window = createEntityFinderWindow();
+				window.show();				
 			}
 		});
 		
@@ -188,5 +164,35 @@ public class EntityListConfigViewImpl extends LayoutContainer implements EntityL
 	/*
 	 * Private Methods
 	 */
+	private Window createEntityFinderWindow() {
+		final Window window = new Window();  				
+		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
+		window.setPlain(true);
+		window.setModal(true);
+		window.setHeading(DisplayConstants.FIND_ENTITIES);
+		window.setLayout(new FitLayout());
+		window.add(entityFinder.asWidget(), new FitData(4));				
+		window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				Reference selected = entityFinder.getSelectedEntity();
+				if(selected.getTargetId() != null) {					
+					presenter.addRecord(selected.getTargetId(), selected.getTargetVersionNumber(), null);
+					window.hide();
+				} else {
+					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+				}
+			}
+		}));
+		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		}));
+		window.setButtonAlign(HorizontalAlignment.RIGHT);
+		return window;
+	}
+
 
 }

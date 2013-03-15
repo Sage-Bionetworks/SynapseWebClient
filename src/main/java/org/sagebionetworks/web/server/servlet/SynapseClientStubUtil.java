@@ -203,7 +203,7 @@ public class SynapseClientStubUtil {
 		EntityPath path = new EntityPath();
 		bundle.setPath(path);
 		PaginatedResults<EntityHeader> refby = new PaginatedResults<EntityHeader>();
-		bundle.setReferencedBy(refby);
+		bundle.setReferencedBy(refby.getResults());
 		bundle.setHasChildren(false);
 		AccessControlList acl = new AccessControlList();
 		bundle.setAccessControlList(acl);

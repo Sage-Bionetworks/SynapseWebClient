@@ -1,33 +1,34 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.widget.EntityListWidgetDescriptor;
-import org.sagebionetworks.repo.model.widget.WidgetDescriptor;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.WidgetNameProvider;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil.RowLoadedHandler;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+
 public class EntityListConfigEditor implements EntityListConfigView.Presenter, WidgetEditorPresenter {
 	
 	private EntityListConfigView view;
-	private EntityListWidgetDescriptor descriptor;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	
+	private Map<String, String> descriptor;
+	List<EntityGroupRecord> records;
+
 	@Inject
 	public EntityListConfigEditor(EntityListConfigView view,
 			AuthenticationController authenticationController,
@@ -40,22 +41,19 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		view.initView();
 	}
 	@Override
-	public void configure(String entityId, WidgetDescriptor widgetDescriptor) {
-		if (!(widgetDescriptor instanceof EntityListWidgetDescriptor))
-			throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_DESCRIPTOR_TYPE);
-		descriptor = (EntityListWidgetDescriptor)widgetDescriptor;
-		
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+		if (widgetDescriptor == null) throw new IllegalArgumentException("Descriptor can not be null");
 		//set up view based on descriptor parameters
-		descriptor = (EntityListWidgetDescriptor)widgetDescriptor;
+		descriptor = widgetDescriptor;
 		final boolean isLoggedIn = authenticationController.isLoggedIn();
 		
 		view.configure();
 
-		List<EntityGroupRecord> records = descriptor.getRecords();
-		if(records != null) {
+		records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
+		if(records != null && !records.equals("")) {
 			for(int i=0; i<records.size(); i++) {
 				final int rowIndex = i;
-				EntityListUtil.loadIndividualRowDetails(synapseClient, nodeModelCreator, isLoggedIn, descriptor, rowIndex, new RowLoadedHandler() {					
+				EntityListUtil.loadIndividualRowDetails(synapseClient, nodeModelCreator, isLoggedIn, records, rowIndex, new RowLoadedHandler() {					
 					@Override
 					public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
 						view.setEntityGroupRecordDisplay(rowIndex, entityGroupRecordDisplay, isLoggedIn);
@@ -69,23 +67,19 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	@Override
 	public void addRecord(final String entityId, Long versionNumber, String note) {
 		final boolean isLoggedIn = authenticationController.isLoggedIn();
-		
-		// add record
-		List<EntityGroupRecord> records = descriptor.getRecords();
-		if(records == null) {
-			records = new ArrayList<EntityGroupRecord>();
-			descriptor.setRecords(records);
-		}
+
+		// add record to list of records
 		final int addedIndex = records.size();
 		EntityGroupRecord record = createRecord(entityId, versionNumber, note);
 		records.add(record);
+		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, EntityListUtil.recordsToString(records));
 		try {
-		EntityListUtil.loadIndividualRowDetails(synapseClient, nodeModelCreator, isLoggedIn, descriptor, addedIndex, new RowLoadedHandler() {					
-			@Override
-			public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
-				view.setEntityGroupRecordDisplay(addedIndex, entityGroupRecordDisplay, isLoggedIn);
-			}
-		});	
+			EntityListUtil.loadIndividualRowDetails(synapseClient, nodeModelCreator, isLoggedIn, records, addedIndex, new RowLoadedHandler() {					
+				@Override
+				public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
+					view.setEntityGroupRecordDisplay(addedIndex, entityGroupRecordDisplay, isLoggedIn);
+				}
+			});	
 		} catch (IllegalArgumentException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_SAVE_MESSAGE);
 		}
@@ -94,18 +88,18 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	
 	@Override
 	public void removeRecord(int row) {
-		List<EntityGroupRecord> records = descriptor.getRecords();
 		if(records != null && records.size() > row) {
 			records.remove(row);
+			descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, EntityListUtil.recordsToString(records));
 		} else {
 			view.showErrorMessage(DisplayConstants.ERROR_SAVE_MESSAGE);
 		}
 	}
 	@Override
 	public void updateNote(int row, String note) {
-		List<EntityGroupRecord> records = descriptor.getRecords();
 		if(records != null && records.size() > row) {
 			records.get(row).setNote(note);
+			descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, EntityListUtil.recordsToString(records));
 		} else {
 			view.showErrorMessage(DisplayConstants.ERROR_SAVE_MESSAGE);
 		}
@@ -136,14 +130,10 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	public int getAdditionalWidth() {
 		return view.getAdditionalWidth();
 	}
-	
+
 	@Override
-	public String getTextToInsert(String name) {
+	public String getTextToInsert() {
 		return null;
-	}
-	
-	@Override
-	public void setNameProvider(WidgetNameProvider provider) {
 	}
 	
 	/*
@@ -159,5 +149,6 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		record.setNote(note);
 		return record;
 	}
+
 
 }

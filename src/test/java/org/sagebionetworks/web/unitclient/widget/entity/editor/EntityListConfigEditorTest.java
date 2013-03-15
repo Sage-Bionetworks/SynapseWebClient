@@ -10,19 +10,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.widget.EntityListWidgetDescriptor;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -36,7 +40,7 @@ public class EntityListConfigEditorTest {
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	
-	EntityListWidgetDescriptor descriptor;
+	Map<String, String> descriptor;
 	Data syn456;
 	EntityGroupRecord record456; 
 	
@@ -55,20 +59,22 @@ public class EntityListConfigEditorTest {
 		syn456.setName(syn456.getId());
 		EntityWrapper wrapper = new EntityWrapper();		
 		AsyncMockStubber.callSuccessWith(wrapper).when(mockSynapseClient).getEntity(eq(syn456.getId()), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(wrapper).when(mockSynapseClient).getEntityForVersion(eq(syn456.getId()), eq(1L), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(wrapper)).thenReturn(syn456);
 
 		// create an entity group record for syn456
 		record456 = new EntityGroupRecord();
 		Reference ref = new Reference();
 		ref.setTargetId(syn456.getId());
+		ref.setTargetVersionNumber(1L);
 		record456.setEntityReference(ref);
 		
 		// create empty descriptor
-		descriptor = new EntityListWidgetDescriptor();		
+		descriptor = new HashMap<String, String>();		
 		
 		editor = new EntityListConfigEditor(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator);
 		
-		editor.configure("syn123", descriptor);
+		editor.configure(null, descriptor);
 	}
 	
 	@Test
@@ -80,10 +86,12 @@ public class EntityListConfigEditorTest {
 	@Test
 	public void testConfigure() throws Exception {
 		reset(mockView); // as configure is called in the before
-		descriptor.setRecords(new ArrayList<EntityGroupRecord>());
-		descriptor.getRecords().add(record456);		
-		
-		editor.configure("syn123", descriptor);
+		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
+		records.add(record456);			
+		String encoded = EntityListUtil.recordsToString(records);
+		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, encoded);
+				
+		editor.configure(null, descriptor);
 		
 		verify(mockView).configure();	
 		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));
@@ -91,32 +99,32 @@ public class EntityListConfigEditorTest {
 	
 	@Test
 	public void testAddRecord() throws Exception {		
-		editor.addRecord(syn456.getId(), null, null);
+		editor.addRecord(syn456.getId(), 1L, null);
 			
 		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));
-		assertEquals(record456, descriptor.getRecords().get(0));
+		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
+		assertEquals(record456, records.get(0));
 	}
 	
 	@Test
-	public void testRemoveRecord() {
-		descriptor.setRecords(new ArrayList<EntityGroupRecord>());
-		descriptor.getRecords().add(record456);		
+	public void testRemoveRecord() {			
+		editor.addRecord(syn456.getId(), 1L, null);
 		
 		editor.removeRecord(0);
 		
-		assertEquals(0, descriptor.getRecords().size());
+		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
+		assertEquals(0, records.size());
 	}
 	
 	@Test
 	public void testUpdateNote() {
 		String newNote = "some note";
-		descriptor.setRecords(new ArrayList<EntityGroupRecord>());
-		descriptor.getRecords().add(record456);
-		assertFalse(newNote.equals(record456.getNote())); // just to make sure
+		editor.addRecord(syn456.getId(), 1L, null);
 		
 		editor.updateNote(0, newNote);
 
-		assertEquals(newNote, record456.getNote());
+		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
+		assertEquals(newNote, records.get(0).getNote());
 	}
 }
 
