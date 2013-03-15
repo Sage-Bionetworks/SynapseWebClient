@@ -43,9 +43,8 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	@Override
 	public void setCodePreview(String code) {
 		clear();
-		setStylePrimaryName("markdown");
 		StringBuilder sb = new StringBuilder();
-		sb.append("<pre style=\"overflow:auto;white-space:pre\"><code>");
+		sb.append("<pre class=\"file-preview\" style=\"overflow:auto;white-space:pre\"><code style=\"background-color:white;\">");
 		sb.append(code);
 		sb.append("</code></pre>");
 		add(new HTMLPanel(sb.toString()));
@@ -65,9 +64,8 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	@Override
 	public void setTablePreview(String csv) {
 		clear();
-		setStylePrimaryName("markdown");
 		StringBuilder sb = new StringBuilder();
-		sb.append("<table style=\"overflow:auto;display:block;max-height:200px\">");
+		sb.append("<table class=\"file-preview\" style=\"overflow:auto;display:block;max-height:200px\">");
 		String[] lines = csv.split("\n");
 		for (int i = 0; i < lines.length; i++) {
 			sb.append("<tr>");

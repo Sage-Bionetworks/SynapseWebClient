@@ -492,16 +492,33 @@ a.shortBtn {
 	margin-left: 725px;
 }
 
-.file-preview {
-	background-clip: padding-box;
-	background-color: #F4F4F4;
-    border: 1px solid #DDDDDD;
-    border-radius: 3px 3px 3px 3px;
-    color: #666666;
-    font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
-    font-family: Courier,monospace;
-    padding: 0 5px 2px;
+.file-preview 
+{
+    position: relative;
+    margin: 15px 0;
+    padding: 39px 19px 14px;
+    background-color: white;
+    border: 1px solid #DDD;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
     white-space: pre-wrap;
+}
+ 
+.file-preview::after {
+    content: "Preview";
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    background-color: whiteSmoke;
+    border: 1px solid #DDD;
+    color: #9DA0A4;
+    -webkit-border-radius: 4px 0 4px 0;
+    -moz-border-radius: 4px 0 4px 0;
+    border-radius: 4px 0 4px 0;
 }
 
 
