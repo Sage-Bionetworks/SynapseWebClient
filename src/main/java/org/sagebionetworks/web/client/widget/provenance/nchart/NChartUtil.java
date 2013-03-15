@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
@@ -56,6 +57,8 @@ public class NChartUtil {
 					layerNodes.add(createEntityLayerNode(jsoProvider, (EntityGraphNode) node));
 				} else if(node instanceof ExpandGraphNode) {
 					layerNodes.add(createExpandLayerNode(jsoProvider, (ExpandGraphNode) node));
+				} else if(node instanceof ExternalGraphNode) {
+					layerNodes.add(createExternalLayerNode(jsoProvider, (ExternalGraphNode) node));
 				}
 			}			
 			// build NChartLayer 
@@ -116,15 +119,29 @@ public class NChartUtil {
 	
 	/**
 	 * Create an entity node for an NChartLayer
+	 * @param node
+	 * @return
+	 */
+	public static NChartLayerNode createExpandLayerNode(JsoProvider jsoProvider, ExpandGraphNode node) {
+		List<String> subnodes = new ArrayList<String>();
+		subnodes.add(node.getId());
+		NChartLayerNode ln = jsoProvider.newNChartLayerNode();
+		ln.setSubnodes(subnodes);
+		ln.setEvent(node.getId());
+		return ln;
+	}
+	
+	/**
+	 * Create an external node for an NChartLayer
 	 * @param entityNode
 	 * @return
 	 */
-	public static NChartLayerNode createExpandLayerNode(JsoProvider jsoProvider, ExpandGraphNode entityNode) {
+	public static NChartLayerNode createExternalLayerNode(JsoProvider jsoProvider, ExternalGraphNode node) {
 		List<String> subnodes = new ArrayList<String>();
-		subnodes.add(entityNode.getId());
+		subnodes.add(node.getId());
 		NChartLayerNode ln = jsoProvider.newNChartLayerNode();
 		ln.setSubnodes(subnodes);
-		ln.setEvent(entityNode.getId());
+		ln.setEvent(node.getId());
 		return ln;
 	}
 	

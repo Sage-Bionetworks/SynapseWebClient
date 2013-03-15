@@ -497,6 +497,7 @@ public class DisplayConstants {
 	public static final String FAVORITES = "Favorites";
 	public static final String ERROR_LOADING_FAVORITES = "Error loading Favorites.";
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
+	public static final String EXTERNAL_URL = "External URL";
 	
 }
 

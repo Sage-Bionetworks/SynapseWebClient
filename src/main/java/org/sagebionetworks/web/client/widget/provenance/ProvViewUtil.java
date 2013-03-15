@@ -12,8 +12,8 @@ import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.extjs.gxt.ui.client.Style.AnchorPosition;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -24,11 +24,9 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
 
 public class ProvViewUtil {	
 	
@@ -119,6 +117,38 @@ public class ProvViewUtil {
 		setPosition(node, container);
 		return container;
 	}	
+
+	public static LayoutContainer createExternalUrlContainer(ExternalGraphNode node, IconsImageBundle iconsImageBundle) {
+		if(node.getName() == null) node.setName("");
+		if(node.getUrl() == null) node.setUrl("");
+		
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		Anchor link = new Anchor();		
+		link.setHref(node.getUrl());
+		link.setTarget("_blank");
+
+		// icon
+		ImageResource icon;
+		if(node.getUrl().contains("github.com")) icon = iconsImageBundle.github16();
+		else icon = iconsImageBundle.documentExternal16();		
+		builder.appendHtmlConstant(AbstractImagePrototype.create(icon).getHTML());
+		builder.appendHtmlConstant("<br/>");
+		
+		// name
+		String stubName = stubEntityString(node.getName(), ENTITY_LINE_NUMBER_CHARS);
+		builder.appendEscaped(stubName);
+		builder.appendHtmlConstant("<br/>");
+				
+		link.setHTML(builder.toSafeHtml());
+
+		LayoutContainer container = new LayoutContainer();
+		if(node.getId() != null) container.setId(node.getId());
+		container.setStyleName(PROV_ENTTITY_NODE_STYLE);
+		container.add(link);
+		container.layout();
+		setPosition(node, container);
+		return container;
+	}
 
 
 	/*
