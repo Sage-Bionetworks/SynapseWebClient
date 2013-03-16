@@ -39,7 +39,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private static native void _bindBootstrapTooltip(String id) /*-{
-		$wnd.jQuery('#'+id).tooltip();
+		$wnd.jQuery('#'+id).tooltip().tooltip('fixTitle');	//update title from data-original-title, if necessary
 	}-*/;
 
 	@Override
@@ -50,7 +50,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native void _hideBootstrapTooltip(String id) /*-{
 		$wnd.jQuery('#'+id).tooltip('hide');
 	}-*/;
-
 	
 	@Override
 	public void bindBootstrapPopover(String id) {

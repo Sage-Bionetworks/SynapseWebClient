@@ -261,7 +261,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			@Override
 			public void onFailure(Throwable caught) {
 				//preview failed
-				showErrorMessage(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT + caught.getMessage());
+				showErrorMessage(DisplayConstants.PREVIEW_FAILED_TEXT + caught.getMessage());
 			}
 		});	
 	}

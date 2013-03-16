@@ -34,6 +34,8 @@ import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -78,7 +80,6 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -154,6 +155,7 @@ public class DisplayUtils {
 
 	
 	private static final String ERROR_OBJ_REASON_KEY = "reason";
+	public static final String PROXY_PARAM_KEY = "proxy";
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
@@ -183,6 +185,9 @@ public class DisplayUtils {
 	
 	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
 	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
+	
+	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/gif","image/png"};
+	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
 	
 	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
@@ -862,7 +867,7 @@ public class DisplayUtils {
 		attachmentMap.put("bmp", DEFAULT_IMAGE_ICON);
 		attachmentMap.put("wbmp", DEFAULT_IMAGE_ICON);
 	}
-
+	
 	/**
 	 * Get the icon to be used with a given file type.
 	 */
@@ -1022,7 +1027,8 @@ public class DisplayUtils {
 	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
 
-		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId(); 
+		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId();
+		el.setId(id);
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "tooltip");
 
@@ -1357,19 +1363,24 @@ public class DisplayUtils {
 					wikiIdParam + nocacheParam;
 	}
 		
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
+	}
+
 	/**
 	 * Create the url to a FileEntity filehandle.
 	 * @param baseURl
 	 * @param entityid
 	 * @return
 	 */
-	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
 		String versionParam = versionNumber == null ? "" : "&" + ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
 		//if preview, then avoid cache
 		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
 		return baseFileHandleUrl + "?" +
 				ENTITY_PARAM_KEY + "=" + entityId + "&" +
-				FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+				FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
+				PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
 				versionParam + nocacheParam;
 	}
 
@@ -1403,14 +1414,55 @@ public class DisplayUtils {
 		return (entity instanceof FileEntity);
 	}
 	
-	public static boolean hasRecognizedImageExtension(String fileName) {
-		String lowerFileName = fileName.toLowerCase();
-		return lowerFileName.endsWith(".png") ||
-				lowerFileName.endsWith(".jpg") ||
-				lowerFileName.endsWith(".jpeg") ||
-				lowerFileName.endsWith(".tiff") ||
-				lowerFileName.endsWith(".gif") ||
-				lowerFileName.endsWith(".bmp");
+	public static boolean isRecognizedImageContentType(String contentType) {
+		String lowerContentType = contentType.toLowerCase();
+		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
 	}
 	
+	public static boolean isTextType(String contentType) {
+		return contentType.toLowerCase().startsWith("text/");
+	}
+	
+	public static boolean isCSV(String contentType) {
+		return contentType.toLowerCase().startsWith("text/csv");
+	}
+
+	/**
+	 * Return a preview filehandle associated with this bundle (or null if unavailable)
+	 * @param bundle
+	 * @return
+	 */
+	public static PreviewFileHandle getPreviewFileHandle(EntityBundle bundle) {
+		PreviewFileHandle fileHandle = null;
+		if (bundle.getFileHandles() != null) {
+			for (FileHandle fh : bundle.getFileHandles()) {
+				if (fh instanceof PreviewFileHandle) {
+					fileHandle = (PreviewFileHandle) fh;
+					break;
+				}
+			}
+		}
+		return fileHandle;
+	}
+
+	/**
+	 * Return the filehandle associated with this bundle (or null if unavailable)
+	 * @param bundle
+	 * @return
+	 */
+	public static FileHandle getFileHandle(EntityBundle bundle) {
+		FileHandle fileHandle = null;
+		if (bundle.getFileHandles() != null) {
+			FileEntity entity = (FileEntity)bundle.getEntity();
+			String targetId = entity.getDataFileHandleId();
+			for (FileHandle fh : bundle.getFileHandles()) {
+				if (fh.getId().equals(targetId)) {
+					fileHandle = fh;
+					break;
+				}
+			}
+		}
+		return fileHandle;
+	}
+
 }

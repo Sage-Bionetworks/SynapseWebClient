@@ -319,7 +319,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	public void setCreatedBy(String who, String when) {
 		String text =  DisplayConstants.CREATED + " by " + who + "<br/>" + when; 
-		DisplayUtils.addTooltip(synapseJSNIUtils, addedBy, text, TOOLTIP_POSITION.BOTTOM);		
+		DisplayUtils.addTooltip(synapseJSNIUtils, addedBy, text, TOOLTIP_POSITION.BOTTOM);
+		
 		addedBy.clear();
 		addedBy.add(new HTML(DisplayConstants.CREATED + " By"));
 	}

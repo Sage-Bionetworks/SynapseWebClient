@@ -66,6 +66,8 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
+import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
+import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidgetViewImpl;
@@ -217,8 +219,11 @@ public class PortalGinModule extends AbstractGinModule {
 		//GWT utility methods
 		bind(GWTWrapperImpl.class).in(Singleton.class);
 		bind(GWTWrapper.class).to(GWTWrapperImpl.class);
-				
-	
+		
+		//RequestBuilder
+		bind(RequestBuilderWrapperImpl.class).in(Singleton.class);
+		bind(RequestBuilderWrapper.class).to(RequestBuilderWrapperImpl.class);
+		
 		// Adapter factoyr
 		bind(AdapterFactory.class).to(GwtAdapterFactory.class);
 		
@@ -350,6 +355,10 @@ public class PortalGinModule extends AbstractGinModule {
 		// EntityPageTop
 		bind(EntityPageTopViewImpl.class).in(Singleton.class);
 		bind(EntityPageTopView.class).to(EntityPageTopViewImpl.class);
+		
+		// Preview
+		bind(PreviewWidgetViewImpl.class).in(Singleton.class);
+		bind(PreviewWidgetView.class).to(PreviewWidgetViewImpl.class);
 		
 		// ActionMenu
 		bind(ActionMenuViewImpl.class).in(Singleton.class);
