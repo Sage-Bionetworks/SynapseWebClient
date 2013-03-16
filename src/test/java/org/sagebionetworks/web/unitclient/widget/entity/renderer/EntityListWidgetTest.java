@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
@@ -36,6 +37,7 @@ public class EntityListWidgetTest {
 	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	
 	Map<String, String> descriptor;
 	Data syn456;
@@ -47,7 +49,7 @@ public class EntityListWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 		// create gettable entity
@@ -69,7 +71,7 @@ public class EntityListWidgetTest {
 		// create empty descriptor
 		descriptor = new HashMap<String, String>();		
 				
-		widget = new EntityListWidget(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator);
+		widget = new EntityListWidget(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils);
 	}
 	
 	@Test

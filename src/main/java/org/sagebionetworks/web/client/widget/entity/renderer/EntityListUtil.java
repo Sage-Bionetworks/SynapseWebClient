@@ -1,21 +1,30 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
+import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -43,7 +52,7 @@ public class EntityListUtil {
 	}
 	
 	public static void loadIndividualRowDetails(
-			SynapseClientAsync synapseClient,
+			SynapseClientAsync synapseClient, final SynapseJSNIUtils synapseJSNIUtils,
 			final NodeModelCreator nodeModelCreator, final boolean isLoggedIn,
 			List<EntityGroupRecord> records, final int rowIndex,
 			final RowLoadedHandler handler) throws IllegalArgumentException {
@@ -55,11 +64,13 @@ public class EntityListUtil {
 		final Reference ref = record.getEntityReference();
 		if(ref == null) return;
 				
-		AsyncCallback<EntityWrapper> callback = new AsyncCallback<EntityWrapper>() {
+		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {								
-					handler.onLoaded(createRecordDisplay(nodeModelCreator, isLoggedIn, record, result));									
+			public void onSuccess(EntityBundleTransport result) {
+				EntityBundle bundle = null;
+				try {
+					bundle = nodeModelCreator.createEntityBundle(result);
+					handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record, synapseJSNIUtils));									
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -82,11 +93,12 @@ public class EntityListUtil {
 				handler.onLoaded(errorDisplay);
 			}
 		};
+		int mask = ENTITY;
 		if(ref.getTargetVersionNumber() != null) {
-			synapseClient.getEntityForVersion(ref.getTargetId(), ref.getTargetVersionNumber(), callback);
+			synapseClient.getEntityBundleForVersion(ref.getTargetId(), ref.getTargetVersionNumber(), mask, callback);
 		} else {
 			// failsafe
-			synapseClient.getEntity(ref.getTargetId(), callback);
+			synapseClient.getEntityBundle(ref.getTargetId(), mask, callback);
 		}
 	}
 
@@ -138,10 +150,10 @@ public class EntityListUtil {
 	 * Private methods
 	 */
 	private static EntityGroupRecordDisplay createRecordDisplay(
-			NodeModelCreator nodeModelCreator, boolean isLoggedIn,
-			EntityGroupRecord record, EntityWrapper result)
+			boolean isLoggedIn, EntityBundle bundle,
+			EntityGroupRecord record, SynapseJSNIUtils synapseJSNIUtils)
 			throws JSONObjectAdapterException {
-		Entity referencedEntity = nodeModelCreator.createEntity(result);
+		Entity referencedEntity = bundle.getEntity();
 				
 		String nameLinkUrl;
 		if(referencedEntity instanceof Versionable) {
@@ -152,13 +164,15 @@ public class EntityListUtil {
 
 		// download
 		String downloadUrl = null;
-		if(referencedEntity instanceof Locationable) {
+		if(!isLoggedIn) {				
+			downloadUrl = "#!" + nameLinkUrl;
+		} else if(referencedEntity instanceof Locationable) {
 			List<LocationData> locations = ((Locationable) referencedEntity).getLocations();
 			if(locations != null && locations.size() > 0) {
 				downloadUrl = locations.get(0).getPath();
-			} else if(!isLoggedIn) {				
-				downloadUrl = "#" + nameLinkUrl;
-			}
+			} 
+		} else if(referencedEntity instanceof FileEntity) {					
+			downloadUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), referencedEntity.getId(), ((FileEntity) referencedEntity).getVersionNumber(), false);
 		}
 		
 		// version

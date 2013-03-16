@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 

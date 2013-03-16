@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -21,16 +22,18 @@ public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetR
 	private EntityListWidgetView view;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	private NodeModelCreator nodeModelCreator;
 	private Map<String, String> descriptor;
 	
 	@Inject
 	public EntityListWidget(EntityListWidgetView view,
 			AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, SynapseJSNIUtils synapseJSNIUtils) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}
@@ -48,7 +51,7 @@ public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetR
 		if(records != null) {
 			for(int i=0; i<records.size(); i++) {
 				final int rowIndex = i;
-				EntityListUtil.loadIndividualRowDetails(synapseClient, nodeModelCreator, isLoggedIn, records, rowIndex, new RowLoadedHandler() {					
+				EntityListUtil.loadIndividualRowDetails(synapseClient, synapseJSNIUtils, nodeModelCreator, isLoggedIn, records, rowIndex, new RowLoadedHandler() {					
 					@Override
 					public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
 						view.setEntityGroupRecordDisplay(rowIndex, entityGroupRecordDisplay, isLoggedIn);

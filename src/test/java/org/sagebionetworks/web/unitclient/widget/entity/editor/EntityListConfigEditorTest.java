@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
@@ -39,6 +40,7 @@ public class EntityListConfigEditorTest {
 	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	
 	Map<String, String> descriptor;
 	Data syn456;
@@ -49,6 +51,7 @@ public class EntityListConfigEditorTest {
 		mockView = mock(EntityListConfigView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -72,7 +75,7 @@ public class EntityListConfigEditorTest {
 		// create empty descriptor
 		descriptor = new HashMap<String, String>();		
 		
-		editor = new EntityListConfigEditor(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator);
+		editor = new EntityListConfigEditor(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils);
 		
 		editor.configure(null, descriptor);
 	}

@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
@@ -49,18 +48,18 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 				}
 				else if (DisplayUtils.isTextType(contentType)) {
 					//some kind of text
-					if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
-						previewFileType = PreviewFileType.CODE;
-					}
-					else if (DisplayUtils.isCSV(contentType)) {
-						if (APPLICATION_ZIP.equals(originalFileHandle.getContentType()))
-							previewFileType = PreviewFileType.ZIP;
-						else
-							previewFileType = PreviewFileType.CSV;
-					}
-					else {
-						previewFileType = PreviewFileType.PLAINTEXT;
-					}
+//					if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
+//						previewFileType = PreviewFileType.CODE;
+//					}
+//					else if (DisplayUtils.isCSV(contentType)) {
+//						if (APPLICATION_ZIP.equals(originalFileHandle.getContentType()))
+//							previewFileType = PreviewFileType.ZIP;
+//						else
+//							previewFileType = PreviewFileType.CSV;
+//					}
+//					else {
+//						previewFileType = PreviewFileType.PLAINTEXT;
+//					}
 				}
 			}
 		}

@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -93,7 +92,7 @@ public class PreviewWidgetTest {
 		mainFileHandle.setFileName("codeFile.R");
 		PreviewFileHandle fh = new PreviewFileHandle();
 		fh.setId("previewFileId");
-		fh.setContentType(ContentTypeUtils.PLAIN_TEXT);
+//		fh.setContentType(ContentTypeUtils.PLAIN_TEXT);
 		fh.setFileName("preview.txt");
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
