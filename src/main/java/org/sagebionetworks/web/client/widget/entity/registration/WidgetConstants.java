@@ -24,6 +24,9 @@ public class WidgetConstants {
 	
 	public static final String API_TABLE_CONTENT_TYPE = "supertable";
 	public static final String API_TABLE_FRIENDLY_NAME = "Super Table (Synapse API Based)";
+
+	public static final String ENTITYLIST_CONTENT_TYPE = "entitylist";
+	public static final String ENTITYLIST_FRIENDLY_NAME ="Synapse Entity List";
 	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
@@ -73,8 +76,6 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
 	public static final String MARKDOWN_HEADING_ID_PREFIX = "synapseheading";
-	public static final String ENTITYLIST_CONTENT_TYPE = "application/entityListDescriptor";
-	public static final String ENTITYLIST_FRIENDLY_NAME ="Synapse Entity List";
 
 }
 
