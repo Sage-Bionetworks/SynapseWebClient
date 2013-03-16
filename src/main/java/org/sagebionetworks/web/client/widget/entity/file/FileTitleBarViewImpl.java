@@ -159,7 +159,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
 			synapseIconForEntity.applyTo(entityIcon);
 			//fileHandle is null if user can't access the filehandle associated with this fileentity
-			FileHandle fileHandle = FileTitleBar.getFileHandle(entityBundle);
+			FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 			boolean isFilenamePanelVisible = fileHandle != null;
 			fileNameContainer.setVisible(isFilenamePanelVisible);
 			if (isFilenamePanelVisible) {

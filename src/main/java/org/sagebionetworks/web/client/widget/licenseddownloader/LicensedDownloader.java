@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -152,7 +151,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			if (entityBundle.getEntity() instanceof FileEntity) {
 				FileEntity fileEntity = (FileEntity)entityBundle.getEntity();
 				if (this.authenticationController.isLoggedIn()) {
-					FileHandle fileHandle = FileTitleBar.getFileHandle(entityBundle);
+					FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 					if (fileHandle != null) {
 						String md5 = null;
 						if (fileHandle instanceof S3FileHandleInterface) {
