@@ -24,7 +24,7 @@ public class EntityListUtilTest {
 		ref.setTargetId(n1id);
 		ref.setTargetVersionNumber(1L);
 		rec.setEntityReference(ref);
-		rec.setNote("This is a note with commas, and delimeters!");
+		rec.setNote("This is a note with commas, and delimeters!;");
 		records.add(rec);
 		
 		rec = new EntityGroupRecord();
