@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.client.Element;
 
 
 public class DisplayConstants {
@@ -498,6 +499,7 @@ public class DisplayConstants {
 	public static final String ERROR_LOADING_FAVORITES = "Error loading Favorites.";
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
 	public static final String EXTERNAL_URL = "External URL";
-	
+	public static final String ADD_ENTITY = "Add Entity";
+		
 }
 

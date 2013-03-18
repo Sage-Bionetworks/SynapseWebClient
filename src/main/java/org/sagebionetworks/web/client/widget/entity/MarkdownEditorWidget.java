@@ -350,6 +350,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	
 	    	};
 		}));
+	    menu.add(getNewCommand(WidgetConstants.ENTITYLIST_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+			@Override
+			public void componentSelected(ComponentEvent ce) {
+				handleInsertWidgetCommand(WidgetConstants.ENTITYLIST_CONTENT_TYPE, callback);
+			}
+		}));
 	    
 	    /**
 	     * load alpha test site widgets

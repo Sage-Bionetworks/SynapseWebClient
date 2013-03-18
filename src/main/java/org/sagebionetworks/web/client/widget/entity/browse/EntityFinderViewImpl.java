@@ -104,7 +104,6 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		}
 		selectedRef = new Reference();
 		presenter.setSelectedEntity(selectedRef);
-
 		
 		// left and right
 		left = new LayoutContainer();
