@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;

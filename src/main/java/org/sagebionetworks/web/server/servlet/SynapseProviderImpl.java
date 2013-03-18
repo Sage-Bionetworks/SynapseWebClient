@@ -17,4 +17,5 @@ public class SynapseProviderImpl implements SynapseProvider {
 		//return SynapseClientStubUtil.createSynapseClient();		
 	}
 
+
 }

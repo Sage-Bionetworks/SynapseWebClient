@@ -17,7 +17,6 @@ import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -34,8 +33,10 @@ import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -51,7 +52,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
@@ -59,7 +59,6 @@ import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -95,7 +94,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -656,7 +654,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryToken(String entityId) {
-		return "#!" + getSynapseHistoryTokenNoHash(entityId, null);
+		return "#" + getSynapseHistoryTokenNoHash(entityId, null);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId) {
@@ -664,12 +662,12 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryToken(String entityId, Long versionNumber) {
-		return "#!" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
+		return "#" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
 		Synapse place = new Synapse(entityId, versionNumber);
-		return getPlaceString(Synapse.class) + ":" + place.toToken();
+		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
 	public static String stubStr(String str, int length) {
@@ -1464,5 +1462,5 @@ public class DisplayUtils {
 		}
 		return fileHandle;
 	}
-
+	
 }

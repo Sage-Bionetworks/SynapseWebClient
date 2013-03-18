@@ -35,7 +35,6 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 		this.view = view;
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
-			
 		view.setPresenter(this);
 	}	
 
