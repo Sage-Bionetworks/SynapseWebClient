@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -30,7 +29,6 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter  {
 
@@ -42,7 +40,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
 	private WidgetRegistrar widgetRegistrar;
-	
+	private EntityUpdatedHandler entityUpdateHandler;
 	private EntityBundle bundle;
 	private boolean readOnly;
 	private String entityTypeDisplay;
@@ -110,11 +108,13 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void fireEntityUpdatedEvent() {
-		bus.fireEvent(new EntityUpdatedEvent());
+		EntityUpdatedEvent event = new EntityUpdatedEvent();
+		entityUpdateHandler.onPersistSuccess(event);
+		bus.fireEvent(event);
 	}
 
-	public HandlerRegistration addEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		return bus.addHandler(EntityUpdatedEvent.getType(), handler);
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		entityUpdateHandler = handler;
 	}
 	
 	@Override 
