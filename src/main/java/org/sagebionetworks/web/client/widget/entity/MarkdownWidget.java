@@ -46,11 +46,11 @@ public class MarkdownWidget extends LayoutContainer {
 	 * @param attachmentBaseUrl if null, will use file handles
 	 */
 	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isWiki, final boolean isPreview) {
-		this.removeAll();
 		synapseClient.markdown2Html(md, isPreview, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
+					removeAll();
 					HTMLPanel panel;
 					if(result == null || "".equals(result)) {
 				    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%;margin-bottom:30px\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>"));
@@ -70,6 +70,7 @@ public class MarkdownWidget extends LayoutContainer {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				removeAll();
 				showErrorMessage(DisplayConstants.ERROR_LOADING_MARKDOWN_FAILED+caught.getMessage());
 			}
 		});
