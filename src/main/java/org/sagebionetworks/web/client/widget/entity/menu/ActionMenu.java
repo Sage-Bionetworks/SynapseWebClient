@@ -1,13 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.Page;
-import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -31,7 +25,6 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,7 +35,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private ActionMenuView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private HandlerManager handlerManager = new HandlerManager(this);
 	private EntityBundle entityBundle;
 	private EntityTypeProvider entityTypeProvider;
 	private SynapseClientAsync synapseClient;
@@ -50,6 +42,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private EntityEditor entityEditor;
 	private AutoGenFactory entityFactory;
 	private boolean readOnly = false;
+	private EntityUpdatedHandler entityUpdatedHandler;
 	
 	@Inject
 	public ActionMenu(ActionMenuView view, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor, AutoGenFactory entityFactory) {
@@ -79,7 +72,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	public void clearState() {
 		view.clear();
 		// remove handlers
-		handlerManager = new HandlerManager(this);		
+		entityUpdatedHandler = null;
 		this.entityBundle = null;		
 	}
 
@@ -93,11 +86,12 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
     
 	@Override
 	public void fireEntityUpdatedEvent() {
-		handlerManager.fireEvent(new EntityUpdatedEvent());
+		if (entityUpdatedHandler != null)
+			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
 	}
 	
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		this.entityUpdatedHandler = handler;
 	}
 
 	@Override
