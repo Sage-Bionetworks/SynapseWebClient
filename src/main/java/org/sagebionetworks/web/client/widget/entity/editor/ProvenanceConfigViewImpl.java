@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -77,7 +78,18 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				entityFinder.configure(true);				
-				final Window window = createEntityFinderWindow();
+				final Window window = new Window();
+				DisplayUtils.configureEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+					@Override
+					public void onSelected(Reference selected) {
+						if(selected.getTargetId() != null) {					
+							appendEntityListValue(selected);
+							window.hide();
+						} else {
+							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+						}
+					}
+				});
 				window.show();				
 			}
 		});
@@ -207,37 +219,6 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 			str += ",";
 		str += DisplayUtils.createEntityVersionString(selected);
 		entityListField.setValue(str);
-	}
-
-
-	private Window createEntityFinderWindow() {
-		final Window window = new Window();  				
-		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
-		window.setPlain(true);
-		window.setModal(true);
-		window.setHeading(DisplayConstants.FIND_ENTITIES);
-		window.setLayout(new FitLayout());
-		window.add(entityFinder.asWidget(), new FitData(4));				
-		window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				Reference selected = entityFinder.getSelectedEntity();
-				if(selected.getTargetId() != null) {					
-					appendEntityListValue(selected);
-					window.hide();
-				} else {
-					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-				}
-			}
-		}));
-		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.hide();
-			}
-		}));
-		window.setButtonAlign(HorizontalAlignment.RIGHT);
-		return window;
 	}
 
 }
