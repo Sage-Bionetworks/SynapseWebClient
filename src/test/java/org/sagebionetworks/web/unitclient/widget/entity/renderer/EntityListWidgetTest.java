@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -18,6 +19,7 @@ import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
@@ -25,7 +27,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
-import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -56,10 +58,11 @@ public class EntityListWidgetTest {
 		syn456 = new Data();
 		syn456.setId("syn456");
 		syn456.setName(syn456.getId());
-		EntityWrapper wrapper = new EntityWrapper();		
-		AsyncMockStubber.callSuccessWith(wrapper).when(mockSynapseClient).getEntity(eq(syn456.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(wrapper).when(mockSynapseClient).getEntityForVersion(eq(syn456.getId()), eq(1L), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntity(wrapper)).thenReturn(syn456);
+		EntityBundle bundle = new EntityBundle(syn456, null, null, null, null, null, null, null);
+		EntityBundleTransport transport = new EntityBundleTransport();
+		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(eq(syn456.getId()), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundleForVersion(eq(syn456.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
+		when(mockNodeModelCreator.createEntityBundle(transport)).thenReturn(bundle);
 
 		// create an entity group record for syn456
 		record456 = new EntityGroupRecord();
