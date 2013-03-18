@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -18,7 +19,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -29,6 +29,9 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 	private NodeModelCreator nodeModelCreator;
 	SageImageBundle sageImageBundle;
 	SynapseJSNIUtils jsniUtils;
+	List<String> inputUserIds;
+	String outputColumnName;
+	private Map<String, List<String>> outputColumnData;
 	
 	@Inject
 	public APITableColumnRendererUserId(SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils) {
@@ -39,11 +42,17 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 	}
 	
 	@Override
-	public void init(List<String> columnData, final AsyncCallback<APITableInitializedColumnRenderer> callback) {
+	public void init(Map<String, List<String>> columnData,
+			APITableColumnConfig config,
+			final AsyncCallback<APITableInitializedColumnRenderer> callback) {
+		String inputColumnName = APITableWidget.getSingleInputColumnName(config);
+		outputColumnName = APITableWidget.getSingleOutputColumnName(config);
+		
 		String emptyString = "";
 		userId2html = new HashMap<String, String>();
 		//get unique user ids, then ask for the user group headers
-		for (Iterator iterator = columnData.iterator(); iterator.hasNext();) {
+		inputUserIds = columnData.get(inputColumnName);
+		for (Iterator iterator = inputUserIds.iterator(); iterator.hasNext();) {
 			String userId = (String) iterator.next();
 			userId2html.put(userId, emptyString);
 		}
@@ -72,21 +81,30 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 						
 					
 					callback.onSuccess(new APITableInitializedColumnRenderer() {
+						
 						@Override
-						public int getColumnCount() {
-							return 1;
-						}
-						@Override
-						public String getRenderedColumnName(int rendererColIndex) {
-							return null;
+						public Map<String, List<String>> getColumnData() {
+							if (outputColumnData == null) {
+								//create
+								outputColumnData = new HashMap<String, List<String>>();
+								//iterate through input user ids to create output list
+								List<String> out = new ArrayList<String>();
+								for (Iterator iterator = inputUserIds.iterator(); iterator.hasNext();) {
+									String userId = (String) iterator.next();
+									String html = userId2html.get(userId);
+									if (html != null && html.length() > 0)
+										out.add(html);
+									else
+										out.add(userId);
+								}
+								outputColumnData.put(outputColumnName, out);
+							}
+							return outputColumnData;
 						}
 						
 						@Override
-						public String render(String value, int rendererColIndex) {
-							String html = userId2html.get(value);
-							if (html != null && html.length() > 0) {
-								return html;
-							} else return value;
+						public List<String> getColumnNames() {
+							return APITableWidget.wrap(outputColumnName);
 						}
 					});
 				} catch (JSONObjectAdapterException e) {

@@ -247,6 +247,7 @@ public class DisplayConstants {
 	public static final String LABEL_UPDATED = "Upated";
 	public static final String TEXT_USER_PROFILE_UPDATED = "Change save to your User Profile.";
 	public static final String TEXT_NO_ATTACHMENTS = "No Attachments.";
+	public static final String TEXT_NO_COLUMNS = "No Columns.";
 	public static final String ERROR_DELETING_ATTACHMENT = "An error occurred deleting the Attachment. Please try again.";
 	public static final String LABEL_DELETED = "deleted";
 	public static final String ERROR_LOADING_DESCRIPTION_FAILED = "Failed to load the description: ";

@@ -6,12 +6,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
+import org.sagebionetworks.repo.model.widget.APITableColumnConfigList;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -31,14 +34,17 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private int offset, total, pageSize, rowCount;
 	private Boolean isPaging,isShowRowNumber;
 	private String rowNumberColName, jsonResultsArrayKeyName, cssStyleName, tableWidth;
+	private List<APITableColumnConfig> columnConfigs;
+	private NodeModelCreator nodeModelCreator;
 	
 	@Inject
-	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector) {
+	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector, NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.ginInjector = ginInjector;
+		this.nodeModelCreator = nodeModelCreator;
 	}
 	
 	@Override
@@ -82,6 +88,17 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 				cssStyleName = descriptor.get(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 			}
 			
+			columnConfigs = null;
+			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIGS)) {
+				//parse out the column configs
+				try {
+					String columnConfigsJson = descriptor.get(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIGS);
+					APITableColumnConfigList columnConfigList = nodeModelCreator.createJSONEntity(columnConfigsJson, APITableColumnConfigList.class);
+					columnConfigs = columnConfigList.getColumnConfigList();
+				} catch (JSONObjectAdapterException e) {
+					view.showError(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				}
+			}
 			refreshData();
 		}
 		else
@@ -170,20 +187,34 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 								columnNamesArray[colNamesIndex] = columnName;
 								colNamesIndex++;
 							}
-							String[] displayColumnNamesArray = columnNamesArray;
 							String[] rendererNamesArray;
 							rendererNamesArray = new String[columnNamesArray.length];
 							for (int i = 0; i < rendererNamesArray.length; i++) {
 								rendererNamesArray[i] = WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE;
 							}
-							APITableColumnRenderer[] renderers = new APITableColumnRenderer[rendererNamesArray.length];
-							//we should not render until all of the column renderers have had a chance to initialize
-							for (int i = 0; i < renderers.length; i++) {
-								renderers[i] = createColumnRenderer(rendererNamesArray[i]);
+							
+							APITableColumnRenderer[] renderers;
+							//either this table is defined by the column configs, or we're showing everything (with no renderers).
+							if (columnConfigs != null) {
+								renderers = new APITableColumnRenderer[columnConfigs.size()];
+								int i = 0;
+								for (Iterator columnConfigIterator = columnConfigs.iterator(); columnConfigIterator
+										.hasNext();) {
+									APITableColumnConfig config = (APITableColumnConfig) columnConfigIterator.next();
+									renderers[i] = createColumnRenderer(config.getRendererName());
+									i++;
+								}
 							}
-							testParameters(columnNamesArray, displayColumnNamesArray, renderers);
+							else {
+								renderers = new APITableColumnRenderer[rendererNamesArray.length];
+								//we should not render until all of the column renderers have had a chance to initialize
+								for (int i = 0; i < renderers.length; i++) {
+									renderers[i] = ginInjector.getAPITableColumnRendererNone();
+								}
+							}
+							
 							APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[rendererNamesArray.length];
-							tableColumnRendererInit(columnData, columnNamesArray, displayColumnNamesArray, renderers, initializedRenderers, 0);
+							tableColumnRendererInit(columnData, columnNamesArray, renderers, initializedRenderers, 0);
 						}
 					}
 				} catch (Exception e1) {
@@ -199,14 +230,6 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		});
 	}
 	
-	private void testParameters(final String[] columnNames, final String[] displayColumnNames, final APITableColumnRenderer[] renderers) {
-		//they must all be the same size
-		int numberOfColumns = columnNames.length;
-		if (displayColumnNames.length != numberOfColumns || renderers.length != numberOfColumns) {
-			throw new IllegalArgumentException(DisplayConstants.API_TABLE_COLUMN_COUNT_MISMATCH);
-		}
-	}
-	
 	private String getPagedURI() {
 		String firstCharacter = uri.contains("?") ? "&" : "?";
 		return uri + firstCharacter + "limit="+pageSize+"&offset="+offset;
@@ -220,7 +243,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	 * @param renderers
 	 * @param currentIndex
 	 */
-	private void tableColumnRendererInit(final Map<String, List<String>> columnData, final String[] columnNames, final String[] displayColumnNames, final APITableColumnRenderer[] renderers, final APITableInitializedColumnRenderer[] initializedRenderers, final int currentIndex) {
+	private void tableColumnRendererInit(final Map<String, List<String>> columnData, final String[] columnNames, final APITableColumnRenderer[] renderers, final APITableInitializedColumnRenderer[] initializedRenderers, final int currentIndex) {
 		AsyncCallback<APITableInitializedColumnRenderer> callback = new AsyncCallback<APITableInitializedColumnRenderer>() {
 			@Override
 			public void onSuccess(APITableInitializedColumnRenderer result) {
@@ -236,17 +259,18 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			private void processNext() {
 				//after all renderers have initialized, then configure the view
 				if (currentIndex == renderers.length-1) {
-					view.configure(columnData, columnNames, displayColumnNames, initializedRenderers, tableWidth, isShowRowNumber, rowNumberColName, cssStyleName, offset);
+					view.configure(columnData, columnNames, initializedRenderers, tableWidth, isShowRowNumber, rowNumberColName, cssStyleName, offset);
 					if (isPaging && total > pageSize) {
 						int start = offset+1;
 						int end = start + rowCount - 1;
 						view.configurePager(start, end, total);
 					}
 				} else
-					tableColumnRendererInit(columnData, columnNames, displayColumnNames, renderers, initializedRenderers, currentIndex+1);
+					tableColumnRendererInit(columnData, columnNames, renderers, initializedRenderers, currentIndex+1);
 			}
 		};
-		renderers[currentIndex].init(columnData.get(columnNames[currentIndex]), callback);
+		APITableColumnConfig config = columnConfigs != null ? columnConfigs.get(currentIndex) : null;
+		renderers[currentIndex].init(columnData, config, callback);
 	}
 	
 	public APITableColumnRenderer createColumnRenderer(String rendererName) {
@@ -275,6 +299,27 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		return view.asWidget();
 	}
 
+	public static List<String> wrap(String s) {
+		List<String> colName = new ArrayList<String>();
+		colName.add(s);
+		return colName;
+	}
+	
+	public static String getSingleOutputColumnName(APITableColumnConfig config) {
+		String inputColumnName = getSingleInputColumnName(config);
+		String outputColumnName = config.getDisplayColumnName();
+		if (outputColumnName == null)
+			outputColumnName = inputColumnName;
+		return outputColumnName;
+	}
+	
+	public static String getSingleInputColumnName(APITableColumnConfig config) {
+		if (config.getInputColumnNames() == null || config.getInputColumnNames().size() < 1) {
+			throw new IllegalArgumentException("Must specific an input column name");
+		}
+		return config.getInputColumnNames().iterator().next();
+	}
+	
 		/*
 	 * Private Methods
 	 */
