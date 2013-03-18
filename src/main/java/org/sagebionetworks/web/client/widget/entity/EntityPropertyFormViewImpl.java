@@ -180,8 +180,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		// formPanel.setSize("100%", "100%");
 		// Basic form data
 		Margins margins = new Margins(10, 10, 0, 10);
-		FormData basicFormData = new FormData(); 
-		basicFormData.setWidth(DIALOG_WIDTH-160);
+		FormData basicFormData = new FormData("-10"); //anchor layout, -10px from the right edge
 		basicFormData.setMargins(margins);
 
 		// Name is the first

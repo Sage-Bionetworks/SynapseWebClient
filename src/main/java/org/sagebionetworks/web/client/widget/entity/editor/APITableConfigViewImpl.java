@@ -2,13 +2,18 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.IconsImageBundle;
 
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -16,10 +21,13 @@ import com.google.inject.Inject;
 public class APITableConfigViewImpl extends LayoutContainer implements APITableConfigView {
 
 	private Presenter presenter;
-	private TextField<String> urlField, columnNamesField, friendlyColumnNamesField, renderersField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField, widthField;
+	private TextField<String> urlField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField, widthField, columnConfigsField;
 	private CheckBox isPagingField, isRowVisibleField;
+	private IconsImageBundle iconsImageBundle;
+	
 	@Inject
-	public APITableConfigViewImpl() {
+	public APITableConfigViewImpl(IconsImageBundle iconsImageBundle) {
+		this.iconsImageBundle = iconsImageBundle;
 	}
 	
 	@Override
@@ -27,9 +35,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		//build the view
 		FlowPanel hp = new FlowPanel();
 		urlField = new TextField<String>();
-		columnNamesField = new TextField<String>();
-		friendlyColumnNamesField = new TextField<String>();
-		renderersField = new TextField<String>();
 		isRowVisibleField = new CheckBox();
 		rowNumbersColumnNameField = new TextField<String>();
 		isPagingField = new CheckBox();
@@ -37,12 +42,10 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		widthField = new TextField<String>();
 		jsonResultsKeyNameField = new TextField<String>();
 		cssStyleNameField = new TextField<String>();
+		columnConfigsField = new TextField<String>();
 		
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_URL_LABEL, urlField, hp);
 		urlField.setAllowBlank(false);
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_COLUMNS_LABEL, columnNamesField, hp);
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_COLUMN_HEADERS_LABEL,friendlyColumnNamesField, hp);
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_RENDERERS_LABEL, renderersField, hp);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL, isRowVisibleField, hp);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME, rowNumbersColumnNameField, hp);
 		
@@ -52,11 +55,20 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_WIDTH, widthField, hp);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME, jsonResultsKeyNameField, hp);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_CSS_STYLE_NAME, cssStyleNameField, hp);
+		LayoutContainer container = initNewField(DisplayConstants.SYNAPSE_API_CALL_COL_CONFIGS_COL_NAME, columnConfigsField, hp);
+		//and add the Add Column Config button
+		Button addColConfigButton = new Button("Add", AbstractImagePrototype.create(iconsImageBundle.addSquare16()), new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				//pop up a new column config dialog to gather that info
+			}
+		});
+		container.add(addColConfigButton);
 		
 		add(hp);
 	}
 	
-	private void initNewField(String label, Field field, FlowPanel container) {
+	private LayoutContainer initNewField(String label, Field field, FlowPanel container) {
 		HorizontalPanel hp= new HorizontalPanel();
 		
 		Label labelField = new Label(label);
@@ -66,6 +78,7 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		hp.add(field);
 		
 		container.add(hp);
+		return hp;
 	}
 	
 	
@@ -82,19 +95,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	@Override
 	public void setApiUrl(String url) {
 		urlField.setValue(url);
-	}
-	
-	@Override
-	public String getFriendlyColumnNames() {
-		return friendlyColumnNamesField.getValue();
-	}
-	@Override
-	public String getColumnsToDisplay() {
-		return columnNamesField.getValue();
-	}
-	@Override
-	public String getRendererNames() {
-		return renderersField.getValue();
 	}
 	
 	@Override
@@ -115,6 +115,11 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	@Override
 	public Boolean isPaging() {
 		return isPagingField.getValue();
+	}
+	
+	@Override
+	public String getColumnConfigs() {
+		return columnConfigsField.getValue();
 	}
 	
 	@Override

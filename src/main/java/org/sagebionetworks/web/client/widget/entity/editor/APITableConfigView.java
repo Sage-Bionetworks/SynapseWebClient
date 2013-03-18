@@ -14,10 +14,6 @@ public interface APITableConfigView extends IsWidget, WidgetEditorView {
 	public void setApiUrl(String url);
 	public String getApiUrl();
 	
-	public String getColumnsToDisplay();
-	public String getFriendlyColumnNames();
-	public String getRendererNames();
-	
 	public String getTableWidth();
 	public Boolean isPaging();
 	public String getPageSize();
@@ -25,6 +21,7 @@ public interface APITableConfigView extends IsWidget, WidgetEditorView {
 	public String getRowNumberColumnName();
 	public String getJsonResultsKeyName();
 	public String getCssStyle();
+	public String getColumnConfigs();
 	
 	/**
 	 * Presenter interface
