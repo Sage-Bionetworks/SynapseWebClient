@@ -138,7 +138,7 @@ public class SearchPresenterTest {
 		List<KeyValue> facets = searchPresenter.getAppliedFacets();
 		boolean found = false;
 		for(KeyValue facet : facets) {
-			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()) && facet.getNot() == Boolean.TRUE)
+			if("project".equals(facet.getValue()) && "node_type".equals(facet.getKey()))
 				found = true;
 
 		}
