@@ -92,7 +92,7 @@ public class PreviewWidgetTest {
 		mainFileHandle.setFileName("codeFile.R");
 		PreviewFileHandle fh = new PreviewFileHandle();
 		fh.setId("previewFileId");
-//		fh.setContentType(ContentTypeUtils.PLAIN_TEXT);
+		fh.setContentType(ContentTypeUtils.PLAIN_TEXT);
 		fh.setFileName("preview.txt");
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
