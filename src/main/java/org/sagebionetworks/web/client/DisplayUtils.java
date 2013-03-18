@@ -237,10 +237,24 @@ public class DisplayUtils {
 			ExpressionData.class.getName(),	GenotypeData.class.getName() };
 	
 	public static SearchQuery getDefaultSearchQuery() {		
-		SearchQuery query = new SearchQuery();
-		// start with a blank, valid query
-		query.setQueryTerm(Arrays.asList(new String[] {""}));		
-		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));
+		SearchQuery query = getBaseSearchQueryNoFacets();
+		
+		// exclude links
+		List<KeyValue> bq = new ArrayList<KeyValue>();
+		KeyValue kv = new KeyValue();
+		kv = new KeyValue();
+		kv.setKey(DisplayUtils.SEARCH_KEY_NODE_TYPE);				
+		kv.setValue("project"); 
+		bq.add(kv);
+		query.setBooleanQuery(bq);
+		
+		query.setFacet(FACETS_DISPLAY_ORDER);
+		
+		return query;
+	}
+	
+	public static SearchQuery getAllTypesSearchQuery() {		
+		SearchQuery query = getBaseSearchQueryNoFacets();
 		
 		// exclude links
 		List<KeyValue> bq = new ArrayList<KeyValue>();
@@ -253,6 +267,14 @@ public class DisplayUtils {
 		
 		query.setFacet(FACETS_DISPLAY_ORDER);
 		
+		return query;
+	}
+
+	private static SearchQuery getBaseSearchQueryNoFacets() {
+		SearchQuery query = new SearchQuery();
+		// start with a blank, valid query
+		query.setQueryTerm(Arrays.asList(new String[] {""}));		
+		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));
 		return query;
 	}
 	
