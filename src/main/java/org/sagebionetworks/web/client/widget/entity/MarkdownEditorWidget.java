@@ -320,6 +320,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    	};
 			}));
 	    }
+	    menu.add(getNewCommand(WidgetConstants.ENTITYLIST_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	@Override
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.ENTITYLIST_CONTENT_TYPE, callback);
+	    	}
+	    }));	    
 	    menu.add(getNewCommand("Image", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
@@ -349,12 +355,6 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	
 	    	};
-		}));
-	    menu.add(getNewCommand(WidgetConstants.ENTITYLIST_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
-			@Override
-			public void componentSelected(ComponentEvent ce) {
-				handleInsertWidgetCommand(WidgetConstants.ENTITYLIST_CONTENT_TYPE, callback);
-			}
 		}));
 	    
 	    /**
