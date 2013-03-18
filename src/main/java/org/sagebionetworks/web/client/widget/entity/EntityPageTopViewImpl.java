@@ -199,10 +199,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		actionMenu.addEntityUpdatedHandler(handler);
-		locationableTitleBar.addEntityUpdatedHandler(handler);
-		fileTitleBar.addEntityUpdatedHandler(handler);
-		filesBrowser.addEntityUpdatedHandler(handler);
+		actionMenu.setEntityUpdatedHandler(handler);
+		locationableTitleBar.setEntityUpdatedHandler(handler);
+		fileTitleBar.setEntityUpdatedHandler(handler);
+		filesBrowser.setEntityUpdatedHandler(handler);
 	}
 
 	@Override

@@ -20,12 +20,12 @@ import com.google.inject.Inject;
 public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private FilesBrowserView view;
-	private HandlerManager handlerManager = new HandlerManager(this);
 	private String configuredEntityId;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AdapterFactory adapterFactory;
 	private AutoGenFactory autogenFactory;
+	private EntityUpdatedHandler entityUpdatedHandler;
 	
 	@Inject
 	public FilesBrowser(FilesBrowserView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
@@ -55,16 +55,17 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	public void clearState() {
 		view.clear();
 		// remove handlers
-		handlerManager = new HandlerManager(this);		
+		this.entityUpdatedHandler = null;		
 	}
 	
 	@Override
 	public void fireEntityUpdatedEvent() {
-		handlerManager.fireEvent(new EntityUpdatedEvent());
+		if (entityUpdatedHandler != null)
+			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
 	}
 	
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		this.entityUpdatedHandler = handler;
 	}
 
 	
