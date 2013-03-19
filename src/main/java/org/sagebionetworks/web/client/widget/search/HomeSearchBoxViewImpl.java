@@ -29,6 +29,8 @@ import com.google.inject.Inject;
 
 public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearchBoxView {
 	
+	private static final String ALL_TYPES = "All Types";
+	private static final String PROJECTS = "Projects";
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;	
@@ -56,89 +58,37 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 	private void createSearchBox() {
 		if(typeDropdown == null) {
 			typeDropdown = new Button();
-			typeDropdown.setText("Everything");
+			typeDropdown.setText(PROJECTS);
 			typeDropdown.setWidth(80);
+
+			MenuItem menuItem = null;
+			Menu menu = new Menu();  
 			
-		    Menu menu = new Menu();  
-		    MenuItem menuItem = null;
-		    
-		    menuItem = new MenuItem("Everything");
+		    menuItem = new MenuItem(PROJECTS);
 		    menuItem.addSelectionListener(new SelectionListener<MenuEvent>() {
 				@Override
 				public void componentSelected(MenuEvent ce) {
-					typeDropdown.setText("Everything");					
+					typeDropdown.setText(PROJECTS);
+					presenter.setSearchAll(false);
 				}		    
 			});
 		    menu.add(menuItem);
 		    
-		    menuItem = new MenuItem("Projects");
-		    menuItem.addSelectionListener(new SelectionListener<MenuEvent>() {
-				@Override
-				public void componentSelected(MenuEvent ce) {
-					typeDropdown.setText("Projects");					
-				}		    
-			});
-		    menuItem.disable();
-		    menu.add(menuItem);
 		    
-		    menuItem = new MenuItem("Datasets");
+		    menuItem = new MenuItem(ALL_TYPES);
 		    menuItem.addSelectionListener(new SelectionListener<MenuEvent>() {
 				@Override
 				public void componentSelected(MenuEvent ce) {
-					typeDropdown.setText("Datasets");					
+					typeDropdown.setText(ALL_TYPES);
+					presenter.setSearchAll(true);
 				}		    
 			});
-		    menuItem.disable();
-		    menu.add(menuItem);
+		    menu.add(menuItem);		    
 		    
 		    typeDropdown.setMenu(menu);		    
 		    horizontalTable.setWidget(0, 0, typeDropdown);
 		    
 		    // add facet links
-		    HorizontalPanel hp = new HorizontalPanel();
-		    Anchor a; 
-		    TableData tableData = new TableData();
-		    tableData.setPadding(5);
-		    		
-		    a = new Anchor(new SafeHtml() {				
-				@Override
-				public String asString() {
-					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Projects";
-				}
-			});
-		    
-		    a.setHref(presenter.getSearchAllProjectsLink());
-		    hp.add(a, tableData);
-		    
-		    a = new Anchor(new SafeHtml() {				
-				@Override
-				public String asString() {
-					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Data";
-				}
-			});
-		    a.setHref(presenter.getSearchAllDataLink());
-		    hp.add(a, tableData);
-		    
-		    a = new Anchor(new SafeHtml() {				
-				@Override
-				public String asString() {
-					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Studies";
-				}
-			});
-		    a.setHref(presenter.getSearchAllStudiesLink());
-		    
-		    hp.add(a, tableData);
-		    
-		    a = new Anchor(new SafeHtml() {				
-				@Override
-				public String asString() {
-					return DisplayUtils.getIconHtml(iconsImageBundle.magnify16()) + " All Code";
-				}
-			});
-		    a.setHref(presenter.getSearchAllCodeLink());
-		    hp.add(a, tableData);
-		    
-		    horizontalTable.setWidget(1, 1, hp); 
 		}
 
 		if(searchField == null) {

@@ -17,7 +17,6 @@ import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -51,15 +50,14 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -68,6 +66,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -76,6 +75,7 @@ import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -95,7 +95,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -238,10 +237,24 @@ public class DisplayUtils {
 			ExpressionData.class.getName(),	GenotypeData.class.getName() };
 	
 	public static SearchQuery getDefaultSearchQuery() {		
-		SearchQuery query = new SearchQuery();
-		// start with a blank, valid query
-		query.setQueryTerm(Arrays.asList(new String[] {""}));		
-		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));
+		SearchQuery query = getBaseSearchQueryNoFacets();
+		
+		// exclude links
+		List<KeyValue> bq = new ArrayList<KeyValue>();
+		KeyValue kv = new KeyValue();
+		kv = new KeyValue();
+		kv.setKey(DisplayUtils.SEARCH_KEY_NODE_TYPE);				
+		kv.setValue("project"); 
+		bq.add(kv);
+		query.setBooleanQuery(bq);
+		
+		query.setFacet(FACETS_DISPLAY_ORDER);
+		
+		return query;
+	}
+	
+	public static SearchQuery getAllTypesSearchQuery() {		
+		SearchQuery query = getBaseSearchQueryNoFacets();
 		
 		// exclude links
 		List<KeyValue> bq = new ArrayList<KeyValue>();
@@ -254,6 +267,14 @@ public class DisplayUtils {
 		
 		query.setFacet(FACETS_DISPLAY_ORDER);
 		
+		return query;
+	}
+
+	private static SearchQuery getBaseSearchQueryNoFacets() {
+		SearchQuery query = new SearchQuery();
+		// start with a blank, valid query
+		query.setQueryTerm(Arrays.asList(new String[] {""}));		
+		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));
 		return query;
 	}
 	
@@ -656,7 +677,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryToken(String entityId) {
-		return "#!" + getSynapseHistoryTokenNoHash(entityId, null);
+		return "#" + getSynapseHistoryTokenNoHash(entityId, null);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId) {
@@ -664,12 +685,12 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryToken(String entityId, Long versionNumber) {
-		return "#!" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
+		return "#" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
 		Synapse place = new Synapse(entityId, versionNumber);
-		return getPlaceString(Synapse.class) + ":" + place.toToken();
+		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
 	public static String stubStr(String str, int length) {
@@ -1465,4 +1486,32 @@ public class DisplayUtils {
 		return fileHandle;
 	}
 
+	public interface SelectedHandler<T> {
+		public void onSelected(T selected);		
+	}
+	
+	public static void configureEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
+		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
+		window.setPlain(true);
+		window.setModal(true);
+		window.setHeading(DisplayConstants.FIND_ENTITIES);
+		window.setLayout(new FitLayout());
+		window.add(entityFinder.asWidget(), new FitData(4));				
+		window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				Reference selected = entityFinder.getSelectedEntity();
+				handler.onSelected(selected);
+			}
+		}));
+		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		}));
+		window.setButtonAlign(HorizontalAlignment.RIGHT);
+	}
+
+	
 }

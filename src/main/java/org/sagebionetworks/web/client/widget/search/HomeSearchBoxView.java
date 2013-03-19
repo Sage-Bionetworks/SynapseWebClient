@@ -31,6 +31,8 @@ public interface HomeSearchBoxView extends IsWidget, SynapseWidgetView {
 		String getSearchAllStudiesLink();
 		
 		String getSearchAllCodeLink();
+
+		void setSearchAll(boolean searchAll);
 		
 	}
 

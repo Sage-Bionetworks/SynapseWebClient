@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
@@ -32,6 +33,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
@@ -90,7 +92,10 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public JiraURLHelper getJiraURLHelper();
 
-	// Widgets
+
+	/*
+	 *  Markdown Widgets
+	 */
 	////// Editors
 	public YouTubeConfigEditor getYouTubeConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
@@ -101,6 +106,7 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableConfigEditor getSynapseAPICallConfigEditor();
 	public TabbedTableConfigEditor getTabbedTableConfigEditor();
 	public EntityTreeBrowser getEntityTreeBrowser();
+	public EntityListConfigEditor getEntityListConfigEditor();
 
 	////// Renderers
 	public YouTubeWidget getYouTubeRenderer();
@@ -118,5 +124,6 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableColumnRendererDate getAPITableColumnRendererDate();
 	public APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
 	public APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
-
+	public EntityListWidget getEntityListRenderer();
+	
 }
