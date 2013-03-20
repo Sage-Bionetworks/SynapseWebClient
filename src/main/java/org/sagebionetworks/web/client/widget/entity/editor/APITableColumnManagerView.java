@@ -20,7 +20,7 @@ public interface APITableColumnManagerView extends IsWidget, SynapseWidgetView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void configure(APITableColumnConfigList configs);
+		void configure(List<APITableColumnConfig> configs);
 		void deleteColumnConfig(String tokenId);
 		void addColumnConfig(String rendererName, String inputColumnNames, String displayColumnName);
 	}

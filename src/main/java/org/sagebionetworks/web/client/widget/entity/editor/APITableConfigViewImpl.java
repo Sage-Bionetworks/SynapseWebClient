@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.repo.model.widget.APITableColumnConfigList;
+import java.util.List;
+
+import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -9,10 +11,10 @@ import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,10 +38,14 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	public void initView() {
 		//build the view
 		FlowPanel flowpanel = new FlowPanel();
+		flowpanel.addStyleName("margin-left-5");
+		flowpanel.addStyleName("margin-top-5");
 		urlField = new TextField<String>();
-		isRowVisibleField = new CheckBox();
+		isRowVisibleField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL);
+		isRowVisibleField.addStyleName("apitable");
 		rowNumbersColumnNameField = new TextField<String>();
-		isPagingField = new CheckBox();
+		isPagingField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_PAGING);
+		isPagingField.addStyleName("apitable");
 		pageSizeField = new TextField<String>();
 		widthField = new TextField<String>();
 		jsonResultsKeyNameField = new TextField<String>();
@@ -47,15 +53,17 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_URL_LABEL, urlField, flowpanel);
 		urlField.setAllowBlank(false);
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL, isRowVisibleField, flowpanel);
+
+		flowpanel.add(isRowVisibleField);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME, rowNumbersColumnNameField, flowpanel);
-		
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_IS_PAGING, isPagingField, flowpanel);
+
+		flowpanel.add(isPagingField);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_PAGE_SIZE, pageSizeField, flowpanel);
 		
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_WIDTH, widthField, flowpanel);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME, jsonResultsKeyNameField, flowpanel);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_CSS_STYLE_NAME, cssStyleNameField, flowpanel);
+		
 		
 		flowpanel.add(columnsManager.asWidget());
 		
@@ -80,7 +88,8 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	    window.show();		
 	}
 	
-	public void setConfigs(APITableColumnConfigList configs) {
+	@Override
+	public void setConfigs(List<APITableColumnConfig> configs) {
 		columnsManager.configure(configs);
 	}
 	

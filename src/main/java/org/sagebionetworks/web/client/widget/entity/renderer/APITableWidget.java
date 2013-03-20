@@ -2,12 +2,13 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
-import org.sagebionetworks.repo.model.widget.APITableColumnConfigList;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,6 +38,9 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private String rowNumberColName, jsonResultsArrayKeyName, cssStyleName, tableWidth;
 	private List<APITableColumnConfig> columnConfigs;
 	private NodeModelCreator nodeModelCreator;
+	
+	public final static String COLUMN_NAMES_DELIMITER = ";";	
+	public final static String FIELD_DELIMITER = ",";	
 	
 	@Inject
 	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector, NodeModelCreator nodeModelCreator) {
@@ -88,16 +93,24 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 				cssStyleName = descriptor.get(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 			}
 			
-			columnConfigs = null;
-			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIGS)) {
-				//parse out the column configs
-				try {
-					String columnConfigsJson = descriptor.get(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIGS);
-					APITableColumnConfigList columnConfigList = nodeModelCreator.createJSONEntity(columnConfigsJson, APITableColumnConfigList.class);
-					columnConfigs = columnConfigList.getColumnConfigList();
-				} catch (JSONObjectAdapterException e) {
-					view.showError(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+			columnConfigs = new ArrayList<APITableColumnConfig>();
+			//reconstruct table column configs (if there are any)
+			int i = 0;
+			while (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i)) {
+				String configString = descriptor.get(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX+i);
+				String[] parts = configString.split(FIELD_DELIMITER);
+				APITableColumnConfig config = new APITableColumnConfig();
+				config.setRendererName(parts[0]);
+				config.setDisplayColumnName(WidgetEncodingUtil.decodeValue(parts[1]));
+				Set<String> inputColumnNames = new HashSet<String>();
+				String[] inputColumns = parts[2].split(COLUMN_NAMES_DELIMITER);
+				for (int j = 0; j < inputColumns.length; j++) {
+					inputColumnNames.add(inputColumns[j]);
 				}
+				config.setInputColumnNames(inputColumnNames);
+				
+				columnConfigs.add(config);
+				i++;
 			}
 			refreshData();
 		}
@@ -187,33 +200,21 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 								columnNamesArray[colNamesIndex] = columnName;
 								colNamesIndex++;
 							}
-							String[] rendererNamesArray;
-							rendererNamesArray = new String[columnNamesArray.length];
-							for (int i = 0; i < rendererNamesArray.length; i++) {
-								rendererNamesArray[i] = WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE;
+							//if column configs were not passed in, then use default
+							if (columnConfigs == null || columnConfigs.size() == 0) {
+								columnConfigs = getDefaultColumnConfigs(columnNamesArray);
 							}
 							
-							APITableColumnRenderer[] renderers;
-							//either this table is defined by the column configs, or we're showing everything (with no renderers).
-							if (columnConfigs != null) {
-								renderers = new APITableColumnRenderer[columnConfigs.size()];
-								int i = 0;
-								for (Iterator columnConfigIterator = columnConfigs.iterator(); columnConfigIterator
-										.hasNext();) {
-									APITableColumnConfig config = (APITableColumnConfig) columnConfigIterator.next();
-									renderers[i] = createColumnRenderer(config.getRendererName());
-									i++;
-								}
-							}
-							else {
-								renderers = new APITableColumnRenderer[rendererNamesArray.length];
-								//we should not render until all of the column renderers have had a chance to initialize
-								for (int i = 0; i < renderers.length; i++) {
-									renderers[i] = ginInjector.getAPITableColumnRendererNone();
-								}
+							APITableColumnRenderer[] renderers = new APITableColumnRenderer[columnConfigs.size()];
+							int i = 0;
+							for (Iterator columnConfigIterator = columnConfigs.iterator(); columnConfigIterator
+									.hasNext();) {
+								APITableColumnConfig config = (APITableColumnConfig) columnConfigIterator.next();
+								renderers[i] = createColumnRenderer(config.getRendererName());
+								i++;
 							}
 							
-							APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[rendererNamesArray.length];
+							APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[renderers.length];
 							tableColumnRendererInit(columnData, columnNamesArray, renderers, initializedRenderers, 0);
 						}
 					}
@@ -225,6 +226,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				caught.printStackTrace();
 				view.showError(caught.getMessage());
 			}
 		});
@@ -269,8 +271,24 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 					tableColumnRendererInit(columnData, columnNames, renderers, initializedRenderers, currentIndex+1);
 			}
 		};
-		APITableColumnConfig config = columnConfigs != null ? columnConfigs.get(currentIndex) : null;
+		APITableColumnConfig config = columnConfigs.get(currentIndex);
 		renderers[currentIndex].init(columnData, config, callback);
+	}
+	
+	private List<APITableColumnConfig> getDefaultColumnConfigs(String[] columnNamesArray) {
+		List<APITableColumnConfig> defaultConfigs = new ArrayList<APITableColumnConfig>();
+		//create a config for each column
+		for (int i = 0; i < columnNamesArray.length; i++) {
+			APITableColumnConfig newConfig = new APITableColumnConfig();
+			newConfig.setDisplayColumnName(columnNamesArray[i]);
+			Set<String> inputColumnSet = new HashSet<String>();
+			inputColumnSet.add(columnNamesArray[i]);
+			newConfig.setInputColumnNames(inputColumnSet);
+			newConfig.setRendererName(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
+			defaultConfigs.add(newConfig);
+		}
+				
+		return defaultConfigs;
 	}
 	
 	public APITableColumnRenderer createColumnRenderer(String rendererName) {
@@ -308,7 +326,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	public static String getSingleOutputColumnName(APITableColumnConfig config) {
 		String inputColumnName = getSingleInputColumnName(config);
 		String outputColumnName = config.getDisplayColumnName();
-		if (outputColumnName == null)
+		if (outputColumnName == null || outputColumnName.trim().length()==0)
 			outputColumnName = inputColumnName;
 		return outputColumnName;
 	}

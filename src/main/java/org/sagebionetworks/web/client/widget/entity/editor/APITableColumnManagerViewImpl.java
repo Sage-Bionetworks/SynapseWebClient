@@ -23,6 +23,7 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.TextField;
@@ -60,6 +61,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 	ColumnModel columnModel;
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
+	private boolean isEmpty;
 	
 	@Inject
 	public APITableColumnManagerViewImpl(IconsImageBundle iconsImageBundle) {
@@ -128,12 +130,12 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 	@Override
 	public void configure(List<APITableColumnConfig> configs) {		
 		gridStore.removeAll();
-		if(configs == null || configs.size() == 0){
+		isEmpty = configs == null || configs.size() == 0;
+		if(isEmpty){
 			addNoConfigRow();
 		} else {
 			populateStore(configs);			
 		}
-
 		
 		if(isRendered())
 			grid.reconfigure(gridStore, columnModel);
@@ -163,6 +165,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 		//input column names (required)
 		//display column name (optional)
 		FlowPanel panel = new FlowPanel();
+		panel.addStyleName("margin-top-left-10");
 		final TextField<String> columnNames = new TextField<String>();
 		final TextField<String> displayColumnName = new TextField<String>();
 		final SimpleComboBox<String> combo = new SimpleComboBox<String>();
@@ -172,9 +175,10 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
 		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS);
 		combo.setSimpleValue(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
+		combo.setTriggerAction(TriggerAction.ALL);
 		
 		initNewField("Renderer", combo, panel);
-		initNewField("Column Names", columnNames, panel);
+		initNewField("Input Column Names", columnNames, panel);
 		initNewField("Display Column Name (optional)", displayColumnName, panel);
 		okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
@@ -204,7 +208,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 	private void addNoConfigRow() {
 		BaseModelData model = new BaseModelData();
 		model.set(CONFIG_COL_KEY, DisplayConstants.TEXT_NO_COLUMNS);
-		gridStore.add(model);		
+		gridStore.add(model);
 	}
 	
 	private void populateStore(List<APITableColumnConfig> configs) {		
@@ -243,20 +247,21 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 				wrap.setWidth(COLUMN_WIDTH_PX-50);
 				
 				panel.add(wrap);
-
-				AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle.deleteButtonGrey16());
-				Anchor button = DisplayUtils.createIconLink(img, new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						deleteAttachmentAt(rowIndex);
-					}
-				});
-
-				TableData td = new TableData();
-				td.setHorizontalAlign(HorizontalAlignment.RIGHT);
-				td.setVerticalAlign(VerticalAlignment.MIDDLE);
-				
-				panel.add(button, td);
+				if (!isEmpty) {
+					AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle.deleteButtonGrey16());
+					Anchor button = DisplayUtils.createIconLink(img, new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							deleteAttachmentAt(rowIndex);
+						}
+					});
+	
+					TableData td = new TableData();
+					td.setHorizontalAlign(HorizontalAlignment.RIGHT);
+					td.setVerticalAlign(VerticalAlignment.MIDDLE);
+					panel.add(button, td);
+				}
+					
 				panel.setAutoWidth(true);
 				return panel;
 			}

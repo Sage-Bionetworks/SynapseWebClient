@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
-import org.sagebionetworks.repo.model.widget.APITableColumnConfigList;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -19,13 +18,11 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 	
 	private APITableConfigView view;
 	private Map<String, String> descriptor;
-	private AdapterFactory adapterFactory;
-	private APITableColumnConfigList configs;
+	private List<APITableColumnConfig> configs;
 	
 	@Inject
-	public APITableConfigEditor(APITableConfigView view, AdapterFactory adapterFactory) {
+	public APITableConfigEditor(APITableConfigView view) {
 		this.view = view;
-		this.adapterFactory = adapterFactory;
 		view.setPresenter(this);
 		view.initView();
 	}
@@ -36,8 +33,7 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 		String uri = descriptor.get(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
 		if (uri != null)
 			view.setApiUrl(uri);
-		configs = new APITableColumnConfigList();
-		configs.setColumnConfigList(new ArrayList<APITableColumnConfig>());
+		configs = new ArrayList<APITableColumnConfig>();
 		view.setConfigs(configs);
 	}
 	
@@ -64,14 +60,22 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, view.getJsonResultsKeyName());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE, view.getCssStyle());
 		
-		String configsJson = null;
-		try {
-			configsJson = configs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			//encode via WidgetEncodingUtil
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
+		for (int i = 0; i < configs.size(); i++) {
+			APITableColumnConfig config = configs.get(i);
+			StringBuilder sb = new StringBuilder();
+			sb.append(config.getRendererName());
+			sb.append(APITableWidget.FIELD_DELIMITER);
+			String displayColumnName = "";
+			if (config.getDisplayColumnName() != null)
+				displayColumnName = config.getDisplayColumnName().trim();
+			sb.append(WidgetEncodingUtil.encodeValue(displayColumnName));
+			sb.append(APITableWidget.FIELD_DELIMITER);
+			for (String columnName : config.getInputColumnNames()) {
+				sb.append(columnName);
+				sb.append(APITableWidget.COLUMN_NAMES_DELIMITER);
+			}
+			updateDescriptor(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i, sb.toString());
 		}
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIGS, configsJson);
 	}
 	
 	private void updateDescriptor(String key, String value) {

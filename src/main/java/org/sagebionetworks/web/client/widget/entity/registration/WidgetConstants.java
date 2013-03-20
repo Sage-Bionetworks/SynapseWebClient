@@ -58,11 +58,11 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY = "showRowNumber";
 	public static final String API_TABLE_WIDGET_RESULTS_KEY = "jsonResultsKeyName";
 	public static final String API_TABLE_WIDGET_CSS_STYLE = "cssStyle";
-	public static final String API_TABLE_WIDGET_COLUMN_CONFIGS = "columnConfigs";
+	public static final String API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX = "columnConfig";
 	public static final String API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY = "rowNumberDisplayName";
 	public static final String API_TABLE_WIDGET_WIDTH_KEY = "width";
 	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
-	
+	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	
 	/**
 	 * API Table Column Renderers

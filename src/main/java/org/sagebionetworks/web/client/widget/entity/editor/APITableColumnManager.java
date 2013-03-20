@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
-import org.sagebionetworks.repo.model.widget.APITableColumnConfigList;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -15,7 +15,7 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 		SynapseWidgetPresenter {
 
 	private APITableColumnManagerView view;
-	private APITableColumnConfigList configs;
+	private List<APITableColumnConfig> configs;
 	
 	@Inject
 	public APITableColumnManager(APITableColumnManagerView view) {
@@ -24,9 +24,9 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 	}
 	
 	@Override
-	public void configure(APITableColumnConfigList configs) {
+	public void configure(List<APITableColumnConfig> configs) {
 		this.configs = configs;
-		view.configure(configs.getColumnConfigList());
+		view.configure(configs);
 	}
 
 	@Override
@@ -40,7 +40,6 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 		if (rendererName == null || inputColumnNames == null || rendererName.trim().length() == 0 || inputColumnNames.trim().length() == 0) {
 			throw new IllegalArgumentException("Renderer and Input Columns are required");
 		}
-		List<APITableColumnConfig> columnConfigList = configs.getColumnConfigList();
 		APITableColumnConfig newConfig = new APITableColumnConfig();
 		newConfig.setRendererName(rendererName);
 		String[] inputColNamesArray = inputColumnNames.split(",");
@@ -49,17 +48,22 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 			inputColumnNamesSet.add(inputColNamesArray[i].trim());
 		}
 		newConfig.setInputColumnNames(inputColumnNamesSet);
-		columnConfigList.add(newConfig);
+		if (displayColumnName == null || displayColumnName.trim().length()==0) {
+			displayColumnName = APITableWidget.getSingleInputColumnName(newConfig);
+		}
+		newConfig.setDisplayColumnName(displayColumnName);
+		configs.add(newConfig);
+		view.configure(configs);
 	}
 	
 	@Override
 	public void deleteColumnConfig(String tokenId) {
-		List<APITableColumnConfig> columnConfigList = configs.getColumnConfigList();
 		if(tokenId != null) {
 			// find config and remove it
-			for(APITableColumnConfig data : columnConfigList) {
+			for(APITableColumnConfig data : configs) {
 				if(tokenId.equals(data.toString())) {
-					columnConfigList.remove(data);
+					configs.remove(data);
+					view.configure(configs);
 					return;
 				}
 			}
