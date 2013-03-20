@@ -3,22 +3,14 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.MarkdownWidthParam;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import scala.actors.threadpool.Arrays;
-
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
+import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,11 +20,7 @@ public class ShinySiteConfigViewImpl extends LayoutContainer implements ShinySit
 
 	private Presenter presenter;
 	private TextField<String> urlField;
-	private SimpleComboBox<String> widthCombo;
 	private TextField<String> heightField;
-	
-	private final static String WIDE = "Wide";
-	private final static String NARROW = "Narrow";
 	
 	@Inject
 	public ShinySiteConfigViewImpl() {
@@ -63,17 +51,6 @@ public class ShinySiteConfigViewImpl extends LayoutContainer implements ShinySit
 		urlField.setFieldLabel(DisplayConstants.SHINYSITE_SITE_LABEL);
 		panel.add(urlField, basicFormData);
 		
-		widthCombo = new SimpleComboBox<String>();
-		widthCombo.setFieldLabel(DisplayConstants.WIDTH);
-		widthCombo.setTypeAhead(false);
-		widthCombo.setEditable(false);
-		widthCombo.setForceSelection(true);
-		widthCombo.setTriggerAction(TriggerAction.ALL);
-		widthCombo.add(WIDE);
-		widthCombo.add(NARROW);
-		widthCombo.setSimpleValue(WIDE);
-		panel.add(widthCombo, basicFormData);
-		
 		heightField = new TextField<String>();
 		heightField.setValue(null);
 		heightField.setEmptyText(WidgetConstants.SHINYSITE_DEFAULT_HEIGHT_PX + " (" + DisplayConstants.DEFAULT + ")");
@@ -101,11 +78,6 @@ public class ShinySiteConfigViewImpl extends LayoutContainer implements ShinySit
 	}
 
 	@Override
-	public MarkdownWidthParam getSiteWidth() {		
-		return MarkdownWidthParam.valueOf(widthCombo.getValue().getValue().toUpperCase());
-	}
-
-	@Override
 	public Integer getSiteHeight() {		
 		String value = heightField.getValue();
 		Integer height = null;
@@ -119,8 +91,9 @@ public class ShinySiteConfigViewImpl extends LayoutContainer implements ShinySit
 	}
 	
 	@Override
-	public void configure(String url, int width, int height) {
+	public void configure(String url, int height) {
 		urlField.setValue(url);
+		heightField.setValue(String.valueOf(height));
 	}
 	
 	@Override

@@ -2,10 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.MarkdownWidthParam;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -27,11 +25,10 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		int width = getWidthFromDescriptor(descriptor);
 		int height = getHeightFromDescriptor(descriptor);
 		String siteUrl = descriptor.get(WidgetConstants.SHINYSITE_SITE_KEY);
 		if(isValidShinySite(siteUrl))
-			view.configure(siteUrl, width, height);
+			view.configure(siteUrl, height);
 		else 
 			view.showInvalidSiteUrl(siteUrl);
 	}
@@ -43,12 +40,6 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
-	}
-
-	public static int getWidthFromDescriptor(Map<String, String> descriptor) {
-		String param = descriptor.get(WidgetConstants.SHINYSITE_WIDTH_KEY); 		
-		MarkdownWidthParam widthParam = param != null ? MarkdownWidthParam.valueOf(param) : null;
-		return DisplayUtils.getMarkdownWidth(widthParam);
 	}
 
 	public static int getHeightFromDescriptor(Map<String, String> descriptor) {

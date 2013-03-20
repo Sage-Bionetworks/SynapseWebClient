@@ -56,10 +56,8 @@ import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.MarkdownWidthParam;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -1518,16 +1516,6 @@ public class DisplayUtils {
 			}
 		}));
 		window.setButtonAlign(HorizontalAlignment.RIGHT);
-	}
-
-	public static int getMarkdownWidth(MarkdownWidthParam param) {
-		int width = MARKDOWN_WIDTH_WIDE_PX;
-		if(param != null) {
-			if(param == MarkdownWidthParam.NARROW) {
-				width = MARKDOWN_WIDTH_NARROW_PX;
-			} 
-		}
-		return width;
 	}
 		
 }

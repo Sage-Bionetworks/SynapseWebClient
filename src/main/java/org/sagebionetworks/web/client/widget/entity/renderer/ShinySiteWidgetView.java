@@ -10,7 +10,7 @@ public interface ShinySiteWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(String siteUrl, int width, int height);
+	public void configure(String siteUrl, int height);
 	
 	/**
 	 * Presenter interface

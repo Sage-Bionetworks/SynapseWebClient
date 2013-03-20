@@ -25,10 +25,9 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
 		String siteUrl = descriptor.get(WidgetConstants.SHINYSITE_SITE_KEY);
-		int width = ShinySiteWidget.getWidthFromDescriptor(descriptor);
 		int height = ShinySiteWidget.getHeightFromDescriptor(descriptor);
 		if (siteUrl != null)
-			view.configure(siteUrl, width, height);
+			view.configure(siteUrl, height);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -47,7 +46,6 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 		view.checkParams();
 		try{			
 			descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, view.getSiteUrl());
-			descriptor.put(WidgetConstants.SHINYSITE_WIDTH_KEY, view.getSiteWidth().toString());
 			if(view.getSiteHeight() != null) descriptor.put(WidgetConstants.SHINYSITE_HEIGHT_KEY, String.valueOf(view.getSiteHeight()));			
 		} catch (IllegalArgumentException e) {
 			view.showErrorMessage(e.getMessage());

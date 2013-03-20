@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -17,15 +16,15 @@ public class ShinySiteWidgetViewImpl extends LayoutContainer implements ShinySit
 	}
 	
 	@Override
-	public void configure(String siteUrl, int width, int height) {
+	public void configure(String siteUrl, int height) {
 		this.removeAll();
-		add(new HTMLPanel(getShinySiteHTML(siteUrl, width, height)));
+		add(new HTMLPanel(getShinySiteHTML(siteUrl, height)));
 	}	
 	
-	public static String getShinySiteHTML(String siteUrl, int width, int height){
+	public static String getShinySiteHTML(String siteUrl, int height){
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append("<iframe width=\"" + width + "\" height=\""+ height +"\" src=\"");
+		sb.append("<iframe width=\"100%\" height=\""+ height +"\" src=\"");
 		sb.append(siteUrl);
 		sb.append("\" frameborder=\"0\" allowfullscreen></iframe>");
 	    return sb.toString();

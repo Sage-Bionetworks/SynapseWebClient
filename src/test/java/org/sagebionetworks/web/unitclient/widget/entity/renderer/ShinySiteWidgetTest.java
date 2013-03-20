@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -11,9 +13,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.MarkdownWidthParam;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -43,7 +43,7 @@ public class ShinySiteWidgetTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
 		widget.configure(wikiKey, descriptor);
-		verify(mockView).configure(eq(validSiteUrl), anyInt(), anyInt());
+		verify(mockView).configure(eq(validSiteUrl), anyInt());
 	}
 	
 	@Test
@@ -52,19 +52,6 @@ public class ShinySiteWidgetTest {
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, invalidSiteUrl);
 		widget.configure(wikiKey, descriptor);
 		verify(mockView).showInvalidSiteUrl(invalidSiteUrl);
-	}
-
-	@Test
-	public void testGetWidthFromDescriptor() {
-		Map<String, String> descriptor = new HashMap<String, String>();
-		assertEquals(DisplayUtils.getMarkdownWidth(null), ShinySiteWidget.getWidthFromDescriptor(descriptor));
-		
-		descriptor.put(WidgetConstants.SHINYSITE_WIDTH_KEY, MarkdownWidthParam.NARROW.toString());
-		assertEquals(DisplayUtils.getMarkdownWidth(MarkdownWidthParam.NARROW), ShinySiteWidget.getWidthFromDescriptor(descriptor));
-
-		descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.SHINYSITE_WIDTH_KEY, MarkdownWidthParam.WIDE.toString());
-		assertEquals(DisplayUtils.getMarkdownWidth(MarkdownWidthParam.WIDE), ShinySiteWidget.getWidthFromDescriptor(descriptor));
 	}
 	
 	@Test
