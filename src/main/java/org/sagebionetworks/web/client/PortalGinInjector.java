@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
@@ -36,6 +37,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWi
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
@@ -107,6 +109,7 @@ public interface PortalGinInjector extends Ginjector {
 	public TabbedTableConfigEditor getTabbedTableConfigEditor();
 	public EntityTreeBrowser getEntityTreeBrowser();
 	public EntityListConfigEditor getEntityListConfigEditor();
+	public ShinySiteConfigEditor getShinySiteConfigEditor();
 
 	////// Renderers
 	public YouTubeWidget getYouTubeRenderer();
@@ -117,6 +120,8 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableWidget getSynapseAPICallRenderer();
 	public TableOfContentsWidget getTableOfContentsRenderer();
 	public WikiFilesPreviewWidget getWikiFilesPreviewRenderer();
+	public EntityListWidget getEntityListRenderer();
+	public ShinySiteWidget getShinySiteRenderer(); 
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
@@ -124,6 +129,5 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableColumnRendererDate getAPITableColumnRendererDate();
 	public APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
 	public APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
-	public EntityListWidget getEntityListRenderer();
 	
 }

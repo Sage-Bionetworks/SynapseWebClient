@@ -28,6 +28,9 @@ public class WidgetConstants {
 	public static final String ENTITYLIST_CONTENT_TYPE = "entitylist";
 	public static final String ENTITYLIST_FRIENDLY_NAME ="Entity List";
 	
+	public static final String SHINYSITE_CONTENT_TYPE = "shinysite";
+	public static final String SHINYSITE_FRIENDLY_NAME ="Shiny Site";
+		
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
@@ -39,6 +42,7 @@ public class WidgetConstants {
 	/**
 	 * Widget parameter keys
 	 */
+	
 	public static final String IMAGE_WIDGET_FILE_NAME_KEY = "fileName";
 	public static final String IMAGE_WIDGET_WIDTH_KEY = "width";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
@@ -66,6 +70,9 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_RENDERERS_KEY = "renderers";
 	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	
+	public static final String SHINYSITE_SITE_KEY = "site";	
+	public static final String SHINYSITE_HEIGHT_KEY = "height";
+	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
 	/**
 	 * API Table Column Renderers
