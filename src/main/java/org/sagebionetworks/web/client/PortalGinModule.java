@@ -103,6 +103,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
@@ -125,6 +127,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetView;
@@ -425,12 +429,13 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TabbedTableConfigView.class).to(TabbedTableConfigViewImpl.class);
 		bind(APITableConfigView.class).to(APITableConfigViewImpl.class);
 		bind(EntityListConfigView.class).to(EntityListConfigViewImpl.class);
+		bind(ShinySiteConfigView.class).to(ShinySiteConfigViewImpl.class);
 		
 		// UI Widget Renderers
 		bind(YouTubeWidgetView.class).to(YouTubeWidgetViewImpl.class);
 		bind(OldImageWidgetView.class).to(OldImageWidgetViewImpl.class);
 		bind(EntityListWidgetView.class).to(EntityListWidgetViewImpl.class);
-		
+		bind(ShinySiteWidgetView.class).to(ShinySiteWidgetViewImpl.class);		
 		bind(ImageWidgetView.class).to(ImageWidgetViewImpl.class);
 		bind(AttachmentPreviewWidgetView.class).to(AttachmentPreviewWidgetViewImpl.class);
 		bind(APITableWidgetView.class).to(APITableWidgetViewImpl.class);

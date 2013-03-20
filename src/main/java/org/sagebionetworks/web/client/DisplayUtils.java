@@ -108,6 +108,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
 
+	public static final String HELP_EMAIL_ADDRESS = "synapseInfo@sagebase.org";
+	public static final String HELP_EMAIL_ADDRESS_LINK = "<a href=\""+ DisplayUtils.HELP_EMAIL_ADDRESS +"\" class=\"link\">contact us</a>";
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
 	public static final String SUPPORT_FEED_URL = "http://api.getsatisfaction.com/companies/sagebase/topics/";
 	public static final String SUPPORT_RECENT_ACTIVITY_URL = "http://support.sagebase.org/sagebase?view=recent";
@@ -181,6 +183,9 @@ public class DisplayUtils {
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
 	public static final int BIG_BUTTON_HEIGHT_PX = 36;
+	private static final int MARKDOWN_WIDTH_WIDE_PX = 940;
+	private static final int MARKDOWN_WIDTH_NARROW_PX = 660;
+
 	
 	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
 	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
@@ -1226,7 +1231,7 @@ public class DisplayUtils {
 		}
 		return videoId;
 	}
-
+	
 	public static Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
 		Anchor anchor = new Anchor();
 		anchor.setHTML(icon.getHTML());
@@ -1512,6 +1517,5 @@ public class DisplayUtils {
 		}));
 		window.setButtonAlign(HorizontalAlignment.RIGHT);
 	}
-
-	
+		
 }
