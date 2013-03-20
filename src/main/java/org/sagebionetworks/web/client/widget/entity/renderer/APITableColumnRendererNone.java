@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
+import org.sagebionetworks.web.client.DisplayConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -21,8 +22,15 @@ public class APITableColumnRendererNone implements APITableColumnRenderer {
 		outputColumnName = APITableWidget.getSingleOutputColumnName(config);
 		
 		outputColumnData = new HashMap<String, List<String>>();
-		outputColumnData.put(outputColumnName, columnData.get(APITableWidget.getSingleInputColumnName(config)));
+		String inputColumnName = APITableWidget.getSingleInputColumnName(config);
+		List<String> colValues = columnData.get(inputColumnName);
+		if (colValues == null) {
+			//user defined an input column that doesn't exist in the service output
+			callback.onFailure(new IllegalArgumentException(DisplayConstants.ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN + inputColumnName));
+		}
+		outputColumnData.put(outputColumnName, colValues);
 		
+
 		callback.onSuccess(new APITableInitializedColumnRenderer() {
 			@Override
 			public Map<String, List<String>> getColumnData() {

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -36,7 +37,12 @@ public class APITableColumnRendererDate implements APITableColumnRenderer {
 		
 		//and precompute the output values
 		outputColumnData = new HashMap<String, List<String>>();
-		List<String> colValues = columnData.get(APITableWidget.getSingleInputColumnName(config));
+		String inputColumnName = APITableWidget.getSingleInputColumnName(config);
+		List<String> colValues = columnData.get(inputColumnName);
+		if (colValues == null) {
+			//user defined an input column that doesn't exist in the service output
+			callback.onFailure(new IllegalArgumentException(DisplayConstants.ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN + inputColumnName));
+		}
 		List<String> outputValues = new ArrayList<String>();
 		
 		for (Iterator iterator2 = colValues.iterator(); iterator2

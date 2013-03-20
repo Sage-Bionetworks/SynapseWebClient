@@ -118,6 +118,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 						@Override
 						public Map<String, List<String>> getColumnData() {
 							if (outputColumnData == null) {
+								outputColumnData = new HashMap<String,List<String>>();
 								//create
 								for (Iterator iterator = getColumnNames().iterator(); iterator
 										.hasNext();) {
@@ -135,7 +136,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 											//does this row have the same annotation
 											String renderedValue = "";
 											if (row != null) {
-												for (Iterator iterator3 = row.iterator(); iterator.hasNext();) {
+												for (Iterator iterator3 = row.iterator(); iterator3.hasNext();) {
 													EntityRow<?> entityRow = (EntityRow<?>) iterator3.next();
 													if (entityRow.getLabel().equals(outputColumnName)) {
 														//report this display value
@@ -158,9 +159,11 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 						public List<String> getColumnNames() {
 							if (outputColumnNames == null) {
 								outputColumnNames =  new ArrayList<String>();
-								for (Iterator<EntityRow<?>> iterator = masterAnnotationList.iterator(); iterator
-										.hasNext();) {
-									outputColumnNames.add(iterator.next().getLabel());
+								if (masterAnnotationList != null) {
+									for (Iterator<EntityRow<?>> iterator = masterAnnotationList.iterator(); iterator
+											.hasNext();) {
+										outputColumnNames.add(iterator.next().getLabel());
+									}
 								}
 							}
 							return outputColumnNames;

@@ -255,8 +255,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			@Override
 			public void onFailure(Throwable caught) {
 				//there was a problem initializing a particular renderer
-				//keep going
-				processNext();
+				view.showError(caught.getMessage());
 			}
 			private void processNext() {
 				//after all renderers have initialized, then configure the view
