@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
-import org.sagebionetworks.repo.model.widget.APITableColumnConfigList;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -21,7 +20,7 @@ public interface APITableColumnManagerView extends IsWidget, SynapseWidgetView {
 	 */
 	public interface Presenter {
 		void configure(List<APITableColumnConfig> configs);
-		void deleteColumnConfig(String tokenId);
+		void deleteColumnConfig(APITableColumnConfig config);
 		void addColumnConfig(String rendererName, String inputColumnNames, String displayColumnName);
 	}
 

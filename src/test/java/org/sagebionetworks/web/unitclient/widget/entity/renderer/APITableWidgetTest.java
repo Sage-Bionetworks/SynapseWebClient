@@ -16,6 +16,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -103,7 +104,7 @@ public class APITableWidgetTest {
 	public void testConfigure() {
 		widget.configure(testWikiKey, descriptor);
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
@@ -120,7 +121,7 @@ public class APITableWidgetTest {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 		
 		widget.configure(testWikiKey, descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 	}
 	
 	@Test
@@ -128,7 +129,9 @@ public class APITableWidgetTest {
 		//even if the column renderer fails to initialize, everything should still work
 		APITableColumnRendererSynapseID failColumnRenderer = new APITableColumnRendererSynapseID(){
 			@Override
-			public void init(List<String> columnData, AsyncCallback<APITableInitializedColumnRenderer> callback) {
+			public void init(Map<String, List<String>> columnData,
+					APITableColumnConfig config,
+					AsyncCallback<APITableInitializedColumnRenderer> callback) {
 				callback.onFailure(new Exception("Load failure"));
 			}
 		};
@@ -137,10 +140,9 @@ public class APITableWidgetTest {
 		widget.configure(testWikiKey, descriptor);
 		
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
 	}
-
 	
 	//test removing uri causes error to be shown
 	@Test
@@ -163,14 +165,14 @@ public class APITableWidgetTest {
 	public void testNoPaging() throws JSONObjectAdapterException {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
 		widget.configure(testWikiKey, descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
 	@Test
 	public void testPagerNotNecessary() throws JSONObjectAdapterException {
 		testReturnJSONObject.put("totalNumberOfResults", 2);
 		widget.configure(testWikiKey, descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	

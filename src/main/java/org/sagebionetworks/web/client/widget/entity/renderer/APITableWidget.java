@@ -15,7 +15,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
@@ -37,19 +36,17 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private Boolean isPaging,isShowRowNumber;
 	private String rowNumberColName, jsonResultsArrayKeyName, cssStyleName, tableWidth;
 	private List<APITableColumnConfig> columnConfigs;
-	private NodeModelCreator nodeModelCreator;
 	
 	public final static String COLUMN_NAMES_DELIMITER = ";";	
 	public final static String FIELD_DELIMITER = ",";	
 	
 	@Inject
-	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector, NodeModelCreator nodeModelCreator) {
+	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.ginInjector = ginInjector;
-		this.nodeModelCreator = nodeModelCreator;
 	}
 	
 	@Override

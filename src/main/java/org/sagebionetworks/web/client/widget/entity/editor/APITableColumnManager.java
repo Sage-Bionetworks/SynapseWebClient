@@ -57,18 +57,17 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 	}
 	
 	@Override
-	public void deleteColumnConfig(String tokenId) {
-		if(tokenId != null) {
-			// find config and remove it
-			for(APITableColumnConfig data : configs) {
-				if(tokenId.equals(data.toString())) {
-					configs.remove(data);
-					view.configure(configs);
-					return;
-				}
-			}
+	public void deleteColumnConfig(APITableColumnConfig config) {
+		if(config != null) {
+			configs.remove(config);
+			view.configure(configs);
 		} else {
 			view.showErrorMessage("Column configuration token not set");
 		}
+	}
+	
+	//expose for unit testing purposes
+	public List<APITableColumnConfig> getColumnConfigs() {
+		return configs;
 	}
 }

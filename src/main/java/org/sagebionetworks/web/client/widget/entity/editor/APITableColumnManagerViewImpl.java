@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -62,6 +64,8 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private boolean isEmpty;
+	private Map<Integer, APITableColumnConfig> token2ColumnConfig;
+	
 	
 	@Inject
 	public APITableColumnManagerViewImpl(IconsImageBundle iconsImageBundle) {
@@ -128,7 +132,8 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 	}
 	
 	@Override
-	public void configure(List<APITableColumnConfig> configs) {		
+	public void configure(List<APITableColumnConfig> configs) {
+		token2ColumnConfig = new HashMap<Integer, APITableColumnConfig>();
 		gridStore.removeAll();
 		isEmpty = configs == null || configs.size() == 0;
 		if(isEmpty){
@@ -212,6 +217,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 	}
 	
 	private void populateStore(List<APITableColumnConfig> configs) {		
+		int i = 0;
 		for(APITableColumnConfig data: configs){
 			SafeHtmlBuilder builder = new SafeHtmlBuilder();
 			builder.appendHtmlConstant("<div style=\"margin-left:20px\">");
@@ -220,9 +226,11 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 			Html listItem = new Html(builder.toSafeHtml().asString());
 		    BaseModelData model = new BaseModelData();
 			model.set(CONFIG_COL_KEY, listItem.getHtml());
-			model.set(DATA_TOKEN_KEY, data.toString());
+			model.set(DATA_TOKEN_KEY, i);
 			model.set(DATA_NAME_KEY, SafeHtmlUtils.fromString(data.getDisplayColumnName()).asString());
 			gridStore.add(model);
+			token2ColumnConfig.put(i, data);
+			i++;
 		}
 	}
 
@@ -309,7 +317,8 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 	public void deleteAttachmentAt(int rowIndex) {
 		final BaseModelData model = grid.getStore().getAt(rowIndex);
 		if (model != null) {
-			presenter.deleteColumnConfig((String) model.get(DATA_TOKEN_KEY));
+			Integer dataIndex = (Integer)model.get(DATA_TOKEN_KEY);
+			presenter.deleteColumnConfig(token2ColumnConfig.get(dataIndex));
 		}
 	}
 	@Override
