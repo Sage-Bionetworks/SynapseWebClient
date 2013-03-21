@@ -770,13 +770,34 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException {
-		Synapse synapseClient = createSynapseClient();
+		
 		ObjectType ownerObjectType = ObjectType.valueOf(ownerType);
 		if (ObjectType.ENTITY.equals(ownerObjectType))
 			return hasAccess(ownerId, accessType);
-		//TODO: support other object type access queries.  Like Competition
-//		else if (ObjectType.COMPETITION.equals(ownerObjectType))
-//			return hasAccessToCompetition(ownerId, accessType);
+		//everyone has (read) access to evaluation
+		else if (ObjectType.EVALUATION.equals(ownerObjectType)) {
+			if (ACCESS_TYPE.READ.toString().equals(accessType))
+				return true;
+			else {
+				try {
+					//get the page
+					Synapse synapseClient = createSynapseClient();
+					//get the root wiki page for this object
+					WikiPage page = synapseClient.getRootWikiPage(ownerId, ObjectType.valueOf(ownerType));
+					String pageOwnerId = page.getCreatedBy();
+					if (synapseClient.getUserSessionData() != null && synapseClient.getUserSessionData().getProfile() != null) {
+						String currentUserId = synapseClient.getUserSessionData().getProfile().getOwnerId();
+						return pageOwnerId.equals(currentUserId);
+					}
+					else return false;
+				} catch (SynapseException e) {
+					throw ExceptionUtil.convertSynapseException(e);
+				} catch (JSONObjectAdapterException e) {
+					throw new UnknownErrorException(e.getMessage());
+				} 
+			}
+		}
+			
 		throw new IllegalArgumentException(DisplayConstants.UNSUPPORTED_FOR_OWNER_TYPE + ownerType);
 	}
 	

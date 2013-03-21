@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
@@ -205,21 +206,29 @@ public class WikiPageWidget extends LayoutContainer {
 		
 		FlowPanel mainPanel = new FlowPanel();
 		mainPanel.addStyleName("span-"+spanWidth + " notopmargin");
-		mainPanel.add(getBreadCrumbs());
-		mainPanel.add(markdownWidget.asWidget());
+		mainPanel.add(getBreadCrumbs(spanWidth));
+		SimplePanel mdWidgetWrapper = new SimplePanel();
+		mdWidgetWrapper.addStyleName("span-"+spanWidth);
+		mdWidgetWrapper.add(markdownWidget.asWidget());
+		mainPanel.add(mdWidgetWrapper);
 		mainPanel.add(pagesBrowser.asWidget());
 		
 		add(mainPanel);
 		layout(true);
 	}
 	
-	private Widget getBreadCrumbs() {
+	private Widget getBreadCrumbs(int spanWidth) {
 		final SimplePanel breadcrumbsWrapper = new SimplePanel();
-		breadcrumbsWrapper.addStyleName("span-24 notopmargin");
+		breadcrumbsWrapper.addStyleName("span-"+spanWidth+" notopmargin");
 		if (!isEmbeddedInOwnerPage) {
 			List<LinkData> links = new ArrayList<LinkData>();
-			Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
-			links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(WidgetConstants.WIKI_OWNER_ID_EVALUATION)) {
+				//point to Home
+				links.add(new LinkData("Home", new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)));
+			} else {
+				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
+				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+			}
 			breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
 			layout(true);
 			//TODO: support other object types.  
@@ -228,6 +237,8 @@ public class WikiPageWidget extends LayoutContainer {
 	}
 	
 	public void setOwnerObjectName(final OwnerObjectNameCallback callback) {
+		ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
+
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(WidgetConstants.WIKI_OWNER_ID_ENTITY)) {
 			//lookup the entity name based on the id
 			Reference ref = new Reference();
@@ -245,7 +256,6 @@ public class WikiPageWidget extends LayoutContainer {
 							headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
 							if (headers.getTotalNumberOfResults() == 1) {
 								EntityHeader theHeader = headers.getResults().get(0);
-								ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 								ownerObjectName = theHeader.getName();
 								callback.ownerObjectNameInitialized();
 							}
@@ -262,6 +272,10 @@ public class WikiPageWidget extends LayoutContainer {
 			} catch (JSONObjectAdapterException e) {
 				showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 			}
+		}
+		else if (wikiKey.getOwnerObjectType().equalsIgnoreCase(WidgetConstants.WIKI_OWNER_ID_EVALUATION)) {
+			ownerObjectName = "";
+			callback.ownerObjectNameInitialized();
 		}
 	}
 	
