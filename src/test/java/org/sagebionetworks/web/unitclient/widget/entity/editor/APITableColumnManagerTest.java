@@ -14,7 +14,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import static junit.framework.Assert.*;
-import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
+
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManager;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
