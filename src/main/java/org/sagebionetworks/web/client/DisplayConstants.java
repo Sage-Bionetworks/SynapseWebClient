@@ -135,6 +135,7 @@ public class DisplayConstants {
 	public static final String LABEL_SEARCHING = "Searching...";
 	public static final String LABEL_FOUND_FORWARDING = "Found. Forwarding now.";
 	public static final String LABEL_ENTITY_NOT_FOUND = "Sorry, that Synapse Id could not be located.";
+	public static final String ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN = "Specified input column is missing from the service response: ";
 	public static final String ERROR_GETTING_PERMISSIONS_TEXT = "READ ONLY MODE. Reason: An error occurred in retrieving your level of access.";	
 	public static final String ERROR_ACL_RETRIEVAL_FAILED = "Retrieval of sharing settings failed. Please try again.";
 	public static final String ERROR_LOCAL_ACL_CREATION_FAILED = "Creation of local sharing settings failed. Please try again.";
@@ -248,6 +249,7 @@ public class DisplayConstants {
 	public static final String LABEL_UPDATED = "Upated";
 	public static final String TEXT_USER_PROFILE_UPDATED = "Change save to your User Profile.";
 	public static final String TEXT_NO_ATTACHMENTS = "No Attachments.";
+	public static final String TEXT_NO_COLUMNS = "No Columns.";
 	public static final String ERROR_DELETING_ATTACHMENT = "An error occurred deleting the Attachment. Please try again.";
 	public static final String LABEL_DELETED = "deleted";
 	public static final String ERROR_LOADING_DESCRIPTION_FAILED = "Failed to load the description: ";
@@ -349,6 +351,7 @@ public class DisplayConstants {
 	public static final String SHINYSITE_SITE_LABEL = "Shiny Site URL";
 	public static final String WIDTH = "Width";
 	public static final String HEIGHT = "Height";
+	public static final String SYNAPSE_API_CALL_COL_CONFIGS_COL_NAME = "Column Configurations:";
 	
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
 	public static final String SHOW_EXPAND = "Show Expand";
@@ -505,7 +508,7 @@ public class DisplayConstants {
 	public static final String ADD_ENTITY = "Add Entity";
 	public static final String INVALID_SHINY_SITE = " is not a valid Shiny Site URL. Please " + DisplayUtils.HELP_EMAIL_ADDRESS_LINK + " if you would like your Shiny Server added to our white list.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
-	
+		
 	
 }
 

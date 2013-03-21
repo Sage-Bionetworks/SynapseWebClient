@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -30,34 +31,34 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	}
 	
 	@Override
-	public void configure(java.util.Map<String,java.util.List<String>> columnData, String[] columnNames, String[] displayColumnNames, APITableInitializedColumnRenderer[] renderers, String tableWidth, boolean showRowNumbers, String rowNumberColName, String cssStyleName, int offset) {
+	public void configure(java.util.Map<String,java.util.List<String>> columnData, String[] columnNames, APITableInitializedColumnRenderer[] renderers, String tableWidth, boolean showRowNumbers, String rowNumberColName, String cssStyleName, int offset) {
 		removeAll();
 		if (columnData.size() > 0) {
+			String elementId = HTMLPanel.createUniqueId();
 			StringBuilder builder = new StringBuilder();
 			boolean isCssStyled = cssStyleName != null &&  cssStyleName.length() > 0;
 			//if it's css styled, then wrap it in a span so that the style is as specific as the markdown css style (and should "win")
 			if (isCssStyled)
 				builder.append("<span class=\"" + cssStyleName + "\">");
-			builder.append("<table");
+			builder.append("<table id=\""+elementId+"\" class=\"tablesorter\"");
 			if (tableWidth != null)
 				builder.append(" style=\"width:"+tableWidth+"\"");
 			builder.append(">");
 				
 			//headers
-			builder.append("<tr>");
+			builder.append("<thead><tr>");
 			if (showRowNumbers)
 				builder.append("<th>"+rowNumberColName+"</th>");	//row number
-			for (int i = 0; i < displayColumnNames.length; i++) {
-				String columnName = displayColumnNames[i];
-				//create renderer columns
-				int rendererColCount = renderers[i].getColumnCount();
-				for (int j = 0; j < rendererColCount; j++) {
-					String rendererColumnName = renderers[i].getRenderedColumnName(j);
-					String outputColName = rendererColumnName == null ? columnName : rendererColumnName;
-					builder.append("<th>"+outputColName+"</th>");	
+			
+			//for each renderer, ask for it's list of columns that are being output
+			for (int i = 0; i < renderers.length; i++) {
+				List<String> rendererColumnNames = renderers[i].getColumnNames();
+				for (Iterator<String> iterator = rendererColumnNames.iterator(); iterator.hasNext();) {
+					String columnName = iterator.next();
+					builder.append("<th>"+columnName+"</th>");					
 				}
 			}
-			builder.append("</tr>");
+			builder.append("</tr></thead><tbody>");
 			if (columnNames.length > 0) {
 				//find the row count (there has to be at least one key/value mapping)
 				List<String> data = columnData.get(columnNames[0]);
@@ -68,29 +69,27 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 						builder.append("<tr>");
 						if (showRowNumbers)
 							builder.append("<td>"+(i+offset+1)+"</td>"); //row number
-						for (int j = 0; j < columnNames.length; j++) {
-							String colName = columnNames[j];
-							List<String> colData = columnData.get(colName);
-							if (colData != null) {
-								String value = colData.get(i);
-								int rendererColCount = renderers[j].getColumnCount();
-								//now render each column
-								for (int k = 0; k < rendererColCount; k++) {
-									builder.append("<td>"+renderers[j].render(value,k)+"</td>");	
-								}
+						
+						//column data (each renderer has a list of columns that it will output.  ask for each value
+						for (int j = 0; j < renderers.length; j++) {
+							List<String> rendererColumnNames = renderers[j].getColumnNames();
+							for (Iterator<String> iterator = rendererColumnNames.iterator(); iterator.hasNext();) {
+								String columnName = iterator.next();
+								String value = renderers[j].getColumnData().get(columnName).get(i);
+								builder.append("<td>"+value+"</td>");
 							}
-							else
-								builder.append("<td></td>");
 						}
+						
 						builder.append("</tr>");
 					}
 				}
 			}
-			builder.append("</table>");
+			builder.append("</tbody></table>");
 			if (isCssStyled)
 				builder.append("</span>");
 
 			add(new HTMLPanel(builder.toString()));
+			synapseJSNIUtils.tablesorter(elementId);
 		}
 	}	
 	

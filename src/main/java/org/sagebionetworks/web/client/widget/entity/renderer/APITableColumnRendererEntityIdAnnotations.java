@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.widget.APITableColumnConfig;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -43,6 +44,9 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 	List<EntityRow<?>> masterAnnotationList;
 	AdapterFactory factory;
 	EntitySchemaCache cache;
+	private List<String> outputColumnNames;
+	private Map<String, List<String>> outputColumnData;
+	private List<String> sourceColumnData;
 	
 	@Inject
 	public APITableColumnRendererEntityIdAnnotations(AdapterFactory factory, EntitySchemaCache cache, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
@@ -53,9 +57,16 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 	}
 	
 	@Override
-	public void init(List<String> columnData, AsyncCallback<APITableInitializedColumnRenderer> callback) {
+	public void init(Map<String, List<String>> columnData,
+			APITableColumnConfig config,
+			AsyncCallback<APITableInitializedColumnRenderer> callback) {
+		outputColumnNames = null;
+		outputColumnData = null;
+		Set<String> inputColumnNames = config.getInputColumnNames();
 		Set<String> uniqueIds = new HashSet<String>(columnData.size());
-		uniqueIds.addAll(columnData);
+		String idColumnName = inputColumnNames.iterator().next();
+		sourceColumnData = columnData.get(idColumnName); 
+		uniqueIds.addAll(sourceColumnData);
 		entityIds = new ArrayList<String>();
 		entityIds.addAll(uniqueIds);
 		value2Annotations = new HashMap<String, List<EntityRow<?>>>();
@@ -105,42 +116,58 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 				if (currentIndex == columnData.size()-1) {
 					finalCallback.onSuccess(new APITableInitializedColumnRenderer() {
 						@Override
-						public int getColumnCount() {
-							return masterAnnotationList.size();
-						}
-						@Override
-						public String getRenderedColumnName(int rendererColIndex) {
-							return masterAnnotationList.get(rendererColIndex).getLabel();
+						public Map<String, List<String>> getColumnData() {
+							if (outputColumnData == null) {
+								outputColumnData = new HashMap<String,List<String>>();
+								//create
+								for (Iterator iterator = getColumnNames().iterator(); iterator
+										.hasNext();) {
+									String outputColumnName = (String) iterator.next();
+									List<String> outputColumn = new ArrayList<String>();
+									//go through every entry in sourceColumnData for this output column
+									for (Iterator iterator2 = sourceColumnData.iterator(); iterator2.hasNext();) {
+										String originalValue = (String) iterator2.next();
+										String error = value2Error.get(originalValue);
+										if (error != null) {
+											outputColumn.add(error);
+										}
+										else {
+											List<EntityRow<?>> row = value2Annotations.get(originalValue);
+											//does this row have the same annotation
+											String renderedValue = "";
+											if (row != null) {
+												for (Iterator iterator3 = row.iterator(); iterator3.hasNext();) {
+													EntityRow<?> entityRow = (EntityRow<?>) iterator3.next();
+													if (entityRow.getLabel().equals(outputColumnName)) {
+														//report this display value
+														if (entityRow.getValue() != null)
+															renderedValue = entityRow.getDislplayValue();
+														break;
+													}
+												}
+											}
+											outputColumn.add(renderedValue);
+										}
+									}
+									outputColumnData.put(outputColumnName, outputColumn);
+								}
+							}
+							return outputColumnData;
 						}
 						
 						@Override
-						public String render(String value, int rendererColIndex) {
-							//was there an error processing this value?
-							String error = value2Error.get(value);
-							if (error != null) {
-								return error;
-							}
-							
-							int colIndex = rendererColIndex;
-							String masterAnnotationLabel = masterAnnotationList.get(colIndex).getLabel();
-							
-							List<EntityRow<?>> row = value2Annotations.get(value);
-							//does this row have the same annotation
-							String renderedValue = "";
-							if (row != null) {
-								for (Iterator iterator = row.iterator(); iterator.hasNext();) {
-									EntityRow<?> entityRow = (EntityRow<?>) iterator.next();
-									if (entityRow.getLabel().equals(masterAnnotationLabel)) {
-										//report this display value
-										if (entityRow.getValue() != null)
-											renderedValue = entityRow.getDislplayValue();
-										break;
+						public List<String> getColumnNames() {
+							if (outputColumnNames == null) {
+								outputColumnNames =  new ArrayList<String>();
+								if (masterAnnotationList != null) {
+									for (Iterator<EntityRow<?>> iterator = masterAnnotationList.iterator(); iterator
+											.hasNext();) {
+										outputColumnNames.add(iterator.next().getLabel());
 									}
 								}
 							}
-							return renderedValue;
+							return outputColumnNames;
 						}
-
 					});
 				} else
 					columnDataInit(columnData, currentIndex+1);

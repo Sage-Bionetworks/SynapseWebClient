@@ -203,12 +203,14 @@ public class ServerMarkdownUtils {
 		String regEx = ".*[|]{1}.+[|]{1}.*";
 		String[] lines = rawMarkdown.split(NEWLINE_WITH_SPACES);
 		StringBuilder sb = new StringBuilder();
+		int tableCount = 0;
 		int i = 0;
 		while (i < lines.length) {
 			boolean looksLikeTable = lines[i].matches(regEx);
 			if (looksLikeTable) {
 				//create a table, and consume until the regEx stops
-				i = appendNewTableHtml(sb, regEx, lines, i);
+				i = appendNewTableHtml(sb, regEx, lines, tableCount, i);
+				tableCount++;
 			} else {
 				//just add the line and move on
 				sb.append(lines[i] + NEWLINE_WITH_SPACES);
@@ -219,11 +221,24 @@ public class ServerMarkdownUtils {
 		return sb.toString();
 	}
 	
-	public static int appendNewTableHtml(StringBuilder builder, String regEx, String[] lines, int i) {
-		builder.append("<table>");
+	public static int appendNewTableHtml(StringBuilder builder, String regEx, String[] lines, int tableCount, int i) {
+		builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
+		//header
+		builder.append("<thead>");
+		builder.append("<tr>");
+		String[] cells = lines[i].split("\\|");
+		for (int j = 0; j < cells.length; j++) {
+			builder.append("<th>");
+			builder.append(cells[j]);
+			builder.append("</th>");
+		}
+		builder.append("</tr>");
+		builder.append("</thead>");
+		builder.append("<tbody>");
+		i++;
 		while (i < lines.length && lines[i].matches(regEx)) {
 			builder.append("<tr>");
-			String[] cells = lines[i].split("\\|");
+			cells = lines[i].split("\\|");
 			for (int j = 0; j < cells.length; j++) {
 				builder.append("<td>");
 				builder.append(cells[j]);
@@ -232,6 +247,7 @@ public class ServerMarkdownUtils {
 			builder.append("</tr>");
 			i++;
 		}
+		builder.append("</tbody>");
 		builder.append("</table>");
 		
 		return i;
