@@ -34,18 +34,19 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	public void configure(java.util.Map<String,java.util.List<String>> columnData, String[] columnNames, APITableInitializedColumnRenderer[] renderers, String tableWidth, boolean showRowNumbers, String rowNumberColName, String cssStyleName, int offset) {
 		removeAll();
 		if (columnData.size() > 0) {
+			String elementId = HTMLPanel.createUniqueId();
 			StringBuilder builder = new StringBuilder();
 			boolean isCssStyled = cssStyleName != null &&  cssStyleName.length() > 0;
 			//if it's css styled, then wrap it in a span so that the style is as specific as the markdown css style (and should "win")
 			if (isCssStyled)
 				builder.append("<span class=\"" + cssStyleName + "\">");
-			builder.append("<table");
+			builder.append("<table id=\""+elementId+"\" class=\"tablesorter\"");
 			if (tableWidth != null)
 				builder.append(" style=\"width:"+tableWidth+"\"");
 			builder.append(">");
 				
 			//headers
-			builder.append("<tr>");
+			builder.append("<thead><tr>");
 			if (showRowNumbers)
 				builder.append("<th>"+rowNumberColName+"</th>");	//row number
 			
@@ -57,7 +58,7 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 					builder.append("<th>"+columnName+"</th>");					
 				}
 			}
-			builder.append("</tr>");
+			builder.append("</tr></thead><tbody>");
 			if (columnNames.length > 0) {
 				//find the row count (there has to be at least one key/value mapping)
 				List<String> data = columnData.get(columnNames[0]);
@@ -83,11 +84,12 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 					}
 				}
 			}
-			builder.append("</table>");
+			builder.append("</tbody></table>");
 			if (isCssStyled)
 				builder.append("</span>");
 
 			add(new HTMLPanel(builder.toString()));
+			synapseJSNIUtils.tablesorter(elementId);
 		}
 	}	
 	

@@ -65,6 +65,15 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	  $wnd.jQuery('code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
 	}-*/;
 	
+	@Override
+	public void tablesorter(String id) {
+		_tablesorter(id);
+	}
+	
+	private static native void _tablesorter(String id) /*-{
+		$wnd.jQuery('#'+id).tablesorter();
+	}-*/;
+	
 	private static native void _bindBootstrapPopover(String id) /*-{
 		$wnd.jQuery('#'+id).popover();
 	}-*/;
