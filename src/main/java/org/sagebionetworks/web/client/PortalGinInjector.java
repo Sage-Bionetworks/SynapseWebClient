@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.EvaluationPresenter;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -89,6 +90,8 @@ public interface PortalGinInjector extends Ginjector {
 	public BCCSignup getBCCSignup();
 	
 	public WikiPresenter getWikiPresenter();
+	
+	public EvaluationPresenter getEvaluationPresenter();
 	
 	public EventBus getEventBus();
 	

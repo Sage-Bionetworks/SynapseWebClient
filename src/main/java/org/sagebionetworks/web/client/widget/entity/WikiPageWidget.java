@@ -228,10 +228,10 @@ public class WikiPageWidget extends LayoutContainer {
 			} else {
 				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
 				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+				breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
 			}
-			breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
+			
 			layout(true);
-			//TODO: support other object types.  
 		}
 		return breadcrumbsWrapper;
 	}
