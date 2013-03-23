@@ -651,7 +651,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryToken(String entityId) {
-		return "#!" + getSynapseHistoryTokenNoHash(entityId, null);
+		return "#" + getSynapseHistoryTokenNoHash(entityId, null);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId) {
@@ -659,12 +659,12 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryToken(String entityId, Long versionNumber) {
-		return "#!" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
+		return "#" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
 		Synapse place = new Synapse(entityId, versionNumber);
-		return getPlaceString(Synapse.class) + ":" + place.toToken();
+		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
 	public static String stubStr(String str, int length) {
