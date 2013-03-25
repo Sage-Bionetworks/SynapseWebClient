@@ -75,6 +75,8 @@ import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsViewImpl;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
@@ -460,6 +462,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityFinderView.class).to(EntityFinderViewImpl.class);		
 
 		bind(FavoriteWidgetView.class).to(FavoriteWidgetViewImpl.class);
+		
+		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
 	}
 
 }

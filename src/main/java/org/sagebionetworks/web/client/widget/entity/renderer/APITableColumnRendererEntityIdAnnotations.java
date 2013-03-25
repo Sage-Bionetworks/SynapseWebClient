@@ -6,7 +6,6 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,13 +119,10 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 							if (outputColumnData == null) {
 								outputColumnData = new HashMap<String,List<String>>();
 								//create
-								for (Iterator iterator = getColumnNames().iterator(); iterator
-										.hasNext();) {
-									String outputColumnName = (String) iterator.next();
+								for (String outputColumnName : getColumnNames()) {
 									List<String> outputColumn = new ArrayList<String>();
 									//go through every entry in sourceColumnData for this output column
-									for (Iterator iterator2 = sourceColumnData.iterator(); iterator2.hasNext();) {
-										String originalValue = (String) iterator2.next();
+									for (String originalValue : sourceColumnData) {
 										String error = value2Error.get(originalValue);
 										if (error != null) {
 											outputColumn.add(error);
@@ -136,8 +132,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 											//does this row have the same annotation
 											String renderedValue = "";
 											if (row != null) {
-												for (Iterator iterator3 = row.iterator(); iterator3.hasNext();) {
-													EntityRow<?> entityRow = (EntityRow<?>) iterator3.next();
+												for (EntityRow<?> entityRow : row) {
 													if (entityRow.getLabel().equals(outputColumnName)) {
 														//report this display value
 														if (entityRow.getValue() != null)
@@ -160,9 +155,8 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 							if (outputColumnNames == null) {
 								outputColumnNames =  new ArrayList<String>();
 								if (masterAnnotationList != null) {
-									for (Iterator<EntityRow<?>> iterator = masterAnnotationList.iterator(); iterator
-											.hasNext();) {
-										outputColumnNames.add(iterator.next().getLabel());
+									for (EntityRow<?> entityRow : masterAnnotationList) {
+										outputColumnNames.add(entityRow.getLabel());
 									}
 								}
 							}

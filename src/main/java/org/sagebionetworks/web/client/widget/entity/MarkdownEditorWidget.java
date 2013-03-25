@@ -284,7 +284,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		else{
 			panel = new HTMLPanel(result);
 		}
-		MarkdownWidget.loadTableSorters(panel, synapseJSNIUtils);
+		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
 		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");

@@ -209,7 +209,7 @@ public class FileHandleServlet extends HttpServlet {
                 File tempDir = Files.createTempDir();
 				File temp = new File(tempDir.getAbsolutePath() + File.separator + fileName);
 
-				ServiceUtils.writeToFile(temp, stream, MAX_ATTACHMENT_SIZE_IN_BYTES);
+				ServiceUtils.writeToFile(temp, stream, Long.MAX_VALUE);
 				try{
 					// Now upload the file
 					String contentType = item.getContentType();

@@ -1516,5 +1516,16 @@ public class DisplayUtils {
 		}));
 		window.setButtonAlign(HorizontalAlignment.RIGHT);
 	}
+
+	public static void loadTableSorters(final HTMLPanel panel, SynapseJSNIUtils synapseJSNIUtils) {
+		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
+		int i = 0;
+		Element table = panel.getElementById(id + i);
+		while (table != null) {
+			synapseJSNIUtils.tablesorter(id+i);
+			i++;
+			table = panel.getElementById(id + i);
+		}
+	}
 		
 }
