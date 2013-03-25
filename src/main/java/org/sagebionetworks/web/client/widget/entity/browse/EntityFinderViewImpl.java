@@ -305,10 +305,12 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	}
 
 	private void replaceRightWidget(Widget widget) {
-		rightTop.removeAll();
-		versionChooser = null;
-		rightTop.add(widget, MARGIN_10);
-		rightTop.layout(true);
+		if(rightTop != null && widget != null) {
+			rightTop.removeAll();
+			versionChooser = null;
+			rightTop.add(widget, MARGIN_10);
+			rightTop.layout(true);
+		}
 	}
 	
 	private void createSelectedWidget() {
@@ -490,6 +492,11 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	@Override
 	public int getViewHeight() {
 		return HEIGHT_PX + 80;
+	}
+
+	@Override
+	public void refresh() {
+		replaceRightWidget(myEntitiesBrowserWidget);
 	}
 	
 }

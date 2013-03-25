@@ -1495,7 +1495,7 @@ public class DisplayUtils {
 		public void onSelected(T selected);		
 	}
 	
-	public static void configureEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
+	public static void configureAndShowEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
 		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
 		window.setPlain(true);
 		window.setModal(true);
@@ -1516,6 +1516,8 @@ public class DisplayUtils {
 			}
 		}));
 		window.setButtonAlign(HorizontalAlignment.RIGHT);
+		window.show();
+		entityFinder.refresh();
 	}
 		
 }
