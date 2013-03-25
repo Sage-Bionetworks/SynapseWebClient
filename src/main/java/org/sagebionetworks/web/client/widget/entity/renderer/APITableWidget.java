@@ -105,6 +105,9 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 					inputColumnNames.add(inputColumns[j]);
 				}
 				config.setInputColumnNames(inputColumnNames);
+//				add other parameters
+//				if (parts.length > 3) {
+//				}
 				
 				columnConfigs.add(config);
 				i++;
