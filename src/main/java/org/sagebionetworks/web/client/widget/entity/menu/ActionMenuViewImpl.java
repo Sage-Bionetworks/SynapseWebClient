@@ -389,7 +389,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			public void componentSelected(MenuEvent ce) {				
 				entityFinder.configure(false);				
 				final Window window = new Window();
-				DisplayUtils.configureEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {
@@ -399,8 +399,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
 					}
-				});
-				window.show();					
+				});					
 			}
 		});
 		menu.add(item);
@@ -421,7 +420,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			public void componentSelected(MenuEvent ce) {				
 				entityFinder.configure(false);				
 				final Window window = new Window();
-				DisplayUtils.configureEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {
@@ -431,8 +430,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
 					}
-				});
-				window.show();					
+				});				
 			}
 		});
 		menu.add(itemMove);

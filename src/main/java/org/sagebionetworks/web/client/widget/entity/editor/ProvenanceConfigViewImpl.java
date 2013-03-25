@@ -79,7 +79,7 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 			public void componentSelected(ButtonEvent ce) {
 				entityFinder.configure(true);				
 				final Window window = new Window();
-				DisplayUtils.configureEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {					
@@ -90,7 +90,6 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 						}
 					}
 				});
-				window.show();				
 			}
 		});
 		AdapterField buttonField = new AdapterField(findEntitiesButton);
