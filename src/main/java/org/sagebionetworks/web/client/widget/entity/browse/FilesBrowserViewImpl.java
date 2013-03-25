@@ -83,7 +83,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 
 		Button upload = getUploadButton(entityId); 
 		upload.addStyleName("right last");
-		//right.add(upload);
+		right.add(upload);
 
 		Button addFolder = new Button(DisplayConstants.ADD_FOLDER, AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16()), new SelectionListener<ButtonEvent>() {
 			@Override
