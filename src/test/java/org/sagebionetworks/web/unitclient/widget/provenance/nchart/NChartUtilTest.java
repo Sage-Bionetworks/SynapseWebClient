@@ -335,8 +335,8 @@ public class NChartUtilTest {
 		assertTrue((int)(1*NChartUtil.SCALE_X) == d1.getxPos());
 		
 		assertTrue(0 == d2.getyPos());
-		assertTrue(100 == a.getyPos());
-		assertTrue(200 == d1.getyPos());
+		assertTrue((int)(100*NChartUtil.SCALE_Y) == a.getyPos());
+		assertTrue((int)(200*NChartUtil.SCALE_Y) == d1.getyPos());	
 	}
 	
 	/*
