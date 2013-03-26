@@ -56,6 +56,10 @@ public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
 	
 	public void setDownloadLocation(String fileName, String entityId, Long versionNumber, String md5);
 	
+	/**
+	 * If no access restrictions are present, then this will return the download url for the FileEntity FileHandle.  Otherwise, it will return null.
+	 */
+	public String getDirectDownloadURL();
 	
 	/**
 	 * Presenter Interface 

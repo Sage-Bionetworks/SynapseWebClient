@@ -58,6 +58,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraUrlHelper;
+	private boolean isDirectDownloadSupported; 
 	
 	// for testing
 	public void setUserProfile(UserProfile userProfile) {this.userProfile=userProfile;}
@@ -118,6 +119,16 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.userProfile = userProfile;
 		// first, clear license agreement.  then, if there is an agreement required, set it below
 		setLicenseAgreement(ars, unmetARs);
+	}
+	
+	/**
+	 * If no access restrictions are present, then this will return the download url for the FileEntity FileHandle.  Otherwise, it will return null.
+	 * @return
+	 */
+	public String getDirectDownloadURL() {
+		if (isDirectDownloadSupported)
+			return view.getDirectDownloadURL();
+		else return null; 
 	}
 	
 	/**
@@ -202,8 +213,10 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		accessRequirementToDisplay = GovernanceServiceHelper.selectAccessRequirement(allARs, unmetARs);
 		setRestrictionLevel(GovernanceServiceHelper.entityRestrictionLevel(allARs));
 		if (unmetARs==null || unmetARs.isEmpty()) {
+			isDirectDownloadSupported = true; 
 			setApprovalType(APPROVAL_TYPE.NONE);
 		} else {
+			isDirectDownloadSupported = false; 
 			setApprovalType(GovernanceServiceHelper.accessRequirementApprovalType(accessRequirementToDisplay));
 		}
 		
