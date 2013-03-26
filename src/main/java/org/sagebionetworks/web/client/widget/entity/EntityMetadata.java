@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -48,8 +49,7 @@ public class EntityMetadata implements Presenter {
 	private JiraURLHelper jiraURLHelper;
 	private EventBus bus;
 	private GlobalApplicationState globalApplicationState;
-
-	private EntityBundle bundle;
+	private EntityBundle bundle;	
 
 	@Inject
 	public EntityMetadata(EntityMetadataView view,
@@ -104,8 +104,21 @@ public class EntityMetadata implements Presenter {
 	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
 		this.bundle = bundle;
 		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit() && readOnly);
-		boolean isLocationable = bundle.getEntity() instanceof Locationable;
-		view.setDetailedMetadataVisible(!isLocationable || LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous()));
+		boolean showDetailedMetadata = false;
+		boolean showEntityName = false;
+		if (bundle.getEntity() instanceof FileEntity) {
+			//it has data if there is a file handle associated with it
+			showDetailedMetadata = ((FileEntity)bundle.getEntity()).getDataFileHandleId() != null;
+			showEntityName = !showDetailedMetadata;
+		}
+		else {
+			//TODO: delete this after migration to FileHandle system.  This corresponds to the old logic
+			boolean isLocationable = bundle.getEntity() instanceof Locationable;
+			showDetailedMetadata = !isLocationable || LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
+			showEntityName = !isLocationable || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
+		}
+		view.setDetailedMetadataVisible(showDetailedMetadata);
+		view.setEntityNameVisible(showEntityName);
 	}
 
 	private UserProfile getUserProfile() {
@@ -172,7 +185,7 @@ public class EntityMetadata implements Presenter {
 
 	@Override
 	public boolean includeRestrictionWidget() {
-		return (bundle.getEntity() instanceof Locationable);
+		return (bundle.getEntity() instanceof FileEntity) || (bundle.getEntity() instanceof Locationable);
 	}
 
 	@Override
@@ -346,6 +359,5 @@ public class EntityMetadata implements Presenter {
 			}
 		});
 	}
-
 
 }

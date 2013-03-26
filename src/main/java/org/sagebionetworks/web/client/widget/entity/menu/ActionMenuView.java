@@ -53,8 +53,6 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 		 */
 		void moveEntity(String newParentId);
 
-		List<EntityType> getAddSkipTypes();
-
 		boolean isUserLoggedIn();
 		
 		public void addNewChild(EntityType type, String parentId);

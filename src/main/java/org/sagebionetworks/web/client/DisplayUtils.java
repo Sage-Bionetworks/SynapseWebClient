@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ExpressionData;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
@@ -32,6 +33,8 @@ import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -44,12 +47,14 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
-import org.sagebionetworks.web.client.widget.entity.download.LocationableUploader;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
@@ -61,6 +66,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -69,6 +75,7 @@ import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -101,6 +108,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
 
+	public static final String HELP_EMAIL_ADDRESS = "synapseInfo@sagebase.org";
+	public static final String HELP_EMAIL_ADDRESS_LINK = "<a href=\""+ DisplayUtils.HELP_EMAIL_ADDRESS +"\" class=\"link\">contact us</a>";
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
 	public static final String SUPPORT_FEED_URL = "http://api.getsatisfaction.com/companies/sagebase/topics/";
 	public static final String SUPPORT_RECENT_ACTIVITY_URL = "http://support.sagebase.org/sagebase?view=recent";
@@ -147,14 +156,18 @@ public class DisplayUtils {
 
 	
 	private static final String ERROR_OBJ_REASON_KEY = "reason";
+	public static final String PROXY_PARAM_KEY = "proxy";
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 	public static final String ENTITY_PARAM_KEY = "entityId";
+	public static final String ENTITY_VERSION_PARAM_KEY = "version";
 	public static final String WIKI_OWNER_ID_PARAM_KEY = "ownerId";
 	public static final String WIKI_OWNER_TYPE_PARAM_KEY = "ownerType";
 	public static final String WIKI_ID_PARAM_KEY = "wikiId";
 	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
-	public static final String WIKI_PREVIEW_PARAM_KEY = "preview";
+	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
+	public static final String FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY = "createFileEntity";
+	public static final String FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY = "fileEntityParentId";
 	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
 	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
@@ -165,13 +178,20 @@ public class DisplayUtils {
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
 	public static final String ETAG_KEY = "etag";
+	public static final String ENTITY_VERSION_STRING = "/version/";
 	
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
 	public static final int BIG_BUTTON_HEIGHT_PX = 36;
+	private static final int MARKDOWN_WIDTH_WIDE_PX = 940;
+	private static final int MARKDOWN_WIDTH_NARROW_PX = 660;
+
 	
 	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
 	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
+	
+	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/gif","image/png"};
+	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
 	
 	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
@@ -222,10 +242,24 @@ public class DisplayUtils {
 			ExpressionData.class.getName(),	GenotypeData.class.getName() };
 	
 	public static SearchQuery getDefaultSearchQuery() {		
-		SearchQuery query = new SearchQuery();
-		// start with a blank, valid query
-		query.setQueryTerm(Arrays.asList(new String[] {""}));		
-		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));
+		SearchQuery query = getBaseSearchQueryNoFacets();
+		
+		// exclude links
+		List<KeyValue> bq = new ArrayList<KeyValue>();
+		KeyValue kv = new KeyValue();
+		kv = new KeyValue();
+		kv.setKey(DisplayUtils.SEARCH_KEY_NODE_TYPE);				
+		kv.setValue("project"); 
+		bq.add(kv);
+		query.setBooleanQuery(bq);
+		
+		query.setFacet(FACETS_DISPLAY_ORDER);
+		
+		return query;
+	}
+	
+	public static SearchQuery getAllTypesSearchQuery() {		
+		SearchQuery query = getBaseSearchQueryNoFacets();
 		
 		// exclude links
 		List<KeyValue> bq = new ArrayList<KeyValue>();
@@ -238,6 +272,14 @@ public class DisplayUtils {
 		
 		query.setFacet(FACETS_DISPLAY_ORDER);
 		
+		return query;
+	}
+
+	private static SearchQuery getBaseSearchQueryNoFacets() {
+		SearchQuery query = new SearchQuery();
+		// start with a blank, valid query
+		query.setQueryTerm(Arrays.asList(new String[] {""}));		
+		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));
 		return query;
 	}
 	
@@ -402,7 +444,7 @@ public class DisplayUtils {
 		}
 	}	
 
-	public static String getFileNameFromLocationPath(String path){
+	public static String getFileNameFromExternalUrl(String path){
 		//grab the text between the last '/' and following '?'
 		String fileName = "";
 		if (path != null) {
@@ -626,7 +668,17 @@ public class DisplayUtils {
 	
 	public static String getSynapseWikiHistoryToken(String ownerId, String objectType, String wikiPageId) {
 		Wiki place = new Wiki(ownerId, objectType, wikiPageId);
-		return "#" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
+		return "#!" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
+	}
+	
+	public static String getSearchHistoryToken(String searchQuery) {
+		Search place = new Search(searchQuery);
+		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
+	}
+	
+	public static String getSearchHistoryToken(String searchQuery, Long start) {
+		Search place = new Search(searchQuery, start);
+		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
 	}
 	
 	public static String getSynapseHistoryToken(String entityId) {
@@ -643,7 +695,7 @@ public class DisplayUtils {
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
 		Synapse place = new Synapse(entityId, versionNumber);
-		return getPlaceString(Synapse.class) + ":" + place.toToken();
+		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
 	public static String stubStr(String str, int length) {
@@ -668,6 +720,12 @@ public class DisplayUtils {
 	}
 	
 	private static String getWikiPlaceString(Class<Wiki> place) {
+		String fullPlaceName = place.getName();		
+		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
+		return fullPlaceName;
+	}
+	
+	private static String getSearchPlaceString(Class<Search> place) {
 		String fullPlaceName = place.getName();		
 		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
 		return fullPlaceName;
@@ -768,6 +826,10 @@ public class DisplayUtils {
 			// Folder
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();			
+		} else if(FileEntity.class.getName().equals(className)) {
+			// File
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
 //		} else if(Model.class.getName().equals(className)) {
 			// Model
 //			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
@@ -831,7 +893,7 @@ public class DisplayUtils {
 		attachmentMap.put("bmp", DEFAULT_IMAGE_ICON);
 		attachmentMap.put("wbmp", DEFAULT_IMAGE_ICON);
 	}
-
+	
 	/**
 	 * Get the icon to be used with a given file type.
 	 */
@@ -991,7 +1053,8 @@ public class DisplayUtils {
 	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
 
-		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId(); 
+		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId();
+		el.setId(id);
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "tooltip");
 
@@ -1020,6 +1083,16 @@ public class DisplayUtils {
 		optionsMap.put("title", title);
 		optionsMap.put("data-placement", pos.toString().toLowerCase());
 		optionsMap.put("trigger", "click");		
+		addPopover(util, widget, content, optionsMap);
+	}
+
+	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
+		Map<String, String> optionsMap = new TreeMap<String, String>();
+		optionsMap.put("data-html", "true");
+		optionsMap.put("data-animation", "true");
+		optionsMap.put("title", title);
+		optionsMap.put("data-placement", pos.toString().toLowerCase());
+		optionsMap.put("data-trigger", "hover");		
 		addPopover(util, widget, content, optionsMap);
 	}
 
@@ -1158,7 +1231,7 @@ public class DisplayUtils {
 		}
 		return videoId;
 	}
-
+	
 	public static Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
 		Anchor anchor = new Anchor();
 		anchor.setHTML(icon.getHTML());
@@ -1213,9 +1286,9 @@ public class DisplayUtils {
 	 * @param entityType 
 	 */
 	public static Widget getUploadButton(final EntityBundle entityBundle,
-			EntityType entityType, final LocationableUploader locationableUploader,
+			EntityType entityType, final Uploader locationableUploader,
 			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
-		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
+		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
 		final Window window = new Window();  
 		locationableUploader.clearHandlers();
@@ -1243,7 +1316,7 @@ public class DisplayUtils {
 				window.setSize(400, 320);
 				window.setPlain(true);
 				window.setModal(true);		
-				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE);
+				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 				window.setLayout(new FitLayout());			
 				window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
 				window.show();
@@ -1283,10 +1356,8 @@ public class DisplayUtils {
 		} else{
 			cookies.removeCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY);
 		}
-			
-		
 	}
-
+	
 	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
 
 	/**
@@ -1297,21 +1368,156 @@ public class DisplayUtils {
 		 * @param fileName
 		 * @return
 		 */
-		public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
-			//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
-	//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
-	//		return repoServicesUrl 
-	//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
-	//				+"/"+ wikiKey.getOwnerObjectId()
-	//				+"/wiki/" 
-	//				+wikiKey.getWikiPageId()
-	//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
-			String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
-			return baseFileHandleUrl + "?" +
-					WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
-					WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
-					WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
-					WIKI_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
-					wikiIdParam;
+	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
+		//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
+//		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
+//		return repoServicesUrl 
+//				+"/" +wikiKey.getOwnerObjectType().toLowerCase() 
+//				+"/"+ wikiKey.getOwnerObjectId()
+//				+"/wiki/" 
+//				+wikiKey.getWikiPageId()
+//				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
+		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+
+			//if preview, then avoid cache
+			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+		return baseFileHandleUrl + "?" +
+				WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
+				WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
+				WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
+					FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+					wikiIdParam + nocacheParam;
+	}
+		
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
+	}
+
+	/**
+	 * Create the url to a FileEntity filehandle.
+	 * @param baseURl
+	 * @param entityid
+	 * @return
+	 */
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
+		String versionParam = versionNumber == null ? "" : "&" + ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
+		//if preview, then avoid cache
+		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+		return baseFileHandleUrl + "?" +
+				ENTITY_PARAM_KEY + "=" + entityId + "&" +
+				FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
+				PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
+				versionParam + nocacheParam;
+	}
+
+	public static String createEntityVersionString(Reference ref) {
+		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
+	}
+	
+	public static String createEntityVersionString(String id, Long version) {
+		if(version != null)
+			return id+ENTITY_VERSION_STRING+version;
+		else 
+			return id;		
+	}
+	public static Reference parseEntityVersionString(String entityVersion) {
+		String[] parts = entityVersion.split(ENTITY_VERSION_STRING);
+		Reference ref = null;
+		if(parts.length > 0) {
+			ref = new Reference();
+			ref.setTargetId(parts[0]);
+			if(parts.length > 1) {
+				try {
+					ref.setTargetVersionNumber(Long.parseLong(parts[1]));
+				} catch(NumberFormatException e) {}
+			}
+		}		
+		return ref;		
+	}
+	
+	public static boolean isWikiSupportedType(Entity entity) {
+		//TODO: add Folder and Project once they are migrated (description goes to Wiki markdown, attachments to wiki FileHandles)
+		return (entity instanceof FileEntity);
+	}
+	
+	public static boolean isRecognizedImageContentType(String contentType) {
+		String lowerContentType = contentType.toLowerCase();
+		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
+	}
+	
+	public static boolean isTextType(String contentType) {
+		return contentType.toLowerCase().startsWith("text/");
+	}
+	
+	public static boolean isCSV(String contentType) {
+		return contentType.toLowerCase().startsWith("text/csv");
+	}
+
+	/**
+	 * Return a preview filehandle associated with this bundle (or null if unavailable)
+	 * @param bundle
+	 * @return
+	 */
+	public static PreviewFileHandle getPreviewFileHandle(EntityBundle bundle) {
+		PreviewFileHandle fileHandle = null;
+		if (bundle.getFileHandles() != null) {
+			for (FileHandle fh : bundle.getFileHandles()) {
+				if (fh instanceof PreviewFileHandle) {
+					fileHandle = (PreviewFileHandle) fh;
+					break;
+				}
+			}
 		}
+		return fileHandle;
+	}
+
+	/**
+	 * Return the filehandle associated with this bundle (or null if unavailable)
+	 * @param bundle
+	 * @return
+	 */
+	public static FileHandle getFileHandle(EntityBundle bundle) {
+		FileHandle fileHandle = null;
+		if (bundle.getFileHandles() != null) {
+			FileEntity entity = (FileEntity)bundle.getEntity();
+			String targetId = entity.getDataFileHandleId();
+			for (FileHandle fh : bundle.getFileHandles()) {
+				if (fh.getId().equals(targetId)) {
+					fileHandle = fh;
+					break;
+				}
+			}
+		}
+		return fileHandle;
+	}
+
+	public interface SelectedHandler<T> {
+		public void onSelected(T selected);		
+	}
+	
+	public static void configureAndShowEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
+		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
+		window.setPlain(true);
+		window.setModal(true);
+		window.setHeading(DisplayConstants.FIND_ENTITIES);
+		window.setLayout(new FitLayout());
+		window.add(entityFinder.asWidget(), new FitData(4));				
+		window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				Reference selected = entityFinder.getSelectedEntity();
+				handler.onSelected(selected);
+			}
+		}));
+		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		}));
+		window.setButtonAlign(HorizontalAlignment.RIGHT);
+		window.show();
+		entityFinder.refresh();
+	}
+		
 }

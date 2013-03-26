@@ -30,8 +30,6 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 
 		void fireEntityUpdatedEvent();
 
-		boolean isLocationable();
-
 		boolean isLoggedIn();
 
 		void loadShortcuts(int offset, int limit, AsyncCallback<PaginatedResults<EntityHeader>> asyncCallback);
@@ -39,6 +37,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 		String createEntityLink(String id, String version, String display);
 
 		ImageResource getIconForType(String typeString);
+				
 	}
 
 }

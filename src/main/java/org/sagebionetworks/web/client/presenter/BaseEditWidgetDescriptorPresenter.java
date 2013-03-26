@@ -39,9 +39,9 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	 * @param attachmentName
 	 * @param handler
 	 */
-	public static void editNewWidget(BaseEditWidgetDescriptorPresenter presenter, WikiPageKey wikiKey, String contentTypeKey, WidgetDescriptorUpdatedHandler handler) {
+	public static void editNewWidget(BaseEditWidgetDescriptorPresenter presenter, WikiPageKey wikiKey, String contentTypeKey, WidgetDescriptorUpdatedHandler handler, boolean isWiki) {
 		presenter.addWidgetDescriptorUpdatedHandler(handler);
-		presenter.editNew(wikiKey, contentTypeKey);
+		presenter.editNew(wikiKey, contentTypeKey, isWiki);
 	}
 	
 	@Override
@@ -93,7 +93,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	}
 	
 	@Override
-	public void editNew(WikiPageKey wikiKey, String contentTypeKey) {
+	public void editNew(WikiPageKey wikiKey, String contentTypeKey, boolean isWiki) {
 		if(wikiKey == null) throw new IllegalArgumentException("wiki key cannot be null");
 		if(wikiKey.getOwnerObjectId() == null) throw new IllegalArgumentException("ownerObjectId cannot be null");
 		if(wikiKey.getOwnerObjectType() == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
@@ -104,7 +104,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		
 		//initialize the view with a new widget descriptor definition of the correct type and show
 		widgetDescriptor = new HashMap<String, String>();
-		view.setWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor);
+		view.setWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, isWiki);
 		//prepopulate with a unique attachment name of the correct type
 		String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
 		view.show(friendlyName);

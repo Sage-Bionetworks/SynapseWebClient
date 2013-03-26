@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -25,13 +24,15 @@ public interface HomeSearchBoxView extends IsWidget, SynapseWidgetView {
 
 		void search(String value);
 		
-		void searchAllProjects();
+		String getSearchAllProjectsLink();
 		
-		void searchAllData();
+		String getSearchAllDataLink();
 		
-		void searchAllStudies();
+		String getSearchAllStudiesLink();
 		
-		void searchAllCode();
+		String getSearchAllCodeLink();
+
+		void setSearchAll(boolean searchAll);
 		
 	}
 

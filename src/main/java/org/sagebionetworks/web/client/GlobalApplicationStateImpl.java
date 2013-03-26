@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client;
 
 import java.util.Date;
+import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -9,7 +11,6 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
-import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
@@ -19,6 +20,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
 	private ActivityMapper directMapper;
 	private PlaceChanger placeChanger;
+	private List<EntityHeader> favorites;
 	
 	@Inject
 	public GlobalApplicationStateImpl(CookieProvider cookieProvider) {
@@ -98,6 +100,16 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void setActivityMapper(ActivityMapper mapper) {
 		this.directMapper = mapper;
+	}
+
+	@Override
+	public List<EntityHeader> getFavorites() {
+		return favorites;
+	}
+
+	@Override
+	public void setFavorites(List<EntityHeader> favorites) {
+		this.favorites = favorites;
 	}
 		
 }

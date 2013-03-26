@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.search;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -31,6 +32,8 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
 	
+	private boolean searchAll = false;
+	
 	@Inject
 	public HomeSearchBox(HomeSearchBoxView view, 
 			NodeModelCreator nodeModelCreator,
@@ -60,28 +63,42 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 	}
     
 	@Override
-	public void search(String value) {		
+	public void search(String value) {
+		if(searchAll) {
+			SearchQuery query = DisplayUtils.getAllTypesSearchQuery();
+			query.setQueryTerm(Arrays.asList(value.split(" ")));
+			try {
+				value = query.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
+			} catch (JSONObjectAdapterException e) {
+				// if fail, fall back on regular search
+			}
+		}
 		globalApplicationState.getPlaceChanger().goTo(new Search(value));
 	}
 
 	@Override
-	public void searchAllProjects() {		
-		search(getSearchQueryForType("project"));	
+	public String getSearchAllProjectsLink() {		
+		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("project"));	
 	}
 
 	@Override
-	public void searchAllData() {
-		search(getSearchQueryForType("data"));
+	public String getSearchAllDataLink() {
+		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("data"));
 	}
 
 	@Override
-	public void searchAllStudies() {
-		search(getSearchQueryForType("study"));
+	public String getSearchAllStudiesLink() {
+		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("study"));
 	}
 
 	@Override
-	public void searchAllCode() {
-		search(getSearchQueryForType("code"));
+	public String getSearchAllCodeLink() {
+		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("code"));
+	}
+	
+	@Override
+	public void setSearchAll(boolean searchAll) {
+		this.searchAll = searchAll;
 	}
 	
 	/*

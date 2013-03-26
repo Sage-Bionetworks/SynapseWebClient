@@ -84,7 +84,7 @@ public class PagesBrowserTest {
 	@Test
 	public void testConfigureProject() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		pagesBrowser.configure(new WikiPageKey(entityId, WidgetConstants.WIKI_OWNER_ID_ENTITY, null), "syn123", "#Synapse:syn123", "Project A", true);
+		pagesBrowser.configure(new WikiPageKey(entityId, WidgetConstants.WIKI_OWNER_ID_ENTITY, null), "syn123", "#!Synapse:syn123", "Project A", true);
 		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -92,7 +92,7 @@ public class PagesBrowserTest {
 	@Test
 	public void testConfigureProjectRootNotFound() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		pagesBrowser.configure(new WikiPageKey(entityId, WidgetConstants.WIKI_OWNER_ID_ENTITY, null), "syn123", "#Synapse:syn123", "Project A", true);
+		pagesBrowser.configure(new WikiPageKey(entityId, WidgetConstants.WIKI_OWNER_ID_ENTITY, null), "syn123", "#!Synapse:syn123", "Project A", true);
 		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).configure(anyBoolean(), any(TreeItem.class));
 	}

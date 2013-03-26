@@ -10,8 +10,8 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 public interface WidgetRegistrar {
 	public void registerWidget(String contentTypeKey, String friendlyName);
 	public String getWidgetContentType(Map<String, String> model);
-	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model);
-	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model);
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki);
+	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki);
 	public String getFriendlyTypeName(String contentTypeKey);
 	public Map<String, String> getWidgetDescriptor(String mdRepresentation);
 	public String getWidgetContentType(String mdRepresentation);

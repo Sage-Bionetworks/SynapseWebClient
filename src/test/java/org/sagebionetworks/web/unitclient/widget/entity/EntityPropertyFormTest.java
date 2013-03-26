@@ -64,7 +64,7 @@ public class EntityPropertyFormTest {
 		mockEventBus = mock(EventBus.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
 		presenter = new EntityPropertyForm(mockView, mockEventBus, mockNodeModelCreator, mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar);
-		EntityBundle bundle = new EntityBundle(new Project(), null, null, null,null,null, null);
+		EntityBundle bundle = new EntityBundle(new Project(), null, null, null,null,null, null, null);
 		
 		String entityId = "123";
 		entity = new ExampleEntity();
@@ -82,7 +82,7 @@ public class EntityPropertyFormTest {
 		EntityBundleTransport ebt = new EntityBundleTransport();
 		ebt.setEntityJson(EntityFactory.createJSONStringForEntity(entity));
 		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null);
+		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		when(mockNodeModelCreator.createEntityBundle(any(EntityBundleTransport.class))).thenReturn(entityBundle);
 		
 		AdapterFactory factory = new AdapterFactoryImpl();

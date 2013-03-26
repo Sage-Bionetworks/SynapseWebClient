@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -42,7 +44,7 @@ public class EntityPageTopTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	EntityPageTopView mockView;
 	EntitySchemaCache mockSchemaCache;
-	JSONObjectAdapter mockJsonObjectAdapter;
+	JSONObjectAdapter jsonObjectAdapter;
 	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	EventBus mockEventBus;
@@ -52,6 +54,7 @@ public class EntityPageTopTest {
 	ExampleEntity entity;
 	AttachmentData attachment1;
 	WidgetRendererPresenter testWidgetRenderer;
+	String entityId = "syn123";
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -62,7 +65,7 @@ public class EntityPageTopTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityPageTopView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
-		mockJsonObjectAdapter = mock(JSONObjectAdapter.class);
+		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockEventBus = mock(EventBus.class);
@@ -77,7 +80,6 @@ public class EntityPageTopTest {
 				mockEventBus, new JSONObjectAdapterImpl());
 		
 		// Setup the the entity
-		String entityId = "123";
 		entity = new ExampleEntity();
 		entity.setId(entityId);
 		entity.setEntityType(ExampleEntity.class.getName());
@@ -89,8 +91,11 @@ public class EntityPageTopTest {
 		attachment1.setContentType(WidgetConstants.YOUTUBE_CONTENT_TYPE);
 		entityAttachments.add(attachment1);
 		entity.setAttachments(entityAttachments);
-		when(mockJsonObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
-		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class))).thenReturn(testWidgetRenderer);
+		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean())).thenReturn(testWidgetRenderer);
+
+		EntityBundle bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
+		pageTop.setBundle(bundle, false);
 	}
+
 }

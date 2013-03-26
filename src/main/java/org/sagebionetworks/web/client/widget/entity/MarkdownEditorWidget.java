@@ -30,6 +30,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
@@ -62,6 +63,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private TextArea markdownTextArea;
 	private HTML descriptionFormatInfo;
 	private WikiPageKey wikiKey;
+	private boolean isWikiEditor;
 	
 	public interface CloseHandler{
 		public void saveClicked();
@@ -95,9 +97,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	 * @param callback
 	 * @param saveHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
 	 */
-	public void configure(final WikiPageKey wikiKey, final TextArea markdownTextArea, LayoutContainer formPanel, boolean showFieldLabel, final WidgetDescriptorUpdatedHandler callback, final CloseHandler saveHandler, final ManagementHandler managementHandler) {
+	public void configure(final WikiPageKey wikiKey, final TextArea markdownTextArea, LayoutContainer formPanel, boolean showFieldLabel, final boolean isWikiEditor, final WidgetDescriptorUpdatedHandler callback, final CloseHandler saveHandler, final ManagementHandler managementHandler, int spanWidth) {
 		this.markdownTextArea = markdownTextArea;
 		this.wikiKey = wikiKey;
+		this.isWikiEditor = isWikiEditor;
+		
 		descriptionFormatInfo = new HTML(WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
@@ -111,7 +115,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		if (showFieldLabel)
 			formPanel.add(new Label("Description:"),descriptionLabelFormData);
 		FormData mdCommandFormData = new FormData();
-		mdCommandFormData.setMargins(new Margins(0,15,0,10));
+		mdCommandFormData.setMargins(new Margins(0,-15,0,10));
 		formPanel.add(mdCommands,mdCommandFormData);
 		
 		// followed by description.
@@ -130,7 +134,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		previewButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				showPreview(markdownTextArea.getValue());
+				showPreview(markdownTextArea.getValue(), isWikiEditor);
 			}
 		});
 		
@@ -170,7 +174,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		formPanel.add(mdCommandsLower, previewFormData);
 		if (saveHandler != null) {
 			SimplePanel space = new SimplePanel();
-			space.addStyleName("margin-left-490");
+			space.addStyleName("span-" + (spanWidth-12) + " margin-left-35");
 			mdCommandsLower.add(space);
 			
 			//also add a save button to the lower command bar
@@ -222,7 +226,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}); 
 		mdCommands.add(image);
 		
-		if (DisplayUtils.isInTestWebsite(cookies)) {
+		if (isWikiEditor) {
 			Image attachment = getNewCommand("Insert Attachment", iconsImageBundle.attachment16(),new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -243,13 +247,13 @@ public class MarkdownEditorWidget extends LayoutContainer {
 				
 	}
 	
-	public void showPreview(String descriptionMarkdown) {
+	public void showPreview(String descriptionMarkdown, final boolean isWiki) {
 	    //get the html for the markdown
 	    synapseClient.markdown2Html(descriptionMarkdown, true, new AsyncCallback<String>() {
 	    	@Override
 			public void onSuccess(String result) {
 	    		try {
-					showPreviewHTML(result);
+					showPreviewHTML(result, isWiki);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -257,12 +261,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			@Override
 			public void onFailure(Throwable caught) {
 				//preview failed
-				showErrorMessage(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT + caught.getMessage());
+				showErrorMessage(DisplayConstants.PREVIEW_FAILED_TEXT + caught.getMessage());
 			}
 		});	
 	}
 
-	public void showPreviewHTML(String result) throws JSONObjectAdapterException {
+	public void showPreviewHTML(String result, boolean isWiki) throws JSONObjectAdapterException {
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
 	    window.setSize(650, 500);
@@ -280,7 +284,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		else{
 			panel = new HTMLPanel(result);
 		}
-		MarkdownWidget.loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, true);
+		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
 		f.add(panel);
@@ -309,6 +313,19 @@ public class MarkdownEditorWidget extends LayoutContainer {
 
 	private Menu createWidgetMenu(final WidgetDescriptorUpdatedHandler callback) {
 	    Menu menu = new Menu();
+	    if (isWikiEditor) {
+		    menu.add(getNewCommand("Attachment", new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		handleInsertWidgetCommand(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, callback);
+		    	};
+			}));
+	    }
+	    menu.add(getNewCommand(WidgetConstants.ENTITYLIST_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	@Override
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.ENTITYLIST_CONTENT_TYPE, callback);
+	    	}
+	    }));	    
 	    menu.add(getNewCommand("Image", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
@@ -319,38 +336,45 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.LINK_CONTENT_TYPE, callback);
 	    	};
 		}));
-	    menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
-	    	public void componentSelected(ComponentEvent ce) {
-	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	
-	    	};
-		}));
 	    menu.add(getNewCommand("Provenance Graph", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.PROVENANCE_CONTENT_TYPE, callback);
 	    	};
 		}));
+	    menu.add(getNewCommand(WidgetConstants.SHINYSITE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.SHINYSITE_CONTENT_TYPE, callback);
+	    	};
+		}));
+    	menu.add(getNewCommand("Table", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, callback);
+	    	};
+		}));
+    	menu.add(getNewCommand("Table Of Contents", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TOC_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
+	    	};
+		}));
+	    menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	
+	    	};
+		}));
+	    
+	    /**
+	     * load alpha test site widgets
+	     */
 	    if (DisplayUtils.isInTestWebsite(cookies)) {
-		    menu.add(getNewCommand("Attachment", new SelectionListener<ComponentEvent>() {
+	    	menu.add(new SeparatorMenuItem());
+		    menu.add(getNewCommand("Synapse API SuperTable", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
-		    		handleInsertWidgetCommand(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, callback);
+		    		handleInsertWidgetCommand(WidgetConstants.API_TABLE_CONTENT_TYPE, callback);
 		    	};
 			}));
-	    	menu.add(getNewCommand("Table Of Contents", new SelectionListener<ComponentEvent>() {
-		    	public void componentSelected(ComponentEvent ce) {
-		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TOC_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
-		    	};
-			}));
-	    	
 	    	menu.add(getNewCommand("Wiki Files Preview", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
 		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
-		    	};
-			}));
-
-		    
-	    	menu.add(getNewCommand("Synapse API SuperTable", new SelectionListener<ComponentEvent>() {
-		    	public void componentSelected(ComponentEvent ce) {
-		    		handleInsertWidgetCommand(WidgetConstants.API_TABLE_CONTENT_TYPE, callback);
 		    	};
 			}));
 	    }
@@ -367,19 +391,20 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			}
 			callback.onUpdate(event);
 		}
-		});
+		}, isWikiEditor);
 	}
 	
 	public void insertMarkdown(String md) {
 		String currentValue = markdownTextArea.getValue();
 		if (currentValue == null)
 			currentValue = "";
+		
 		int cursorPos = markdownTextArea.getCursorPos();
-		if (cursorPos < 0)
-			cursorPos = 0;
-		else if (cursorPos > currentValue.length())
+		if (cursorPos < 0 || cursorPos > currentValue.length())
 			cursorPos = currentValue.length();
 		DisplayUtils.updateTextArea(markdownTextArea, currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
+		//SWC-406: set cursor to after the current markdown
+		markdownTextArea.setCursorPos(cursorPos + md.length());
 	}
 	
 	/**

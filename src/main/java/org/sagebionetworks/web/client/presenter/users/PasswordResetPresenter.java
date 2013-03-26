@@ -77,7 +77,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			view.showMessage(AbstractImagePrototype.create(sageImageBundle.loading16()).getHTML() + " Loading Password Reset...");
 			
 			// show same error if service fails as with an invalid token					
-			final String errorMessage = "Password reset period has expired. <a href=\"#PasswordReset:0\">Please request another Password Reset</a>.";
+			final String errorMessage = "Password reset period has expired. <a href=\"#!PasswordReset:0\">Please request another Password Reset</a>.";
 			String sessionToken = place.toToken();
 			authenticationController.loginUser(sessionToken, new AsyncCallback<String>() {
 				@Override

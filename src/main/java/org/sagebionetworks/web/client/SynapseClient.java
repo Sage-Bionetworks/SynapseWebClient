@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.Favorite;
+import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -169,6 +171,11 @@ public interface SynapseClient extends RemoteService {
 			throws RestServiceException;
 	
 	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl) throws RestServiceException;
+	
+	public EntityWrapper updateExternalFile(String entityId, String externalUrl) throws RestServiceException;
+	
+	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl) throws RestServiceException;
+	
 	/**
 	 * convenience method for converting markdown to html
 	 * @param markdown
@@ -183,6 +190,8 @@ public interface SynapseClient extends RemoteService {
 	public String getActivityForEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
 	
 	public String getActivity(String activityId) throws RestServiceException;
+	
+	public String getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset) throws RestServiceException;
 	
 	String promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
 	public EntityWrapper removeAttachmentFromEntity(String entityId, String attachmentName) throws RestServiceException;
@@ -199,4 +208,10 @@ public interface SynapseClient extends RemoteService {
 	public String getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	public String getFileEndpoint() throws RestServiceException;
+	
+	public String addFavorite(String entityId) throws RestServiceException;
+	
+	public void removeFavorite(String entityId) throws RestServiceException;
+	
+	public String getFavorites(Integer limit, Integer offset) throws RestServiceException;
 }

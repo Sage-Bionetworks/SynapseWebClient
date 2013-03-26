@@ -6,16 +6,23 @@ import java.util.Set;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public abstract class ProvTreeNode implements Iterable<ProvTreeNode>, IsSerializable {
+public class ProvTreeNode implements Iterable<ProvTreeNode>, IsSerializable {
 
-	public abstract String getId();
-
+	private String id;
 	private Set<ProvTreeNode> children;
 	private double xPos;
 	private double yPos;
 
 	public ProvTreeNode() {
 		children = new HashSet<ProvTreeNode>();
+	}
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	/*

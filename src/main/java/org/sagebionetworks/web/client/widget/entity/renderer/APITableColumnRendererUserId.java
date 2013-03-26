@@ -56,7 +56,7 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 					UserGroupHeaderResponsePage response = nodeModelCreator.createJSONEntity(result.getEntityJson(), UserGroupHeaderResponsePage.class);
 					for (UserGroupHeader ugh : response.getChildren()){
 						StringBuilder html = new StringBuilder();
-						html.append("<a class=\"link\" href=\"#Profile:"+ugh.getOwnerId()+"\">");
+						html.append("<a class=\"link\" href=\"#!Profile:"+ugh.getOwnerId()+"\">");
 						if (ugh.getPic() != null && ugh.getPic().getPreviewId() != null && ugh.getPic().getPreviewId().length() > 0) {
 							//also include a little profile pic in the link
 							html.append("<span class=\"iconSpan\"><img src=\"");

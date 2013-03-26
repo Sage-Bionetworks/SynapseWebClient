@@ -1,6 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
 <head>
+<meta name="description" content="" />
+<meta name="google-site-verification" content="KBWdTSY6N0LEKx_JZh-MRKuKV_xHeZz5FWyLbZVwSSs" />
+<meta name="msvalidate.01" content="E37AC1589F823723B64275D4BC890B1A" />
+<!-- 
+adding the following meta tag should tell the crawler to try to crawl the ugly version of *this* URL, 
+but I only want it to find the production (want it to ignore staging, which may have the same data) 
+<meta name="fragment" content="!" />  
+-->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
 		<!--                                                               -->
@@ -45,6 +53,13 @@
 		<script type="text/javascript" src="js/jquery.vaccordion.js"></script>
 		<script type="text/javascript" src="js/highlight.pack.js"></script>
 
+		<!-- Google Closure -->
+		<script type="text/javascript" src="js/goog/base.js"></script>
+		
+		<!-- NChart  -->
+    	<script type="text/javascript" src="js/nchart.js"></script>
+		
+
 		<!-- jsPlumb Javascript -->
 		<script type="text/javascript" src="jsPlumb/lib/jquery.ui.touch-punch.min.js"></script>
 		<!-- support lib for bezier stuff -->		
@@ -68,6 +83,8 @@
 		<!-- jquery jsPlumb adapter -->
 		<script type="text/javascript" src="jsPlumb/jquery.jsPlumb-1.3.13-RC1.js"></script>
 		<!-- /JS -->
+		
+
 		
 		<!--GOOGLE FONTS-->
 		<link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css' />
@@ -119,7 +136,10 @@
 			<noscript>
 			<div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
 			Your web browser must have JavaScript enabled in order for this
-			application to display correctly.</div>
+			application to display correctly.<br />
+			If you are an automated web crawler from a search engine, follow this <a href="https://synapse.prod.sagebase.org/Portal.html#!Home:0">AJAX application crawl link</a>
+			</div>
+			
 			</noscript>
 			
 			<!-- This is the GWT-generated body -->

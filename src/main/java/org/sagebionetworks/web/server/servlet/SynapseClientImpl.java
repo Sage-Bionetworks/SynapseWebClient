@@ -12,10 +12,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.pegdown.PegDownProcessor;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -27,8 +27,10 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -38,6 +40,7 @@ import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -57,6 +60,7 @@ import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
@@ -66,7 +70,6 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -74,6 +77,8 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
+
+import eu.henkelmann.actuarius.ActuariusTransformer;
 
 @SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -87,7 +92,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
-	PegDownProcessor markdownProcessor = new PegDownProcessor(WebConstants.MARKDOWN_OPTIONS);
+	ActuariusTransformer markdownProcessor = new ActuariusTransformer();
 	
 	/**
 	 * Injected with Gin
@@ -179,7 +184,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		try {			
 			Synapse synapseClient = createSynapseClient();			
-			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);
+			EntityBundle eb;
+			//TODO:remove the try catch when PLFM-1752 is fixed
+			try {
+				eb = synapseClient.getEntityBundle(entityId, partsMask);
+				} catch(SynapseNotFoundException e) {
+				//if we're trying to get the filehandles, then give another try without the filehandles
+				if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0) {
+					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES) & partsMask;
+					eb = synapseClient.getEntityBundle(entityId, newPartsMask);
+				}
+				else throw e;
+			}
 			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -190,8 +206,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public EntityBundleTransport getEntityBundleForVersion(String entityId,
 			Long versionNumber, int partsMask) throws RestServiceException {
 		try {			
-			Synapse synapseClient = createSynapseClient();			
-			EntityBundle eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
+			Synapse synapseClient = createSynapseClient();
+			EntityBundle eb;
+			//TODO:remove the try catch when PLFM-1752 is fixed
+			try {
+				eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
+			} catch(SynapseNotFoundException e) {
+				//if we're trying to get the filehandles, then give another try without the filehandles
+				if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0) {
+					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES) & partsMask;
+					eb = synapseClient.getEntityBundle(entityId, versionNumber, newPartsMask);
+				}
+				else throw e;
+			}
+			
 			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -294,7 +322,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				ebt.setEntityPathJson(EntityFactory.createJSONStringForEntity(path));
 			}
 			if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
-				PaginatedResults<EntityHeader> rb = eb.getReferencedBy();
+				List<EntityHeader> rbList = eb.getReferencedBy();
+				PaginatedResults<EntityHeader> rb = new PaginatedResults<EntityHeader>();
+				rb.setResults(rbList);
 				ebt.setEntityReferencedByJson(EntityFactory.createJSONStringForEntity(rb));
 			}
 			if ((EntityBundleTransport.HAS_CHILDREN & partsMask) > 0) {
@@ -319,6 +349,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask)!=0) {
 				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb.getUnmetAccessRequirements()));
 			}
+			if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0 && eb.getFileHandles() != null)
+				ebt.setFileHandlesJson(createJSONStringFromArray(eb.getFileHandles()));
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());			
 		}
@@ -347,6 +379,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
+		synapseClient.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
 		return synapseClient;
 	}
 
@@ -850,6 +883,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} 
 	}
 	@Override
+	@Deprecated
 	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
@@ -868,8 +902,70 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String markdown2Html(String markdown, Boolean isPreview) {
-		return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+	public EntityWrapper updateExternalFile(String entityId, String externalUrl) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			Entity entity = synapseClient.getEntityById(entityId);
+			if(!(entity instanceof FileEntity)) {
+				throw new RuntimeException("Upload failed. Entity id: " + entity.getId() + " is not a File.");
+			}
+			
+			ExternalFileHandle efh = new ExternalFileHandle();
+			efh.setExternalURL(externalUrl);
+			ExternalFileHandle clone = synapseClient.createExternalFileHandle(efh);
+			((FileEntity)entity).setDataFileHandleId(clone.getId());
+			Entity updatedEntity = synapseClient.putEntity(entity);
+			updatedEntity = updateExternalFileName(updatedEntity, externalUrl, synapseClient);
+			JSONObjectAdapter aaJson = updatedEntity.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	@Override
+	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			FileEntity newEntity = new FileEntity();
+			ExternalFileHandle efh = new ExternalFileHandle();
+			efh.setExternalURL(externalUrl);
+			ExternalFileHandle clone = synapseClient.createExternalFileHandle(efh);
+			newEntity.setDataFileHandleId(clone.getId());
+			newEntity.setParentId(parentEntityId);
+			Entity updatedEntity = synapseClient.createEntity(newEntity);
+			updatedEntity = updateExternalFileName(updatedEntity, externalUrl, synapseClient);
+			JSONObjectAdapter aaJson = updatedEntity.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	private Entity updateExternalFileName(Entity entity, String externalUrl, Synapse synapseClient) {
+		String oldName = entity.getName();
+		try{
+			//also try to rename to something reasonable, ignore if anything goes wrong
+			entity.setName(DisplayUtils.getFileNameFromExternalUrl(externalUrl));
+			entity = synapseClient.putEntity(entity);
+		} catch(Throwable t) {
+			//if anything goes wrong, send back the actual name
+			entity.setName(oldName);
+		}
+		return entity;
+	}
+
+	@Override
+	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException{
+		try {
+			return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+		} catch (IOException e) {
+			throw new RestServiceException(e.getMessage());
+		}
 	}
 
 	@Override
@@ -905,7 +1001,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	
+	@Override
+	public String getEntitiesGeneratedBy(String activityId, Integer limit,
+			Integer offset) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<Reference> refs = synapseClient.getEntitiesGeneratedBy(activityId, limit, offset);
+			return EntityFactory.createJSONStringForEntity(refs);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 	@Override
 	public EntityWrapper removeAttachmentFromEntity(String entityId,
 			String attachmentName) throws RestServiceException {
@@ -1007,14 +1116,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	private String getRootWikiId(String ownerId, ObjectType ownerType) throws RestServiceException{
-		PaginatedResults<WikiHeader> results = getWikiHeaderTree(ownerId, ownerType);
-		for (WikiHeader header : results.getResults()) {
-			if (header.getParentId() == null) {
-				return header.getId();
-			}
+	private String getRootWikiId(Synapse synapseClient, String ownerId, ObjectType ownerType) throws RestServiceException{
+		try{
+			WikiPage rootPage = synapseClient.getRootWikiPage(ownerId, ownerType);
+			if (rootPage != null)
+				return rootPage.getId();
+			else return null;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		}
-		return null;
 	}
 	
 	@Override
@@ -1023,7 +1135,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			if (key.getWikiPageId() == null) {
 				//asking for the root.  find the root id first
-				String rootWikiPage = getRootWikiId(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+				String rootWikiPage = getRootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
 			}
 			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
@@ -1065,12 +1177,49 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			if (key.getWikiPageId() == null) {
 				//asking for the root.  find the root id first
-				String rootWikiPage = getRootWikiId(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+				String rootWikiPage = getRootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
 			}
 			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
 			FileHandleResults results = synapseClient.getWikiAttachmenthHandles(properKey);
 			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String addFavorite(String entityId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			EntityHeader favorite = synapseClient.addFavorite(entityId);
+			return EntityFactory.createJSONStringForEntity(favorite);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public void removeFavorite(String entityId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			synapseClient.removeFavorite(entityId);			
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+
+	@Override
+	public String getFavorites(Integer limit, Integer offset)
+			throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<EntityHeader> favorites = synapseClient.getFavorites(limit, offset);
+			return EntityFactory.createJSONStringForEntity(favorites);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {

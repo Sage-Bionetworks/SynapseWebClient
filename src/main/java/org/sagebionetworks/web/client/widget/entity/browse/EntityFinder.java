@@ -35,7 +35,6 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 		this.view = view;
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
-			
 		view.setPresenter(this);
 	}	
 
@@ -47,7 +46,7 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 	}
 
 	public void configure(boolean showVersions) {
-		this.showVersions = showVersions;
+		this.showVersions = showVersions;		
 	}
 	
 	@Override
@@ -122,5 +121,9 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 	@Override
 	public boolean showVersions() {
 		return this.showVersions;
+	}
+
+	public void refresh() {
+		view.refresh();
 	}
 }

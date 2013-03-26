@@ -3,7 +3,8 @@
 jQuery.noConflict()(function($){
 	$(document).ready(function () {
 		// start jqtweet!
-		JQTWEET.loadTweets();
+		//JQTWEET is not defined
+		//JQTWEET.loadTweets();
 	});
 });
 	
@@ -243,7 +244,7 @@ jQuery.noConflict()(function($) {
 // Activating tabs
 jQuery.noConflict()(function($){
 	$(document).ready(function() {
-		implement_tabs();
+		//implement_tabs();
 	});
 });
 

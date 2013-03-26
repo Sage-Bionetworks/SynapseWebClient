@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Map;
-
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -22,9 +19,6 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
-import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -32,12 +26,9 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter  {
 
@@ -49,7 +40,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
 	private WidgetRegistrar widgetRegistrar;
-	
+	private EntityUpdatedHandler entityUpdateHandler;
 	private EntityBundle bundle;
 	private boolean readOnly;
 	private String entityTypeDisplay;
@@ -117,23 +108,16 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void fireEntityUpdatedEvent() {
-		bus.fireEvent(new EntityUpdatedEvent());
+		EntityUpdatedEvent event = new EntityUpdatedEvent();
+		entityUpdateHandler.onPersistSuccess(event);
+		bus.fireEvent(event);
 	}
 
-	public HandlerRegistration addEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		return bus.addHandler(EntityUpdatedEvent.getType(), handler);
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		entityUpdateHandler = handler;
 	}
 	
-	@Override
-	public boolean isLocationable() {
-		if(bundle.getEntity() instanceof Locationable) {
-			return true;
-		}
-		return false;
-	}
-
 	@Override 
-
 	public boolean isLoggedIn() {
 		return authenticationController.getLoggedInUser() != null;
 	}
@@ -178,7 +162,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			});
 		}
 	}
-
+	
 	/*
 	 * Private Methods
 	 */
@@ -190,7 +174,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	
 	private UserProfile getUserProfile() {
 		UserSessionData sessionData = authenticationController.getLoggedInUser();
-		return (sessionData==null ? null : sessionData.getProfile());
-		
+		return (sessionData==null ? null : sessionData.getProfile());		
 	}
 }

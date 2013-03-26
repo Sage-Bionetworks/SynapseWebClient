@@ -1,28 +1,30 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
-import com.extjs.gxt.ui.client.Style.AnchorPosition;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
-import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -44,17 +46,21 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private IconsImageBundle icons;
 	private Header headerWidget;
 	private Footer footerWidget;
+	ProvenanceWidget provenanceWidget;
+	SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils) {		
+			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		
+		this.provenanceWidget = provenanceWidget;
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
 				
@@ -63,12 +69,18 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
+		//provenanceWidget.setHeight(400);
+		((LayoutContainer)provenanceWidget.asWidget()).setAutoHeight(true);
+		
 		header.clear();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
+				
+		
+		
 	}
 
 	@Override
@@ -91,7 +103,24 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
 	@Override
 	public void setEntity(Entity entity) {
-		// use the entity how you like
+		Long version = null;
+		if(entity instanceof Versionable) 
+			version = ((Versionable)entity).getVersionNumber();			
+		Map<String,String> configMap = new HashMap<String,String>();
+		String entityList = DisplayUtils.createEntityVersionString(entity.getId(), null) +","+"syn114241";
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entityList);
+		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
+		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(false));
+		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
+	    provenanceWidget.configure(null, configMap);
+	    provenanceWidget.setHeight(800);	
+	    entityView.setWidget(provenanceWidget.asWidget());
 	}
 
+	
+	
+	
+	
+	
+	
 }

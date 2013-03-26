@@ -65,6 +65,12 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/document--pencil-16.png")
 	ImageResource documentEdit16();
 
+	@Source("images/icons/document-export-16.png")
+	ImageResource documentExport16();
+
+	@Source("images/icons/document-external-16.png")
+	ImageResource documentExternal16();
+
 	@Source("images/icons/document-text-16.png")
 	ImageResource documentText16();
 
@@ -116,6 +122,12 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/flag-small-16.png")
 	ImageResource flagSmall16();
 
+	@Source("images/icons/github-16.png")
+	ImageResource github16();	
+	
+	@Source("images/icons/github-24.png")
+	ImageResource github24();	
+	
 	@Source("images/icons/globe-green-16.png")
 	ImageResource globe16();	
 	
@@ -212,6 +224,12 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/edit-16.png")
 	ImageResource slideInfo16();	
 	
+	@Source("images/icons/star-16.png")
+	ImageResource star16();	
+	
+	@Source("images/icons/star-empty-16.png")
+	ImageResource starEmpty16();	
+	
 	@Source("images/icons/table-insert-column-16.png")
 	ImageResource tableInsertColumn16();
 	
@@ -263,6 +281,12 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/synapse-data-24.png")
 	ImageResource synapseData24();
+
+	@Source("images/icons/document-16.png")
+	ImageResource synapseFile16();
+
+	@Source("images/icons/document-24.png")
+	ImageResource synapseFile24();
 	
 	@Source("images/icons/synapse-folder-16.png")
 	ImageResource synapseFolder16();
@@ -287,7 +311,6 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/document-text-24.png")
 	ImageResource synapsePage24();
-
 	
 	@Source("images/icons/synapse-project-16.png")
 	ImageResource synapseProject16();
@@ -318,6 +341,9 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/synapse-study-24.png")
 	ImageResource synapseStudy24();
+	
+	@Source("images/icons/trash-16.png")
+	ImageResource trash16();
 		
 	// demo
 	

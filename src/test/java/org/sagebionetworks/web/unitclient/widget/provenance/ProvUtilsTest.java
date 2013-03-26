@@ -1,17 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.provenance;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.eq;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -19,17 +18,14 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.verification.Times;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -39,15 +35,14 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
-import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.provenance.ActivityTreeNode;
-import org.sagebionetworks.web.shared.provenance.EntityTreeNode;
-import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
-import com.google.gwt.dev.util.collect.HashSet;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
+import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
+import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
+import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ProvGraph;
+import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
+import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 public class ProvUtilsTest {
 		
@@ -72,54 +67,90 @@ public class ProvUtilsTest {
 		
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testBuildProvTree() throws Exception {
-		Data entity = new Data();
-		entity.setId("syn123");
-		entity.setVersionNumber(1L);
+	public void testBuildProvGraph() throws Exception {
+		Data entity1 = new Data();
+		entity1.setId("syn123");
+		entity1.setVersionNumber(1L);
 		Data entity2 = new Data();
 		entity2.setId("syn456");
 		entity2.setVersionNumber(1L);
 		Activity act = new Activity();
 		act.setId("789");
-		Reference ref = new Reference();
-		ref.setTargetId(entity2.getId());
-		ref.setTargetVersionNumber(entity2.getVersionNumber());
-		EntityHeader header = new EntityHeader();
-		header.setId(ref.getTargetId());
-		header.setVersionNumber(ref.getTargetVersionNumber());
+
+		Reference ref1 = new Reference();
+		ref1.setTargetId(entity1.getId());
+		ref1.setTargetVersionNumber(entity1.getVersionNumber());
+		EntityHeader header1 = new EntityHeader();
+		header1.setId(ref1.getTargetId());
+		header1.setVersionNumber(ref1.getTargetVersionNumber());
+		
+		Reference ref2 = new Reference();
+		ref2.setTargetId(entity2.getId());
+		ref2.setTargetVersionNumber(entity2.getVersionNumber());
+		EntityHeader header2 = new EntityHeader();
+		header2.setId(ref2.getTargetId());
+		header2.setVersionNumber(ref2.getTargetVersionNumber());
+		
 		UsedEntity ue = new UsedEntity();
-		ue.setReference(ref);
-		Set<UsedEntity> used = new HashSet<UsedEntity>();
+		ue.setReference(ref2);
+		Set<Used> used = new HashSet<Used>();
 		used.add(ue);
 		act.setUsed(used);
 
 		List<Activity> activities = new ArrayList<Activity>();
 		activities.add(act);
-		Map<String, ProvTreeNode> idToNode = new HashMap<String, ProvTreeNode>();
+		Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
 		Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
-		refToHeader.put(ref, header);		
+		refToHeader.put(ref1, header1);
+		refToHeader.put(ref2, header2);
 		
-		ProvTreeNode root = ProvUtils.buildProvTree(activities, entity, idToNode, refToHeader, false, synapseJsniUtils);		
-		
-		assertEquals(root, idToNode.get(root.getId()));
-		assertEquals(entity.getId(), ((EntityTreeNode)root).getEntityId());
-		assertTrue(root.iterator().hasNext());
+		Map<Reference, String> generatedByActivityId = new HashMap<Reference, String>();
+		generatedByActivityId.put(ref1, act.getId());
 
-		ActivityTreeNode actNode = (ActivityTreeNode)root.iterator().next();
-		assertEquals(actNode, idToNode.get(actNode.getId()));
-		assertEquals(act.getId(), actNode.getActivityId());
-		assertTrue(actNode.iterator().hasNext());
+		Map<String, Activity> processedActivities = new HashMap<String, Activity>();
+		processedActivities.put(act.getId(), act);		
 		
-		EntityTreeNode entity2Node = (EntityTreeNode)actNode.iterator().next();
-		assertEquals(entity2Node, idToNode.get(entity2Node.getId()));
-		assertEquals(entity2.getId(), entity2Node.getEntityId());
-		assertFalse(entity2Node.iterator().hasNext());		
+		Set<Reference> startRefs = new HashSet<Reference>();
+		startRefs.add(ref1);
+		
+		Set<Reference> noExpandNodes = new HashSet<Reference>();
+		
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, false, startRefs, noExpandNodes);		
+		
+		assertNotNull(graph.getNodes());
+		assertNotNull(graph.getEdges());		
+		Set<ProvGraphNode> nodes = graph.getNodes();
+		Set<ProvGraphEdge> edges = graph.getEdges();
+		
+		// verify all nodes created
+		
+		EntityGraphNode entity1Node = null;
+		EntityGraphNode entity2Node = null;
+		ActivityGraphNode actNode = null;
+		for(ProvGraphNode node : nodes) {			
+			if(node instanceof EntityGraphNode) {
+				if(((EntityGraphNode)node).getEntityId().equals(entity1.getId())) entity1Node = (EntityGraphNode) node;
+				if(((EntityGraphNode)node).getEntityId().equals(entity2.getId())) entity2Node = (EntityGraphNode) node;
+			} else if(node instanceof ActivityGraphNode) {
+				if(((ActivityGraphNode)node).getActivityId().equals(act.getId())) actNode = (ActivityGraphNode) node;
+			}
+		}
+		assertNotNull(entity1Node);
+		assertNotNull(entity2Node);
+		assertNotNull(actNode);
+		
+		// verify all edges created
+		ProvGraphEdge generatedByEdge = new ProvGraphEdge(entity1Node, actNode);
+		assertTrue(edges.contains(generatedByEdge));
+		ProvGraphEdge usedEdge = new ProvGraphEdge(actNode, entity2Node);
+		assertTrue(edges.contains(usedEdge));
 	}
 
-	public void testCreateUniqueNodeId() throws Exception {		
-		Map<String, ProvTreeNode> idToNode = new HashMap<String, ProvTreeNode>();
+	public void testCreateUniqueNodeId() throws Exception {
+		Integer sequence = 0;
+		Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
 		for(int i=0; i<10; i++) {
-			String next = ProvUtils.createUniqueNodeId(idToNode, synapseJsniUtils);
+			String next = ProvUtils.createUniqueNodeId();
 			assertFalse(idToNode.containsKey(next));
 			idToNode.put(next, null);
 		}		
@@ -135,7 +166,7 @@ public class ProvUtilsTest {
 		Reference ref2 = new Reference();
 		ref2.setTargetId(entId2);
 
-		Set<UsedEntity> used = new HashSet<UsedEntity>();
+		Set<Used> used = new HashSet<Used>();
 		UsedEntity ue;
 		ue = new UsedEntity();
 		ue.setReference(ref);
@@ -241,11 +272,24 @@ public class ProvUtilsTest {
 			public String getLocationQueryString() {
 				return "?foo=bar";
 			}
-			
 			@Override
 			public String getBaseFileHandleUrl() {
-				// TODO Auto-generated method stub
+				return "";
+			}
+			
+			@Override
+			public LayoutResult nChartlayout(NChartLayersArray layers, NChartCharacters characters) {
 				return null;
+			}
+			@Override
+			public void setPageDescription(String newDescription) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void setPageTitle(String newTitle) {
+				// TODO Auto-generated method stub
+				
 			}
 		};
 	}

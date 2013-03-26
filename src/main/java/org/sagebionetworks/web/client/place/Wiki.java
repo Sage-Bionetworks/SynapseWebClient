@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.place;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
+import com.google.gwt.place.shared.Prefix;
 
 public class Wiki extends Place{
 	public static final String DELIMITER = "/"; 
@@ -56,6 +57,7 @@ public class Wiki extends Place{
 		this.wikiId = wikiId;
 	}
 
+	@Prefix("!Wiki")
 	public static class Tokenizer implements PlaceTokenizer<Wiki> {
         @Override
         public String getToken(Wiki place) {

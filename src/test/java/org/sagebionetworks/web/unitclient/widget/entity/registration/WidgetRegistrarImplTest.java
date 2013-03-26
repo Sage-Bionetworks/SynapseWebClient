@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
@@ -22,7 +21,6 @@ public class WidgetRegistrarImplTest {
 		
 	WidgetRegistrarImpl widgetRegistrar;
 	PortalGinInjector mockGinInjector;
-	CookieProvider mockCookies;
 	NodeModelCreator mockNodeModelCreator;
 	Map<String, String> testImageWidgetDescriptor;
 	String testFileName = "testfile.png";
@@ -30,27 +28,30 @@ public class WidgetRegistrarImplTest {
 	public void setup(){	
 		mockGinInjector = mock(PortalGinInjector.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		mockCookies = mock(CookieProvider.class);
-		widgetRegistrar= new WidgetRegistrarImpl(mockGinInjector,mockNodeModelCreator, new JSONObjectAdapterImpl(),mockCookies);
+		widgetRegistrar= new WidgetRegistrarImpl(mockGinInjector,mockNodeModelCreator, new JSONObjectAdapterImpl());
 		testImageWidgetDescriptor = new HashMap<String, String>();
 	}
 	
 	@Test
 	public void testCreateWidgets() {
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, true);
 		verify(mockGinInjector).getYouTubeRenderer();
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, false);
 		verify(mockGinInjector).getOldImageRenderer();
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, true);
+		verify(mockGinInjector).getImageRenderer();
+		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, true);
 		verify(mockGinInjector).getProvenanceRenderer();
 	}
 	@Test
 	public void testCreateWidgetEditors() {
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, true);
 		verify(mockGinInjector).getYouTubeConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, false);
 		verify(mockGinInjector).getOldImageConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, true);
+		verify(mockGinInjector).getImageConfigEditor();
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, true);
 		verify(mockGinInjector).getProvenanceConfigEditor();
 	}
 	
@@ -87,33 +88,6 @@ public class WidgetRegistrarImplTest {
 		//there's a single key/value pair, so there isn't an ordering problem in this test.  If another key/value were added to the Image WidgetDescriptor, 
 		//then this equality test would be fragile (since the keys are not necessarily in order)
 		Assert.assertEquals(WidgetConstants.IMAGE_CONTENT_TYPE+"?fileName=getMDRepresentationDecodedTest%2Epng", actualResult);
-	}
-	
-	@Test
-	public void testRoundTripEncodeDecode() {
-		//round trip tests
-		String in = "[{value1:\"10%\" \nvalue2:[{v2a=\"1 and %0A\"},{v2b=\"2\"}]}]";
-		String encoded = widgetRegistrar.encodeValue(in);
-		Assert.assertEquals("%5B%7Bvalue1%3A\"10%25\" %0Avalue2%3A%5B%7Bv2a%3D\"1 and %250A\"%7D%2C%7Bv2b%3D\"2\"%7D%5D%7D%5D", encoded);
-		String out = widgetRegistrar.decodeValue(encoded);
-		Assert.assertEquals(in, out);
-	
-		in = "{}-_.!~*'()[]:;\n\r/?&=+,#$%";
-		encoded = widgetRegistrar.encodeValue(in);
-		out = widgetRegistrar.decodeValue(encoded);
-		Assert.assertEquals(in, out);
-		
-		Assert.assertEquals("", widgetRegistrar.encodeValue(""));
-		Assert.assertEquals("", widgetRegistrar.decodeValue(""));
-		Assert.assertEquals("%", widgetRegistrar.decodeValue("%25"));
-		String oldParamName = "oldNonEscapedDot.png";  //now periods are escaped, but decoding one of these old values should not fail
-		Assert.assertEquals(oldParamName, widgetRegistrar.decodeValue(oldParamName));
-		//test rolling decode window
-		Assert.assertEquals("hi", widgetRegistrar.decodeValue("hi"));
-		Assert.assertEquals("123", widgetRegistrar.decodeValue("123"));
-		Assert.assertEquals("1234", widgetRegistrar.decodeValue("1234"));
-}
-	
-	
+	}	
 	
 }

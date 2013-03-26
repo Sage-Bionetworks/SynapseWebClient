@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.client.Element;
 
 
 public class DisplayConstants {
@@ -12,6 +13,9 @@ public class DisplayConstants {
 	/*
 	 * Text constants
 	 */
+	public static final String DEFAULT_PAGE_TITLE = "Sage Synapse: Contribute to the Cure";
+	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
+	
 	public static final String FOLLOW_DATASET_HTML = "Following a dataset allows you to be notified when the dataset has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this dataset. You can adjust your notifications settings through your Profile.";  
 	public static final String FOLLOW_PROJECT_HTML = "Following a project allows you to be notified when the project has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";
 	public static final String FOLLOW_ANALYSIS_HTML = "Following an analysis project allows you to be notified when the analysis has new comments or additional steps.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";
@@ -45,6 +49,8 @@ public class DisplayConstants {
 	public static final String PASSWORD_SET_FAILED_TEXT = "Password change failed. Please try again.";
 	public static final String PASSWORD_RESET_TEXT = "Your password has been reset.";
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
+	
+	public static final String PREVIEW_UNAVAILABLE="No Preview Available";	//text shown when FileEntity preview can't be shown
 	
 	public static final String NEWS_UNAVAILABLE_TEXT = "The Synapse news service is currently unavailable.";
 	public static final String SUPPORT_FEED_UNAVAILABLE_TEXT = "The Synapse support feed service is currently unavailable.";
@@ -200,7 +206,7 @@ public class DisplayConstants {
 	public static final String LABEL_SEARCH = "Search";
 	public static final String LABEL_PROJECT_NAME = "Project Name";
 	public static final String LABEL_PROJECT_CREATED = "Project Created";
-	public static final String TEXT_UPLOAD_FILE = "Upload or Link to File";
+	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
 	public static final String TEXT_USER_SETTINGS = "Settings";
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
 	public static final String LABEL_UPLOAD_TO_SYNAPSE = "To Synapse";
@@ -293,7 +299,7 @@ public class DisplayConstants {
 	public static final String HIDE_VERSIONS = "hide all versions";
 	public static final String NOT_FOUND = "Not Found";
 	public static final String ERROR_LOADING = "Error Loading";
-	public static final String ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT = "Preview failed: ";
+	public static final String PREVIEW_FAILED_TEXT = "Preview failed: ";
 	public static final String ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT = "Preview";
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
 	public static final String ENTITY_DESCRIPTION_TIPS_TEXT = "Formatting Guide";
@@ -304,9 +310,9 @@ public class DisplayConstants {
 	public static final String CODE_EXECUTION = "Code Execution";
 	public static final String MANUAL = "Manual";
 	public static final String UNDEFINED = "Undefined";
-	public static final String NOT_VERSIONED = "not versioned";
 	public static final String ERROR_LAYOUT = "An error occured laying out the Provenance view.";
 	public static final String ERROR_PROVENANCE = "An error occured creating the Provenance view.";
+	public static final String ERROR_PROVENANCE_RELOAD = "Loading Error. Reload.";
 	public static final String ENTITY = "Entity";
 	public static final String LOADING = "Loading";
 	public static final String ACTIVITY = "Activity";
@@ -326,6 +332,7 @@ public class DisplayConstants {
 	public static final String IMAGE_CONFIG_URL_LABEL = "Image URL:";
 	public static final String IMAGE_CONFIG_ALT_TEXT = "Alternate Text:";
 	public static final String URL_LABEL = "URL:";
+	public static final String TABLE_LABEL = "Tab Delimitted Table Contents:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
 	public static final String SYNAPSE_API_CALL_URL_LABEL = "Synapse API URI:";
@@ -339,9 +346,12 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_WIDTH = "Width (% or pixels)";
 	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
 	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
+	public static final String SHINYSITE_SITE_LABEL = "Shiny Site URL";
+	public static final String WIDTH = "Width";
+	public static final String HEIGHT = "Height";
 	
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
-	public static final String SHOW_EXPANDED_LABEL = "Show Expanded?";
+	public static final String SHOW_EXPAND = "Show Expand";
 	public static final String INVALID_NUMBER_MESSAGE = "Please enter a valid number";
 	public static final String DEPTH_LABEL = "Depth";
 	public static final String INVALID_SYNAPSE_ID_MESSAGE = "Please enter a valid Synapse ID";
@@ -403,7 +413,7 @@ public class DisplayConstants {
 	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to these data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
 	
-	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
+	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
 	public static String GOVERNANCE_REFERENCE = "For more information on data access conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
 	
@@ -448,6 +458,7 @@ public class DisplayConstants {
 	public static final String ADD_FILE = "Add File";
 	public static final String FILES = "Files";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
+	public static final String ERROR_FILE_CREATION_FAILED = "File creation failed. Please try again";
 	public static final String PAGES = "Pages";
 	public static final String ADD_PAGE = "Add a new Page";
 	public static final String CREATE_WIKI = "Insert Wiki";
@@ -469,6 +480,12 @@ public class DisplayConstants {
 	public static final String CURRENT = "Current";
 	public static final String CURRENTLY_SELCTED = "Currently Selected";
 	public static final String PLEASE_MAKE_SELECTION = "Please make a selection";
+	public static final String CLOSE = "Close";
+	public static final String DISPLAY_HEIGHT = "Display Height";
+	public static final String DEFAULT = "Default";
+	public static final String ENTITY_LIST = "Entity List";
+	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
+	public static final String FIND_ENTITIES = "Find Entities";
 	
 	public static final String API_TABLE_COLUMN_COUNT_MISMATCH = "SuperTable: The number of columns must be the same as the number of renderers and column header titles.";
 	public static final String API_TABLE_MISSING_URI = "SuperTable: Endpoint path not specified.";
@@ -480,5 +497,15 @@ public class DisplayConstants {
 	public static final String TEST_MODE_WARNING = "This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade. Are you sure you want to switch into this mode?";
 	
 	public static final String UNSUPPORTED_FOR_OWNER_TYPE = "This operation is not currently supported for the given owner type: ";
+	public static final String MY_PROJECTS = "My Projects";
+	public static final String FAVORITES = "Favorites";
+	public static final String ERROR_LOADING_FAVORITES = "Error loading Favorites.";
+	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
+	public static final String EXTERNAL_URL = "External URL";
+	public static final String ADD_ENTITY = "Add Entity";
+	public static final String INVALID_SHINY_SITE = " is not a valid Shiny Site URL. Please " + DisplayUtils.HELP_EMAIL_ADDRESS_LINK + " if you would like your Shiny Server added to our white list.";
+	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
+	
+	
 }
 

@@ -13,16 +13,24 @@ public class WidgetConstants {
 	public static final String IMAGE_CONTENT_TYPE = "image";
 	public static final String IMAGE_FRIENDLY_NAME ="Image";
 	
-	public static final String ATTACHMENT_PREVIEW_CONTENT_TYPE = "preview";
-	public static final String ATTACHMENT_PREVIEW_FRIENDLY_NAME ="Attachment Preview";
-
+	public static final String ATTACHMENT_PREVIEW_CONTENT_TYPE = "previewattachment";
+	public static final String ATTACHMENT_PREVIEW_FRIENDLY_NAME ="Attachment";
 	
 	public static final String LINK_CONTENT_TYPE = "link";
 	public static final String LINK_FRIENDLY_NAME ="Link";
 
+	public static final String TABBED_TABLE_CONTENT_TYPE = "tabbedtable";
+	public static final String TABBED_TABLE_FRIENDLY_NAME ="Table";
+	
 	public static final String API_TABLE_CONTENT_TYPE = "supertable";
 	public static final String API_TABLE_FRIENDLY_NAME = "Super Table (Synapse API Based)";
+
+	public static final String ENTITYLIST_CONTENT_TYPE = "entitylist";
+	public static final String ENTITYLIST_FRIENDLY_NAME ="Entity List";
 	
+	public static final String SHINYSITE_CONTENT_TYPE = "shinysite";
+	public static final String SHINYSITE_FRIENDLY_NAME ="Shiny Site";
+		
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
@@ -34,12 +42,20 @@ public class WidgetConstants {
 	/**
 	 * Widget parameter keys
 	 */
+	
 	public static final String IMAGE_WIDGET_FILE_NAME_KEY = "fileName";
 	public static final String IMAGE_WIDGET_WIDTH_KEY = "width";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
+
+	@Deprecated
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
+	public static final String PROV_WIDGET_ENTITY_LIST_KEY = "entityList";
+	public static final String PROV_WIDGET_ENTITY_LIST_DELIMETER = ",";
 	public static final String PROV_WIDGET_DEPTH_KEY = "depth";
 	public static final String PROV_WIDGET_EXPAND_KEY = "showExpand";
+	public static final String PROV_WIDGET_UNDEFINED_KEY = "showUndefined";
+	public static final String PROV_WIDGET_DISPLAY_HEIGHT_KEY = "displayHeightPx";
+	public static final int PROV_WIDGET_HEIGHT_DEFAULT = 275;
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
 	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
 	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";
@@ -52,8 +68,11 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_COLUMNS_KEY = "columns";
 	public static final String API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY = "displayNames";
 	public static final String API_TABLE_WIDGET_RENDERERS_KEY = "renderers";
+	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	
-	
+	public static final String SHINYSITE_SITE_KEY = "site";	
+	public static final String SHINYSITE_HEIGHT_KEY = "height";
+	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
 	/**
 	 * API Table Column Renderers
@@ -64,4 +83,6 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
 	public static final String MARKDOWN_HEADING_ID_PREFIX = "synapseheading";
+
 }
+

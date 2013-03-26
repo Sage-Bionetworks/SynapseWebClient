@@ -8,9 +8,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.MarkdownUtils;
 
 public class DisplayUtilsTest {
 	
@@ -102,19 +100,12 @@ public class DisplayUtilsTest {
 	}
 	
 	@Test
-	public void testAttachmentLinkMarkdown(){
-		String expectedResult = "![Example](Attachment/entity/syn12345/tokenId/tokenA/1234/previewTokenId/previewA/5678 \"my title\")";
-		String actualResult = MarkdownUtils.getAttachmentLinkMarkdown("Example", "syn12345", "tokenA/1234", "previewA/5678", "my title");
-		Assert.assertEquals(actualResult, expectedResult);
-	}
-
-	@Test
 	public void testGetFileNameFromLocationPath() {
 		String name = "filename.txt";
-		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://some.really.long.com/path/to/a/file/" + name));
-		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://some.really.long.com/path/to/a/file/" + name + "?param1=value&param2=value"));
-		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("/root/" + name));
-		assertEquals(name, DisplayUtils.getFileNameFromLocationPath("http://google.com/" + name));
+		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("http://some.really.long.com/path/to/a/file/" + name));
+		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("http://some.really.long.com/path/to/a/file/" + name + "?param1=value&param2=value"));
+		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("/root/" + name));
+		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("http://google.com/" + name));
 		
 	}
 	

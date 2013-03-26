@@ -45,12 +45,12 @@ public class MarkdownWidget extends LayoutContainer {
 	 * @param md
 	 * @param attachmentBaseUrl if null, will use file handles
 	 */
-	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isPreview) {
-		this.removeAll();
+	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isWiki, final boolean isPreview) {
 		synapseClient.markdown2Html(md, isPreview, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
+					removeAll();
 					HTMLPanel panel;
 					if(result == null || "".equals(result)) {
 				    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%;margin-bottom:30px\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>"));
@@ -63,13 +63,14 @@ public class MarkdownWidget extends LayoutContainer {
 					layout();
 					synapseJSNIUtils.highlightCodeBlocks();
 					//asynchronously load the widgets
-					loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, isPreview);
+					loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				removeAll();
 				showErrorMessage(DisplayConstants.ERROR_LOADING_MARKDOWN_FAILED+caught.getMessage());
 			}
 		});
@@ -86,7 +87,7 @@ public class MarkdownWidget extends LayoutContainer {
 	 * @param view
 	 * @throws JSONObjectAdapterException 
 	 */
-	public static void loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, IconsImageBundle iconsImageBundle, Boolean isPreview) throws JSONObjectAdapterException {
+	public static void loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, boolean isWiki, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, IconsImageBundle iconsImageBundle, Boolean isPreview) throws JSONObjectAdapterException {
 		final String suffix = isPreview ? DisplayConstants.DIV_ID_PREVIEW_SUFFIX : "";
 		//look for every element that has the right format
 		int i = 0;
@@ -100,7 +101,7 @@ public class MarkdownWidget extends LayoutContainer {
 						innerText = innerText.trim();
 						String contentType = widgetRegistrar.getWidgetContentType(innerText);
 						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
-						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor);
+						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, isWiki);
 						if (presenter == null)
 							throw new IllegalArgumentException("unable to render widget from the specified markdown:" + innerText);
 						panel.add(presenter.asWidget(), currentWidgetDiv);
