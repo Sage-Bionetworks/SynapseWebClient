@@ -1439,7 +1439,7 @@ public class DisplayUtils {
 		//TODO: add Folder and Project once they are migrated (description goes to Wiki markdown, attachments to wiki FileHandles)
 		return (entity instanceof FileEntity);
 	}
-	
+		
 	public static boolean isRecognizedImageContentType(String contentType) {
 		String lowerContentType = contentType.toLowerCase();
 		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
