@@ -51,6 +51,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	private int downloadWindowWidth;
 	private List<LocationData> locations;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private String directDownloadURL;
 	
 	/*
 	 * Constructors
@@ -80,13 +81,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		if (!presenter.isDownloadAllowed()) return;
 		
 		if (approvalType==APPROVAL_TYPE.NONE) {
-			//if 1, open it
-			if (locations != null && locations.size() == 1){
-				DisplayUtils.newWindow(locations.get(0).getPath(),"","");
-			} else {
-				createDownloadWindow();
-				downloadWindow.show();
-			}
+			createDownloadWindow();
+			downloadWindow.show();
 		} else {
 			Callback termsOfUseCallback = presenter.getTermsOfUseCallback();
 			GovernanceDialogHelper.showAccessRequirement(
@@ -152,6 +148,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		SafeHtmlBuilder sb = new SafeHtmlBuilder();
 		String displayString = "Download";
 		String url = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
+		directDownloadURL = approvalType == APPROVAL_TYPE.NONE ? url : null;
 		sb.appendHtmlConstant("<a href=\"" + url + "\" target=\"_blank\">")
 		.appendEscaped(displayString)
 		.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
@@ -171,6 +168,11 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 			fillDownloadContentContainer();
 		}
 
+	}
+	
+	@Override
+	public String getDirectDownloadURL() {
+		return directDownloadURL;
 	}
 	
 	@Override

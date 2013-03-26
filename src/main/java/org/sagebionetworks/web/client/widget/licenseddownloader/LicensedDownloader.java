@@ -121,6 +121,14 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	}
 	
 	/**
+	 * If no access restrictions are present, then this will return the download url for the FileEntity FileHandle.  Otherwise, it will return null.
+	 * @return
+	 */
+	public String getDirectDownloadURL() {
+		return view.getDirectDownloadURL();
+	}
+	
+	/**
 	 * Returns a standard download button
 	 * @param entity
 	 * @param showDownloadLocations
