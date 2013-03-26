@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.Presenter;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
@@ -45,7 +46,6 @@ public class ProvViewUtil {
 	private static final int ENTITY_LINE_NUMBER_CHARS = 17;
 	private static final int MAX_TOOL_TIP_VALUE_CHAR = 43;	 	
 	private static final int MAX_ACT_CODE_NAME_CHAR = 17;
-	private static final int MAX_ACT_MANUAL_NAME_CHAR = 17;
 	private static LayoutContainer UNDEFINED_SUB_NODE;
 		
 	public static LayoutContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle) {
@@ -57,25 +57,13 @@ public class ProvViewUtil {
 		HTML activityLabel = null;
 		LayoutContainer subNode = null;
 		
-		switch(node.getType()) {
-		case CODE_EXECUTION:			
-			activityLabel = new HTML(node.getActivityName() != null ? stubEntityString(node.getActivityName(), MAX_ACT_CODE_NAME_CHAR) : DisplayConstants.CODE_EXECUTION);
-			subNode = createEntityContainer(null, node.getSubEntityId(), node.getSubName(),
-					node.getSubVersionLabel(),
-					node.getSubVersionNumber(),
-					node.getSubEntityType(), iconsImageBundle);		
-			break;
-		case MANUAL:
-			container.addStyleName(PROV_ACTIVITY_MANUAL_STYLE); 
-			activityLabel = new HTML(node.getActivityName() != null ? stubEntityString(node.getActivityName(), MAX_ACT_CODE_NAME_CHAR) : DisplayConstants.MANUAL);
-			break;
-		case UNDEFINED:
+		if(node.getType() == ActivityType.UNDEFINED) {		
 			container.addStyleName(PROV_ACTIVITY_UNDEFINED_STYLE);			
 			activityLabel = new HTML(DisplayConstants.UNDEFINED);
 			subNode = getUndefinedSubNode(iconsImageBundle);
-			break;
-		default:
-				break;
+		} else {
+			container.addStyleName(PROV_ACTIVITY_MANUAL_STYLE); 
+			activityLabel = new HTML(node.getActivityName() != null ? stubEntityString(node.getActivityName(), MAX_ACT_CODE_NAME_CHAR) : DisplayConstants.MANUAL);			
 		}
 		label.add(activityLabel);
 		container.add(label);
@@ -145,7 +133,7 @@ public class ProvViewUtil {
 		
 		// name
 		String stubName = stubEntityString(name, ENTITY_LINE_NUMBER_CHARS);
-		builder.appendEscaped(stubName);
+		if(stubName != null) builder.appendEscaped(stubName);
 		builder.appendHtmlConstant("<br/>");
 		
 		// version
