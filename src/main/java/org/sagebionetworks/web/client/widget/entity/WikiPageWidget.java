@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -189,21 +188,6 @@ SynapseWidgetPresenter {
 	}
 	
 	@Override
-	public void insertButtonClicked(boolean isFirstPage) {
-		if (isFirstPage) {
-			createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
-		}
-		else {
-			NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
-				@Override
-				public void onSave(String name, String description) {
-					createPage(name);
-				}
-			});
-		}
-	}
-	
-	@Override
 	public void saveClicked(String title, String md) 
 	{
 		//before saving, we need to update the page first (widgets may have added/removed file handles from the list, like ImageConfigEditor)
@@ -254,6 +238,7 @@ SynapseWidgetPresenter {
 		refresh();
 	}
 
+	@Override
 	public void createPage(final String name) {
 		WikiPage page = new WikiPage();
 		//if this is creating the root wiki, then refresh the full page

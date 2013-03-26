@@ -147,9 +147,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		// build a list of links in HTML
 		SafeHtmlBuilder sb = new SafeHtmlBuilder();
 		String displayString = "Download";
-		String url = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
-		directDownloadURL = approvalType == APPROVAL_TYPE.NONE ? url : null;
-		sb.appendHtmlConstant("<a href=\"" + url + "\" target=\"_blank\">")
+		directDownloadURL = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
+		sb.appendHtmlConstant("<a href=\"" + directDownloadURL + "\" target=\"_blank\">")
 		.appendEscaped(displayString)
 		.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
 		downloadWindowWidth = 300;

@@ -20,7 +20,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseWidgetView {
 	 */
 	public interface Presenter {
 		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage, int spanWidth);
-		public void insertButtonClicked(boolean isFirstPage);
+		public void createPage(String name);
 		public void deleteButtonClicked();
 		public void refreshWikiAttachments(final String updatedTitle, final String updatedMarkdown, final Callback pageUpdatedCallback);
 		public void saveClicked(String title, String md);

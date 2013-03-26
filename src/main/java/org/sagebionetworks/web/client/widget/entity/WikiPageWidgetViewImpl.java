@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHandler;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowser;
+import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
@@ -212,7 +213,18 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		insertButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				presenter.insertButtonClicked(isFirstPage);
+				if (isFirstPage) {
+					presenter.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
+				}
+				else {
+					NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
+						@Override
+						public void onSave(String name, String description) {
+							presenter.createPage(name);
+						}
+					});
+				}
+
 			}
 		});
 		return insertButton;
