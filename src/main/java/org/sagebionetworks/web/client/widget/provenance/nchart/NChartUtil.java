@@ -17,7 +17,8 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 public class NChartUtil {
 
 	public static final int DEFULT_DURATION = 10;
-	public static final double SCALE_X = 1.4; // scale x by	
+	public static final double SCALE_X = 1.5; // scale x by	
+	public static final double SCALE_Y = 0.75; // scale y by
 	
 	public static NChartLayersArray createLayers(JsoProvider jsoProvider, ProvGraph graph) {
 		Map<ProvGraphNode,Integer> nodeToLayer = new HashMap<ProvGraphNode, Integer>();	
@@ -153,6 +154,7 @@ public class NChartUtil {
 				XYPoint pt = xyPoints.get(0);
 				int x = (int) (pt.getY() * SCALE_X);
 				int y = (-1*pt.getX()) + range; // reflect y axis
+				y = new Long(Math.round(y * SCALE_Y)).intValue();
 				node.setxPos(x); 
 				node.setyPos(y);
 			}
