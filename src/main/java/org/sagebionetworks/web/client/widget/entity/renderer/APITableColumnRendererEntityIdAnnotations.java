@@ -113,60 +113,64 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 			private void processNext() {
 				//after all values have initialized, then do the final callback
 				if (currentIndex == columnData.size()-1) {
-					finalCallback.onSuccess(new APITableInitializedColumnRenderer() {
-						@Override
-						public Map<String, List<String>> getColumnData() {
-							if (outputColumnData == null) {
-								outputColumnData = new HashMap<String,List<String>>();
-								//create
-								for (String outputColumnName : getColumnNames()) {
-									List<String> outputColumn = new ArrayList<String>();
-									//go through every entry in sourceColumnData for this output column
-									for (String originalValue : sourceColumnData) {
-										String error = value2Error.get(originalValue);
-										if (error != null) {
-											outputColumn.add(error);
-										}
-										else {
-											List<EntityRow<?>> row = value2Annotations.get(originalValue);
-											//does this row have the same annotation
-											String renderedValue = "";
-											if (row != null) {
-												for (EntityRow<?> entityRow : row) {
-													if (entityRow.getLabel().equals(outputColumnName)) {
-														//report this display value
-														if (entityRow.getValue() != null)
-															renderedValue = entityRow.getDislplayValue();
-														break;
-													}
-												}
-											}
-											outputColumn.add(renderedValue);
-										}
-									}
-									outputColumnData.put(outputColumnName, outputColumn);
-								}
-							}
-							return outputColumnData;
-						}
-						
-						@Override
-						public List<String> getColumnNames() {
-							if (outputColumnNames == null) {
-								outputColumnNames =  new ArrayList<String>();
-								if (masterAnnotationList != null) {
-									for (EntityRow<?> entityRow : masterAnnotationList) {
-										outputColumnNames.add(entityRow.getLabel());
-									}
-								}
-							}
-							return outputColumnNames;
-						}
-					});
+					finalCallback.onSuccess(getOutputColumnRenderer());
 				} else
 					columnDataInit(columnData, currentIndex+1);
 			}
 		};
 		synapseClient.getEntityBundle(columnData.get(currentIndex), ENTITY| ANNOTATIONS, callback);
+	}
+	
+	private APITableInitializedColumnRenderer getOutputColumnRenderer() {
+		return new APITableInitializedColumnRenderer() {
+			@Override
+			public Map<String, List<String>> getColumnData() {
+				if (outputColumnData == null) {
+					outputColumnData = new HashMap<String,List<String>>();
+					//create
+					for (String outputColumnName : getColumnNames()) {
+						List<String> outputColumn = new ArrayList<String>();
+						//go through every entry in sourceColumnData for this output column
+						for (String originalValue : sourceColumnData) {
+							String error = value2Error.get(originalValue);
+							if (error != null) {
+								outputColumn.add(error);
+							}
+							else {
+								List<EntityRow<?>> row = value2Annotations.get(originalValue);
+								//does this row have the same annotation
+								String renderedValue = "";
+								if (row != null) {
+									for (EntityRow<?> entityRow : row) {
+										if (entityRow.getLabel().equals(outputColumnName)) {
+											//report this display value
+											if (entityRow.getValue() != null)
+												renderedValue = entityRow.getDislplayValue();
+											break;
+										}
+									}
+								}
+								outputColumn.add(renderedValue);
+							}
+						}
+						outputColumnData.put(outputColumnName, outputColumn);
+					}
+				}
+				return outputColumnData;
+			}
+			
+			@Override
+			public List<String> getColumnNames() {
+				if (outputColumnNames == null) {
+					outputColumnNames =  new ArrayList<String>();
+					if (masterAnnotationList != null) {
+						for (EntityRow<?> entityRow : masterAnnotationList) {
+							outputColumnNames.add(entityRow.getLabel());
+						}
+					}
+				}
+				return outputColumnNames;
+			}
+		};
 	}
 }

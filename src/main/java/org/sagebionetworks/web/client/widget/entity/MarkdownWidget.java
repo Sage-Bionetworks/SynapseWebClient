@@ -106,9 +106,9 @@ public class MarkdownWidget extends LayoutContainer {
 						if (presenter == null)
 							throw new IllegalArgumentException("unable to render widget from the specified markdown:" + innerText);
 						panel.add(presenter.asWidget(), currentWidgetDiv);
-					}catch(IllegalArgumentException e) {
+					}catch(Throwable e) {
 						//try our best to load all of the widgets. if one fails to load, then fail quietly.
-						panel.add(new HTMLPanel(DisplayUtils.getIconHtml(iconsImageBundle.error16()) + innerText), currentWidgetDiv);
+						panel.add(new HTMLPanel(DisplayUtils.getIconHtml(iconsImageBundle.error16()) + innerText + "<br>Message: " + e.getMessage()), currentWidgetDiv);
 					}
 				}
 			

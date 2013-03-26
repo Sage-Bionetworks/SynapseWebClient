@@ -86,7 +86,7 @@ public class APITableColumnConfig {
 	 * 
 	 * @return rendererName
 	 */
-	public String getRendererName() {
+	public String getRendererFriendlyName() {
 		return rendererName;
 	}
 
@@ -99,7 +99,7 @@ public class APITableColumnConfig {
 	 * 
 	 * @param rendererName
 	 */
-	public void setRendererName(String rendererName) {
+	public void setRendererFriendlyName(String rendererName) {
 		this.rendererName = rendererName;
 	}
 

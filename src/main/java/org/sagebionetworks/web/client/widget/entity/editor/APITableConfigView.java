@@ -13,7 +13,6 @@ public interface APITableConfigView extends IsWidget, WidgetEditorView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	public void setApiUrl(String url);
 	public String getApiUrl();
 	
 	public String getTableWidth();
@@ -23,7 +22,8 @@ public interface APITableConfigView extends IsWidget, WidgetEditorView {
 	public String getRowNumberColumnName();
 	public String getJsonResultsKeyName();
 	public String getCssStyle();
-	public void setConfigs(List<APITableColumnConfig> configs);
+	public List<APITableColumnConfig> getConfigs();
+	public void configure(APITableConfig tableConfig);
 	
 	/**
 	 * Presenter interface
@@ -31,4 +31,6 @@ public interface APITableConfigView extends IsWidget, WidgetEditorView {
 	public interface Presenter {
 
 	}
+
+	
 }

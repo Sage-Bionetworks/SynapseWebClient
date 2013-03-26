@@ -110,13 +110,17 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Override
-	public void configure(String markdown, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit) {
+	public void configure(WikiPage newPage, WikiPageKey wikiKey,
+			String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.ownerObjectName = ownerObjectName;
+		this.currentPage = newPage;
+		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		this.spanWidth = spanWidth;
+		
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
-		markdownWidget.setMarkdown(currentPage.getMarkdown(), wikiKey, true, false);
+		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
 		pagesBrowser.configure(wikiKey, ownerObjectName, ownerHistoryToken, DisplayConstants.PAGES, canEdit);
 		showDefaultViewWithWiki();
 	}

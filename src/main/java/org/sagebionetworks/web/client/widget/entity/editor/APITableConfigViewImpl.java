@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -24,12 +23,10 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	private Presenter presenter;
 	private TextField<String> urlField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField, widthField;
 	private CheckBox isPagingField, isRowVisibleField;
-	private IconsImageBundle iconsImageBundle;
 	private APITableColumnManager columnsManager;
 	
 	@Inject
-	public APITableConfigViewImpl(IconsImageBundle iconsImageBundle, APITableColumnManager columnsManager) {
-		this.iconsImageBundle = iconsImageBundle;
+	public APITableConfigViewImpl(APITableColumnManager columnsManager) {
 		this.columnsManager = columnsManager;
 	}
 	
@@ -88,8 +85,21 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	}
 	
 	@Override
-	public void setConfigs(List<APITableColumnConfig> configs) {
-		columnsManager.configure(configs);
+	public void configure(APITableConfig tableConfig) {
+		columnsManager.configure(tableConfig.getColumnConfigs());
+		urlField.setValue(tableConfig.getUri());
+		isPagingField.setValue(tableConfig.isPaging());
+		isRowVisibleField.setValue(tableConfig.isShowRowNumber());
+		rowNumbersColumnNameField.setValue(tableConfig.getRowNumberColName());
+		pageSizeField.setValue(Integer.toString(tableConfig.getPageSize()));
+		jsonResultsKeyNameField.setValue(tableConfig.getJsonResultsArrayKeyName());
+		cssStyleNameField.setValue(tableConfig.getCssStyleName());
+		widthField.setValue(tableConfig.getTableWidth());
+	}
+	
+	@Override
+	public List<APITableColumnConfig> getConfigs() {
+		return columnsManager.getColumnConfigs();
 	}
 	
 	private LayoutContainer initNewField(String label, Field field, FlowPanel container) {
@@ -114,11 +124,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	@Override
 	public String getApiUrl() {
 		return urlField.getValue();
-	}
-	
-	@Override
-	public void setApiUrl(String url) {
-		urlField.setValue(url);
 	}
 	
 	@Override

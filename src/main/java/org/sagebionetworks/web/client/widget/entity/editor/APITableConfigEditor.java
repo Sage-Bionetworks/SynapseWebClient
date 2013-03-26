@@ -7,7 +7,6 @@ import java.util.Map;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -17,7 +16,6 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 	
 	private APITableConfigView view;
 	private Map<String, String> descriptor;
-	private List<APITableColumnConfig> configs;
 	
 	@Inject
 	public APITableConfigEditor(APITableConfigView view) {
@@ -29,11 +27,10 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
-		String uri = descriptor.get(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
-		if (uri != null)
-			view.setApiUrl(uri);
-		configs = new ArrayList<APITableColumnConfig>();
-		view.setConfigs(configs);
+		APITableConfig tableConfig = new APITableConfig(widgetDescriptor);
+		if (tableConfig.getColumnConfigs() == null)
+			tableConfig.setColumnConfigs(new ArrayList<APITableColumnConfig>());
+		view.configure(tableConfig);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -58,20 +55,20 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, view.getRowNumberColumnName());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, view.getJsonResultsKeyName());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE, view.getCssStyle());
-		
+		List<APITableColumnConfig> configs = view.getConfigs();
 		for (int i = 0; i < configs.size(); i++) {
 			APITableColumnConfig config = configs.get(i);
 			StringBuilder sb = new StringBuilder();
-			sb.append(config.getRendererName());
-			sb.append(APITableWidget.FIELD_DELIMITER);
+			sb.append(config.getRendererFriendlyName());
+			sb.append(APITableConfig.FIELD_DELIMITER);
 			String displayColumnName = "";
 			if (config.getDisplayColumnName() != null)
 				displayColumnName = config.getDisplayColumnName().trim();
 			sb.append(WidgetEncodingUtil.encodeValue(displayColumnName));
-			sb.append(APITableWidget.FIELD_DELIMITER);
+			sb.append(APITableConfig.FIELD_DELIMITER);
 			for (String columnName : config.getInputColumnNames()) {
 				sb.append(columnName);
-				sb.append(APITableWidget.COLUMN_NAMES_DELIMITER);
+				sb.append(APITableConfig.COLUMN_NAMES_DELIMITER);
 			}
 			updateDescriptor(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i, sb.toString());
 		}

@@ -57,7 +57,7 @@ public class APITableColumnManagerTest {
 		APITableColumnConfig newConfig = manager.getColumnConfigs().get(0);
 		verify(mockView).configure(anyList());
 		assertEquals(defaultInputColumnNamesSet, newConfig.getInputColumnNames());
-		assertEquals(defaultRendererName, newConfig.getRendererName());
+		assertEquals(defaultRendererName, newConfig.getRendererFriendlyName());
 		assertEquals(defaultInputColumnName, newConfig.getDisplayColumnName());
 		
 		//now try deleting the thing

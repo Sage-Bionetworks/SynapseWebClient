@@ -67,6 +67,7 @@ SynapseWidgetPresenter {
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.adapterFactory = adapterFactory;
 		this.globalApplicationState = globalApplicationState;
+		view.setPresenter(this);
 	}
 	
 	@Override
@@ -74,7 +75,7 @@ SynapseWidgetPresenter {
 		return view.asWidget();
 	}
 	
-	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage, int spanWidth) {
+	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, Callback callback, final boolean isEmbeddedInOwnerPage, final int spanWidth) {
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
@@ -100,7 +101,7 @@ SynapseWidgetPresenter {
 						try {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
-							view.configure(currentPage.getMarkdown(), wikiKey, ownerObjectName, canEdit);
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isEmbeddedInOwnerPage, spanWidth);
 						} catch (JSONObjectAdapterException e) {
 							onFailure(e);
 						}

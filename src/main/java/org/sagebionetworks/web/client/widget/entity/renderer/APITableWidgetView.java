@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface APITableWidgetView extends IsWidget {
@@ -13,7 +15,7 @@ public interface APITableWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(Map<String, List<String>> columnData, String[] columnNames, APITableInitializedColumnRenderer[] renderers, String tableWidth, boolean showRowNumbers, String rowNumberColName, String cssStyleName, int offset);
+	public void configure(Map<String, List<String>> columnData, String[] columnNames, APITableInitializedColumnRenderer[] renderers, APITableConfig tableConfig);
 	/**
 	 * Call to add the pager bar to the table
 	 * @param start

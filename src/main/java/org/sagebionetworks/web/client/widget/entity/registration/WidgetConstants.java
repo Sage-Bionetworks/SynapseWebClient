@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.registration;
 
+
 public class WidgetConstants {
 	public static final String WIKI_OWNER_ID_ENTITY = "ENTITY";
 	public static final String WIKI_OWNER_ID_EVALUATION = "EVALUATION";
@@ -79,6 +80,7 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_DATE = "date";
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
+	
 	public static final String MARKDOWN_HEADING_ID_PREFIX = "synapseheading";
 	public static final String MARKDOWN_TABLE_ID_PREFIX = "markdown-table-";
 
