@@ -17,7 +17,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 public class NChartUtil {
 
 	public static final int DEFULT_DURATION = 10;
-	public static final double SCALE_X = 1.5; // scale x by	
+	public static final double SCALE_X = 1.7; // scale x by	
 	public static final double SCALE_Y = 0.75; // scale y by
 	
 	public static NChartLayersArray createLayers(JsoProvider jsoProvider, ProvGraph graph) {
@@ -225,6 +225,19 @@ public class NChartUtil {
 	private static class EdgesForNode {
 		List<ProvGraphEdge> in;
 		List<ProvGraphEdge> out;	
+	}
+
+	public static void repositionExpandNodes(ProvGraph graph) {
+		if(graph != null && graph.getEdges() != null) {
+			for(ProvGraphEdge edge : graph.getEdges()) {
+				if(edge.getSink() instanceof ExpandGraphNode) {
+					// place expand node directly above node
+					edge.getSink().setxPos(edge.getSource().getxPos() + 32);
+					edge.getSink().setyPos(edge.getSource().getyPos() - 35);
+				}
+			}
+		}
+		
 	}
 		
 }
