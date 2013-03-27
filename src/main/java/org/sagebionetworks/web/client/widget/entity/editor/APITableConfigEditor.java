@@ -28,8 +28,6 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
 		APITableConfig tableConfig = new APITableConfig(widgetDescriptor);
-		if (tableConfig.getColumnConfigs() == null)
-			tableConfig.setColumnConfigs(new ArrayList<APITableColumnConfig>());
 		view.configure(tableConfig);
 	}
 	

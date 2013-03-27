@@ -131,7 +131,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 							APITableColumnRenderer[] renderers = new APITableColumnRenderer[tableConfig.getColumnConfigs().size()];
 							int i = 0;
 							for (APITableColumnConfig config : tableConfig.getColumnConfigs()) {
-								renderers[i] = createColumnRendererInstance(config.getRendererFriendlyName());
+								renderers[i] = createColumnRendererInstance(ginInjector, config.getRendererFriendlyName());
 								i++;
 							}
 							
@@ -240,7 +240,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	 * @param friendlyName
 	 * @return
 	 */
-	public APITableColumnRenderer createColumnRendererInstance(String friendlyName) {
+	public static APITableColumnRenderer createColumnRendererInstance(PortalGinInjector ginInjector, String friendlyName) {
 		APITableColumnRenderer renderer;
 		if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID))
 			renderer = ginInjector.getAPITableColumnRendererUserId();
@@ -250,8 +250,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			renderer = ginInjector.getAPITableColumnRendererSynapseID();
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS))
 			renderer = ginInjector.getAPITableColumnRendererEntityAnnotations();
-		else
+		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE))
 			renderer = ginInjector.getAPITableColumnRendererNone();
+		else
+			throw new IllegalArgumentException("Unknown friendly column renderer name:" + friendlyName);
 		
 		return renderer;
 	}

@@ -81,8 +81,12 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		if (!presenter.isDownloadAllowed()) return;
 		
 		if (approvalType==APPROVAL_TYPE.NONE) {
-			createDownloadWindow();
-			downloadWindow.show();
+			if (directDownloadURL != null) {
+				DisplayUtils.newWindow(directDownloadURL, "", "");
+			} else {
+				createDownloadWindow();
+				downloadWindow.show();
+			}
 		} else {
 			Callback termsOfUseCallback = presenter.getTermsOfUseCallback();
 			GovernanceDialogHelper.showAccessRequirement(
@@ -194,6 +198,9 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 				}
 				sb.appendHtmlConstant("<br/>");				
 			}
+			if (locations.size() == 1) {
+				directDownloadURL = locations.get(0).getPath();
+			} else directDownloadURL = null;
 			safeDownloadHtml = sb.toSafeHtml();
 			if (md5 == null)
 				downloadWindowWidth = 300;
