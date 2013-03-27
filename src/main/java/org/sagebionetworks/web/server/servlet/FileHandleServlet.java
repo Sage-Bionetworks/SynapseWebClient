@@ -50,7 +50,6 @@ import com.google.inject.Inject;
  */
 public class FileHandleServlet extends HttpServlet {
 
-	public static final int MAX_TIME_OUT = 10 * 1000;
 	private static Logger logger = Logger.getLogger(FileUpload.class.getName());
 	private static final long serialVersionUID = 1L;
 
