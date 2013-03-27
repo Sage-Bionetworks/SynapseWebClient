@@ -813,3 +813,15 @@ strong {
 .underline {
 	text-decoration: underline;
 }
+ol.decimal {	
+	list-style: decimal outside;
+	padding: 0 0 0 30px;
+}
+ol.loweralpha {	
+	list-style: lower-alpha outside;
+	padding: 0 0 0 30px;
+}
+ol.lowerroman {	
+	list-style: lower-roman outside;
+	padding: 0 0 0 30px;
+}

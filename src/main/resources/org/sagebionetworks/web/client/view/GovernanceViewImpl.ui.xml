@@ -60,7 +60,7 @@
 						  <li><strong>Respect intellectual property rights</strong> of others and <strong>acknowledge contributors</strong> in all presentations. </li>
 						  <li><strong>Not discriminate,</strong> <strong>identify, or re-contact</strong> individuals or groups represented by the data.</li>
 						  <li>Use and contribute only data that has been <strong>de-identified to HIPAA standards</strong>. For information about de-identification in accordance with the HIPAA Privacy Rule, please visit 
-						  <a class="link" href="http://www.hhs.gov/ocr/privacy/hipaa/understanding/coveredentities/De-identification/guidance.html" target="_blank">http://www.hhs.gov/ocr/privacy/hipaa/understanding/coveredentities/De-identification/guidance.html</a>.  </li>
+						  <a class="link" target="_blank" href="http://www.hhs.gov/ocr/privacy/hipaa/understanding/coveredentities/De-identification/guidance.html">http://www.hhs.gov/ocr/privacy/hipaa/understanding/coveredentities/De-identification/guidance.html</a>.  </li>
 						  <li><strong>Ensure that human participants have consented to share their data on Synapse, where required by applicable law</strong>.<strong></strong></li>
 						  <li><strong>Keep personal information private and secure from any potential abuses</strong>.<strong></strong></li>
 						</ul>
@@ -68,9 +68,9 @@
 						<p><span class="underline">Sage Bionetworks wants you to know that:</span></p>
 						<ul class="list arrow-list">
 						  <li>Contribution to and use of data in the Synapse Commons are governed by <strong>these 
-						  <a class="link" href="https://synapse.prod.sagebase.org/static/governance/SynapseCommonsDataUseProcedure.pdf" target="_blank">Terms and Conditions of Use</a>, 
-						  the </strong><a class="link" href="https://synapse.prod.sagebase.org/static/governance/SynapseCommonsDataUseProcedure.pdf" target="_blank"><strong>Synapse Commons Data Use Procedure</strong></a>
-						  <strong> and the </strong><a class="link" href="https://synapse.prod.sagebase.org/static/governance/SynapsePrivacyPolicy.pdf" target="_blank"><strong>Synapse Privacy Policy</strong></a><strong>.</strong></li>
+						  <a class="link" target="_blank" href="https://synapse.prod.sagebase.org/static/governance/SynapseCommonsDataUseProcedure.pdf">Terms and Conditions of Use</a>, 
+						  the </strong><a class="link" target="_blank" href="https://synapse.prod.sagebase.org/static/governance/SynapseCommonsDataUseProcedure.pdf"><strong>Synapse Commons Data Use Procedure</strong></a>
+						  <strong> and the </strong><a class="link" target="_blank" href="https://synapse.prod.sagebase.org/static/governance/SynapsePrivacyPolicy.pdf"><strong>Synapse Privacy Policy</strong></a><strong>.</strong></li>
 						  <li>We will <strong>remove content</strong> if we deem it inappropriate.</li>
 						  <li>These Terms and Conditions of Use apply to, but we otherwise do not monitor, data or content contributed to <strong>private workspaces</strong>.</li>
 						  <li>We respect the <strong>intellectual property rights</strong> of others, and ask you to do the same.</li>
@@ -80,29 +80,16 @@
 						</ul>
 						<br/>
 						
+												
 						<h2>Documents</h2>
 
-
-						<a class="link" href=""
-							target="_blank">
-							<h4>
-								<span style="text-decoration:underline;"></span>
-							</h4>
-						</a>
-					
-						<a class="link" href=""
-							target="_blank">
-							<h4>
-								<span style="text-decoration:underline;"></span>
-							</h4>
-						</a>
-						<h4><a class="link" href="static/governance/SynapsePrivacyPolicy.pdf" target="_blank">
+						<h4><a class="link" target="_blank" href="static/governance/SynapsePrivacyPolicy.pdf">
 							<span style="text-decoration:underline;">Synapse Privacy Policy</span>
 						</a></h4>
-						<h4><a class="link" href="static/governance/SynapseCommonsDataUseProcedure" target="_blank">
+						<h4><a class="link" target="_blank" href="static/governance/SynapseCommonsDataUseProcedure">
 							<span style="text-decoration:underline;">Synapse Data Use Procedure</span>
 						</a></h4>
-						<h4><a class="link" href="static/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf" target="_blank">
+						<h4><a class="link" target="_blank" href="static/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf">
 							<span style="text-decoration:underline;">Synapse Terms and Conditions of Use</span>
 						</a></h4>
 					</div>
