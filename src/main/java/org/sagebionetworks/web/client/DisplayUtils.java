@@ -1436,8 +1436,7 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isWikiSupportedType(Entity entity) {
-		//TODO: add Folder and Project once they are migrated (description goes to Wiki markdown, attachments to wiki FileHandles)
-		return (entity instanceof FileEntity);
+		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project); 
 	}
 		
 	public static boolean isRecognizedImageContentType(String contentType) {
