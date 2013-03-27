@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.Favorite;
-import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -12,7 +10,6 @@ import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -214,4 +211,6 @@ public interface SynapseClient extends RemoteService {
 	public void removeFavorite(String entityId) throws RestServiceException;
 	
 	public String getFavorites(Integer limit, Integer offset) throws RestServiceException;
+	
+	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 }
