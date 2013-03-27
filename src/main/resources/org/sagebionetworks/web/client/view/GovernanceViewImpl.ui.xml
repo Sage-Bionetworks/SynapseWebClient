@@ -11,6 +11,12 @@
 		.rowTop {
 			vertical-align: top;
 		}
+		strong {
+			font-weight: bold;
+		}
+		.underline {
+			text-decoration: underline !important;
+		}
 	</ui:style>
 
 	<g:HTMLPanel>
@@ -30,29 +36,75 @@
 							<a href="#">Home</a>
 						</li>
 					</ul>
-					<h2>Governance Documents</h2>
 
 					<div class="info">
-						<a href="static/governance/SynapseCommonsDataSharingPolicy.pdf"
+
+						<h2 align="center">Synapse Terms and Conditions of Use<br />
+						  Summary of key Provisions</h2>
+						<h4>Last updated: March 18, 2013</h4>
+						<p>By using Synapse, you agree to the Terms and Conditions of Use listed below.  Here is a summary of several key provisions of those Terms and Conditions.  Be certain to read the full Terms and Conditions of Use in detail; in the event of any conflict or inconsistency between this summary and the full Terms and Conditions, the full Terms and Conditions will govern.</p>
+						<p><span class="underline">When <strong>using Synapse</strong>, you must:</span></p>
+						<ul class="list arrow-list">
+						  <li><strong>Act ethically and responsibly</strong>.</li>
+						  <li><strong>Protect and respect data participant&rsquo;s privacy and confidentiality </strong></li>
+						  <li><strong>Abide by all applicable laws and regulations</strong>.</li>
+						  <li><strong>Not hack Synapse</strong>.</li>
+						  <li><strong>Share content only when you have authority</strong> to do so and sharing does not violate any applicable laws or contracts.</li>
+						  <li>Take <strong>full responsibility</strong> for your use of data, software and other Synapse content.</li>
+						</ul>
+						<br/>
+						<p><span class="underline">If using or contributing<strong> data</strong> on Synapse, you must:</span></p>
+						<ul class="list arrow-list">
+						  <li><strong>Register using accurate, current and complete information</strong>.<strong></strong></li>
+						  <li><strong>Understand and respect the specific rules for redistributing dataset, software or other content</strong>.<strong></strong></li>
+						  <li><strong>Respect intellectual property rights</strong> of others and <strong>acknowledge contributors</strong> in all presentations. </li>
+						  <li><strong>Not discriminate,</strong> <strong>identify, or re-contact</strong> individuals or groups represented by the data.</li>
+						  <li>Use and contribute only data that has been <strong>de-identified to HIPAA standards</strong>. For information about de-identification in accordance with the HIPAA Privacy Rule, please visit 
+						  <a class="link" href="http://www.hhs.gov/ocr/privacy/hipaa/understanding/coveredentities/De-identification/guidance.html" target="_blank">http://www.hhs.gov/ocr/privacy/hipaa/understanding/coveredentities/De-identification/guidance.html</a>.  </li>
+						  <li><strong>Ensure that human participants have consented to share their data on Synapse, where required by applicable law</strong>.<strong></strong></li>
+						  <li><strong>Keep personal information private and secure from any potential abuses</strong>.<strong></strong></li>
+						</ul>
+						<br/>
+						<p><span class="underline">Sage Bionetworks wants you to know that:</span></p>
+						<ul class="list arrow-list">
+						  <li>Contribution to and use of data in the Synapse Commons are governed by <strong>these 
+						  <a class="link" href="https://synapse.prod.sagebase.org/static/governance/SynapseCommonsDataUseProcedure.pdf" target="_blank">Terms and Conditions of Use</a>, 
+						  the </strong><a class="link" href="https://synapse.prod.sagebase.org/static/governance/SynapseCommonsDataUseProcedure.pdf" target="_blank"><strong>Synapse Commons Data Use Procedure</strong></a>
+						  <strong> and the </strong><a class="link" href="https://synapse.prod.sagebase.org/static/governance/SynapsePrivacyPolicy.pdf" target="_blank"><strong>Synapse Privacy Policy</strong></a><strong>.</strong></li>
+						  <li>We will <strong>remove content</strong> if we deem it inappropriate.</li>
+						  <li>These Terms and Conditions of Use apply to, but we otherwise do not monitor, data or content contributed to <strong>private workspaces</strong>.</li>
+						  <li>We respect the <strong>intellectual property rights</strong> of others, and ask you to do the same.</li>
+						  <li>You must be <strong>13 years old of age </strong>to use this site. </li>
+						  <li>We take <strong>no responsibility or liability for any content</strong> that has been posted to Synapse.</li>
+						  <li>You may <strong>cancel your Synapse account at any time</strong>.</li>
+						</ul>
+						<br/>
+						
+						<h2>Documents</h2>
+
+
+						<a class="link" href=""
 							target="_blank">
 							<h4>
-								<span style="text-decoration:underline;">Synapse Commons Data Sharing Policy</span>
+								<span style="text-decoration:underline;"></span>
 							</h4>
 						</a>
 					
-						<a href="static/governance/SynapseCommonsDataAccessandUseProcedure.pdf"
+						<a class="link" href=""
 							target="_blank">
 							<h4>
-								<span style="text-decoration:underline;">Synapse Commons Data Access and Use Procedure</span>
+								<span style="text-decoration:underline;"></span>
 							</h4>
 						</a>
-					
-						<a href="static/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf"
-							target="_blank">
-							<h4>
-								<span style="text-decoration:underline;">Synapse Terms and Conditions of Use</span>
-							</h4>
-						</a>
+						<h4><a class="link" href="static/governance/SynapsePrivacyPolicy.pdf" target="_blank">
+							<span style="text-decoration:underline;">Synapse Privacy Policy</span>
+						</a></h4>
+						<h4><a class="link" href="static/governance/SynapseCommonsDataUseProcedure" target="_blank">
+							<span style="text-decoration:underline;">Synapse Data Use Procedure</span>
+						</a></h4>
+						<h4><a class="link" href="static/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf" target="_blank">
+							<span style="text-decoration:underline;">Synapse Terms and Conditions of Use</span>
+						</a></h4>
 					</div>
 				</div>
 
