@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.List;
+import java.util.Map;
+
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
+
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -15,5 +19,5 @@ public interface APITableColumnRenderer {
 	 * @param columnData
 	 * @param callback
 	 */
-	void init(List<String> columnData, AsyncCallback<APITableInitializedColumnRenderer> callback);
+	void init(Map<String, List<String>> columnData, APITableColumnConfig config, AsyncCallback<APITableInitializedColumnRenderer> callback);
 }
