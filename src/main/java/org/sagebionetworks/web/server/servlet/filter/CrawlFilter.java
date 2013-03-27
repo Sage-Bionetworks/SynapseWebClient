@@ -29,9 +29,11 @@ import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -53,6 +55,8 @@ public class CrawlFilter implements Filter {
 	 */
 	private SynapseClientImpl synapseClient;
 
+	JSONObjectAdapter adapter;
+	
 	@Override
 	public void destroy() {
 		sc = null;
@@ -113,6 +117,8 @@ public class CrawlFilter implements Filter {
 	private String getHomePageHtml(){
 		StringBuilder html = new StringBuilder();
 		html.append("<html><head><title>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</title><meta name=\"description\" content=\""+DisplayConstants.DEFAULT_PAGE_DESCRIPTION+"\" /></head><body>");
+		//add direct links to all public projects in the system
+		
 		//add Search Projects link
 		html.append("<a href=\"#!Search:{%22returnFields%22:[%22name%22,%22description%22,%22id%22,%22node_type_r%22,%22created_by_r%22,%22created_on%22,%22modified_by_r%22,%22modified_on%22,%22path%22],%20%22facet%22:[%22node_type%22,%22species%22,%22disease%22,%22modified_on%22,%22created_on%22,%22tissue%22,%22num_samples%22,%22created_by%22],%20%22booleanQuery%22:[{%22value%22:%22project%22,%20%22key%22:%22node_type%22}],%20%22queryTerm%22:[%22%22]}\">All Projects</a>");
 		html.append("</body></html>");
@@ -176,7 +182,15 @@ public class CrawlFilter implements Filter {
 	}
 	
 	private String getAllProjectsHtml(String searchQueryJson) throws RestServiceException, JSONObjectAdapterException{
-		EntityWrapper entityWrapper = synapseClient.search(searchQueryJson);
+		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+
+		try {
+			query.writeToJSONObject(adapter);
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+		}
+		
+		EntityWrapper entityWrapper = synapseClient.search();
 		SearchResults results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
 		SearchQuery inputQuery = EntityFactory.createEntityFromJSONString(searchQueryJson, SearchQuery.class);
 		//append this set to the list
