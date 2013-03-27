@@ -811,3 +811,22 @@ h1, h2, h3, h4, h5, h6 {
 	font-size: 0.9em;
 	margin-left: 30px;
 }	
+
+strong {
+	font-weight: bold;
+}
+.underline {
+	text-decoration: underline;
+}
+ol.decimal {	
+	list-style: decimal outside;
+	padding: 0 0 0 30px;
+}
+ol.loweralpha {	
+	list-style: lower-alpha outside;
+	padding: 0 0 0 30px;
+}
+ol.lowerroman {	
+	list-style: lower-roman outside;
+	padding: 0 0 0 30px;
+}
