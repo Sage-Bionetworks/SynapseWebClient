@@ -24,6 +24,8 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityId;
+import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
@@ -32,6 +34,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
@@ -55,7 +58,7 @@ public class CrawlFilter implements Filter {
 	 */
 	private SynapseClientImpl synapseClient;
 
-	JSONObjectAdapter adapter;
+	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Override
 	public void destroy() {
@@ -114,13 +117,37 @@ public class CrawlFilter implements Filter {
 		}
 	}
 
-	private String getHomePageHtml(){
+	private String getHomePageHtml() throws JSONObjectAdapterException, RestServiceException{
 		StringBuilder html = new StringBuilder();
 		html.append("<html><head><title>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</title><meta name=\"description\" content=\""+DisplayConstants.DEFAULT_PAGE_DESCRIPTION+"\" /></head><body>");
 		//add direct links to all public projects in the system
+		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		html.append("<h1>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</h1>" + DisplayConstants.DEFAULT_PAGE_DESCRIPTION + "<br />");
+		String queryJson = "";
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		query.writeToJSONObject(adapter);
+		queryJson = adapter.toJSONString();
+
+		EntityWrapper entityWrapper = synapseClient.search(queryJson);
+		SearchResults results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
 		
-		//add Search Projects link
-		html.append("<a href=\"#!Search:{%22returnFields%22:[%22name%22,%22description%22,%22id%22,%22node_type_r%22,%22created_by_r%22,%22created_on%22,%22modified_by_r%22,%22modified_on%22,%22path%22],%20%22facet%22:[%22node_type%22,%22species%22,%22disease%22,%22modified_on%22,%22created_on%22,%22tissue%22,%22num_samples%22,%22created_by%22],%20%22booleanQuery%22:[{%22value%22:%22project%22,%20%22key%22:%22node_type%22}],%20%22queryTerm%22:[%22%22]}\">All Projects</a>");
+		//append this set to the list
+		while(results.getHits().size() > 0) {
+			for (Hit hit : results.getHits()) {
+				//add links
+				html.append("<a href=\"#!Synapse:"+hit.getId()+"\">"+hit.getName()+"</a><br />");
+			}
+			long newStart = results.getStart() + results.getHits().size();
+			query.setStart(newStart);
+			
+			adapter = jsonObjectAdapter.createNew();
+			query.writeToJSONObject(adapter);
+			queryJson = adapter.toJSONString();
+			
+			entityWrapper = synapseClient.search(queryJson);
+			results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
+		}
+		
 		html.append("</body></html>");
 		return html.toString();
 	}
@@ -134,7 +161,7 @@ public class CrawlFilter implements Filter {
 		String name = entity.getName();
 		String description = entity.getDescription();
 		String markdown = null;
-		
+		String createdBy = entity.getCreatedBy();
 		try{
 			String wikiPageJson = synapseClient.getWikiPage(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
 			WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, WikiPage.class);
@@ -146,12 +173,14 @@ public class CrawlFilter implements Filter {
 		//note: can't set description meta tag, since it might be markdown.
 		html.append("<html><head><title>"+entity.getId()+": "+name+"</title><meta name=\"description\" content=\"\" /></head><body>");
 		
-		html.append("<h5>Name</h5> " + name + "<br />");
+		html.append("<h1>"+name+"</h1>");
 		if (description != null)
-			html.append("<h5>Description</h5> " + description + "<br />");
+			html.append(description + "<br />");
+		if (createdBy != null)
+			html.append("Created By " + createdBy + "<br />");
 		if (markdown != null)
-			html.append("<h5>Wiki</h5> " + markdown + "<br />");
-		html.append("<h5>Annotations</h5> <br />");
+			html.append(markdown + "<br />");
+		html.append("<br />");
 		for (String key : annotations.getStringAnnotations().keySet()) {
 			List<String> value = annotations.getStringAnnotations().get(key);
 			html.append(key + getValueString(value) + "<br />");
@@ -165,6 +194,12 @@ public class CrawlFilter implements Filter {
 			html.append(key + getValueString(value) + "<br />");
 		}
 		
+		//and ask for all descendents
+		String childListJson = synapseClient.getDescendants(entityId, Integer.MAX_VALUE, null);
+		EntityIdList childList = EntityFactory.createEntityFromJSONString(childListJson, EntityIdList.class);
+		for (EntityId childId : childList.getIdList()) {
+			html.append("<a href=\"#!Synapse:"+childId.getId()+"\">"+childId.getId()+"</a><br />");
+		}
 		html.append("</body></html>");
 		return html.toString();
 	}
@@ -182,15 +217,7 @@ public class CrawlFilter implements Filter {
 	}
 	
 	private String getAllProjectsHtml(String searchQueryJson) throws RestServiceException, JSONObjectAdapterException{
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
-
-		try {
-			query.writeToJSONObject(adapter);
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
-		}
-		
-		EntityWrapper entityWrapper = synapseClient.search();
+		EntityWrapper entityWrapper = synapseClient.search(searchQueryJson);
 		SearchResults results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
 		SearchQuery inputQuery = EntityFactory.createEntityFromJSONString(searchQueryJson, SearchQuery.class);
 		//append this set to the list
@@ -229,5 +256,6 @@ public class CrawlFilter implements Filter {
 		this.sc = config.getServletContext();
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setServiceUrlProvider(new ServiceUrlProvider());
+		jsonObjectAdapter = new JSONObjectAdapterImpl();
     }
 }
