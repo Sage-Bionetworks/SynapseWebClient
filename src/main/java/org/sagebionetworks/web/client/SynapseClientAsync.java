@@ -129,4 +129,6 @@ public interface SynapseClientAsync {
 
 	void getFavorites(Integer limit, Integer offset,
 			AsyncCallback<String> callback);
+	
+	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
 }
