@@ -1,0 +1,176 @@
+package org.sagebionetworks.web.client.widget.entity.editor;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
+
+/**
+ * APITableConfig Package information relating to an api table (including service call path, column configs).
+ * Is initialized from a widget descriptor map.
+ */
+public class APITableConfig {
+	private String uri, tableWidth, jsonResultsArrayKeyName, cssStyleName, rowNumberColName;
+	private boolean isPaging, isShowRowNumber;
+	private int offset, pageSize;
+	private List<APITableColumnConfig> columnConfigs;
+	public final static String COLUMN_NAMES_DELIMITER = ";";	
+	public final static String FIELD_DELIMITER = ",";	
+
+	public APITableConfig(Map<String, String> descriptor) {
+		uri = descriptor.get(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
+		if (uri != null) {
+			isPaging = false;
+			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY)){
+				isPaging = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY));
+				if (isPaging) {
+					//initialize the offset and pagesize
+					offset=0;
+					if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY))
+						pageSize = Integer.parseInt(descriptor.get(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY));
+					else
+						pageSize = 10;
+				}	
+			}
+			tableWidth = "";
+			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_WIDTH_KEY)){
+				tableWidth = descriptor.get(WidgetConstants.API_TABLE_WIDGET_WIDTH_KEY);
+			}
+			isShowRowNumber = false;
+			rowNumberColName = "";
+			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY)){
+				isShowRowNumber = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY));
+				if (isShowRowNumber && descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY))
+					rowNumberColName =descriptor.get(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY);
+			}
+			
+			jsonResultsArrayKeyName = "results";
+			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY)){
+				jsonResultsArrayKeyName = descriptor.get(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY);
+			}
+			
+			cssStyleName = "";
+			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE)){
+				cssStyleName = descriptor.get(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
+			}
+			
+			columnConfigs = parseTableColumnConfigs(descriptor);
+		}
+	}
+	
+	public static List<APITableColumnConfig> parseTableColumnConfigs(Map<String, String> descriptor) {
+		List<APITableColumnConfig> columnConfigs = new ArrayList<APITableColumnConfig>();
+		//reconstruct table column configs (if there are any)
+		int i = 0;
+		while (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i)) {
+			String configString = descriptor.get(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX+i);
+			String[] parts = configString.split(FIELD_DELIMITER);
+			if (parts.length < 3) {
+				throw new IllegalArgumentException(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i + ": Invalid configuration due to missing fields.");
+			}
+			try {
+				APITableColumnConfig config = new APITableColumnConfig();
+				config.setRendererFriendlyName(parts[0]);
+				config.setDisplayColumnName(WidgetEncodingUtil.decodeValue(parts[1]));
+				Set<String> inputColumnNames = new HashSet<String>();
+				String[] inputColumns = parts[2].split(COLUMN_NAMES_DELIMITER);
+				for (int j = 0; j < inputColumns.length; j++) {
+					inputColumnNames.add(inputColumns[j]);
+				}
+				config.setInputColumnNames(inputColumnNames);
+				
+				columnConfigs.add(config);
+			} catch (Throwable t) {
+				throw new RuntimeException(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i+":"+t.getMessage(), t);
+			}
+			i++;
+		}
+		return columnConfigs;
+	}
+
+	public String getUri() {
+		return uri;
+	}
+
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+
+	public String getTableWidth() {
+		return tableWidth;
+	}
+
+	public void setTableWidth(String tableWidth) {
+		this.tableWidth = tableWidth;
+	}
+
+	public String getJsonResultsArrayKeyName() {
+		return jsonResultsArrayKeyName;
+	}
+
+	public void setJsonResultsArrayKeyName(String jsonResultsArrayKeyName) {
+		this.jsonResultsArrayKeyName = jsonResultsArrayKeyName;
+	}
+
+	public String getCssStyleName() {
+		return cssStyleName;
+	}
+
+	public void setCssStyleName(String cssStyleName) {
+		this.cssStyleName = cssStyleName;
+	}
+
+	public String getRowNumberColName() {
+		return rowNumberColName;
+	}
+
+	public void setRowNumberColName(String rowNumberColName) {
+		this.rowNumberColName = rowNumberColName;
+	}
+
+	public boolean isPaging() {
+		return isPaging;
+	}
+
+	public void setPaging(boolean isPaging) {
+		this.isPaging = isPaging;
+	}
+
+	public boolean isShowRowNumber() {
+		return isShowRowNumber;
+	}
+
+	public void setShowRowNumber(boolean isShowRowNumber) {
+		this.isShowRowNumber = isShowRowNumber;
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public List<APITableColumnConfig> getColumnConfigs() {
+		return columnConfigs;
+	}
+
+	public void setColumnConfigs(List<APITableColumnConfig> columnConfigs) {
+		this.columnConfigs = columnConfigs;
+	}
+
+	
+}

@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.registration;
 
+
 public class WidgetConstants {
 	public static final String WIKI_OWNER_ID_ENTITY = "ENTITY";
-	public static final String WIKI_OWNER_ID_COMPETITION = "COMPETITION";
+	public static final String WIKI_OWNER_ID_EVALUATION = "EVALUATION";
 	
 	public static final String YOUTUBE_CONTENT_TYPE = "youtube";
 	public static final String YOUTUBE_FRIENDLY_NAME = "YouTube";
@@ -42,7 +43,6 @@ public class WidgetConstants {
 	/**
 	 * Widget parameter keys
 	 */
-	
 	public static final String IMAGE_WIDGET_FILE_NAME_KEY = "fileName";
 	public static final String IMAGE_WIDGET_WIDTH_KEY = "width";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
@@ -62,12 +62,10 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY = "showRowNumber";
 	public static final String API_TABLE_WIDGET_RESULTS_KEY = "jsonResultsKeyName";
 	public static final String API_TABLE_WIDGET_CSS_STYLE = "cssStyle";
+	public static final String API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX = "columnConfig";
 	public static final String API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY = "rowNumberDisplayName";
 	public static final String API_TABLE_WIDGET_WIDTH_KEY = "width";
 	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
-	public static final String API_TABLE_WIDGET_COLUMNS_KEY = "columns";
-	public static final String API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY = "displayNames";
-	public static final String API_TABLE_WIDGET_RENDERERS_KEY = "renderers";
 	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	
@@ -82,7 +80,8 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_DATE = "date";
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
+	
 	public static final String MARKDOWN_HEADING_ID_PREFIX = "synapseheading";
+	public static final String MARKDOWN_TABLE_ID_PREFIX = "markdown-table-";
 
 }
-

@@ -52,7 +52,7 @@ public class ServerMarkdownUtilsTest {
 		
 		ActuariusTransformer processor = new ActuariusTransformer();
 		String actualResult = ServerMarkdownUtils.markdown2Html(testString, false, processor);
-		assertTrue(actualResult.contains("<table>"));
+		assertTrue(actualResult.contains("<table"));
 		assertTrue(actualResult.contains("<tr>"));
 		assertTrue(actualResult.contains("<td>"));
 	}
@@ -71,11 +71,11 @@ public class ServerMarkdownUtilsTest {
 	public void testResolveTables(){
 		String testString = "${image?fileName=bill%5Fgates%2Egif}  | Second Header | Third Header  \nContent Cell1a  | Content Cell2a  | Content Cell3a  \nContent Cell1b  | Content Cell2b   Content Cell3b";
 		String result = ServerMarkdownUtils.resolveTables(testString);
-		assertTrue(result.contains("<table>"));
+		assertTrue(result.contains("<table"));
 		
 		testString = "|Content Cell1a  | Content Cell2a  | Content Cell3a|  \n|Content Cell1b  | Content Cell2b   Content Cell3b|  \n  \nMore text below";
 		result = ServerMarkdownUtils.resolveTables(testString);
-		assertTrue(result.contains("<table>"));
+		assertTrue(result.contains("<table"));
 		assertTrue(result.contains("More text below"));
 	}
 	

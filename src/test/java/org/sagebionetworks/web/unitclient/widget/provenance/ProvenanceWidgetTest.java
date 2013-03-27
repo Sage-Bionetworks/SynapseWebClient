@@ -377,6 +377,9 @@ public class ProvenanceWidgetTest {
 			
 			@Override
 			public void setPageTitle(String newTitle) {};
+			
+			@Override
+			public void tablesorter(String id) {}
 		};
 	}
 

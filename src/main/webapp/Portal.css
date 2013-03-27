@@ -559,6 +559,11 @@ a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
     padding: 0 5px 2px
 }
 
+.apitable label {
+	margin-left:5px;
+	display:inline;
+}
+
 .wiki-description {
 	color: #666666;
 }
