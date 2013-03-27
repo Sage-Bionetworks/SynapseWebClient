@@ -171,7 +171,7 @@ public class CrawlFilter implements Filter {
 		StringBuilder html = new StringBuilder();
 		
 		//note: can't set description meta tag, since it might be markdown.
-		html.append("<html><head><title>"+entity.getId()+": "+name+"</title><meta name=\"description\" content=\"\" /></head><body>");
+		html.append("<html><head><title>"+name +" - "+ entity.getId()+"</title><meta name=\"description\" content=\"\" /></head><body>");
 		
 		html.append("<h1>"+name+"</h1>");
 		if (description != null)

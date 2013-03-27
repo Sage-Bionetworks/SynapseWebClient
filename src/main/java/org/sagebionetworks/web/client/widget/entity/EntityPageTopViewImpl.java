@@ -175,7 +175,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			// default entity view
 			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		}
-		synapseJSNIUtils.setPageTitle(bundle.getEntity().getId() + ": " + bundle.getEntity().getName());
+		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
 
 		colLeftContainer.layout(true);
