@@ -21,7 +21,8 @@ import eu.henkelmann.actuarius.ActuariusTransformer;
 
 public class ServerMarkdownUtils {
 	
-	private static final String NEWLINE_WITH_SPACES = "  <br />\n";
+	public static final String NEWLINE_WITH_SPACES = "  <br />\n";
+	public static final String NEWLINE_WITH_SPACES_ESCAPED = Pattern.quote(NEWLINE_WITH_SPACES);
 	private static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
 	/**
 	 * This converts the given markdown to html using the given markdown processor.
@@ -201,7 +202,7 @@ public class ServerMarkdownUtils {
 	public static String resolveTables(String rawMarkdown) {
 		//find all tables, and replace the raw text with html table
 		String regEx = ".*[|]{1}.+[|]{1}.*";
-		String[] lines = rawMarkdown.split(NEWLINE_WITH_SPACES);
+		String[] lines = rawMarkdown.split(NEWLINE_WITH_SPACES_ESCAPED);
 		StringBuilder sb = new StringBuilder();
 		int tableCount = 0;
 		int i = 0;

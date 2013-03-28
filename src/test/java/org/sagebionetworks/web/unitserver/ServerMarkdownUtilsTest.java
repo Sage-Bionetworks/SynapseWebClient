@@ -69,11 +69,11 @@ public class ServerMarkdownUtilsTest {
 	
 	@Test
 	public void testResolveTables(){
-		String testString = "${image?fileName=bill%5Fgates%2Egif}  | Second Header | Third Header  \nContent Cell1a  | Content Cell2a  | Content Cell3a  \nContent Cell1b  | Content Cell2b   Content Cell3b";
+		String testString = "${image?fileName=bill%5Fgates%2Egif}  | Second Header | Third Header"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"Content Cell1a  | Content Cell2a  | Content Cell3a"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"Content Cell1b  | Content Cell2b   Content Cell3b";
 		String result = ServerMarkdownUtils.resolveTables(testString);
 		assertTrue(result.contains("<table"));
 		
-		testString = "|Content Cell1a  | Content Cell2a  | Content Cell3a|  \n|Content Cell1b  | Content Cell2b   Content Cell3b|  \n  \nMore text below";
+		testString = "|Content Cell1a  | Content Cell2a  | Content Cell3a|"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"|Content Cell1b  | Content Cell2b   Content Cell3b|"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"More text below";
 		result = ServerMarkdownUtils.resolveTables(testString);
 		assertTrue(result.contains("<table"));
 		assertTrue(result.contains("More text below"));
