@@ -537,8 +537,6 @@ a.shortBtn {
 }
 .markdown strong { font-weight: bold; }
 .markdown em { font-style: italic; }
-a.auto-detected-synapse-link, a.auto-detected-synapse-link:hover, a.auto-detected-synapse-link:visited {}
-a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
 .markdown a, a:hover, a:visited {}
 .markdown blockquote {
 	margin: 1em 3em;
