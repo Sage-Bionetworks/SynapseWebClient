@@ -26,6 +26,17 @@ public class ServerMarkdownUtilsTest {
 	}
 	
 	@Test
+	public void testDetectDoiLinks(){
+		String testString = "<html> <head></head> <body>doi:10.5072/fk2.syn12345 not:a:doi: doi:10.1016/j.compcom.2005.12.006\nDoil doing <a href=\"http://somewhere.else\">link text that has a doi:10.5072/fk2.syn12345 in it.</a> should not be touched doi:</body></html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span><a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/10.5072/fk2.syn12345\">doi:10.5072/fk2.syn12345</a> not:a:doi: <a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/10.1016/j.compcom.2005.12.006\">doi:10.1016/j.compcom.2005.12.006</a> Doil doing </span>\n  <a href=\"http://somewhere.else\">link text that has a doi:10.5072/fk2.syn12345 in it.</a>\n  <span> should not be touched doi:</span>\n </body>\n</html>";
+		Document htmlDoc = Jsoup.parse(testString);
+		ServerMarkdownUtils.addDoiLinks(htmlDoc);
+		String actualResult = htmlDoc.html();
+		assertEquals(expectedResult, actualResult);
+	}
+
+	
+	@Test
 	public void testMarkdown2HtmlEscapeControlCharacters() throws IOException{
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
 		String testString = "& ==> &amp;\" ==> &quot;> ==> &gt;< ==> &lt;' =";

@@ -66,6 +66,7 @@ public class ServerMarkdownUtils {
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
 //		reportTime("addWidgets");
 		ServerMarkdownUtils.addSynapseLinks(doc);
+		ServerMarkdownUtils.addDoiLinks(doc);
 //		reportTime("addSynapseLinks");
 		//URLs are automatically resolved from the markdown processor
 		String returnHtml = "<div class=\"markdown\">" + doc.html() + "</div>";
@@ -162,12 +163,48 @@ public class ServerMarkdownUtils {
 	        return builder.toString();
 	}
 
+	public static void addDoiLinks(Document doc) {
+		// in this case, I still need a regular expression to find the doi links.
+		// find all elements whose text contains a doi pattern (but not anchors)
+		// replace the TextNode element children with Elements, whose html contain a link to relevant doi.
+		// regular expression: look for non-word characters (0 or more), followed by "doi:" and some characters, followed by more non-word characters (0 or more).
+		// capture the doi name in one group (the parenthesis).
+		String regEx = "\\W*(doi:([a-zA-Z_0-9./]+))\\W*";
+		Elements elements = doc.select("*:matchesOwn(" + regEx + "):not(a,code)");  	// selector is case insensitive
+		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
+		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
+			Element element = (Element) iterator.next();
+			//only process the TextNode children (ignore others)
+			for (Iterator iterator2 = element.childNodes().iterator(); iterator2.hasNext();) {
+				Node childNode = (Node) iterator2.next();
+				if (childNode instanceof TextNode) {
+					String oldText = ((TextNode) childNode).text();
+					// find it in the text
+					Matcher matcher = pattern.matcher(oldText);
+					StringBuilder sb = new StringBuilder();
+					int previousFoundIndex = 0;
+					while (matcher.find() && matcher.groupCount() == 2) {
+						sb.append(oldText.substring(previousFoundIndex, matcher.start(1)));
+						sb.append(ServerMarkdownUtils.getDoiLink(matcher.group(1), matcher.group(2)));
+						previousFoundIndex = matcher.end(1);
+					}
+					if (previousFoundIndex < oldText.length() - 1)
+						// substring, go from the previously found index to the end
+						sb.append(oldText.substring(previousFoundIndex));
+					Element newElement = doc.createElement("span"); //wrap new html in a span, since it needs a container!
+					newElement.html(sb.toString());
+					childNode.replaceWith(newElement);		
+				}
+			}
+		}
+	}
+	
 	public static void addSynapseLinks(Document doc) {
 		// in this case, I still need a regular expression to find the synapse ids.
 		// find all elements whose text contains a synapse id pattern (but not anchors)
 		// replace the TextNode element children with Elements, whose html contain a link to relevant synapse entity.
 		// regular expression: look for non-word characters (0 or more), followed by "syn" and a number, followed by more non-word characters (0 or more).
-		// capture the synapse id in a group (the paranthesis).
+		// capture the synapse id in a group (the parenthesis).
 		String regEx = "\\W*(syn\\d+)\\W*";
 		Elements elements = doc.select("*:matchesOwn(" + regEx + "):not(a,code)");  	// selector is case insensitive
 		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
@@ -308,6 +345,11 @@ public class ServerMarkdownUtils {
 	    sb.append(synId);
 	    sb.append("</a>");
 	    return sb.toString();
+	}
+	
+	public static String getDoiLink(String fullDoi, String doiName){
+		return "<a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/" +
+				doiName + "\">" + fullDoi +"</a>";
 	}
 
 	public static String getYouTubeHTML(String videoId){
