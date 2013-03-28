@@ -21,7 +21,7 @@ import eu.henkelmann.actuarius.ActuariusTransformer;
 
 public class ServerMarkdownUtils {
 	
-	private static final String NEWLINE_WITH_SPACES = "  \n";
+	private static final String NEWLINE_WITH_SPACES = "  <br />\n";
 	private static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
 	/**
 	 * This converts the given markdown to html using the given markdown processor.

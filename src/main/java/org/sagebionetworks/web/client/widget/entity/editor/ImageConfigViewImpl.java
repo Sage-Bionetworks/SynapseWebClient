@@ -8,20 +8,32 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.SliderEvent;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.Slider;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
+import com.extjs.gxt.ui.client.widget.form.FormPanel;
+import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
+import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
+import com.extjs.gxt.ui.client.widget.form.SliderField;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,6 +41,7 @@ import com.google.inject.Inject;
 
 public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigView {
 
+	private static final int DISPLAY_HEIGHT = 220;
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
 	private UploadFormPanel uploadPanel;
@@ -39,6 +52,8 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	TabItem externalTab,uploadTab;
 	private HTMLPanel uploadStatusPanel;
 	private String uploadedFileHandleName;
+	private Slider scaleSlider;
+	private SimpleComboBox<String> alignmentCombo;
 	
 	TabPanel tabPanel;
 	@Inject
@@ -70,7 +85,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		externalTab.add(externalLinkPanel);
 		tabPanel.add(externalTab);
 		
-		this.setHeight(150);
+		this.setHeight(DISPLAY_HEIGHT);
 		this.layout(true);
 	}
 	
@@ -78,6 +93,19 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	@Override
 	public String getUploadedFileHandleName() {
 		return uploadedFileHandleName;
+	}
+	@Override
+	public String getAlignment() {
+		if(alignmentCombo != null && alignmentCombo.getValue() != null)
+			return alignmentCombo.getValue().getValue();			
+		return null;
+	}
+	
+	@Override
+	public String getScale() {
+		if (scaleSlider != null)
+			return Integer.toString(scaleSlider.getValue());
+		return null;
 	}
 
 	private HorizontalPanel getExternalLinkPanel() {
@@ -118,7 +146,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		//update the uploadPanel
 		initUploadPanel(wikiKey);
 		
-		this.setHeight(150);
+		this.setHeight(DISPLAY_HEIGHT);
 		this.layout(true);
 	}
 	
@@ -149,8 +177,58 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 				uploadedFileHandleName = uploadPanel.getFileUploadField().getValue();
 			}
 		}, null);
-		uploadTab.add(uploadPanel);
+		
+	    FlowPanel container = new FlowPanel();
+	    container.add(uploadPanel);
+	    container.add(getImageParamsPanel());
+		uploadTab.add(container);
 		layout(true);
+	}
+	
+	public FormPanel getImageParamsPanel() {
+		FormPanel panel = new FormPanel();
+		panel.setHeaderVisible(false);
+		panel.setFrame(false);
+		panel.setBorders(false);
+		panel.setShadow(false);
+		panel.setLabelAlign(LabelAlign.LEFT);
+		panel.setBodyBorder(false);
+		FormData basicFormData = new FormData("-50");
+		panel.setFieldWidth(40);
+		//and add scale and alignment
+		scaleSlider = new Slider();
+	    scaleSlider.setMinValue(1);
+	    scaleSlider.setMaxValue(200);
+	    scaleSlider.setValue(100);
+	    scaleSlider.setIncrement(1);
+	    final SliderField sf = new SliderField(scaleSlider);
+	    sf.setFieldLabel("Scale (100%)");
+	    //bug in gxt slider where the message popup is shown far from the slider, and can't seem to hide it
+	    scaleSlider.setMessage("{0}%");
+	    //update the field label as a workaround
+	    scaleSlider.addListener(Events.Change, new Listener<SliderEvent>() {
+	    	@Override
+	    	public void handleEvent(SliderEvent be) {
+	    		sf.setFieldLabel("Scale (" + be.getNewValue() + "%)");
+	    	}
+		});
+
+	    panel.add(sf, basicFormData);
+	    
+	    alignmentCombo = new SimpleComboBox<String>();
+		alignmentCombo.add(WidgetConstants.FLOAT_NONE);
+		alignmentCombo.add(WidgetConstants.FLOAT_LEFT);
+		alignmentCombo.add(WidgetConstants.FLOAT_RIGHT);
+		alignmentCombo.setSimpleValue(WidgetConstants.FLOAT_NONE);
+		alignmentCombo.setTypeAhead(false);
+		alignmentCombo.setEditable(false);
+		alignmentCombo.setForceSelection(true);
+		alignmentCombo.setTriggerAction(TriggerAction.ALL);
+		alignmentCombo.setFieldLabel("Alignment");
+		
+		panel.add(alignmentCombo, basicFormData);
+
+		return panel;
 	}
 	
 	@Override
@@ -197,7 +275,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	}
 	@Override
 	public int getDisplayHeight() {
-		return 150;
+		return DISPLAY_HEIGHT;
 	}
 	@Override
 	public int getAdditionalWidth() {
