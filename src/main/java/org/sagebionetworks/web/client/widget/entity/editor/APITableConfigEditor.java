@@ -54,21 +54,23 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, view.getJsonResultsKeyName());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE, view.getCssStyle());
 		List<APITableColumnConfig> configs = view.getConfigs();
-		for (int i = 0; i < configs.size(); i++) {
-			APITableColumnConfig config = configs.get(i);
-			StringBuilder sb = new StringBuilder();
-			sb.append(config.getRendererFriendlyName());
-			sb.append(APITableConfig.FIELD_DELIMITER);
-			String displayColumnName = "";
-			if (config.getDisplayColumnName() != null)
-				displayColumnName = config.getDisplayColumnName().trim();
-			sb.append(WidgetEncodingUtil.encodeValue(displayColumnName));
-			sb.append(APITableConfig.FIELD_DELIMITER);
-			for (String columnName : config.getInputColumnNames()) {
-				sb.append(columnName);
-				sb.append(APITableConfig.COLUMN_NAMES_DELIMITER);
+		if (configs != null) {
+			for (int i = 0; i < configs.size(); i++) {
+				APITableColumnConfig config = configs.get(i);
+				StringBuilder sb = new StringBuilder();
+				sb.append(config.getRendererFriendlyName());
+				sb.append(APITableConfig.FIELD_DELIMITER);
+				String displayColumnName = "";
+				if (config.getDisplayColumnName() != null)
+					displayColumnName = config.getDisplayColumnName().trim();
+				sb.append(WidgetEncodingUtil.encodeValue(displayColumnName));
+				sb.append(APITableConfig.FIELD_DELIMITER);
+				for (String columnName : config.getInputColumnNames()) {
+					sb.append(columnName);
+					sb.append(APITableConfig.COLUMN_NAMES_DELIMITER);
+				}
+				updateDescriptor(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i, sb.toString());
 			}
-			updateDescriptor(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i, sb.toString());
 		}
 	}
 	
