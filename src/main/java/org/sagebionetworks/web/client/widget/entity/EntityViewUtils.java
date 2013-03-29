@@ -70,7 +70,7 @@ public class EntityViewUtils {
 		
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">"+DisplayConstants.DATA_ACCESS_RESTRICTIONS_TEXT+"</span>" + DisplayUtils.getIconHtml(shieldIcon) + "</div>");
-		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 20px;\">"+description+"</span>");
+		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 3px;\">"+description+"</span>");
 		
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());

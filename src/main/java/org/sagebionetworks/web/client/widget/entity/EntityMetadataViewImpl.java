@@ -261,10 +261,14 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setModified(e.getModifiedBy(), synapseJSNIUtils.convertDateToSmallString(e.getModifiedOn()));
 			
 		dataUseContainer.clear();
-		Widget dataUse = createRestrictionWidget();
-		if(dataUse != null) {
-			dataUseContainer.setVisible(true);
-			dataUseContainer.add(dataUse);
+		if(bundle.getPermissions().getCanPublicRead()) {
+			Widget dataUse = createRestrictionWidget();
+			if(dataUse != null) {
+				dataUseContainer.setVisible(true);
+				dataUseContainer.add(dataUse);
+			} else {
+				dataUseContainer.setVisible(false);
+			}		
 		} else {
 			dataUseContainer.setVisible(false);
 		}
