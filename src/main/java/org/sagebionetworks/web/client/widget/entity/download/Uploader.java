@@ -245,10 +245,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
 
-	@Override
-	public void closeButtonSelected() {
-		handlerManager.fireEvent(new CancelEvent());
-	}
 
 	public void entityUpdated() {
 		handlerManager.fireEvent(new EntityUpdatedEvent());

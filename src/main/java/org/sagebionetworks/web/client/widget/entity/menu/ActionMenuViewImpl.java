@@ -342,7 +342,13 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
 			MenuItem item = new MenuItem(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 			item.setIcon(AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
-			final Window window = new Window();  
+			final Window window = new Window();
+			window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					window.hide();
+				}
+			}));
 			uploader.clearHandlers();
 			uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
 				@Override

@@ -55,7 +55,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private FormPanel formPanel;
 	private FileUploadField fileUploadField;
 	private Button uploadBtn;
-	private Button cancelBtn;
 	private ProgressBar progressBar;
 	// external link panel
 	private Button saveExternalLinkButton;
@@ -77,7 +76,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.linkExternalOpenRadio = new Radio();
 		this.linkExternalRestrictedRadio = new Radio();
 		this.uploadBtn = new Button("Upload");
-		this.cancelBtn = new Button("Cancel");
 		this.progressBar = new ProgressBar();
 		this.formPanel = new FormPanel();
 		this.fileUploadField = new FileUploadField();
@@ -124,16 +122,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// reset
 		pathField.clear();
 
-		// click any use by default
-		linkExternalOpenRadio.setValue(true);
-		openSelected();
-
 	}
 
 	
 	@Override
 	public int getDisplayHeight() {
-		return 450;
+		return 490;
 	}
 
 	@Override
@@ -153,7 +147,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		container.setLayout(new FlowLayout());
 		this.add(container);
 				
-		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"><h4 class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\">" + DisplayConstants.DEFAULT_SHARING_ACCESS + ":&nbsp;</h4>" 
+		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"><h4 class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\">" + DisplayConstants.ACCESS_WILL_BE + ":&nbsp;</h4>" 
 				+ "<div class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\" style=\"top:-3px; position: relative;\">" + DisplayUtils.getShareSettingsDisplay(null, false, synapseJSNIUtils) + "</div>"				
 				+ "</div>"));
 		
@@ -226,16 +220,10 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 	
 	private void openSelected() {
-		uploadBtn.setEnabled(true);
-		if (saveExternalLinkButton != null)
-			saveExternalLinkButton.setEnabled(true);
 		formPanel.setAction(presenter.getUploadActionUrl(/*isRestricted*/false));		
 	}
 	
 	private void restrictedSelected() {
-		uploadBtn.setEnabled(true);
-		if(saveExternalLinkButton != null)
-			saveExternalLinkButton.setEnabled(true);
 		formPanel.setAction(presenter.getUploadActionUrl(/*isRestricted*/true));		
 	}
 	
@@ -298,9 +286,15 @@ public class UploaderViewImpl extends LayoutContainer implements
 			public void componentSelected(ButtonEvent ce) {
 				if (!formPanel.isValid()) {
 					return;
-				}		
+				}
+				if(restrictedModeChosen() == RADIO_SELECTED.NO_RADIO_SELECTED) {
+					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
+					return;
+				}
+				
 				formPanel.add(progressBar);
 				formPanel.layout(true);
+								
 				// this is used in the 'handleEvent' listener, but must
 				// be created in the original thread.  for more, see
 				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
@@ -311,18 +305,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 			}
 		};
 		uploadBtn.addSelectionListener(uploadListener);	
-		// don't want to enable the upload button until a radio button is selected
-		uploadBtn.setEnabled(isInitiallyRestricted);
 	
-		cancelBtn.removeAllListeners();
-		SelectionListener<ButtonEvent> cancelListener = new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				presenter.closeButtonSelected();
-			}
-		};
-		cancelBtn.addSelectionListener(cancelListener);
-
 	}
 	
 	private void addRadioButtonsToContainer(
@@ -347,7 +330,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 	
 	private static final int PANEL_HEIGHT = 100;
-	private static final int PANEL_WIDTH = 600;
+	private static final int PANEL_WIDTH = 590;
 	
 	private static final String FILE_UPLOAD_RESTRICTED_PARAM_NAME = "fileUploadRestrictionSetting";
 	private static final String LINK_EXTERNAL_RESTRICTED_PARAM_NAME = "linkExternalRestrictionSetting";
@@ -445,9 +428,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		AdapterField uploadAf = new AdapterField(uploadBtn);
 		uploadAf.setHideLabel(true);
 		buttonField.add(uploadAf);
-		AdapterField cancelAf = new AdapterField(cancelBtn);
-		cancelAf.setHideLabel(true);
-		buttonField.add(cancelAf);
 				
 		formPanel.layout(true);
 		
@@ -473,6 +453,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 				if (!externalLinkFormPanel.isValid()) {
 					return;
 				}
+
+				if(restrictedModeChosen() == RADIO_SELECTED.NO_RADIO_SELECTED) {
+					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
+					return;
+				}
+
 				// this is used in the 'handleEvent' listener, but must
 				// be created in the original thread.  for more, see
 				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
@@ -482,7 +468,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 				presenter.setExternalFilePath(pathField.getValue(), isNewlyRestricted());
 			}
 		});
-		saveExternalLinkButton.setEnabled(isInitiallyRestricted);
 		externalLinkFormPanel.addButton(saveExternalLinkButton);
 		
 		return externalLinkFormPanel;

@@ -29,7 +29,6 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 
 		void setExternalFilePath(String path, boolean isNewlyRestricted);
 		
-		public void closeButtonSelected();
 
 		/**
 		 * 

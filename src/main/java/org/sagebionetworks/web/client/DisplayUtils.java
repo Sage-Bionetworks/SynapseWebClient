@@ -1295,6 +1295,12 @@ public class DisplayUtils {
 		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
 		final Window window = new Window();  
+		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		}));
 		uploader.clearHandlers();
 		// add user defined handler
 		uploader.addPersistSuccessHandler(handler);
