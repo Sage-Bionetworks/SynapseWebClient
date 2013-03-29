@@ -65,8 +65,8 @@ public class ServerMarkdownUtils {
 //		reportTime("add link class");
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
 //		reportTime("addWidgets");
-		new SynapseAutoLinkDetector().createLinks(doc);
-		new DoiAutoLinkDetector().createLinks(doc);
+		SynapseAutoLinkDetector.getInstance().createLinks(doc);
+		DoiAutoLinkDetector.getInstance().createLinks(doc);
 //		reportTime("addSynapseLinks");
 		//URLs are automatically resolved from the markdown processor
 		String returnHtml = "<div class=\"markdown\">" + doc.html() + "</div>";

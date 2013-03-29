@@ -19,9 +19,9 @@ public class ServerMarkdownUtilsTest {
 	@Test
 	public void testDetectEntityLinks(){
 		String testString = "<html> <head></head> <body> synapse123 SYn1234\nsyn567 syntax syn3 <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a> syn</body></html>";
-		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#!Synapse:syn1234\">SYn1234</a> <a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#!Synapse:syn567\">syn567</a> syntax <a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#!Synapse:syn3\">syn3</a></span>\n  <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a>\n  <span> syn</span>\n </body>\n</html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a target=\"_blank\" class=\"link\" href=\"#!Synapse:SYn1234\">SYn1234</a> <a target=\"_blank\" class=\"link\" href=\"#!Synapse:syn567\">syn567</a> syntax <a target=\"_blank\" class=\"link\" href=\"#!Synapse:syn3\">syn3</a></span>\n  <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a>\n  <span> syn</span>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
-		new SynapseAutoLinkDetector().createLinks(htmlDoc);
+		SynapseAutoLinkDetector.getInstance().createLinks(htmlDoc);
 		String actualResult = htmlDoc.html();
 		assertEquals(expectedResult, actualResult);
 	}
@@ -31,7 +31,7 @@ public class ServerMarkdownUtilsTest {
 		String testString = "<html> <head></head> <body>doi:10.5072/fk2.syn12345 not:a:doi: doi:10.1016/j.compcom.2005.12.006\nDoil doing <a href=\"http://somewhere.else\">link text that has a doi:10.5072/fk2.syn12345 in it.</a> should not be touched doi:</body></html>";
 		String expectedResult = "<html> \n <head></head> \n <body>\n  <span><a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/10.5072/fk2.syn12345\">doi:10.5072/fk2.syn12345</a> not:a:doi: <a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/10.1016/j.compcom.2005.12.006\">doi:10.1016/j.compcom.2005.12.006</a> Doil doing </span>\n  <a href=\"http://somewhere.else\">link text that has a doi:10.5072/fk2.syn12345 in it.</a>\n  <span> should not be touched doi:</span>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
-		new DoiAutoLinkDetector().createLinks(htmlDoc);
+		DoiAutoLinkDetector.getInstance().createLinks(htmlDoc);
 		String actualResult = htmlDoc.html();
 		assertEquals(expectedResult, actualResult);
 	}

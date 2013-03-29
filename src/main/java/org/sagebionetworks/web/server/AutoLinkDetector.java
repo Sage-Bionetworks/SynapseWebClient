@@ -10,6 +10,7 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 public abstract class AutoLinkDetector {
+	
 	public void createLinks(Document doc) {
 		String regEx = getRegularExpression();
 		Elements elements = doc.select("*:matchesOwn(" + regEx + "):not(a,code)");  	
