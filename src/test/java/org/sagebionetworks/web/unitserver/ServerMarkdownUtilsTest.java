@@ -57,9 +57,11 @@ public class ServerMarkdownUtilsTest {
 	
 	@Test
 	public void testFixNewlines() throws IOException{
-		String testString = "should have line break\nalso should\n```\nthis is code so it should not\nhave any html line breaks\n```\nand html line breaks should be added\nagain";
+		String testString = "should have line break\n```\nthis is code so it should not\nhave any html line breaks\n```\nagain";
 		String actualResult = ServerMarkdownUtils.fixNewLines(testString);
-		assertTrue(actualResult.contains("&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt; &lt; ==&gt; &lt;' ="));
+		assertTrue(actualResult.contains("should have line break<br />"));
+		assertTrue(actualResult.contains("this is code so it should not\n"));
+		assertTrue(actualResult.contains("again<br />"));
 	}
 	
 	@Test
