@@ -14,8 +14,6 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FormEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.extjs.gxt.ui.client.widget.TabItem;
@@ -46,7 +44,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
-
+	TextField<String> pathField;
+	
 	// initialized in constructor
 	private boolean isInitiallyRestricted;
 	private Radio fileUploadOpenRadio;
@@ -82,8 +81,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.progressBar = new ProgressBar();
 		this.formPanel = new FormPanel();
 		this.fileUploadField = new FileUploadField();
-
-		this.container = new LayoutContainer();
 		
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
@@ -120,8 +117,36 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Override
 	public void createUploadForm(boolean isExternalSupported) {
 		initializeControls();
-		
-		this.removeAll();
+		if(container == null) {
+			createUploadContents(isExternalSupported);
+		}
+
+		// reset
+		pathField.clear();
+
+		// click any use by default
+		linkExternalOpenRadio.setValue(true);
+		openSelected();
+
+	}
+
+	
+	@Override
+	public int getDisplayHeight() {
+		return 450;
+	}
+
+	@Override
+	public int getDisplayWidth() {
+		return 650;
+	}
+
+
+	/*
+	 * Private Methods
+	 */	
+	private void createUploadContents(boolean isExternalSupported) {
+		this.container = new LayoutContainer();
 		this.setLayout(new FitLayout());
 		this.addStyleName(DisplayUtils.STYLE_WHITE_BACKGROUND);
 		container.addStyleName(DisplayUtils.STYLE_WHITE_BACKGROUND);
@@ -158,23 +183,19 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// Data Use message 
 		
 		container.add(new HTML("<h3>"+ DisplayConstants.DATA_USE_BANNER +"</h3>"), new MarginData(25, 10, 5, 10));
-		container.add(new HTML("<div class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\"> <span style=\"font-size: 14pt; display: inline; color: #000;\">"
+		container.add(new HTML("<div class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\"> <span style=\"font-size: 12pt; display: inline; color: #000;\">"
 				+ DisplayConstants.DATA_USE_BANNER_SUB1  + "</span>" 				
 				+ DisplayUtils.getShareSettingsDisplay(null, true, synapseJSNIUtils) 				
-				+ "<span style=\"font-size: 14pt; display: inline; color: #000;\">" + DisplayConstants.DATA_USE_BANNER_SUB2 + "</span>" 				
-				+"</div>"), new MarginData(3, 10, 0, 10));		
+				+ "<span style=\"font-size: 12pt; display: inline; color: #000;\">" + DisplayConstants.DATA_USE_BANNER_SUB2 + "</span>" 				
+				+"</div>"), new MarginData(0, 10, 0, 10));		
 		container.add(new HTML(DisplayConstants.DATA_USE_NOTE), new MarginData(3, 10, 10, 10));
 		
 		addRadioButtonsToContainer(container, linkExternalOpenRadio, linkExternalRestrictedRadio);
 		
-		// click any use by default
-		linkExternalOpenRadio.setValue(true);
-		openSelected();
 		
 		this.setSize(PANEL_WIDTH+200, PANEL_HEIGHT);
 		container.layout(true);
 		this.layout(true);
-
 	}
 	
 	@Override
@@ -185,21 +206,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// only use it once
 		window = null;
 	}
-	
-	@Override
-	public int getDisplayHeight() {
-		return 450;
-	}
-
-	@Override
-	public int getDisplayWidth() {
-		return 650;
-	}
-
-
-	/*
-	 * Private Methods
-	 */	
 	
 	private void initializeOpenRadio(Radio openRadio, String radioGroup, Listener<BaseEvent> listener) {
 		openRadio.removeAllListeners();
@@ -341,7 +347,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 	
 	private static final int PANEL_HEIGHT = 100;
-	private static final int PANEL_WIDTH = 350;
+	private static final int PANEL_WIDTH = 600;
 	
 	private static final String FILE_UPLOAD_RESTRICTED_PARAM_NAME = "fileUploadRestrictionSetting";
 	private static final String LINK_EXTERNAL_RESTRICTED_PARAM_NAME = "linkExternalRestrictionSetting";
@@ -450,7 +456,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 	private Widget createExternalPanel() {
 		final FormPanel externalLinkFormPanel = new FormPanel();
-		final TextField<String> pathField = new TextField<String>();
+		pathField = new TextField<String>();
 		externalLinkFormPanel.setHeaderVisible(false);
 		externalLinkFormPanel.setFrame(false);
 		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.RIGHT);

@@ -435,7 +435,7 @@ public class DisplayConstants {
 	public static final String DATA_USE_NOTE = 
 		"You are responsible to ensure your data is used in compliance with the "+SYNAPSE_GUIDELINES_LINK+
 		" and all applicable laws. If/when you make this file public, can its data be used by any registered Synapse user "+
-		"without use restrictions? If so, then select \"Any Use\", below.  Otherwise select \"Restricted / Controlled\".";
+		"without restriction? If so, then select \"Any Use\", below.  Otherwise select \"Restricted / Controlled\".";
 	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 	
 	

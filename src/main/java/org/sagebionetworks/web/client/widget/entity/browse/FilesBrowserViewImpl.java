@@ -189,7 +189,6 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 					window.setModal(true);		
 					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 					window.setLayout(new FitLayout());
-					window.setBodyStyle("backgroundColor: white !important;");
 					window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
 					window.show();
 			}
