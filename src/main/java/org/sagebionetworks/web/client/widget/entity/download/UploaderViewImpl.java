@@ -155,23 +155,22 @@ public class UploaderViewImpl extends LayoutContainer implements
 		tabPanel.setPlain(true);
 		tabPanel.setHeight(130);		
 		container.add(tabPanel, new MarginData(0, 10, 10, 10));
+		TabItem tab;
 		
-		TabItem tab = new TabItem(DisplayConstants.UPLOAD_FILE);
+		// Upload File
+		tab = new TabItem(DisplayConstants.UPLOAD_FILE);
 		tab.addStyleName("pad-text");
-		tab.setLayout(new FlowLayout());
 		tab.add(formPanel);
-
-		
 		tabPanel.add(tab);
 
+		// External URL
 		tab = new TabItem(DisplayConstants.LINK_TO_URL);
 		if (!isExternalSupported)
 			tab.setEnabled(false);
 		tab.addStyleName("pad-text");		
-		tab.setLayout(new FlowLayout());		
-		tab.add(createExternalPanel());
-		
+		tab.add(createExternalPanel());		
 		tabPanel.add(tab);
+		
 		tabPanel.recalculate();
 
 		// Data Use message 
@@ -304,8 +303,11 @@ public class UploaderViewImpl extends LayoutContainer implements
 				formPanel.submit();
 			}
 		};
-		uploadBtn.addSelectionListener(uploadListener);	
-	
+		uploadBtn.addSelectionListener(uploadListener);
+		formPanel.addButton(uploadBtn);
+		
+		
+		formPanel.layout(true);
 	}
 	
 	private void addRadioButtonsToContainer(
@@ -390,7 +392,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setFrame(false);
 		formPanel.setEncoding(Encoding.MULTIPART);
 		formPanel.setMethod(Method.POST);
-		formPanel.setButtonAlign(HorizontalAlignment.RIGHT);		
+		formPanel.setButtonAlign(HorizontalAlignment.LEFT);		
 		formPanel.setHeight(PANEL_HEIGHT);
 		formPanel.setBorders(false);
 		formPanel.setAutoWidth(true);
@@ -419,16 +421,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		progressBar.auto();
 		progressBar.updateText(DisplayConstants.LABEL_UPLOADING);					
-						
-		// buttons
-		MultiField buttonField = new MultiField();
-		buttonField.setLayoutData(new FitLayout());
-		formPanel.add(buttonField);
-		buttonField.setHideLabel(true);
-		AdapterField uploadAf = new AdapterField(uploadBtn);
-		uploadAf.setHideLabel(true);
-		buttonField.add(uploadAf);
-				
+								
 		formPanel.layout(true);
 		
 		return formPanel;
@@ -439,7 +432,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		pathField = new TextField<String>();
 		externalLinkFormPanel.setHeaderVisible(false);
 		externalLinkFormPanel.setFrame(false);
-		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.RIGHT);
+		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.LEFT);
 		externalLinkFormPanel.setLabelWidth(110);
 		externalLinkFormPanel.setFieldWidth(230);
 		pathField.setFieldLabel("External Path or URL");
