@@ -22,8 +22,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.message.AbstractHttpMessage;
-import org.apache.http.util.EntityUtils;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.HttpClientProviderImpl;
 import org.sagebionetworks.client.Synapse;
@@ -52,10 +50,6 @@ import com.google.inject.Inject;
  */
 public class FileHandleServlet extends HttpServlet {
 
-	public static final int MAX_TIME_OUT = 10 * 1000;
-	public static final long BYTES_PER_MEGABYTE = 1048576;
-	public static final long MAX_ATTACHMENT_MEGABYTES = 10;
-	public static final long MAX_ATTACHMENT_SIZE_IN_BYTES = MAX_ATTACHMENT_MEGABYTES*BYTES_PER_MEGABYTE; // 10 MB
 	private static Logger logger = Logger.getLogger(FileUpload.class.getName());
 	private static final long serialVersionUID = 1L;
 
@@ -209,7 +203,7 @@ public class FileHandleServlet extends HttpServlet {
                 File tempDir = Files.createTempDir();
 				File temp = new File(tempDir.getAbsolutePath() + File.separator + fileName);
 
-				ServiceUtils.writeToFile(temp, stream, MAX_ATTACHMENT_SIZE_IN_BYTES);
+				ServiceUtils.writeToFile(temp, stream, Long.MAX_VALUE);
 				try{
 					// Now upload the file
 					String contentType = item.getContentType();

@@ -414,6 +414,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		NChartLayersArray layerArray = NChartUtil.createLayers(jsoProvider, graph);
 		LayoutResult layoutResult = synapseJSNIUtils.nChartlayout(layerArray, characters);
 		NChartUtil.fillPositions(layoutResult, graph);
+		NChartUtil.repositionExpandNodes(graph);
 		view.setGraph(graph);
 	}
 	

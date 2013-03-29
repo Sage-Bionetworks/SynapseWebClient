@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -63,7 +62,7 @@ public class MarkdownWidget extends LayoutContainer {
 					add(panel);
 					layout();
 					synapseJSNIUtils.highlightCodeBlocks();
-					MarkdownWidget.loadTableSorters(panel, synapseJSNIUtils);
+					DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
 					//asynchronously load the widgets
 					loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview);
 				} catch (JSONObjectAdapterException e) {
@@ -107,26 +106,15 @@ public class MarkdownWidget extends LayoutContainer {
 						if (presenter == null)
 							throw new IllegalArgumentException("unable to render widget from the specified markdown:" + innerText);
 						panel.add(presenter.asWidget(), currentWidgetDiv);
-					}catch(IllegalArgumentException e) {
+					}catch(Throwable e) {
 						//try our best to load all of the widgets. if one fails to load, then fail quietly.
-						panel.add(new HTMLPanel(DisplayUtils.getIconHtml(iconsImageBundle.error16()) + innerText), currentWidgetDiv);
+						panel.add(new HTMLPanel(DisplayUtils.getIconHtml(iconsImageBundle.error16()) + innerText + "<br>Message: " + e.getMessage()), currentWidgetDiv);
 					}
 				}
 			
 			i++;
 			currentWidgetDiv = DisplayConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 			el = panel.getElementById(currentWidgetDiv);
-		}
-	}
-	
-	public static void loadTableSorters(final HTMLPanel panel, SynapseJSNIUtils synapseJSNIUtils) {
-		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
-		int i = 0;
-		Element table = panel.getElementById(id + i);
-		while (table != null) {
-			synapseJSNIUtils.tablesorter(id+i);
-			i++;
-			table = panel.getElementById(id + i);
 		}
 	}
 	

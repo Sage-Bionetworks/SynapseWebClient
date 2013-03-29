@@ -64,7 +64,7 @@ public class EntityListConfigViewImpl extends LayoutContainer implements EntityL
 			public void componentSelected(ButtonEvent ce) {
 				entityFinder.configure(true);				
 				final Window window = new Window();
-				DisplayUtils.configureEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {					
@@ -74,8 +74,7 @@ public class EntityListConfigViewImpl extends LayoutContainer implements EntityL
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
 					}
-				});
-				window.show();				
+				});				
 			}
 		});
 		

@@ -28,5 +28,4 @@ public interface APITableColumnManagerView extends IsWidget, SynapseWidgetView {
 	 * @param entity
 	 */
 	public void configure(List<APITableColumnConfig> configs);
-	public void configDeleted(String tokenId, String deletedName);
 }

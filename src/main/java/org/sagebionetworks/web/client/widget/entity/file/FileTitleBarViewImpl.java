@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -33,6 +32,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -82,7 +82,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	SpanElement fileSize;
 	@UiField
 	SimplePanel favoritePanel;
-
+	private HandlerRegistration entityLinkHandlerRegistration;
 	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
@@ -112,12 +112,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5LinkContainer.addStyleName("inline-block font-italic margin-left-5");
 		entityLink.addStyleName("downloadLink link");
 		uploadButtonContainer.addStyleName("inline-block vertical-align-bottom");
-		entityLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				downloadButton.fireEvent(event);
-			}
-		});
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
@@ -207,7 +201,25 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
-
+		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
+		if (directDownloadUrl != null) {
+			//clear old handler, if there is one
+			if (entityLinkHandlerRegistration != null)
+				entityLinkHandlerRegistration.removeHandler();
+			entityLink.setHref(directDownloadUrl);	
+		}
+		else {
+			//clear href, if there is one
+			entityLink.setHref(null);
+			entityLinkHandlerRegistration = entityLink.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					//if there is an href, ignore it
+					event.preventDefault();
+					downloadButton.fireEvent(event);
+				}
+			});
+		}
 	}
 	
 	@Override

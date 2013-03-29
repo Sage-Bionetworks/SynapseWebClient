@@ -134,4 +134,6 @@ public interface SynapseClientAsync {
 	void getUserEvaluationState(String evaluationId, AsyncCallback<UserEvaluationState> callback) throws RestServiceException;
 	void createParticipant(String evaluationId, AsyncCallback<String> callback) throws RestServiceException;
 	void deleteParticipant(String evaluationId, AsyncCallback<Void> callback) throws RestServiceException;
+	
+	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
 }

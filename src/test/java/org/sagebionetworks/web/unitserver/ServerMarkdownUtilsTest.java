@@ -5,11 +5,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
+import org.sagebionetworks.web.server.DoiAutoLinkDetector;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
+import org.sagebionetworks.web.server.SynapseAutoLinkDetector;
 
 import eu.henkelmann.actuarius.ActuariusTransformer;
 
@@ -18,12 +19,23 @@ public class ServerMarkdownUtilsTest {
 	@Test
 	public void testDetectEntityLinks(){
 		String testString = "<html> <head></head> <body> synapse123 SYn1234\nsyn567 syntax syn3 <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a> syn</body></html>";
-		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#!Synapse:syn1234\">SYn1234</a> <a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#!Synapse:syn567\">syn567</a> syntax <a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#!Synapse:syn3\">syn3</a></span>\n  <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a>\n  <span> syn</span>\n </body>\n</html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a target=\"_blank\" class=\"link\" href=\"#!Synapse:SYn1234\">SYn1234</a> <a target=\"_blank\" class=\"link\" href=\"#!Synapse:syn567\">syn567</a> syntax <a target=\"_blank\" class=\"link\" href=\"#!Synapse:syn3\">syn3</a></span>\n  <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a>\n  <span> syn</span>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
-		ServerMarkdownUtils.addSynapseLinks(htmlDoc);
+		SynapseAutoLinkDetector.getInstance().createLinks(htmlDoc);
 		String actualResult = htmlDoc.html();
 		assertEquals(expectedResult, actualResult);
 	}
+	
+	@Test
+	public void testDetectDoiLinks(){
+		String testString = "<html> <head></head> <body>doi:10.5072/fk2.syn12345 not:a:doi: doi:10.1016/j.compcom.2005.12.006\nDoil doing <a href=\"http://somewhere.else\">link text that has a doi:10.5072/fk2.syn12345 in it.</a> should not be touched doi:</body></html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span><a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/10.5072/fk2.syn12345\">doi:10.5072/fk2.syn12345</a> not:a:doi: <a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/10.1016/j.compcom.2005.12.006\">doi:10.1016/j.compcom.2005.12.006</a> Doil doing </span>\n  <a href=\"http://somewhere.else\">link text that has a doi:10.5072/fk2.syn12345 in it.</a>\n  <span> should not be touched doi:</span>\n </body>\n</html>";
+		Document htmlDoc = Jsoup.parse(testString);
+		DoiAutoLinkDetector.getInstance().createLinks(htmlDoc);
+		String actualResult = htmlDoc.html();
+		assertEquals(expectedResult, actualResult);
+	}
+
 	
 	@Test
 	public void testMarkdown2HtmlEscapeControlCharacters() throws IOException{
@@ -42,6 +54,15 @@ public class ServerMarkdownUtilsTest {
 		assertTrue(!actualResult.contains("<table>"));
 		assertTrue(!actualResult.contains("<iframe>"));
 		assertTrue(!actualResult.contains("<embed>"));
+	}
+	
+	@Test
+	public void testRAssign() throws IOException{
+		//testing R assignment operator (html stripping should not alter)
+		String testString = "DemoClinicalOnlyModel <- setRefClass(Class  = \"CINModel\",...";
+		String actualResult = ServerMarkdownUtils.markdown2Html(testString, false, new ActuariusTransformer());
+		//there should be no space between the less than and the dash:
+		assertTrue(actualResult.contains("&lt;-"));
 	}
 	
 	@Test
@@ -69,11 +90,11 @@ public class ServerMarkdownUtilsTest {
 	
 	@Test
 	public void testResolveTables(){
-		String testString = "${image?fileName=bill%5Fgates%2Egif}  | Second Header | Third Header  \nContent Cell1a  | Content Cell2a  | Content Cell3a  \nContent Cell1b  | Content Cell2b   Content Cell3b";
+		String testString = "${image?fileName=bill%5Fgates%2Egif}  | Second Header | Third Header"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"Content Cell1a  | Content Cell2a  | Content Cell3a"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"Content Cell1b  | Content Cell2b   Content Cell3b";
 		String result = ServerMarkdownUtils.resolveTables(testString);
 		assertTrue(result.contains("<table"));
 		
-		testString = "|Content Cell1a  | Content Cell2a  | Content Cell3a|  \n|Content Cell1b  | Content Cell2b   Content Cell3b|  \n  \nMore text below";
+		testString = "|Content Cell1a  | Content Cell2a  | Content Cell3a|"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"|Content Cell1b  | Content Cell2b   Content Cell3b|"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"More text below";
 		result = ServerMarkdownUtils.resolveTables(testString);
 		assertTrue(result.contains("<table"));
 		assertTrue(result.contains("More text below"));

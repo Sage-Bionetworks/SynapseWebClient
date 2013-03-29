@@ -42,6 +42,8 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		view.checkParams();
 		if (!view.isExternal()) {
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, view.getUploadedFileHandleName());
+			descriptor.put(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY, view.getAlignment());
+			descriptor.put(WidgetConstants.IMAGE_WIDGET_SCALE_KEY, view.getScale());
 		}
 	}
 	

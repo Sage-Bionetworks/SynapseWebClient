@@ -48,7 +48,7 @@ public class OldImageWidget implements OldImageWidgetView.Presenter, WidgetRende
 								.hasNext();) {
 							AttachmentData data = (AttachmentData) iterator.next();
 							if (descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY).equals(data.getName()))
-								view.configure(wikiKey.getOwnerObjectId(), data, descriptor.get(WidgetConstants.IMAGE_WIDGET_WIDTH_KEY));				
+								view.configure(wikiKey.getOwnerObjectId(), data, descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY));				
 						}
 					}
 				} catch (JSONObjectAdapterException e) {

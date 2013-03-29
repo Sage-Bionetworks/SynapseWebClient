@@ -259,7 +259,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 					Anchor button = DisplayUtils.createIconLink(img, new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
-							deleteAttachmentAt(rowIndex);
+							deleteColumnConfigAt(rowIndex);
 						}
 					});
 	
@@ -313,32 +313,11 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 	/*
 	 * Private Methods
 	 */
-	public void deleteAttachmentAt(int rowIndex) {
+	public void deleteColumnConfigAt(int rowIndex) {
 		final BaseModelData model = grid.getStore().getAt(rowIndex);
 		if (model != null) {
 			Integer dataIndex = (Integer)model.get(DATA_TOKEN_KEY);
 			presenter.deleteColumnConfig(token2ColumnConfig.get(dataIndex));
 		}
 	}
-	@Override
-	public void configDeleted(String tokenId, String deletedName) {
-			if(isRendered() && tokenId != null && grid != null && gridStore != null) {
-			//BaseModelData
-			Integer foundIdx = null;			
-			for(int i=0; i<gridStore.getCount(); i++) {
-				BaseModelData model = gridStore.getAt(i);
-				if(tokenId.equals(model.get(DATA_TOKEN_KEY)))
-					foundIdx = i;
-			}
-			if(foundIdx != null) {
-				gridStore.remove(foundIdx);
-				if(gridStore.getCount() == 0) {
-					addNoConfigRow();
-				}
-				grid.reconfigure(gridStore, columnModel);
-			}
-		}
-		showInfo(deletedName + " " + DisplayConstants.LABEL_DELETED + ".", "");
-	}
-	
 }

@@ -393,6 +393,11 @@ a.shortBtn {
 	float: left;
 }
 
+.floatright {
+	float: right;
+}
+
+
 .clearleft {
 	clear:left;	
 }
@@ -422,6 +427,11 @@ a.shortBtn {
 .margin-right-5 {
 	margin-right: 5px;
 }
+
+.margin-right-10 {
+	margin-right: 10px;
+}
+
 
 .user-profile-edit-table td {
 	padding-bottom: 5px;
@@ -537,17 +547,12 @@ a.shortBtn {
 }
 .markdown strong { font-weight: bold; }
 .markdown em { font-style: italic; }
-a.auto-detected-synapse-link, a.auto-detected-synapse-link:hover, a.auto-detected-synapse-link:visited {}
-a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
 .markdown a, a:hover, a:visited {}
 .markdown blockquote {
 	margin: 1em 3em;
 	padding: .5em 1em;
 	border-left: 5px solid #fce27c;
 	background-color: #f6ebc1; }
-.markdown img {
-	max-width: 940px;
-}
 
 .markdown code {
 	background-clip: padding-box;
@@ -811,3 +816,22 @@ h1, h2, h3, h4, h5, h6 {
 	font-size: 0.9em;
 	margin-left: 30px;
 }	
+
+strong {
+	font-weight: bold;
+}
+.underline {
+	text-decoration: underline;
+}
+ol.decimal {	
+	list-style: decimal outside;
+	padding: 0 0 0 30px;
+}
+ol.loweralpha {	
+	list-style: lower-alpha outside;
+	padding: 0 0 0 30px;
+}
+ol.lowerroman {	
+	list-style: lower-roman outside;
+	padding: 0 0 0 30px;
+}

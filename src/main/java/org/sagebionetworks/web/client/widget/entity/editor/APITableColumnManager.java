@@ -40,7 +40,7 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 			throw new IllegalArgumentException("Renderer and Input Columns are required");
 		}
 		APITableColumnConfig newConfig = new APITableColumnConfig();
-		newConfig.setRendererName(rendererName);
+		newConfig.setRendererFriendlyName(rendererName);
 		String[] inputColNamesArray = inputColumnNames.split(",");
 		Set<String> inputColumnNamesSet = new HashSet<String>();
 		for (int i = 0; i < inputColNamesArray.length; i++) {

@@ -21,8 +21,13 @@ import eu.henkelmann.actuarius.ActuariusTransformer;
 
 public class ServerMarkdownUtils {
 	
-	private static final String NEWLINE_WITH_SPACES = "  \n";
+	public static final String NEWLINE_WITH_SPACES = "  <br />\n";
+	public static final String NEWLINE_WITH_SPACES_ESCAPED = Pattern.quote(NEWLINE_WITH_SPACES);
 	private static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
+	private static final String R_ASSIGNMENT = "<-";
+	private static final String R_MESSED_UP_ASSIGNMENT = "< -";
+	
+	
 	/**
 	 * This converts the given markdown to html using the given markdown processor.
 	 * It also post processes the output html, including:
@@ -42,8 +47,11 @@ public class ServerMarkdownUtils {
 			markdown = markdown.replace("\n", TEMP_NEWLINE_DELIMITER);
 		}
 //		lastTime = System.currentTimeMillis();
+		//played with other forms of html stripping, 
+		//and this method has been the least destructive (compared to clean() with various WhiteLists, or using java HTMLEditorKit to do it).
 		markdown = Jsoup.parse(markdown).text();
 		markdown = markdown.replace(TEMP_NEWLINE_DELIMITER, NEWLINE_WITH_SPACES);
+		markdown = markdown.replace(R_MESSED_UP_ASSIGNMENT, R_ASSIGNMENT);
 //		reportTime("suppress/escape html");
 		markdown = resolveTables(markdown);
 //		reportTime("resolved tables");
@@ -65,7 +73,8 @@ public class ServerMarkdownUtils {
 //		reportTime("add link class");
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
 //		reportTime("addWidgets");
-		ServerMarkdownUtils.addSynapseLinks(doc);
+		SynapseAutoLinkDetector.getInstance().createLinks(doc);
+		DoiAutoLinkDetector.getInstance().createLinks(doc);
 //		reportTime("addSynapseLinks");
 		//URLs are automatically resolved from the markdown processor
 		String returnHtml = "<div class=\"markdown\">" + doc.html() + "</div>";
@@ -161,47 +170,11 @@ public class ServerMarkdownUtils {
 	        builder.append("&"+DisplayUtils.WAIT_FOR_URL+"=true");
 	        return builder.toString();
 	}
-
-	public static void addSynapseLinks(Document doc) {
-		// in this case, I still need a regular expression to find the synapse ids.
-		// find all elements whose text contains a synapse id pattern (but not anchors)
-		// replace the TextNode element children with Elements, whose html contain a link to relevant synapse entity.
-		// regular expression: look for non-word characters (0 or more), followed by "syn" and a number, followed by more non-word characters (0 or more).
-		// capture the synapse id in a group (the paranthesis).
-		String regEx = "\\W*(syn\\d+)\\W*";
-		Elements elements = doc.select("*:matchesOwn(" + regEx + "):not(a,code)");  	// selector is case insensitive
-		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
-		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
-			Element element = (Element) iterator.next();
-			//only process the TextNode children (ignore others)
-			for (Iterator iterator2 = element.childNodes().iterator(); iterator2.hasNext();) {
-				Node childNode = (Node) iterator2.next();
-				if (childNode instanceof TextNode) {
-					String oldText = ((TextNode) childNode).text();
-					// find it in the text
-					Matcher matcher = pattern.matcher(oldText);
-					StringBuilder sb = new StringBuilder();
-					int previousFoundIndex = 0;
-					while (matcher.find() && matcher.groupCount() == 1) {
-						sb.append(oldText.substring(previousFoundIndex, matcher.start(1)));
-						sb.append(ServerMarkdownUtils.getSynAnchorHtml(matcher.group(1))); //the actual synapse Id group (not the non-word characters that might surround it)
-						previousFoundIndex = matcher.end(1);
-					}
-					if (previousFoundIndex < oldText.length() - 1)
-						// substring, go from the previously found index to the end
-						sb.append(oldText.substring(previousFoundIndex));
-					Element newElement = doc.createElement("span"); //wrap new html in a span, since it needs a container!
-					newElement.html(sb.toString());
-					childNode.replaceWith(newElement);		
-				}
-			}
-		}
-	}
 	
 	public static String resolveTables(String rawMarkdown) {
 		//find all tables, and replace the raw text with html table
 		String regEx = ".*[|]{1}.+[|]{1}.*";
-		String[] lines = rawMarkdown.split(NEWLINE_WITH_SPACES);
+		String[] lines = rawMarkdown.split(NEWLINE_WITH_SPACES_ESCAPED);
 		StringBuilder sb = new StringBuilder();
 		int tableCount = 0;
 		int i = 0;
@@ -290,33 +263,14 @@ public class ServerMarkdownUtils {
 		}
 	}
 
-	public static String getUrlHtml(String url){
-		StringBuilder sb = new StringBuilder();
-		sb.append("<a target=\"_blank\" class=\"link auto-detected-url\" href=\"");
-	    sb.append(url.trim());
-	    sb.append("\">");
-	    sb.append(url);
-	    sb.append("</a>");
-	    return sb.toString();
-	}
-
 	public static String getSynAnchorHtml(String synId){
-		StringBuilder sb = new StringBuilder();
-		sb.append("<a target=\"_blank\" class=\"link auto-detected-synapse-link\" href=\"#!Synapse:");
-	    sb.append(synId.toLowerCase().trim());
-	    sb.append("\">");
-	    sb.append(synId);
-	    sb.append("</a>");
-	    return sb.toString();
+		return "<a target=\"_blank\" class=\"link\" href=\"" + DisplayUtils.getSynapseHistoryToken(synId) 
+				+"\">" + synId + "</a>";
 	}
-
-	public static String getYouTubeHTML(String videoId){
-		
-		StringBuilder sb = new StringBuilder();
-		sb.append("<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/");
-		sb.append(videoId);
-		sb.append("\" frameborder=\"0\" allowfullscreen></iframe>");
-	    return sb.toString();
+	
+	public static String getDoiLink(String fullDoi, String doiName){
+		return "<a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/" +
+				doiName + "\">" + fullDoi +"</a>";
 	}
 	
 	public static String getWidgetHTML(int widgetIndex, String suffix, String widgetProperties){

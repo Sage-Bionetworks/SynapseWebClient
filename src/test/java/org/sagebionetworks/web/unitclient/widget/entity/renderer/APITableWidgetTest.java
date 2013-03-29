@@ -24,6 +24,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
@@ -104,7 +105,7 @@ public class APITableWidgetTest {
 	public void testConfigure() {
 		widget.configure(testWikiKey, descriptor);
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
@@ -121,7 +122,7 @@ public class APITableWidgetTest {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 		
 		widget.configure(testWikiKey, descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 	}
 	
 	@Test
@@ -140,7 +141,7 @@ public class APITableWidgetTest {
 		widget.configure(testWikiKey, descriptor);
 		
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
@@ -165,14 +166,15 @@ public class APITableWidgetTest {
 	public void testNoPaging() throws JSONObjectAdapterException {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
 		widget.configure(testWikiKey, descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
+		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
 	@Test
 	public void testPagerNotNecessary() throws JSONObjectAdapterException {
 		testReturnJSONObject.put("totalNumberOfResults", 2);
 		widget.configure(testWikiKey, descriptor);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), anyString(), anyBoolean(), anyString(), anyString(), anyInt());
+		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	

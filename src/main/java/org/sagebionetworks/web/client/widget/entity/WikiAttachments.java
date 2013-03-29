@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.file.FileHandle;

@@ -30,6 +30,7 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
@@ -781,28 +782,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		if (ObjectType.ENTITY.equals(ownerObjectType))
 			return hasAccess(ownerId, accessType);
 		//everyone has (read) access to evaluation
-		else if (ObjectType.EVALUATION.equals(ownerObjectType)) {
-			if (ACCESS_TYPE.READ.toString().equals(accessType))
-				return true;
-			else {
-				try {
-					//get the page
-					Synapse synapseClient = createSynapseClient();
-					//get the root wiki page for this object
-					WikiPage page = synapseClient.getRootWikiPage(ownerId, ObjectType.valueOf(ownerType));
-					String pageOwnerId = page.getCreatedBy();
-					if (synapseClient.getUserSessionData() != null && synapseClient.getUserSessionData().getProfile() != null) {
-						String currentUserId = synapseClient.getUserSessionData().getProfile().getOwnerId();
-						return pageOwnerId.equals(currentUserId);
-					}
-					else return false;
-				} catch (SynapseException e) {
-					throw ExceptionUtil.convertSynapseException(e);
-				} catch (JSONObjectAdapterException e) {
-					throw new UnknownErrorException(e.getMessage());
-				} 
-			}
-		}
 			
 		throw new IllegalArgumentException(DisplayConstants.UNSUPPORTED_FOR_OWNER_TYPE + ownerType);
 	}
@@ -1254,6 +1233,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	@Override
+	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException{
+		Synapse synapseClient = createSynapseClient();
+		try {
+			EntityIdList entityIdList = synapseClient.getDescendants(nodeId, pageSize, lastDescIdExcl);
+			return EntityFactory.createJSONStringForEntity(entityIdList);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 	@Override
 	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException{
 		//is the evaluation open?

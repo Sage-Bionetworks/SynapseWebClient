@@ -1438,7 +1438,7 @@ public class DisplayUtils {
 	public static boolean isWikiSupportedType(Entity entity) {
 		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project);
 	}
-	
+		
 	public static boolean isRecognizedImageContentType(String contentType) {
 		String lowerContentType = contentType.toLowerCase();
 		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
@@ -1494,7 +1494,7 @@ public class DisplayUtils {
 		public void onSelected(T selected);		
 	}
 	
-	public static void configureEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
+	public static void configureAndShowEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
 		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
 		window.setPlain(true);
 		window.setModal(true);
@@ -1515,6 +1515,19 @@ public class DisplayUtils {
 			}
 		}));
 		window.setButtonAlign(HorizontalAlignment.RIGHT);
+		window.show();
+		entityFinder.refresh();
+	}
+
+	public static void loadTableSorters(final HTMLPanel panel, SynapseJSNIUtils synapseJSNIUtils) {
+		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
+		int i = 0;
+		Element table = panel.getElementById(id + i);
+		while (table != null) {
+			synapseJSNIUtils.tablesorter(id+i);
+			i++;
+			table = panel.getElementById(id + i);
+		}
 	}
 		
 }
