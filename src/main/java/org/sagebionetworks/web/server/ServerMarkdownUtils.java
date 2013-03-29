@@ -23,6 +23,10 @@ public class ServerMarkdownUtils {
 	
 	private static final String NEWLINE_WITH_SPACES = "  \n";
 	private static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
+	private static final String R_ASSIGNMENT = "<-";
+	private static final String R_MESSED_UP_ASSIGNMENT = "< -";
+	
+	
 	/**
 	 * This converts the given markdown to html using the given markdown processor.
 	 * It also post processes the output html, including:
@@ -42,8 +46,11 @@ public class ServerMarkdownUtils {
 			markdown = markdown.replace("\n", TEMP_NEWLINE_DELIMITER);
 		}
 //		lastTime = System.currentTimeMillis();
+		//played with other forms of html stripping, 
+		//and this method has been the least destructive (compared to clean() with various WhiteLists, or using java HTMLEditorKit to do it).
 		markdown = Jsoup.parse(markdown).text();
 		markdown = markdown.replace(TEMP_NEWLINE_DELIMITER, NEWLINE_WITH_SPACES);
+		markdown = markdown.replace(R_MESSED_UP_ASSIGNMENT, R_ASSIGNMENT);
 //		reportTime("suppress/escape html");
 		markdown = resolveTables(markdown);
 //		reportTime("resolved tables");

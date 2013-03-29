@@ -45,6 +45,15 @@ public class ServerMarkdownUtilsTest {
 	}
 	
 	@Test
+	public void testRAssign() throws IOException{
+		//testing R assignment operator (html stripping should not alter)
+		String testString = "DemoClinicalOnlyModel <- setRefClass(Class  = \"CINModel\",...";
+		String actualResult = ServerMarkdownUtils.markdown2Html(testString, false, new ActuariusTransformer());
+		//there should be no space between the less than and the dash:
+		assertTrue(actualResult.contains("&lt;-"));
+	}
+	
+	@Test
 	public void testTableSupport() throws IOException{
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
 		String testString = 
