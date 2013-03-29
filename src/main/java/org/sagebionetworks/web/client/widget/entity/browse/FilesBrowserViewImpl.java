@@ -184,11 +184,12 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			public void componentSelected(ButtonEvent ce) {
 					//let the uploader create the FileEntity
 					window.removeAll();
-					window.setSize(400, 320);
+					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 					window.setPlain(true);
 					window.setModal(true);		
 					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-					window.setLayout(new FitLayout());			
+					window.setLayout(new FitLayout());
+					window.setBodyStyle("backgroundColor: white !important;");
 					window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
 					window.show();
 			}

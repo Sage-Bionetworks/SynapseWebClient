@@ -830,3 +830,6 @@ ol.lowerroman {
 	list-style: lower-roman outside;
 	padding: 0 0 0 30px;
 }
+.blackText {
+	color: #000000;
+}

@@ -16,6 +16,10 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 	
 	public void openNewBrowserTab(String url);
 	
+	public int getDisplayHeight();
+
+	public int getDisplayWidth();
+
 	/**
 	 * Presenter interface
 	 */
@@ -43,6 +47,5 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 
 		void clearHandlers();
 	}
-
 
 }

@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.download;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityViewUtils;
 
@@ -12,6 +14,7 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FormEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.ProgressBar;
@@ -29,6 +32,7 @@ import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.HTML;
@@ -38,7 +42,10 @@ import com.google.inject.Inject;
 public class UploaderViewImpl extends LayoutContainer implements
 		UploaderView {
 
+	private static final MarginData MARGIN = new MarginData(10);
+	
 	private Presenter presenter;
+	SynapseJSNIUtils synapseJSNIUtils;
 
 	// initialized in constructor
 	private boolean isInitiallyRestricted;
@@ -56,9 +63,15 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	private JavaScriptObject window;
+	
+	LayoutContainer container;
+	IconsImageBundle iconsImageBundle;
 
 	@Inject
-	public UploaderViewImpl() {
+	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, IconsImageBundle iconsImageBundle) {
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.iconsImageBundle = iconsImageBundle;
+		
 		// initialize graphic elements
 		this.fileUploadOpenRadio = new Radio();
 		this.fileUploadRestrictedRadio = new Radio();	
@@ -70,6 +83,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.formPanel = new FormPanel();
 		this.fileUploadField = new FileUploadField();
 
+		this.container = new LayoutContainer();
+		
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 	}
@@ -105,7 +120,61 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Override
 	public void createUploadForm(boolean isExternalSupported) {
 		initializeControls();
-		createTabPanel(isExternalSupported);
+		
+		this.removeAll();
+		this.setLayout(new FitLayout());
+		this.addStyleName(DisplayUtils.STYLE_WHITE_BACKGROUND);
+		container.addStyleName(DisplayUtils.STYLE_WHITE_BACKGROUND);
+		container.setLayout(new FlowLayout());
+		this.add(container);
+				
+		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"><h4 class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\">" + DisplayConstants.DEFAULT_SHARING_ACCESS + ":&nbsp;</h4>" 
+				+ "<div class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\" style=\"top:-3px; position: relative;\">" + DisplayUtils.getShareSettingsDisplay(null, false, synapseJSNIUtils) + "</div>"				
+				+ "</div>"));
+		
+		TabPanel tabPanel = new TabPanel();		
+		tabPanel.setPlain(true);
+		tabPanel.setHeight(130);		
+		container.add(tabPanel, new MarginData(0, 10, 10, 10));
+		
+		TabItem tab = new TabItem(DisplayConstants.UPLOAD_FILE);
+		tab.addStyleName("pad-text");
+		tab.setLayout(new FlowLayout());
+		tab.add(formPanel);
+
+		
+		tabPanel.add(tab);
+
+		tab = new TabItem(DisplayConstants.LINK_TO_URL);
+		if (!isExternalSupported)
+			tab.setEnabled(false);
+		tab.addStyleName("pad-text");		
+		tab.setLayout(new FlowLayout());		
+		tab.add(createExternalPanel());
+		
+		tabPanel.add(tab);
+		tabPanel.recalculate();
+
+		// Data Use message 
+		
+		container.add(new HTML("<h3>"+ DisplayConstants.DATA_USE_BANNER +"</h3>"), new MarginData(25, 10, 5, 10));
+		container.add(new HTML("<div class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\"> <span style=\"font-size: 14pt; display: inline; color: #000;\">"
+				+ DisplayConstants.DATA_USE_BANNER_SUB1  + "</span>" 				
+				+ DisplayUtils.getShareSettingsDisplay(null, true, synapseJSNIUtils) 				
+				+ "<span style=\"font-size: 14pt; display: inline; color: #000;\">" + DisplayConstants.DATA_USE_BANNER_SUB2 + "</span>" 				
+				+"</div>"), new MarginData(3, 10, 0, 10));		
+		container.add(new HTML(DisplayConstants.DATA_USE_NOTE), new MarginData(3, 10, 10, 10));
+		
+		addRadioButtonsToContainer(container, linkExternalOpenRadio, linkExternalRestrictedRadio);
+		
+		// click any use by default
+		linkExternalOpenRadio.setValue(true);
+		openSelected();
+		
+		this.setSize(PANEL_WIDTH+200, PANEL_HEIGHT);
+		container.layout(true);
+		this.layout(true);
+
 	}
 	
 	@Override
@@ -116,47 +185,21 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// only use it once
 		window = null;
 	}
+	
+	@Override
+	public int getDisplayHeight() {
+		return 450;
+	}
+
+	@Override
+	public int getDisplayWidth() {
+		return 650;
+	}
+
 
 	/*
 	 * Private Methods
-	 */
-	
-	private void createTabPanel(boolean isExternalSupported) {
-		this.removeAll();
-		setLayout(new FitLayout());
-		
-		TabPanel tabPanel = new TabPanel();		
-		tabPanel.setPlain(true);
-		this.add(tabPanel);
-		
-		TabItem tab = new TabItem(DisplayConstants.LABEL_UPLOAD_TO_SYNAPSE);
-		addUploadComponentsToLayoutContainer(tab);
-		tabPanel.add(tab);
-
-		tab = new TabItem(DisplayConstants.LABEL_TO_EXTERNAL);
-		if (!isExternalSupported)
-			tab.setEnabled(false);
-		tab.addStyleName("pad-text");		
-		tab.setLayout(new FlowLayout());
-		addWarningToLayoutContainer(tab);
-		addRadioButtonsToLayoutContainer(tab, linkExternalOpenRadio, linkExternalRestrictedRadio);
-		tab.add(createExternalPanel());
-		
-		tabPanel.add(tab);
-		tabPanel.recalculate();
-		
-		this.setSize(PANEL_WIDTH+200, PANEL_HEIGHT);
-		this.layout(true);
-	}
-	
-	private void addUploadComponentsToLayoutContainer(LayoutContainer uploadContainer) {
-		uploadContainer.addStyleName("pad-text");
-		uploadContainer.setLayout(new FlowLayout());
-		addWarningToLayoutContainer(uploadContainer);
-		addRadioButtonsToLayoutContainer(uploadContainer, fileUploadOpenRadio, fileUploadRestrictedRadio);
-		uploadContainer.add(formPanel);
-	}
-
+	 */	
 	
 	private void initializeOpenRadio(Radio openRadio, String radioGroup, Listener<BaseEvent> listener) {
 		openRadio.removeAllListeners();
@@ -274,16 +317,9 @@ public class UploaderViewImpl extends LayoutContainer implements
 		};
 		cancelBtn.addSelectionListener(cancelListener);
 
-}
-
-	private static void addWarningToLayoutContainer(LayoutContainer container) {
-		Label lf = new Label(DisplayConstants.FILE_DOWNLOAD_NOTE);
-		lf.setWidth(PANEL_WIDTH);
-		lf.setAutoHeight(true);
-		container.add(lf);
 	}
 	
-	private void addRadioButtonsToLayoutContainer(
+	private void addRadioButtonsToContainer(
 			LayoutContainer layoutContainer,
 			Radio openRadio,
 			Radio restrictedRadio) {
@@ -294,14 +330,14 @@ public class UploaderViewImpl extends LayoutContainer implements
 		radioButtonPanel.setBorders(false);
 		radioButtonPanel.setAutoWidth(true);
 		radioButtonPanel.setFieldWidth(PANEL_WIDTH);
-		
+				
 		radioButtonPanel.add(radioField(openRadio, new Widget[]{
-				createRestrictionLabel(RESTRICTION_LEVEL.OPEN)}));
+				createRestrictionLabel(RESTRICTION_LEVEL.OPEN, iconsImageBundle)}));
 		radioButtonPanel.add(radioField(restrictedRadio, new Widget[]{
-				createRestrictionLabel(RESTRICTION_LEVEL.RESTRICTED),
-				createRestrictionLabel(RESTRICTION_LEVEL.CONTROLLED)}));
+				createRestrictionLabel(RESTRICTION_LEVEL.RESTRICTED, iconsImageBundle),
+				createRestrictionLabel(RESTRICTION_LEVEL.CONTROLLED, iconsImageBundle)}));
 
-		layoutContainer.add(radioButtonPanel);
+		layoutContainer.add(radioButtonPanel, MARGIN);
 	}
 	
 	private static final int PANEL_HEIGHT = 100;
@@ -349,12 +385,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 		return !isInitiallyRestricted && restrictedModeChosen()==RADIO_SELECTED.RESTRICTED_RADIO_SELECTED;
 	}
 	
-	private static Widget createRestrictionLabel(RESTRICTION_LEVEL restrictionLevel) {
+	private static Widget createRestrictionLabel(RESTRICTION_LEVEL restrictionLevel, IconsImageBundle iconsImageBundle) {
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(
-				"<div class=\"left "+EntityViewUtils.shieldStyleName(restrictionLevel)+
-				"\"  style=\"margin-left: 7px;\"></div> <h5 class=\"left\" style=\"margin-right: 5px; margin-left: 7px;\">"+
-				EntityViewUtils.restrictionDescriptor(restrictionLevel)+"</h5>");
+		shb.appendHtmlConstant("&nbsp;"
+				+ DisplayUtils.getIconHtml(EntityViewUtils.getShieldIcon(restrictionLevel, iconsImageBundle))
+				+ " <h5 class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE +  "\">"
+				+ EntityViewUtils.restrictionDescriptor(restrictionLevel)+"</h5>");
 		return new HTML(shb.toSafeHtml());
 	}
 	
@@ -445,4 +481,5 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		return externalLinkFormPanel;
 	}
+
 }
