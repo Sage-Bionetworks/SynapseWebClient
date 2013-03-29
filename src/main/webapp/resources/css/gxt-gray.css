@@ -380,7 +380,7 @@ ul.x-tab-strip-bottom{
     border-top:1px solid #eee;
     border-bottom:1px solid #d0d0d0;
     border-right:1px solid #d0d0d0;
-    background:transparent !important;
+    background:transparent;
 }
 
 body.x-body-masked .x-window-mc, body.x-body-masked .x-window-plain .x-window-mc {

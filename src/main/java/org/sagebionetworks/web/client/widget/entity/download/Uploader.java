@@ -245,10 +245,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
 
-	@Override
-	public void closeButtonSelected() {
-		handlerManager.fireEvent(new CancelEvent());
-	}
 
 	public void entityUpdated() {
 		handlerManager.fireEvent(new EntityUpdatedEvent());
@@ -313,12 +309,19 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return GovernanceServiceHelper.entityRestrictionLevel(accessRequirements)!=RESTRICTION_LEVEL.OPEN;
 	}
 	
-	
 	@Override
 	public String getJiraRestrictionLink() {
 		UserProfile userProfile = authenticationController.getLoggedInUser().getProfile();
 		if (userProfile==null) throw new NullPointerException("User profile cannot be null.");
 		return jiraURLHelper.createAccessRestrictionIssue(
 				userProfile.getUserName(), userProfile.getDisplayName(), entity.getId());
+	}
+
+	public int getDisplayHeight() {
+		return view.getDisplayHeight();
+	}
+	
+	public int getDisplayWidth() {
+		return view.getDisplayWidth();
 	}
 }

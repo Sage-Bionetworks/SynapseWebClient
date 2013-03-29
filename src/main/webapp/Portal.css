@@ -337,24 +337,6 @@ a.shortBtn {
   background-image: url(/images/icons/list-trigger.gif);
 }
 
-.red-shield {
-	background-image: url(images/icons/shield-red-16.png);
-	width: 16px;
-	height: 16px;
-}
-
-.yellow-shield {
-	background-image: url(images/icons/shield-yellow-16.png);
-	width: 16px;
-	height: 16px;
-}
-
-.green-shield {
-	background-image: url(images/icons/shield-green-16.png);
-	width: 16px;
-	height: 16px;
-}
-
 .image-loading {
 	 background: white url(images/ui-anim_basic_16x16.gif) no-repeat center center;
 }
@@ -834,4 +816,7 @@ ol.loweralpha {
 ol.lowerroman {	
 	list-style: lower-roman outside;
 	padding: 0 0 0 30px;
+}
+.blackText {
+	color: #000000;
 }

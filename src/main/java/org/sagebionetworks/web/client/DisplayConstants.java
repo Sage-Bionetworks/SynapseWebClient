@@ -211,8 +211,8 @@ public class DisplayConstants {
 	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
 	public static final String TEXT_USER_SETTINGS = "Settings";
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
-	public static final String LABEL_UPLOAD_TO_SYNAPSE = "To Synapse";
-	public static final String LABEL_TO_EXTERNAL = "Link External Location";
+	public static final String UPLOAD_FILE = "Upload File";
+	public static final String LINK_TO_URL = "Link to URL";
 	public static final String TEXT_LINK_FILE = "Link File";
 	public static final String TEXT_LINK_SUCCESS = "Link successfully updated in Synapse";
 	public static final String TEXT_LINK_FAILED = "An error occurred while creating the link. Please check the URL and try again.";
@@ -394,9 +394,8 @@ public class DisplayConstants {
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
 
 	// constants used in GovernanceDialogHelper	
-	public static final String OPEN = "Open";
-	public static final String RESTRICTED = "Restricted";
-	public static final String CONTROLLED = "Controlled";
+	public static final String RESTRICTED_USE = "Restricted Use";
+	public static final String CONTROLLED_USE = "Controlled Use";
 	public static final String MODIFY = "modify";
 	public static final String INFO = "info";
 	public static final String GAIN_ACCESS = "gain access";
@@ -417,9 +416,9 @@ public class DisplayConstants {
 	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to these data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
 	
-	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
+	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Data Use Restrictions for Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
-	public static String GOVERNANCE_REFERENCE = "For more information on data access conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
+	public static String GOVERNANCE_REFERENCE = "For more information on Data Use conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
 	
 	public static String ADMIN_GOVERNANCE_REFERENCE = "You are responsible to ensure your data is shared in compliance with the "+
 	SYNAPSE_GUIDELINES_LINK+" and all applicable laws. ";
@@ -431,15 +430,13 @@ public class DisplayConstants {
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
-	public static final String FILE_DOWNLOAD_NOTE = 
-		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
-		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
-		"without restrictions select \"Open\", below.  Otherwise select \"Restricted / Controlled\".";
-
-	public static final String EXTERNAL_LINK_NOTE = 
-		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
-		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
-		"without restrictions select \"save unrestricted\", below.  Otherwise select \"save restricted\".";
+	public static final String DATA_USE_BANNER = "Data Use Restrictions for Public Data";
+	public static final String DATA_USE_BANNER_SUB1 = "If you change Sharing to be ";
+	public static final String DATA_USE_BANNER_SUB2 = ", who can use these data?";
+	public static final String DATA_USE_NOTE = 
+		"You are responsible to ensure your data is used in compliance with the "+SYNAPSE_GUIDELINES_LINK+
+		" and all applicable laws. If/when you make this file public, can its data be used by any registered Synapse user "+
+		"without restriction? If so, then select \"Any Use\", below.  Otherwise select \"Restricted / Controlled\".";
 	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 	
 	
@@ -509,6 +506,9 @@ public class DisplayConstants {
 	public static final String ADD_ENTITY = "Add Entity";
 	public static final String INVALID_SHINY_SITE = " is not a valid Shiny Site URL. Please " + DisplayUtils.HELP_EMAIL_ADDRESS_LINK + " if you would like your Shiny Server added to our white list.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
+	public static final String ACCESS_WILL_BE = "Access Will Be";
+	public static final String ANY_USE = "Any Use";
+	public static final String SELECT_DATA_USE = "Please select a Data Use Level";
 		
 	
 }

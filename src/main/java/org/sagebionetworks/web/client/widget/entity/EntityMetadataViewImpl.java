@@ -255,16 +255,20 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.readOnly.setVisible(readOnly);
 		
 		sharingContainer.clear();
-		sharingContainer.add(createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()));
+		sharingContainer.add(DisplayUtils.getShareSettingsDisplay("<span style=\"margin-right: 5px;\">Sharing:</span>", bundle.getPermissions().getCanPublicRead(), synapseJSNIUtils));
 
 		setCreatedBy(e.getCreatedBy(), synapseJSNIUtils.convertDateToSmallString(e.getCreatedOn()));
 		setModified(e.getModifiedBy(), synapseJSNIUtils.convertDateToSmallString(e.getModifiedOn()));
 			
 		dataUseContainer.clear();
-		Widget dataUse = createRestrictionWidget();
-		if(dataUse != null) {
-			dataUseContainer.setVisible(true);
-			dataUseContainer.add(dataUse);
+		if(bundle.getPermissions().getCanPublicRead()) {
+			Widget dataUse = createRestrictionWidget();
+			if(dataUse != null) {
+				dataUseContainer.setVisible(true);
+				dataUseContainer.add(dataUse);
+			} else {
+				dataUseContainer.setVisible(false);
+			}		
 		} else {
 			dataUseContainer.setVisible(false);
 		}
@@ -592,24 +596,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		return new ColumnModel(columns);
 	}
 
-	private Widget createShareSettingsWidget(boolean isPublic) {
-		final SimplePanel lc = new SimplePanel();
-		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
-		String description = isPublic ? DisplayConstants.PUBLIC_ACL_ENTITY_PAGE : DisplayConstants.PRIVATE_ACL_ENTITY_PAGE;
-		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
-
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">Sharing:</span><div class=\"" + styleName+ "\" style=\"display:inline-block; position:absolute\"></div>");
-		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
-
-		//form the html
-		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
-		lc.add(htmlPanel);
-
-		return lc;
-	}
 	
 	private Widget createRestrictionWidget() {
 		if (!presenter.includeRestrictionWidget()) return null;
