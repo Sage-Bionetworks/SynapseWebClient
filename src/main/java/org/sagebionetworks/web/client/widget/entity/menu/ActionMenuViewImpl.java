@@ -57,7 +57,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private AccessControlListEditor accessControlListEditor;
-	private Uploader locationableUploader;
+	private Uploader uploader;
 	private EntityTypeProvider typeProvider;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityFinder entityFinder;
@@ -79,7 +79,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			EntityFinder entityFinder) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
-		this.locationableUploader = locationableUploader;
+		this.uploader = locationableUploader;
 		this.typeProvider = typeProvider;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.entityFinder = entityFinder;
@@ -342,16 +342,22 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
 			MenuItem item = new MenuItem(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 			item.setIcon(AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
-			final Window window = new Window();  
-			locationableUploader.clearHandlers();
-			locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
+			final Window window = new Window();
+			window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					window.hide();
+				}
+			}));
+			uploader.clearHandlers();
+			uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
 				@Override
 				public void onPersistSuccess(EntityUpdatedEvent event) {
 					window.hide();
 					presenter.fireEntityUpdatedEvent();
 				}
 			});
-			locationableUploader.addCancelHandler(new CancelHandler() {				
+			uploader.addCancelHandler(new CancelHandler() {				
 				@Override
 				public void onCancel(CancelEvent event) {
 					window.hide();
@@ -361,12 +367,12 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				@Override
 				public void componentSelected(MenuEvent ce) {
 					window.removeAll();
-					window.setSize(400, 320);
+					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 					window.setPlain(true);
 					window.setModal(true);		
 					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 					window.setLayout(new FitLayout());			
-					window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+					window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
 					window.show();
 				}
 			});			

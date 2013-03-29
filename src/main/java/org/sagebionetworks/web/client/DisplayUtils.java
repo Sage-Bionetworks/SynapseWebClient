@@ -71,6 +71,7 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -103,6 +104,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -214,8 +216,10 @@ public class DisplayUtils {
 	public static final String STYLE_SMALL_SEARCHBOX = "smallsearchbox";
 	public static final String STYLE_OTHER_SEARCHBOX = "othersearchbox";
 	public static final String STYLE_BREAK_WORD = "break-word";
-
-
+	public static final String STYLE_WHITE_BACKGROUND = "whiteBackground";
+	public static final String STYLE_DISPLAY_INLINE = "inline-block";
+	public static final String STYLE_BLACK_TEXT = "blackText";
+	
 	/*
 	 * Search
 	 */
@@ -1286,23 +1290,29 @@ public class DisplayUtils {
 	 * @param entityType 
 	 */
 	public static Widget getUploadButton(final EntityBundle entityBundle,
-			EntityType entityType, final Uploader locationableUploader,
+			EntityType entityType, final Uploader uploader,
 			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
 		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
 		final Window window = new Window();  
-		locationableUploader.clearHandlers();
+		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		}));
+		uploader.clearHandlers();
 		// add user defined handler
-		locationableUploader.addPersistSuccessHandler(handler);
+		uploader.addPersistSuccessHandler(handler);
 		
 		// add handlers for closing the window
-		locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
+		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				window.hide();
 			}
 		});
-		locationableUploader.addCancelHandler(new CancelHandler() {				
+		uploader.addCancelHandler(new CancelHandler() {				
 			@Override
 			public void onCancel(CancelEvent event) {
 				window.hide();
@@ -1313,12 +1323,12 @@ public class DisplayUtils {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				window.removeAll();
-				window.setSize(400, 320);
+				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 				window.setPlain(true);
 				window.setModal(true);		
 				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 				window.setLayout(new FitLayout());			
-				window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+				window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
 				window.show();
 			}
 		});
@@ -1358,7 +1368,7 @@ public class DisplayUtils {
 		}
 	}
 	
-	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
+	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";	
 
 	/**
 		 * Create the url to a wiki filehandle.
@@ -1529,5 +1539,27 @@ public class DisplayUtils {
 			table = panel.getElementById(id + i);
 		}
 	}
-		
+
+	public static Widget getShareSettingsDisplay(String prefix, boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
+		if(prefix == null) prefix = "";
+		final SimplePanel lc = new SimplePanel();
+		lc.addStyleName(STYLE_DISPLAY_INLINE);
+		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
+		String description = isPublic ? DisplayConstants.PUBLIC_ACL_ENTITY_PAGE : DisplayConstants.PRIVATE_ACL_ENTITY_PAGE;
+		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
+
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(prefix + "<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
+		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
+
+		//form the html
+		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
+		htmlPanel.addStyleName("inline-block");
+		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
+		lc.add(htmlPanel);
+
+		return lc;
+	}
+
+	
 }
