@@ -23,6 +23,8 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public String getAltText();
 	public void setImageUrl(String url);
 	public String getUploadedFileHandleName();
+	public String getAlignment();
+	public String getScale();
 	public void setExternalVisible(boolean visible);
 	
 	public void configure(WikiPageKey wikiKey);
