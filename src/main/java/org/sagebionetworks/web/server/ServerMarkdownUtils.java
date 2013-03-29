@@ -21,9 +21,9 @@ import eu.henkelmann.actuarius.ActuariusTransformer;
 
 public class ServerMarkdownUtils {
 	
-	public static final String NEWLINE_WITH_SPACES = "  <br />\n";
-	public static final String NEWLINE_WITH_SPACES_ESCAPED = Pattern.quote(NEWLINE_WITH_SPACES);
+	public static final String HTML_LINE_BREAK = "<br />\n";
 	private static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
+	private static final String TEMP_SPACE_DELIMITER = "%^&2_9d";
 	private static final String R_ASSIGNMENT = "<-";
 	private static final String R_MESSED_UP_ASSIGNMENT = "< -";
 	
@@ -44,17 +44,18 @@ public class ServerMarkdownUtils {
 		if (markdown == null) return "";
 		//trick to maintain newlines when suppressing all html
 		if (markdown != null) {
-			markdown = markdown.replace("\n", TEMP_NEWLINE_DELIMITER);
+			markdown = preserveWhitespace(markdown);
 		}
 //		lastTime = System.currentTimeMillis();
 		//played with other forms of html stripping, 
 		//and this method has been the least destructive (compared to clean() with various WhiteLists, or using java HTMLEditorKit to do it).
 		markdown = Jsoup.parse(markdown).text();
-		markdown = markdown.replace(TEMP_NEWLINE_DELIMITER, NEWLINE_WITH_SPACES);
+		markdown = restoreWhitespace(markdown);
 		markdown = markdown.replace(R_MESSED_UP_ASSIGNMENT, R_ASSIGNMENT);
 //		reportTime("suppress/escape html");
 		markdown = resolveTables(markdown);
 //		reportTime("resolved tables");
+		markdown = fixNewLines(markdown);
 		markdown = markdownProcessor.apply(markdown);
 //		reportTime("markdownToHtml");
 		if (markdown == null) {
@@ -79,6 +80,40 @@ public class ServerMarkdownUtils {
 		//URLs are automatically resolved from the markdown processor
 		String returnHtml = "<div class=\"markdown\">" + doc.html() + "</div>";
 		return returnHtml;
+	}
+	
+	public static String preserveWhitespace(String markdown){
+		return markdown.replace("\n", TEMP_NEWLINE_DELIMITER).replace(" ", TEMP_SPACE_DELIMITER);
+	}
+	
+	public static String restoreWhitespace(String markdown){
+		return markdown.replace(TEMP_NEWLINE_DELIMITER, "\n").replace(TEMP_SPACE_DELIMITER, " ");
+	}
+	
+	
+	/**
+	 * adds html line breaks to every line, unless it suspects that the line will be in a preformatted code block
+	 * @param markdown
+	 * @return
+	 */
+	public static String fixNewLines(String markdown) {
+		if (markdown == null || markdown.length() == 0) return markdown;
+		
+		StringBuilder sb = new StringBuilder();
+		boolean isSuspectedCode = false;
+		for (String line : markdown.split("\n")) {
+			boolean currentLineHasFence = line.contains("```");
+			if (currentLineHasFence) {
+				//flip
+				isSuspectedCode = !isSuspectedCode;
+			}
+			sb.append(line);
+			//add a <br> if we're not in a code block (unless it's the current line that has the ```)
+			if (!isSuspectedCode && !currentLineHasFence)
+				sb.append(HTML_LINE_BREAK);
+			sb.append("\n");
+		}
+		return sb.toString();
 	}
 	
 //	private static long lastTime;
@@ -174,7 +209,7 @@ public class ServerMarkdownUtils {
 	public static String resolveTables(String rawMarkdown) {
 		//find all tables, and replace the raw text with html table
 		String regEx = ".*[|]{1}.+[|]{1}.*";
-		String[] lines = rawMarkdown.split(NEWLINE_WITH_SPACES_ESCAPED);
+		String[] lines = rawMarkdown.split("\n");
 		StringBuilder sb = new StringBuilder();
 		int tableCount = 0;
 		int i = 0;
@@ -186,7 +221,7 @@ public class ServerMarkdownUtils {
 				tableCount++;
 			} else {
 				//just add the line and move on
-				sb.append(lines[i] + NEWLINE_WITH_SPACES);
+				sb.append(lines[i] + "\n");
 				i++;
 			}
 		}

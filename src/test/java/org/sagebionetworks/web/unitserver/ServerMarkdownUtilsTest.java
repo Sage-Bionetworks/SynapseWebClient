@@ -47,6 +47,22 @@ public class ServerMarkdownUtilsTest {
 	}
 	
 	@Test
+	public void testWhitespacePreservation() throws IOException{
+		String codeBlock = " spaces  and\nnewline    -  test\n  preservation in preformatted  code blocks";
+		String testString = "```\n"+codeBlock+"\n```";
+		String actualResult = ServerMarkdownUtils.markdown2Html(testString, false, new ActuariusTransformer());
+		//it should contain the code block, exactly as written
+		assertTrue(actualResult.contains(codeBlock));
+	}
+	
+	@Test
+	public void testFixNewlines() throws IOException{
+		String testString = "should have line break\nalso should\n```\nthis is code so it should not\nhave any html line breaks\n```\nand html line breaks should be added\nagain";
+		String actualResult = ServerMarkdownUtils.fixNewLines(testString);
+		assertTrue(actualResult.contains("&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt; &lt; ==&gt; &lt;' ="));
+	}
+	
+	@Test
 	public void testRemoveAllHTML() throws IOException{
 		//testing html control character conversion (leaving this up to the markdown library, so it has to work!)
 		String testString = "<table><tr><td>this is a test</td><td>column 2</td></tr></table><iframe width=\"420\" height=\"315\" src=\"http://www.youtube.com/embed/AOjaQ7Vl7SM\" frameborder=\"0\" allowfullscreen></iframe><embed>";
@@ -77,7 +93,7 @@ public class ServerMarkdownUtilsTest {
 		assertTrue(actualResult.contains("<tr>"));
 		assertTrue(actualResult.contains("<td>"));
 	}
-
+	
 	@Test
 	public void testAddWidgetDivs(){
 		String testString = "<p>Line of widgets: <ul><li>${type1:aWidgetParam=1}</li><li>${type2:aWidgetParam=2}</li></ul></p>";
@@ -90,11 +106,11 @@ public class ServerMarkdownUtilsTest {
 	
 	@Test
 	public void testResolveTables(){
-		String testString = "${image?fileName=bill%5Fgates%2Egif}  | Second Header | Third Header"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"Content Cell1a  | Content Cell2a  | Content Cell3a"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"Content Cell1b  | Content Cell2b   Content Cell3b";
+		String testString = "${image?fileName=bill%5Fgates%2Egif}  | Second Header | Third Header\nContent Cell1a  | Content Cell2a  | Content Cell3a\nContent Cell1b  | Content Cell2b   Content Cell3b";
 		String result = ServerMarkdownUtils.resolveTables(testString);
 		assertTrue(result.contains("<table"));
 		
-		testString = "|Content Cell1a  | Content Cell2a  | Content Cell3a|"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"|Content Cell1b  | Content Cell2b   Content Cell3b|"+ServerMarkdownUtils.NEWLINE_WITH_SPACES+ServerMarkdownUtils.NEWLINE_WITH_SPACES+"More text below";
+		testString = "|Content Cell1a  | Content Cell2a  | Content Cell3a|\n|Content Cell1b  | Content Cell2b   Content Cell3b|\n\nMore text below";
 		result = ServerMarkdownUtils.resolveTables(testString);
 		assertTrue(result.contains("<table"));
 		assertTrue(result.contains("More text below"));
