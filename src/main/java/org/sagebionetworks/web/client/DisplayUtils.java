@@ -636,6 +636,10 @@ public class DisplayUtils {
 		return title;
 	}
 	
+	public static String getMarkdownWidgetWarningHtml(String warningText) {
+		return "<div class=\"alert alert-block\"><strong>"+ DisplayConstants.MARKDOWN_WIDGET_WARNING + "</strong><br/> " + warningText + "</div>";
+	}
+	
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}

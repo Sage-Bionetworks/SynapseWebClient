@@ -104,11 +104,14 @@ public class MarkdownWidget extends LayoutContainer {
 						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
 						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, isWiki);
 						if (presenter == null)
-							throw new IllegalArgumentException("unable to render widget from the specified markdown:" + innerText);
+							throw new IllegalArgumentException("Unable to render widget from the specified markdown.");
 						panel.add(presenter.asWidget(), currentWidgetDiv);
 					}catch(Throwable e) {
 						//try our best to load all of the widgets. if one fails to load, then fail quietly.
-						panel.add(new HTMLPanel(DisplayUtils.getIconHtml(iconsImageBundle.error16()) + innerText + "<br>Message: " + e.getMessage()), currentWidgetDiv);
+						String message = innerText;
+						if (e.getMessage() != null)
+							message += "<br>" + e.getMessage();
+						panel.add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(message)), currentWidgetDiv);
 					}
 				}
 			

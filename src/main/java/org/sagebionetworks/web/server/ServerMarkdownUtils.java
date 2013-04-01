@@ -102,7 +102,7 @@ public class ServerMarkdownUtils {
 		StringBuilder sb = new StringBuilder();
 		boolean isSuspectedCode = false;
 		for (String line : markdown.split("\n")) {
-			boolean currentLineHasFence = line.contains("```");
+			boolean currentLineHasFence = line.startsWith("```");
 			if (currentLineHasFence) {
 				//flip
 				isSuspectedCode = !isSuspectedCode;

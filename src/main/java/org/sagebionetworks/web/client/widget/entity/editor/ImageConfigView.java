@@ -18,6 +18,7 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	 * @return
 	 */
 	public boolean isExternal();
+	public boolean isSynapseEntity();
 	
 	public String getImageUrl();
 	public String getAltText();
@@ -25,6 +26,7 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public String getUploadedFileHandleName();
 	public String getAlignment();
 	public String getScale();
+	public String getSynapseId();
 	public void setExternalVisible(boolean visible);
 	
 	public void configure(WikiPageKey wikiKey);
