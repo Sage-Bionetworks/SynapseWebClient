@@ -1,14 +1,21 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.ErrorEvent;
+import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -17,19 +24,34 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
+	private GlobalApplicationState globalApplicationState;
 	private static final int MAX_IMAGE_WIDTH = 940;
 	@Inject
-	public ImageWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils) {
+	public ImageWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, GlobalApplicationState globalApplicationState) {
 		this.synapseJsniUtils = synapseJsniUtils;
+		this.globalApplicationState = globalApplicationState;
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, String fileName,
-			final String scale, String alignment) {
+	public void configure(WikiPageKey wikiKey, final String fileName,
+			final String scale, String alignment, final String synapseId) {
 		this.removeAll();
 		//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 		//create img
-		final Image image = new Image(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
+		final String url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, null, false) :
+			DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false);
+
+		final Image image = new Image(url);
+		if (synapseId != null) {
+			image.addStyleName("imageButton");
+			image.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					//go to the relevant Synapse page
+					globalApplicationState.getPlaceChanger().goTo(new Synapse(synapseId));
+				}
+			});
+		}
 		
 		if (alignment != null) {
 			String trimmedAlignment = alignment.trim();
@@ -46,6 +68,17 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 		}
 		//don't show until we have the correct size (otherwise it's initially shown at 100%, then scaled down!).
 		image.setVisible(false);
+		image.addErrorHandler(new ErrorHandler() {
+			@Override
+		    public void onError(ErrorEvent event) {
+				if (synapseId != null)
+					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + "Please check the validity of Image File Entity " + synapseId);
+				else if (fileName != null)
+					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + fileName);
+				else
+					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + url);
+		    }
+		});
 		image.addLoadHandler(new LoadHandler() {
 			@Override
 			public void onLoad(LoadEvent event) {
@@ -77,7 +110,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 					image.setVisible(true);
 				} catch (Exception e) {
 					remove(image);
-					showError("Image failed to load: " + e.getMessage());
+					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + e.getMessage());
 				}
 			}
 			
@@ -92,7 +125,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 	}
 	
 	public void showError(String error) {
-		add(new HTML(error));
+		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));
 		layout(true);
 	}
 	

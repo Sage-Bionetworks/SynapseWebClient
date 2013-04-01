@@ -23,7 +23,8 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor) {
 		this.descriptor = widgetDescriptor;
-		view.configure(wikiKey, descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY), descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY), descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+		String synapseId = descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY);
+		view.configure(wikiKey, descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY), descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY), descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY), synapseId);
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 	}

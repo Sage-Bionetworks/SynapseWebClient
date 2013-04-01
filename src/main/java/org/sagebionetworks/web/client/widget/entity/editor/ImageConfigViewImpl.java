@@ -1,38 +1,40 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SliderEvent;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.Slider;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
+import com.extjs.gxt.ui.client.widget.Window;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
-import com.extjs.gxt.ui.client.widget.form.SliderField;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -44,22 +46,23 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	private static final int DISPLAY_HEIGHT = 220;
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
+	EntityFinder entityFinder;
 	private UploadFormPanel uploadPanel;
 	private IconsImageBundle iconsImageBundle;
-	private TextField<String> urlField;
-	private TextField<String> nameField;
-	private HorizontalPanel externalLinkPanel;
-	TabItem externalTab,uploadTab;
+	private TextField<String> urlField, nameField, entityField;
+	
+	TabItem externalTab,uploadTab, synapseTab;
 	private HTMLPanel uploadStatusPanel;
 	private String uploadedFileHandleName;
-	private Slider scaleSlider;
-	private SimpleComboBox<String> alignmentCombo;
+	
+	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
 	
 	TabPanel tabPanel;
 	@Inject
-	public ImageConfigViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
+	public ImageConfigViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, EntityFinder entityFinder) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
+		this.entityFinder = entityFinder;
 	}
 	
 	@Override
@@ -85,10 +88,66 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		externalTab.add(externalLinkPanel);
 		tabPanel.add(externalTab);
 		
+		synapseTab = new TabItem(DisplayConstants.IMAGE_CONFIG_FROM_SYNAPSE);
+		synapseTab.addStyleName("pad-text");
+		synapseTab.setLayout(new FlowLayout());
+		FlowPanel synapseEntityPanel = new FlowPanel();
+		synapseEntityPanel.add(getSynapseEntityPanel());
+		synapseParamsPanel = new ImageParamsPanel();
+		synapseEntityPanel.add(synapseParamsPanel);
+		
+		synapseTab.add(synapseEntityPanel);
+		tabPanel.add(synapseTab);
+		
 		this.setHeight(DISPLAY_HEIGHT);
 		this.layout(true);
 	}
 	
+	private FormPanel getSynapseEntityPanel() {
+		final FormPanel panel = new FormPanel();
+		panel.setHeaderVisible(false);
+		panel.setFrame(false);
+		panel.setBorders(false);
+		panel.setShadow(false);
+		panel.setLabelAlign(LabelAlign.RIGHT);
+		panel.setBodyBorder(false);
+		panel.setLabelWidth(88);
+		FormData basicFormData = new FormData();
+		basicFormData.setWidth(330);
+		Margins margins = new Margins(10, 10, 0, 0);
+		basicFormData.setMargins(margins);
+		
+		entityField = new TextField<String>(); 
+		entityField.setFieldLabel(DisplayConstants.IMAGE_FILE_ENTITY);
+		entityField.setAllowBlank(false);
+		entityField.setRegex(WebConstants.VALID_ENTITY_ID_REGEX);
+		entityField.getMessages().setRegexText(DisplayConstants.INVALID_SYNAPSE_ID_MESSAGE);
+		
+		panel.add(entityField, basicFormData);
+		Button findEntitiesButton = new Button(DisplayConstants.FIND_IMAGE_ENTITY, AbstractImagePrototype.create(iconsImageBundle.magnify16()));
+		findEntitiesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				entityFinder.configure(false);				
+				final Window window = new Window();
+				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+					@Override
+					public void onSelected(Reference selected) {
+						if(selected.getTargetId() != null) {
+							entityField.setValue(DisplayUtils.createEntityVersionString(selected));
+							window.hide();
+						} else {
+							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+						}
+					}
+				});
+			}
+		});
+		AdapterField buttonField = new AdapterField(findEntitiesButton);
+		buttonField.setLabelSeparator("");
+		panel.add(buttonField, basicFormData);
+		return panel;
+	}
 	
 	@Override
 	public String getUploadedFileHandleName() {
@@ -96,16 +155,18 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	}
 	@Override
 	public String getAlignment() {
-		if(alignmentCombo != null && alignmentCombo.getValue() != null)
-			return alignmentCombo.getValue().getValue();			
-		return null;
+		if (isSynapseEntity())
+			return synapseParamsPanel.getAlignment();
+		else
+			return uploadParamsPanel.getAlignment();
 	}
 	
 	@Override
 	public String getScale() {
-		if (scaleSlider != null)
-			return Integer.toString(scaleSlider.getValue());
-		return null;
+		if (isSynapseEntity())
+			return synapseParamsPanel.getScale();
+		else
+			return uploadParamsPanel.getScale();
 	}
 
 	private HorizontalPanel getExternalLinkPanel() {
@@ -180,55 +241,10 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		
 	    FlowPanel container = new FlowPanel();
 	    container.add(uploadPanel);
-	    container.add(getImageParamsPanel());
+	    uploadParamsPanel = new ImageParamsPanel();
+	    container.add(uploadParamsPanel);
 		uploadTab.add(container);
 		layout(true);
-	}
-	
-	public FormPanel getImageParamsPanel() {
-		FormPanel panel = new FormPanel();
-		panel.setHeaderVisible(false);
-		panel.setFrame(false);
-		panel.setBorders(false);
-		panel.setShadow(false);
-		panel.setLabelAlign(LabelAlign.LEFT);
-		panel.setBodyBorder(false);
-		FormData basicFormData = new FormData("-50");
-		panel.setFieldWidth(40);
-		//and add scale and alignment
-		scaleSlider = new Slider();
-	    scaleSlider.setMinValue(1);
-	    scaleSlider.setMaxValue(200);
-	    scaleSlider.setValue(100);
-	    scaleSlider.setIncrement(1);
-	    final SliderField sf = new SliderField(scaleSlider);
-	    sf.setFieldLabel("Scale (100%)");
-	    //bug in gxt slider where the message popup is shown far from the slider, and can't seem to hide it
-	    scaleSlider.setMessage("{0}%");
-	    //update the field label as a workaround
-	    scaleSlider.addListener(Events.Change, new Listener<SliderEvent>() {
-	    	@Override
-	    	public void handleEvent(SliderEvent be) {
-	    		sf.setFieldLabel("Scale (" + be.getNewValue() + "%)");
-	    	}
-		});
-
-	    panel.add(sf, basicFormData);
-	    
-	    alignmentCombo = new SimpleComboBox<String>();
-		alignmentCombo.add(WidgetConstants.FLOAT_NONE);
-		alignmentCombo.add(WidgetConstants.FLOAT_LEFT);
-		alignmentCombo.add(WidgetConstants.FLOAT_RIGHT);
-		alignmentCombo.setSimpleValue(WidgetConstants.FLOAT_NONE);
-		alignmentCombo.setTypeAhead(false);
-		alignmentCombo.setEditable(false);
-		alignmentCombo.setForceSelection(true);
-		alignmentCombo.setTriggerAction(TriggerAction.ALL);
-		alignmentCombo.setFieldLabel("Alignment");
-		
-		panel.add(alignmentCombo, basicFormData);
-
-		return panel;
 	}
 	
 	@Override
@@ -239,6 +255,9 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 			if (!nameField.isValid())
 				throw new IllegalArgumentException(nameField.getErrorMessage());
 
+		} else if (isSynapseEntity()) {
+			if (!entityField.isValid())
+				throw new IllegalArgumentException(entityField.getErrorMessage());
 		} else {
 			//must have been uploaded
 			if (uploadedFileHandleName == null)
@@ -296,8 +315,18 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	}
 	
 	@Override
+	public String getSynapseId() {
+		return entityField.getValue();
+	}
+	
+	@Override
 	public boolean isExternal() {
 		return externalTab.equals(tabPanel.getSelectedItem());
+	}
+	
+	@Override
+	public boolean isSynapseEntity() {
+		return synapseTab.equals(tabPanel.getSelectedItem());
 	}
 	
 	@Override

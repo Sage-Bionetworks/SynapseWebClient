@@ -332,8 +332,10 @@ public class DisplayConstants {
 	public static final String IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE = "Please enter valid alternate text for the URL";
 	public static final String IMAGE_CONFIG_UPLOAD = "Upload";
 	public static final String IMAGE_CONFIG_FROM_THE_WEB = "From the Web";
+	public static final String IMAGE_CONFIG_FROM_SYNAPSE = "From Synapse File";
 	public static final String IMAGE_CONFIG_URL_LABEL = "Image URL:";
 	public static final String IMAGE_CONFIG_ALT_TEXT = "Alternate Text:";
+	public static final String IMAGE_FAILED_TO_LOAD = "Image failed to load: ";
 	public static final String URL_LABEL = "URL:";
 	public static final String TABLE_LABEL = "Tab Delimitted Table Contents:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
@@ -485,6 +487,8 @@ public class DisplayConstants {
 	public static final String DISPLAY_HEIGHT = "Display Height";
 	public static final String DEFAULT = "Default";
 	public static final String ENTITY_LIST = "Entity List";
+	public static final String IMAGE_FILE_ENTITY = "Image File Entity";
+	public static final String FIND_IMAGE_ENTITY = "Find Image File Entity";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
 	public static final String FIND_ENTITIES = "Find Entities";
 	
