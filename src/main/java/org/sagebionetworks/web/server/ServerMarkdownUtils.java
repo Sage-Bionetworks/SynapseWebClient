@@ -76,6 +76,7 @@ public class ServerMarkdownUtils {
 //		reportTime("addWidgets");
 		SynapseAutoLinkDetector.getInstance().createLinks(doc);
 		DoiAutoLinkDetector.getInstance().createLinks(doc);
+		UrlAutoLinkDetector.getInstance().createLinks(doc);
 //		reportTime("addSynapseLinks");
 		//URLs are automatically resolved from the markdown processor
 		String returnHtml = "<div class=\"markdown\">" + doc.html() + "</div>";
@@ -306,6 +307,10 @@ public class ServerMarkdownUtils {
 	public static String getDoiLink(String fullDoi, String doiName){
 		return "<a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/" +
 				doiName + "\">" + fullDoi +"</a>";
+	}
+	
+	public static String getUrlHtml(String url){
+		return "<a target=\"_blank\" class=\"link\" href=\"" + url.trim() + "\">" + url+ "</a>";
 	}
 	
 	public static String getWidgetHTML(int widgetIndex, String suffix, String widgetProperties){
