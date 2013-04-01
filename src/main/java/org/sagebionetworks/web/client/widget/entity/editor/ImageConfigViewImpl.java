@@ -91,7 +91,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		synapseTab = new TabItem(DisplayConstants.IMAGE_CONFIG_FROM_SYNAPSE);
 		synapseTab.addStyleName("pad-text");
 		synapseTab.setLayout(new FlowLayout());
-		VerticalPanel synapseEntityPanel = new VerticalPanel();
+		FlowPanel synapseEntityPanel = new FlowPanel();
 		synapseEntityPanel.add(getSynapseEntityPanel());
 		synapseParamsPanel = new ImageParamsPanel();
 		synapseEntityPanel.add(synapseParamsPanel);
@@ -111,11 +111,10 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		panel.setShadow(false);
 		panel.setLabelAlign(LabelAlign.RIGHT);
 		panel.setBodyBorder(false);
-		panel.setLabelWidth(104);
-				
+		panel.setLabelWidth(88);
 		FormData basicFormData = new FormData();
-		basicFormData.setWidth(250);
-		Margins margins = new Margins(10, 10, 0, 10);
+		basicFormData.setWidth(330);
+		Margins margins = new Margins(10, 10, 0, 0);
 		basicFormData.setMargins(margins);
 		
 		entityField = new TextField<String>(); 
