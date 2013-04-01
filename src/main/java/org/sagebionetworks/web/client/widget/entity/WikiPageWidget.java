@@ -206,7 +206,10 @@ public class WikiPageWidget extends LayoutContainer {
 		FlowPanel mainPanel = new FlowPanel();
 		mainPanel.addStyleName("span-"+spanWidth + " notopmargin");
 		mainPanel.add(getBreadCrumbs());
-		mainPanel.add(markdownWidget.asWidget());
+		SimplePanel mdWidgetWrapper = new SimplePanel();
+		mdWidgetWrapper.addStyleName("span-"+spanWidth);
+		mdWidgetWrapper.add(markdownWidget.asWidget());
+		mainPanel.add(mdWidgetWrapper);
 		mainPanel.add(pagesBrowser.asWidget());
 		
 		add(mainPanel);
