@@ -24,6 +24,7 @@ public class ShinySiteWidgetTest {
 	ShinySiteWidgetView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
 	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
+
 	String invalidSiteUrl = "http://google.com";
 	
 	@Before
@@ -66,7 +67,10 @@ public class ShinySiteWidgetTest {
 	@Test 
 	public void testIsValidShinySite() {
 		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl));
+		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl.toUpperCase()));
 		assertFalse(ShinySiteWidget.isValidShinySite(invalidSiteUrl));
 		assertFalse(ShinySiteWidget.isValidShinySite(null));
 	}
+	
+	
 }
