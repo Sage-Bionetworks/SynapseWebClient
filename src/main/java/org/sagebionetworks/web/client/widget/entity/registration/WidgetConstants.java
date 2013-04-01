@@ -46,10 +46,11 @@ public class WidgetConstants {
 	public static final String IMAGE_WIDGET_FILE_NAME_KEY = "fileName";
 	public static final String IMAGE_WIDGET_SCALE_KEY = "scale";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
+	public static final String IMAGE_WIDGET_SYNAPSE_ID_KEY = "synapseId";
 	public static final String FLOAT_NONE = "None";
 	public static final String FLOAT_LEFT = "Left";
 	public static final String FLOAT_RIGHT = "Right";
-
+	
 	@Deprecated
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
 	public static final String PROV_WIDGET_ENTITY_LIST_KEY = "entityList";
