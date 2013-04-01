@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.sagebionetworks.web.server.DoiAutoLinkDetector;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.server.SynapseAutoLinkDetector;
+import org.sagebionetworks.web.server.UrlAutoLinkDetector;
 
 import eu.henkelmann.actuarius.ActuariusTransformer;
 
@@ -32,6 +33,16 @@ public class ServerMarkdownUtilsTest {
 		String expectedResult = "<html> \n <head></head> \n <body>\n  <span><a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/10.5072/fk2.syn12345\">doi:10.5072/fk2.syn12345</a> not:a:doi: <a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/10.1016/j.compcom.2005.12.006\">doi:10.1016/j.compcom.2005.12.006</a> Doil doing </span>\n  <a href=\"http://somewhere.else\">link text that has a doi:10.5072/fk2.syn12345 in it.</a>\n  <span> should not be touched doi:</span>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
 		DoiAutoLinkDetector.getInstance().createLinks(htmlDoc);
+		String actualResult = htmlDoc.html();
+		assertEquals(expectedResult, actualResult);
+	}
+
+	@Test
+	public void testUrlLinks(){
+		String testString = "<html> <head></head> <body>http://test1.com https://test2.org ftp://test.com/test3 HTtp://test4.org http3://notalink.com <a href=\"http://somewhere.else\">link text that has a link http://link.com in it.</a> should not be touched http://</body></html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span><a target=\"_blank\" class=\"link\" href=\"http://test1.com\">http://test1.com</a> <a target=\"_blank\" class=\"link\" href=\"https://test2.org\">https://test2.org</a> <a target=\"_blank\" class=\"link\" href=\"ftp://test.com/test3\">ftp://test.com/test3</a> <a target=\"_blank\" class=\"link\" href=\"HTtp://test4.org\">HTtp://test4.org</a> http3://notalink.com </span>\n  <a href=\"http://somewhere.else\">link text that has a link http://link.com in it.</a>\n  <span> should not be touched http://</span>\n </body>\n</html>";
+		Document htmlDoc = Jsoup.parse(testString);
+		UrlAutoLinkDetector.getInstance().createLinks(htmlDoc);
 		String actualResult = htmlDoc.html();
 		assertEquals(expectedResult, actualResult);
 	}
