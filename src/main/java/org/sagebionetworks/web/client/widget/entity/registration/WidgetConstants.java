@@ -28,7 +28,7 @@ public class WidgetConstants {
 	public static final String ENTITYLIST_CONTENT_TYPE = "entitylist";
 	public static final String ENTITYLIST_FRIENDLY_NAME ="Entity List";
 	
-	public static final String SHINYSITE_CONTENT_TYPE = "shinysite";
+	public static final String SHINYSITE_CONTENT_TYPE = "iframe";
 	public static final String SHINYSITE_FRIENDLY_NAME ="Shiny Site";
 		
 	public static final String WIDGET_START_MARKDOWN = "${";
