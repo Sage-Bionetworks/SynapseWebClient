@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -157,14 +158,14 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		return null;
 	}
 
-	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer container, final String title) {		
-		container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayUtils.getLoadingHtml(sageImageBundle)));			
+	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer container, final String title) {					
+		//container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayUtils.getLoadingHtml(sageImageBundle)));			
 		container.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {	
 				// load the tooltip contents only once
 				if(filledPopoverIds.containsKey(node.getId())) {															
-					container.setToolTip(ProvViewUtil.createTooltipConfig(title, filledPopoverIds.get(node.getId())));
+//					container.setToolTip(ProvViewUtil.createTooltipConfig(title, filledPopoverIds.get(node.getId())));
 					return;
 				}															
 				// retrieve info
@@ -173,12 +174,15 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 					public void onSuccess(KeyValueDisplay<String> result) {
 						String rendered = ProvViewUtil.createEntityPopoverHtml(result).asString();
 						filledPopoverIds.put(container.getId(), rendered);
-					    container.setToolTip(ProvViewUtil.createTooltipConfig(title, rendered));										
+					    //container.setToolTip(ProvViewUtil.createTooltipConfig(title, rendered));
+						//DisplayUtils.addTooltipSpecial(synapseJSNIUtils, container, rendered, TOOLTIP_POSITION.RIGHT);
+						container.setTitle(rendered);
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayConstants.ERROR_GENERIC_RELOAD));
+						//container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayConstants.ERROR_GENERIC_RELOAD));
+						container.setTitle(DisplayConstants.ERROR_GENERIC_RELOAD);
 					}
 				});
 			}

@@ -96,7 +96,7 @@ public class ProvViewUtil {
 				presenter.expand(node);
 			}
 		});
-
+		
 		LayoutContainer container = new LayoutContainer();
 		container.setId(node.getId());
 		container.setStyleName(PROV_ENTTITY_NODE_STYLE + " " + PROV_EXPAND_NODE_STYLE);
@@ -212,21 +212,32 @@ public class ProvViewUtil {
 	}
 
 	public static SafeHtml createEntityPopoverHtml(KeyValueDisplay<String> kvDisplay) {
-		SafeHtmlBuilder sb = new SafeHtmlBuilder();
+//		SafeHtmlBuilder sb = new SafeHtmlBuilder();
+//		if(kvDisplay != null) {
+//			Map<String,String> map = kvDisplay.getMap();
+//			for(String key : kvDisplay.getKeyDisplayOrder()) {
+//				String val = map.get(key);
+//				if(val == null) val = "";
+//				val = val.length() > MAX_TOOL_TIP_VALUE_CHAR ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR-3) + "..." : val;
+//				sb.appendHtmlConstant("<span class=\"boldText\">")
+//				.appendEscaped(key + ":")
+//				.appendHtmlConstant("</span> ")
+//				.appendEscaped(val)
+//				.appendHtmlConstant("<br/>");
+//			}
+//		}		
+//		return sb.toSafeHtml();
+		String str = "";
 		if(kvDisplay != null) {
 			Map<String,String> map = kvDisplay.getMap();
 			for(String key : kvDisplay.getKeyDisplayOrder()) {
 				String val = map.get(key);
 				if(val == null) val = "";
 				val = val.length() > MAX_TOOL_TIP_VALUE_CHAR ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR-3) + "..." : val;
-				sb.appendHtmlConstant("<span class=\"boldText\">")
-				.appendEscaped(key + ":")
-				.appendHtmlConstant("</span> ")
-				.appendEscaped(val)
-				.appendHtmlConstant("<br/>");
+				str += key + ": " + val + "\n";
 			}
 		}		
-		return sb.toSafeHtml();
+		return SafeHtmlUtils.fromString(str);
 	}
 
 	public static ToolTipConfig createTooltipConfig(String title, String text) {
