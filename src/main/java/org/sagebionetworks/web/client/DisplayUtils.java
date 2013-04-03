@@ -655,6 +655,11 @@ public class DisplayUtils {
 		return ISODateTimeFormat.dateTime().print(dt);
 	}
 	
+	/**
+	 * YYYY-MM-DD HH:mm:ss
+	 * @param toFormat
+	 * @return
+	 */
 	public static String converDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
 		DateTime dt = new DateTime(toFormat.getTime());

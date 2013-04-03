@@ -51,11 +51,10 @@ public class ProvViewUtil {
 	private static final int ENTITY_LINE_NUMBER_CHARS = 17;
 	private static final int MAX_TOOL_TIP_VALUE_CHAR = 43;	 	
 	private static final int MAX_ACT_CODE_NAME_CHAR = 30;
-	private static LayoutContainer UNDEFINED_SUB_NODE;
+	private static final int MAX_DISPLAY_NAME_CHAR = 13;
 	private static MarginData ACT_MARGIN_USER = new MarginData(0, 0, 1, 10);
 	private static MarginData ACT_MARGIN_TIME = new MarginData(0, 0, 3, 10);
 	private static final MarginData ACT_MARGIN_NAME = new MarginData(5, 4, 8, 10);
-	private static final MarginData ACT_MARGIN_SUBNODE = new MarginData(3, 0, 3, 0);
 		
 	public static LayoutContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
 		LayoutContainer container = new LayoutContainer();
@@ -80,6 +79,7 @@ public class ProvViewUtil {
 				container.addStyleName(PROV_ACTIVITY_USER_BADGE_STYLE); 				
 			}
 			UserBadge badge = ginInjector.getUserBadgeWidget();
+			badge.setMaxNameLength(MAX_DISPLAY_NAME_CHAR);
 			badge.configure(node.getModifiedBy());
 			HTML time = new HTML(DisplayUtils.converDataToPrettyString(node.getModifiedOn()));
 			time.addStyleName(PROV_ACTIVITY_TIME_STYLE);

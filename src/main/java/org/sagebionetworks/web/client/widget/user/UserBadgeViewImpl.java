@@ -16,11 +16,11 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView {
-
-	private static final int MAX_DISPLAY_NAME_CHAR = 13;
+	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	GlobalApplicationState globalApplicationState;
@@ -42,23 +42,31 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 	}
 	
 	@Override
-	public void setProfile(UserProfile profile, Integer maxNameLength) {
+	public void setProfile(final UserProfile profile, Integer maxNameLength) {
 		container.clear();
 		if(profile == null)  throw new IllegalArgumentException("Profile is required");
 		
-		final Anchor userAnchor = new Anchor();
-		userAnchor.addStyleName("usernameLink");
-		userAnchor.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
-			}
-		});
-				
 		if(profile != null) {
-			//has user data, update the user name and add user commands (and set to the current user name)
-			userAnchor.setText(DisplayUtils.stubStrPartialWord(profile.getDisplayName(), MAX_DISPLAY_NAME_CHAR));
-			container.clear();
+			String name = maxNameLength == null ? profile.getDisplayName() : DisplayUtils.stubStrPartialWord(profile.getDisplayName(), maxNameLength); 
+			
+			Widget nameWidget;	
+			final Anchor userAnchor = new Anchor();
+			if(profile.getOwnerId() != null) {				
+				userAnchor.setText(name);
+				userAnchor.addStyleName("usernameLink");
+				userAnchor.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));
+					}
+				});
+				nameWidget = userAnchor;
+			} else {
+				HTML html = new HTML(name);
+				html.addStyleName("usernamelink");
+				nameWidget = html;
+			}				
+			
 			Image profilePicture; 
 			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
 				profilePicture = new Image();
@@ -77,7 +85,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 				}
 			});
 			container.add(profilePicture);
-			container.add(userAnchor);				 
+			container.add(nameWidget);				 
 		} 		
 		
 	}
@@ -121,8 +129,5 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 	/*
 	 * Private Methods
 	 */
-//	private Widget getUserProfileLink(UserProfile profile, final GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJSNIUtils) {
-//			
-//	}
 
 }
