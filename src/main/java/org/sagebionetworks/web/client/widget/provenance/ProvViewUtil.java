@@ -6,8 +6,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.Presenter;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
@@ -18,6 +20,8 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.extjs.gxt.ui.client.Style.AnchorPosition;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.layout.LayoutData;
+import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -28,6 +32,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Widget;
 
 public class ProvViewUtil {	
 	
@@ -36,38 +41,53 @@ public class ProvViewUtil {
 	private static final String PROV_EXPAND_NODE_STYLE = "provExpandNode";
 
 	private static final String PROV_ACTIVITY_LABEL_STYLE = "provActivityLabel";
+	private static final String PROV_ACTIVITY_TIME_STYLE = "provActivityLabelTime";	
 	private static final String PROV_ACTIVITY_UNDEFINED_ICON_STYLE = "provActivityUndefinedIcon";
 	private static final String PROV_VERSION_DISPLAY_STYLE = "provVersionDisplay";
-	private static final String PROV_ACTIVITY_MANUAL_STYLE = "provManualChange";
+	private static final String PROV_ACTIVITY_USER_BADGE_STYLE = "provUserBadge";
+	private static final String PROV_ACTIVITY_USER_AND_NAME_STYLE = "provUserAndName";
 	private static final String PROV_ACTIVITY_UNDEFINED_STYLE = "provUndefinedChange";
 	
 	private static final int ENTITY_LINE_NUMBER_CHARS = 17;
 	private static final int MAX_TOOL_TIP_VALUE_CHAR = 43;	 	
-	private static final int MAX_ACT_CODE_NAME_CHAR = 17;
+	private static final int MAX_ACT_CODE_NAME_CHAR = 30;
 	private static LayoutContainer UNDEFINED_SUB_NODE;
+	private static MarginData ACT_MARGIN_USER = new MarginData(0, 0, 1, 10);
+	private static MarginData ACT_MARGIN_TIME = new MarginData(0, 0, 3, 10);
+	private static final MarginData ACT_MARGIN_NAME = new MarginData(5, 4, 8, 10);
+	private static final MarginData ACT_MARGIN_SUBNODE = new MarginData(3, 0, 3, 0);
 		
-	public static LayoutContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle) {
+	public static LayoutContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
 		LayoutContainer container = new LayoutContainer();
+		container.setAutoHeight(true);
+		container.setAutoWidth(true);
 		container.setId(node.getId());
 		container.setStyleName(PROV_ACTIVITY_NODE_STYLE);
 		LayoutContainer label = new LayoutContainer();
 		label.setStyleName(PROV_ACTIVITY_LABEL_STYLE);
-		HTML activityLabel = null;
-		LayoutContainer subNode = null;
+
 		
 		if(node.getType() == ActivityType.UNDEFINED) {		
-			container.addStyleName(PROV_ACTIVITY_UNDEFINED_STYLE);			
-			activityLabel = new HTML(DisplayConstants.UNDEFINED);
-			subNode = getUndefinedSubNode(iconsImageBundle);
+			container.addStyleName(PROV_ACTIVITY_UNDEFINED_STYLE);						
+			label.add(new HTML(DisplayConstants.UNDEFINED));
+			container.add(label, ACT_MARGIN_NAME);
 		} else {
-			container.addStyleName(PROV_ACTIVITY_MANUAL_STYLE); 
-			activityLabel = new HTML(node.getActivityName() != null ? stubEntityString(node.getActivityName(), MAX_ACT_CODE_NAME_CHAR) : DisplayConstants.MANUAL);			
-		}
-		label.add(activityLabel);
-		container.add(label);
-		
-		if(subNode != null) {
-			container.add(subNode);
+			// display user profile and name if defined
+			if(node.getActivityName() != null) {				
+				label.add(new HTML(DisplayUtils.stubStrPartialWord(node.getActivityName(), MAX_ACT_CODE_NAME_CHAR)));
+				container.addStyleName(PROV_ACTIVITY_USER_AND_NAME_STYLE); 
+			} else {
+				container.addStyleName(PROV_ACTIVITY_USER_BADGE_STYLE); 				
+			}
+			UserBadge badge = ginInjector.getUserBadgeWidget();
+			badge.configure(node.getModifiedBy());
+			HTML time = new HTML(DisplayUtils.converDataToPrettyString(node.getModifiedOn()));
+			time.addStyleName(PROV_ACTIVITY_TIME_STYLE);
+
+			
+			container.add(label, ACT_MARGIN_NAME);
+			container.add(badge.asWidget(), ACT_MARGIN_USER);
+			container.add(time, ACT_MARGIN_TIME);
 		}
 		
 		setPosition(node, container);
@@ -123,7 +143,7 @@ public class ProvViewUtil {
 		builder.appendHtmlConstant("<br/>");
 		
 		// name
-		String stubName = stubEntityString(node.getName(), ENTITY_LINE_NUMBER_CHARS);
+		String stubName = DisplayUtils.stubStrPartialWord(node.getName(), ENTITY_LINE_NUMBER_CHARS);
 		builder.appendEscaped(stubName);
 		builder.appendHtmlConstant("<br/>");
 				
@@ -162,7 +182,7 @@ public class ProvViewUtil {
 		builder.appendHtmlConstant("<br/>");
 		
 		// name
-		String stubName = stubEntityString(name, ENTITY_LINE_NUMBER_CHARS);
+		String stubName = DisplayUtils.stubStrPartialWord(name, ENTITY_LINE_NUMBER_CHARS);
 		if(stubName != null) builder.appendEscaped(stubName);
 		builder.appendHtmlConstant("<br/>");
 		
@@ -174,9 +194,9 @@ public class ProvViewUtil {
 			if(versionNumber.toString().equals(versionLabel)) {
 				versionDisplay = versionNumberStr;
 			} else {
-				versionDisplay = stubEntityString(versionLabel + " (" + versionNumberStr + ")", ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length());
+				versionDisplay = DisplayUtils.stubStrPartialWord(versionLabel + " (" + versionNumberStr + ")", ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length());
 			}			
-			versionHtml = new HTML(SafeHtmlUtils.fromString(stubEntityString(versionDisplay, ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length())));
+			versionHtml = new HTML(SafeHtmlUtils.fromString(DisplayUtils.stubStrPartialWord(versionDisplay, ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length())));
 		} else {
 			versionHtml = new HTML("");			
 		}
@@ -191,24 +211,6 @@ public class ProvViewUtil {
 		node.add(link);
 		node.layout();
 		return node;
-	}
-
-	private static String stubEntityString(String contents, int maxLength) {
-		String stub = contents;
-		if(contents != null && contents.length() > maxLength) {
-			stub = contents.substring(0, maxLength-3);
-			stub += "...";
-		}
-		return stub; 
-	}
-
-	private static LayoutContainer getUndefinedSubNode(IconsImageBundle iconsImageBundle) {
-		if (UNDEFINED_SUB_NODE == null) {
-			UNDEFINED_SUB_NODE = new LayoutContainer();
-			UNDEFINED_SUB_NODE.setStyleName(PROV_ACTIVITY_UNDEFINED_ICON_STYLE);
-			UNDEFINED_SUB_NODE.add(new HTML(AbstractImagePrototype.create(iconsImageBundle.warning16()).getHTML()));			
-		}
-		return UNDEFINED_SUB_NODE;
 	}
 
 	public static SafeHtml createEntityPopoverHtml(KeyValueDisplay<String> kvDisplay) {

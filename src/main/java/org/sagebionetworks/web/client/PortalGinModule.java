@@ -165,6 +165,8 @@ import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
+import org.sagebionetworks.web.client.widget.user.UserBadgeView;
+import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 
 import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
 import com.google.gwt.event.shared.EventBus;
@@ -464,6 +466,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FavoriteWidgetView.class).to(FavoriteWidgetViewImpl.class);
 		
 		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
+		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
 	}
 
 }

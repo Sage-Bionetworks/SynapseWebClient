@@ -98,7 +98,17 @@
   transition:.2s; }
 .headerLink:hover { color: #BC3226; text-decoration:none; }
 
-.headerUsernameLink { font-weight: bold; color: #6e6e6e !important; padding: 0px 2px 0px 0px; text-align: left;}
+.headerUsernameLink { 
+	font-weight: bold; 
+	color: #6e6e6e !important; 
+	padding: 0px 2px 0px 0px; 
+	text-align: left;
+}
+
+.usernameLink { 
+	padding: 0px 2px 0px 0px; 
+	text-align: left;
+}
 
 /* Removes annoying FireFox dotted border */
 :focus {
@@ -108,6 +118,14 @@
 .imageButton, .gwt-Anchor, .previewDisclosureFace {
 	cursor: pointer;
 	cursor: hand;
+}
+
+.userProfileImage {
+	margin:auto; 
+	display:block;
+	border-radius: 3px;
+	margin-right: 5px;
+	box-shadow: 0 1px 2px #000000;
 }
 
 /* Search loading image */
