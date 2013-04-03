@@ -51,6 +51,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	private int downloadWindowWidth;
 	private List<LocationData> locations;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private String directDownloadURL;
 	
 	/*
 	 * Constructors
@@ -80,9 +81,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		if (!presenter.isDownloadAllowed()) return;
 		
 		if (approvalType==APPROVAL_TYPE.NONE) {
-			//if 1, open it
-			if (locations != null && locations.size() == 1){
-				DisplayUtils.newWindow(locations.get(0).getPath(),"","");
+			if (directDownloadURL != null) {
+				DisplayUtils.newWindow(directDownloadURL, "", "");
 			} else {
 				createDownloadWindow();
 				downloadWindow.show();
@@ -151,8 +151,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		// build a list of links in HTML
 		SafeHtmlBuilder sb = new SafeHtmlBuilder();
 		String displayString = "Download";
-		String url = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
-		sb.appendHtmlConstant("<a href=\"" + url + "\" target=\"_blank\">")
+		directDownloadURL = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
+		sb.appendHtmlConstant("<a href=\"" + directDownloadURL + "\" target=\"_blank\">") 
 		.appendEscaped(displayString)
 		.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
 		downloadWindowWidth = 300;
@@ -171,6 +171,11 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 			fillDownloadContentContainer();
 		}
 
+	}
+	
+	@Override
+	public String getDirectDownloadURL() {
+		return directDownloadURL;
 	}
 	
 	@Override
@@ -193,6 +198,9 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 				}
 				sb.appendHtmlConstant("<br/>");				
 			}
+			if (locations.size() == 1) {
+				directDownloadURL = locations.get(0).getPath();
+			} else directDownloadURL = null;
 			safeDownloadHtml = sb.toSafeHtml();
 			if (md5 == null)
 				downloadWindowWidth = 300;
