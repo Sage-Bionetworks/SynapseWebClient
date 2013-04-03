@@ -12,8 +12,6 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.events.CancelEvent;
-import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -28,17 +26,12 @@ import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -90,6 +83,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	@UiField
 	SimplePanel favoritePanel;
 
+	private HandlerRegistration entityLinkHandlerRegistration;
 	
 	interface LocationableTitleBarViewImplUiBinder extends UiBinder<Widget, LocationableTitleBarViewImpl> {
 	}
@@ -119,12 +113,6 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		md5LinkContainer.addStyleName("inline-block font-italic margin-left-5");
 		entityLink.addStyleName("downloadLink link");
 		uploadButtonContainer.addStyleName("inline-block vertical-align-bottom");
-		entityLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				downloadButton.fireEvent(event);
-			}
-		});
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
@@ -238,7 +226,26 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
-
+		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
+		if (directDownloadUrl != null) {
+			//clear old handler, if there is one
+			if (entityLinkHandlerRegistration != null)
+				entityLinkHandlerRegistration.removeHandler();
+			entityLink.setHref(directDownloadUrl);
+			entityLink.setTarget("_blank");
+		}
+		else {
+			//clear href, if there is one
+			entityLink.setHref(null);
+			entityLinkHandlerRegistration = entityLink.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					//if there is an href, ignore it
+					event.preventDefault();
+					downloadButton.fireEvent(event);
+				}
+			});
+		}
 	}
 	
 	@Override
