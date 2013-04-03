@@ -777,13 +777,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException {
-		
-		ObjectType ownerObjectType = ObjectType.valueOf(ownerType);
-		if (ObjectType.ENTITY.equals(ownerObjectType))
-			return hasAccess(ownerId, accessType);
-		//everyone has (read) access to evaluation
-			
-		throw new IllegalArgumentException(DisplayConstants.UNSUPPORTED_FOR_OWNER_TYPE + ownerType);
+		Synapse synapseClient = createSynapseClient();
+		try {
+			return synapseClient.canAccess(ownerId, ObjectType.valueOf(ownerType), ACCESS_TYPE.valueOf(accessType));
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 	
 	@Override
