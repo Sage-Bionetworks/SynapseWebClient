@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SearchQueryUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -208,7 +209,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 
 	@Override
 	public List<String> getFacetDisplayOrder() {
-		return DisplayUtils.FACETS_DISPLAY_ORDER;
+		return SearchQueryUtils.FACETS_DISPLAY_ORDER;
 	}
 
 	@Override
@@ -303,7 +304,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	}
 
 	private SearchQuery getBaseSearchQuery() {
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		timeValueToDisplay.clear();
 		searchStartTime = new DateTime();		
 		newQuery = true;		

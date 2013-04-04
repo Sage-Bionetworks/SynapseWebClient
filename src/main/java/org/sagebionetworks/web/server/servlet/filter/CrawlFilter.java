@@ -36,7 +36,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SearchQueryUtils;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -121,7 +121,7 @@ public class CrawlFilter implements Filter {
 		StringBuilder html = new StringBuilder();
 		html.append("<html><head><title>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</title><meta name=\"description\" content=\""+DisplayConstants.DEFAULT_PAGE_DESCRIPTION+"\" /></head><body>");
 		//add direct links to all public projects in the system
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		html.append("<h1>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</h1>" + DisplayConstants.DEFAULT_PAGE_DESCRIPTION + "<br />");
 		String queryJson = "";
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();

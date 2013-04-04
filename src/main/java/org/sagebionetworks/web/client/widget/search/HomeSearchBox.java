@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SearchQueryUtils;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -65,7 +66,7 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 	@Override
 	public void search(String value) {
 		if(searchAll) {
-			SearchQuery query = DisplayUtils.getAllTypesSearchQuery();
+			SearchQuery query = SearchQueryUtils.getAllTypesSearchQuery();
 			query.setQueryTerm(Arrays.asList(value.split(" ")));
 			try {
 				value = query.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
@@ -106,10 +107,10 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 	 */
 	private String getSearchQueryForType(String entityType) {
 		String json = null;
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		ArrayList<KeyValue> bq = new ArrayList<KeyValue>();
 		KeyValue kv = new KeyValue();
-		kv.setKey(DisplayUtils.SEARCH_KEY_NODE_TYPE);				
+		kv.setKey(SearchQueryUtils.SEARCH_KEY_NODE_TYPE);				
 		kv.setValue(entityType); 
 		bq.add(kv);
 		query.setBooleanQuery(bq);

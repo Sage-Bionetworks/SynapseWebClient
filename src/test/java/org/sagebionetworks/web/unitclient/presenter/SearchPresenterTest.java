@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SearchQueryUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -71,7 +72,7 @@ public class SearchPresenterTest {
 				mockIconsImageBundle);
 		
 		exampleTerm = "searchQueryTerm";
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		query.setQueryTerm(Arrays.asList(new String[] {exampleTerm}));
 		exampleTermSearchQueryJson = query.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
 
@@ -115,7 +116,7 @@ public class SearchPresenterTest {
 		// test for a word with the prefix but not a synapse ID
 		String term = DisplayUtils.SYNAPSE_ID_PREFIX + "apse"; // # 'synapse'
 
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		query.setQueryTerm(Arrays.asList(new String[] {term}));
 		String json = query.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
 
