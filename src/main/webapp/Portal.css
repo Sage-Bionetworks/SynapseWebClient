@@ -570,7 +570,8 @@ a.shortBtn {
 }
 
 .wiki-description {
-	color: #666666;
+	color: black;
+	font-size: 13px;
 }
 
 .entity-description-preview-wrapper {
