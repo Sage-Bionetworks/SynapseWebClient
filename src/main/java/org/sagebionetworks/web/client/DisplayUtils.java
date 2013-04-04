@@ -31,6 +31,7 @@ import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -47,9 +48,11 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
@@ -96,6 +99,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -104,6 +108,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
@@ -650,10 +655,15 @@ public class DisplayUtils {
 		return ISODateTimeFormat.dateTime().print(dt);
 	}
 	
+	/**
+	 * YYYY-MM-DD HH:mm:ss
+	 * @param toFormat
+	 * @return
+	 */
 	public static String converDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
 		DateTime dt = new DateTime(toFormat.getTime());
-		return ISODateTimeFormat.dateTime().print(dt);		
+		return ISODateTimeFormat.dateHourMinuteSecond().print(dt).replaceAll("T", " ");		
 	}
 	
 	
@@ -706,6 +716,12 @@ public class DisplayUtils {
 		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
+	/**
+	 * Stub the string removing the last partial word
+	 * @param str
+	 * @param length
+	 * @return
+	 */
 	public static String stubStr(String str, int length) {
 		if(str == null) {
 			return "";
@@ -717,6 +733,22 @@ public class DisplayUtils {
 		return str; 
 	}
 
+	/**
+	 * Stub the string with partial word at end left in 
+	 * @param contents
+	 * @param maxLength
+	 * @return
+	 */
+	public static String stubStrPartialWord(String contents, int maxLength) {
+		String stub = contents;
+		if(contents != null && contents.length() > maxLength) {
+			stub = contents.substring(0, maxLength-3);
+			stub += " ..";
+		}
+		return stub; 
+	}
+
+	
 	
 	/*
 	 * Private methods
@@ -1564,6 +1596,5 @@ public class DisplayUtils {
 
 		return lc;
 	}
-
-	
+		
 }

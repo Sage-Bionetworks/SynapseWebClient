@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.transform.JsoProvider;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
@@ -50,17 +51,17 @@ public class NChartUtilTest {
 	
 	@Before
 	public void setup() {
-		jsoProvider = mock(JsoProvider.class);			
+		jsoProvider = mock(JsoProvider.class);
 		d1 = new EntityGraphNode("d1",null,null,null,null,null,false,false);		
 		d2 = new EntityGraphNode("d2",null,null,null,null,null,false,false);
 		d3 = new EntityGraphNode("d3",null,null,null,null,null,false,false);
 		d4 = new EntityGraphNode("d4",null,null,null,null,null,false,false);
 		d5 = new EntityGraphNode("d5",null,null,null,null,null,false,false);
 		d6 = new EntityGraphNode("d6",null,null,null,null,null,false,false);
-		a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,false);
-		b = new ActivityGraphNode("B","2","Step B", ActivityType.MANUAL,false);
-		c = new ActivityGraphNode("C","2","Step C", ActivityType.MANUAL,false);
-		d = new ActivityGraphNode("D","4","Step D", ActivityType.MANUAL,false);
+		a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL, "1", new Date(), false);
+		b = new ActivityGraphNode("B","2","Step B", ActivityType.MANUAL,"1", new Date(), false);
+		c = new ActivityGraphNode("C","2","Step C", ActivityType.MANUAL,"1", new Date(), false);
+		d = new ActivityGraphNode("D","4","Step D", ActivityType.MANUAL,"1", new Date(), false);
 	}
 	
 	/**
@@ -247,7 +248,7 @@ public class NChartUtilTest {
 	public void testCreateNChartCharacters() {
 		EntityGraphNode d1 = new EntityGraphNode("d1",null,null,null,null,null,false,false);		
 		EntityGraphNode d2 = new EntityGraphNode("d2",null,null,null,null,null,false,false);
-		ActivityGraphNode a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,false);
+		ActivityGraphNode a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,"1", new Date(), false);
 		Set<ProvGraphNode> graphNodes = new HashSet<ProvGraphNode>();
 		graphNodes.add(d1);
 		graphNodes.add(d2);
@@ -271,7 +272,7 @@ public class NChartUtilTest {
 	public void testCreateActivityLayerNode() {
 		EntityGraphNode d1 = new EntityGraphNode("d1",null,null,null,null,null,false,false);		
 		EntityGraphNode d2 = new EntityGraphNode("d2",null,null,null,null,null,false,false);
-		ActivityGraphNode a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,false);
+		ActivityGraphNode a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,"1", new Date(), false);
 		List<ProvGraphNode> graphNodes = new ArrayList<ProvGraphNode>();
 		graphNodes.add(d1);
 		graphNodes.add(d2);
