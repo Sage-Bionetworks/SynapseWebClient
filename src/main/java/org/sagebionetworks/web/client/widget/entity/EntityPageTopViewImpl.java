@@ -522,7 +522,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    // Create the property body
 	    // the headers for properties.
 	    propertyWidget.setEntityBundle(bundle);
-	    
 	    LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
@@ -530,7 +529,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.ANNOTATIONS + "</h4>")));
 		    // Create the property body
 		    // the headers for properties.
-		    propertyWidget.setEntityBundle(bundle);
 		    lc.add(propertyWidget.asWidget());
 		}
 		lc.layout();
