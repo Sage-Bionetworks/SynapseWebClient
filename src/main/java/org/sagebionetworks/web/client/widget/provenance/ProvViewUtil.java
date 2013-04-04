@@ -42,10 +42,7 @@ public class ProvViewUtil {
 
 	private static final String PROV_ACTIVITY_LABEL_STYLE = "provActivityLabel";
 	private static final String PROV_ACTIVITY_TIME_STYLE = "provActivityLabelTime";	
-	private static final String PROV_ACTIVITY_UNDEFINED_ICON_STYLE = "provActivityUndefinedIcon";
 	private static final String PROV_VERSION_DISPLAY_STYLE = "provVersionDisplay";
-	private static final String PROV_ACTIVITY_USER_BADGE_STYLE = "provUserBadge";
-	private static final String PROV_ACTIVITY_USER_AND_NAME_STYLE = "provUserAndName";
 	private static final String PROV_ACTIVITY_UNDEFINED_STYLE = "provUndefinedChange";
 	
 	private static final int ENTITY_LINE_NUMBER_CHARS = 17;
@@ -74,9 +71,6 @@ public class ProvViewUtil {
 			// display user profile and name if defined
 			if(node.getActivityName() != null) {				
 				label.add(new HTML(DisplayUtils.stubStrPartialWord(node.getActivityName(), MAX_ACT_CODE_NAME_CHAR)));
-				container.addStyleName(PROV_ACTIVITY_USER_AND_NAME_STYLE); 
-			} else {
-				container.addStyleName(PROV_ACTIVITY_USER_BADGE_STYLE); 				
 			}
 			UserBadge badge = ginInjector.getUserBadgeWidget();
 			badge.setMaxNameLength(MAX_DISPLAY_NAME_CHAR);
