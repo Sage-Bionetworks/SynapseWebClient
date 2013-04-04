@@ -19,7 +19,7 @@ public class NChartUtil {
 
 	public static final int DEFULT_DURATION = 10;
 	public static final double SCALE_X = 1.7; // scale x by  
-	public static final double SCALE_Y = 0.75; // scale y by
+	public static final double SCALE_Y = 0.9; // scale y by
 	
 	public static NChartLayersArray createLayers(JsoProvider jsoProvider, ProvGraph graph) {
 		Map<ProvGraphNode,Integer> nodeToLayer = new HashMap<ProvGraphNode, Integer>();	

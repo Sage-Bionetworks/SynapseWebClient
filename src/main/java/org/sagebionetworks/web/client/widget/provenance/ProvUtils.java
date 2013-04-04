@@ -80,6 +80,8 @@ public class ProvUtils {
 						act.getId(),
 						act.getName(), 
 						type,
+						act.getModifiedBy(),
+						act.getModifiedOn(),
 						false);			
 			idToNode.put(activityNode.getId(), activityNode);
 			graph.addNode(activityNode);

@@ -6,6 +6,7 @@ import java.util.Set;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
@@ -35,7 +36,8 @@ import com.google.inject.Inject;
 public class ProvenanceWidgetViewImpl extends LayoutContainer implements ProvenanceWidgetView {
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;		
+	private IconsImageBundle iconsImageBundle;
+	private PortalGinInjector ginInjector;
 	private ProvGraph graph;
 	private LayoutContainer debug;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -45,10 +47,11 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	
 	@Inject
 	public ProvenanceWidgetViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils) {
+			IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.ginInjector = ginInjector;
 	}
 		
 	
@@ -140,7 +143,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			addToolTipToContainer(node, container, DisplayConstants.ENTITY);			
 			return container;
 		} else if(node instanceof ActivityGraphNode) {
-			LayoutContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle);
+			LayoutContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle, ginInjector);
 			// create tool tip for defined activities only
 			if(((ActivityGraphNode) node).getType() == ActivityType.UNDEFINED) {
 				addUndefinedToolTip(container);
