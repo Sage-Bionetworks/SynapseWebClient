@@ -61,6 +61,10 @@ public class PropertyWidget implements PropertyWidgetView.Presenter, IsWidget {
 		}
 	}
 	
+	public boolean isEmpty() {
+		return rows.isEmpty();
+	}
+	
 	public static List<EntityRow<?>> getRows(Entity entity, Annotations annotations, AdapterFactory factory, EntitySchemaCache cache) throws JSONObjectAdapterException {
 		JSONObjectAdapter adapter = factory.createNew();
 		entity.writeToJSONObject(adapter);

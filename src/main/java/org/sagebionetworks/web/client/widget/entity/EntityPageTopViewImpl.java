@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -520,16 +519,21 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	private LayoutContainer createPropertyWidget(EntityBundle bundle) {
-		LayoutContainer lc = new LayoutContainer();
-		lc.setAutoWidth(true);
-		lc.setAutoHeight(true);
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.ANNOTATIONS + "</h4>")));
-
 	    // Create the property body
 	    // the headers for properties.
 	    propertyWidget.setEntityBundle(bundle);
-	    lc.add(propertyWidget.asWidget());
-	    lc.layout();
+	    
+	    LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+		if (!propertyWidget.isEmpty()) {
+			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.ANNOTATIONS + "</h4>")));
+		    // Create the property body
+		    // the headers for properties.
+		    propertyWidget.setEntityBundle(bundle);
+		    lc.add(propertyWidget.asWidget());
+		}
+		lc.layout();
 		return lc;
 	}
 
