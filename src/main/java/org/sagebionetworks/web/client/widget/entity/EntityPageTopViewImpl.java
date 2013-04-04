@@ -175,7 +175,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			// default entity view
 			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		}
-		synapseJSNIUtils.setPageTitle(bundle.getEntity().getId() + ": " + bundle.getEntity().getName());
+		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
 
 		colLeftContainer.layout(true);
@@ -353,7 +353,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, int spanWidth) {
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
-			container.add(wikiPageWidget);
+			container.add(wikiPageWidget.asWidget());
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), canEdit, new WikiPageWidget.Callback() {
 				@Override
 				public void pageUpdated() {

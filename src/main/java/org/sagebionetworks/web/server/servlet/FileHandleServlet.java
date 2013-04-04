@@ -22,8 +22,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.message.AbstractHttpMessage;
-import org.apache.http.util.EntityUtils;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.HttpClientProviderImpl;
 import org.sagebionetworks.client.Synapse;

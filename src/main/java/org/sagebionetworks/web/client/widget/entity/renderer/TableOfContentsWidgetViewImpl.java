@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -42,8 +43,12 @@ public class TableOfContentsWidgetViewImpl extends LayoutContainer implements Ta
 			String id = WidgetConstants.MARKDOWN_HEADING_ID_PREFIX;
 			int i = 0;
 			Element heading = parentPanel.getElementById(id + i);
+			if (heading == null) {
+				//no entries.  add an informative message
+				linkContainer.add(new HTML("<p class=\"smallGreyText\">"+DisplayConstants.NO_HEADERS_FOUND+"</p>"));
+			}
 			while (heading != null) {
-				String text = heading.getInnerHTML();
+				String text = heading.getInnerText();
 				//create links to all headers in the page
 				final Element scrollToElement = heading;
 				SimplePanel wrapper = new SimplePanel();

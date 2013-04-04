@@ -165,7 +165,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				@Override
 				public void onClick(ClickEvent event) {
 					globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
-		}
+				}
 			});
 		}
 		if (userCommands == null){
@@ -255,8 +255,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
 				profilePicture.setWidth("20px");
 				profilePicture.setHeight("20px");
-				profilePicture.addStyleName("margin:auto; display:block;");
-				profilePicture.addStyleName("imageButton");
+				profilePicture.addStyleName("imageButton userProfileImage");
 				profilePicture.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {

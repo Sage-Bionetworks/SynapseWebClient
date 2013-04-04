@@ -75,6 +75,8 @@ import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsViewImpl;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
@@ -89,6 +91,8 @@ import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescrip
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerView;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigView;
@@ -161,6 +165,8 @@ import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
+import org.sagebionetworks.web.client.widget.user.UserBadgeView;
+import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 
 import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
 import com.google.gwt.event.shared.EventBus;
@@ -402,7 +408,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// Wiki Attachments		
 		bind(WikiAttachmentsView.class).to(WikiAttachmentsViewImpl.class);
-
+		
 		// SnapshotWidget		
 		bind(SnapshotWidgetView.class).to(SnapshotWidgetViewImpl.class);
 
@@ -413,6 +419,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityMetadataViewImpl.class).in(Singleton.class);
 		bind(EntityMetadataView.class).to(EntityMetadataViewImpl.class);
 		
+
+		// API Table Column manager	
+		bind(APITableColumnManagerView.class).to(APITableColumnManagerViewImpl.class);
 
 		//Widget Registration
 		bind(WidgetRegistrarImpl.class).in(Singleton.class);
@@ -455,6 +464,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityFinderView.class).to(EntityFinderViewImpl.class);		
 
 		bind(FavoriteWidgetView.class).to(FavoriteWidgetViewImpl.class);
+		
+		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
+		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
 	}
 
 }

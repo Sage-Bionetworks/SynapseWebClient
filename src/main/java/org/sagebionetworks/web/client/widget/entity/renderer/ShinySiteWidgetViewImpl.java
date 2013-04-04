@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -44,7 +45,7 @@ public class ShinySiteWidgetViewImpl extends LayoutContainer implements ShinySit
 	@Override
 	public void showInvalidSiteUrl(String siteUrl) {
 		this.removeAll();
-		add(new HTMLPanel("<div class=\"alert alert-block\"><strong>"+ DisplayConstants.MARKDOWN_WIDGET_WARNING + "</strong><br/> " + siteUrl + DisplayConstants.INVALID_SHINY_SITE + "</div>"));
+		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(siteUrl + DisplayConstants.INVALID_SHINY_SITE)));
 	}		
 	
 	/*

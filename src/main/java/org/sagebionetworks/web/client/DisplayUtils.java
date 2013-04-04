@@ -31,6 +31,7 @@ import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -47,9 +48,11 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
@@ -71,6 +74,7 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -95,6 +99,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -103,6 +108,8 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -214,8 +221,10 @@ public class DisplayUtils {
 	public static final String STYLE_SMALL_SEARCHBOX = "smallsearchbox";
 	public static final String STYLE_OTHER_SEARCHBOX = "othersearchbox";
 	public static final String STYLE_BREAK_WORD = "break-word";
-
-
+	public static final String STYLE_WHITE_BACKGROUND = "whiteBackground";
+	public static final String STYLE_DISPLAY_INLINE = "inline-block";
+	public static final String STYLE_BLACK_TEXT = "blackText";
+	
 	/*
 	 * Search
 	 */
@@ -632,6 +641,10 @@ public class DisplayUtils {
 		return title;
 	}
 	
+	public static String getMarkdownWidgetWarningHtml(String warningText) {
+		return "<div class=\"alert alert-block\"><strong>"+ DisplayConstants.MARKDOWN_WIDGET_WARNING + "</strong><br/> " + warningText + "</div>";
+	}
+	
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}
@@ -642,10 +655,15 @@ public class DisplayUtils {
 		return ISODateTimeFormat.dateTime().print(dt);
 	}
 	
+	/**
+	 * YYYY-MM-DD HH:mm:ss
+	 * @param toFormat
+	 * @return
+	 */
 	public static String converDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
 		DateTime dt = new DateTime(toFormat.getTime());
-		return ISODateTimeFormat.dateTime().print(dt);		
+		return ISODateTimeFormat.dateHourMinuteSecond().print(dt).replaceAll("T", " ");		
 	}
 	
 	
@@ -698,6 +716,12 @@ public class DisplayUtils {
 		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
+	/**
+	 * Stub the string removing the last partial word
+	 * @param str
+	 * @param length
+	 * @return
+	 */
 	public static String stubStr(String str, int length) {
 		if(str == null) {
 			return "";
@@ -709,6 +733,22 @@ public class DisplayUtils {
 		return str; 
 	}
 
+	/**
+	 * Stub the string with partial word at end left in 
+	 * @param contents
+	 * @param maxLength
+	 * @return
+	 */
+	public static String stubStrPartialWord(String contents, int maxLength) {
+		String stub = contents;
+		if(contents != null && contents.length() > maxLength) {
+			stub = contents.substring(0, maxLength-3);
+			stub += " ..";
+		}
+		return stub; 
+	}
+
+	
 	
 	/*
 	 * Private methods
@@ -1286,23 +1326,29 @@ public class DisplayUtils {
 	 * @param entityType 
 	 */
 	public static Widget getUploadButton(final EntityBundle entityBundle,
-			EntityType entityType, final Uploader locationableUploader,
+			EntityType entityType, final Uploader uploader,
 			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
 		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
 		final Window window = new Window();  
-		locationableUploader.clearHandlers();
+		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		}));
+		uploader.clearHandlers();
 		// add user defined handler
-		locationableUploader.addPersistSuccessHandler(handler);
+		uploader.addPersistSuccessHandler(handler);
 		
 		// add handlers for closing the window
-		locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
+		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				window.hide();
 			}
 		});
-		locationableUploader.addCancelHandler(new CancelHandler() {				
+		uploader.addCancelHandler(new CancelHandler() {				
 			@Override
 			public void onCancel(CancelEvent event) {
 				window.hide();
@@ -1313,12 +1359,12 @@ public class DisplayUtils {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				window.removeAll();
-				window.setSize(400, 320);
+				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 				window.setPlain(true);
 				window.setModal(true);		
 				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 				window.setLayout(new FitLayout());			
-				window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+				window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
 				window.show();
 			}
 		});
@@ -1358,7 +1404,7 @@ public class DisplayUtils {
 		}
 	}
 	
-	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
+	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";	
 
 	/**
 		 * Create the url to a wiki filehandle.
@@ -1436,8 +1482,7 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isWikiSupportedType(Entity entity) {
-		//TODO: add Folder and Project once they are migrated (description goes to Wiki markdown, attachments to wiki FileHandles)
-		return (entity instanceof FileEntity);
+		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project);
 	}
 		
 	public static boolean isRecognizedImageContentType(String contentType) {
@@ -1518,6 +1563,38 @@ public class DisplayUtils {
 		window.setButtonAlign(HorizontalAlignment.RIGHT);
 		window.show();
 		entityFinder.refresh();
+	}
+
+	public static void loadTableSorters(final HTMLPanel panel, SynapseJSNIUtils synapseJSNIUtils) {
+		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
+		int i = 0;
+		Element table = panel.getElementById(id + i);
+		while (table != null) {
+			synapseJSNIUtils.tablesorter(id+i);
+			i++;
+			table = panel.getElementById(id + i);
+		}
+	}
+
+	public static Widget getShareSettingsDisplay(String prefix, boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
+		if(prefix == null) prefix = "";
+		final SimplePanel lc = new SimplePanel();
+		lc.addStyleName(STYLE_DISPLAY_INLINE);
+		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
+		String description = isPublic ? DisplayConstants.PUBLIC_ACL_ENTITY_PAGE : DisplayConstants.PRIVATE_ACL_ENTITY_PAGE;
+		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
+
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(prefix + "<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
+		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
+
+		//form the html
+		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
+		htmlPanel.addStyleName("inline-block");
+		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
+		lc.add(htmlPanel);
+
+		return lc;
 	}
 		
 }

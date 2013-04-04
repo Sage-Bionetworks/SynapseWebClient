@@ -135,6 +135,7 @@ public class DisplayConstants {
 	public static final String LABEL_SEARCHING = "Searching...";
 	public static final String LABEL_FOUND_FORWARDING = "Found. Forwarding now.";
 	public static final String LABEL_ENTITY_NOT_FOUND = "Sorry, that Synapse Id could not be located.";
+	public static final String ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN = "Specified input column is missing from the service response: ";
 	public static final String ERROR_GETTING_PERMISSIONS_TEXT = "READ ONLY MODE. Reason: An error occurred in retrieving your level of access.";	
 	public static final String ERROR_ACL_RETRIEVAL_FAILED = "Retrieval of sharing settings failed. Please try again.";
 	public static final String ERROR_LOCAL_ACL_CREATION_FAILED = "Creation of local sharing settings failed. Please try again.";
@@ -149,6 +150,7 @@ public class DisplayConstants {
 	public static final String ERROR_BAD_REQUEST_MESSAGE = "An unknown communication error occurred. Please reload the page.";
 	public static final String ERROR_DUPLICATE_ENTITY_MESSAGE = "An entity with this name already exists. Please enter a different name.";
 	public static final String ERROR_INVALID_ENTITY_NAME = "Name contains contains an invalid character";
+	public static final String NO_HEADERS_FOUND = "No Headers were found on this page.";
 	public static final String ERROR_TITLE_LOGIN_REQUIRED = "Login Required";
 	public static final String ERROR_LOGIN_REQUIRED = "You will need to login for access to that resource.";
 	public static final String ERROR_TITLE_VALIDATION_ERROR = "Validation Error";
@@ -209,8 +211,8 @@ public class DisplayConstants {
 	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
 	public static final String TEXT_USER_SETTINGS = "Settings";
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
-	public static final String LABEL_UPLOAD_TO_SYNAPSE = "To Synapse";
-	public static final String LABEL_TO_EXTERNAL = "Link External Location";
+	public static final String UPLOAD_FILE = "Upload File";
+	public static final String LINK_TO_URL = "Link to URL";
 	public static final String TEXT_LINK_FILE = "Link File";
 	public static final String TEXT_LINK_SUCCESS = "Link successfully updated in Synapse";
 	public static final String TEXT_LINK_FAILED = "An error occurred while creating the link. Please check the URL and try again.";
@@ -248,6 +250,7 @@ public class DisplayConstants {
 	public static final String LABEL_UPDATED = "Upated";
 	public static final String TEXT_USER_PROFILE_UPDATED = "Change save to your User Profile.";
 	public static final String TEXT_NO_ATTACHMENTS = "No Attachments.";
+	public static final String TEXT_NO_COLUMNS = "No Columns.";
 	public static final String ERROR_DELETING_ATTACHMENT = "An error occurred deleting the Attachment. Please try again.";
 	public static final String LABEL_DELETED = "deleted";
 	public static final String ERROR_LOADING_DESCRIPTION_FAILED = "Failed to load the description: ";
@@ -329,8 +332,10 @@ public class DisplayConstants {
 	public static final String IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE = "Please enter valid alternate text for the URL";
 	public static final String IMAGE_CONFIG_UPLOAD = "Upload";
 	public static final String IMAGE_CONFIG_FROM_THE_WEB = "From the Web";
+	public static final String IMAGE_CONFIG_FROM_SYNAPSE = "From Synapse File";
 	public static final String IMAGE_CONFIG_URL_LABEL = "Image URL:";
 	public static final String IMAGE_CONFIG_ALT_TEXT = "Alternate Text:";
+	public static final String IMAGE_FAILED_TO_LOAD = "Image failed to load: ";
 	public static final String URL_LABEL = "URL:";
 	public static final String TABLE_LABEL = "Tab Delimitted Table Contents:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
@@ -349,6 +354,7 @@ public class DisplayConstants {
 	public static final String SHINYSITE_SITE_LABEL = "Shiny Site URL";
 	public static final String WIDTH = "Width";
 	public static final String HEIGHT = "Height";
+	public static final String SYNAPSE_API_CALL_COL_CONFIGS_COL_NAME = "Column Configurations:";
 	
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
 	public static final String SHOW_EXPAND = "Show Expand";
@@ -390,9 +396,8 @@ public class DisplayConstants {
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
 
 	// constants used in GovernanceDialogHelper	
-	public static final String OPEN = "Open";
-	public static final String RESTRICTED = "Restricted";
-	public static final String CONTROLLED = "Controlled";
+	public static final String RESTRICTED_USE = "Restricted Use";
+	public static final String CONTROLLED_USE = "Controlled Use";
 	public static final String MODIFY = "modify";
 	public static final String INFO = "info";
 	public static final String GAIN_ACCESS = "gain access";
@@ -413,9 +418,9 @@ public class DisplayConstants {
 	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to these data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
 	
-	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
+	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Data Use Restrictions for Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
-	public static String GOVERNANCE_REFERENCE = "For more information on data access conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
+	public static String GOVERNANCE_REFERENCE = "For more information on Data Use conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
 	
 	public static String ADMIN_GOVERNANCE_REFERENCE = "You are responsible to ensure your data is shared in compliance with the "+
 	SYNAPSE_GUIDELINES_LINK+" and all applicable laws. ";
@@ -427,15 +432,13 @@ public class DisplayConstants {
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
-	public static final String FILE_DOWNLOAD_NOTE = 
-		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
-		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
-		"without restrictions select \"Open\", below.  Otherwise select \"Restricted / Controlled\".";
-
-	public static final String EXTERNAL_LINK_NOTE = 
-		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
-		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
-		"without restrictions select \"save unrestricted\", below.  Otherwise select \"save restricted\".";
+	public static final String DATA_USE_BANNER = "Data Use Restrictions for Public Data";
+	public static final String DATA_USE_BANNER_SUB1 = "If you change Sharing to be ";
+	public static final String DATA_USE_BANNER_SUB2 = ", who can use these data?";
+	public static final String DATA_USE_NOTE = 
+		"You are responsible to ensure your data is used in compliance with the "+SYNAPSE_GUIDELINES_LINK+
+		" and all applicable laws. If/when you make this file public, can its data be used by any registered Synapse user "+
+		"without restriction? If so, then select \"Any Use\", below.  Otherwise select \"Restricted / Controlled\".";
 	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 	
 	
@@ -484,6 +487,8 @@ public class DisplayConstants {
 	public static final String DISPLAY_HEIGHT = "Display Height";
 	public static final String DEFAULT = "Default";
 	public static final String ENTITY_LIST = "Entity List";
+	public static final String IMAGE_FILE_ENTITY = "Image File Entity";
+	public static final String FIND_IMAGE_ENTITY = "Find Image File Entity";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
 	public static final String FIND_ENTITIES = "Find Entities";
 	
@@ -505,7 +510,10 @@ public class DisplayConstants {
 	public static final String ADD_ENTITY = "Add Entity";
 	public static final String INVALID_SHINY_SITE = " is not a valid Shiny Site URL. Please " + DisplayUtils.HELP_EMAIL_ADDRESS_LINK + " if you would like your Shiny Server added to our white list.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
-	
+	public static final String ACCESS_WILL_BE = "Access Will Be";
+	public static final String ANY_USE = "Any Use";
+	public static final String SELECT_DATA_USE = "Please select a Data Use Level";
+		
 	
 }
 
