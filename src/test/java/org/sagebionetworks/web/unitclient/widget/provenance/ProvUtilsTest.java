@@ -44,6 +44,8 @@ import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
+import com.google.gwt.xhr.client.XMLHttpRequest;
+
 public class ProvUtilsTest {
 		
 	ProvenanceWidget provenanceWidget;
@@ -293,6 +295,21 @@ public class ProvUtilsTest {
 			}
 			@Override
 			public void tablesorter(String id) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public boolean isDirectUploadSupported() {
+				return false;
+			}
+			@Override
+			public String getContentType(String fileFieldId) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public void uploadFile(String fileFieldId, String url,
+					XMLHttpRequest xhr) {
 				// TODO Auto-generated method stub
 				
 			}

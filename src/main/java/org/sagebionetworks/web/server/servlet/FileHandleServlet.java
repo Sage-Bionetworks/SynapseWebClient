@@ -25,6 +25,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.HttpClientProviderImpl;
 import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
@@ -37,6 +38,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.shared.EntityUtil;
 
 import com.google.common.io.Files;
@@ -241,12 +243,7 @@ public class FileHandleServlet extends HttpServlet {
 				else if (isCreateEntity) {
 					//create the file entity
 					String parentEntityId = request.getParameter(DisplayUtils.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY);
-					fileEntity = new FileEntity();
-					fileEntity.setParentId(parentEntityId);
-					fileEntity.setEntityType(FileEntity.class.getName());
-					//set data file handle id before creation
-					fileEntity.setDataFileHandleId(newFileHandle.getId());
-					fileEntity = client.createEntity(fileEntity);
+					fileEntity = getNewFileEntity(parentEntityId, newFileHandle.getId(), client);
 					entityId = fileEntity.getId();
 				}
 				else if (entityId != null) {
@@ -261,25 +258,7 @@ public class FileHandleServlet extends HttpServlet {
 					String restrictedParam = request.getParameter(DisplayUtils.IS_RESTRICTED_PARAM_KEY);
 					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
 					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
-					String originalFileEntityName = fileEntity.getName();
-					try{
-						//and try to set the name to the filename
-						fileEntity.setName(newFileHandle.getFileName());
-						fileEntity = client.putEntity(fileEntity);
-					} catch(Throwable t){
-						fileEntity.setName(originalFileEntityName);
-					};
-					
-					// now lock down restricted data
-					if (isRestricted) {
-						// we only proceed if there aren't currently any access restrictions
-						VariableContentPaginatedResults<AccessRequirement> currentARs = client.getAccessRequirements(entityId);
-						if (currentARs.getTotalNumberOfResults()==0L) {
-							AccessRequirement ar = EntityUtil.createLockDownDataAccessRequirement(entityId);
-							client.createAccessRequirement(ar);
-						}
-					}
-
+					fixNameAndLockDown(fileEntity, newFileHandle, isRestricted, client);
 				}
 			}
 			
@@ -312,7 +291,36 @@ public class FileHandleServlet extends HttpServlet {
 			return;
 		}
 	}
-
+	
+	public static FileEntity getNewFileEntity(String parentEntityId, String fileHandleId, Synapse client) throws SynapseException {
+		FileEntity fileEntity = new FileEntity();
+		fileEntity.setParentId(parentEntityId);
+		fileEntity.setEntityType(FileEntity.class.getName());
+		//set data file handle id before creation
+		fileEntity.setDataFileHandleId(fileHandleId);
+		fileEntity = client.createEntity(fileEntity);
+		return fileEntity;
+	}
+	public static void fixNameAndLockDown(FileEntity fileEntity, FileHandle newFileHandle, boolean isRestricted, Synapse client) throws SynapseException {
+		String originalFileEntityName = fileEntity.getName();
+		try{
+			//and try to set the name to the filename
+			fileEntity.setName(newFileHandle.getFileName());
+			fileEntity = client.putEntity(fileEntity);
+		} catch(Throwable t){
+			fileEntity.setName(originalFileEntityName);
+		};
+		
+		// now lock down restricted data
+		if (isRestricted) {
+			// we only proceed if there aren't currently any access restrictions
+			VariableContentPaginatedResults<AccessRequirement> currentARs = client.getAccessRequirements(fileEntity.getId());
+			if (currentARs.getTotalNumberOfResults()==0L) {
+				AccessRequirement ar = EntityUtil.createLockDownDataAccessRequirement(fileEntity.getId());
+				client.createAccessRequirement(ar);
+			}
+		}
+	}
 	/**
 	 * Get the session token
 	 * @param request
