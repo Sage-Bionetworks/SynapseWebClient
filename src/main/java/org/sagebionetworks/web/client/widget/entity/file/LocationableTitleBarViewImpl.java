@@ -229,7 +229,8 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			//clear old handler, if there is one
 			if (entityLinkHandlerRegistration != null)
 				entityLinkHandlerRegistration.removeHandler();
-			entityLink.setHref(directDownloadUrl);	
+			entityLink.setHref(directDownloadUrl);
+			entityLink.setTarget("_blank");
 		}
 		else {
 			//clear href, if there is one

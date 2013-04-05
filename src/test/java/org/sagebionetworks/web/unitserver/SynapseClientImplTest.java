@@ -50,12 +50,16 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.file.ChunkRequest;
+import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.storage.StorageUsage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
@@ -81,8 +85,6 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-
-import com.google.gwt.dev.javac.testing.impl.MockJavaResource;
 
 /**
  * Test for the SynapseClientImpl
@@ -221,6 +223,13 @@ public class SynapseClientImplTest {
 		page.setMarkdown("my markdown");
 		page.setParentWikiId(null);
 		page.setTitle("A Title");
+		S3FileHandle handle = new S3FileHandle();
+		handle.setId("4422");
+		when(mockSynapse.completeChunkFileUpload(any(CompleteChunkedFileRequest.class))).thenReturn(handle);
+		VariableContentPaginatedResults<AccessRequirement> ars = new VariableContentPaginatedResults<AccessRequirement>();
+		ars.setTotalNumberOfResults(0);
+		ars.setResults(new ArrayList<AccessRequirement>());
+		when(mockSynapse.getAccessRequirements(anyString())).thenReturn(ars);
 	}
 	
 	@Test
@@ -598,6 +607,66 @@ public class SynapseClientImplTest {
 		verify(mockSynapse, Mockito.times(4)).putEntity(arg.capture());
 		fileEntityArg = arg.getValue();	//last value captured
 		assertEquals(originalFileEntityName, fileEntityArg.getName());
+	}
+	
+	private FileEntity getTestFileEntity() {
+		FileEntity testFileEntity = new FileEntity();
+		testFileEntity.setId("5544");
+		testFileEntity.setName("testFileEntity.R");
+		return testFileEntity;
+	}
+	
+	private String getTestChunkRequestJson() throws JSONObjectAdapterException {
+		ChunkRequest chunkRequest = new ChunkRequest();
+		ChunkedFileToken token = new ChunkedFileToken();
+		token.setKey("test key");
+		chunkRequest.setChunkedFileToken(token);
+		chunkRequest.setChunkNumber(1l);
+		return EntityFactory.createJSONStringForEntity(chunkRequest);
+	}
+	
+	/**
+	 * Direct upload tests.  Most of the methods are simple pass-throughs to the Java Synapse client, but completeChunkedFileUpload has
+	 * additional logic
+	 * @throws JSONObjectAdapterException 
+	 * @throws SynapseException 
+	 * @throws RestServiceException 
+	 */
+	@Test
+	public void testCompleteChunkedFileUpload() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		String chunkRequestJson = getTestChunkRequestJson();
+		FileEntity testFileEntity = getTestFileEntity();
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
+		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
+		boolean isRestricted = true;
+		synapseClient.completeChunkedFileUpload(null, chunkRequestJson, "syn1", isRestricted);
+		
+		verify(mockSynapse).completeChunkFileUpload(any(CompleteChunkedFileRequest.class));
+		//it should have tried to create a new entity (since entity id was null)
+		verify(mockSynapse).createEntity(any(FileEntity.class));
+		//and update the name
+		verify(mockSynapse).putEntity(any(FileEntity.class));
+		//and lock down
+		verify(mockSynapse).createAccessRequirement(any(AccessRequirement.class));
+	}
+	
+	@Test
+	public void testCompleteChunkedFileUploadExistingEntity() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		String chunkRequestJson = getTestChunkRequestJson();
+		FileEntity testFileEntity = getTestFileEntity();
+		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
+		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
+		boolean isRestricted = false;
+		synapseClient.completeChunkedFileUpload(entityId, chunkRequestJson, "syn1", isRestricted);
+		
+		verify(mockSynapse).completeChunkFileUpload(any(CompleteChunkedFileRequest.class));
+		//it should have tried to find the entity
+		verify(mockSynapse).getEntityById(anyString());
+		//update the data file handle id, and update the name
+		verify(mockSynapse, Mockito.times(2)).putEntity(any(FileEntity.class));
+		//do not lock down (restricted=false)
+		verify(mockSynapse, Mockito.times(0)).createAccessRequirement(any(AccessRequirement.class));
 	}
 
 }
