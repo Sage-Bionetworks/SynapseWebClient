@@ -174,6 +174,7 @@ public class LicensedDownloaderTest {
 		StudyEntityWrapper = new EntityWrapper("StudyEntityWrapper", Study.class.getName());
 		layerEntityWrapper = new EntityWrapper("layerEntityWrapper", Data.class.getName());
 		pathEntityWrapper = new EntityWrapper("pathEntityWrapper", EntityPath.class.getName());
+		
 		when(mockView.getDirectDownloadURL()).thenReturn("http://synapse.sagebase.org/file.png");
 	}
 	
@@ -302,6 +303,26 @@ public class LicensedDownloaderTest {
 		licensedDownloader.setLicenseAccepted();		
 	}
 
+	@Test
+	public void testGetDirectDownloadUrlAvailable(){
+		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
+		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);
+		//direct download available if there are no access requirements
+		assertTrue(licensedDownloader.getDirectDownloadURL()!=null);
+	}
+
+	@Test
+	public void testGetDirectDownloadUrlIsNull(){
+		String touText = "some agreement";
+		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
+		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
+		accessRequirement.setTermsOfUse(touText);
+		accessRequirements.add(accessRequirement);
+		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);
+		//direct download unavailable if there are any access requirements
+		assertNull(licensedDownloader.getDirectDownloadURL());
+	}
+	
 	@Test
 	public void testGetDirectDownloadUrlAvailable(){
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();

@@ -57,7 +57,7 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	public static boolean isValidShinySite(String siteUrl) {
 		if(siteUrl != null) {
 			for(String base : VALID_URL_BASES) {
-				// starts with one of the valid url bases?
+				// starts with one of the valid url bases?				
 				if(siteUrl.toLowerCase().startsWith(base)) return true;
 			}
 		}

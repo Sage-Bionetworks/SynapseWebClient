@@ -1422,7 +1422,7 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isWikiSupportedType(Entity entity) {
-		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project);
+		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project); 
 	}
 		
 	public static boolean isRecognizedImageContentType(String contentType) {
