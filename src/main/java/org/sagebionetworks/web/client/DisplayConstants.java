@@ -513,7 +513,7 @@ public class DisplayConstants {
 	public static final String ACCESS_WILL_BE = "Access Will Be";
 	public static final String ANY_USE = "Any Use";
 	public static final String SELECT_DATA_USE = "Please select a Data Use Level";
-		
+	public static final String LARGE_FILE_ON_UNSUPPORTED_BROWSER = "The file exceeds the maximum file size that Synapse supports for this browser. Please update your browser to the latest version and try again.";	
 	
 }
 

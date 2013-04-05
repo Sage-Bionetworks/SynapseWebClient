@@ -51,6 +51,8 @@ import com.google.inject.Inject;
  */
 public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable {
 	
+	public static final double OLD_BROWSER_MAX_SIZE = DisplayUtils.MB * 5; //5MB
+	
 	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -159,6 +161,20 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		else {
 			//use case A and B from above
 			//uses the default action url
+			//if using this method, block if file size is > MAX_SIZE
+			if (isFileEntity) {
+				try {
+					double fileSize = synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
+					//check
+					if (fileSize > OLD_BROWSER_MAX_SIZE) {
+						view.showErrorMessage(DisplayConstants.LARGE_FILE_ON_UNSUPPORTED_BROWSER);
+						fireCancelEvent();
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			view.submitForm();
 		}
 	}
@@ -404,8 +420,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	private void uploadError() {
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD);
+		fireCancelEvent();
+	}
+	
+	private void fireCancelEvent(){
 		handlerManager.fireEvent(new CancelEvent());
 	}
+	
 	private void uploadSuccess(boolean isNewlyRestricted) {
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		if (isNewlyRestricted) {

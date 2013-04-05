@@ -46,4 +46,5 @@ public interface SynapseJSNIUtils {
 	
 	public void uploadFile(String fileFieldId, String url, XMLHttpRequest xhr);
 	public String getContentType(String fileFieldId);
+	public double getFileSize(String fileFieldId);
 }
