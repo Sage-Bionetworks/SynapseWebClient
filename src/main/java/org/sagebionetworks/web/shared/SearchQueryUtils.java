@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client;
+package org.sagebionetworks.web.shared;
 
 import java.util.ArrayList;
 import java.util.Arrays;

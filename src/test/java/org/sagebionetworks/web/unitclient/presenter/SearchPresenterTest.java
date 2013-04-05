@@ -24,7 +24,6 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SearchQueryUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -32,6 +31,7 @@ import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SearchView;
+import org.sagebionetworks.web.shared.SearchQueryUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
