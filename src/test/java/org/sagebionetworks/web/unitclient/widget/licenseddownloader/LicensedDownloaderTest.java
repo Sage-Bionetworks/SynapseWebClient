@@ -323,26 +323,6 @@ public class LicensedDownloaderTest {
 		assertNull(licensedDownloader.getDirectDownloadURL());
 	}
 	
-	@Test
-	public void testGetDirectDownloadUrlAvailable(){
-		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
-		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);
-		//direct download available if there are no access requirements
-		assertTrue(licensedDownloader.getDirectDownloadURL()!=null);
-	}
-
-	@Test
-	public void testGetDirectDownloadUrlIsNull(){
-		String touText = "some agreement";
-		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
-		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
-		accessRequirement.setTermsOfUse(touText);
-		accessRequirements.add(accessRequirement);
-		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);
-		//direct download unavailable if there are any access requirements
-		assertNull(licensedDownloader.getDirectDownloadURL());
-	}
-	
 	/*
 	 * Private methods
 	 */
