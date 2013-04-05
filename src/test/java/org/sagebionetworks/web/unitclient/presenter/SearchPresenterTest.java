@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SearchView;
+import org.sagebionetworks.web.shared.SearchQueryUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -71,7 +72,7 @@ public class SearchPresenterTest {
 				mockIconsImageBundle);
 		
 		exampleTerm = "searchQueryTerm";
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		query.setQueryTerm(Arrays.asList(new String[] {exampleTerm}));
 		exampleTermSearchQueryJson = query.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
 
@@ -115,7 +116,7 @@ public class SearchPresenterTest {
 		// test for a word with the prefix but not a synapse ID
 		String term = DisplayUtils.SYNAPSE_ID_PREFIX + "apse"; // # 'synapse'
 
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		query.setQueryTerm(Arrays.asList(new String[] {term}));
 		String json = query.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
 
