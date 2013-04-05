@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class GWTWrapperImpl implements GWTWrapper {
 
@@ -25,5 +26,11 @@ public class GWTWrapperImpl implements GWTWrapper {
 	public String encodeQueryString(String queryString){
 		return URL.encodeQueryString(queryString);
 	}
+	
+	@Override
+	public XMLHttpRequest createXMLHttpRequest() {
+		return XMLHttpRequest.create();
+	}
+	
 
 }

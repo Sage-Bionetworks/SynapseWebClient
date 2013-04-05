@@ -131,4 +131,7 @@ public interface SynapseClientAsync {
 			AsyncCallback<String> callback);
 	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
+	void getChunkedFileToken(String fileName,  String contentType, long chunkNumber, AsyncCallback<String> callback) throws RestServiceException;
+	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
+	void completeChunkedFileUpload(String entityId, String requestJson, String parentEntityId, boolean isRestricted, AsyncCallback<String> callback) throws RestServiceException;
 }

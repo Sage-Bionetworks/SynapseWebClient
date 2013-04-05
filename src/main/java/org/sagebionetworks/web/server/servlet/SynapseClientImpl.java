@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -41,8 +42,14 @@ import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.file.ChunkRequest;
+import org.sagebionetworks.repo.model.file.ChunkResult;
+import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
+import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
@@ -1240,4 +1247,84 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	@Override
+	public String getChunkedFileToken(String fileName, String contentType, long chunkNumber) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			CreateChunkedFileTokenRequest ccftr = new CreateChunkedFileTokenRequest();
+			ccftr.setFileName(fileName);
+			ccftr.setContentType(contentType);
+			// Start the upload
+			ChunkedFileToken token = synapseClient.createChunkedFileUploadToken(ccftr);
+			ChunkRequest request = new ChunkRequest();
+			request.setChunkedFileToken(token);
+			request.setChunkNumber(chunkNumber);
+			
+			JSONObjectAdapter requestJson = request.writeToJSONObject(adapterFactory.createNew());
+			return requestJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException{
+		Synapse synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			ChunkRequest request = jsonEntityFactory.createEntity(requestJson, ChunkRequest.class);
+			return synapseClient.createChunkedPresignedUrl(request).toString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public String completeChunkedFileUpload(String entityId, String requestJson, String parentEntityId, boolean isRestricted) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			//re-create the request
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			ChunkRequest request = jsonEntityFactory.createEntity(requestJson, ChunkRequest.class);
+			
+			//create the chunkresult
+			ChunkResult result = synapseClient.addChunkToFile(request);
+			List<ChunkResult> results = new ArrayList<ChunkResult>();
+			results.add(result);
+
+			// And complete the upload
+			CompleteChunkedFileRequest ccfr = new CompleteChunkedFileRequest();
+			ccfr.setChunkedFileToken(request.getChunkedFileToken());
+			ccfr.setChunkResults(results);
+			// Complete the upload
+			S3FileHandle newHandle = synapseClient.completeChunkFileUpload(ccfr);
+			String fileHandleId = newHandle.getId();
+			//create entity if we have to
+			FileEntity fileEntity = null;
+			
+			if (entityId == null) {
+				//create the file entity
+				fileEntity = FileHandleServlet.getNewFileEntity(parentEntityId, fileHandleId, synapseClient);
+			}
+			else {
+				//get the file entity to update
+				fileEntity = (FileEntity) synapseClient.getEntityById(entityId);
+				//update data file handle id
+				fileEntity.setDataFileHandleId(fileHandleId);
+				fileEntity = synapseClient.putEntity(fileEntity);
+			}
+			//fix name and lock down
+			FileHandleServlet.fixNameAndLockDown(fileEntity, newHandle, isRestricted, synapseClient);
+			return fileEntity.getId();
+						
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 }

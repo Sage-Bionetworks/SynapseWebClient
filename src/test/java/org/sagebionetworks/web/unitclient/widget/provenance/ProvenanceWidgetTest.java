@@ -65,6 +65,7 @@ import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTe
 
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class ProvenanceWidgetTest {
 		
@@ -380,6 +381,21 @@ public class ProvenanceWidgetTest {
 			
 			@Override
 			public void tablesorter(String id) {}
+			@Override
+			public boolean isDirectUploadSupported() {
+				return false;
+			}
+			@Override
+			public String getContentType(String fileFieldId) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public void uploadFile(String fileFieldId, String url,
+					XMLHttpRequest xhr) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 

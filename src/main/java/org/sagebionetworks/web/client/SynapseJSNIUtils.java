@@ -6,6 +6,8 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 
+import com.google.gwt.xhr.client.XMLHttpRequest;
+
 public interface SynapseJSNIUtils {
 
 	public void recordPageVisit(String token);
@@ -39,4 +41,9 @@ public interface SynapseJSNIUtils {
 	public void setPageTitle(String newTitle);
 	
 	public void setPageDescription(String newDescription);
+
+	public boolean isDirectUploadSupported();
+	
+	public void uploadFile(String fileFieldId, String url, XMLHttpRequest xhr);
+	public String getContentType(String fileFieldId);
 }
