@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -208,7 +209,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 
 	@Override
 	public List<String> getFacetDisplayOrder() {
-		return DisplayUtils.FACETS_DISPLAY_ORDER;
+		return SearchQueryUtils.FACETS_DISPLAY_ORDER;
 	}
 
 	@Override
@@ -303,7 +304,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	}
 
 	private SearchQuery getBaseSearchQuery() {
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		timeValueToDisplay.clear();
 		searchStartTime = new DateTime();		
 		newQuery = true;		
