@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
@@ -16,6 +15,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
+import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
@@ -159,5 +159,34 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		    }
 		}
 	}
+	@Override
+	public boolean isDirectUploadSupported() {
+		return _isDirectUploadSupported();
+	}
 	
+	private final static native boolean _isDirectUploadSupported() /*-{ 
+		var xhr = new XMLHttpRequest();
+		// This test is from http://blogs.msdn.com/b/ie/archive/2012/02/09/cors-for-xhr-in-ie10.aspx
+		return ("withCredentials" in xhr);
+	}-*/;
+
+	@Override
+	public void uploadFile(String fileFieldId, String url, XMLHttpRequest xhr) {
+		_directUploadFile(fileFieldId, url, xhr);
+	}
+	private final static native void _directUploadFile(String fileFieldId, String url, XMLHttpRequest xhr) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		var fileToUpload = fileToUploadElement.files[0];
+		xhr.open('PUT', url, true);
+		xhr.send(fileToUpload);
+	}-*/;
+	
+	@Override
+	public String getContentType(String fileFieldId) {
+		return _getContentType(fileFieldId);
+	}
+	private final static native String _getContentType(String fileFieldId) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		return fileToUploadElement.files[0].type;
+	}-*/;
 }
