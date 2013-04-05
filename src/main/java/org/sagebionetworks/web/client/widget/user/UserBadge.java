@@ -7,15 +7,17 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresenter {
+public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresenter, WidgetRendererPresenter {
 	
 	private UserBadgeView view;
-	private Map<String, String> descriptor;
 	SynapseClientAsync synapseClient;
 	NodeModelCreator nodeModelCreator;
 	private Integer maxNameLength;
@@ -35,7 +37,13 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	public void configure(UserProfile profile) {
 		view.setProfile(profile, maxNameLength);
 	}
-		
+	
+	@Override
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+		//get the user id from the descriptor, and pass to the other configure
+		configure(widgetDescriptor.get(WidgetConstants.USERBADGE_WIDGET_ID_KEY));
+	}
+	
 	public void configure(final String principalId) {
 		view.showLoading();
 		synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
