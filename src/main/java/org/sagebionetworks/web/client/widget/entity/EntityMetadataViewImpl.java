@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -60,13 +59,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.resources.client.CssResource;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -89,6 +86,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static final int VERSION_LIMIT = 100;
 	private static final int NAME_TIME_STUB_LENGTH = 7;
 	private FavoriteWidget favoriteWidget;
+	private DoiWidget doiWidget;
 	
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
@@ -134,6 +132,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	SimplePanel favoritePanel;
 
 	@UiField
+	SimplePanel doiPanel;
+
+	@UiField
 	LayoutContainer previousVersions;
 
 	@UiField
@@ -167,10 +168,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget) {
+			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget, DoiWidget doiWidget) {
 		this.icons = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
+		this.doiWidget = doiWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 
 		versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(allVersions, previousVersions));
@@ -236,7 +238,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
-				
+		
+		doiPanel.addStyleName("inline-block");
+		doiPanel.setWidget(doiWidget.asWidget());
+		
 		previousVersions.setLayout(new FlowLayout(10));
 	}
 
@@ -274,14 +279,18 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		}
 		
 		setVersionsVisible(false);
+		Long versionNumber = null;
 		if (e instanceof Versionable) {
 			setVersionsVisible(true);
 			Versionable vb = (Versionable) e;
 			setVersionInfo(vb);
 			setEntityVersions(vb);
 			versionAnimation.hide();
+			versionNumber = vb.getVersionNumber();
 		}
 		favoriteWidget.configure(bundle.getEntity().getId());
+		
+		doiWidget.configure(bundle.getEntity().getId(), versionNumber);
 	}
 
 	private void clear() {

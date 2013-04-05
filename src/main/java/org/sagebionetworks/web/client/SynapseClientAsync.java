@@ -131,4 +131,6 @@ public interface SynapseClientAsync {
 			AsyncCallback<String> callback);
 	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
+	void getEntityDoi(String entityId, Long versionNumber, AsyncCallback<String> callback);
+	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 }
