@@ -110,6 +110,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getEntityListRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.SHINYSITE_CONTENT_TYPE)) {
 			presenter = ginInjector.getShinySiteRenderer();
+		} else if (contentTypeKey.equals(WidgetConstants.USERBADGE_CONTENT_TYPE)) {
+			presenter = ginInjector.getUserBadgeWidget();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
