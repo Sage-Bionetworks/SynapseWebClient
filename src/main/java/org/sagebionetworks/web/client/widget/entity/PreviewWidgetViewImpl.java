@@ -55,9 +55,9 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	public void setTextPreview(String text) {
 		clear();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<p class=\"file-preview\">");
+		sb.append("<pre class=\"file-preview\" style=\"overflow:auto;white-space:pre\">");
 		sb.append(text);
-		sb.append("</p>");
+		sb.append("</pre>");
 		add(new HTMLPanel(sb.toString()));
 	}
 	
