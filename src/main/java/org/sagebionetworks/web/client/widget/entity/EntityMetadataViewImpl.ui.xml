@@ -36,7 +36,9 @@
 				<span class="metadata-tag"><g:HTMLPanel tag="span" ui:field="addedBy"></g:HTMLPanel></span>
 				<span class="metadata-tag"><g:HTMLPanel tag="span" ui:field="modifiedBy"></g:HTMLPanel></span>
 			</div>
-			<gxt:LayoutContainer ui:field="previousVersions" styleName="{style.limitedHeight}" visible="false" autoHeight="true" />
+			<div class="span-16 notopmargin">
+				<gxt:LayoutContainer ui:field="previousVersions" styleName="{style.limitedHeight}" visible="false" autoHeight="true" />
+			</div>
 			<g:HTMLPanel ui:field="readOnly">
 			  <h4 class="colored">READ ONLY <g:Image resource="{icons.help16}"/></h4>
 			</g:HTMLPanel>
