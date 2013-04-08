@@ -246,7 +246,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
+	public void setEntityBundle(EntityBundle bundle, boolean canEdit, boolean readOnly) {
 		clear();
 
 		Entity e = bundle.getEntity();
@@ -289,8 +289,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			versionNumber = vb.getVersionNumber();
 		}
 		favoriteWidget.configure(bundle.getEntity().getId());
-		
-		doiWidget.configure(bundle.getEntity().getId(), versionNumber);
+
+		//TODO: uncomment to expose doi widget	
+//		if (canEdit)
+//			doiWidget.configure(bundle.getEntity().getId(), versionNumber);
 	}
 
 	private void clear() {
@@ -299,6 +301,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setVersionsVisible(false);
 		previousVersions.setVisible(false);
 		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+		doiWidget.clear();
 	}
 
 	@Override

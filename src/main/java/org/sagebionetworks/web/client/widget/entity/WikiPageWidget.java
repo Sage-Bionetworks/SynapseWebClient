@@ -109,7 +109,8 @@ SynapseWidgetPresenter {
 					public void onFailure(Throwable caught) {
 						//if it is because of a missing root (and we have edit permission), then the pages browser should have a Create Wiki button
 						if (caught instanceof NotFoundException) {
-							view.showNoWikiAvailableUI();
+							if (canEdit)
+								view.showNoWikiAvailableUI();
 						}
 						else {
 							view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());

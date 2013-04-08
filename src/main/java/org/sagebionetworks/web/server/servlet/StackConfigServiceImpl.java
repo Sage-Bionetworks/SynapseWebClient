@@ -21,5 +21,9 @@ public class StackConfigServiceImpl extends RemoteServiceServlet implements Stac
 	public String getBCCSignupEnabled() {
 		return StackConfiguration.getBCCSignupEnabled();
 	}
+	@Override
+	public String getDoiPrefix() {
+		return StackConfiguration.getEzidDoiPrefix();
+	}
 
 }
