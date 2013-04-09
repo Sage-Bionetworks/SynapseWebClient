@@ -839,6 +839,11 @@ ol.lowerroman {
 	color: #000000;
 }
 
-.pagesTree div{
-	padding-left:5px !important;
+.pagesTree img{
+	padding-right:7px;
+}
+
+.pagesTree a{
+	font-family: Verdana,Arial,sans-serif;
+	font-size: 13px;
 }
