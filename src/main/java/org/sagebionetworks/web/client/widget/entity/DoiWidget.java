@@ -1,0 +1,143 @@
+package org.sagebionetworks.web.client.widget.entity;
+
+import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.doi.DoiStatus;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.entity.DoiWidgetView.Presenter;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+
+public class DoiWidget implements Presenter {
+
+	public static final String DOI = "doi:";
+	public static final int REFRESH_TIME = 10 * 1000; //10 seconds
+	private DoiWidgetView view;
+	private SynapseClientAsync synapseClient;
+	private NodeModelCreator nodeModelCreator;
+	private JSONObjectAdapter jsonObjectAdapter;
+	private StackConfigServiceAsync stackConfigService;
+	
+	private Timer timer = null;
+	
+	Doi doi;
+	String entityId;
+	Long versionNumber;
+	
+	@Inject
+	public DoiWidget(DoiWidgetView view,
+			SynapseClientAsync synapseClient,
+			NodeModelCreator nodeModelCreator,
+			JSONObjectAdapter jsonObjectAdapter,
+			GlobalApplicationState globalApplicationState, 
+			StackConfigServiceAsync stackConfigService) {
+		this.view = view;
+		this.view.setPresenter(this);
+		this.synapseClient = synapseClient;
+		this.nodeModelCreator = nodeModelCreator;
+		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.stackConfigService = stackConfigService;
+	}
+	
+	public void configure(String entityId, Long versionNumber) {
+		this.entityId = entityId;
+		this.versionNumber = versionNumber;
+		configureDoi();
+	}
+	
+	public Widget asWidget() {
+		return view.asWidget();
+	}
+
+	public void configureDoi() {
+		view.clear();
+		//get this entity's Doi (if it has one)
+		doi = null;
+		timer = null;
+		synapseClient.getEntityDoi(entityId, versionNumber, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				//construct the DOI
+				try {
+					doi = nodeModelCreator.createJSONEntity(result, Doi.class);
+					view.showDoi(doi.getDoiStatus());
+					if (doi.getDoiStatus() == DoiStatus.IN_PROCESS && timer == null) {
+						timer = new Timer() {
+							public void run() {
+								configureDoi();
+							};
+						};
+						//schedule a timer to update the DOI status 10 seconds from now
+						timer.schedule(REFRESH_TIME);
+					};
+				} catch (JSONObjectAdapterException e) {							
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException) {
+					view.showCreateDoi();
+				} else {
+					view.showErrorMessage(caught.getMessage());
+				}
+			}
+		});
+	}
+
+	@Override
+	public void createDoi() {
+		synapseClient.createDoi(entityId, versionNumber, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void v) {
+				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
+				configureDoi();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+	
+	@Override
+	public void getDoiPrefix(AsyncCallback<String> callback) {
+		stackConfigService.getDoiPrefix(callback);
+	}
+	
+	@Override
+	public String getDoiLink(String prefix) {
+		String html = "";
+		if (prefix != null && prefix.length() > 0) {
+			String versionString = "";
+			if (versionNumber != null) {
+				versionString = "." + versionNumber;
+			}
+			
+			String fullDoi = prefix + entityId + versionString;
+			String doiName = prefix.substring(DOI.length()) + entityId + versionString;
+			html = getDoiLink(fullDoi, doiName);	
+		}
+		return html;
+	}
+	
+	public static String getDoiLink(String fullDoi, String doiName){
+		return "<a target=\"_blank\" class=\"link margin-left-5\" href=\"http://dx.doi.org/" +
+				doiName + "\">" + fullDoi +"</a>";
+	}
+	
+	public void clear() {
+		view.clear();
+	}
+
+}

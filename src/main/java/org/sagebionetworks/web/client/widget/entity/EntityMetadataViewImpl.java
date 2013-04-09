@@ -86,6 +86,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static final int VERSION_LIMIT = 100;
 	private static final int NAME_TIME_STUB_LENGTH = 7;
 	private FavoriteWidget favoriteWidget;
+	private DoiWidget doiWidget;
 	
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
@@ -131,6 +132,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	SimplePanel favoritePanel;
 
 	@UiField
+	SimplePanel doiPanel;
+
+	@UiField
 	LayoutContainer previousVersions;
 
 	@UiField
@@ -164,10 +168,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget) {
+			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget, DoiWidget doiWidget) {
 		this.icons = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
+		this.doiWidget = doiWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 
 		versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(allVersions, previousVersions));
@@ -233,12 +238,15 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
-				
+		
+		doiPanel.addStyleName("inline-block");
+		doiPanel.setWidget(doiWidget.asWidget());
+		
 		previousVersions.setLayout(new FlowLayout(10));
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
+	public void setEntityBundle(EntityBundle bundle, boolean canEdit, boolean readOnly) {
 		clear();
 
 		Entity e = bundle.getEntity();
@@ -271,14 +279,20 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		}
 		
 		setVersionsVisible(false);
+		Long versionNumber = null;
 		if (e instanceof Versionable) {
 			setVersionsVisible(true);
 			Versionable vb = (Versionable) e;
 			setVersionInfo(vb);
 			setEntityVersions(vb);
 			versionAnimation.hide();
+			versionNumber = vb.getVersionNumber();
 		}
 		favoriteWidget.configure(bundle.getEntity().getId());
+
+		//TODO: uncomment to expose doi widget	
+//		if (canEdit)
+//			doiWidget.configure(bundle.getEntity().getId(), versionNumber);
 	}
 
 	private void clear() {
@@ -287,6 +301,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setVersionsVisible(false);
 		previousVersions.setVisible(false);
 		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+		doiWidget.clear();
 	}
 
 	@Override

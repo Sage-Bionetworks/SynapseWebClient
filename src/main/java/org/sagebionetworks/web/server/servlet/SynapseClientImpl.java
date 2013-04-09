@@ -47,6 +47,7 @@ import org.sagebionetworks.repo.model.file.ChunkResult;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
 import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
+import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
@@ -1246,7 +1247,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-
+	@Override
+	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			Doi	doi = synapseClient.getEntityDoi(entityId, versionNumber);
+			return EntityFactory.createJSONStringForEntity(doi);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} catch (Exception e) {
+			throw ExceptionUtil.convertSynapseException(new SynapseNotFoundException());	//backend will be changed to throw a SynapseNotFoundException when no records are found
+		}
+	}
+	
+	@Override
+	public void createDoi(String entityId, Long versionNumber) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			synapseClient.createEntityDoi(entityId, versionNumber);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 	@Override
 	public String getChunkedFileToken(String fileName, String contentType, long chunkNumber) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();

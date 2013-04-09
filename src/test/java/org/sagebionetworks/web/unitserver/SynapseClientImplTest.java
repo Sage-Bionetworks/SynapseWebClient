@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,7 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +34,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -57,7 +60,10 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
+import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.message.ObjectType;
@@ -82,6 +88,7 @@ import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -608,13 +615,42 @@ public class SynapseClientImplTest {
 		fileEntityArg = arg.getValue();	//last value captured
 		assertEquals(originalFileEntityName, fileEntityArg.getName());
 	}
-	
+
+	@Test
+	public void testGetEntityDoi() throws Exception {
+		//wiring test
+		Doi testDoi = new Doi();
+		testDoi.setDoiStatus(DoiStatus.READY);
+		testDoi.setId("test doi id");
+		testDoi.setCreatedBy("Test User");
+		testDoi.setCreatedOn(new Date());
+		testDoi.setObjectId("syn1234");
+		Mockito.when(mockSynapse.getEntityDoi(anyString(), anyLong())).thenReturn(testDoi);
+		synapseClient.getEntityDoi("test entity id", null);
+	    verify(mockSynapse).getEntityDoi(anyString(), anyLong());
 	private FileEntity getTestFileEntity() {
 		FileEntity testFileEntity = new FileEntity();
 		testFileEntity.setId("5544");
 		testFileEntity.setName("testFileEntity.R");
 		return testFileEntity;
 	}
+	
+	@Test (expected=NotFoundException.class)
+	public void testGetEntityDoiNotFound() throws Exception {
+		//wiring test
+		Mockito.when(mockSynapse.getEntityDoi(anyString(), anyLong())).thenThrow(new SynapseNotFoundException());
+		synapseClient.getEntityDoi("test entity id", null);
+	}
+	
+	@Test
+	public void testCreateDoi() throws Exception {
+		//wiring test
+		synapseClient.createDoi("test entity id", null);
+		verify(mockSynapse).createEntityDoi(anyString(), anyLong());
+	}
+
+
+}
 	
 	private String getTestChunkRequestJson() throws JSONObjectAdapterException {
 		ChunkRequest chunkRequest = new ChunkRequest();
