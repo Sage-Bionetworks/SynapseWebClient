@@ -1269,6 +1269,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			synapseClient.createEntityDoi(entityId, versionNumber);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
 	@Override
 	public String getChunkedFileToken(String fileName, String contentType, long chunkNumber) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
