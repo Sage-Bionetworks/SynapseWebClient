@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
+import org.sagebionetworks.web.client.presenter.HomePresenterProxy;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.activity.shared.Activity;
@@ -31,7 +32,7 @@ public class AppActivityMapperTest {
 	
 	PortalGinInjector mockInjector;
 	AuthenticationController mockController;
-	HomePresenter mockAll;
+	HomePresenterProxy mockAll;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	
@@ -52,7 +53,7 @@ public class AppActivityMapperTest {
 		when(mockSynapseJSNIUtils.getCurrentHistoryToken()).thenReturn(historyToken);
 		
 		// Home
-		mockAll = Mockito.mock(HomePresenter.class);
+		mockAll = Mockito.mock(HomePresenterProxy.class);
 		when(mockInjector.getHomePresenter()).thenReturn(mockAll);
 		// Global App State
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);

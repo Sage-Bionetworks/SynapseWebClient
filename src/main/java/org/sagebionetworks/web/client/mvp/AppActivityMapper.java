@@ -27,9 +27,9 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
-import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.EntityPresenterProxy;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
-import org.sagebionetworks.web.client.presenter.HomePresenter;
+import org.sagebionetworks.web.client.presenter.HomePresenterProxy;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
@@ -115,11 +115,12 @@ public class AppActivityMapper implements ActivityMapper {
 		// We use GIN to generate and inject all presenters with 
 		// their dependencies.
 		if(place instanceof Home) {
-			HomePresenter presenter = ginjector.getHomePresenter();
+			// Split the code
+			HomePresenterProxy presenter = ginjector.getHomePresenter();
 			presenter.setPlace((Home)place);
 			return presenter;
 		} else if(place instanceof Synapse){
-			EntityPresenter presenter = ginjector.getEntityPresenter();
+			EntityPresenterProxy presenter = ginjector.getEntityPresenter();
 			presenter.setPlace((Synapse)place);
 			return presenter;
 		}else if (place instanceof ProjectsHome) {

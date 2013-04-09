@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
-import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.EntityPresenterProxy;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
-import org.sagebionetworks.web.client.presenter.HomePresenter;
+import org.sagebionetworks.web.client.presenter.HomePresenterProxy;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
@@ -21,8 +21,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
@@ -59,9 +59,9 @@ public interface PortalGinInjector extends Ginjector {
 
 	public GlobalApplicationState getGlobalApplicationState();
 	
-	public HomePresenter getHomePresenter();
+	public HomePresenterProxy getHomePresenter();
 
-	public EntityPresenter getEntityPresenter();
+	public EntityPresenterProxy getEntityPresenter();
 	
 	public ProjectsHomePresenter getProjectsHomePresenter();
 	
