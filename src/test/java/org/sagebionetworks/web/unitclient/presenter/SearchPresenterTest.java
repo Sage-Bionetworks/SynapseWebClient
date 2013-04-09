@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
+import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SearchView;
@@ -129,9 +130,7 @@ public class SearchPresenterTest {
 	public void testSetPlaceSynapseIdPrefix() throws Exception {
 		// test for a word with the prefix and is a synapse ID
 		String term = DisplayUtils.SYNAPSE_ID_PREFIX + "1234567890"; // # 'syn1234567890'
-		
-		searchPresenter.setPlace(new Search(term));		
-		assertEquals(searchPresenter.getRedirect(), new Synapse(term)); 
+		assertEquals(SearchUtil.willRedirect(new Search(term)), new Synapse(term)); 
 	}
 
 	@Test 

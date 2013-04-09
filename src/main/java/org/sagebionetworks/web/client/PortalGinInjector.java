@@ -1,19 +1,19 @@
 package org.sagebionetworks.web.client;
 
-import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
-import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
+import org.sagebionetworks.web.client.presenter.BCCOverviewPresenterProxy;
+import org.sagebionetworks.web.client.presenter.ComingSoonPresenterProxy;
 import org.sagebionetworks.web.client.presenter.EntityPresenterProxy;
-import org.sagebionetworks.web.client.presenter.GovernancePresenter;
+import org.sagebionetworks.web.client.presenter.GovernancePresenterProxy;
 import org.sagebionetworks.web.client.presenter.HomePresenterProxy;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
-import org.sagebionetworks.web.client.presenter.ProfilePresenter;
-import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
-import org.sagebionetworks.web.client.presenter.SearchPresenter;
-import org.sagebionetworks.web.client.presenter.SettingsPresenter;
-import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
-import org.sagebionetworks.web.client.presenter.WikiPresenter;
-import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
-import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
+import org.sagebionetworks.web.client.presenter.LoginPresenterProxy;
+import org.sagebionetworks.web.client.presenter.ProfilePresenterProxy;
+import org.sagebionetworks.web.client.presenter.ProjectsHomePresenterProxy;
+import org.sagebionetworks.web.client.presenter.SearchPresenterProxy;
+import org.sagebionetworks.web.client.presenter.SettingsPresenterProxy;
+import org.sagebionetworks.web.client.presenter.SynapseWikiPresenterProxy;
+import org.sagebionetworks.web.client.presenter.WikiPresenterProxy;
+import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenterProxy;
+import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenterProxy;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -63,33 +63,31 @@ public interface PortalGinInjector extends Ginjector {
 
 	public EntityPresenterProxy getEntityPresenter();
 	
-	public ProjectsHomePresenter getProjectsHomePresenter();
+	public ProjectsHomePresenterProxy getProjectsHomePresenter();
 	
-	public LoginPresenter getLoginPresenter();
+	public LoginPresenterProxy getLoginPresenter();
 	
 	public AuthenticationController getAuthenticationController();
 	
-	public PasswordResetPresenter getPasswordResetPresenter();
+	public PasswordResetPresenterProxy getPasswordResetPresenter();
 	
-	public RegisterAccountPresenter getRegisterAccountPresenter();
+	public RegisterAccountPresenterProxy getRegisterAccountPresenter();
 
-	public ProfilePresenter getProfilePresenter();
+	public ProfilePresenterProxy getProfilePresenter();
 
-	public SettingsPresenter getSettingsPresenter();
+	public SettingsPresenterProxy getSettingsPresenter();
 	
-	public ComingSoonPresenter getComingSoonPresenter();
+	public ComingSoonPresenterProxy getComingSoonPresenter();
 	
-	public BCCOverviewPresenter getBCCOverviewPresenter();
+	public BCCOverviewPresenterProxy getBCCOverviewPresenter();
 	
-	public GovernancePresenter getGovernancePresenter();
+	public GovernancePresenterProxy getGovernancePresenter();
 	
-	public SearchPresenter getSearchPresenter();
+	public SearchPresenterProxy getSearchPresenter();
 	
-	public SynapseWikiPresenter getSynapseWikiPresenter();
+	public SynapseWikiPresenterProxy getSynapseWikiPresenter();
 	
-	public BCCSignup getBCCSignup();
-	
-	public WikiPresenter getWikiPresenter();
+	public WikiPresenterProxy getWikiPresenter();
 	
 	public EventBus getEventBus();
 	

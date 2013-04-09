@@ -59,7 +59,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private boolean newQuery = false;
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
 	private DateTime searchStartTime;
-	private Place redirect; 
 	
 	
 	@Inject
@@ -93,14 +92,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public void setPlace(Search place) {
 		this.place = place;
 		view.setPresenter(this);
-		redirect = null;
 		String queryTerm = place.getSearchTerm();
 		if (queryTerm == null) queryTerm = "";
-		
-		if (willRedirect(queryTerm)) {
-			redirect = new Synapse(queryTerm);
-			return;
-		}
 
 		currentSearch = checkForJson(queryTerm);
 		if (place.getStart() != null)
@@ -238,9 +231,9 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		return PaginationUtil.getPagination(nResults.intValue(), start.intValue(), nPerPage, nPagesToShow);
 	}
 
-	public Place getRedirect() {
-		return redirect;
-	}
+//	public Place getRedirect() {
+//		return redirect;
+//	}
 
 	@Override
 	public ImageResource getIconForHit(Hit hit) {
@@ -254,15 +247,15 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	 * Private Methods
 	 */
 
-	private boolean willRedirect(String queryTerm) {
-		if(queryTerm.startsWith(DisplayUtils.SYNAPSE_ID_PREFIX)) {
-			String remainder = queryTerm.replaceFirst(DisplayUtils.SYNAPSE_ID_PREFIX, "");
-			if(remainder.matches("^[0-9]+$")) {
-				return true;
-			}
-		}
-		return false;
-	}
+//	public static boolean willRedirect(String queryTerm) {
+//		if(queryTerm.startsWith(DisplayUtils.SYNAPSE_ID_PREFIX)) {
+//			String remainder = queryTerm.replaceFirst(DisplayUtils.SYNAPSE_ID_PREFIX, "");
+//			if(remainder.matches("^[0-9]+$")) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 	
 	@Override
 	public String getCurrentSearchJSON() {

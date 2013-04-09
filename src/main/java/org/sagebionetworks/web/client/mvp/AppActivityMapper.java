@@ -25,20 +25,21 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
-import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
+import org.sagebionetworks.web.client.presenter.BCCOverviewPresenterProxy;
+import org.sagebionetworks.web.client.presenter.ComingSoonPresenterProxy;
 import org.sagebionetworks.web.client.presenter.EntityPresenterProxy;
-import org.sagebionetworks.web.client.presenter.GovernancePresenter;
+import org.sagebionetworks.web.client.presenter.GovernancePresenterProxy;
 import org.sagebionetworks.web.client.presenter.HomePresenterProxy;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
-import org.sagebionetworks.web.client.presenter.ProfilePresenter;
-import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
-import org.sagebionetworks.web.client.presenter.SearchPresenter;
-import org.sagebionetworks.web.client.presenter.SettingsPresenter;
-import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
-import org.sagebionetworks.web.client.presenter.WikiPresenter;
-import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
-import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
+import org.sagebionetworks.web.client.presenter.LoginPresenterProxy;
+import org.sagebionetworks.web.client.presenter.ProfilePresenterProxy;
+import org.sagebionetworks.web.client.presenter.ProjectsHomePresenterProxy;
+import org.sagebionetworks.web.client.presenter.SearchPresenterProxy;
+import org.sagebionetworks.web.client.presenter.SearchUtil;
+import org.sagebionetworks.web.client.presenter.SettingsPresenterProxy;
+import org.sagebionetworks.web.client.presenter.SynapseWikiPresenterProxy;
+import org.sagebionetworks.web.client.presenter.WikiPresenterProxy;
+import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenterProxy;
+import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenterProxy;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.activity.shared.Activity;
@@ -125,65 +126,66 @@ public class AppActivityMapper implements ActivityMapper {
 			return presenter;
 		}else if (place instanceof ProjectsHome) {
 			// Projects Home 
-			ProjectsHomePresenter presenter = ginjector.getProjectsHomePresenter();
+			ProjectsHomePresenterProxy presenter = ginjector.getProjectsHomePresenter();
 			presenter.setPlace((ProjectsHome)place);
 			return presenter;
 		}else if (place instanceof LoginPlace) {
 			// login view
-			LoginPresenter presenter = ginjector.getLoginPresenter();
+			LoginPresenterProxy presenter = ginjector.getLoginPresenter();
 			presenter.setPlace((LoginPlace)place);
 			return presenter;
 		} else if (place instanceof PasswordReset) {
 			// reset passwords
-			PasswordResetPresenter presenter = ginjector.getPasswordResetPresenter();
+			PasswordResetPresenterProxy presenter = ginjector.getPasswordResetPresenter();
 			presenter.setPlace((PasswordReset)place);
 			return presenter;
 		} else if (place instanceof RegisterAccount) {
 			// register for a new account
-			RegisterAccountPresenter presenter = ginjector.getRegisterAccountPresenter();
+			RegisterAccountPresenterProxy presenter = ginjector.getRegisterAccountPresenter();
 			presenter.setPlace((RegisterAccount)place);
 			return presenter;
 		} else if (place instanceof Profile) {
 			// user's profile page
-			ProfilePresenter presenter = ginjector.getProfilePresenter();
+			ProfilePresenterProxy presenter = ginjector.getProfilePresenter();
 			presenter.setPlace((Profile)place);
 			return presenter;
 		} else if (place instanceof Settings) {
 			// user's profile page
-			SettingsPresenter presenter = ginjector.getSettingsPresenter();
+			SettingsPresenterProxy presenter = ginjector.getSettingsPresenter();
 			presenter.setPlace((Settings)place);
 			return presenter;
 		} else if (place instanceof ComingSoon) {
 			// user's profile page
-			ComingSoonPresenter presenter = ginjector.getComingSoonPresenter();
+			ComingSoonPresenterProxy presenter = ginjector.getComingSoonPresenter();
 			presenter.setPlace((ComingSoon)place);
 			return presenter;
 		} else if (place instanceof Governance) {
 			// user's profile page
-			GovernancePresenter presenter = ginjector.getGovernancePresenter();
+			GovernancePresenterProxy presenter = ginjector.getGovernancePresenter();
 			presenter.setPlace((Governance)place);
 			return presenter;
 		} else if (place instanceof BCCOverview) {
 			// user's profile page
-			BCCOverviewPresenter presenter = ginjector.getBCCOverviewPresenter();
+			BCCOverviewPresenterProxy presenter = ginjector.getBCCOverviewPresenter();
 			presenter.setPlace((BCCOverview)place);
 			return presenter;
 		} else if (place instanceof Search) {
 			// search results page
-			SearchPresenter presenter = ginjector.getSearchPresenter();
-			presenter.setPlace((Search)place);
-			Place forwardTo = presenter.getRedirect(); 
-			if(forwardTo != null) {
-				return getActivity(forwardTo);
+			Search searchPlace = (Search) place;
+			Synapse redirect = SearchUtil.willRedirect(searchPlace);
+			if(redirect != null){
+				return getActivity(redirect);
 			}
+			SearchPresenterProxy presenter = ginjector.getSearchPresenter();
+			presenter.setPlace((Search)place);
 			return presenter;
 		} else if (place instanceof WikiPlace) {
 			// wiki page
-			WikiPresenter presenter = ginjector.getWikiPresenter();
+			WikiPresenterProxy presenter = ginjector.getWikiPresenter();
 			presenter.setPlace((WikiPlace)place);
 			return presenter;
 		} else if(place instanceof Wiki){
-			SynapseWikiPresenter presenter = ginjector.getSynapseWikiPresenter();
+			SynapseWikiPresenterProxy presenter = ginjector.getSynapseWikiPresenter();
 			presenter.setPlace((Wiki)place);
 			return presenter;
 		} else {
