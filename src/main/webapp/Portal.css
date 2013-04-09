@@ -838,3 +838,7 @@ ol.lowerroman {
 .blackText {
 	color: #000000;
 }
+
+.pagesTree div{
+	padding-left:5px !important;
+}
