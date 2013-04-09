@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -21,11 +20,10 @@ import com.google.inject.Inject;
 public class DoiWidget implements Presenter {
 
 	public static final String DOI = "doi:";
-	public static final int REFRESH_TIME = 10 * 1000; //10 seconds
+	public static final int REFRESH_TIME = 13 * 1000; //13 seconds
 	private DoiWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private StackConfigServiceAsync stackConfigService;
 	
 	private Timer timer = null;
@@ -38,14 +36,12 @@ public class DoiWidget implements Presenter {
 	public DoiWidget(DoiWidgetView view,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
-			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState, 
 			StackConfigServiceAsync stackConfigService) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.stackConfigService = stackConfigService;
 	}
 	
@@ -77,7 +73,7 @@ public class DoiWidget implements Presenter {
 								configureDoi();
 							};
 						};
-						//schedule a timer to update the DOI status 10 seconds from now
+						//schedule a timer to update the DOI status later
 						timer.schedule(REFRESH_TIME);
 					};
 				} catch (JSONObjectAdapterException e) {							

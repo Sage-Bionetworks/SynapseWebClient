@@ -103,7 +103,7 @@ public class EntityMetadata implements Presenter {
 
 	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
 		this.bundle = bundle;
-		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit(), bundle.getPermissions().getCanEdit() && readOnly);
+		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit() && readOnly);
 		boolean showDetailedMetadata = false;
 		boolean showEntityName = false;
 		if (bundle.getEntity() instanceof FileEntity) {

@@ -246,7 +246,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, boolean canEdit, boolean readOnly) {
+	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
 		clear();
 
 		Entity e = bundle.getEntity();
@@ -291,7 +291,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		favoriteWidget.configure(bundle.getEntity().getId());
 
 		//TODO: uncomment to expose doi widget	
-//		if (canEdit)
+//		if (bundle.getPermissions().getCanEdit())
 //			doiWidget.configure(bundle.getEntity().getId(), versionNumber);
 	}
 
