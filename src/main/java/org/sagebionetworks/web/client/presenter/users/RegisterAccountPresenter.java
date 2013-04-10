@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.users.UserRegistration;
@@ -16,7 +17,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class RegisterAccountPresenter extends AbstractActivity implements RegisterAccountView.Presenter {
+public class RegisterAccountPresenter extends AbstractActivity implements RegisterAccountView.Presenter, Presenter<RegisterAccount> {
 	public static final String KEY_DATASETS_SELECTED_COLUMNS_COOKIE = "org.sagebionetworks.selected.dataset.columns";
 	
 	private RegisterAccount place;
@@ -49,6 +50,7 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
+	@Override
 	public void setPlace(RegisterAccount place) {
 		this.place = place;
 		view.setPresenter(this);

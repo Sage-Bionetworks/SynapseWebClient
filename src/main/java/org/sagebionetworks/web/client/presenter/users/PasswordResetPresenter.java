@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
@@ -24,7 +25,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 @SuppressWarnings("unused")
-public class PasswordResetPresenter extends AbstractActivity implements PasswordResetView.Presenter {
+public class PasswordResetPresenter extends AbstractActivity implements PasswordResetView.Presenter, Presenter<PasswordReset> {
 	public static final String REGISTRATION_TOKEN_PREFIX = "register_";
 	private PasswordReset place;	
 	private PasswordResetView view;
@@ -59,6 +60,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(PasswordReset place) {
 		this.place = place;
 		view.setPresenter(this);			

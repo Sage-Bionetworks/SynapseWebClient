@@ -39,7 +39,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class EntityPresenter extends AbstractActivity implements EntityView.Presenter {
+public class EntityPresenter extends AbstractActivity implements EntityView.Presenter, Presenter<Synapse> {
 		
 	private Synapse place;
 	private EntityView view;
@@ -74,6 +74,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(Synapse place) {
 		this.place = place;
 		this.view.setPresenter(this);		
