@@ -843,3 +843,12 @@ ol.lowerroman {
 .blackText {
 	color: #000000;
 }
+
+.pagesTree img{
+	padding-right:7px;
+}
+
+.pagesTree a{
+	font-family: Verdana,Arial,sans-serif;
+	font-size: 13px;
+}
