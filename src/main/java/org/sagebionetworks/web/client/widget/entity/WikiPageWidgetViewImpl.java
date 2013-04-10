@@ -144,14 +144,11 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		FlowPanel mainPanel = new FlowPanel();
 		mainPanel.addStyleName("span-"+spanWidth + " notopmargin");
 		mainPanel.add(getBreadCrumbs(spanWidth));
+		mainPanel.add(getCommands(canEdit));
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "span-"+spanWidth + " margin-top-5"));
 		mainPanel.add(wrapWidget(pagesBrowser.asWidget(), "span-"+spanWidth+" notopmargin margin-bottom-10"));
-		mainPanel.add(getCommands(canEdit));
 		add(mainPanel);
 		
-		SimplePanel bottomBarWrapper = new SimplePanel();
-		bottomBarWrapper.addStyleName("span-"+spanWidth + " margin-top-5 margin-bottom-10 separator");
-		add(bottomBarWrapper);
 		layout(true);
 	}
 	
@@ -184,7 +181,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private SimplePanel getCommands(Boolean canEdit) {
 		if (commandBarWrapper == null) {
 			commandBarWrapper = new SimplePanel();
-			commandBarWrapper.addStyleName("span-"+spanWidth + " notopmargin");
+			commandBarWrapper.addStyleName("margin-bottom-20 span-"+spanWidth);
 			commandBar = new HorizontalPanel();
 			commandBar.setVerticalAlign(VerticalAlignment.MIDDLE);
 			commandBar.setHorizontalAlign(HorizontalAlignment.LEFT);
