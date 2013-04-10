@@ -18,6 +18,8 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -57,10 +59,12 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
+import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.provenance.UsedURL;
 import org.sagebionetworks.repo.model.storage.StorageUsage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -669,4 +673,30 @@ public class SynapseClientImplTest {
 		verify(mockSynapse, Mockito.times(0)).createAccessRequirement(any(AccessRequirement.class));
 	}
 
+	@Test
+	public void testGetChunkedFileToken() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		String fileName = "test file.zip";
+		Long chunkNumber = 222l;
+		String contentType = "application/test";
+		ChunkedFileToken testToken = new ChunkedFileToken();
+		testToken.setFileName(fileName);
+		testToken.setKey("a key 42");
+		testToken.setUploadId("upload ID 123");
+		when(mockSynapse.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class))).thenReturn(testToken);
+		
+		String requestJson = synapseClient.getChunkedFileToken(fileName, contentType, chunkNumber);
+		ChunkRequest request = EntityFactory.createEntityFromJSONString(requestJson, ChunkRequest.class);
+		verify(mockSynapse).createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class));
+		assertEquals(testToken, request.getChunkedFileToken());
+		assertEquals(chunkNumber, request.getChunkNumber());
+	}
+	
+	@Test
+	public void testGetChunkedPresignedUrl() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		URL testUrl = new URL("http://test.presignedurl.com/foo");
+		when(mockSynapse.createChunkedPresignedUrl(any(ChunkRequest.class))).thenReturn(testUrl);
+		String presignedUrl = synapseClient.getChunkedPresignedUrl(getTestChunkRequestJson());
+		verify(mockSynapse).createChunkedPresignedUrl(any(ChunkRequest.class));
+		assertEquals(testUrl.toString(), presignedUrl);
+	}
 }
