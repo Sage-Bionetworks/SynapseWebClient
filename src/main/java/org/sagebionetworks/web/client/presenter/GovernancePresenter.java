@@ -9,7 +9,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class GovernancePresenter extends AbstractActivity implements GovernanceView.Presenter {
+public class GovernancePresenter extends AbstractActivity implements GovernanceView.Presenter, Presenter<Governance> {
 		
 	private Governance place;
 	private GovernanceView view;
@@ -30,6 +30,7 @@ public class GovernancePresenter extends AbstractActivity implements GovernanceV
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(Governance place) {
 		this.place = place;
 		this.view.setPresenter(this);

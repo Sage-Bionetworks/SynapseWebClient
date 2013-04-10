@@ -22,7 +22,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class ProjectsHomePresenter extends AbstractActivity implements ProjectsHomeView.Presenter {
+public class ProjectsHomePresenter extends AbstractActivity implements ProjectsHomeView.Presenter, Presenter<ProjectsHome>{
 		
 	private ProjectsHome place;
 	private ProjectsHomeView view;
@@ -56,6 +56,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(ProjectsHome place) {
 		this.place = place;
 		view.setPresenter(this);
