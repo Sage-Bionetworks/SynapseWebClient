@@ -9,13 +9,13 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.internal.util.MockUtil;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
+import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.activity.shared.Activity;
@@ -31,7 +31,7 @@ public class AppActivityMapperTest {
 	
 	PortalGinInjector mockInjector;
 	AuthenticationController mockController;
-	HomePresenter mockAll;
+	PresenterProxy<HomePresenter, Home> mockAll;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	
@@ -52,7 +52,7 @@ public class AppActivityMapperTest {
 		when(mockSynapseJSNIUtils.getCurrentHistoryToken()).thenReturn(historyToken);
 		
 		// Home
-		mockAll = Mockito.mock(HomePresenter.class);
+		mockAll = Mockito.mock(PresenterProxy.class);
 		when(mockInjector.getHomePresenter()).thenReturn(mockAll);
 		// Global App State
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
@@ -74,7 +74,6 @@ public class AppActivityMapperTest {
 		AppActivityMapper mapper = new AppActivityMapper(mockInjector, mockSynapseJSNIUtils);
 		Activity object = mapper.getActivity(unknownPlace);
 		assertNotNull(object);
-		assertTrue(object instanceof HomePresenter);
 		
 		// Validate that the place was set.
 		verify(mockAll).setPlace((Home) anyObject());

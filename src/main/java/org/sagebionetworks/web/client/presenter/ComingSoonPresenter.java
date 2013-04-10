@@ -37,7 +37,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class ComingSoonPresenter extends AbstractActivity implements ComingSoonView.Presenter {
+public class ComingSoonPresenter extends AbstractActivity implements ComingSoonView.Presenter, Presenter<ComingSoon> {
 		
 	private ComingSoon place;
 	private ComingSoonView view;
@@ -73,6 +73,7 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(ComingSoon place) {
 		this.place = place;
 		this.view.setPresenter(this);
