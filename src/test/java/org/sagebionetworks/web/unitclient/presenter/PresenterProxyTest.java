@@ -53,7 +53,7 @@ public class PresenterProxyTest {
 		verify(mockPresenter, times(0)).setPlace(any(Home.class));
 		// Now set the place on the proxy
 		presenterProxy.start(mockPanel, mockEventBus);
-		// verity everything was passed along
+		// Verify everything was passed along
 		verify(mockPresenter, times(1)).setPlace(place);
 		verify(mockPresenter, times(1)).start(mockPanel, mockEventBus);
 	}

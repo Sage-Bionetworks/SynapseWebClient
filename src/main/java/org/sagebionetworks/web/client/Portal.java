@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 
+import com.amazonaws.services.cloudformation.model.OnFailure;
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -51,32 +52,36 @@ public class Portal implements EntryPoint {
 
 				@Override
 				public void onSuccess() {
-					EventBus eventBus = ginjector.getEventBus();
-				    PlaceController placeController = new PlaceController(eventBus);
-				    
-					// Start ActivityManager for the main widget with our ActivityMapper
-					AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl());
-					ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
-					activityManager.setDisplay(appWidget);
-					
-					// All pages get added to the root panel
-					appWidget.addStyleName("rootPanel");
-			
-					// Start PlaceHistoryHandler with our PlaceHistoryMapper
-					AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
-					PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
-					historyHandler.register(placeController, eventBus, activityMapper.getDefaultPlace());
-			
-					RootPanel.get("rootPanel").add(appWidget);
-			
-					GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
-				    globalApplicationState.setPlaceController(placeController);
-				    globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
-				    globalApplicationState.setActivityMapper(activityMapper);
-			
-					// Goes to place represented on URL or default place
-				    historyHandler.handleCurrentHistory();
-					loading.hide();
+					try {
+						EventBus eventBus = ginjector.getEventBus();
+						PlaceController placeController = new PlaceController(eventBus);
+						
+						// Start ActivityManager for the main widget with our ActivityMapper
+						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl());
+						ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
+						activityManager.setDisplay(appWidget);
+						
+						// All pages get added to the root panel
+						appWidget.addStyleName("rootPanel");
+
+						// Start PlaceHistoryHandler with our PlaceHistoryMapper
+						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
+						PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
+						historyHandler.register(placeController, eventBus, activityMapper.getDefaultPlace());
+
+						RootPanel.get("rootPanel").add(appWidget);
+
+						GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
+						globalApplicationState.setPlaceController(placeController);
+						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
+						globalApplicationState.setActivityMapper(activityMapper);
+
+						// Goes to place represented on URL or default place
+						historyHandler.handleCurrentHistory();
+						loading.hide();
+					} catch (Throwable e) {
+						onFailure(e);
+					}
 				}
 			});
 			
