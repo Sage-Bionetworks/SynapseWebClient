@@ -189,4 +189,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 		return fileToUploadElement.files[0].type;
 	}-*/;
+	
+	@Override
+	public double getFileSize(String fileFieldId) {
+		return _getFileSize(fileFieldId);
+	}
+	private final static native double _getFileSize(String fileFieldId) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		return fileToUploadElement.files[0].size;
+	}-*/;
 }
