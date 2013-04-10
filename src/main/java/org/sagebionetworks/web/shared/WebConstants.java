@@ -1,11 +1,6 @@
 package org.sagebionetworks.web.shared;
-import java.util.Iterator;
 
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.sagebionetworks.repo.model.util.ModelConstants;
-import org.sagebionetworks.web.client.DisplayConstants;
 
 
 /**
@@ -82,39 +77,6 @@ public class WebConstants {
 
 	public static final int MAX_COLUMNS_IN_GRID = 100;
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
-	public static void resolveAttachmentImages(Document doc, String attachmentUrl) {
-		Elements images = doc.select("img");
-		for (Iterator iterator = images.iterator(); iterator.hasNext();) {
-			Element img = (Element) iterator.next();
-			String src = img.attr("src");
-			if (src.startsWith(DisplayConstants.ENTITY_DESCRIPTION_ATTACHMENT_PREFIX)){
-		    	String[] tokens = src.split("/");
-		    	if (tokens.length > 5) {
-			        String entityId = tokens[2];
-				    String tokenId = tokens[4] +"/"+ tokens[5];
-				    img.attr("src", WebConstants.createAttachmentUrl(attachmentUrl, entityId, tokenId, tokenId,WebConstants.ENTITY_PARAM_KEY));
-		    	}
-			}
-		}
-	}
-	/**
-	 * Create the url to an attachment image.
-	 * @param baseURl
-	 * @param id
-	 * @param tokenId
-	 * @param fileName
-	 * @return
-	 */
-	public static String createAttachmentUrl(String baseURl, String id, String tokenId, String fileName, String paramKey){
-	        StringBuilder builder = new StringBuilder();
-	        builder.append(baseURl);
-	        builder.append("?"+paramKey+"=");
-	        builder.append(id);
-	        builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
-	        builder.append(tokenId);
-	        builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
-	        return builder.toString();
-	}
 	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
 
 	public static final String DIV_ID_WIDGET_PREFIX = "widget_";

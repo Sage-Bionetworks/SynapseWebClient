@@ -13,6 +13,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -170,6 +171,42 @@ public class ServerMarkdownUtils {
 		elements.attr("target", "_blank");
 	}
 
+
+	public static void resolveAttachmentImages(Document doc, String attachmentUrl) {
+		Elements images = doc.select("img");
+		for (Iterator iterator = images.iterator(); iterator.hasNext();) {
+			Element img = (Element) iterator.next();
+			String src = img.attr("src");
+			if (src.startsWith(DisplayConstants.ENTITY_DESCRIPTION_ATTACHMENT_PREFIX)){
+		    	String[] tokens = src.split("/");
+		    	if (tokens.length > 5) {
+			        String entityId = tokens[2];
+				    String tokenId = tokens[4] +"/"+ tokens[5];
+				    img.attr("src", ServerMarkdownUtils.createAttachmentUrl(attachmentUrl, entityId, tokenId, tokenId,WebConstants.ENTITY_PARAM_KEY));
+		    	}
+			}
+		}
+	}
+
+	/**
+	 * Create the url to an attachment image.
+	 * @param baseURl
+	 * @param id
+	 * @param tokenId
+	 * @param fileName
+	 * @return
+	 */
+	public static String createAttachmentUrl(String baseURl, String id, String tokenId, String fileName, String paramKey){
+	        StringBuilder builder = new StringBuilder();
+	        builder.append(baseURl);
+	        builder.append("?"+paramKey+"=");
+	        builder.append(id);
+	        builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
+	        builder.append(tokenId);
+	        builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
+	        return builder.toString();
+	}
+	
 	public static String resolveTables(String rawMarkdown) {
 		//find all tables, and replace the raw text with html table
 		String regEx = ".*[|]{1}.+[|]{1}.*";
@@ -287,5 +324,4 @@ public class ServerMarkdownUtils {
 		sb.append("</div>");
 	    return sb.toString();
 	}
-
 }
