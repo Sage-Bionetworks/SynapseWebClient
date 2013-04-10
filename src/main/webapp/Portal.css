@@ -645,6 +645,10 @@ h1, h2, h3, h4, h5, h6 {
 	color: #000000;
 }
 
+.markdown p {
+	margin: 0px;
+}
+
 .markdown table {
   border: 1px solid #dddddd;
   border-collapse: separate;
