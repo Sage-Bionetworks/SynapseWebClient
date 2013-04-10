@@ -135,25 +135,28 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private void showDefaultViewWithWiki() {
 		removeAll(true);
 		SimplePanel topBarWrapper = new SimplePanel();
-		topBarWrapper.addStyleName("span-"+spanWidth + " margin-top-5");
-		HorizontalPanel topBar = new HorizontalPanel();
+		String hrString = isEmbeddedInOwnerPage ? "separator" : "";
+		topBarWrapper.addStyleName("span-"+spanWidth + " margin-top-5 " + hrString);
 		String titleString = isEmbeddedInOwnerPage ? "" : currentPage.getTitle();
-		topBar.add(new HTMLPanel("<h2 class=\"span-"+(spanWidth-5)+"\" style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
-		topBar.add(getCommands(canEdit));
-		topBarWrapper.add(topBar);
+		topBarWrapper.add(new HTMLPanel("<h2 class=\"span-"+(spanWidth-5)+"\" style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
 		add(topBarWrapper);
 		
 		FlowPanel mainPanel = new FlowPanel();
 		mainPanel.addStyleName("span-"+spanWidth + " notopmargin");
 		mainPanel.add(getBreadCrumbs(spanWidth));
-		SimplePanel mdWidgetWrapper = new SimplePanel();
-		mdWidgetWrapper.addStyleName("span-"+spanWidth);
-		mdWidgetWrapper.add(markdownWidget.asWidget());
-		mainPanel.add(mdWidgetWrapper);
-		mainPanel.add(pagesBrowser.asWidget());
-		
+		mainPanel.add(getCommands(canEdit));
+		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "span-"+spanWidth + " margin-top-5"));
+		mainPanel.add(wrapWidget(pagesBrowser.asWidget(), "span-"+spanWidth+" notopmargin margin-bottom-10"));
 		add(mainPanel);
+		
 		layout(true);
+	}
+	
+	private SimplePanel wrapWidget(Widget widget, String styleNames) {
+		SimplePanel widgetWrapper = new SimplePanel();
+		widgetWrapper.addStyleName(styleNames);
+		widgetWrapper.add(widget);
+		return widgetWrapper;
 	}
 	
 	private Widget getBreadCrumbs(int spanWidth) {
@@ -178,10 +181,10 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private SimplePanel getCommands(Boolean canEdit) {
 		if (commandBarWrapper == null) {
 			commandBarWrapper = new SimplePanel();
-			commandBarWrapper.addStyleName("span-3 notopmargin");
+			commandBarWrapper.addStyleName("margin-bottom-20 span-"+spanWidth);
 			commandBar = new HorizontalPanel();
 			commandBar.setVerticalAlign(VerticalAlignment.MIDDLE);
-			commandBar.setHorizontalAlign(HorizontalAlignment.RIGHT);
+			commandBar.setHorizontalAlign(HorizontalAlignment.LEFT);
 			commandBarWrapper.add(commandBar);
 		}
 			
