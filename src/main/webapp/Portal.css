@@ -80,6 +80,11 @@
 	padding: 10px;
 }
 
+.mainPageLoading {
+	border: 0;
+	padding: 10px;
+}
+
 .boldRight {
 	text-align: left;
 	width: 100px;

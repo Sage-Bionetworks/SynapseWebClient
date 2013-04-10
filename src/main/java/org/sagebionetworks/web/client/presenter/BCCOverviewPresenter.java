@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class BCCOverviewPresenter extends AbstractActivity implements BCCOverviewView.Presenter {
+public class BCCOverviewPresenter extends AbstractActivity implements BCCOverviewView.Presenter, Presenter<BCCOverview> {
 		
 	private BCCOverview place;
 	private BCCOverviewView view;
@@ -51,6 +51,7 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(BCCOverview place) {
 		this.place = place;
 		this.view.setPresenter(this);

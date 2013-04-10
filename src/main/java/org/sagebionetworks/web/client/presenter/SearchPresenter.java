@@ -40,7 +40,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class SearchPresenter extends AbstractActivity implements SearchView.Presenter {
+public class SearchPresenter extends AbstractActivity implements SearchView.Presenter, Presenter<Search> {
 	
 	//private final List<String> FACETS_DEFAULT = Arrays.asList(new String[] {"node_type","disease","species","tissue","platform","num_samples","created_by","modified_by","created_on","modified_on","acl","reference"});
 	
@@ -89,6 +89,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(Search place) {
 		this.place = place;
 		view.setPresenter(this);
