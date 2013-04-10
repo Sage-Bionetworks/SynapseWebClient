@@ -232,31 +232,12 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		return PaginationUtil.getPagination(nResults.intValue(), start.intValue(), nPerPage, nPagesToShow);
 	}
 
-//	public Place getRedirect() {
-//		return redirect;
-//	}
-
 	@Override
 	public ImageResource getIconForHit(Hit hit) {
 		if(hit == null) return null;
 		EntityType type = entityTypeProvider.getEntityTypeForString(hit.getNode_type());
 		return DisplayUtils.getSynapseIconForEntityType(type, DisplayUtils.IconSize.PX24, iconsImageBundle);
 	}
-
-	
-	/*
-	 * Private Methods
-	 */
-
-//	public static boolean willRedirect(String queryTerm) {
-//		if(queryTerm.startsWith(DisplayUtils.SYNAPSE_ID_PREFIX)) {
-//			String remainder = queryTerm.replaceFirst(DisplayUtils.SYNAPSE_ID_PREFIX, "");
-//			if(remainder.matches("^[0-9]+$")) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
 	
 	@Override
 	public String getCurrentSearchJSON() {
