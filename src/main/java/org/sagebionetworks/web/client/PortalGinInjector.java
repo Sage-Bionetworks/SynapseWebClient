@@ -1,11 +1,26 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.web.client.place.BCCOverview;
+import org.sagebionetworks.web.client.place.ComingSoon;
+import org.sagebionetworks.web.client.place.Governance;
+import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.ProjectsHome;
+import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.Settings;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.place.WikiPlace;
+import org.sagebionetworks.web.client.place.users.PasswordReset;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
@@ -21,8 +36,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
@@ -59,37 +74,35 @@ public interface PortalGinInjector extends Ginjector {
 
 	public GlobalApplicationState getGlobalApplicationState();
 	
-	public HomePresenter getHomePresenter();
+	public PresenterProxy<HomePresenter, Home> getHomePresenter();
 
-	public EntityPresenter getEntityPresenter();
+	public PresenterProxy<EntityPresenter, Synapse> getEntityPresenter();
 	
-	public ProjectsHomePresenter getProjectsHomePresenter();
+	public PresenterProxy<ProjectsHomePresenter, ProjectsHome> getProjectsHomePresenter();
 	
-	public LoginPresenter getLoginPresenter();
+	public PresenterProxy<LoginPresenter, LoginPlace> getLoginPresenter();
 	
 	public AuthenticationController getAuthenticationController();
 	
-	public PasswordResetPresenter getPasswordResetPresenter();
+	public PresenterProxy<PasswordResetPresenter, PasswordReset> getPasswordResetPresenter();
 	
-	public RegisterAccountPresenter getRegisterAccountPresenter();
+	public PresenterProxy<RegisterAccountPresenter, RegisterAccount> getRegisterAccountPresenter();
 
-	public ProfilePresenter getProfilePresenter();
+	public PresenterProxy<ProfilePresenter, Profile> getProfilePresenter();
 
-	public SettingsPresenter getSettingsPresenter();
+	public PresenterProxy<SettingsPresenter, Settings> getSettingsPresenter();
 	
-	public ComingSoonPresenter getComingSoonPresenter();
+	public PresenterProxy<ComingSoonPresenter, ComingSoon> getComingSoonPresenter();
 	
-	public BCCOverviewPresenter getBCCOverviewPresenter();
+	public PresenterProxy<BCCOverviewPresenter, BCCOverview> getBCCOverviewPresenter();
 	
-	public GovernancePresenter getGovernancePresenter();
+	public PresenterProxy<GovernancePresenter, Governance> getGovernancePresenter();
 	
-	public SearchPresenter getSearchPresenter();
+	public PresenterProxy<SearchPresenter, Search> getSearchPresenter();
 	
-	public SynapseWikiPresenter getSynapseWikiPresenter();
+	public PresenterProxy<SynapseWikiPresenter, Wiki> getSynapseWikiPresenter();
 	
-	public BCCSignup getBCCSignup();
-	
-	public WikiPresenter getWikiPresenter();
+	public PresenterProxy<WikiPresenter, WikiPlace> getWikiPresenter();
 	
 	public EventBus getEventBus();
 	

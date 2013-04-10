@@ -33,7 +33,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter {
+public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 		
 	private Profile place;
 	private ProfileView view;
@@ -79,6 +79,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		
 	}
 
+	@Override
 	public void setPlace(Profile place) {
 		this.place = place;
 		this.view.setPresenter(this);

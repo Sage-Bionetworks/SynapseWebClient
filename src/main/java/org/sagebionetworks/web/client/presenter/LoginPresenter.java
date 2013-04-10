@@ -29,7 +29,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class LoginPresenter extends AbstractActivity implements LoginView.Presenter {
+public class LoginPresenter extends AbstractActivity implements LoginView.Presenter, Presenter<LoginPlace> {
 
 	private LoginPlace loginPlace;
 	private LoginView view;
@@ -66,6 +66,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	public static final String LOGIN_PLACE  = "LoginPlace";
 
+	@Override
 	public void setPlace(final LoginPlace place) {
 		this.loginPlace = place;
 		view.setPresenter(this);
