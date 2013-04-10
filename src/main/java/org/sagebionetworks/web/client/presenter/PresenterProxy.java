@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.AsyncProvider;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -17,7 +18,7 @@ import com.google.inject.Inject;
  * @param <P> - Presenter
  * @param <T> - The Presenter's place
  */
-public class PresenterProxy<P extends Presenter<T>,T> extends AbstractActivity {
+public class PresenterProxy<P extends Presenter<T>,T extends Place> extends AbstractActivity {
 	
 	AsyncProvider<P> provider;
 	T place;

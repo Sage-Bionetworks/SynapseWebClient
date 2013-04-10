@@ -130,7 +130,7 @@ public class SearchPresenterTest {
 	public void testSetPlaceSynapseIdPrefix() throws Exception {
 		// test for a word with the prefix and is a synapse ID
 		String term = DisplayUtils.SYNAPSE_ID_PREFIX + "1234567890"; // # 'syn1234567890'
-		assertEquals(SearchUtil.willRedirect(new Search(term)), new Synapse(term)); 
+		assertEquals(new Synapse(term), SearchUtil.willRedirect(new Search(term))); 
 	}
 
 	@Test 
