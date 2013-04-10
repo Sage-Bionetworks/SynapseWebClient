@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -135,16 +136,16 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public String getDefaultUploadActionUrl(boolean isRestricted) {
 		isUploadRestricted = isRestricted;
 		boolean isFileEntity = entity == null || entity instanceof FileEntity;
-		String entityParentString = entity==null && parentEntityId != null ? DisplayUtils.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY + "=" + parentEntityId + "&": "";
-		String entityIdString = entity != null ? DisplayUtils.ENTITY_PARAM_KEY + "=" + entity.getId() + "&" : "";
+		String entityParentString = entity==null && parentEntityId != null ? WebConstants.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY + "=" + parentEntityId + "&": "";
+		String entityIdString = entity != null ? WebConstants.ENTITY_PARAM_KEY + "=" + entity.getId() + "&" : "";
 		String uploadUrl = isFileEntity ? 
 				//new way
-				synapseJsniUtils.getBaseFileHandleUrl() + "?" + DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted + "&" +
-						DisplayUtils.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY  + "=" + Boolean.toString(entity == null) + "&" + entityParentString + entityIdString: 
+				synapseJsniUtils.getBaseFileHandleUrl() + "?" + WebConstants.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted + "&" +
+						WebConstants.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY  + "=" + Boolean.toString(entity == null) + "&" + entityParentString + entityIdString: 
 				//old way
 				gwt.getModuleBaseURL() + "upload" + "?" + 
 					entityIdString +
-					DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
+					WebConstants.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
 		return uploadUrl;
 	}
 	

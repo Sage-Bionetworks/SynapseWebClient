@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -457,7 +458,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 pictureCanvasContainer.setVisible(true);
 		 
 		 String userId = profile.getOwnerId();
-		 final String actionUrl =  synapseJSNIUtils.getBaseProfileAttachmentUrl()+ "?" + DisplayUtils.USER_PROFILE_PARAM_KEY + "=" + userId;
+		 final String actionUrl =  synapseJSNIUtils.getBaseProfileAttachmentUrl()+ "?" + WebConstants.USER_PROFILE_PARAM_KEY + "=" + userId;
 		 if (editPhotoHandler != null)
 			 editPhotoHandler.removeHandler();
 		 editPhotoHandler = editPhotoLink.addClickHandler(new ClickHandler() {

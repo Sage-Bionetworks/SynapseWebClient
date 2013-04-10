@@ -1,5 +1,11 @@
 package org.sagebionetworks.web.shared;
+import java.util.Iterator;
+
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.sagebionetworks.repo.model.util.ModelConstants;
+import org.sagebionetworks.web.client.DisplayConstants;
 
 
 /**
@@ -76,4 +82,82 @@ public class WebConstants {
 
 	public static final int MAX_COLUMNS_IN_GRID = 100;
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
+	public static void resolveAttachmentImages(Document doc, String attachmentUrl) {
+		Elements images = doc.select("img");
+		for (Iterator iterator = images.iterator(); iterator.hasNext();) {
+			Element img = (Element) iterator.next();
+			String src = img.attr("src");
+			if (src.startsWith(DisplayConstants.ENTITY_DESCRIPTION_ATTACHMENT_PREFIX)){
+		    	String[] tokens = src.split("/");
+		    	if (tokens.length > 5) {
+			        String entityId = tokens[2];
+				    String tokenId = tokens[4] +"/"+ tokens[5];
+				    img.attr("src", WebConstants.createAttachmentUrl(attachmentUrl, entityId, tokenId, tokenId,WebConstants.ENTITY_PARAM_KEY));
+		    	}
+			}
+		}
+	}
+	/**
+	 * Create the url to an attachment image.
+	 * @param baseURl
+	 * @param id
+	 * @param tokenId
+	 * @param fileName
+	 * @return
+	 */
+	public static String createAttachmentUrl(String baseURl, String id, String tokenId, String fileName, String paramKey){
+	        StringBuilder builder = new StringBuilder();
+	        builder.append(baseURl);
+	        builder.append("?"+paramKey+"=");
+	        builder.append(id);
+	        builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
+	        builder.append(tokenId);
+	        builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
+	        return builder.toString();
+	}
+	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
+
+	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
+
+	public static final String PROXY_PARAM_KEY = "proxy";
+
+	public static final String ENTITY_PARENT_ID_KEY = "parentId";
+
+	public static final String ENTITY_EULA_ID_KEY = "eulaId";
+
+	public static final String ENTITY_PARAM_KEY = "entityId";
+
+	public static final String ENTITY_VERSION_PARAM_KEY = "version";
+
+	public static final String WIKI_OWNER_ID_PARAM_KEY = "ownerId";
+
+	public static final String WIKI_OWNER_TYPE_PARAM_KEY = "ownerType";
+
+	public static final String WIKI_ID_PARAM_KEY = "wikiId";
+
+	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
+
+	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
+
+	public static final String FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY = "createFileEntity";
+
+	public static final String FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY = "fileEntityParentId";
+
+	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
+
+	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
+
+	public static final String USER_PROFILE_PARAM_KEY = "userId";
+
+	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
+
+	public static final String WAIT_FOR_URL = "waitForUrl";
+
+	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "createdByPrincipalId";
+
+	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
+
+	public static final String ETAG_KEY = "etag";
+
+	public static final String ENTITY_VERSION_STRING = "/version/";
 }

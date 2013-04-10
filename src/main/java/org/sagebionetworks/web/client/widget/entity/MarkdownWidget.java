@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -89,10 +90,10 @@ public class MarkdownWidget extends LayoutContainer {
 	 * @throws JSONObjectAdapterException 
 	 */
 	public static void loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, boolean isWiki, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, IconsImageBundle iconsImageBundle, Boolean isPreview) throws JSONObjectAdapterException {
-		final String suffix = isPreview ? DisplayConstants.DIV_ID_PREVIEW_SUFFIX : "";
+		final String suffix = isPreview ? WebConstants.DIV_ID_PREVIEW_SUFFIX : "";
 		//look for every element that has the right format
 		int i = 0;
-		String currentWidgetDiv = DisplayConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+		String currentWidgetDiv = WebConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 		Element el = panel.getElementById(currentWidgetDiv);
 		while (el != null) {
 				//based on the contents of the element, create the correct widget descriptor and renderer
@@ -116,7 +117,7 @@ public class MarkdownWidget extends LayoutContainer {
 				}
 			
 			i++;
-			currentWidgetDiv = DisplayConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+			currentWidgetDiv = WebConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 			el = panel.getElementById(currentWidgetDiv);
 		}
 	}

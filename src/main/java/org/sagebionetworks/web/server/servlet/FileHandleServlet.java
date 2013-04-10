@@ -37,9 +37,9 @@ import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.shared.EntityUtil;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.common.io.Files;
 import com.google.inject.Inject;
@@ -118,21 +118,21 @@ public class FileHandleServlet extends HttpServlet {
 		String token = getSessionToken(request);
 		Synapse client = createNewClient(token);
 		boolean isProxy = false;
-		String proxy = request.getParameter(DisplayUtils.PROXY_PARAM_KEY);
+		String proxy = request.getParameter(WebConstants.PROXY_PARAM_KEY);
 		if (proxy != null)
 			isProxy = Boolean.parseBoolean(proxy);
 		
-		String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
-		String entityVersion = request.getParameter(DisplayUtils.ENTITY_VERSION_PARAM_KEY);
+		String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
+		String entityVersion = request.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY);
 		
-		String ownerId = request.getParameter(DisplayUtils.WIKI_OWNER_ID_PARAM_KEY);
-		String ownerType = request.getParameter(DisplayUtils.WIKI_OWNER_TYPE_PARAM_KEY);
-		String fileName = request.getParameter(DisplayUtils.WIKI_FILENAME_PARAM_KEY);
-		Boolean isPreview = Boolean.parseBoolean(request.getParameter(DisplayUtils.FILE_HANDLE_PREVIEW_PARAM_KEY));
+		String ownerId = request.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY);
+		String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
+		String fileName = request.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY);
+		Boolean isPreview = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY));
 		URL resolvedUrl = null;
 		if (ownerId != null && ownerType != null) {
 			ObjectType type = ObjectType.valueOf(ownerType);
-			String wikiId = request.getParameter(DisplayUtils.WIKI_ID_PARAM_KEY);
+			String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
 			WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
 
 			// Redirect the user to the temp preview url
@@ -224,15 +224,15 @@ public class FileHandleServlet extends HttpServlet {
 
 			//and update the wiki page (if the wiki key info was given as parameters) or FileEntity (if entity id was given)
 			if (newFileHandle != null) {
-				entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
-				Boolean isCreateEntity = Boolean.parseBoolean(request.getParameter(DisplayUtils.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY));
-				String ownerId = request.getParameter(DisplayUtils.WIKI_OWNER_ID_PARAM_KEY);
-				String ownerType = request.getParameter(DisplayUtils.WIKI_OWNER_TYPE_PARAM_KEY);
+				entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
+				Boolean isCreateEntity = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY));
+				String ownerId = request.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY);
+				String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
 				FileEntity fileEntity = null;
 				
 				if (ownerId != null && ownerType != null) {
 					ObjectType type = ObjectType.valueOf(ownerType);
-					String wikiId = request.getParameter(DisplayUtils.WIKI_ID_PARAM_KEY);
+					String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
 					WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
 					WikiPage page = client.getWikiPage(properKey);
 					List<String> fileHandleIds = page.getAttachmentFileHandleIds();
@@ -242,7 +242,7 @@ public class FileHandleServlet extends HttpServlet {
 				}
 				else if (isCreateEntity) {
 					//create the file entity
-					String parentEntityId = request.getParameter(DisplayUtils.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY);
+					String parentEntityId = request.getParameter(WebConstants.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY);
 					fileEntity = getNewFileEntity(parentEntityId, newFileHandle.getId(), client);
 					entityId = fileEntity.getId();
 				}
@@ -255,7 +255,7 @@ public class FileHandleServlet extends HttpServlet {
 				}
 				
 				if (fileEntity != null) {
-					String restrictedParam = request.getParameter(DisplayUtils.IS_RESTRICTED_PARAM_KEY);
+					String restrictedParam = request.getParameter(WebConstants.IS_RESTRICTED_PARAM_KEY);
 					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
 					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
 					fixNameAndLockDown(fileEntity, newFileHandle, isRestricted, client);
