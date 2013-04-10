@@ -171,8 +171,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						fireCancelEvent();
 					}
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					view.showErrorMessage(e.getMessage());
 				}
 			}
 			view.submitForm();
@@ -424,6 +423,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	private void fireCancelEvent(){
+		view.hideLoading();
 		handlerManager.fireEvent(new CancelEvent());
 	}
 	

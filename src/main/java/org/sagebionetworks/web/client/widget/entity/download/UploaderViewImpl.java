@@ -290,9 +290,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
 					return;
 				}
-				
-				formPanel.add(progressBar);
-				formPanel.layout(true);
+				progressBar.setVisible(true);
 								
 				// this is used in the 'handleEvent' listener, but must
 				// be created in the original thread.  for more, see
@@ -304,14 +302,16 @@ public class UploaderViewImpl extends LayoutContainer implements
 			}
 		};
 		uploadBtn.addSelectionListener(uploadListener);
+		progressBar.setVisible(false);
+		formPanel.add(progressBar);
 		formPanel.addButton(uploadBtn);
 		formPanel.layout(true);
 	}
 	
 	@Override
 	public void hideLoading() {
-		formPanel.remove(progressBar);
-		formPanel.layout(true);
+		//try to hide the loading progress bar.  ignore any errors
+		progressBar.setVisible(false);
 	}
 	
 	@Override
@@ -428,7 +428,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.layout(true);
 		
 		progressBar.auto();
-		progressBar.updateText(DisplayConstants.LABEL_UPLOADING);					
+		progressBar.updateText(DisplayConstants.LABEL_UPLOADING);
+		progressBar.setWidth(PANEL_WIDTH - 30);
 								
 		formPanel.layout(true);
 		
