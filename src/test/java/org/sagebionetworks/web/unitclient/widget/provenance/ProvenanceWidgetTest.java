@@ -396,6 +396,11 @@ public class ProvenanceWidgetTest {
 				// TODO Auto-generated method stub
 				
 			}
+			@Override
+			public double getFileSize(String fileFieldId) {
+				// TODO Auto-generated method stub
+				return 0;
+			}
 		};
 	}
 
