@@ -320,8 +320,6 @@ public class DisplayConstants {
 	public static final String ENTITY = "Entity";
 	public static final String LOADING = "Loading";
 	public static final String ACTIVITY = "Activity";
-	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
-	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
 	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	public static final String ERROR_WIDGET_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, hypens, periods, plus signs, and parentheses.";
 

@@ -132,7 +132,7 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 		//The wiki file handle way, or the old way?
 		String actionUrl;
 		String baseURl = GWT.getModuleBaseURL()+"attachment";
-		actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + wikiKey.getOwnerObjectId();
+		actionUrl =  baseURl+ "?" + WebConstants.ENTITY_PARAM_KEY + "=" + wikiKey.getOwnerObjectId();
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(actionUrl,sageImageBundle,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,25,new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
