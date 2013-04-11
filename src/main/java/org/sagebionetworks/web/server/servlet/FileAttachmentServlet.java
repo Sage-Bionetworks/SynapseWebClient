@@ -26,7 +26,7 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
 
@@ -102,9 +102,9 @@ public class FileAttachmentServlet extends HttpServlet {
 
 		// Now get the signed url
 		Synapse client = createNewClient(token);
-		String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
-		String tokenId = request.getParameter(DisplayUtils.TOKEN_ID_PARAM_KEY);
-		String waitString = request.getParameter(DisplayUtils.WAIT_FOR_URL);
+		String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
+		String tokenId = request.getParameter(WebConstants.TOKEN_ID_PARAM_KEY);
+		String waitString = request.getParameter(WebConstants.WAIT_FOR_URL);
 		boolean wait=false;
 		if(waitString != null){
 			wait = Boolean.parseBoolean(waitString);
@@ -152,7 +152,7 @@ public class FileAttachmentServlet extends HttpServlet {
 			// Connect to syanpse
 			Synapse client = createNewClient(token);
 			// get Entity and store file in location
-			String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
+			String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 			FileItemIterator iter = upload.getItemIterator(request);
 			AttachmentData data = null;
 			while (iter.hasNext()) {
