@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.EntityUtil;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.common.io.Files;
 import com.google.inject.Inject;
@@ -89,7 +90,7 @@ public class FileUpload extends HttpServlet {
         try{ 
 			FileItemIterator fileItemIterator = upload.getItemIterator(request);
 
-			String entityId = request.getParameter(DisplayUtils.ENTITY_PARAM_KEY);
+			String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 			String makeAttachment=null;
 			Synapse synapseClient=null;
 			Entity locationable=null;
@@ -100,11 +101,11 @@ public class FileUpload extends HttpServlet {
 						return UserDataProvider.getThreadLocalUserToken(request);
 					}
 				};
-				makeAttachment = request.getParameter(DisplayUtils.MAKE_ATTACHMENT_PARAM_KEY);
+				makeAttachment = request.getParameter(WebConstants.MAKE_ATTACHMENT_PARAM_KEY);
 				synapseClient = ServiceUtils.createSynapseClient(synapseProvider, urlProvider, tokenProvider.getSessionToken());						
 			}
 			
-			String restrictedParam = request.getParameter(DisplayUtils.IS_RESTRICTED_PARAM_KEY);
+			String restrictedParam = request.getParameter(WebConstants.IS_RESTRICTED_PARAM_KEY);
 			if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
 			boolean isRestricted = Boolean.parseBoolean(restrictedParam);
 			

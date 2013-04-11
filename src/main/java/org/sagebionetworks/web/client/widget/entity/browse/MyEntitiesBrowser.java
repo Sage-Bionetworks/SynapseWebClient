@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
@@ -24,6 +23,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -115,7 +115,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			view.showLoading();
 			List<WhereCondition> where = new ArrayList<WhereCondition>();
 			UserSessionData userSessionData = authenticationController.getLoggedInUser();
-			where.add(new WhereCondition(DisplayUtils.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, userSessionData.getProfile().getOwnerId()));
+			where.add(new WhereCondition(WebConstants.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, userSessionData.getProfile().getOwnerId()));
 			searchService.searchEntities("project", where, 1, 1000, null, false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {
