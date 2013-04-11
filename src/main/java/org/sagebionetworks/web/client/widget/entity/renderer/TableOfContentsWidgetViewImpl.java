@@ -48,11 +48,12 @@ public class TableOfContentsWidgetViewImpl extends LayoutContainer implements Ta
 				linkContainer.add(new HTML("<p class=\"smallGreyText\">"+DisplayConstants.NO_HEADERS_FOUND+"</p>"));
 			}
 			while (heading != null) {
-				String text = heading.getInnerText();
+				String text = heading.getInnerHTML();
 				//create links to all headers in the page
 				final Element scrollToElement = heading;
 				SimplePanel wrapper = new SimplePanel();
-				Anchor a = new Anchor(text);
+				Anchor a = new Anchor();
+				a.setHTML(text);
 				a.addStyleName("link");
 				a.addStyleName(heading.getAttribute("toc-style"));
 				
