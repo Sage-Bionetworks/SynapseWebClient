@@ -518,6 +518,7 @@ public class DisplayConstants {
 	public static final String DOI_REQUEST_SENT_MESSAGE = "Note that it may take a few minutes for the service to create the new DOI.";
 	public static final String DOI_CREATION_ERROR = "There was a problem creating a DOI";
 	public static final String DOI_CREATION_IN_PROGRESS = "Creating a DOI";
+	public static final String LARGE_FILE_ON_UNSUPPORTED_BROWSER = "The file exceeds the maximum file size that Synapse supports for this browser. Please update your browser to the latest version and try again.";	
 	
 }
 
