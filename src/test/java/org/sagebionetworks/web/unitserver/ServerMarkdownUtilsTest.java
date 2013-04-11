@@ -20,7 +20,7 @@ public class ServerMarkdownUtilsTest {
 	@Test
 	public void testDetectEntityLinks(){
 		String testString = "<html> <head></head> <body> synapse123 SYn1234\nsyn567 syntax syn3 <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a> syn</body></html>";
-		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a target=\"_blank\" class=\"link\" href=\"#!Synapse:SYn1234\">SYn1234</a> <a target=\"_blank\" class=\"link\" href=\"#!Synapse:syn567\">syn567</a> syntax <a target=\"_blank\" class=\"link\" href=\"#!Synapse:syn3\">syn3</a></span>\n  <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a>\n  <span> syn</span>\n </body>\n</html>";
+		String expectedResult = "<html> \n <head></head> \n <body>\n  <span> synapse123 <a class=\"link\" href=\"#!Synapse:SYn1234\">SYn1234</a> <a class=\"link\" href=\"#!Synapse:syn567\">syn567</a> syntax <a class=\"link\" href=\"#!Synapse:syn3\">syn3</a></span>\n  <a href=\"http://somewhere.else\">link text that has the synapse id syn555 embedded in it.</a>\n  <span> syn</span>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
 		SynapseAutoLinkDetector.getInstance().createLinks(htmlDoc);
 		String actualResult = htmlDoc.html();
