@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
@@ -18,7 +19,9 @@ import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
-
+	
+	private static ProgressCallback progressCallback;
+	
 	@Override
 	public void recordPageVisit(String token) {
 		_recordPageVisit(token);
@@ -171,14 +174,33 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
 	@Override
-	public void uploadFile(String fileFieldId, String url, XMLHttpRequest xhr) {
+	public void uploadFile(String fileFieldId, String url, XMLHttpRequest xhr, ProgressCallback callback) {
+		SynapseJSNIUtilsImpl.progressCallback = callback;
 		_directUploadFile(fileFieldId, url, xhr);
 	}
 	private final static native void _directUploadFile(String fileFieldId, String url, XMLHttpRequest xhr) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 		var fileToUpload = fileToUploadElement.files[0];
-		xhr.open('PUT', url, true);
+		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
+  		xhr.open('PUT', url, true);
 		xhr.send(fileToUpload);
+	}-*/;
+	
+	public static void updateProgress(JavaScriptObject evt) {
+		if (SynapseJSNIUtilsImpl.progressCallback != null) {
+			//parse out value
+			double currentProgress = _getProgress(evt);
+			int percent = (int)Math.floor(currentProgress*100.0);
+			String text = percent+"%";
+			SynapseJSNIUtilsImpl.progressCallback.updateProgress(currentProgress, text);
+		}
+	}
+	
+	private final static native double _getProgress(JavaScriptObject evt) /*-{
+		if (evt.lengthComputable) {
+			return evt.loaded / evt.total;
+		}
+		return 0;
 	}-*/;
 	
 	@Override
