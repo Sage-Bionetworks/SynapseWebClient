@@ -11,7 +11,7 @@ import com.google.inject.Inject;
 
 public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRendererPresenter {
 	
-	private static final String[] VALID_URL_BASES = { "http://glimmer.rstudio.com" };
+	private static final String[] VALID_URL_BASES = { "http://glimmer.rstudio.com", "http://shiny.synapse.org" };
 	private ShinySiteWidgetView view;
 	private Map<String, String> descriptor;
 	
