@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -58,10 +59,10 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	
 	private void initUploadPanel(WikiPageKey wikiKey) {
 		removeAll();
-		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + DisplayUtils.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
 		String baseURl = GWT.getModuleBaseURL()+"filehandle?" +
-				DisplayUtils.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
-				DisplayUtils.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + 
+				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
+				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + 
 				wikiIdParam;
 		
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.IMAGE_CONFIG_UPLOAD, 25, new AddAttachmentDialog.Callback() {
