@@ -53,6 +53,7 @@ public class ServerMarkdownUtils {
 		markdown = restoreWhitespace(markdown);
 		markdown = markdown.replace(R_MESSED_UP_ASSIGNMENT, R_ASSIGNMENT);
 //		reportTime("suppress/escape html");
+		markdown = resolveHorizontalRules(markdown);
 		markdown = resolveTables(markdown);
 //		reportTime("resolved tables");
 		markdown = fixNewLines(markdown);
@@ -206,6 +207,29 @@ public class ServerMarkdownUtils {
 	        builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
 	        return builder.toString();
 	}
+	
+	public static String resolveHorizontalRules(String rawMarkdown) {
+		//find all horizontal rules
+		//match if we have 3 or more '-' or '*', and it's the only thing on the line
+		String regEx1 = "^[-]{3,}$";
+		String regEx2 = "^[*]{3,}$";
+		String[] lines = rawMarkdown.split("\n");
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < lines.length; i++) {
+			String testLine = lines[i].replaceAll(" ", "");
+			boolean isHr = testLine.matches(regEx1) || testLine.matches(regEx2);
+			if (isHr) {
+				//output hr
+				sb.append("<hr>\n");
+			} else {
+				//just add the line and move on
+				sb.append(lines[i] + "\n");
+			}
+		}
+		
+		return sb.toString();
+	}
+	
 	
 	public static String resolveTables(String rawMarkdown) {
 		//find all tables, and replace the raw text with html table
