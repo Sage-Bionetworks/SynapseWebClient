@@ -72,6 +72,10 @@ public class ServerMarkdownUtils {
 //		reportTime("sendAllLinksToNewWindow");
 		Elements anchors = doc.getElementsByTag("a");
 		anchors.addClass("link");
+		
+		Elements tables = doc.getElementsByTag("table");
+		tables.addClass("markdowntable");
+		
 //		reportTime("add link class");
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
 //		reportTime("addWidgets");
