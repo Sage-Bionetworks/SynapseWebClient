@@ -69,7 +69,7 @@ public class EntityViewUtils {
 		String tooltip = DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP;
 		
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">"+DisplayConstants.DATA_ACCESS_RESTRICTIONS_TEXT+"</span>" + DisplayUtils.getIconHtml(shieldIcon) + "</div>");
+		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\" class=\"boldText\">"+DisplayConstants.DATA_ACCESS_RESTRICTIONS_TEXT+"</span>" + DisplayUtils.getIconHtml(shieldIcon) + "</div>");
 		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 3px;\">"+description+"</span>");
 		
 		//form the html
