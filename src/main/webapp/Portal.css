@@ -185,7 +185,6 @@
 	overflow-x: auto;
 }	
 	
-	
 .suggestSearchTerm {
 	color: #7a0402;
 	font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
@@ -566,7 +565,9 @@ a.shortBtn {
     color: #666666;
     font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
     font-family: Courier,monospace;
-    padding: 0 5px 2px
+    padding: 0 5px 2px;
+    overflow:auto;
+    white-space:pre;
 }
 
 .apitable label {
