@@ -38,6 +38,7 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -63,6 +64,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTestImpl;
 
+import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
@@ -392,9 +394,8 @@ public class ProvenanceWidgetTest {
 			}
 			@Override
 			public void uploadFile(String fileFieldId, String url,
-					XMLHttpRequest xhr) {
+					XMLHttpRequest xhr, ProgressCallback progressCallback) {
 				// TODO Auto-generated method stub
-				
 			}
 			@Override
 			public double getFileSize(String fileFieldId) {

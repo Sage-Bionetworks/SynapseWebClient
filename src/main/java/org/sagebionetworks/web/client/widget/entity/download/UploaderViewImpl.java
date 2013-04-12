@@ -290,8 +290,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
 					return;
 				}
-				progressBar.setVisible(true);
-								
+				initializeProgressBar();
 				// this is used in the 'handleEvent' listener, but must
 				// be created in the original thread.  for more, see
 				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
@@ -311,12 +310,20 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Override
 	public void hideLoading() {
 		//try to hide the loading progress bar.  ignore any errors
+		progressBar.reset();
 		progressBar.setVisible(false);
 	}
 	
 	@Override
 	public void submitForm() {
+		progressBar.updateText(DisplayConstants.LABEL_UPLOADING);
 		formPanel.submit();	
+	}
+	
+	private void initializeProgressBar() {
+		progressBar.auto();
+		progressBar.updateText(DisplayConstants.LABEL_INITIALIZING);
+		progressBar.setVisible(true);
 	}
 	
 	private void addRadioButtonsToContainer(
@@ -427,8 +434,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.add(fileUploadMF);
 		formPanel.layout(true);
 		
-		progressBar.auto();
-		progressBar.updateText(DisplayConstants.LABEL_UPLOADING);
 		progressBar.setWidth(PANEL_WIDTH - 30);
 								
 		formPanel.layout(true);
@@ -474,5 +479,13 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		return externalLinkFormPanel;
 	}
-
+	
+	@Override
+	public void resetProgresBar() {
+		progressBar.reset();
+	}
+	@Override
+	public void updateProgress(double value, String text) {
+		progressBar.updateProgress(value, text);
+	}
 }
