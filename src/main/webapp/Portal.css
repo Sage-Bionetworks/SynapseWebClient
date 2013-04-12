@@ -637,16 +637,6 @@ h1, h2, h3, h4, h5, h6 {
 	overflow: auto;
 }
 
-.metadata-tag {
-	float:left; 
-	margin-right: 5px;  
-	background-color: #f3f3f3; 
-	padding: 2px 4px 2px 4px;		
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	-moz-border-radius: 4px;	
-}
-
 .markdown {
 	color: #000000;
 }
@@ -861,4 +851,7 @@ ol.lowerroman {
 .pagesTree a{
 	font-family: Verdana,Arial,sans-serif;
 	font-size: 13px;
+}
+.padding-top-15 {
+	padding-top: 15px;
 }

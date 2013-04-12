@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.IconMenu;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
@@ -260,10 +259,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.readOnly.setVisible(readOnly);
 		
 		sharingContainer.clear();
-		sharingContainer.add(DisplayUtils.getShareSettingsDisplay("<span style=\"margin-right: 5px;\">Sharing:</span>", bundle.getPermissions().getCanPublicRead(), synapseJSNIUtils));
+		sharingContainer.add(DisplayUtils.getShareSettingsDisplay("<span style=\"margin-right: 5px;\" class=\"boldText\">Sharing:</span>", bundle.getPermissions().getCanPublicRead(), synapseJSNIUtils));
 
-		setCreatedBy(e.getCreatedBy(), synapseJSNIUtils.convertDateToSmallString(e.getCreatedOn()));
-		setModified(e.getModifiedBy(), synapseJSNIUtils.convertDateToSmallString(e.getModifiedOn()));
+		setCreatedBy(e.getCreatedBy(), DisplayUtils.converDataToPrettyString(e.getCreatedOn()));
+		setModified(e.getModifiedBy(), DisplayUtils.converDataToPrettyString(e.getModifiedOn()));
 			
 		dataUseContainer.clear();
 		if(bundle.getPermissions().getCanPublicRead()) {
@@ -334,29 +333,25 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	public void setCreatedBy(String who, String when) {
-		String text =  DisplayConstants.CREATED + " by " + who + "<br/>" + when; 
-		DisplayUtils.addTooltip(synapseJSNIUtils, addedBy, text, TOOLTIP_POSITION.BOTTOM);
-		
-		addedBy.clear();
-		addedBy.add(new HTML(DisplayConstants.CREATED + " By"));
+		addedBy.clear();		
+		addedBy.add(new HTML("<span class=\"boldText\">" + DisplayConstants.CREATED + " by:</span> " + who + ", " + when));
 	}
 
 	public void setModified(String who, String when) {
-		String text =  DisplayConstants.MODIFIED + " by " + who + "<br/>" + when;
-		DisplayUtils.addTooltip(synapseJSNIUtils, modifiedBy, text, TOOLTIP_POSITION.BOTTOM);
 		modifiedBy.clear();
-		modifiedBy.add(new HTML(DisplayConstants.MODIFIED + " By"));		
+		modifiedBy.add(new HTML("<span class=\"boldText\">" + DisplayConstants.MODIFIED + " by:</span> " + who + ", " + when));		
 	}
 
 	public void setVersionInfo(Versionable vb) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(vb.getVersionLabel());
 
-		if (vb.getVersionComment() != null) {
-			DisplayUtils.addTooltip(synapseJSNIUtils, versions, vb.getVersionComment(), TOOLTIP_POSITION.BOTTOM);
-		} else {
-			DisplayUtils.addTooltip(synapseJSNIUtils, versions, DisplayConstants.NO_VERSION_COMMENT, TOOLTIP_POSITION.BOTTOM);
-		}
+		// TODO : figure out a mobile-friendly way to display the version comment
+//		if (vb.getVersionComment() != null) {
+//			DisplayUtils.addTooltip(synapseJSNIUtils, versions, vb.getVersionComment(), TOOLTIP_POSITION.BOTTOM);
+//		} else {
+//			DisplayUtils.addTooltip(synapseJSNIUtils, versions, DisplayConstants.NO_VERSION_COMMENT, TOOLTIP_POSITION.BOTTOM);
+//		}
 		
 		label.setInnerText(sb.toString());
 	}
@@ -367,8 +362,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	public void setVersionsVisible(boolean visible) {
-		if(visible) versions.addStyleName("metadata-tag"); 
-		else versions.removeStyleName("metadata-tag");
 		versions.setVisible(visible);
 	}
 
