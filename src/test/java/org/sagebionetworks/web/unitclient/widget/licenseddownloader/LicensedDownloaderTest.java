@@ -174,6 +174,7 @@ public class LicensedDownloaderTest {
 		StudyEntityWrapper = new EntityWrapper("StudyEntityWrapper", Study.class.getName());
 		layerEntityWrapper = new EntityWrapper("layerEntityWrapper", Data.class.getName());
 		pathEntityWrapper = new EntityWrapper("pathEntityWrapper", EntityPath.class.getName());
+		
 		when(mockView.getDirectDownloadURL()).thenReturn("http://synapse.sagebase.org/file.png");
 	}
 	

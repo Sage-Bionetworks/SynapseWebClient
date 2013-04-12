@@ -204,8 +204,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
 		if (directDownloadUrl != null) {
 			//clear old handler, if there is one
-			if (entityLinkHandlerRegistration != null)
+			if (entityLinkHandlerRegistration != null) {
 				entityLinkHandlerRegistration.removeHandler();
+				entityLinkHandlerRegistration = null;
+			}
 			entityLink.setHref(directDownloadUrl);	
 		}
 		else {

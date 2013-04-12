@@ -51,7 +51,7 @@ public class PagesBrowserViewImpl extends LayoutContainer implements PagesBrowse
 		//only show the tree if the root has children
 		if (root != null && root.getChildCount() > 0) {
 			LayoutContainer files = new LayoutContainer();
-			files.setStyleName("span-24 notopmargin");
+			files.setStyleName("pagesTree span-24 notopmargin");
 			Tree t = new Tree();
 			t.addItem(root);
 			root.setState(true);

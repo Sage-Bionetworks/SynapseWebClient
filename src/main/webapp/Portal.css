@@ -80,6 +80,11 @@
 	padding: 10px;
 }
 
+.mainPageLoading {
+	border: 0;
+	padding: 10px;
+}
+
 .boldRight {
 	text-align: left;
 	width: 100px;
@@ -570,7 +575,8 @@ a.shortBtn {
 }
 
 .wiki-description {
-	color: #666666;
+	color: #000000;
+	font-size: 13px;
 }
 
 .entity-description-preview-wrapper {
@@ -640,7 +646,15 @@ h1, h2, h3, h4, h5, h6 {
 	-moz-border-radius: 4px;	
 }
 
-.markdown table {
+.markdown {
+	color: #000000;
+}
+
+.markdown p {
+	margin: 0px;
+}
+
+.markdowntable {
   border: 1px solid #dddddd;
   border-collapse: separate;
   *border-collapse: collapsed;
@@ -650,43 +664,43 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 4px;
 }
 
-.markdown table td {
+.markdowntable td {
   border-left: 1px solid #dddddd;
   border-top: 1px solid #dddddd;
   padding: 2px 4px;
 }
-.markdown table th {
+.markdowntable th {
   border-left: 1px solid #dddddd;
   border-top: 1px solid #dddddd;
   padding: 2px 4px;
   font-weight: bold;
 }
 
-.markdown table caption + thead tr:first-child th,
-.markdown table caption + tbody tr:first-child th,
-.markdown table caption + tbody tr:first-child td,
-.markdown table colgroup + thead tr:first-child th,
-.markdown table colgroup + tbody tr:first-child th,
-.markdown table colgroup + tbody tr:first-child td,
-.markdown table thead:first-child tr:first-child th,
-.markdown table tbody:first-child tr:first-child th,
-.markdown table tbody:first-child tr:first-child td {
+.markdowntable caption + thead tr:first-child th,
+.markdowntable caption + tbody tr:first-child th,
+.markdowntable caption + tbody tr:first-child td,
+.markdowntable colgroup + thead tr:first-child th,
+.markdowntable colgroup + tbody tr:first-child th,
+.markdowntable colgroup + tbody tr:first-child td,
+.markdowntable thead:first-child tr:first-child th,
+.markdowntable tbody:first-child tr:first-child th,
+.markdowntable tbody:first-child tr:first-child td {
   border-top: 0;
 }
-.markdown table thead:first-child tr:first-child th:first-child,
-.markdown table tbody:first-child tr:first-child td:first-child {
+.markdowntable thead:first-child tr:first-child th:first-child,
+.markdowntable tbody:first-child tr:first-child td:first-child {
   -webkit-border-top-left-radius: 4px;
   border-top-left-radius: 4px;
   -moz-border-radius-topleft: 4px;
 }
-.markdown table thead:first-child tr:first-child th:last-child,
-.markdown table tbody:first-child tr:first-child td:last-child {
+.markdowntable thead:first-child tr:first-child th:last-child,
+.markdowntable tbody:first-child tr:first-child td:last-child {
   -webkit-border-top-right-radius: 4px;
   border-top-right-radius: 4px;
   -moz-border-radius-topright: 4px;
 }
-.markdown table thead:last-child tr:last-child th:first-child,
-.markdown table tbody:last-child tr:last-child td:first-child {
+.markdowntable thead:last-child tr:last-child th:first-child,
+.markdowntable tbody:last-child tr:last-child td:first-child {
   -webkit-border-radius: 0 0 0 4px;
   -moz-border-radius: 0 0 0 4px;
   border-radius: 0 0 0 4px;
@@ -694,8 +708,8 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom-left-radius: 4px;
   -moz-border-radius-bottomleft: 4px;
 }
-.markdown table thead:last-child tr:last-child th:last-child,
-.markdown table tbody:last-child tr:last-child td:last-child {
+.markdowntable thead:last-child tr:last-child th:last-child,
+.markdowntable tbody:last-child tr:last-child td:last-child {
   -webkit-border-bottom-right-radius: 4px;
   border-bottom-right-radius: 4px;
   -moz-border-radius-bottomright: 4px;
@@ -837,4 +851,13 @@ ol.lowerroman {
 }
 .blackText {
 	color: #000000;
+}
+
+.pagesTree img{
+	padding-right:7px;
+}
+
+.pagesTree a{
+	font-family: Verdana,Arial,sans-serif;
+	font-size: 13px;
 }

@@ -11,7 +11,7 @@ import com.google.inject.Inject;
 
 public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRendererPresenter {
 	
-	private static final String[] VALID_URL_BASES = { "http://glimmer.rstudio.com" };
+	private static final String[] VALID_URL_BASES = { "http://glimmer.rstudio.com", "http://shiny.synapse.org" };
 	private ShinySiteWidgetView view;
 	private Map<String, String> descriptor;
 	
@@ -57,7 +57,7 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	public static boolean isValidShinySite(String siteUrl) {
 		if(siteUrl != null) {
 			for(String base : VALID_URL_BASES) {
-				// starts with one of the valid url bases?
+				// starts with one of the valid url bases?				
 				if(siteUrl.toLowerCase().startsWith(base)) return true;
 			}
 		}

@@ -82,6 +82,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	SpanElement fileSize;
 	@UiField
 	SimplePanel favoritePanel;
+
 	private HandlerRegistration entityLinkHandlerRegistration;
 	
 	interface LocationableTitleBarViewImplUiBinder extends UiBinder<Widget, LocationableTitleBarViewImpl> {
@@ -112,6 +113,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		md5LinkContainer.addStyleName("inline-block font-italic margin-left-5");
 		entityLink.addStyleName("downloadLink link");
 		uploadButtonContainer.addStyleName("inline-block vertical-align-bottom");
+		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
 	}
@@ -227,9 +229,12 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
 		if (directDownloadUrl != null) {
 			//clear old handler, if there is one
-			if (entityLinkHandlerRegistration != null)
+			if (entityLinkHandlerRegistration != null) {
 				entityLinkHandlerRegistration.removeHandler();
-			entityLink.setHref(directDownloadUrl);	
+				entityLinkHandlerRegistration = null;
+			}
+			entityLink.setHref(directDownloadUrl);
+			entityLink.setTarget("_blank");
 		}
 		else {
 			//clear href, if there is one
@@ -243,7 +248,6 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 				}
 			});
 		}
-
 	}
 	
 	@Override

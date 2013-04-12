@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -232,6 +233,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		
 		if (DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
 			descriptionField = (TextField<String>) formFactory.createField(model.getDescription());
+			descriptionField.setToolTip(DisplayConstants.ENTITY_DESCRIPTION_TOOLTIP);
 		}
 		else {
 			markdownDescriptionField = formFactory.createTextAreaField(model.getDescription());

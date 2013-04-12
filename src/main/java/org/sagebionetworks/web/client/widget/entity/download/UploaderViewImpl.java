@@ -40,6 +40,8 @@ import com.google.inject.Inject;
 public class UploaderViewImpl extends LayoutContainer implements
 		UploaderView {
 
+	public static final String FILE_FIELD_ID = "fileToUpload";
+
 	private static final MarginData MARGIN = new MarginData(10);
 	
 	private Presenter presenter;
@@ -58,13 +60,13 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private ProgressBar progressBar;
 	// external link panel
 	private Button saveExternalLinkButton;
+	private String fileName;
 	
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	private JavaScriptObject window;
 	
 	LayoutContainer container;
 	IconsImageBundle iconsImageBundle;
-
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, IconsImageBundle iconsImageBundle) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -219,11 +221,11 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 	
 	private void openSelected() {
-		formPanel.setAction(presenter.getUploadActionUrl(/*isRestricted*/false));		
+		formPanel.setAction(presenter.getDefaultUploadActionUrl(/*isRestricted*/false));		
 	}
 	
 	private void restrictedSelected() {
-		formPanel.setAction(presenter.getUploadActionUrl(/*isRestricted*/true));		
+		formPanel.setAction(presenter.getDefaultUploadActionUrl(/*isRestricted*/true));		
 	}
 	
 	// set the initial state of the controls when widget is made visible
@@ -269,13 +271,11 @@ public class UploaderViewImpl extends LayoutContainer implements
 			@Override
 			public void handleEvent(FormEvent be) {
 				presenter.handleSubmitResult(be.getResultHtml(), isNewlyRestricted());
-				// hide loading
-				formPanel.remove(progressBar);
-				formPanel.layout(true);
+				hideLoading();
 			}
 		};
 		formPanel.addListener(Events.Submit, submitListener);
-		formPanel.setAction(presenter.getUploadActionUrl(restrictedModeChosen()==RADIO_SELECTED.RESTRICTED_RADIO_SELECTED));
+		formPanel.setAction(presenter.getDefaultUploadActionUrl(restrictedModeChosen()==RADIO_SELECTED.RESTRICTED_RADIO_SELECTED));
 		fileUploadField.clearState(); // doesn't successfully clear previous selection
 		if(formPanel.isRendered()) formPanel.reset(); // clear file choice from fileUploadField
 
@@ -290,24 +290,40 @@ public class UploaderViewImpl extends LayoutContainer implements
 					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
 					return;
 				}
-				
-				formPanel.add(progressBar);
-				formPanel.layout(true);
-								
+				initializeProgressBar();
 				// this is used in the 'handleEvent' listener, but must
 				// be created in the original thread.  for more, see
 				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 				if (isNewlyRestricted()) {
 					window = DisplayUtils.newWindow("", "", "");
 				}
-				formPanel.submit();
+				presenter.handleUpload(fileName);
 			}
 		};
 		uploadBtn.addSelectionListener(uploadListener);
+		progressBar.setVisible(false);
+		formPanel.add(progressBar);
 		formPanel.addButton(uploadBtn);
-		
-		
 		formPanel.layout(true);
+	}
+	
+	@Override
+	public void hideLoading() {
+		//try to hide the loading progress bar.  ignore any errors
+		progressBar.reset();
+		progressBar.setVisible(false);
+	}
+	
+	@Override
+	public void submitForm() {
+		progressBar.updateText(DisplayConstants.LABEL_UPLOADING);
+		formPanel.submit();	
+	}
+	
+	private void initializeProgressBar() {
+		progressBar.auto();
+		progressBar.updateText(DisplayConstants.LABEL_INITIALIZING);
+		progressBar.setVisible(true);
 	}
 	
 	private void addRadioButtonsToContainer(
@@ -372,7 +388,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	 * Returns true iff the dataset is NOT already restricted and it is becoming restricted
 	 * @return
 	 */
-	private boolean isNewlyRestricted() {
+	public boolean isNewlyRestricted() {
 		return !isInitiallyRestricted && restrictedModeChosen()==RADIO_SELECTED.RESTRICTED_RADIO_SELECTED;
 	}
 	
@@ -400,27 +416,25 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 		fileUploadField.setWidth(PANEL_WIDTH-100);
 		fileUploadField.setAllowBlank(false);
-		fileUploadField.setName("uploadedfile");
+		fileUploadField.setName("file");
 		fileUploadField.setFieldLabel("File");
-		
 		fileUploadField.addListener(Events.OnChange, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {
 				final String fullPath = fileUploadField.getValue();
 				final int lastIndex = fullPath.lastIndexOf('\\');
-				final String fileName = fullPath.substring(lastIndex + 1);
+				fileName = fullPath.substring(lastIndex + 1);
 				fileUploadField.setValue(fileName);
+				fileUploadField.getFileInput().setId(FILE_FIELD_ID);
 			}
 		});
-		
 		MultiField fileUploadMF = new MultiField();
 		fileUploadMF.add(fileUploadField);
 		fileUploadMF.setFieldLabel("File");
-		formPanel.add(fileUploadMF);		
+		formPanel.add(fileUploadMF);
 		formPanel.layout(true);
 		
-		progressBar.auto();
-		progressBar.updateText(DisplayConstants.LABEL_UPLOADING);					
+		progressBar.setWidth(PANEL_WIDTH - 30);
 								
 		formPanel.layout(true);
 		
@@ -465,5 +479,13 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		return externalLinkFormPanel;
 	}
-
+	
+	@Override
+	public void resetProgresBar() {
+		progressBar.reset();
+	}
+	@Override
+	public void updateProgress(double value, String text) {
+		progressBar.updateProgress(value, text);
+	}
 }

@@ -12,7 +12,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class SynapseWikiPresenter extends AbstractActivity implements SynapseWikiView.Presenter {
+public class SynapseWikiPresenter extends AbstractActivity implements SynapseWikiView.Presenter, Presenter<Wiki> {
 		
 	private Wiki place;
 	private SynapseWikiView view;
@@ -31,6 +31,7 @@ public class SynapseWikiPresenter extends AbstractActivity implements SynapseWik
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(Wiki place) {
 		this.place = place;
 		this.view.setPresenter(this);

@@ -16,9 +16,12 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
+import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
-
+	
+	private static ProgressCallback progressCallback;
+	
 	@Override
 	public void recordPageVisit(String token) {
 		_recordPageVisit(token);
@@ -159,5 +162,62 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		    }
 		}
 	}
+	@Override
+	public boolean isDirectUploadSupported() {
+		return _isDirectUploadSupported();
+	}
 	
+	private final static native boolean _isDirectUploadSupported() /*-{ 
+		var xhr = new XMLHttpRequest();
+		// This test is from http://blogs.msdn.com/b/ie/archive/2012/02/09/cors-for-xhr-in-ie10.aspx
+		return ("withCredentials" in xhr);
+	}-*/;
+
+	@Override
+	public void uploadFile(String fileFieldId, String url, XMLHttpRequest xhr, ProgressCallback callback) {
+		SynapseJSNIUtilsImpl.progressCallback = callback;
+		_directUploadFile(fileFieldId, url, xhr);
+	}
+	private final static native void _directUploadFile(String fileFieldId, String url, XMLHttpRequest xhr) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		var fileToUpload = fileToUploadElement.files[0];
+		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
+  		xhr.open('PUT', url, true);
+		xhr.send(fileToUpload);
+	}-*/;
+	
+	public static void updateProgress(JavaScriptObject evt) {
+		if (SynapseJSNIUtilsImpl.progressCallback != null) {
+			//parse out value
+			double currentProgress = _getProgress(evt);
+			int percent = (int)Math.floor(currentProgress*100.0);
+			String text = percent+"%";
+			SynapseJSNIUtilsImpl.progressCallback.updateProgress(currentProgress, text);
+		}
+	}
+	
+	private final static native double _getProgress(JavaScriptObject evt) /*-{
+		if (evt.lengthComputable) {
+			return evt.loaded / evt.total;
+		}
+		return 0;
+	}-*/;
+	
+	@Override
+	public String getContentType(String fileFieldId) {
+		return _getContentType(fileFieldId);
+	}
+	private final static native String _getContentType(String fileFieldId) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		return fileToUploadElement.files[0].type;
+	}-*/;
+	
+	@Override
+	public double getFileSize(String fileFieldId) {
+		return _getFileSize(fileFieldId);
+	}
+	private final static native double _getFileSize(String fileFieldId) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		return fileToUploadElement.files[0].size;
+	}-*/;
 }

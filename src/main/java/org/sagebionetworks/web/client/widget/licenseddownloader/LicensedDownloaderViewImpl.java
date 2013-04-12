@@ -152,7 +152,7 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		SafeHtmlBuilder sb = new SafeHtmlBuilder();
 		String displayString = "Download";
 		directDownloadURL = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
-		sb.appendHtmlConstant("<a href=\"" + directDownloadURL + "\" target=\"_blank\">")
+		sb.appendHtmlConstant("<a href=\"" + directDownloadURL + "\" target=\"_blank\">") 
 		.appendEscaped(displayString)
 		.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());
 		downloadWindowWidth = 300;

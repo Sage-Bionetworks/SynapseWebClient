@@ -58,7 +58,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraUrlHelper;
-	private boolean isDirectDownloadSupported;
+	private boolean isDirectDownloadSupported; 
 	
 	// for testing
 	public void setUserProfile(UserProfile userProfile) {this.userProfile=userProfile;}
@@ -128,7 +128,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	public String getDirectDownloadURL() {
 		if (isDirectDownloadSupported)
 			return view.getDirectDownloadURL();
-		else return null;
+		else return null; 
 	}
 	
 	/**
@@ -213,10 +213,10 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		accessRequirementToDisplay = GovernanceServiceHelper.selectAccessRequirement(allARs, unmetARs);
 		setRestrictionLevel(GovernanceServiceHelper.entityRestrictionLevel(allARs));
 		if (unmetARs==null || unmetARs.isEmpty()) {
-			isDirectDownloadSupported = true;
+			isDirectDownloadSupported = true; 
 			setApprovalType(APPROVAL_TYPE.NONE);
 		} else {
-			isDirectDownloadSupported = false;
+			isDirectDownloadSupported = false; 
 			setApprovalType(GovernanceServiceHelper.accessRequirementApprovalType(accessRequirementToDisplay));
 		}
 		

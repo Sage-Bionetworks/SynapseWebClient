@@ -36,8 +36,6 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.repo.model.search.query.KeyValue;
-import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -61,6 +59,7 @@ import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -163,30 +162,8 @@ public class DisplayUtils {
 
 	
 	private static final String ERROR_OBJ_REASON_KEY = "reason";
-	public static final String PROXY_PARAM_KEY = "proxy";
-	public static final String ENTITY_PARENT_ID_KEY = "parentId";
-	public static final String ENTITY_EULA_ID_KEY = "eulaId";
-	public static final String ENTITY_PARAM_KEY = "entityId";
-	public static final String ENTITY_VERSION_PARAM_KEY = "version";
-	public static final String WIKI_OWNER_ID_PARAM_KEY = "ownerId";
-	public static final String WIKI_OWNER_TYPE_PARAM_KEY = "ownerType";
-	public static final String WIKI_ID_PARAM_KEY = "wikiId";
-	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
-	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
-	public static final String FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY = "createFileEntity";
-	public static final String FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY = "fileEntityParentId";
-	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
-	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
-	public static final String USER_PROFILE_PARAM_KEY = "userId";
-	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
-	public static final String WAIT_FOR_URL = "waitForUrl";
-	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "createdByPrincipalId";
-	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
-	public static final String ETAG_KEY = "etag";
-	public static final String ENTITY_VERSION_STRING = "/version/";
-	
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
 	public static final int BIG_BUTTON_HEIGHT_PX = 36;
@@ -200,7 +177,7 @@ public class DisplayUtils {
 	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/gif","image/png"};
 	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
 	
-	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
+	public static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
 	/**
 	 * Sometimes we are forced to use a table to center an image in a fixed space. 
@@ -225,22 +202,6 @@ public class DisplayUtils {
 	public static final String STYLE_DISPLAY_INLINE = "inline-block";
 	public static final String STYLE_BLACK_TEXT = "blackText";
 	
-	/*
-	 * Search
-	 */
-	public final static String SEARCH_KEY_NODE_TYPE = "node_type";
-	public final static String SEARCH_KEY_SPECIES = "species";
-	public final static String SEARCH_KEY_DISEASE = "disease";
-	public final static String SEARCH_KEY_MODIFIED_ON = "modified_on";
-	public final static String SEARCH_KEY_CREATED_ON = "created_on";
-	public final static String SEARCH_KEY_TISSUE = "tissue";
-	public final static String SEARCH_KEY_NUM_SAMPLES = "num_samples";
-	public final static String SEARCH_KEY_CREATED_BY = "created_by";
-	public final static List<String> FACETS_DISPLAY_ORDER = Arrays
-			.asList(new String[] { SEARCH_KEY_NODE_TYPE, SEARCH_KEY_SPECIES,
-					SEARCH_KEY_DISEASE, SEARCH_KEY_MODIFIED_ON,
-					SEARCH_KEY_CREATED_ON, SEARCH_KEY_TISSUE,
-					SEARCH_KEY_NUM_SAMPLES, SEARCH_KEY_CREATED_BY });
 	public static final String UPLOAD_SUCCESS = "Upload Success";
 	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
@@ -249,48 +210,6 @@ public class DisplayUtils {
 			Analysis.class.getName(), Step.class.getName(), 
 			RObject.class.getName(), PhenotypeData.class.getName(), 
 			ExpressionData.class.getName(),	GenotypeData.class.getName() };
-	
-	public static SearchQuery getDefaultSearchQuery() {		
-		SearchQuery query = getBaseSearchQueryNoFacets();
-		
-		// exclude links
-		List<KeyValue> bq = new ArrayList<KeyValue>();
-		KeyValue kv = new KeyValue();
-		kv = new KeyValue();
-		kv.setKey(DisplayUtils.SEARCH_KEY_NODE_TYPE);				
-		kv.setValue("project"); 
-		bq.add(kv);
-		query.setBooleanQuery(bq);
-		
-		query.setFacet(FACETS_DISPLAY_ORDER);
-		
-		return query;
-	}
-	
-	public static SearchQuery getAllTypesSearchQuery() {		
-		SearchQuery query = getBaseSearchQueryNoFacets();
-		
-		// exclude links
-		List<KeyValue> bq = new ArrayList<KeyValue>();
-		KeyValue kv = new KeyValue();
-		kv.setKey("node_type");
-		kv.setValue("link");
-		kv.setNot(true);
-		bq.add(kv);
-		query.setBooleanQuery(bq);
-		
-		query.setFacet(FACETS_DISPLAY_ORDER);
-		
-		return query;
-	}
-
-	private static SearchQuery getBaseSearchQueryNoFacets() {
-		SearchQuery query = new SearchQuery();
-		// start with a blank, valid query
-		query.setQueryTerm(Arrays.asList(new String[] {""}));		
-		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));
-		return query;
-	}
 	
 	/**
 	 * Returns a properly aligned icon from an ImageResource
@@ -642,7 +561,11 @@ public class DisplayUtils {
 	}
 	
 	public static String getMarkdownWidgetWarningHtml(String warningText) {
-		return "<div class=\"alert alert-block\"><strong>"+ DisplayConstants.MARKDOWN_WIDGET_WARNING + "</strong><br/> " + warningText + "</div>";
+		return getWarningHtml(DisplayConstants.MARKDOWN_WIDGET_WARNING, warningText);
+	}
+	
+	public static String getWarningHtml(String title, String warningText) {
+		return "<div class=\"alert alert-block\"><strong>"+ title + "</strong><br/> " + warningText + "</div>";
 	}
 	
 	public static String uppercaseFirstLetter(String display) {
@@ -979,7 +902,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createAttachmentUrl(String baseURl, String entityId, String tokenId, String fileName){
-		return createAttachmentUrl(baseURl, entityId, tokenId, fileName, DisplayUtils.ENTITY_PARAM_KEY);
+		return createAttachmentUrl(baseURl, entityId, tokenId, fileName, WebConstants.ENTITY_PARAM_KEY);
 	}
 	
 
@@ -992,7 +915,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String tokenId, String fileName){
-		return createAttachmentUrl(baseURl, userId, tokenId, fileName, DisplayUtils.USER_PROFILE_PARAM_KEY);
+		return createAttachmentUrl(baseURl, userId, tokenId, fileName, WebConstants.USER_PROFILE_PARAM_KEY);
 	}
 	
 	/**
@@ -1008,9 +931,9 @@ public class DisplayUtils {
 		builder.append(baseURl);
 		builder.append("?"+paramKey+"=");
 		builder.append(id);
-		builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
+		builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
-		builder.append("&"+DisplayUtils.WAIT_FOR_URL+"=true");
+		builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
 		return builder.toString();
 	}
 	
@@ -1423,15 +1346,15 @@ public class DisplayUtils {
 //				+"/wiki/" 
 //				+wikiKey.getWikiPageId()
 //				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
-		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
 
 			//if preview, then avoid cache
 			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
 		return baseFileHandleUrl + "?" +
-				WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
-				WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
-				WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
-					FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
+				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
+				WebConstants.WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
+					WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
 					wikiIdParam + nocacheParam;
 	}
 		
@@ -1446,13 +1369,13 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
-		String versionParam = versionNumber == null ? "" : "&" + ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
+		String versionParam = versionNumber == null ? "" : "&" + WebConstants.ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
 		//if preview, then avoid cache
 		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
 		return baseFileHandleUrl + "?" +
-				ENTITY_PARAM_KEY + "=" + entityId + "&" +
-				FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
-				PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
+				WebConstants.ENTITY_PARAM_KEY + "=" + entityId + "&" +
+				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
+				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
 				versionParam + nocacheParam;
 	}
 
@@ -1462,12 +1385,12 @@ public class DisplayUtils {
 	
 	public static String createEntityVersionString(String id, Long version) {
 		if(version != null)
-			return id+ENTITY_VERSION_STRING+version;
+			return id+WebConstants.ENTITY_VERSION_STRING+version;
 		else 
 			return id;		
 	}
 	public static Reference parseEntityVersionString(String entityVersion) {
-		String[] parts = entityVersion.split(ENTITY_VERSION_STRING);
+		String[] parts = entityVersion.split(WebConstants.ENTITY_VERSION_STRING);
 		Reference ref = null;
 		if(parts.length > 0) {
 			ref = new Reference();
@@ -1482,7 +1405,7 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isWikiSupportedType(Entity entity) {
-		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project);
+		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project); 
 	}
 		
 	public static boolean isRecognizedImageContentType(String contentType) {

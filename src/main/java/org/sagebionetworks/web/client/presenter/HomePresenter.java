@@ -26,7 +26,7 @@ import com.google.inject.Inject;
 import com.sun.syndication.feed.synd.SyndContent;
 
 @SuppressWarnings("unused")
-public class HomePresenter extends AbstractActivity implements HomeView.Presenter {
+public class HomePresenter extends AbstractActivity implements HomeView.Presenter, Presenter<Home> {
 	public static final String KEY_DATASETS_SELECTED_COLUMNS_COOKIE = "org.sagebionetworks.selected.dataset.columns";
 	
 	private Home place;
@@ -63,6 +63,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(Home place) {
 		this.place = place;		
 		view.setPresenter(this);		

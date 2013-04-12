@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -39,7 +40,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class SearchPresenter extends AbstractActivity implements SearchView.Presenter {
+public class SearchPresenter extends AbstractActivity implements SearchView.Presenter, Presenter<Search> {
 	
 	//private final List<String> FACETS_DEFAULT = Arrays.asList(new String[] {"node_type","disease","species","tissue","platform","num_samples","created_by","modified_by","created_on","modified_on","acl","reference"});
 	
@@ -58,7 +59,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private boolean newQuery = false;
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
 	private DateTime searchStartTime;
-	private Place redirect; 
 	
 	
 	@Inject
@@ -89,17 +89,12 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(Search place) {
 		this.place = place;
 		view.setPresenter(this);
-		redirect = null;
 		String queryTerm = place.getSearchTerm();
 		if (queryTerm == null) queryTerm = "";
-		
-		if (willRedirect(queryTerm)) {
-			redirect = new Synapse(queryTerm);
-			return;
-		}
 
 		currentSearch = checkForJson(queryTerm);
 		if (place.getStart() != null)
@@ -208,7 +203,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 
 	@Override
 	public List<String> getFacetDisplayOrder() {
-		return DisplayUtils.FACETS_DISPLAY_ORDER;
+		return SearchQueryUtils.FACETS_DISPLAY_ORDER;
 	}
 
 	@Override
@@ -237,30 +232,11 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		return PaginationUtil.getPagination(nResults.intValue(), start.intValue(), nPerPage, nPagesToShow);
 	}
 
-	public Place getRedirect() {
-		return redirect;
-	}
-
 	@Override
 	public ImageResource getIconForHit(Hit hit) {
 		if(hit == null) return null;
 		EntityType type = entityTypeProvider.getEntityTypeForString(hit.getNode_type());
 		return DisplayUtils.getSynapseIconForEntityType(type, DisplayUtils.IconSize.PX24, iconsImageBundle);
-	}
-
-	
-	/*
-	 * Private Methods
-	 */
-
-	private boolean willRedirect(String queryTerm) {
-		if(queryTerm.startsWith(DisplayUtils.SYNAPSE_ID_PREFIX)) {
-			String remainder = queryTerm.replaceFirst(DisplayUtils.SYNAPSE_ID_PREFIX, "");
-			if(remainder.matches("^[0-9]+$")) {
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	@Override
@@ -303,7 +279,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	}
 
 	private SearchQuery getBaseSearchQuery() {
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		timeValueToDisplay.clear();
 		searchStartTime = new DateTime();		
 		newQuery = true;		

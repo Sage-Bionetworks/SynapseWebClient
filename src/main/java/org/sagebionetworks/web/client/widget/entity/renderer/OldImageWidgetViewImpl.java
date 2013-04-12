@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.core.client.GWT;
@@ -32,7 +32,7 @@ public class OldImageWidgetViewImpl extends LayoutContainer implements OldImageW
 		}
 			
 		sb.append(" src=\"");
-		sb.append(createAttachmentUrl(attachmentBaseUrl, entityId, uploadedAttachmentData.getTokenId(), DisplayUtils.ENTITY_PARAM_KEY));
+		sb.append(createAttachmentUrl(attachmentBaseUrl, entityId, uploadedAttachmentData.getTokenId(), WebConstants.ENTITY_PARAM_KEY));
 		sb.append("\"></img>");
 		
 		add(new HTMLPanel(sb.toString()));
@@ -52,9 +52,9 @@ public class OldImageWidgetViewImpl extends LayoutContainer implements OldImageW
 	        builder.append(baseURl);
 	        builder.append("?"+paramKey+"=");
 	        builder.append(id);
-	        builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
+	        builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
 	        builder.append(tokenId);
-	        builder.append("&"+DisplayUtils.WAIT_FOR_URL+"=true");
+	        builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
 	        return builder.toString();
 	}
 	

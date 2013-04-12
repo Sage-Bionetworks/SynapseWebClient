@@ -15,21 +15,26 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 	public void createUploadForm(boolean isExternalSupported);
 	
 	public void openNewBrowserTab(String url);
-	
 	public int getDisplayHeight();
 
 	public int getDisplayWidth();
-
+	public void submitForm();
+	public void hideLoading();
+	public boolean isNewlyRestricted();
+	public void updateProgress(double value, String text);
+	public void resetProgresBar();
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
-		String getUploadActionUrl(boolean isRestricted);
+		
+		String getDefaultUploadActionUrl(boolean isRestricted);
 
 		void setExternalFilePath(String path, boolean isNewlyRestricted);
 		
-
+		void handleUpload(String fileName);
+		
 		/**
 		 * 
 		 * @param resultHtml

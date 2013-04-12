@@ -216,11 +216,12 @@ public class DisplayConstants {
 	public static final String TEXT_LINK_FILE = "Link File";
 	public static final String TEXT_LINK_SUCCESS = "Link successfully updated in Synapse";
 	public static final String TEXT_LINK_FAILED = "An error occurred while creating the link. Please check the URL and try again.";
-	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
+ 	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
 	public static final String TEXT_ATTACHMENT_SUCCESS = "Attachment Uploaded to Synapse";
 	public static final String TEXT_PROFILE_PICTURE_SUCCESS = "Profile Photo Uploaded to Synapse";
 	public static final String ERROR_UPLOAD = "An error occurred during upload. Please try again.";
 	public static final String LABEL_UPLOADING = "Uploading...";
+	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
 	public static final String LABEL_WHERE_SAVE_LINK = "Where would you like to save a Link to this page?";
 	public static final String ERROR_NOT_FOUND = "Sorry, the requested object was not found or no longer exists.";
@@ -305,6 +306,7 @@ public class DisplayConstants {
 	public static final String PREVIEW_FAILED_TEXT = "Preview failed: ";
 	public static final String ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT = "Preview";
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
+	public static final String ENTITY_DESCRIPTION_TOOLTIP = "Enter a short description that will be displayed prominently on the page and used in search results.";
 	public static final String ENTITY_DESCRIPTION_TIPS_TEXT = "Formatting Guide";
 	public static final String ENTITY_DESCRIPTION_HIDE_WIDGETS_TEXT = "Hide Widget Manager";
 	public static final String ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT = "Show Widget Manager";
@@ -319,8 +321,6 @@ public class DisplayConstants {
 	public static final String ENTITY = "Entity";
 	public static final String LOADING = "Loading";
 	public static final String ACTIVITY = "Activity";
-	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
-	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
 	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	public static final String ERROR_WIDGET_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, hypens, periods, plus signs, and parentheses.";
 
@@ -513,7 +513,11 @@ public class DisplayConstants {
 	public static final String ACCESS_WILL_BE = "Access Will Be";
 	public static final String ANY_USE = "Any Use";
 	public static final String SELECT_DATA_USE = "Please select a Data Use Level";
-		
+	public static final String DOI_REQUEST_SENT_TITLE = "The request to create a new DOI has been sent.";	
+	public static final String DOI_REQUEST_SENT_MESSAGE = "Note that it may take a few minutes for the service to create the new DOI.";
+	public static final String DOI_CREATION_ERROR = "There was a problem creating a DOI";
+	public static final String DOI_CREATION_IN_PROGRESS = "Creating a DOI";
+	public static final String LARGE_FILE_ON_UNSUPPORTED_BROWSER = "The file exceeds the maximum file size that Synapse supports for this browser. Please update your browser to the latest version and try again.";	
 	
 }
 
