@@ -18,6 +18,10 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.presenter.SearchUtil;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.GwtDateUtils;
+import org.sagebionetworks.web.client.utils.SynapsePlaceUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -323,7 +327,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			resultsPanel.clear();
 			loadShowing = false;
 		}
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 		
 	}
 
@@ -339,7 +343,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -399,9 +403,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 		
 		SafeHtml attribution = new SafeHtmlBuilder()
 		.appendHtmlConstant("Created by ").appendEscaped(hit.getCreated_by())
-		.appendHtmlConstant(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000)) + ", ")
+		.appendHtmlConstant(" on " + GwtDateUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000)) + ", ")
 		.appendHtmlConstant("Updated by ").appendEscaped(hit.getModified_by())
-		.appendHtmlConstant(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)))
+		.appendHtmlConstant(" on " + GwtDateUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)))
 		.toSafeHtml();
 
 		
@@ -410,7 +414,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		.appendHtmlConstant("	   <h4>" + i + ". \n");
 		if(icon != null) 
 			resultBuilder.appendHtmlConstant(DisplayUtils.getIconHtml(icon));
-		resultBuilder.appendHtmlConstant("         <a class=\"link\" href=\"" + DisplayUtils.getSynapseHistoryToken(hit.getId()) + "\">")
+		resultBuilder.appendHtmlConstant("         <a class=\"link\" href=\"" + SynapsePlaceUtils.getSynapseHistoryToken(hit.getId()) + "\">")
 		.appendEscaped(hit.getName())
 		.appendHtmlConstant("</a>");
 		
@@ -436,7 +440,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		for(int i=0; i<headers.size(); i++) {
 			if(i == 0) continue; // skip "root"
 			EntityHeader header = headers.get(i); 
-			String safeLink = "<a href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\""; 
+			String safeLink = "<a href=\"" + SynapsePlaceUtils.getSynapseHistoryToken(header.getId()) + "\""; 
 			if(i >= headers.size()-1) {
 				// last one show full color
 				safeLink += " class=\"hitBreadcrumbElement\"";
@@ -623,7 +627,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private Anchor createPaginationAnchor(String anchorName, String currentSearchJSON, final long newStart) {
 		Anchor a = new Anchor();
 		a.setHTML(anchorName);
-		a.setHref(DisplayUtils.getSearchHistoryToken(currentSearchJSON, newStart));
+		a.setHref(SearchUtil.getSearchHistoryToken(currentSearchJSON, newStart));
 		return a;
 	}	
 

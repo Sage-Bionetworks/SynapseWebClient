@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton.AccessLevel;
-import org.sagebionetworks.web.shared.NodeType;
 
 import com.google.gwt.user.client.ui.IsWidget;
 

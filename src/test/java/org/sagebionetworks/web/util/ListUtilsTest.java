@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 /**
  * 

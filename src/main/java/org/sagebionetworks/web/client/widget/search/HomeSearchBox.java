@@ -3,49 +3,33 @@ package org.sagebionetworks.web.client.widget.search;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidgetPresenter {
 	
 	private HomeSearchBoxView view;
-	private NodeModelCreator nodeModelCreator;
-	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private HandlerManager handlerManager = new HandlerManager(this);
-	private Entity entity;
-	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
 	
 	private boolean searchAll = false;
 	
 	@Inject
 	public HomeSearchBox(HomeSearchBoxView view, 
-			NodeModelCreator nodeModelCreator,
-			AuthenticationController authenticationController,
-			EntityTypeProvider entityTypeProvider,
 			GlobalApplicationState globalApplicationState,
 			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;		
-		this.nodeModelCreator = nodeModelCreator;
-		this.authenticationController = authenticationController;
-		this.entityTypeProvider = entityTypeProvider;
 		this.globalApplicationState = globalApplicationState;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		
@@ -79,22 +63,22 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 
 	@Override
 	public String getSearchAllProjectsLink() {		
-		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("project"));	
+		return SearchUtil.getSearchHistoryToken(getSearchQueryForType("project"));	
 	}
 
 	@Override
 	public String getSearchAllDataLink() {
-		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("data"));
+		return SearchUtil.getSearchHistoryToken(getSearchQueryForType("data"));
 	}
 
 	@Override
 	public String getSearchAllStudiesLink() {
-		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("study"));
+		return SearchUtil.getSearchHistoryToken(getSearchQueryForType("study"));
 	}
 
 	@Override
 	public String getSearchAllCodeLink() {
-		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("code"));
+		return SearchUtil.getSearchHistoryToken(getSearchQueryForType("code"));
 	}
 	
 	@Override

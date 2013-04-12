@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**

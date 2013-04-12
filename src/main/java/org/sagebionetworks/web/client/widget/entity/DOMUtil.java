@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 /**
  * Some common DOM utility methods.
  * 

@@ -8,6 +8,9 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.EntityFinderUtils;
+import org.sagebionetworks.web.client.utils.VersionUtils;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
@@ -130,11 +133,11 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 			public void componentSelected(ButtonEvent ce) {
 				entityFinder.configure(false);				
 				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				EntityFinderUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {
-							entityField.setValue(DisplayUtils.createEntityVersionString(selected));
+							entityField.setValue(VersionUtils.createEntityVersionString(selected));
 							window.hide();
 						} else {
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
@@ -277,7 +280,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -286,7 +289,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override

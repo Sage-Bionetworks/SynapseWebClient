@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.user.client.Element;
 
 
 public class DisplayConstants {

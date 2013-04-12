@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;

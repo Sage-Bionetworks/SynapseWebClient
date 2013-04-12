@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.io.Serializable;
+
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
 
 public class EntityTreeModel extends BaseTreeModel implements Serializable {

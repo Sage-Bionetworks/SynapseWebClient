@@ -10,11 +10,12 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.ExceptionUtils;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -335,12 +336,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 	
 	@Override
 	public void showInfoSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 		//TODO: Move info messages on top of modal shade
 //		Alert alert = new Alert(title, message);
 //		alert.setTimeout(1000);
@@ -350,7 +351,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	
 	@Override
 	public void showInfoError(String title, String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 	
 	/*
@@ -452,7 +453,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				else if (isTheAuthenticatedUsersGroup)
 					principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.AUTHENTICATED_USERS_ACL_TITLE, DisplayConstants.AUTHENTICATED_USERS_ACL_DESCRIPTION);
 				else
-					principalHtml = DisplayUtils.getUserNameEmailHtml(principal);
+					principalHtml = ExceptionUtils.getUserNameEmailHtml(principal);
 				
 				String iconHtml = "";
 				if (principal.getPic() != null) {

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.VoidCallback;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;

@@ -35,9 +35,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
@@ -279,10 +276,6 @@ public class ProvUtilsTest {
 				return "";
 			}
 			
-			@Override
-			public LayoutResult nChartlayout(NChartLayersArray layers, NChartCharacters characters) {
-				return null;
-			}
 			@Override
 			public void setPageDescription(String newDescription) {
 				// TODO Auto-generated method stub

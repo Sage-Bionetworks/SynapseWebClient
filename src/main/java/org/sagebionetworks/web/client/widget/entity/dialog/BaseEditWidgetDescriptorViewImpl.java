@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.dialog;
 
 import java.util.Map;
 
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -112,7 +112,7 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -121,7 +121,7 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 	
 	@Override

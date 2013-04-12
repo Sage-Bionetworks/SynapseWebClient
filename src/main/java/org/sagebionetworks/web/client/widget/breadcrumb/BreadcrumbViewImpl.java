@@ -3,9 +3,9 @@ package org.sagebionetworks.web.client.widget.breadcrumb;
 import java.util.List;
 
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -93,12 +93,12 @@ public class BreadcrumbViewImpl extends LayoutContainer implements BreadcrumbVie
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message); 
+		AlertUtils.showErrorMessage(message); 
 	}
 
 	/*

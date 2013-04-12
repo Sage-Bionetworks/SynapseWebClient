@@ -7,7 +7,8 @@ import java.util.Map;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.factory.EditorFactory;
+import org.sagebionetworks.web.client.factory.RendererFactory;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -20,15 +21,17 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	
 	private HashMap<String, String> contentType2FriendlyName = new HashMap<String, String>();
 	
-	PortalGinInjector ginInjector;
+	RendererFactory rendererFactory;
+	EditorFactory editorFactory;
 	NodeModelCreator nodeModelCreator;
 	JSONObjectAdapter adapter;
 	
 	@Inject
-	public WidgetRegistrarImpl(PortalGinInjector ginInjector, NodeModelCreator nodeModelCreator, JSONObjectAdapter adapter) {
-		this.ginInjector = ginInjector;
+	public WidgetRegistrarImpl(NodeModelCreator nodeModelCreator, JSONObjectAdapter adapter, RendererFactory rendererFactory, EditorFactory editorFactory) {
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapter = adapter;
+		this.rendererFactory = rendererFactory;
+		this.editorFactory = editorFactory;
 		initWithKnownWidgets();
 	}
 	
@@ -48,26 +51,26 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
-			presenter = ginInjector.getYouTubeConfigEditor();
+			presenter = editorFactory.getYouTubeConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
-			presenter = ginInjector.getProvenanceConfigEditor();
+			presenter = editorFactory.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
 			if (isWiki)
-				presenter = ginInjector.getImageConfigEditor();
+				presenter = editorFactory.getImageConfigEditor();
 			else
-				presenter = ginInjector.getOldImageConfigEditor();
+				presenter = editorFactory.getOldImageConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
-			presenter = ginInjector.getLinkConfigEditor();
+			presenter = editorFactory.getLinkConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.TABBED_TABLE_CONTENT_TYPE)) {
-			presenter = ginInjector.getTabbedTableConfigEditor();
+			presenter = editorFactory.getTabbedTableConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE)) {
-			presenter = ginInjector.getSynapseAPICallConfigEditor();
+			presenter = editorFactory.getSynapseAPICallConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
-			presenter = ginInjector.getAttachmentConfigEditor();
+			presenter = editorFactory.getAttachmentConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.ENTITYLIST_CONTENT_TYPE)) {
-			presenter = ginInjector.getEntityListConfigEditor();
+			presenter = editorFactory.getEntityListConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.SHINYSITE_CONTENT_TYPE)) {
-			presenter = ginInjector.getShinySiteConfigEditor();
+			presenter = editorFactory.getShinySiteConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -90,28 +93,28 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
-			presenter = ginInjector.getYouTubeRenderer();
+			presenter = rendererFactory.getYouTubeRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
-			presenter = ginInjector.getProvenanceRenderer();
+			presenter = rendererFactory.getProvenanceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
 			if (isWiki)
-				presenter = ginInjector.getImageRenderer();
+				presenter = rendererFactory.getImageRenderer();
 			else
-				presenter = ginInjector.getOldImageRenderer();
+				presenter = rendererFactory.getOldImageRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE)) {
-			presenter = ginInjector.getSynapseAPICallRenderer();
+			presenter = rendererFactory.getSynapseAPICallRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.TOC_CONTENT_TYPE)) {
-			presenter = ginInjector.getTableOfContentsRenderer();
+			presenter = rendererFactory.getTableOfContentsRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE)) {
-			presenter = ginInjector.getWikiFilesPreviewRenderer();
+			presenter = rendererFactory.getWikiFilesPreviewRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
-			presenter = ginInjector.getAttachmentPreviewRenderer();
+			presenter = rendererFactory.getAttachmentPreviewRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.ENTITYLIST_CONTENT_TYPE)) {
-			presenter = ginInjector.getEntityListRenderer();
+			presenter = rendererFactory.getEntityListRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.SHINYSITE_CONTENT_TYPE)) {
-			presenter = ginInjector.getShinySiteRenderer();
+			presenter = rendererFactory.getShinySiteRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.USERBADGE_CONTENT_TYPE)) {
-			presenter = ginInjector.getUserBadgeWidget();
+			presenter = rendererFactory.getUserBadgeWidget();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)

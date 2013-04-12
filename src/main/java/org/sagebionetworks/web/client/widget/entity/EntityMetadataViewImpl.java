@@ -12,10 +12,13 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.EntityIconUtils;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
+import org.sagebionetworks.web.client.utils.SynapsePlaceUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.IconMenu;
@@ -251,7 +254,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 		Entity e = bundle.getEntity();
 
-		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
+		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(EntityIconUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
 		synapseIconForEntity.applyTo(entityIcon);
 		
 		setEntityName(e.getName());
@@ -322,7 +325,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	public void setEntityName(String text) {
@@ -478,10 +481,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 						Hyperlink link = new Hyperlink();
 						if (topVersion) {
 							// This is so the user can easily get back to the non-readonly page
-							link.setTargetHistoryToken(DisplayUtils
+							link.setTargetHistoryToken(SynapsePlaceUtils
 								.getSynapseHistoryTokenNoHash(vb.getId()));
 						} else {
-							link.setTargetHistoryToken(DisplayUtils
+							link.setTargetHistoryToken(SynapsePlaceUtils
 									.getSynapseHistoryTokenNoHash(vb.getId(),
 											(Long) model.get(VERSION_KEY_NUMBER)));
 						}
@@ -663,7 +666,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 	
 	private String stubUseTime(String userTime) {

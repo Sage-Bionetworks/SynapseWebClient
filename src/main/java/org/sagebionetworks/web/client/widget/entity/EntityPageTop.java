@@ -7,7 +7,6 @@ import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -18,6 +17,9 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.EntityIconUtils;
+import org.sagebionetworks.web.client.utils.EntityTypeUtils;
+import org.sagebionetworks.web.client.utils.SynapsePlaceUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityType;
@@ -124,7 +126,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public String createEntityLink(String id, String version, String display) {
-		return DisplayUtils.createEntityLink(id, version, display);
+		return SynapsePlaceUtils.createEntityLink(id, version, display);
 	}
 
 	@Override
@@ -134,9 +136,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if(type == null)
 			type = entityTypeProvider.getEntityTypeForClassName(typeString);
 		if(type == null) {
-			return DisplayUtils.getSynapseIconForEntity(null, IconSize.PX16, iconsImageBundle);
+			return EntityIconUtils.getSynapseIconForEntity(null, IconSize.PX16, iconsImageBundle);
 		}
-		return DisplayUtils.getSynapseIconForEntityType(type, IconSize.PX16, iconsImageBundle);
+		return EntityIconUtils.getSynapseIconForEntityType(type, IconSize.PX16, iconsImageBundle);
 	}
 
 	@Override
@@ -168,7 +170,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	 */
 	private void sendDetailsToView(boolean isAdmin, boolean canEdit) {
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
-		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
+		entityTypeDisplay = EntityTypeUtils.getEntityTypeDisplay(schema);
 		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, readOnly);
 	}
 	

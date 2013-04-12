@@ -6,9 +6,10 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.SynapsePlaceUtils;
 
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.Style.SortDir;
@@ -179,7 +180,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -188,7 +189,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -238,7 +239,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 			String link;
 			String name = header.getName();
 			if(makeLinks && !PLACEHOLDER_ID.equals(header.getId())) {
-				link = "<a href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\">" + name + "</a>";
+				link = "<a href=\"" + SynapsePlaceUtils.getSynapseHistoryToken(header.getId()) + "\">" + name + "</a>";
 			} else {
 				link = name;
 			}

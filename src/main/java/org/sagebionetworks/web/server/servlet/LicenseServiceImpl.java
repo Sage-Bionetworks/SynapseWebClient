@@ -1,24 +1,10 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.logging.Logger;
 
-import org.sagebionetworks.web.client.SearchService;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicenceService;
 import org.sagebionetworks.web.server.ColumnConfigProvider;
 import org.sagebionetworks.web.server.RestTemplateProvider;
-import org.sagebionetworks.web.shared.QueryConstants.ObjectType;
-import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
-import org.sagebionetworks.web.shared.SearchParameters;
-import org.sagebionetworks.web.shared.WhereCondition;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;

@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client.widget.footer;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.utils.CookieProviderUtils;
 
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
@@ -20,7 +19,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -55,7 +53,7 @@ public class FooterViewImpl extends Composite implements FooterView {
 		debugModeLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (!DisplayUtils.isInTestWebsite(cookies)) {
+				if (!CookieProviderUtils.isInTestWebsite(cookies)) {
 					//verify
 					MessageBox box = new MessageBox();
 				    box.setButtons(MessageBox.YESNO);
@@ -67,7 +65,7 @@ public class FooterViewImpl extends Composite implements FooterView {
 							Button btn = be.getButtonClicked();
 							if(Dialog.YES.equals(btn.getItemId())) {
 								//switch to pre-release test website mode
-								DisplayUtils.setTestWebsite(true, cookies);
+								CookieProviderUtils.setTestWebsite(true, cookies);
 								Window.Location.reload();
 							}
 						}
@@ -76,7 +74,7 @@ public class FooterViewImpl extends Composite implements FooterView {
 				    box.show();
 				} else {
 					//switch back to standard mode
-					DisplayUtils.setTestWebsite(false, cookies);
+					CookieProviderUtils.setTestWebsite(false, cookies);
 					Window.Location.reload();
 				}
 				

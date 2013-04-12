@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.ExceptionUtils;
 import org.sagebionetworks.web.client.view.BCCCallback;
 import org.sagebionetworks.web.client.view.BCCOverviewView;
 import org.sagebionetworks.web.shared.BCCSignupProfile;
@@ -65,7 +66,7 @@ public class BCCOverviewPresenter extends AbstractActivity implements BCCOvervie
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+				ExceptionUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 			}
 		});
 	}

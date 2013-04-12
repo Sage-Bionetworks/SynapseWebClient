@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.Iterator;
-
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -15,7 +13,6 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.HomeView;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -23,7 +20,6 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
-import com.sun.syndication.feed.synd.SyndContent;
 
 @SuppressWarnings("unused")
 public class HomePresenter extends AbstractActivity implements HomeView.Presenter, Presenter<Home> {

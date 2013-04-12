@@ -9,7 +9,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.events.EntitySelectedHandler;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.VersionUtils;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
 
@@ -153,7 +154,7 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -162,7 +163,7 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -320,7 +321,7 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	}
 
 	private void updateSelectedView() {		
-		selectedText.setHTML("<h4>" + DisplayConstants.CURRENTLY_SELCTED + ": " + DisplayUtils.createEntityVersionString(selectedRef) + "</h4>");
+		selectedText.setHTML("<h4>" + DisplayConstants.CURRENTLY_SELCTED + ": " + VersionUtils.createEntityVersionString(selectedRef) + "</h4>");
 	}
 
 	private void createVersionChooser(String entityId) {

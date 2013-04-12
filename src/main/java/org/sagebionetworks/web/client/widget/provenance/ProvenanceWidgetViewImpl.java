@@ -4,13 +4,12 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
@@ -32,12 +31,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class ProvenanceWidgetViewImpl extends LayoutContainer implements ProvenanceWidgetView {
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
-	private PortalGinInjector ginInjector;
+	private Provider<UserBadge> ginInjector;
 	private ProvGraph graph;
 	private LayoutContainer debug;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -47,7 +47,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	
 	@Inject
 	public ProvenanceWidgetViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
+			IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, Provider<UserBadge> ginInjector) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -83,7 +83,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override

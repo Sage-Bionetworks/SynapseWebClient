@@ -17,7 +17,11 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.EntityIconUtils;
+import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.utils.UploadUtils;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
@@ -150,10 +154,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			//add an anchor with the file name, that redirects to the download button for functionality
 			entityLink.setText(entity.getName());
 			entityId.setInnerText(entity.getId());
-			AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
+			AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(EntityIconUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
 			synapseIconForEntity.applyTo(entityIcon);
 			//fileHandle is null if user can't access the filehandle associated with this fileentity
-			FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+			FileHandle fileHandle = FileHandleUtils.getFileHandle(entityBundle);
 			boolean isFilenamePanelVisible = fileHandle != null;
 			fileNameContainer.setVisible(isFilenamePanelVisible);
 			if (isFilenamePanelVisible) {
@@ -183,7 +187,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		else {
 			uploadButtonContainer.clear();
 			if (canEdit)
-				uploadButtonContainer.add(DisplayUtils.getUploadButton(entityBundle, entityType, locationableUploader, iconsImageBundle, new EntityUpdatedHandler() {				
+				uploadButtonContainer.add(UploadUtils.getUploadButton(entityBundle, entityType, locationableUploader, iconsImageBundle, new EntityUpdatedHandler() {				
 					@Override
 					public void onPersistSuccess(EntityUpdatedEvent event) {
 						presenter.fireEntityUpdatedEvent();
@@ -236,7 +240,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -245,7 +249,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
@@ -77,7 +77,7 @@ public class LinkConfigViewImpl extends LayoutContainer implements LinkConfigVie
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class LinkConfigViewImpl extends LayoutContainer implements LinkConfigVie
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.SynapsePlaceUtils;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -60,7 +60,7 @@ public class APITableColumnRendererSynapseID implements APITableColumnRenderer {
 	public static String getSynapseLinkHTML(String value) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<a class=\"link\" href=\"");
-		sb.append(DisplayUtils.getSynapseHistoryToken(value));
+		sb.append(SynapsePlaceUtils.getSynapseHistoryToken(value));
 		sb.append("\">");
 		sb.append(value);
 		sb.append("</a>");

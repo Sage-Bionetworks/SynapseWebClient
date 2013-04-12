@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.sharing;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton.AccessLevel;
-import org.sagebionetworks.web.shared.NodeType;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.IconAlign;

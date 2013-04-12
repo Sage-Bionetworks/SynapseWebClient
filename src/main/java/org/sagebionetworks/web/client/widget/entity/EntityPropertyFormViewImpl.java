@@ -7,10 +7,11 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.WikiUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -79,7 +80,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	public void showEditEntityDialog(String windowTitle) {
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
-		boolean isWikiEntityEditor = DisplayUtils.isWikiSupportedType(presenter.getEntity());
+		boolean isWikiEntityEditor = WikiUtils.isWikiSupportedType(presenter.getEntity());
 		int height = isWikiEntityEditor ? 400 : 660;
 		window.setSize(DIALOG_WIDTH, height);
 	    window.setPlain(true);  
@@ -191,7 +192,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		
 		//markdown widget to be removed from entity property form
 		//only reconfigure the md editor if the entity id is set
-		if (DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
+		if (WikiUtils.isWikiSupportedType(presenter.getEntity())) {
 			formPanel.add(descriptionField, basicFormData);
 		}
 		else {
@@ -231,7 +232,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
 		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 		
-		if (DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
+		if (WikiUtils.isWikiSupportedType(presenter.getEntity())) {
 			descriptionField = (TextField<String>) formFactory.createField(model.getDescription());
 			descriptionField.setToolTip(DisplayConstants.ENTITY_DESCRIPTION_TOOLTIP);
 		}
@@ -258,7 +259,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	}
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -268,7 +269,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 	
 	/**

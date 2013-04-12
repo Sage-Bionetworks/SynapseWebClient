@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
-import java.util.List;
-
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;

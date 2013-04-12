@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -162,7 +163,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			if (entityBundle.getEntity() instanceof FileEntity) {
 				FileEntity fileEntity = (FileEntity)entityBundle.getEntity();
 				if (this.authenticationController.isLoggedIn()) {
-					FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+					FileHandle fileHandle = FileHandleUtils.getFileHandle(entityBundle);
 					if (fileHandle != null) {
 						String md5 = null;
 						if (fileHandle instanceof S3FileHandleInterface) {

@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.bccsetup.SpreadsheetHelper;
-import org.sagebionetworks.utils.EmailUtils;
 import org.sagebionetworks.web.client.BCCSignup;
 import org.sagebionetworks.web.shared.BCCSignupProfile;
 

@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -173,7 +173,7 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -182,7 +182,7 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override

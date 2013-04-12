@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.fail;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 

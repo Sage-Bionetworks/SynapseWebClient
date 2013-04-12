@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -21,11 +19,11 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.SynapsePlaceUtils;
+import org.sagebionetworks.web.client.utils.VersionUtils;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -111,7 +109,7 @@ public class EntityListUtil {
 			Reference ref = record.getEntityReference();
 			if(ref == null) continue; 		
 			if(!recordStr.equals("")) recordStr += LIST_DELIMITER;
-			recordStr += DisplayUtils.createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
+			recordStr += VersionUtils.createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
 			String note = record.getNote();
 			if(note != null && !note.equals("")) {
 				recordStr += NOTE_DELIMITER + WidgetEncodingUtil.encodeValue(note);
@@ -130,7 +128,7 @@ public class EntityListUtil {
 			if(parts.length <= 0) continue;
 			EntityGroupRecord record = new EntityGroupRecord();			
 			if(parts[0] != null && !"".equals(parts[0])) {
-				Reference ref = DisplayUtils.parseEntityVersionString(parts[0]);
+				Reference ref = VersionUtils.parseEntityVersionString(parts[0]);
 				if(ref == null) continue;
 				record.setEntityReference(ref);				
 			}
@@ -157,9 +155,9 @@ public class EntityListUtil {
 				
 		String nameLinkUrl;
 		if(referencedEntity instanceof Versionable) {
-			nameLinkUrl = DisplayUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId(), ((Versionable)referencedEntity).getVersionNumber());
+			nameLinkUrl = SynapsePlaceUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId(), ((Versionable)referencedEntity).getVersionNumber());
 		} else {
-			nameLinkUrl = DisplayUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId());
+			nameLinkUrl = SynapsePlaceUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId());
 		}
 
 		// download
@@ -178,7 +176,7 @@ public class EntityListUtil {
 		// version
 		String version = "N/A";
 		if(referencedEntity instanceof Versionable) {
-			version = DisplayUtils.getVersionDisplay((Versionable)referencedEntity);
+			version = VersionUtils.getVersionDisplay((Versionable)referencedEntity);
 		}							
 		
 		// desc

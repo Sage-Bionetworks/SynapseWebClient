@@ -37,7 +37,6 @@ import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.WebConstants;
 

@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.ExceptionUtils;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
@@ -295,7 +296,7 @@ public class EntityMetadata implements Presenter {
 						new AsyncCallback<EntityWrapper>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								if (!DisplayUtils.handleServiceException(
+								if (!ExceptionUtils.handleServiceException(
 										caught, globalApplicationState.getPlaceChanger(),
 										authenticationController.getLoggedInUser())) {
 									view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE
@@ -319,7 +320,7 @@ public class EntityMetadata implements Presenter {
 		synapseClient.promoteEntityVersion(entityId, versionNumber, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught,
+				if (!ExceptionUtils.handleServiceException(caught,
 						globalApplicationState.getPlaceChanger(),
 						authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_PROMOTE_FAILURE+ "\n "+ caught.getMessage());
@@ -346,7 +347,7 @@ public class EntityMetadata implements Presenter {
 		synapseClient.deleteEntityVersionById(entityId, versionNumber, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught,
+				if (!ExceptionUtils.handleServiceException(caught,
 						globalApplicationState.getPlaceChanger(),
 						authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + "\n" + caught.getMessage());

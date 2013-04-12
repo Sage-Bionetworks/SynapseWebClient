@@ -7,8 +7,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.shared.NodeType;
 

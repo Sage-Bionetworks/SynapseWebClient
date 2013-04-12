@@ -10,6 +10,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.FileHandleUtils;
+import org.sagebionetworks.web.client.utils.PreviewUtils;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -73,8 +75,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 	public Widget asWidget() {
 		view.clear();
 		if (bundle != null) {
-			PreviewFileHandle handle = DisplayUtils.getPreviewFileHandle(bundle);
-			FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
+			PreviewFileHandle handle = PreviewUtils.getPreviewFileHandle(bundle);
+			FileHandle originalFileHandle = FileHandleUtils.getFileHandle(bundle);
 			final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
 			if (previewType != PreviewFileType.NONE) {
 				FileEntity fileEntity = (FileEntity)bundle.getEntity();

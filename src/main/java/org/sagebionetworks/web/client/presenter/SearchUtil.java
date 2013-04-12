@@ -36,5 +36,23 @@ public class SearchUtil {
 		}
 		return null;
 	}
+	
+	public static String getSearchHistoryToken(String searchQuery) {
+		Search place = new Search(searchQuery);
+		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
+	}
+	
+	public static String getSearchHistoryToken(String searchQuery, Long start) {
+		Search place = new Search(searchQuery, start);
+		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
+	}
+	
+	
+	private static String getSearchPlaceString(Class<Search> place) {
+		String fullPlaceName = place.getName();		
+		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
+		return fullPlaceName;
+	}
+
 
 }

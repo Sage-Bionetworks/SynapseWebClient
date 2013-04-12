@@ -2,10 +2,6 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
-
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public interface SynapseJSNIUtils {
@@ -35,8 +31,6 @@ public interface SynapseJSNIUtils {
 	public String getLocationPath();
 	
 	public String getLocationQueryString();
-	
-	public LayoutResult nChartlayout(NChartLayersArray layers, NChartCharacters characters);
 	
 	public void setPageTitle(String newTitle);
 	

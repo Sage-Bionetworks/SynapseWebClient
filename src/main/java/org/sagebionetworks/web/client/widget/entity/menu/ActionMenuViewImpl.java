@@ -21,6 +21,9 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.EntityFinderUtils;
+import org.sagebionetworks.web.client.utils.EntityIconUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
@@ -157,7 +160,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -166,7 +169,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -259,20 +262,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				window.show();
 			}
 		});		
-	}
-
-	private MenuItem createAddMenuItem(final EntityType childType, final Entity entity) {
-		String displayName = typeProvider.getEntityDispalyName(childType);			
-		MenuItem item = new MenuItem(displayName);				
-		item.setIcon(AbstractImagePrototype.create(DisplayUtils
-				.getSynapseIconForEntityType(childType, IconSize.PX16,
-						iconsImageBundle)));				
-		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-			public void componentSelected(MenuEvent menuEvent) {
-				presenter.addNewChild(childType, entity.getId());
-			}
-		});
-		return item;
 	}
 	
 	private void configureToolsMenu(EntityBundle entityBundle, EntityType entityType, boolean isAdministrator, boolean canEdit) {
@@ -389,13 +378,13 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private void addCreateShortcutItem(Menu menu, Entity entity,EntityType entityType) {	
 		// Create shortcut
 		MenuItem item = new MenuItem(DisplayConstants.LABEL_CREATE_LINK);
-		item.setIcon(AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntityClassName(Link.class.getName(), IconSize.PX16, iconsImageBundle)));		
+		item.setIcon(AbstractImagePrototype.create(EntityIconUtils.getSynapseIconForEntityClassName(Link.class.getName(), IconSize.PX16, iconsImageBundle)));		
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {				
 				entityFinder.configure(false);				
 				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				EntityFinderUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {
@@ -426,7 +415,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			public void componentSelected(MenuEvent ce) {				
 				entityFinder.configure(false);				
 				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				EntityFinderUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {

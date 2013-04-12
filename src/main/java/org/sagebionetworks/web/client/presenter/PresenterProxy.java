@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -35,7 +35,7 @@ public class PresenterProxy<P extends Presenter<T>,T extends Place> extends Abst
 			@Override
 			public void onFailure(Throwable caught) {
 				// Not sure what to do here.
-				DisplayUtils.showErrorMessage(caught.getMessage());
+				AlertUtils.showErrorMessage(caught.getMessage());
 			}
 
 			@Override
