@@ -289,10 +289,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			versionNumber = vb.getVersionNumber();
 		}
 		favoriteWidget.configure(bundle.getEntity().getId());
-
-		//TODO: uncomment to expose doi widget	
-//		if (bundle.getPermissions().getCanEdit())
-//			doiWidget.configure(bundle.getEntity().getId(), versionNumber);
+		
+		//doi widget
+		if (bundle.getPermissions().getCanEdit())
+			doiWidget.configure(bundle.getEntity().getId(), versionNumber);
 	}
 
 	private void clear() {
