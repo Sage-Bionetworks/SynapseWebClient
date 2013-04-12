@@ -21,6 +21,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.CancelEvent;
@@ -36,6 +37,7 @@ import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -201,7 +203,7 @@ public class UploaderTest {
 		uploader.handleUpload("newFile.txt");
 		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
-		verify(synapseJsniUtils).uploadFile(anyString(), anyString(), any(XMLHttpRequest.class));
+		verify(synapseJsniUtils).uploadFile(anyString(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//kick off what would happen after a successful upload
 		uploader.directUploadStep3(false);
 		verify(synapseClient).completeChunkedFileUpload(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));

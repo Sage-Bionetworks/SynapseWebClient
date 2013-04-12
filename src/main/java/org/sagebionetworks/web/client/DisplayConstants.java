@@ -221,6 +221,7 @@ public class DisplayConstants {
 	public static final String TEXT_PROFILE_PICTURE_SUCCESS = "Profile Photo Uploaded to Synapse";
 	public static final String ERROR_UPLOAD = "An error occurred during upload. Please try again.";
 	public static final String LABEL_UPLOADING = "Uploading...";
+	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
 	public static final String LABEL_WHERE_SAVE_LINK = "Where would you like to save a Link to this page?";
 	public static final String ERROR_NOT_FOUND = "Sorry, the requested object was not found or no longer exists.";
