@@ -118,6 +118,21 @@ public class ServerMarkdownUtilsTest {
 	}
 	
 	@Test
+	public void testResolveHorizontalRules(){
+		//dash test
+		String testString = "--------\n-----\n---\n-\n - -  - -   -  \n-----  foo\nother content ------ in line should not match\n------\n- - - - -";
+		String expectedResult = "<hr>\n<hr>\n<hr>\n-\n<hr>\n-----  foo\nother content ------ in line should not match\n<hr>\n<hr>\n";
+		String result = ServerMarkdownUtils.resolveHorizontalRules(testString);
+		assertEquals(expectedResult, result);
+		
+		//asterisk test
+		testString = "********\n*****\n***\n*\n * *  * *   *  \n*****  foo\nother content ****** in line should not match\n******\n* * * * *";
+		expectedResult = "<hr>\n<hr>\n<hr>\n*\n<hr>\n*****  foo\nother content ****** in line should not match\n<hr>\n<hr>\n";
+		result = ServerMarkdownUtils.resolveHorizontalRules(testString);
+		assertEquals(expectedResult, result);
+	}
+	
+	@Test
 	public void testResolveTables(){
 		String testString = "${image?fileName=bill%5Fgates%2Egif}  | Second Header | Third Header\nContent Cell1a  | Content Cell2a  | Content Cell3a\nContent Cell1b  | Content Cell2b   Content Cell3b";
 		String result = ServerMarkdownUtils.resolveTables(testString);

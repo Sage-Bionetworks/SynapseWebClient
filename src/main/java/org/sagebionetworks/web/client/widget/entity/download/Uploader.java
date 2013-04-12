@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.CancelEvent;
@@ -223,7 +224,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							}
 						});
 					}
-					synapseJsniUtils.uploadFile(UploaderViewImpl.FILE_FIELD_ID, urlString, xhr);
+					view.resetProgresBar();
+					synapseJsniUtils.uploadFile(UploaderViewImpl.FILE_FIELD_ID, urlString, xhr, new ProgressCallback() {
+						@Override
+						public void updateProgress(double value, String text) {
+							view.updateProgress(value, text);
+						}
+					});
 				}
 				@Override
 				public void onFailure(Throwable t) {
