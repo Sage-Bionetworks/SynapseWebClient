@@ -92,6 +92,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
+		entityEditor.setEntityUpdatedHandler(handler);
 	}
 
 	@Override
