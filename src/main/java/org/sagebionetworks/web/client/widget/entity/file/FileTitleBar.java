@@ -77,6 +77,7 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
+		entityEditor.setEntityUpdatedHandler(handler);
 	}
 
 	@Override
