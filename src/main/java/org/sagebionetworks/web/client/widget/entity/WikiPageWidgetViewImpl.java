@@ -183,8 +183,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private SimplePanel getCommands(Boolean canEdit) {
 		if (commandBarWrapper == null) {
 			commandBarWrapper = new SimplePanel();
-			commandBarWrapper.addStyleName("margin-bottom-20 span-"+spanWidth);
+			commandBarWrapper.addStyleName("margin-bottom-20 span-"+spanWidth + " margin-top-5");
 			commandBar = new HorizontalPanel();
+			commandBar.addStyleName("right");
 			commandBar.setVerticalAlign(VerticalAlignment.MIDDLE);
 			commandBar.setHorizontalAlign(HorizontalAlignment.LEFT);
 			commandBarWrapper.add(commandBar);
@@ -200,8 +201,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		
 		if(addPageButton == null) {
 			addPageButton = getInsertPageButton(false);
-			commandBar.add(addPageButton);
-			commandBar.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
+			commandBar.add(addPageButton);			
 		}
 		
 		commandBarWrapper.setVisible(canEdit);

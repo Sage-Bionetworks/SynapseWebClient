@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -41,6 +42,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
+import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class ProvUtilsTest {
@@ -302,7 +304,7 @@ public class ProvUtilsTest {
 			}
 			@Override
 			public void uploadFile(String fileFieldId, String url,
-					XMLHttpRequest xhr) {
+					XMLHttpRequest xhr, ProgressCallback progressCallback) {
 				// TODO Auto-generated method stub
 				
 			}
