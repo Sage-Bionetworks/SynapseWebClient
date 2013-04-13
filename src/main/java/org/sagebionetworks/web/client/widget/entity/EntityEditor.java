@@ -16,6 +16,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -24,6 +26,7 @@ import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityType;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -42,6 +45,7 @@ public class EntityEditor {
 	ClientLogger log;
 	GlobalApplicationState globalApplicationState;
 	SynapseClientAsync client;
+	EntityUpdatedHandler entityUpdatedHandler;
 	
 	@Inject
 	public EntityEditor(EntitySchemaCache cache, AdapterFactory factory,
@@ -88,6 +92,15 @@ public class EntityEditor {
 			public void saveEntity(JSONObjectAdapter newAdapter, Annotations newAnnos) {
 				onSaveEntity(newAdapter, newAnnos, isNew);
 			}});
+	}
+	
+	public void fireEntityUpdatedEvent() {
+		if (entityUpdatedHandler != null)
+			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
+	}
+	
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		this.entityUpdatedHandler = handler;
 	}
 
 	/**
@@ -156,8 +169,8 @@ public class EntityEditor {
 				
 				@Override
 				public void onSuccess(String result) {
-					// go to the update entity
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(result));
+					//entity updated
+					fireEntityUpdatedEvent();
 				}
 				
 				@Override
