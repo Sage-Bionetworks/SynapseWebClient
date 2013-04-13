@@ -8,6 +8,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.WikiUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -143,7 +145,7 @@ public class WikiAttachmentsViewImpl extends LayoutContainer implements WikiAtta
 			SafeHtml previewToolip = SafeHtmlUtils.fromSafeConstant("<div class=\"preview-image-loading\" >"
 			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_START
 			    		+ "<img style=\"background: white; margin:auto; display:block;\" src=\"" 
-			    		+ DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, data.getFileName(),true) + "\"/>"
+			    		+ WikiUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, data.getFileName(),true) + "\"/>"
 			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_END
 			    		+ "</div>");  
 		    
@@ -247,12 +249,12 @@ public class WikiAttachmentsViewImpl extends LayoutContainer implements WikiAtta
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	

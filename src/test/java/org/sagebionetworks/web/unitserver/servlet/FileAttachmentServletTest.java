@@ -1,20 +1,20 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
-import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InOrder;
-
-import static org.mockito.Mockito.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.web.client.cookie.CookieKeys;

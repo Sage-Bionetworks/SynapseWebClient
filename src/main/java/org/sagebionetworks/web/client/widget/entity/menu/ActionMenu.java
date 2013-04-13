@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.ExceptionUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
@@ -134,7 +135,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				if (caught instanceof UnauthorizedException) {
 					view.showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
 				}
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!ExceptionUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_MOVE_FAILURE);			
 				}
 			}
@@ -168,7 +169,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!ExceptionUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
 				}
 			}
@@ -226,7 +227,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 					view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
 					return;
 				}
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!ExceptionUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 				}
 			}

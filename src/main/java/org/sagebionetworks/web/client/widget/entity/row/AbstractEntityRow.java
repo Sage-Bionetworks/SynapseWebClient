@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.row;
 
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.web.client.widget.entity.AdapterUtils;
 import org.sagebionetworks.web.client.widget.entity.StringValueUtils;
 
 /**

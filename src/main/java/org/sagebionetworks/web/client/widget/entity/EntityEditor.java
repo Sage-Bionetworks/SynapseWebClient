@@ -12,13 +12,13 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientLogger;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.EntityTypeUtils;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
 import org.sagebionetworks.web.shared.EntityConstants;
@@ -79,7 +79,7 @@ public class EntityEditor {
 	    } else {
 		title.append("Edit ");
 	    }
-	    title.append(DisplayUtils.getEntityTypeDisplay(schema));
+	    title.append(EntityTypeUtils.getEntityTypeDisplay(schema));
 	    
 	    // Show the edit dialog.
 	    editorDialog.showEditEntityDialog(title.toString(), bundle, newAdapter, schema, newAnnos, filter, new EntityEditorDialog.Callback(){

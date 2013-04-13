@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.GovernanceDialogHelper;
@@ -239,12 +240,12 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 	
 	

@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -87,7 +88,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -99,7 +100,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 

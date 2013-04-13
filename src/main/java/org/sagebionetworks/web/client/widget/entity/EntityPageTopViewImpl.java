@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
@@ -24,8 +23,11 @@ import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.EntityBundleUtils;
+import org.sagebionetworks.web.client.utils.VersionUtils;
+import org.sagebionetworks.web.client.utils.WikiUtils;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
@@ -65,6 +67,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class EntityPageTopViewImpl extends Composite implements EntityPageTopView {
 
@@ -91,8 +94,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private ActionMenu actionMenu;
 	private LocationableTitleBar locationableTitleBar;
 	private FileTitleBar fileTitleBar;
-	private PortalGinInjector ginInjector;
-	private EntityTreeBrowser entityTreeBrowser;
+	private Provider<ProvenanceWidget> ginInjector;
 	private Breadcrumb breadcrumb;
 	private PropertyWidget propertyWidget;
 	private LayoutContainer colLeftContainer;
@@ -115,15 +117,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			ActionMenu actionMenu,
 			LocationableTitleBar locationableTitleBar,
 			FileTitleBar fileTitleBar,
-			EntityTreeBrowser entityTreeBrowser, Breadcrumb breadcrumb,
+			Breadcrumb breadcrumb,
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget, PreviewWidget previewWidget) {
+			Provider<ProvenanceWidget> ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget, PreviewWidget previewWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
-		this.entityTreeBrowser = entityTreeBrowser;
 		this.breadcrumb = breadcrumb;
 		this.propertyWidget = propertyWidget;
 		this.attachmentsPanel = attachmentsPanel;
@@ -205,7 +206,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -213,7 +214,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -244,7 +245,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+		if (WikiUtils.isWikiSupportedType(bundle.getEntity())) {
 			//show preview
 			colLeftContainer.add(getFilePreview(bundle));
 		}
@@ -252,7 +253,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 		
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+		if (WikiUtils.isWikiSupportedType(bundle.getEntity())) {
 			// show Wiki
 			addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
 		}
@@ -272,7 +273,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ** FULL WIDTH **
 		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************
 		// Child Browser
-		if(DisplayUtils.hasChildrenOrPreview(bundle)){
+		if(EntityBundleUtils.hasChildrenOrPreview(bundle)){
 			colLeftContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
 		}
 		// ************************************************************************************************		
@@ -353,7 +354,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, int spanWidth) {
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+		if (WikiUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
 			container.add(wikiPageWidget.asWidget());
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), canEdit, new WikiPageWidget.Callback() {
@@ -407,12 +408,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 	    // Create the property body
 	    // the headers for properties.
-		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();				
+		ProvenanceWidget provenanceWidget = ginInjector.get();				
 		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);		
 		
 		Map<String,String> configMap = new HashMap<String,String>();
 		Long version = bundle.getEntity() instanceof Versionable ? ((Versionable)bundle.getEntity()).getVersionNumber() : null; 
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(bundle.getEntity().getId(), version));
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, VersionUtils.createEntityVersionString(bundle.getEntity().getId(), version));
 		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
@@ -505,7 +506,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 		// Add the description body
 	    if(description != null && !("".equals(description))) {
-	    	if (!DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+	    	if (!WikiUtils.isWikiSupportedType(bundle.getEntity())) {
 				lc.add(markdownWidget);
 		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, false);
 	    	}

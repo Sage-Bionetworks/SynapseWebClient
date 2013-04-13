@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
@@ -172,7 +173,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -182,7 +183,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 

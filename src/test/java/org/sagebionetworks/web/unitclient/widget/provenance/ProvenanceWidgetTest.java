@@ -46,6 +46,7 @@ import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceJSNIUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -79,7 +80,7 @@ public class ProvenanceWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	LayoutServiceAsync mockLayoutService;
 	SynapseJSNIUtils synapseJsniUtils = implJSNIUtils();	
-	
+	ProvenanceJSNIUtils provenanceJsniUtils = provIimplJSNIUtils();	
 	Data outputEntity;
 	String entity456Id = "syn456";
 	BatchResults<EntityHeader> referenceHeaders;
@@ -103,7 +104,7 @@ public class ProvenanceWidgetTest {
 		adapterFactory = new AdapterFactoryImpl();
 		jsoProvider = new JsoProviderTestImpl();
 
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthController, mockLayoutService, adapterFactory, synapseJsniUtils, jsoProvider);
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockNodeModelCreator, adapterFactory, synapseJsniUtils, provenanceJsniUtils, jsoProvider);
 		verify(mockView).setPresenter(provenanceWidget);
 		
 		outputEntity = new Data();
@@ -369,11 +370,6 @@ public class ProvenanceWidgetTest {
 			}
 
 			@Override
-			public LayoutResult nChartlayout(NChartLayersArray layers,
-					NChartCharacters characters) {
-				return jsoProvider.newLayoutResult();
-			}
-			@Override
 			public void setPageDescription(String newDescription) {
 				
 			}
@@ -404,7 +400,18 @@ public class ProvenanceWidgetTest {
 			}
 		};
 	}
+	private ProvenanceJSNIUtils provIimplJSNIUtils() {
+		return new ProvenanceJSNIUtils() {
+			Random rand = new Random();
 
+			@Override
+			public LayoutResult nChartlayout(NChartLayersArray layers,
+					NChartCharacters characters) {
+				return jsoProvider.newLayoutResult();
+			}
+
+		};
+	}
 }
 
 

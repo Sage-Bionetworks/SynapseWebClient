@@ -1,16 +1,14 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.ExceptionUtils;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.HeaderData;
@@ -67,7 +65,7 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+				ExceptionUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 				callback.onFailure(caught);			
 			}
 		});
@@ -91,7 +89,7 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
+				ExceptionUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
 				callback.onFailure(caught);
 			}
 		});

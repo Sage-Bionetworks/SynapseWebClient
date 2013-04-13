@@ -12,7 +12,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.springframework.http.HttpHeaders;
 
 /**

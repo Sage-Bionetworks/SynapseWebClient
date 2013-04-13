@@ -12,15 +12,12 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
+import org.sagebionetworks.web.client.utils.ExceptionUtils;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -171,7 +168,7 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 	@Override
 	public EntityTypeResponse createEntityTypeResponse(String json) throws RestServiceException {
 		JSONObject obj = JSONParser.parseStrict(json).isObject();
-		DisplayUtils.checkForErrors(obj);
+		ExceptionUtils.checkForErrors(obj);
 		return new EntityTypeResponse(obj);
 	}
 		

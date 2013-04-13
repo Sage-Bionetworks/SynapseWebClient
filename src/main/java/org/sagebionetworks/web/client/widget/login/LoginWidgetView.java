@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface LoginWidgetView extends IsWidget {

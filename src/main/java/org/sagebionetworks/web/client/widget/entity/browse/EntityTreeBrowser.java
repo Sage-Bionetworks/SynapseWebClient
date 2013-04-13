@@ -26,6 +26,8 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.EntityIconUtils;
+import org.sagebionetworks.web.client.utils.ExceptionUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -104,7 +106,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+				ExceptionUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 			}
 		});
 	}
@@ -147,7 +149,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());				
+					ExceptionUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());				
 					asyncCallback.onFailure(caught);
 				}
 			});					
@@ -199,7 +201,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!ExceptionUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
 				}
 			}
@@ -237,7 +239,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		if(type.startsWith("org.")) entityType = entityTypeProvider.getEntityTypeForClassName(type); 			
 		else entityType = entityTypeProvider.getEntityTypeForString(type);
 		if (entityType == null) return null;
-		return DisplayUtils.getSynapseIconForEntityClassName(entityType.getClassName(), DisplayUtils.IconSize.PX16, iconsImageBundle);
+		return EntityIconUtils.getSynapseIconForEntityClassName(entityType.getClassName(), DisplayUtils.IconSize.PX16, iconsImageBundle);
 	}
 
 	@Override
@@ -257,7 +259,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!ExceptionUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
 					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
 				}
 				globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));

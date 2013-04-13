@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.unitserver.filter;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 import org.sagebionetworks.web.server.servlet.filter.SSLFilter;
 
 public class SSLFilterTest {

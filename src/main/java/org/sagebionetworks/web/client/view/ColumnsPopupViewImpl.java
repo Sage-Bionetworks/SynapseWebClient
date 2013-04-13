@@ -2,14 +2,13 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 import org.sagebionetworks.web.shared.HeaderData;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -91,7 +90,7 @@ public class ColumnsPopupViewImpl extends DialogBox implements ColumnsPopupView 
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -100,7 +99,7 @@ public class ColumnsPopupViewImpl extends DialogBox implements ColumnsPopupView 
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override

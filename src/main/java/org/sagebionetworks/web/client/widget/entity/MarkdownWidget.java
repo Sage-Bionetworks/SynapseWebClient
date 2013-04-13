@@ -8,6 +8,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.MarkdownUtils;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -63,7 +65,7 @@ public class MarkdownWidget extends LayoutContainer {
 					add(panel);
 					layout();
 					synapseJSNIUtils.highlightCodeBlocks();
-					DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
+					MarkdownUtils.loadTableSorters(panel, synapseJSNIUtils);
 					//asynchronously load the widgets
 					loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview);
 				} catch (JSONObjectAdapterException e) {
@@ -123,6 +125,6 @@ public class MarkdownWidget extends LayoutContainer {
 	}
 	
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 }

@@ -19,14 +19,11 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.VersionUtils;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -52,14 +49,12 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	
 	private static final String FAKE_ID_PREFIX = "fakeId";
 	private ProvenanceWidgetView view;
-	private NodeModelCreator nodeModelCreator;
-	private AuthenticationController authenticationController;
-	private GlobalApplicationState globalApplicationState;	
-	private LayoutServiceAsync layoutService;
+	private NodeModelCreator nodeModelCreator;	
 	private SynapseClientAsync synapseClient;
 	private Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
 	private AdapterFactory adapterFactory;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private ProvenanceJSNIUtils provenanceJSNIUtils;
 	private Map<String, String> descriptor;
 	private JsoProvider jsoProvider;
 	
@@ -83,19 +78,16 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
-			AuthenticationController authenticationController, 
-			LayoutServiceAsync layoutService, 
 			AdapterFactory adapterFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
+			ProvenanceJSNIUtils provenanceJSNIUtils,
 			JsoProvider jsoProvider) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
-		this.layoutService = layoutService;
 		this.adapterFactory = adapterFactory;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.provenanceJSNIUtils = provenanceJSNIUtils;
 		this.jsoProvider = jsoProvider;
 		view.setPresenter(this);
 	}	
@@ -115,7 +107,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			if(refs !=null) {
 				for(String refString : refs) {
 					// Only add valid References
-					Reference ref = DisplayUtils.parseEntityVersionString(refString);
+					Reference ref = VersionUtils.parseEntityVersionString(refString);
 					if(ref != null && ref.getTargetId() != null) {
 						if(ref.getTargetVersionNumber() == null) {
 							// if any current versions are requested then we need to look them up before proceeding. 
@@ -412,7 +404,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());
 		NChartLayersArray layerArray = NChartUtil.createLayers(jsoProvider, graph);
-		LayoutResult layoutResult = synapseJSNIUtils.nChartlayout(layerArray, characters);
+		LayoutResult layoutResult = provenanceJSNIUtils.nChartlayout(layerArray, characters);
 		NChartUtil.fillPositions(layoutResult, graph);
 		NChartUtil.repositionExpandNodes(graph);
 		view.setGraph(graph);

@@ -3,18 +3,14 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -130,37 +126,6 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	 */
 	public void clearSelection() {
 		this.view.clearSelection();
-	}
-	
-	/*
-	 * Private Methods
-	 */
-	private void executeSearch(SearchQuery query) { 								
-		JSONObjectAdapter adapter = adapterFactory.createNew();
-		try {
-			query.writeToJSONObject(adapter);
-			synapseClient.search(adapter.toJSONString(), new AsyncCallback<EntityWrapper>() {			
-				@Override
-				public void onSuccess(EntityWrapper result) {
-					SearchResults currentResult = new SearchResults();		
-					try {
-						currentResult = nodeModelCreator.createJSONEntity(result.getEntityJson(), SearchResults.class);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
-					}									
-					view.setSearchResults(currentResult);					
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					}
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
-		}
 	}
 	
 }

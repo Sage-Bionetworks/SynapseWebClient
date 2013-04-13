@@ -5,7 +5,6 @@ import java.util.List;
 import org.sagebionetworks.web.client.ClientLoggerImpl;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowList;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRowListImpl;
 
 import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -15,7 +14,6 @@ import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.form.Field;
-import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.form.TriggerField;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.google.gwt.event.dom.client.KeyCodes;

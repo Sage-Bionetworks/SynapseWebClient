@@ -1,16 +1,8 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.Code;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
-import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
-import org.sagebionetworks.web.shared.provenance.ActivityType;
-import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
-import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 
 /**

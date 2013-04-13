@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.sagebionetworks.web.client.widget.entity.GridStoreFactory;
 import org.sagebionetworks.web.client.widget.entity.StringValueUtils;
 /**
  * Test for the grid store factory

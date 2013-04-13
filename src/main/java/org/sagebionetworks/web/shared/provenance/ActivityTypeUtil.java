@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
-import org.sagebionetworks.repo.model.provenance.UsedEntity;
 
 public class ActivityTypeUtil {
 

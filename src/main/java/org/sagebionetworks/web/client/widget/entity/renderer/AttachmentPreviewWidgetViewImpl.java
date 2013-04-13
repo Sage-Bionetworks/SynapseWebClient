@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.WikiUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -25,7 +26,7 @@ public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements 
 		//create img
 		StringBuilder sb = new StringBuilder();
 		sb.append("<a class=\"link\" href=\"");
-		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
+		sb.append(WikiUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
 		sb.append("\">");
 		int lastDotIndex = fileName.lastIndexOf(".");
 		boolean isPreviewed = false;
@@ -34,7 +35,7 @@ public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements 
 			if (DisplayUtils.isRecognizedImageContentType("image/"+extension)) {
 				sb.append("<img class=\"imageDescriptor\" ");
 				sb.append(" src=\"");
-				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
+				sb.append(WikiUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
 				sb.append("\"></img>");
 				isPreviewed = true;
 			}

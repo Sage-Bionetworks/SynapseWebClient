@@ -10,6 +10,9 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.utils.AlertUtils;
+import org.sagebionetworks.web.client.utils.CookieProviderUtils;
+import org.sagebionetworks.web.client.utils.MarkdownUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -284,7 +287,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		else{
 			panel = new HTMLPanel(result);
 		}
-		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
+		MarkdownUtils.loadTableSorters(panel, synapseJSNIUtils);
 		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
@@ -361,7 +364,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    /**
 	     * load alpha test site widgets
 	     */
-	    if (DisplayUtils.isInTestWebsite(cookies)) {
+	    if (CookieProviderUtils.isInTestWebsite(cookies)) {
 	    	menu.add(new SeparatorMenuItem());
 	    	menu.add(getNewCommand(WidgetConstants.SHINYSITE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
@@ -440,6 +443,6 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	}
 	
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 }

@@ -12,8 +12,8 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.factory.TableColumnRendererFactory;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
@@ -30,13 +30,13 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private Map<String, String> descriptor;
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private PortalGinInjector ginInjector;
+	private TableColumnRendererFactory ginInjector;
 	private int total, rowCount;
 	private APITableConfig tableConfig;
 	
 	
 	@Inject
-	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector) {
+	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, TableColumnRendererFactory ginInjector) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -240,7 +240,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	 * @param friendlyName
 	 * @return
 	 */
-	public static APITableColumnRenderer createColumnRendererInstance(PortalGinInjector ginInjector, String friendlyName) {
+	public static APITableColumnRenderer createColumnRendererInstance(TableColumnRendererFactory ginInjector, String friendlyName) {
 		APITableColumnRenderer renderer;
 		if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID))
 			renderer = ginInjector.getAPITableColumnRendererUserId();

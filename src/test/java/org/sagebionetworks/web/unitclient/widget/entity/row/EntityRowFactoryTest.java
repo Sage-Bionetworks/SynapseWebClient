@@ -27,7 +27,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowAnnotation;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowConcept;

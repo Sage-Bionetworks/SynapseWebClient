@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.WikiUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -46,10 +47,10 @@ public class WikiFilesPreviewWidgetViewImpl extends LayoutContainer implements W
 				sb.append("<div class=\"preview-image-loading view\" >");
 				sb.append(DisplayUtils.IMAGE_CENTERING_TABLE_START);
 				sb.append("<a class=\"item-preview spec-border-ie\" href=\"");
-				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),false));
+				sb.append(WikiUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),false));
 				sb.append("\"><img class=\"wikifilepreviewimg\" ");
 				sb.append(" src=\"");
-				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),true));
+				sb.append(WikiUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),true));
 				sb.append("\"></img></a>");
 				sb.append(DisplayUtils.IMAGE_CENTERING_TABLE_END);
 				sb.append("</div>");

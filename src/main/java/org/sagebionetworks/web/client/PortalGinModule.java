@@ -8,6 +8,12 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
+import org.sagebionetworks.web.client.factory.EditorFactory;
+import org.sagebionetworks.web.client.factory.EditorFactoryImpl;
+import org.sagebionetworks.web.client.factory.RendererFactory;
+import org.sagebionetworks.web.client.factory.RendererFactoryImpl;
+import org.sagebionetworks.web.client.factory.TableColumnRendererFactory;
+import org.sagebionetworks.web.client.factory.TableColumnRendererFactoryImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -153,6 +159,8 @@ import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowView;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowViewImpl;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceJSNIUtils;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceJSNIUtilsImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
@@ -254,7 +262,8 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// JSNI impls
 		bind(SynapseJSNIUtils.class).to(SynapseJSNIUtilsImpl.class);
-		
+		// Prov
+		bind(ProvenanceJSNIUtils.class).to(ProvenanceJSNIUtilsImpl.class);
 		/*
 		 * Places
 		 */
@@ -316,6 +325,19 @@ public class PortalGinModule extends AbstractGinModule {
 
 		//Synapse Wiki Pages
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
+		
+		/*
+		 * Factories
+		 */
+		// editor
+		bind(EditorFactoryImpl.class).in(Singleton.class);
+		bind(EditorFactory.class).to(EditorFactoryImpl.class);
+		// renderer
+		bind(RendererFactoryImpl.class).in(Singleton.class);
+		bind(RendererFactory.class).to(RendererFactoryImpl.class);
+		// table
+		bind(TableColumnRendererFactoryImpl.class).in(Singleton.class);
+		bind(TableColumnRendererFactory.class).to(TableColumnRendererFactoryImpl.class);
 		
 		/*
 		 * Widgets

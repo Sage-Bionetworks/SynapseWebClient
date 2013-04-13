@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitserver.servlet.openid;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.URLEncoder;
 
 import org.junit.Test;
 import org.sagebionetworks.web.server.servlet.openid.OpenIDUtils;
-
-import static org.junit.Assert.*;
 
 public class OpenIDUtilsTest {
 	

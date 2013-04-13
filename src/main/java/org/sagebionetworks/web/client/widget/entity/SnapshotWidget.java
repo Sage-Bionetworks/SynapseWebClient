@@ -22,10 +22,11 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.SynapsePlaceUtils;
+import org.sagebionetworks.web.client.utils.VersionUtils;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -467,9 +468,9 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 				
 		String nameLinkUrl;
 		if(referencedEntity instanceof Versionable) {
-			nameLinkUrl = DisplayUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId(), ((Versionable)referencedEntity).getVersionNumber());
+			nameLinkUrl = SynapsePlaceUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId(), ((Versionable)referencedEntity).getVersionNumber());
 		} else {
-			nameLinkUrl = DisplayUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId());
+			nameLinkUrl = SynapsePlaceUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId());
 		}
 
 		// download
@@ -492,7 +493,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		// version
 		String version = "N/A";
 		if(referencedEntity instanceof Versionable) {
-			version = DisplayUtils.getVersionDisplay((Versionable)referencedEntity);
+			version = VersionUtils.getVersionDisplay((Versionable)referencedEntity);
 		}							
 		
 		// desc

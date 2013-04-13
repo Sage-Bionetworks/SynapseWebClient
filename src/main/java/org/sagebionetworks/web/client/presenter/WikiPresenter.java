@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.ExceptionUtils;
 import org.sagebionetworks.web.client.view.WikiView;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -62,7 +63,7 @@ public class WikiPresenter extends AbstractActivity implements WikiView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+				ExceptionUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 			}
 		});
 		

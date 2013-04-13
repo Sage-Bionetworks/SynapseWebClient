@@ -1,12 +1,19 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.API_TABLE_WIDGET_CSS_STYLE;
+import static org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY;
+import static org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.API_TABLE_WIDGET_PAGING_KEY;
+import static org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.API_TABLE_WIDGET_PATH_KEY;
+import static org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY;
+import static org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY;
+import static org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY;
+import static org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.API_TABLE_WIDGET_WIDTH_KEY;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;

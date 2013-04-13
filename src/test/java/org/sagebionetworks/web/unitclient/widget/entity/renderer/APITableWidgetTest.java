@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -21,8 +20,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.factory.TableColumnRendererFactory;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -42,7 +41,7 @@ public class APITableWidgetTest {
 	APITableWidgetView mockView;
 	SynapseClientAsync mockSynapseClient;
 	JSONObjectAdapter mockJSONObjectAdapter;
-	PortalGinInjector mockGinInjector;
+	TableColumnRendererFactory mockGinInjector;
 	APITableColumnRendererSynapseID synapseIDColumnRenderer;
 	APITableColumnRendererNone noneColumnRenderer;
 	
@@ -56,7 +55,7 @@ public class APITableWidgetTest {
 		mockView = mock(APITableWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
-		mockGinInjector = mock(PortalGinInjector.class);
+		mockGinInjector = mock(TableColumnRendererFactory.class);
 		noneColumnRenderer = new APITableColumnRendererNone();
 		synapseIDColumnRenderer = new APITableColumnRendererSynapseID();
 		

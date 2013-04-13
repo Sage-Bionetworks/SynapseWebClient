@@ -4,12 +4,10 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
+import org.sagebionetworks.web.client.utils.AlertUtils;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.Events;
@@ -21,6 +19,7 @@ import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEntitiesBrowserView {
 
@@ -28,24 +27,19 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 	private static final int WIDTH_PX = 459;
 	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private EntityTreeBrowser myTreeBrowser;
 	private EntityTreeBrowser favoritesTreeBrowser;
 	private EntitySelectedHandler mySelectedHandler;
 	private EntitySelectedHandler favoritesSelectedHandler;
-	private PortalGinInjector ginInjector;
 	
 	private TabPanel panel;
 			
 	@Inject
-	public MyEntitiesBrowserViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
-		this.sageImageBundle = sageImageBundle;
+	public MyEntitiesBrowserViewImpl(IconsImageBundle iconsImageBundle, Provider<EntityTreeBrowser> treeProvider) {
 		this.iconsImageBundle = iconsImageBundle;
-		this.myTreeBrowser = ginInjector.getEntityTreeBrowser();		
-		this.favoritesTreeBrowser = ginInjector.getEntityTreeBrowser();
-		this.ginInjector = ginInjector;
+		this.myTreeBrowser = treeProvider.get();		
+		this.favoritesTreeBrowser = treeProvider.get();
 	}
 	
 	@Override
@@ -114,7 +108,7 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		AlertUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -123,7 +117,7 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 
 	@Override
 	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		AlertUtils.showInfo(title, message);
 	}
 
 	@Override

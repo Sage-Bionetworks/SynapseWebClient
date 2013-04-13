@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import java.io.StringWriter;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 

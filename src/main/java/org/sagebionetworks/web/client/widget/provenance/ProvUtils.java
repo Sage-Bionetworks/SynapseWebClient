@@ -18,9 +18,10 @@ import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.provenance.UsedURL;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.GwtDateUtils;
+import org.sagebionetworks.web.client.utils.VersionUtils;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -174,13 +175,13 @@ public class ProvUtils {
 		
 		if(entity instanceof Versionable) {
 			order.add("Version");
-			map.put("Version", DisplayUtils.getVersionDisplay((Versionable)entity));
+			map.put("Version", VersionUtils.getVersionDisplay((Versionable)entity));
 		}
 		order.add("Modified By");
 		map.put("Modified By", entity.getModifiedBy());
 		
 		order.add("Modified On");
-		map.put("Modified On", DisplayUtils.converDataToPrettyString(entity.getModifiedOn()));
+		map.put("Modified On", GwtDateUtils.converDataToPrettyString(entity.getModifiedOn()));
 		
 		order.add("Description");
 		map.put("Description", entity.getDescription());		
@@ -199,7 +200,7 @@ public class ProvUtils {
 		map.put("Modified By", activity.getModifiedBy());
 		
 		order.add("Modified On");
-		map.put("Modified On", DisplayUtils.converDataToPrettyString(activity.getModifiedOn()));		
+		map.put("Modified On", GwtDateUtils.converDataToPrettyString(activity.getModifiedOn()));		
 		
 		order.add("Description");
 		map.put("Description", activity.getDescription());				

@@ -1,10 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;

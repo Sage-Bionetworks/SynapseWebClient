@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.server.servlet.openid;
 
-import static org.sagebionetworks.repo.model.AuthorizationConstants.ACCEPTS_TERMS_OF_USE_ATTRIBUTE;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,7 +25,6 @@ import org.sagebionetworks.authutil.CrowdAuthUtil;
 import org.sagebionetworks.authutil.Session;
 import org.sagebionetworks.authutil.User;
 import org.sagebionetworks.repo.model.ServiceConstants;
-import org.sagebionetworks.repo.web.ForbiddenException;
 import org.sagebionetworks.repo.web.NotFoundException;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpStatus;

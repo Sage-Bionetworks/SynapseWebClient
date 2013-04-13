@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.provenance.nchart;
 import java.util.List;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
 
 public class NChartLayerJso extends JavaScriptObject implements NChartLayer {
 
