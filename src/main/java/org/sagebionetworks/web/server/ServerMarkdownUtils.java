@@ -104,11 +104,13 @@ public class ServerMarkdownUtils {
 	 */
 	public static String fixNewLines(String markdown) {
 		if (markdown == null || markdown.length() == 0) return markdown;
-		
+		//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by ` exactly 3 times (triple quote), then it's a match
+		String regEx = "^[> \t\n\f\r]*[`]{3}";
+		Pattern p = Pattern.compile(regEx);
 		StringBuilder sb = new StringBuilder();
 		boolean isSuspectedCode = false;
 		for (String line : markdown.split("\n")) {
-			boolean currentLineHasFence = line.startsWith("```");
+			boolean currentLineHasFence = p.matcher(line).matches();
 			if (currentLineHasFence) {
 				//flip
 				isSuspectedCode = !isSuspectedCode;
