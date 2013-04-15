@@ -1,10 +1,17 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.ProjectsHome;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -12,17 +19,23 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -43,34 +56,67 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	SimplePanel newsFeed;
 	@UiField
-	SimplePanel supportFeed;
+	SimplePanel loginBtnPanel;
+	@UiField
+	SimplePanel registerBtnPanel;		
+	@UiField
+	HTMLPanel whatIsSynapseContainer;
+	@UiField
+	HTMLPanel howToUseSynapseContainer;
+	@UiField
+	HTMLPanel getStartedContainer;
 	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
 	private GlobalApplicationState globalApplicationState;
 	private HomeSearchBox homeSearchBox;	
-	private MyEntitiesBrowser myEntitiesBrowser;
+	private EntityTreeBrowser myProjectsTreeBrowser;
+	private EntityTreeBrowser favoritesTreeBrowser;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget,
 			Footer footerWidget, IconsImageBundle icons, QueryFilter filter,
 			SageImageBundle imageBundle,
-			GlobalApplicationState globalApplicationState,
-			HomeSearchBox homeSearchBox, MyEntitiesBrowser myEntitiesBrowser) {
+			final GlobalApplicationState globalApplicationState,
+			HomeSearchBox homeSearchBox, 
+			EntityTreeBrowser myProjectsTreeBrowser,
+			EntityTreeBrowser favoritesTreeBrowser) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.globalApplicationState = globalApplicationState;
 		this.homeSearchBox = homeSearchBox;
-		this.myEntitiesBrowser = myEntitiesBrowser;
+		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
+		this.favoritesTreeBrowser = favoritesTreeBrowser;
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
 		bigSearchBox.clear();
 		bigSearchBox.add(homeSearchBox.asWidget());
-
+		
+		Button loginBtn = new Button(DisplayConstants.BUTTON_LOGIN);
+		loginBtn.removeStyleName("gwt-Button");
+		loginBtn.addStyleName("btn btn-large btn-block");
+		loginBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			}
+		});
+		loginBtnPanel.setWidget(loginBtn);
+		
+		Button registerBtn = new Button(DisplayConstants.REGISTER_BUTTON);
+		registerBtn.removeStyleName("gwt-Button");
+		registerBtn.addStyleName("btn btn-large");
+		registerBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			}
+		});
+		registerBtnPanel.setWidget(registerBtn);
 	}
 
 
@@ -87,15 +133,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		newsFeed.clear();
 		newsFeed.add(panel);
 	}
-	
-	@Override
-	public void showSupportFeed(String html){
-		HTMLPanel panel = new HTMLPanel(html);
-		DisplayUtils.sendAllLinksToNewWindow(panel);
-		supportFeed.clear();
-		supportFeed.add(panel);
-	}
-	
+		
 	@Override
 	public void refresh() {
 		header.clear();
@@ -103,9 +141,20 @@ public class HomeViewImpl extends Composite implements HomeView {
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
-		headerWidget.setSearchVisible(false);
+		headerWidget.setSearchVisible(false);			
 		
-		injectProjectPanel(); 
+		boolean isLoggedIn = presenter.showLoggedInDetails();
+		
+		
+		if(isLoggedIn) {
+			whatIsSynapseContainer.setVisible(false);
+			getStartedContainer.setVisible(false);
+			injectProjectPanel(); 
+		} else {
+			whatIsSynapseContainer.setVisible(true);
+			getStartedContainer.setVisible(true);
+			projectPanel.clear();
+		}
 		
 	    presenter.showBCCSignup(new AsyncCallback<String>() {
 				
@@ -158,41 +207,76 @@ public class HomeViewImpl extends Composite implements HomeView {
 	 */
 	private void injectProjectPanel() {
 		projectPanel.clear();
-		if(presenter.showLoggedInDetails()) {
-			// My Projects
-			LayoutContainer projectDiv = new LayoutContainer();
-			
-			LayoutContainer separator = new LayoutContainer();
-			separator.setStyleName("span-24 separator");
-			
-			LayoutContainer mainService = new LayoutContainer();
-			mainService.setStyleName("span-24 main-service");
-			
-			// Create a project
-			mainService.add(new HTML(SafeHtmlUtils.fromSafeConstant(
-					"<div class=\"span-12 notopmargin\">" +
-					"	<h3>Start Your Own Project</h3>" +
-   					"	<p>Get started using Synapse today by creating your own Project. Projects provide an organizational structure for you to interact with your data, code and analyses.</p>" +
-   					"<ul class=\"list arrow-list\"><li>Organize your work</li><li>Store Data, Code & Results</li><li>Set Sharing Level</li><li>Custom, Searchable Annotations </li><li>Full Programmatic API & R Integration </li><li>Attach Figures and Documents</li><li>Describe & Version </li><li>Create Links & See Usage </li></ul>" + 
-					" 	<div class=\"mega-button\" style=\"margin-top: 10px;\">" +
-					" 		<a id=\"" + DisplayConstants.ID_BTN_START_PROJECT + "\" href=\"#!ProjectsHome:0\">Start a Project</a>" +
-					" 	</div>" +
-					"</div>")));
+		// Overall container
+		LayoutContainer container = new LayoutContainer();
+		container.setStyleName("span-16 notopmargin last");			
+		
+		// My Projects
+		LayoutContainer myProjContainer = new LayoutContainer();
+		myProjContainer.setStyleName("span-8 notopmargin");
+		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>My Projects</h3>")));
+		myProjContainer.add(myProjectsTreeBrowser.asWidget());					
+		container.add(myProjContainer);
 
-			
-			// My Projects
-			LayoutContainer myProjectLayout = new LayoutContainer();
-			myProjectLayout.setStyleName("span-12 notopmargin last");
-			myProjectLayout.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>My Projects</h3>")));
-			myProjectLayout.add(myEntitiesBrowser.asWidget());					
-			mainService.add(myProjectLayout);
-			
-			projectDiv.add(separator);
-			projectDiv.add(mainService);
-			projectDiv.layout(true);
-						
-			projectPanel.add(projectDiv);
-		}
+		// Favorites
+		LayoutContainer favoritesContainer = new LayoutContainer();
+		favoritesContainer.setStyleName("span-8 notopmargin last");
+		favoritesContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Favorites</h3>")));
+		favoritesContainer.add(favoritesTreeBrowser.asWidget());
+		container.add(favoritesContainer);
+
+		// Create a project
+		LayoutContainer createProjectContainer = new LayoutContainer();
+		createProjectContainer.addStyleName("span-16 last");		
+		
+		final TextBox input = new TextBox();
+		input.addStyleName("form-signinInput displayInline");
+		input.setWidth("200px");
+		input.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
+		createProjectContainer.add(input, new MarginData(0, 10, 0, 0));		
+		
+		Button createBtn = new Button(DisplayConstants.LABEL_CREATE);
+		createBtn.removeStyleName("gwt-Button");
+		createBtn.addStyleName("btn displayInline form-inputButton");
+		createBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.createProject(input.getValue());
+			}
+		});
+		createProjectContainer.add(createBtn);		
+
+		Anchor whatProj = new Anchor(DisplayConstants.WHAT_IS_A_PROJECT);
+		whatProj.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new ProjectsHome(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			}
+		});
+		createProjectContainer.add(whatProj, new MarginData(0, 0, 0, 15));
+		
+		container.add(createProjectContainer);
+
+		projectPanel.add(container);		
+	}
+
+
+	@Override
+	public void setMyProjects(List<EntityHeader> myProjects) {
+		myProjectsTreeBrowser.configure(myProjects, true);
+	}
+
+	@Override
+	public void setMyProjectsError(String string) {
+	}
+
+	@Override
+	public void setFavorites(List<EntityHeader> favorites) {
+		favoritesTreeBrowser.configure(favorites, true);
+	}
+
+	@Override
+	public void setFavoritesError(String string) {
 	}
 	
 }
