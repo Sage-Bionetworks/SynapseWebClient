@@ -25,9 +25,9 @@
 					<div class="span-8 notopmargin">
 						<h3>What is Synapse?</h3>
 						<ul class="list check-list">
-							<li class="whatIsSynapseText">A project oriented system that enables you to track, store, collaborate on and even share your work</li>
-							<li class="whatIsSynapseText">An easy to use cloud-based tool that can improve the methodology of data intensive science</li>
-							<li class="whatIsSynapseText">A <span style="font-weight: bold;">Private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">Public</span> <g:Image resource='{icons.globe16}' /> workspace were one can load data directly into analytical tools like R or Python, and record your analysis</li>
+							<li class="whatIsSynapseText">A <span style="font-weight: bold;">Private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">Public</span> <g:Image resource='{icons.globe16}' /> workspace that allows you to record, store, and share your research</li>
+							<li class="whatIsSynapseText">A tool to improve reproducibility of data intensive science, integrated with tools such as R and Python</li>
+							<li class="whatIsSynapseText">A collection of living research projects enabling large-scale collaborative solutions to difficult scientific problems</li>
 						</ul>
 					</div>
 				</g:HTMLPanel>
@@ -38,21 +38,21 @@
 						<h3>How to Use Synapse</h3>
 						<ul class="list arrow-list">
 							<li>
-								<a class="link howToUseLink" href="https://synapse.prod.sagebase.org/#!Wiki:syn1669771/ENTITY/54546" target="_blank">Getting Started Guide</a><br/>
+								<a class="link howToUseLink" href="#!Wiki:syn1669771/ENTITY/54546" target="_blank">Getting Started Guide</a><br/>
 								A quick start guide to using Synapse
 							</li>
 							<li>
-								<a class="link howToUseLink" href="https://synapse.prod.sagebase.org/#!Synapse:syn1669771" target="_blank">Synapse User Guide</a><br/>
+								<a class="link howToUseLink" href="#!Synapse:syn1669771" target="_blank">Synapse User Guide</a><br/>
 								Using Synapse via the Web and programmatic clients
 							</li>
 							<li>
 								<a class="link howToUseLink" href="http://support.sagebase.org/sagebase" target="_blank">Support Forums</a><br/>
-								Frequently asked questions and support topics
+								Help, frequently asked questions and support topics
 								
 							</li>
 							<li>
 								<a class="link howToUseLink" href="mailto:synapseInfo@sagebase.org" target="_blank">Contact Us</a><br/>
-								Interested in working with Sage to start a pilot project on Synapse?
+								Other questions about Synapse?
 							</li>
 						</ul>
 					</div>
@@ -62,6 +62,7 @@
 				<g:HTMLPanel ui:field="getStartedContainer">
 					<div class="span-8 notopmargin last">
 						<h3>Get Started</h3>
+						Synapse is free to use as a Beta service.<br/><br/> 
 						<g:SimplePanel ui:field="loginBtnPanel"/>
 						<br/>
 						<g:SimplePanel ui:field="registerBtnPanel"/>
@@ -81,8 +82,8 @@
 			</div>
 			
 
-			<div class="span-24 separator"></div>
-
+			<div class="span-24 separator"></div>			
+			
 			<div class="span-24 from_portfolio">
 				<div class="span-12 notopmargin">
 					<div class="span-12 notopmargin last">

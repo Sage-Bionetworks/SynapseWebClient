@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
-import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -32,7 +31,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -117,8 +115,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 		registerBtnPanel.setWidget(registerBtn);
-	}
-
+		
+	}	
 
 	@Override
 	public void setPresenter(Presenter presenter) {
@@ -142,7 +140,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		headerWidget.setSearchVisible(false);			
-		
+
 		boolean isLoggedIn = presenter.showLoggedInDetails();
 		
 		
