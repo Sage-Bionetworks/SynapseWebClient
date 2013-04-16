@@ -31,6 +31,7 @@ public class DoiWidget implements Presenter {
 	Doi doi;
 	String entityId;
 	Long versionNumber;
+	boolean canEdit;
 	
 	@Inject
 	public DoiWidget(DoiWidgetView view,
@@ -45,9 +46,10 @@ public class DoiWidget implements Presenter {
 		this.stackConfigService = stackConfigService;
 	}
 	
-	public void configure(String entityId, Long versionNumber) {
+	public void configure(String entityId, boolean canEdit, Long versionNumber) {
 		this.entityId = entityId;
 		this.versionNumber = versionNumber;
+		this.canEdit = canEdit;
 		configureDoi();
 	}
 	
@@ -83,7 +85,8 @@ public class DoiWidget implements Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException) {
-					view.showCreateDoi();
+					if (canEdit)
+						view.showCreateDoi();
 				} else {
 					view.showErrorMessage(caught.getMessage());
 				}
