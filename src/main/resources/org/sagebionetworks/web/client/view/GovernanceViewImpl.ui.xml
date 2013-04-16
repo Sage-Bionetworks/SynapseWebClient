@@ -28,6 +28,7 @@
         <div class="clear"></div>
     	<div class="container"> 		
 			<g:SimplePanel ui:field="header" />
+			
 	        	<div class="span-24 notopmargin">
 				<!-- end header -->
 
@@ -39,59 +40,70 @@
 
 					<div class="info">
 
-						<h2 align="center">Synapse Terms and Conditions of Use<br />
-						  Summary of key Provisions</h2>
-						<h4>Last updated: March 18, 2013</h4>
-						<p>By using Synapse, you agree to the Terms and Conditions of Use listed below.  Here is a summary of several key provisions of those Terms and Conditions.  Be certain to read the full Terms and Conditions of Use in detail; in the event of any conflict or inconsistency between this summary and the full Terms and Conditions, the full Terms and Conditions will govern.</p>
-						<p><span class="underline">When <strong>using Synapse</strong>, you must:</span></p>
-						<ul class="list arrow-list">
-						  <li><strong>Act ethically and responsibly</strong>.</li>
-						  <li><strong>Protect and respect data participant&rsquo;s privacy and confidentiality </strong></li>
-						  <li><strong>Abide by all applicable laws and regulations</strong>.</li>
-						  <li><strong>Not hack Synapse</strong>.</li>
-						  <li><strong>Share content only when you have authority</strong> to do so and sharing does not violate any applicable laws or contracts.</li>
-						  <li>Take <strong>full responsibility</strong> for your use of data, software and other Synapse content.</li>
-						</ul>
-						<br/>
-						<p><span class="underline">If using or contributing<strong> data</strong> on Synapse, you must:</span></p>
-						<ul class="list arrow-list">
-						  <li><strong>Register using accurate, current and complete information</strong>.<strong></strong></li>
-						  <li><strong>Understand and respect the specific rules for redistributing dataset, software or other content</strong>.<strong></strong></li>
-						  <li><strong>Respect intellectual property rights</strong> of others and <strong>acknowledge contributors</strong> in all presentations. </li>
-						  <li><strong>Not discriminate,</strong> <strong>identify, or re-contact</strong> individuals or groups represented by the data.</li>
-						  <li>Use and contribute only data that has been <strong>de-identified to HIPAA standards</strong>. For information about de-identification in accordance with the HIPAA Privacy Rule, please visit 
-						  <a class="link" target="_blank" href="http://www.hhs.gov/ocr/privacy/hipaa/understanding/coveredentities/De-identification/guidance.html">http://www.hhs.gov/ocr/privacy/hipaa/understanding/coveredentities/De-identification/guidance.html</a>.  </li>
-						  <li><strong>Ensure that human participants have consented to share their data on Synapse, where required by applicable law</strong>.<strong></strong></li>
-						  <li><strong>Keep personal information private and secure from any potential abuses</strong>.<strong></strong></li>
-						</ul>
-						<br/>
-						<p><span class="underline">Sage Bionetworks wants you to know that:</span></p>
-						<ul class="list arrow-list">
-						  <li>Contribution to and use of data in the Synapse Commons are governed by <strong>these 
-						  <a class="link" target="_blank" href="https://synapse.prod.sagebase.org/static/governance/SynapseCommonsDataUseProcedure.pdf">Terms and Conditions of Use</a>, 
-						  the </strong><a class="link" target="_blank" href="https://synapse.prod.sagebase.org/static/governance/SynapseCommonsDataUseProcedure.pdf"><strong>Synapse Commons Data Use Procedure</strong></a>
-						  <strong> and the </strong><a class="link" target="_blank" href="https://synapse.prod.sagebase.org/static/governance/SynapsePrivacyPolicy.pdf"><strong>Synapse Privacy Policy</strong></a><strong>.</strong></li>
-						  <li>We will <strong>remove content</strong> if we deem it inappropriate.</li>
-						  <li>These Terms and Conditions of Use apply to, but we otherwise do not monitor, data or content contributed to <strong>private workspaces</strong>.</li>
-						  <li>We respect the <strong>intellectual property rights</strong> of others, and ask you to do the same.</li>
-						  <li>You must be <strong>13 years old of age </strong>to use this site. </li>
-						  <li>We take <strong>no responsibility or liability for any content</strong> that has been posted to Synapse.</li>
-						  <li>You may <strong>cancel your Synapse account at any time</strong>.</li>
-						</ul>
-						<br/>
-						
+						<h2 align="center">Synapse Commons Governance Overview</h2>
+						<p>Synapse operates under a complete governance process that includes
+							well-documented Terms and Conditions of Use, guidelines and operating
+							procedures, privacy enhancing technologies, as well as the right of
+							audit and external reviews.</p>
+						<p>
+							<a class="link" target="_blank" href="static/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf">
+								<h4>Terms and Conditions of Use</h4>
+							</a>
+							
+							The Terms and Conditions of Use document is a detailed description of
+							the terms by which Synapse users must operate.  It establishes the
+							use, disclaimers and limitation of liability governing the use of
+							Synapse including the requirement to adhere to all laws and
+							regulations to protect the privacy of participants whose data they
+							use.     
+						</p>
+						<p>
+							<a class="link" target="_blank" href="static/governance/SynapseCommonsDataUseProcedure.pdf">
+								<h4>Data Use Procedure</h4>
+							</a>
+							Robust procedures support data contribution and use through a Tiered
+							system that distinguishes Open, Restricted or Controlled data use
+							based on the nature of the data and the conditions delineated by the
+							data contributor. Data stored in Synapse must be de-identified
+							according to
+							<a class="link" target="_blank" href="http://www.hhs.gov/ocr/privacy/hipaa/understanding/index.html">HIPAA standards</a>
+							. Synapse users must register before contributing or using content on
+							Synapse.  Use of open or restricted data is authorized in an automated
+							fashion but use of controlled data requires users to engage an ethics
+							committee or institutional review board for approval of their data
+							analysis plan prior to accessing the data through Synapse
+						</p>
+						<p>
+							<a class="link" target="_blank" href="static/governance/SynapsePrivacyPolicy.pdf">
+								<h4>Privacy Policy</h4>
+							</a>							
+							The Privacy Policy explains how Sage Bionetworks aims to protect
+							personal information received in connection with Synapse from casual
+							visitors and registered users.  Personal information may include: your
+							name, email, or other information that identifies you personally. We
+							do not require you to register to visit the Synapse website. However
+							sections of the site and access to some content will be granted only
+							to Registered users for research, statistics and training purposes.
+						</p>
+						<p>
+							<h4>
+								<a class="link" href="#!WikiPlace:dataAccessLevelsContent">Training</a>
+							</h4>
+							Tutorial material explaining how to contribute or access data within
+							Synapse, including governance definitions, is available. 
+						</p>
+						<p>
+							<h4>Governance Contact information </h4>
+							We welcome feedback if you have any questions regarding our governance
+							process.
+							<br />
+							Contact us at: <a class="link" href="mailto:act@sagebase.org">act@sagebase.org</a>
+							<br />							 
+							<br />
+							By using Synapse you consent to these Governance policies and
+							procedures.
+						</p>
 												
-						<h2>Documents</h2>
-
-						<h4><a class="link" target="_blank" href="static/governance/SynapsePrivacyPolicy.pdf">
-							<span style="text-decoration:underline;">Synapse Privacy Policy</span>
-						</a></h4>
-						<h4><a class="link" target="_blank" href="static/governance/SynapseCommonsDataUseProcedure">
-							<span style="text-decoration:underline;">Synapse Data Use Procedure</span>
-						</a></h4>
-						<h4><a class="link" target="_blank" href="static/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf">
-							<span style="text-decoration:underline;">Synapse Terms and Conditions of Use</span>
-						</a></h4>
 					</div>
 				</div>
 

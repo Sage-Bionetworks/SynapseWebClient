@@ -38,6 +38,12 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/paper-clip-16.png")
 	ImageResource attachment16();
 	
+	@Source("images/icons/book-brown-16.png")
+	ImageResource bookBrown16();
+	
+	@Source("images/icons/book-open-16.png")
+	ImageResource bookOpen16();
+	
 	@Source("images/icons/tick-16.png")
 	ImageResource checkGreen16();
 
