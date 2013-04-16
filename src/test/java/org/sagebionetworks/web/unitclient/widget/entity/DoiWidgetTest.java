@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -53,7 +54,15 @@ public class DoiWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureReadyStatus() throws Exception {
-		doiWidget.configure(entityId, null);
+		doiWidget.configure(entityId, true, null);
+		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		verify(mockView).showDoi(DoiStatus.READY);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureReadyStatusNotEditable() throws Exception {
+		doiWidget.configure(entityId, false, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		verify(mockView).showDoi(DoiStatus.READY);
 	}
@@ -62,7 +71,7 @@ public class DoiWidgetTest {
 	@Test
 	public void testConfigureErrorStatus() throws Exception {
 		testDoi.setDoiStatus(DoiStatus.ERROR);
-		doiWidget.configure(entityId, null);
+		doiWidget.configure(entityId, true, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		verify(mockView).showDoi(DoiStatus.ERROR);
 	}
@@ -71,15 +80,24 @@ public class DoiWidgetTest {
 	@Test
 	public void testConfigureNotFound() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		doiWidget.configure(entityId, null);
+		doiWidget.configure(entityId, true, null);
 		verify(mockView).showCreateDoi();
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
+	public void testConfigureNotFoundNonEditable() throws Exception {
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		doiWidget.configure(entityId, false, null);
+		verify(mockView, Mockito.times(0)).showCreateDoi();
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	@Test
 	public void testConfigureOtherError() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		doiWidget.configure(entityId, null);
+		doiWidget.configure(entityId, true, null);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
@@ -113,7 +131,7 @@ public class DoiWidgetTest {
 	public void testGetDoiLink() throws Exception {
 		String prefix = "10.5072/FK2.";
 		Long version = 42l;
-		doiWidget.configure(entityId, version);
+		doiWidget.configure(entityId, true, version);
 		String link = doiWidget.getDoiLink(prefix);
 		assertTrue(link.contains(entityId));
 		assertTrue(link.contains(version.toString()));
@@ -125,7 +143,7 @@ public class DoiWidgetTest {
 	public void testGetDoiLinkNoPrefix() throws Exception {
 		String prefix = "";
 		Long version = 42l;
-		doiWidget.configure(entityId, version);
+		doiWidget.configure(entityId, true, version);
 		String link = doiWidget.getDoiLink(prefix);
 		assertTrue(link.length() == 0);
 		link = doiWidget.getDoiLink(null);
