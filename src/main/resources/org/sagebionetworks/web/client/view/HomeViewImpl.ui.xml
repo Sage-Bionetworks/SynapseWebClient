@@ -66,6 +66,8 @@
 						<g:SimplePanel ui:field="loginBtnPanel"/>
 						<br/>
 						<g:SimplePanel ui:field="registerBtnPanel"/>
+						<br/>
+						<a class="link" href="mailto:sage-dream-challenges@sagebase.org?subject=Sign&nbsp;me&nbsp;up&nbsp;for&nbsp;Sage&nbsp;/&nbsp;DREAM&nbsp;Challenge&nbsp;updates">Sign up for Sage / DREAM challenge updates</a>
 					</div>
 				</g:HTMLPanel>
 
