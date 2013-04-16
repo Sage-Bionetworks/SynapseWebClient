@@ -26,6 +26,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -71,6 +72,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private HomeSearchBox homeSearchBox;	
 	private EntityTreeBrowser myProjectsTreeBrowser;
 	private EntityTreeBrowser favoritesTreeBrowser;
+	IconsImageBundle iconsImageBundle;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget,
@@ -87,6 +89,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.homeSearchBox = homeSearchBox;
 		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
 		this.favoritesTreeBrowser = favoritesTreeBrowser;
+		this.iconsImageBundle = icons;
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -212,14 +215,15 @@ public class HomeViewImpl extends Composite implements HomeView {
 		// My Projects
 		LayoutContainer myProjContainer = new LayoutContainer();
 		myProjContainer.setStyleName("span-8 notopmargin");
-		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>My Projects</h3>")));
+		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
 		myProjContainer.add(myProjectsTreeBrowser.asWidget());					
 		container.add(myProjContainer);
 
 		// Favorites
 		LayoutContainer favoritesContainer = new LayoutContainer();
 		favoritesContainer.setStyleName("span-8 notopmargin last");
-		favoritesContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>Favorites</h3>")));
+		favoritesContainer.add(
+				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
 		favoritesContainer.add(favoritesTreeBrowser.asWidget());
 		container.add(favoritesContainer);
 
