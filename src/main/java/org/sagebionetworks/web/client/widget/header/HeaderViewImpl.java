@@ -226,22 +226,22 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
 		}
 		if (supportLink == null) {
-			supportLink = new Anchor(DisplayConstants.LINK_COMMUNITY_FORUM, "", "_blank");
+			supportLink = new Anchor(DisplayConstants.LINK_COMMUNITY_FORUM, "http://support.sagebase.org", "_blank");
 			supportLink.addStyleName("headerLink");
 			commandBar.add(supportLink);
 		}
-		presenter.getSupportHRef(new AsyncCallback<String>() {
-			
-			@Override
-			public void onSuccess(String result) {
-				supportLink.setHref(result);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				//should never enter this code.  if the fastpass request fails, it should still return the standard support site url
-			}
-		});
+//		presenter.getSupportHRef(new AsyncCallback<String>() {
+//			
+//			@Override
+//			public void onSuccess(String result) {
+//				supportLink.setHref(result);
+//			}
+//			
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				//should never enter this code.  if the fastpass request fails, it should still return the standard support site url
+//			}
+//		});
 		
 		if(userData != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
