@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -114,8 +115,9 @@ public class EntityMetadata implements Presenter {
 		else {
 			//TODO: delete this after migration to FileHandle system.  This corresponds to the old logic
 			boolean isLocationable = bundle.getEntity() instanceof Locationable;
-			showDetailedMetadata = !isLocationable || LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
-			showEntityName = !isLocationable || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
+			boolean isStudy = bundle.getEntity() instanceof Study; //if study, always show metadata and entity name
+			showDetailedMetadata = !isLocationable || isStudy || LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
+			showEntityName = !isLocationable || isStudy || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
 		}
 		view.setDetailedMetadataVisible(showDetailedMetadata);
 		view.setEntityNameVisible(showEntityName);
