@@ -254,10 +254,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 		
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
-			// show Wiki
-			addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
-		}
+		// show Wiki
+		addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
 				
 
 		// ** RIGHT **
@@ -351,6 +349,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, int spanWidth) {
+		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
 			container.add(wikiPageWidget.asWidget());

@@ -270,6 +270,9 @@ SynapseWidgetPresenter {
 		}
 	}
 	
+	public void clear(){
+		view.clear();
+	}
 	private void refresh() {
 		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage, spanWidth);
 	}
