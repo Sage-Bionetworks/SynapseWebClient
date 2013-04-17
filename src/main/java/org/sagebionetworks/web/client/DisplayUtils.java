@@ -120,6 +120,8 @@ public class DisplayUtils {
 	public static final String SUPPORT_FEED_URL = "http://api.getsatisfaction.com/companies/sagebase/topics/";
 	public static final String SUPPORT_RECENT_ACTIVITY_URL = "http://support.sagebase.org/sagebase?view=recent";
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
+	public static final String USER_GUIDE_ID = "syn1669771";
+	
 	public static final String BCC_CONTENT_PAGE_ID = "24084517";
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";

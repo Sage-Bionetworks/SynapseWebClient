@@ -2463,8 +2463,8 @@ a.btn3	{
 	margin:0px;	
 	display:block;
 	padding:6px 0px 6px 35px;
-	background: url(../images/check.png) no-repeat;
-	background-position:left center;
+	background: url("../images/check.png") no-repeat scroll transparent;
+	background-position: 0px 10px;
 	font-style:italic;
 	border-bottom:1px dotted #dedede;
 }
@@ -2530,7 +2530,7 @@ a.btn3	{
 	display:block;
 	padding:5px 0px 5px 35px;
 	background: url(../images/list-arrow.png) no-repeat;
-	background-position:left center;
+	background-position:0px 7px;
 	font-style:italic;
 }
 
