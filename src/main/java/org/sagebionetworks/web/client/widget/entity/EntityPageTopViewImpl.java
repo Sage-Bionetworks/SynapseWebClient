@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -167,7 +168,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Custom layouts for certain entities
 		if (bundle.getEntity() instanceof Project) {
 			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
-		} else if (bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study) {  //render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
+		} else if (bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis) {
+			//render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
 			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		} else if (bundle.getEntity() instanceof Summary) {
 		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
@@ -269,12 +271,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Attachments
 		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly, false), widgetMargin);
 		
-		// ** FULL WIDTH **
-		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************
-		// Child Browser
-		if(DisplayUtils.hasChildrenOrPreview(bundle)){
-			colLeftContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
-		}
+		//these types should not have children to show (and don't show deprecated Preview child object)
+		
 		// ************************************************************************************************		
 	}
 	
