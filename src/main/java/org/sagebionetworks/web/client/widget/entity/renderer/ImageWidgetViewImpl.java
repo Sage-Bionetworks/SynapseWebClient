@@ -34,7 +34,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, final String fileName,
-			final String scale, String alignment, final String synapseId) {
+			final String scale, String alignment, final String synapseId, final boolean isLoggedIn) {
 		this.removeAll();
 		//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 		//create img
@@ -71,8 +71,13 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 		image.addErrorHandler(new ErrorHandler() {
 			@Override
 		    public void onError(ErrorEvent event) {
-				if (synapseId != null)
-					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + "Please check the validity of Image File Entity " + synapseId);
+				if (synapseId != null) {
+					if (!isLoggedIn) 
+						showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + "You may need to log in to gain access to this image content (" + synapseId+")");
+					else 
+						showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + "Unable to view image " + synapseId);
+				}
+					
 				else if (fileName != null)
 					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + fileName);
 				else
