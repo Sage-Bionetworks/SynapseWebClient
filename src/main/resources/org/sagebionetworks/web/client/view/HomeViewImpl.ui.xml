@@ -25,9 +25,9 @@
 					<div class="span-8 notopmargin">
 						<h3>What is Synapse?</h3>
 						<ul class="list check-list">
-							<li class="whatIsSynapseText">A <span style="font-weight: bold;">Private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">Public</span> <g:Image resource='{icons.globe16}' /> workspace that allows you to record, store, and share your research</li>
-							<li class="whatIsSynapseText">A tool to improve reproducibility of data intensive science, integrated with tools such as R and Python</li>
-							<li class="whatIsSynapseText">A collection of living research projects enabling large-scale collaborative solutions to difficult scientific problems</li>
+							<li class="whatIsSynapseText">A <span style="font-weight: bold;">private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">public</span> <g:Image resource='{icons.globe16}' /> workspace that allows you to <span style="font-weight: bold;">aggregate</span>, <span style="font-weight: bold;">describe</span>, and <span style="font-weight: bold;">share</span> your research.</li>
+							<li class="whatIsSynapseText">A tool to improve reproducibility of data intensive science, <span style="font-weight: bold;">recording your progress as you work</span> with tools such as <span style="font-weight: bold;">R</span> and <span style="font-weight: bold;">Python</span>.</li>
+							<li class="whatIsSynapseText">A collection of <span style="font-weight: bold;">living research projects</span> you to contribute to <span style="font-weight: bold;">large-scale collaborative solutions</span> to difficult scientific problems.</li>
 						</ul>
 					</div>
 				</g:HTMLPanel>
@@ -66,88 +66,82 @@
 						<g:SimplePanel ui:field="loginBtnPanel"/>
 						<br/>
 						<g:SimplePanel ui:field="registerBtnPanel"/>
-						<br/>
-						<a class="link" href="mailto:sage-dream-challenges@sagebase.org?subject=Sign&nbsp;me&nbsp;up&nbsp;for&nbsp;Sage&nbsp;/&nbsp;DREAM&nbsp;Challenge&nbsp;updates">Sign up for Sage / DREAM challenge updates</a>
 					</div>
 				</g:HTMLPanel>
 
 				<!-- START PROJECT & MY PROJECTS -->
 				<g:SimplePanel ui:field="projectPanel" />
-			</div>
+			</div>			
+
+            <!-- SLIDER -->
+            <div class="span-24 notopmargin">
+            <div class="span-24 slider-area">
+            	<div class="theme-default">
+                    <div id="slider" class="nivoSlider">
+                        <a href="#!Synapse:syn1710250"><img src="images/spotlight/attractorMetagene.jpg" alt="" title="#bccGatewayCaption" /></a>                        
+                        <a href="#!Synapse:syn300013"><img src="images/spotlight/TcgaPancancer.jpg" alt="" title="#tcgaPancanCaption" /></a>
+                        <a class="link" href="mailto:sage-dream-challenges@sagebase.org?subject=Sign&nbsp;me&nbsp;up&nbsp;for&nbsp;Sage&nbsp;/&nbsp;DREAM&nbsp;Challenge&nbsp;updates"><img src="images/spotlight/CompetitionUpdates.jpg" alt="" title="#compSignupCaption" /></a>
+                    </div>
+                    <div id="bccGatewayCaption" class="nivo-html-caption" style="top: 120px !important;">
+                        <a href="#!Synapse:syn1710250">BCC Gateway Project</a>
+                    </div>
+                    <div id="tcgaPancanCaption" class="nivo-html-caption" style="top: 120px !important;">
+                        <a href="#!Synapse:syn300013">TCGA Pancancer Project</a>
+                    </div>
+                    <div id="compSignupCaption" class="nivo-html-caption" style="top: 120px !important;">
+                    	<a class="link" href="mailto:sage-dream-challenges@sagebase.org?subject=Sign&nbsp;me&nbsp;up&nbsp;for&nbsp;Sage&nbsp;/&nbsp;DREAM&nbsp;Challenge&nbsp;updates">Sign up for Updates</a>                    
+                    </div>
+
+                </div>
+            </div>
+            </div>
+            <!-- END SLIDER -->
 
 			<!-- SEARCH BOX -->
-			<div class="span-24 notopmargin" style="margin-top: 10px !important;">
+			<div class="span-24">
 				<h3>Search Synapse</h3>
 				<div class="span-23 inner-6 view notopmargin">
 					<g:SimplePanel ui:field="bigSearchBox" />
 				</div>
 			</div>
-			
+			<!-- END SEARCH BOX -->
 
-			<div class="span-24 separator"></div>			
-			
-			<div class="span-24 from_portfolio">
-				<div class="span-12 notopmargin">
-					<div class="span-12 notopmargin last">
-						<h3>Projects in the Spotlight</h3>
-					</div>
-					<div>
-						<g:SimplePanel ui:field="bccSignup" />
-					</div>
-					<div class="span-6 inner-6 view notopmargin last">
-						<h5>
-							<a class="link" href="#!Synapse:syn150935">Synapse Commons Repository</a>
-						</h5>
-						<p>The Synapse Commons Repository is the place to access publicly
-							available data sets. To build this project we have developed a
-							system to crawl repositories, like GEO, ArrayExpress, and TCGA,
-							and
-							to manage contributions from users.</p>
-						<a class="button_readmore" href="#!Synapse:syn150935"></a>
-					</div>								
-				</div>
-				<!-- Access tutorial -->
-				<div class="span-12 notopmargin last">
-					<div class="span-12 notopmargin">
-						<h3>Data Use Conditions</h3>
-					</div>
-					<div class="span-12 inner-12 view notopmargin">
-						<div class="span-12 notopmargin last">
-							<div class="span-4 last">
-								<div class="span-4 notopmargin">
-									<g:Image resource='{icons.shieldRed16}' />
-								    	<h5 style="display: inline; margin-left: 3px;">Controlled Use</h5>
-								</div>
-								<div class="span-4 notopmargin">
-									<g:Image resource='{icons.shieldYellow16}' />
-								    	<h5 style="display: inline; margin-left: 3px;">Restricted Use</h5>
-								</div>
-								<div class="span-4 notopmargin">
-									<g:Image resource='{icons.sheildGreen16}' />
-										<h5 style="display: inline; margin-left: 3px;">Open Use</h5>
-								</div>
-							</div>
-							<div class="span-7 notopmargin last" style="width: 290px;">
-								<h4><a href="#!WikiPlace:dataAccessLevelsContent" class="service-tipsy north link">Learn the Rules for Sharing And Using Human Data</a></h4>
-								<p>There are times where human data can only be shared with certain restrictions.  Learn what the rules are and how to apply and comply with data privacy levels.</p>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-				
-			</div>
-
-			<div class="span-24 separator"></div>
+			<div class="span-24 separator"></div>						
 						
 			<div class="span-24 notopmargin main-service">
-				<div class="span-24">
+				<div class="span-18">
 					<h3>News</h3>
+					<g:SimplePanel ui:field="newsFeed" />
 				</div>
-				<g:SimplePanel ui:field="newsFeed" />
+				
+				<!-- DATA USE -->
+				<div class="span-6 notopmargin last">
+					<div class="span-6">
+						<h3>Data Use Conditions</h3>
+					</div>
+					<div class="span-6 inner-6 view notopmargin">
+						<div class="span-5 notopmargin last">
+							<p>There are times where human data can only be shared with certain
+								restrictions. Learn what the rules are and how to apply and comply
+								with data privacy levels.</p>
+							<div style="margin-top: 10px;">
+								<h4>
+									<a href="#!WikiPlace:dataAccessLevelsContent" class="service-tipsy north link">Learn the
+										Rules for Sharing And Using Human Data</a>
+								</h4>
+							</div>
+							<div style="margin-top: 15px;">
+								<g:Image resource='{icons.shieldRed16}' /><h5 style="display: inline; margin-left: 3px;">Controlled Use</h5><br/>
+								<g:Image resource='{icons.shieldYellow16}' /><h5 style="display: inline; margin-left: 3px;">Restricted Use</h5><br/>
+								<g:Image resource='{icons.sheildGreen16}' /><h5 style="display: inline; margin-left: 3px;">Open Use</h5><br/>
+							</div>
+						</div>
+			
+					</div>
+				</div>
+				<!-- END DATA USE -->				
 			</div>
 
-			<div class="span-24 separator"></div>
 			<div class="clear"></div>
 		</div> <!-- close class="container" -->
 		<g:SimplePanel ui:field="footer" />
