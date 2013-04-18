@@ -372,5 +372,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void clear() {
+		removeAll(true);
 	}
 }
