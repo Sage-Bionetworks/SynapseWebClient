@@ -168,6 +168,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	private final static native boolean _isDirectUploadSupported() /*-{ 
+		//if Safari, direct upload is not supported
+		if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)
+			return false;
 		var xhr = new XMLHttpRequest();
 		// This test is from http://blogs.msdn.com/b/ie/archive/2012/02/09/cors-for-xhr-in-ie10.aspx
 		return ("withCredentials" in xhr);
