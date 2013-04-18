@@ -99,14 +99,6 @@ public class HomePresenterTest {
 	}
 	
 	@Test
-	public void testBccLoad() {
-		String result = "challenge description";
-		AsyncMockStubber.callSuccessWith(result).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));		
-		homePresenter.loadBccOverviewDescription();
-		verify(mockView).showBccOverview(result);
-	}	
-	
-	@Test
 	public void testNewsFeed() throws JSONObjectAdapterException {
 		//when news is loaded, the view should be updated with the service result
 		String exampleNewsFeedResult = "news feed";
