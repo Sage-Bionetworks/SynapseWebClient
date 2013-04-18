@@ -12,15 +12,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import static org.mockito.Mockito.*;
 
 public class ImageWidgetTest {
 		
 	ImageWidget widget;
 	ImageWidgetView mockView;
+	AuthenticationController mockAuthenticationController;
 	Page testPage;
 	Map<String, String> descriptor;
 	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
@@ -28,9 +31,11 @@ public class ImageWidgetTest {
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		mockView = mock(ImageWidgetView.class);
-		widget = new ImageWidget(mockView);
+		mockAuthenticationController = mock(AuthenticationController.class);
+		widget = new ImageWidget(mockView, mockAuthenticationController);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 	}
 	
 	@Test
@@ -42,6 +47,6 @@ public class ImageWidgetTest {
 	@Test
 	public void testConfigure() {
 		widget.configure(wikiKey,descriptor);
-		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), anyString());
+		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
 	}
 }

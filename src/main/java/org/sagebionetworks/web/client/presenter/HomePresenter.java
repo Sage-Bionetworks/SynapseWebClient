@@ -35,6 +35,8 @@ import com.google.inject.Inject;
 @SuppressWarnings("unused")
 public class HomePresenter extends AbstractActivity implements HomeView.Presenter, Presenter<Home> {
 	public static final String KEY_DATASETS_SELECTED_COLUMNS_COOKIE = "org.sagebionetworks.selected.dataset.columns";
+
+	private static final int MAX_NEWS_ITEMS = 3;
 	
 	private Home place;
 	private HomeView view;
@@ -96,20 +98,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			loadProjectsAndFavorites();
 		}
 	}
-	
-	public void loadBccOverviewDescription() {
-		rssService.getCachedContent(DisplayUtils.BCC_SUMMARY_PROVIDER_ID, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				view.showBccOverview(result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				//don't show the bcc overview
-			}
-		});
-	}
-	
+		
 	public void loadNewsFeed(){
 		rssService.getCachedContent(DisplayUtils.NEWS_FEED_PROVIDER_ID, new AsyncCallback<String>() {
 			@Override
@@ -130,12 +119,12 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public String getHtml(String rssFeedJson) throws JSONObjectAdapterException {
 		RSSFeed feed = nodeModelCreator.createJSONEntity(rssFeedJson, RSSFeed.class);
 		StringBuilder htmlResponse = new StringBuilder();
-	
-		for (int i = 0; i < feed.getEntries().size(); i++) {
+		int maxIdx = feed.getEntries().size() > MAX_NEWS_ITEMS ? MAX_NEWS_ITEMS : feed.getEntries().size();
+		for (int i = 0; i < maxIdx; i++) {
 			RSSEntry entry = feed.getEntries().get(i);
-			//every 4, set as the last (if we support more than 4)
-			String lastString = (i+1)%4==0 ? "last" : "";
-			htmlResponse.append("<div class=\"span-6 serv "+lastString+"\"><div class=\"icon-white-big left icon161-white\" style=\"background-color: rgb(122, 122, 122);\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
+			//every max, set as the last
+			String lastString = (i+1)%MAX_NEWS_ITEMS==0 ? "last" : "";
+			htmlResponse.append("<div class=\"span-6 serv notopmargin "+lastString+"\"><div class=\"icon-white-big left icon161-white\" style=\"background-color: rgb(122, 122, 122);\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
             htmlResponse.append(entry.getLink());
             htmlResponse.append("\" class=\"service-tipsy north link\">");
             htmlResponse.append(entry.getTitle());
@@ -176,11 +165,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	@Override
 	public boolean showLoggedInDetails() {
 		return authenticationController.isLoggedIn();
-	}
-
-	@Override
-	public void showBCCSignup(AsyncCallback<String> callback) {
-		stackConfigService.getBCCSignupEnabled(callback);
 	}
 	
 	private void loadProjectsAndFavorites() {
