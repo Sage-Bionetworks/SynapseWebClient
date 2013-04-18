@@ -354,7 +354,8 @@ public class FileHandleServlet extends HttpServlet {
 		Synapse client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		client.setSessionToken(sessionToken);
+		if (sessionToken != null)
+			client.setSessionToken(sessionToken);
 		return client;
 	}
 

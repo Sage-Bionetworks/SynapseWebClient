@@ -25,14 +25,12 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,8 +46,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	SimplePanel footer;
 	@UiField
 	SimplePanel bigSearchBox;
-	@UiField
-	SimplePanel bccSignup;
 	@UiField
 	SimplePanel projectPanel;
 	@UiField
@@ -110,7 +106,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		Button registerBtn = new Button(DisplayConstants.REGISTER_BUTTON);
 		registerBtn.removeStyleName("gwt-Button");
-		registerBtn.addStyleName("btn btn-large");
+		registerBtn.addStyleName("btn btn-large btn-block");
 		registerBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -122,6 +118,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 	}	
 
 	@Override
+	public void onAttach() {
+		super.onAttach();
+		carousel();
+	}
+	
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 		Window.scrollTo(0, 0); // scroll user to top of page		
@@ -129,12 +131,29 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	@Override
 	public void showNews(String html){
-		HTMLPanel panel = new HTMLPanel(html);
+		HTMLPanel panel = new HTMLPanel(html);		
 		DisplayUtils.sendAllLinksToNewWindow(panel);
 		newsFeed.clear();
 		newsFeed.add(panel);
 	}
 		
+	private static native void carousel() /*-{
+		$wnd.jQuery("#slider").nivoSlider({
+	        effect:"sliceDown",
+	        slices:15,
+	        boxCols:8,
+	        boxRows:4,
+	        animSpeed:500,
+	        pauseTime:9000,
+	        startSlide:0,
+	        directionNav:true,
+	        controlNav:true,
+	        controlNavThumbs:false,
+	        pauseOnHover:true,
+	        manualAdvance:false
+	    });
+	}-*/;
+	
 	@Override
 	public void refresh() {
 		header.clear();
@@ -146,7 +165,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 		boolean isLoggedIn = presenter.showLoggedInDetails();
 		
-		
 		if(isLoggedIn) {
 			whatIsSynapseContainer.setVisible(false);
 			getStartedContainer.setVisible(false);
@@ -155,34 +173,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 			whatIsSynapseContainer.setVisible(true);
 			getStartedContainer.setVisible(true);
 			projectPanel.clear();
-		}
-		
-	    presenter.showBCCSignup(new AsyncCallback<String>() {
-				
-				public void onSuccess(String showBCCSignup) {
-					if (showBCCSignup==null || !showBCCSignup.equalsIgnoreCase("true")) return;
-					//now, pull the content
-					presenter.loadBccOverviewDescription();
-				}
-				public void onFailure(Throwable t) {
-					// do nothing
-				} // "span-6 inner-6 view notopmargin"
-		});
+		}		
 	}
 	
-	@Override
-	public void showBccOverview(String description){
-		Panel sp = new SimplePanel();
-		
-		sp.add(new HTML(SafeHtmlUtils.fromSafeConstant(
-				"<div class=\"span-6 inner-6 view notopmargin\">" +
-				"<h5><a class=\"link\" href=\"#!BCCOverview:0\">Sage / DREAM Breast Cancer Prognosis Challenge</a></h5>"+
-				description+
-				"<a class=\"button_readmore\" href=\"#!BCCOverview:0\"></a></div>")));
-		bccSignup.clear();
-		bccSignup.add(sp);
-	}
-
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
