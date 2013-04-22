@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -94,6 +96,35 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", WidgetConstants.WIKI_OWNER_ID_ENTITY, null), true, null, true, 17);
 		verify(mockView).showNoWikiAvailableUI();
+	}
+	
+	@Test
+	public void testConfigureNoWikiPageNotEmbedded(){
+		//if page is not embedded in the owner page, and the user can't edit, then it should show a 404
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		presenter.configure(new WikiPageKey("ownerId", WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, null, false, 17);
+		verify(mockView).show404();
+	}
+	
+	@Test
+	public void testConfigureWikiForbiddenNotEmbedded(){
+		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		presenter.configure(new WikiPageKey("ownerId", WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, null, false, 17);
+		verify(mockView).show403();
+	}
+	
+	//also show a 404 if we get an empty entity list
+	@Test
+	public void testEmptyEntityList() throws JSONObjectAdapterException {
+		BatchResults<EntityHeader> headers = new BatchResults<EntityHeader>();
+		headers.setTotalNumberOfResults(0);
+		EntityHeader testEntityHeader = new EntityHeader();
+		testEntityHeader.setName(MY_TEST_ENTITY_OWNER_NAME);
+		headers.setResults(new ArrayList());
+		when(mockNodeModelCreator.createBatchResults(anyString(), any(Class.class))).thenReturn(headers);
+		presenter.configure(new WikiPageKey("ownerId", WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, null, true, 17);
+		
+		verify(mockView).show404();
 	}
 	
 	@Test
