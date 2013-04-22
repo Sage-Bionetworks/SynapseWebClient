@@ -2,8 +2,10 @@ package org.sagebionetworks.web.server.servlet.filter;
 
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -14,7 +16,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +37,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -106,10 +106,8 @@ public class CrawlFilter implements Filter {
 				response.setContentType(mt);
 				HttpServletResponse httpResponse = (HttpServletResponse) response;
 				httpResponse.setStatus(HttpServletResponse.SC_OK);
-				ServletOutputStream out = httpResponse.getOutputStream();
+				PrintWriter out = httpResponse.getWriter();
 				out.println(replacedWithFullHrefs);
-				out.flush();
-				out.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -120,7 +118,7 @@ public class CrawlFilter implements Filter {
 
 	private String getHomePageHtml() throws JSONObjectAdapterException, RestServiceException{
 		StringBuilder html = new StringBuilder();
-		html.append("<html><head><title>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</title><meta name=\"description\" content=\""+DisplayConstants.DEFAULT_PAGE_DESCRIPTION+"\" /></head><body>");
+		html.append("<!DOCTYPE html><html><head><title>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</title><meta name=\"description\" content=\""+DisplayConstants.DEFAULT_PAGE_DESCRIPTION+"\" /></head><body>");
 		//add direct links to all public projects in the system
 		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		html.append("<h1>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</h1>" + DisplayConstants.DEFAULT_PAGE_DESCRIPTION + "<br />");
@@ -159,20 +157,20 @@ public class CrawlFilter implements Filter {
 		Entity entity = EntityFactory.createEntityFromJSONString(entityTransport.getEntityJson(), Entity.class);
 		Annotations annotations = EntityFactory.createEntityFromJSONString(entityTransport.getAnnotationsJson(), Annotations.class);
 		
-		String name = entity.getName();
-		String description = entity.getDescription();
+		String name = escapeHtml(entity.getName());
+		String description = escapeHtml(entity.getDescription());
 		String markdown = null;
-		String createdBy = entity.getCreatedBy();
+		String createdBy = escapeHtml(entity.getCreatedBy());
 		try{
 			String wikiPageJson = synapseClient.getWikiPage(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
 			WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, WikiPage.class);
-			markdown = rootPage.getMarkdown();
+			markdown = escapeHtml(rootPage.getMarkdown());
 		} catch (Exception e) {}
 		
 		StringBuilder html = new StringBuilder();
 		
 		//note: can't set description meta tag, since it might be markdown.
-		html.append("<html><head><title>"+name +" - "+ entity.getId()+"</title><meta name=\"description\" content=\"\" /></head><body>");
+		html.append("<!DOCTYPE html><html><head><title>"+name +" - "+ entity.getId()+"</title></head><body>");
 		
 		html.append("<h1>"+name+"</h1>");
 		if (description != null)
@@ -184,15 +182,15 @@ public class CrawlFilter implements Filter {
 		html.append("<br />");
 		for (String key : annotations.getStringAnnotations().keySet()) {
 			List<String> value = annotations.getStringAnnotations().get(key);
-			html.append(key + getValueString(value) + "<br />");
+			html.append(escapeHtml(key) + escapeHtml(getValueString(value)) + "<br />");
 		}
 		for (String key : annotations.getLongAnnotations().keySet()) {
 			List<Long> value = annotations.getLongAnnotations().get(key);
-			html.append(key + getValueString(value) + "<br />");
+			html.append(escapeHtml(key) + escapeHtml(getValueString(value)) + "<br />");
 		}
 		for (String key : annotations.getDoubleAnnotations().keySet()) {
 			List<Double> value = annotations.getDoubleAnnotations().get(key);
-			html.append(key + getValueString(value) + "<br />");
+			html.append(escapeHtml(key) + escapeHtml(getValueString(value)) + "<br />");
 		}
 		
 		//and ask for all descendents
@@ -223,7 +221,7 @@ public class CrawlFilter implements Filter {
 		SearchQuery inputQuery = EntityFactory.createEntityFromJSONString(searchQueryJson, SearchQuery.class);
 		//append this set to the list
 		StringBuilder html = new StringBuilder();
-		html.append("<html><head><title>Sage Synapse: All Projects - starting from "+inputQuery.getStart()+"</title><meta name=\"description\" content=\"\" /></head><body>");
+		html.append("<!DOCTYPE html><html><head><title>Sage Synapse: All Projects - starting from "+inputQuery.getStart()+"</title><meta name=\"description\" content=\"\" /></head><body>");
 		for (Hit hit : results.getHits()) {
 			//add links
 			html.append("<a href=\"#!Synapse:"+hit.getId()+"\">"+hit.getName()+"</a><br />");
