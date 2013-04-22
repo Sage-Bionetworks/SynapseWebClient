@@ -314,6 +314,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 
 	private Menu createWidgetMenu(final WidgetDescriptorUpdatedHandler callback) {
 	    Menu menu = new Menu();
+	    menu.setEnableScrolling(false);
 	    if (isWikiEditor) {
 		    menu.add(getNewCommand("Attachment", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {

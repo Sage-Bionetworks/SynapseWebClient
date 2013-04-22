@@ -80,7 +80,7 @@
                     <div id="slider" class="nivoSlider">
                         <a href="#!Synapse:syn1710250"><img src="images/spotlight/attractorMetagene.jpg" alt="" title="#bccGatewayCaption" /></a>                        
                         <a href="#!Synapse:syn300013"><img src="images/spotlight/TcgaPancancer.jpg" alt="" title="#tcgaPancanCaption" /></a>
-                        <a class="link" href="mailto:sage-dream-challenges@sagebase.org?subject=Sign&nbsp;me&nbsp;up&nbsp;for&nbsp;Sage&nbsp;/&nbsp;DREAM&nbsp;Challenge&nbsp;updates"><img src="images/spotlight/CompetitionUpdates.jpg" alt="" title="#compSignupCaption" /></a>
+                        <a class="link" href="mailto:DREAM8@sagebase.org?subject=Sign&nbsp;me&nbsp;up&nbsp;for&nbsp;Sage&nbsp;/&nbsp;DREAM&nbsp;Challenge&nbsp;updates"><img src="images/spotlight/CompetitionUpdates.jpg" alt="" title="#compSignupCaption" /></a>
                     </div>
                     <div id="bccGatewayCaption" class="nivo-html-caption" style="top: 120px !important;">
                         <a href="#!Synapse:syn1710250">BCC Gateway Project</a>
