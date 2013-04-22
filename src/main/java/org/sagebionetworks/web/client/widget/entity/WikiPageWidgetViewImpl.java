@@ -167,11 +167,13 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(WidgetConstants.WIKI_OWNER_ID_EVALUATION)) {
 				//point to Home
 				links.add(new LinkData("Home", new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)));
+				breadcrumbsWrapper.add(breadcrumb.asWidget(links, null));
 			} else {
 				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
 				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+				breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
 			}
-			breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
+			
 			layout(true);
 			//TODO: support other object types.  
 		}

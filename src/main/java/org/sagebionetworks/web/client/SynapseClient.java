@@ -2,7 +2,8 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
-
+import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.web.client.presenter.UserEvaluationState;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -211,6 +212,12 @@ public interface SynapseClient extends RemoteService {
 	public void removeFavorite(String entityId) throws RestServiceException;
 	
 	public String getFavorites(Integer limit, Integer offset) throws RestServiceException;
+	
+	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException;
+	
+	public String createParticipant(String evaluationId) throws RestServiceException;
+	
+	public void deleteParticipant(String evaluationId) throws RestServiceException;
 	
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	

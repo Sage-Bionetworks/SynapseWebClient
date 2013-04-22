@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.EvaluationPresenter;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -103,6 +104,8 @@ public interface PortalGinInjector extends Ginjector {
 	public PresenterProxy<SynapseWikiPresenter, Wiki> getSynapseWikiPresenter();
 	
 	public PresenterProxy<WikiPresenter, WikiPlace> getWikiPresenter();
+	
+	public EvaluationPresenter getEvaluationPresenter();
 	
 	public EventBus getEventBus();
 	

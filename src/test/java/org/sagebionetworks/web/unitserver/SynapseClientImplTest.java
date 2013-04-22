@@ -37,10 +37,14 @@ import org.mockito.Mockito;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.EvaluationStatus;
+import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -55,6 +59,7 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
@@ -79,6 +84,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.presenter.UserEvaluationState;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -119,7 +125,10 @@ public class SynapseClientImplTest {
 	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
 	AccessControlList acl;
 	WikiPage page;
-	
+	Evaluation mockEvaluation;
+	Participant mockParticipant;
+	UserSessionData mockUserSessionData;
+	UserProfile mockUserProfile;
 	
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -240,6 +249,18 @@ public class SynapseClientImplTest {
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
 		when(mockSynapse.getAccessRequirements(anyString())).thenReturn(ars);
+		mockEvaluation = Mockito.mock(Evaluation.class);
+		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
+		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
+		mockUserSessionData = Mockito.mock(UserSessionData.class);
+		mockUserProfile = Mockito.mock(UserProfile.class);
+		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
+		when(mockUserProfile.getOwnerId()).thenReturn("MyOwnerID");
+		mockParticipant = Mockito.mock(Participant.class);
+		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(mockParticipant);
+		
+		when(mockSynapse.createParticipant(anyString())).thenReturn(mockParticipant);
 	}
 	
 	@Test
@@ -618,7 +639,7 @@ public class SynapseClientImplTest {
 		fileEntityArg = arg.getValue();	//last value captured
 		assertEquals(originalFileEntityName, fileEntityArg.getName());
 	}
-
+	
 	@Test
 	public void testGetEntityDoi() throws Exception {
 		//wiring test
@@ -632,6 +653,59 @@ public class SynapseClientImplTest {
 		synapseClient.getEntityDoi("test entity id", null);
 	    verify(mockSynapse).getEntityDoi(anyString(), anyLong());
 	}
+
+	@Test
+	public void testGetUserEvaluationState() throws Exception{
+		//base case, OPEN competition where user is a participant
+		UserEvaluationState state = synapseClient.getUserEvaluationState("myEvalId");
+		assertTrue(UserEvaluationState.EVAL_OPEN_USER_REGISTERED.equals(state));
+	}
+	
+	@Test
+	public void testGetUserEvaluationStateNotOpen() throws Exception{
+		//evaluation is in some state, other than OPEN.  Could be CLOSED, COMPLETED, or PLANNED.
+		//in all cases, registration is unavailable
+		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.CLOSED);
+		UserEvaluationState state = synapseClient.getUserEvaluationState("myEvalId");
+		assertTrue(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE.equals(state));
+		
+		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.COMPLETED);
+		state = synapseClient.getUserEvaluationState("myEvalId");
+		assertTrue(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE.equals(state));
+
+		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.PLANNED);
+		state = synapseClient.getUserEvaluationState("myEvalId");
+		assertTrue(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE.equals(state));
+	}
+	
+	@Test
+	public void testGetUserEvaluationStateAsAnonymous() throws Exception{
+		//competition is open, but I'm logged in as anonymous
+		when(mockUserProfile.getOwnerId()).thenReturn(AuthorizationConstants.ANONYMOUS_USER_ID);
+		UserEvaluationState state = synapseClient.getUserEvaluationState("myEvalId");
+		assertTrue(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE.equals(state));
+	}
+
+	@Test
+	public void testGetUserEvaluationStateNotRegistered() throws Exception{
+		//competition is open, but I'm logged in as anonymous
+		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(null);
+		UserEvaluationState state = synapseClient.getUserEvaluationState("myEvalId");
+		assertTrue(UserEvaluationState.EVAL_OPEN_USER_NOT_REGISTERED.equals(state));
+		
+		//or if there is some problem finding the user
+		when(mockSynapse.getParticipant(anyString(), anyString())).thenThrow(new SynapseException());
+		state = synapseClient.getUserEvaluationState("myEvalId");
+		assertTrue(UserEvaluationState.EVAL_OPEN_USER_NOT_REGISTERED.equals(state));
+	}
+
+//	@Test
+//	public void testGetParticipant() throws Exception{
+//		//basic wiring test
+//		//String returnJson = synapseClient.createParticipant("myEvalId");
+//		
+//	}
+
 	
 	private FileEntity getTestFileEntity() {
 		FileEntity testFileEntity = new FileEntity();

@@ -17,11 +17,15 @@ import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.EvaluationStatus;
+import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
@@ -36,6 +40,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -71,6 +76,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
+import org.sagebionetworks.web.client.presenter.UserEvaluationState;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
@@ -779,13 +785,26 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException {
+		ObjectType type = ObjectType.valueOf(ownerType);
+		ACCESS_TYPE access = ACCESS_TYPE.valueOf(accessType);
+		Synapse synapseClient = createSynapseClient();
+		try {
+			if (type == ObjectType.EVALUATION) {
+				 if (access == ACCESS_TYPE.READ)
+					 return true;
+				 else if (access == ACCESS_TYPE.UPDATE){
+					 //can the user update the referenced evaluation?
+					 Evaluation evaluation = synapseClient.getEvaluation(ownerId);
+					 synapseClient.updateEvaluation(evaluation);
+					 //was able to update
+					 return true;
+				 }
+			}
 		
-		ObjectType ownerObjectType = ObjectType.valueOf(ownerType);
-		if (ObjectType.ENTITY.equals(ownerObjectType))
-			return hasAccess(ownerId, accessType);
-		//everyone has (read) access to evaluation
-			
-		throw new IllegalArgumentException(DisplayConstants.UNSUPPORTED_FOR_OWNER_TYPE + ownerType);
+			return synapseClient.canAccess(ownerId, access);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 	
 	@Override
@@ -1261,7 +1280,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(new SynapseNotFoundException());	//backend will be changed to throw a SynapseNotFoundException when no records are found
 		}
 	}
-	
+
 	@Override
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
@@ -1270,6 +1289,75 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	
+	@Override
+	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException{
+		//is the evaluation open?
+		Synapse synapseClient = createSynapseClient();
+		UserEvaluationState returnState = UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE;
+		try {
+			Evaluation evaluation = synapseClient.getEvaluation(evaluationId);
+			EvaluationStatus status  = evaluation.getStatus();
+			if (EvaluationStatus.OPEN.equals(status)) {
+				//is the user registered for this?
+				UserSessionData sessionData = synapseClient.getUserSessionData();
+				String userId = getUserId(sessionData);
+				if (userId != null) {
+					//try to get the participant
+					returnState = UserEvaluationState.EVAL_OPEN_USER_NOT_REGISTERED;
+					try {
+						Participant user = synapseClient.getParticipant(evaluationId, userId);
+						if (user != null) {
+							returnState = UserEvaluationState.EVAL_OPEN_USER_REGISTERED;
+						}
+					} catch (Exception e) {e.printStackTrace();}
+				}
+				//else user principle id unavailable, returnState = EVAL_REGISTRATION_UNAVAILABLE
+			}
+			//else registration is not OPEN, returnState = EVAL_REGISTRATION_UNAVAILABLE
+			return returnState;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	private String getUserId(UserSessionData sessionData) {
+		String userId = null;
+		if (sessionData != null && sessionData.getProfile() != null && sessionData.getProfile().getOwnerId() != null && !sessionData.getProfile().getOwnerId().equals(AuthorizationConstants.ANONYMOUS_USER_ID)) {
+			userId = sessionData.getProfile().getOwnerId();
+		}
+		return userId;
+	}
+	
+	@Override
+	public String createParticipant(String evaluationId)
+			throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			Participant participant = synapseClient.createParticipant(evaluationId);
+			return EntityFactory.createJSONStringForEntity(participant);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public void deleteParticipant(String evaluationId)
+			throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			UserSessionData sessionData = synapseClient.getUserSessionData();
+			String userId = getUserId(sessionData);
+			if (userId != null)
+				synapseClient.deleteParticipant(evaluationId, userId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+
+		
 	}
 	
 	@Override
