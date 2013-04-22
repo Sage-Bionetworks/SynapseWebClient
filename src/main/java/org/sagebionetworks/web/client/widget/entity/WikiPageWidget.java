@@ -109,8 +109,11 @@ SynapseWidgetPresenter {
 					public void onFailure(Throwable caught) {
 						//if it is because of a missing root (and we have edit permission), then the pages browser should have a Create Wiki button
 						if (caught instanceof NotFoundException) {
-							if (canEdit)
+							//show insert wiki button if user can edit and it's embedded in another entity page
+							if (canEdit && isEmbeddedInOwnerPage)
 								view.showNoWikiAvailableUI();
+							else if (!isEmbeddedInOwnerPage) //otherwise, if it's not embedded in the owner page, show a 404
+								view.show404();
 						}
 						else {
 							view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
@@ -167,6 +170,8 @@ SynapseWidgetPresenter {
 								EntityHeader theHeader = headers.getResults().get(0);
 								ownerObjectName = theHeader.getName();
 								callback.ownerObjectNameInitialized();
+							} else {
+								view.show404();
 							}
 						} catch (JSONObjectAdapterException e) {
 							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
