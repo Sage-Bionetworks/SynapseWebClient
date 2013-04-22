@@ -109,6 +109,13 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Override
+	public void show403() {
+		removeAll(true);
+		add(new HTML(DisplayUtils.get403Html()));
+		layout(true);
+	}
+	
+	@Override
 	public void showNoWikiAvailableUI() {
 		removeAll(true);
 		SimplePanel createWikiButtonWrapper = new SimplePanel();

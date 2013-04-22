@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -103,6 +104,13 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, null, false, 17);
 		verify(mockView).show404();
+	}
+	
+	@Test
+	public void testConfigureWikiForbiddenNotEmbedded(){
+		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		presenter.configure(new WikiPageKey("ownerId", WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, null, false, 17);
+		verify(mockView).show403();
 	}
 	
 	//also show a 404 if we get an empty entity list

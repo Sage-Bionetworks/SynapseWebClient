@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -114,6 +115,10 @@ SynapseWidgetPresenter {
 								view.showNoWikiAvailableUI();
 							else if (!isEmbeddedInOwnerPage) //otherwise, if it's not embedded in the owner page, show a 404
 								view.show404();
+						}
+						else if (caught instanceof ForbiddenException) {
+							if (!isEmbeddedInOwnerPage) //if it's not embedded in the owner page, show a 403
+								view.show403();
 						}
 						else {
 							view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
