@@ -64,25 +64,27 @@ public class WidgetEncodingUtil {
 	}
 	
 	public static String decodeValue(String value) {
+		final int WINDOW = 3;
+		
 		if(value == null) return null;
 		
 		//detect the hex codes using a sliding window (of 3 characters)
 		//if the input value is less than 3 in length, then there's nothing to decode
-		if (value.length() < 3){
+		if (value.length() < WINDOW){
 			return value;
 		}
 		//build up the output
 		StringBuilder output = new StringBuilder();
 		
 		int start = 0;
-		int end=3;
+		int end=WINDOW;
 		for (; end <= value.length();) {
 			String currentSubString = value.substring(start, end);
 			if (h2c.containsKey(currentSubString)) {
 				//found one, add the resolved character to the output and skip ahead
 				output.append(h2c.get(currentSubString));
-				start += 3;
-				end += 3;
+				start += WINDOW;
+				end += WINDOW;
 			} else {
 				//is not one, just append the character at start, and move the window over
 				output.append(value.charAt(start));
@@ -90,12 +92,10 @@ public class WidgetEncodingUtil {
 				end++;
 			}
 		}
-		//check to see if we have any left over in the window
-		if (end == value.length() + 1 && start == value.length()-2) {
-			//our window went outside of the boundary.  append the remaining characters to the output
-			output.append(value.substring(start, value.length()));
-		}
 
+		// append any trailing characters	 
+		output.append(value.substring(start));
+		
 		return output.toString();
 	}
 	

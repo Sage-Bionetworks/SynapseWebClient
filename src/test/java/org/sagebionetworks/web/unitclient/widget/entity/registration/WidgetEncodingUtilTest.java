@@ -27,9 +27,17 @@ public class WidgetEncodingUtilTest {
 		String oldParamName = "oldNonEscapedDot.png";  //now periods are escaped, but decoding one of these old values should not fail
 		Assert.assertEquals(oldParamName, WidgetEncodingUtil.decodeValue(oldParamName));
 		//test rolling decode window
-		Assert.assertEquals("hi", WidgetEncodingUtil.decodeValue("hi"));
-		Assert.assertEquals("123", WidgetEncodingUtil.decodeValue("123"));
-		Assert.assertEquals("1234", WidgetEncodingUtil.decodeValue("1234"));
+		Assert.assertEquals("hi", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("hi")));
+		Assert.assertEquals("123", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("123")));
+		Assert.assertEquals("1234", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("1234")));
+		Assert.assertEquals("123$", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("123$")));
+		Assert.assertEquals("$123$", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("$123$")));
+		Assert.assertEquals("$1$2$", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("$1$2$")));
+		Assert.assertEquals("$1$2$3", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("$1$2$3")));
+		Assert.assertEquals("$1$2$34", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("$1$2$34")));
+		Assert.assertEquals("$1$2$345", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("$1$2$345")));
+		Assert.assertEquals("$1$2$3456", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("$1$2$3456")));
+		Assert.assertEquals("syn1234/version/5", WidgetEncodingUtil.decodeValue(WidgetEncodingUtil.encodeValue("syn1234/version/5"))); // regression test
 	}
 	
 
