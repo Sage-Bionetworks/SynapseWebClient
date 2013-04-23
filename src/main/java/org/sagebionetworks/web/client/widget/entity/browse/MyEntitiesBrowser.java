@@ -126,6 +126,10 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	public EntityTreeBrowser getEntityTreeBrowser() {
 		return view.getEntityTreeBrowser();
 	}
+	
+	public EntityTreeBrowser getFavoritesTreeBrowser() {
+		return view.getFavoritesTreeBrowser();
+	}
 
 	@Override
 	public void loadFavorites() {
