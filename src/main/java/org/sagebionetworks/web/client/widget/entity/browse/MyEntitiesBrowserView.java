@@ -22,6 +22,8 @@ public interface MyEntitiesBrowserView extends IsWidget, SynapseWidgetView {
 	
 	void setFavoriteEntities(List<EntityHeader> favoriteEntities);
 
+	public EntityTreeBrowser getFavoritesTreeBrowser();
+
 	/**
 	 * Presenter interface
 	 */
@@ -33,6 +35,7 @@ public interface MyEntitiesBrowserView extends IsWidget, SynapseWidgetView {
 
 		void loadFavorites();
 	}
+
 
 
 }
