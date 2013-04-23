@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.footer;
 
+import java.util.Date;
+
+import org.gwttime.time.DateTime;
+import org.gwttime.time.format.ISODateTimeFormat;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -12,6 +16,7 @@ import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.dom.client.ScriptElement;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,10 +35,11 @@ public class FooterViewImpl extends Composite implements FooterView {
 	}
 
 	@UiField
-	ScriptElement searchScript;
-	
+	ScriptElement searchScript;	
 	@UiField
-	FlowPanel debugModePanel;
+	FlowPanel debugModePanel;	
+	@UiField
+	SpanElement copyrightYear;
 	
 	private Presenter presenter;
 	private CookieProvider cookies;
@@ -45,12 +51,12 @@ public class FooterViewImpl extends Composite implements FooterView {
 		searchScript.setText("var TRANSMART_SEARCH = \"http://transmart.sagebase.org/transmart/search/search?sourcepage=search&id=\";		$(function() {			$( \"#query\" ).autocomplete({				source: function( request, response ) {					$.ajax({						url: \"http://transmart.sagebase.org/transmart/search/loadSearch\",						dataType: \"jsonp\",						data: {							query: \"all:\" + request.term												},						success: function( data ) {							response( $.map( data.rows, function( item ) {								return {									label: item.display + \": \" + item.keyword,									value: item.name,									id: item.id								}							}));						}					});				},				minLength: 1,				select: function( event, ui ) {					if(ui.item.id) {											document.location =  TRANSMART_SEARCH + ui.item.id;					}				}			});		});");
 		this.cookies = cookies;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		addDebugModeLink();
+		addDebugModeLink();		
+		copyrightYear.setInnerHTML(ISODateTimeFormat.year().print(new DateTime()));
 	}
 	
 	private void addDebugModeLink() {
 		final Anchor debugModeLink = new Anchor();
-		debugModeLink.addStyleName("link");
 		debugModeLink.setText("@");
 		debugModeLink.addClickHandler(new ClickHandler() {
 			@Override
