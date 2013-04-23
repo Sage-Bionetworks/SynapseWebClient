@@ -789,19 +789,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		ACCESS_TYPE access = ACCESS_TYPE.valueOf(accessType);
 		Synapse synapseClient = createSynapseClient();
 		try {
-			if (type == ObjectType.EVALUATION) {
-				 if (access == ACCESS_TYPE.READ)
-					 return true;
-				 else if (access == ACCESS_TYPE.UPDATE){
-					 //can the user update the referenced evaluation?
-					 Evaluation evaluation = synapseClient.getEvaluation(ownerId);
-					 synapseClient.updateEvaluation(evaluation);
-					 //was able to update
-					 return true;
-				 }
-			}
-		
-			return synapseClient.canAccess(ownerId, access);
+			return synapseClient.canAccess(ownerId, type, access);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -1293,6 +1281,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException{
+		//TODO: method should be rewritten when Synapse call is available to find available evaluations (see PLFM-1858)
 		//is the evaluation open?
 		Synapse synapseClient = createSynapseClient();
 		UserEvaluationState returnState = UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE;

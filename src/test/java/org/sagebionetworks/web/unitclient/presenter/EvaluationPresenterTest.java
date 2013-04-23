@@ -10,14 +10,18 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Evaluation;
 import org.sagebionetworks.web.client.presenter.EvaluationPresenter;
 import org.sagebionetworks.web.client.presenter.UserEvaluationState;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EvaluationView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EvaluationPresenterTest {
@@ -25,14 +29,22 @@ public class EvaluationPresenterTest {
 	EvaluationPresenter presenter;
 	EvaluationView mockView;
 	SynapseClientAsync mockSynapseClient;
+	AuthenticationController mockAuthController;
+	GlobalApplicationState mockGlobalApplicationState;
+	PlaceChanger mockPlaceChanger;
 	
 	@Before
 	public void setup() throws Exception{
 		mockView = mock(EvaluationView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockAuthController = mock(AuthenticationController.class);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		mockPlaceChanger = mock(PlaceChanger.class);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).hasAccess(anyString(), anyString(), anyString(), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE).when(mockSynapseClient).getUserEvaluationState(anyString(), any(AsyncCallback.class));
-		presenter = new EvaluationPresenter(mockView, mockSynapseClient);
+		presenter = new EvaluationPresenter(mockView, mockSynapseClient, mockAuthController, mockGlobalApplicationState);
 		verify(mockView).setPresenter(presenter);
 	}	
 	
@@ -72,6 +84,15 @@ public class EvaluationPresenterTest {
 		presenter.register();
 		verify(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
+	}
+	
+	@Test
+	public void testRegisterNotLoggedIn() throws Exception {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		AsyncMockStubber.callSuccessWith("my participant json").when(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
+		presenter.configure("evalId");
+		presenter.register();
+		verify(mockPlaceChanger).goTo(any(Place.class));
 	}
 	
 	@Test

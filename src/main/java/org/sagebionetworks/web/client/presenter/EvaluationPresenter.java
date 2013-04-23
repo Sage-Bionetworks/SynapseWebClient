@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Evaluation;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EvaluationView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -10,6 +13,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -20,11 +24,15 @@ public class EvaluationPresenter extends AbstractActivity implements EvaluationV
 	private EvaluationView view;
 	private SynapseClientAsync synapseClient;
 	private String evaluationId;
+	private AuthenticationController authenticationController;
+	private GlobalApplicationState globalApplicationState;
 	
 	@Inject
-	public EvaluationPresenter(EvaluationView view, SynapseClientAsync synapseClient){
+	public EvaluationPresenter(EvaluationView view, SynapseClientAsync synapseClient, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.authenticationController = authenticationController;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 	}
 
@@ -40,7 +48,6 @@ public class EvaluationPresenter extends AbstractActivity implements EvaluationV
 		
 		configure(place.toToken());
 	}
-	
 	
 	@Override
 	public void configure(final String evaluationId) {
@@ -73,17 +80,23 @@ public class EvaluationPresenter extends AbstractActivity implements EvaluationV
 	@Override
 	public void register() {
 		try {
-			synapseClient.createParticipant(evaluationId, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					view.showInfo("Successfully Joined!", "");
-					configure(evaluationId);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
-				}
-			});
+			if (!authenticationController.isLoggedIn()) {
+				//go to login page
+				goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			}
+			else {
+				synapseClient.createParticipant(evaluationId, new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String result) {
+						view.showInfo("Successfully Joined!", "");
+						configure(evaluationId);
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(caught.getMessage());
+					}
+				});
+			}
 		} catch (RestServiceException e) {
 			view.showErrorMessage(e.getMessage());
 		}
@@ -108,6 +121,9 @@ public class EvaluationPresenter extends AbstractActivity implements EvaluationV
 		}
 	}
 
+	public void goTo(Place place) {
+		globalApplicationState.getPlaceChanger().goTo(place);
+	}
 	
 	@Override
     public String mayStop() {

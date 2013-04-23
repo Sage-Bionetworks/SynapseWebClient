@@ -5,8 +5,6 @@ import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
 public class Evaluation extends Place{
-	public static final String DELIMITER = "/"; 
-	
 	private String token;
 	
 	public Evaluation(String token) {
