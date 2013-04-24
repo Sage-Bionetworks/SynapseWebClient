@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class ProvUtils {
 			Set<Reference> startRefs, Set<Reference> noExpandNode) {
 		ProvGraph graph = new ProvGraph();
 		Integer sequence = 0;
+		Set<ProvGraphNode> nodeHasExpandNode = new HashSet<ProvGraphNode>();
 		
 		// maps for local building retrieval
 		Map<Reference,EntityGraphNode> entityNodes = new HashMap<Reference,EntityGraphNode>();
@@ -99,17 +101,18 @@ public class ProvUtils {
 						graph.addEdge(new ProvGraphEdge(activityNode, entityNode));				
 						
 						// create expand nodes for those that don't have generatedBy activities defined
-						if(showExpand && !generatedByActivityId.containsKey(ref) && !noExpandNode.contains(ref)) {
+						if(showExpand && !generatedByActivityId.containsKey(ref) && !noExpandNode.contains(ref) && !nodeHasExpandNode.contains(entityNode)) {
 							ProvGraphNode expandNode = new ExpandGraphNode(createUniqueNodeId(), ref.getTargetId(), ref.getTargetVersionNumber());
 							idToNode.put(expandNode.getId(), expandNode);
 							graph.addEdge(new ProvGraphEdge(entityNode, expandNode));
+							nodeHasExpandNode.add(entityNode);
 						}
 					} else if(used instanceof UsedURL) {
 						UsedURL ue = (UsedURL)used;									
 						ExternalGraphNode externalGraphNode = new ExternalGraphNode(createUniqueNodeId(), ue.getName(), ue.getUrl(), ue.getWasExecuted());
 						idToNode.put(externalGraphNode.getId(), externalGraphNode);
 						graph.addNode(externalGraphNode);
-						graph.addEdge(new ProvGraphEdge(activityNode, externalGraphNode));										
+						graph.addEdge(new ProvGraphEdge(activityNode, externalGraphNode));						
 					}
 				}
 				
