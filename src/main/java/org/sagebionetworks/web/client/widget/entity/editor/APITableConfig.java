@@ -23,6 +23,8 @@ public class APITableConfig {
 
 	public APITableConfig(Map<String, String> descriptor) {
 		uri = descriptor.get(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
+		//always initialize column configs (could be an empty list)
+		columnConfigs = parseTableColumnConfigs(descriptor);
 		if (uri != null) {
 			isPaging = false;
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY)){
@@ -57,8 +59,6 @@ public class APITableConfig {
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE)){
 				cssStyleName = descriptor.get(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 			}
-			
-			columnConfigs = parseTableColumnConfigs(descriptor);
 		}
 	}
 	
