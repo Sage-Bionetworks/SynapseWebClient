@@ -1281,8 +1281,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException{
-		//TODO: method should be rewritten when Synapse call is available to find available evaluations (see PLFM-1858)
-		//is the evaluation open?
 		Synapse synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getUserEvaluationState(evaluationId);

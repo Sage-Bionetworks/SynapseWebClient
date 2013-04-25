@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -9,7 +10,6 @@ import org.sagebionetworks.web.client.place.Evaluation;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EvaluationView;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -54,14 +54,14 @@ public class EvaluationPresenter extends AbstractActivity implements EvaluationV
 	@Override
 	public void configure(final String evaluationId) {
 		this.evaluationId = evaluationId;
-		synapseClient.hasAccess(evaluationId, WidgetConstants.WIKI_OWNER_ID_EVALUATION, ACCESS_TYPE.UPDATE.toString(), new AsyncCallback<Boolean>() {
+		synapseClient.hasAccess(evaluationId, ObjectType.EVALUATION.toString(), ACCESS_TYPE.UPDATE.toString(), new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(final Boolean canEdit) {
 				try {
 					synapseClient.getUserEvaluationState(evaluationId, new AsyncCallback<UserEvaluationState>() {
 						@Override
 						public void onSuccess(UserEvaluationState state) {
-							view.showPage(new WikiPageKey(evaluationId, WidgetConstants.WIKI_OWNER_ID_EVALUATION, null), state, canEdit);		
+							view.showPage(new WikiPageKey(evaluationId, ObjectType.EVALUATION.toString(), null), state, canEdit);		
 						}
 						@Override
 						public void onFailure(Throwable caught) {

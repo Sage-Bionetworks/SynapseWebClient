@@ -132,6 +132,13 @@ public interface SynapseClientAsync {
 			AsyncCallback<String> callback);
 	
 	void getUserEvaluationState(String evaluationId, AsyncCallback<UserEvaluationState> callback) throws RestServiceException;
+
+	/**
+	 * Returns json string representation of created Participant
+	 * @param evaluationId
+	 * @return
+	 * @throws RestServiceException
+	 */
 	void createParticipant(String evaluationId, AsyncCallback<String> callback) throws RestServiceException;
 	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);

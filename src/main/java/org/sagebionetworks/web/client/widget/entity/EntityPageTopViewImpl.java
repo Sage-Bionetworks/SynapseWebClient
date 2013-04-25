@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -353,7 +354,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
 			container.add(wikiPageWidget.asWidget());
-			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), canEdit, new WikiPageWidget.Callback() {
+			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), null), canEdit, new WikiPageWidget.Callback() {
 				@Override
 				public void pageUpdated() {
 					presenter.fireEntityUpdatedEvent();
@@ -504,7 +505,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    if(description != null && !("".equals(description))) {
 	    	if (!DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 				lc.add(markdownWidget);
-		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, false);
+		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  ObjectType.ENTITY.toString(), null), false, false);
 	    	}
 	    	else {
 	    		Label plainDescriptionText = new Label();
