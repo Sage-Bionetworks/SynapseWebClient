@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.presenter.UserEvaluationState;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -116,18 +116,6 @@ public class EvaluationViewImpl extends Composite implements EvaluationView {
 				megaButton.add(applyForChallengeLink);
 				buttonContainer.add(megaButton);
 			}
-//			else if (UserEvaluationState.EVAL_OPEN_USER_REGISTERED.equals(state)) {
-//				Button registrationButton = new Button();
-//				registrationButton.setText("Unregister");
-//				registrationButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
-//					@Override
-//					public void componentSelected(ButtonEvent ce) {
-//						presenter.unregister();
-//					}
-//				});
-//				buttonContainer.add(registrationButton);
-//			}
-			
 			fullWidthContainer.add(buttonContainer);
 		}
 		fullWidthContainer.layout(true);

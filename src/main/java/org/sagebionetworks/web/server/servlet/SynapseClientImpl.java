@@ -20,6 +20,7 @@ import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
+import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -76,7 +77,6 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
-import org.sagebionetworks.web.client.presenter.UserEvaluationState;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
@@ -1284,39 +1284,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		//TODO: method should be rewritten when Synapse call is available to find available evaluations (see PLFM-1858)
 		//is the evaluation open?
 		Synapse synapseClient = createSynapseClient();
-		UserEvaluationState returnState = UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE;
 		try {
-			Evaluation evaluation = synapseClient.getEvaluation(evaluationId);
-			EvaluationStatus status  = evaluation.getStatus();
-			if (EvaluationStatus.OPEN.equals(status)) {
-				//is the user registered for this?
-				UserSessionData sessionData = synapseClient.getUserSessionData();
-				String userId = getUserId(sessionData);
-				if (userId != null) {
-					//try to get the participant
-					returnState = UserEvaluationState.EVAL_OPEN_USER_NOT_REGISTERED;
-					try {
-						Participant user = synapseClient.getParticipant(evaluationId, userId);
-						if (user != null) {
-							returnState = UserEvaluationState.EVAL_OPEN_USER_REGISTERED;
-						}
-					} catch (Exception e) {e.printStackTrace();}
-				}
-				//else user principle id unavailable, returnState = EVAL_REGISTRATION_UNAVAILABLE
-			}
-			//else registration is not OPEN, returnState = EVAL_REGISTRATION_UNAVAILABLE
-			return returnState;
+			return synapseClient.getUserEvaluationState(evaluationId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
-	}
-	
-	private String getUserId(UserSessionData sessionData) {
-		String userId = null;
-		if (sessionData != null && sessionData.getProfile() != null && sessionData.getProfile().getOwnerId() != null && !sessionData.getProfile().getOwnerId().equals(AuthorizationConstants.ANONYMOUS_USER_ID)) {
-			userId = sessionData.getProfile().getOwnerId();
-		}
-		return userId;
 	}
 	
 	@Override
@@ -1331,22 +1303,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-	}
-	
-	@Override
-	public void deleteParticipant(String evaluationId)
-			throws RestServiceException {
-		Synapse synapseClient = createSynapseClient();
-		try {
-			UserSessionData sessionData = synapseClient.getUserSessionData();
-			String userId = getUserId(sessionData);
-			if (userId != null)
-				synapseClient.deleteParticipant(evaluationId, userId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-
-		
 	}
 	
 	@Override

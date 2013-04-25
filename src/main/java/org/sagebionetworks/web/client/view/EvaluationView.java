@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.presenter.UserEvaluationState;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -22,7 +22,6 @@ public interface EvaluationView extends IsWidget, SynapseView {
 		 * register the currently logged in user for this evaluation
 		 */
 		public void register();
-		public void unregister();
 	}
 
 }

@@ -40,6 +40,7 @@ import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
+import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -84,7 +85,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.presenter.UserEvaluationState;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -652,51 +652,6 @@ public class SynapseClientImplTest {
 		Mockito.when(mockSynapse.getEntityDoi(anyString(), anyLong())).thenReturn(testDoi);
 		synapseClient.getEntityDoi("test entity id", null);
 	    verify(mockSynapse).getEntityDoi(anyString(), anyLong());
-	}
-
-	@Test
-	public void testGetUserEvaluationState() throws Exception{
-		//base case, OPEN competition where user is a participant
-		UserEvaluationState state = synapseClient.getUserEvaluationState("myEvalId");
-		assertTrue(UserEvaluationState.EVAL_OPEN_USER_REGISTERED.equals(state));
-	}
-	
-	@Test
-	public void testGetUserEvaluationStateNotOpen() throws Exception{
-		//evaluation is in some state, other than OPEN.  Could be CLOSED, COMPLETED, or PLANNED.
-		//in all cases, registration is unavailable
-		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.CLOSED);
-		UserEvaluationState state = synapseClient.getUserEvaluationState("myEvalId");
-		assertTrue(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE.equals(state));
-		
-		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.COMPLETED);
-		state = synapseClient.getUserEvaluationState("myEvalId");
-		assertTrue(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE.equals(state));
-
-		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.PLANNED);
-		state = synapseClient.getUserEvaluationState("myEvalId");
-		assertTrue(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE.equals(state));
-	}
-	
-	@Test
-	public void testGetUserEvaluationStateAsAnonymous() throws Exception{
-		//competition is open, but I'm logged in as anonymous
-		when(mockUserProfile.getOwnerId()).thenReturn(AuthorizationConstants.ANONYMOUS_USER_ID);
-		UserEvaluationState state = synapseClient.getUserEvaluationState("myEvalId");
-		assertTrue(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE.equals(state));
-	}
-
-	@Test
-	public void testGetUserEvaluationStateNotRegistered() throws Exception{
-		//competition is open, but I'm logged in as anonymous
-		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(null);
-		UserEvaluationState state = synapseClient.getUserEvaluationState("myEvalId");
-		assertTrue(UserEvaluationState.EVAL_OPEN_USER_NOT_REGISTERED.equals(state));
-		
-		//or if there is some problem finding the user
-		when(mockSynapse.getParticipant(anyString(), anyString())).thenThrow(new SynapseException());
-		state = synapseClient.getUserEvaluationState("myEvalId");
-		assertTrue(UserEvaluationState.EVAL_OPEN_USER_NOT_REGISTERED.equals(state));
 	}
 
 //	@Test

@@ -10,18 +10,18 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Evaluation;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.presenter.EvaluationPresenter;
-import org.sagebionetworks.web.client.presenter.UserEvaluationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EvaluationView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EvaluationPresenterTest {
@@ -92,7 +92,7 @@ public class EvaluationPresenterTest {
 		AsyncMockStubber.callSuccessWith("my participant json").when(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
 		presenter.configure("evalId");
 		presenter.register();
-		verify(mockPlaceChanger).goTo(any(Place.class));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
 	}
 	
 	@Test
@@ -103,24 +103,4 @@ public class EvaluationPresenterTest {
 		verify(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
-	@Test
-	public void testUnRegister() throws Exception {
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteParticipant(anyString(), any(AsyncCallback.class));
-		presenter.configure("evalId");
-		presenter.unregister();
-		verify(mockSynapseClient).deleteParticipant(anyString(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
-	}
-	
-	@Test
-	public void testUnRegisterFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).deleteParticipant(anyString(), any(AsyncCallback.class));
-		presenter.configure("evalId");
-		presenter.unregister();
-		verify(mockSynapseClient).deleteParticipant(anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
-	}
-	
-	
 }

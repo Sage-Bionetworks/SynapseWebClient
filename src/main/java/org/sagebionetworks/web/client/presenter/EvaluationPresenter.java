@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Evaluation;
@@ -63,16 +65,16 @@ public class EvaluationPresenter extends AbstractActivity implements EvaluationV
 						}
 						@Override
 						public void onFailure(Throwable caught) {
-							view.showErrorMessage(caught.getMessage());
+							view.showErrorMessage(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
 						}
 					});
 				} catch (RestServiceException e) {
-					view.showErrorMessage(e.getMessage());
+					view.showErrorMessage(DisplayConstants.EVALUATION_USER_STATE_ERROR + e.getMessage());
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				view.showErrorMessage(DisplayConstants.EVALUATION_USER_ACCESS_ERROR + caught.getMessage());
 			}
 		});
 	}
@@ -93,31 +95,12 @@ public class EvaluationPresenter extends AbstractActivity implements EvaluationV
 					}
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showErrorMessage(caught.getMessage());
+						view.showErrorMessage(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
 					}
 				});
 			}
 		} catch (RestServiceException e) {
-			view.showErrorMessage(e.getMessage());
-		}
-	}
-
-	@Override
-	public void unregister() {
-		try {
-			synapseClient.deleteParticipant(evaluationId, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.showInfo("Successful", "");
-					configure(evaluationId);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
-				}
-			});
-		} catch (RestServiceException e) {
-			view.showErrorMessage(e.getMessage());
+			view.showErrorMessage(DisplayConstants.EVALUATION_REGISTRATION_ERROR + e.getMessage());
 		}
 	}
 
