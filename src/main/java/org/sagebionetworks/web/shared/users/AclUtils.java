@@ -7,12 +7,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.ResourceAccess;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.shared.NodeType;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class AclUtils {
 
@@ -29,13 +23,14 @@ public class AclUtils {
 
 		accessList.add(ACCESS_TYPE.READ);
 		permToACCESS_TYPE.put(PermissionLevel.CAN_VIEW, new TreeSet<ACCESS_TYPE>(accessList));
-		permToACCESS_TYPE.put(PermissionLevel.CAN_DOWNLOAD, new TreeSet<ACCESS_TYPE>(accessList));
 
 		accessList.add(ACCESS_TYPE.CREATE);
 		accessList.add(ACCESS_TYPE.UPDATE);
 		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT, new TreeSet<ACCESS_TYPE>(accessList));
-
+		
 		accessList.add(ACCESS_TYPE.DELETE);
+		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT_DELETE, new TreeSet<ACCESS_TYPE>(accessList));
+		
 		accessList.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
 		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, new TreeSet<ACCESS_TYPE>(accessList));
 
@@ -52,49 +47,6 @@ public class AclUtils {
 			}
 			accessTypeToPerm.put(type, levels);
 		}
-	}
-
-	/**
-	 * Returns the highest permission level for the logged in user for the given entity
-	 * @param nodeType
-	 * @param nodeId
-	 * @return
-	 */
-	public static void getHighestPermissionLevel(final NodeType nodeType, final String nodeId, final SynapseClientAsync synapseClient, final AsyncCallback<PermissionLevel> callback) {
-
-		// TODO : making two rest calls is not ideal. need to change hasAccess API to include multi params
-		synapseClient.hasAccess(nodeId, ACCESS_TYPE.UPDATE.name(), new AsyncCallback<Boolean>() {
-			@Override
-			public void onSuccess(Boolean canUpdate) {
-				if(canUpdate) {
-					// CAN EDIT, now check can administer
-					synapseClient.hasAccess(nodeId, ACCESS_TYPE.CHANGE_PERMISSIONS.name(), new AsyncCallback<Boolean>() {
-						@Override
-						public void onSuccess(Boolean canAdmin) {
-							if(canAdmin) {
-								// user can administer
-								callback.onSuccess(PermissionLevel.CAN_ADMINISTER);
-							} else {
-								callback.onSuccess(PermissionLevel.CAN_EDIT);
-							}
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
-						}
-					});
-				} else {
-					// user can only view
-					callback.onSuccess(PermissionLevel.CAN_VIEW);
-				}
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
 	}
 
 	public static PermissionLevel getPermissionLevel(Set<ACCESS_TYPE> accessTypes) {
