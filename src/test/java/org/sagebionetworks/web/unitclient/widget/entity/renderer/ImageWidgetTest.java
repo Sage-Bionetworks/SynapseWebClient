@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,13 +13,13 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Page;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import static org.mockito.Mockito.*;
 
 public class ImageWidgetTest {
 		
@@ -26,7 +28,7 @@ public class ImageWidgetTest {
 	AuthenticationController mockAuthenticationController;
 	Page testPage;
 	Map<String, String> descriptor;
-	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
+	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{

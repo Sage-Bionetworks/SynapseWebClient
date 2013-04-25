@@ -11,6 +11,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Page;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
@@ -23,7 +24,7 @@ public class AttachmentPreviewWidgetTest {
 	AttachmentPreviewWidgetView mockView;
 	Page testPage;
 	Map<String, String> descriptor;
-	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
+	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{

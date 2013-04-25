@@ -2,16 +2,15 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -196,7 +195,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		}
 		else {
 			if (presenter.getEntity().getId() != null) {
-				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), markdownDescriptionField, formPanel, true, false, new WidgetDescriptorUpdatedHandler() {
+				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  ObjectType.ENTITY.toString(), null), markdownDescriptionField, formPanel, true, false, new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						presenter.refreshEntityAttachments();

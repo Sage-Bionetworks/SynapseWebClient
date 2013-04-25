@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
@@ -64,7 +65,6 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTestImpl;
 
-import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
@@ -87,7 +87,7 @@ public class ProvenanceWidgetTest {
 	String referenceListJSON;
 	String referenceHeadersJSON;
 	Exception someException = new Exception();
-	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
+	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	JsoProvider jsoProvider;
 	Map<String, String> descriptor;
 	Activity act;
