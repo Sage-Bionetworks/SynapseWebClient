@@ -526,5 +526,8 @@ public class DisplayConstants {
 	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
 	public static final String USER_GUIDE = "User Guide";
 	
+	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
+	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
+	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
 }
 

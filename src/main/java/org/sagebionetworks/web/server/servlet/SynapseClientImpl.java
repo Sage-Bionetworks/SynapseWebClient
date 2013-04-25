@@ -17,11 +17,16 @@ import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.EvaluationStatus;
+import org.sagebionetworks.evaluation.model.Participant;
+import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
@@ -36,6 +41,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -779,13 +785,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException {
-		
-		ObjectType ownerObjectType = ObjectType.valueOf(ownerType);
-		if (ObjectType.ENTITY.equals(ownerObjectType))
-			return hasAccess(ownerId, accessType);
-		//everyone has (read) access to evaluation
-			
-		throw new IllegalArgumentException(DisplayConstants.UNSUPPORTED_FOR_OWNER_TYPE + ownerType);
+		ObjectType type = ObjectType.valueOf(ownerType);
+		ACCESS_TYPE access = ACCESS_TYPE.valueOf(accessType);
+		Synapse synapseClient = createSynapseClient();
+		try {
+			return synapseClient.canAccess(ownerId, type, access);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 	
 	@Override
@@ -1261,7 +1268,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(new SynapseNotFoundException());	//backend will be changed to throw a SynapseNotFoundException when no records are found
 		}
 	}
-	
+
 	@Override
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
@@ -1269,6 +1276,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			synapseClient.createEntityDoi(entityId, versionNumber);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException{
+		Synapse synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getUserEvaluationState(evaluationId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public String createParticipant(String evaluationId)
+			throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			Participant participant = synapseClient.createParticipant(evaluationId);
+			return EntityFactory.createJSONStringForEntity(participant);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 	

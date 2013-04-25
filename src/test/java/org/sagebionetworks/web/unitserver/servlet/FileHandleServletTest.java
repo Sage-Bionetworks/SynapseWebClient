@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,10 +24,10 @@ import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -88,7 +88,7 @@ public class FileHandleServletTest {
 	
 	private void setupWiki() {
 		when(mockRequest.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY)).thenReturn("syn296531");
-		when(mockRequest.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY)).thenReturn(WidgetConstants.WIKI_OWNER_ID_ENTITY);
+		when(mockRequest.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY)).thenReturn(ObjectType.ENTITY.toString());
 		when(mockRequest.getParameter(WebConstants.WIKI_ID_PARAM_KEY)).thenReturn("2");
 		when(mockRequest.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY)).thenReturn("file.png");
 	}

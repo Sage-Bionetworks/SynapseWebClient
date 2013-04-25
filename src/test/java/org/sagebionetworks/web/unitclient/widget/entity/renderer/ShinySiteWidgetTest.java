@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
@@ -22,7 +23,7 @@ public class ShinySiteWidgetTest {
 		
 	ShinySiteWidget widget;
 	ShinySiteWidgetView mockView;
-	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
+	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
 
 	String invalidSiteUrl = "http://google.com";
