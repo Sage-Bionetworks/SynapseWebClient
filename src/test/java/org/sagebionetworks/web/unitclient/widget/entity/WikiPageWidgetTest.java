@@ -102,14 +102,14 @@ public class WikiPageWidgetTest {
 	public void testConfigureNoWikiPageNotEmbedded(){
 		//if page is not embedded in the owner page, and the user can't edit, then it should show a 404
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, null, false, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), false, null, false, 17);
 		verify(mockView).show404();
 	}
 	
 	@Test
 	public void testConfigureWikiForbiddenNotEmbedded(){
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, null, false, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), false, null, false, 17);
 		verify(mockView).show403();
 	}
 	
@@ -122,7 +122,7 @@ public class WikiPageWidgetTest {
 		testEntityHeader.setName(MY_TEST_ENTITY_OWNER_NAME);
 		headers.setResults(new ArrayList());
 		when(mockNodeModelCreator.createBatchResults(anyString(), any(Class.class))).thenReturn(headers);
-		presenter.configure(new WikiPageKey("ownerId", WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, null, true, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), false, null, true, 17);
 		
 		verify(mockView).show404();
 	}
