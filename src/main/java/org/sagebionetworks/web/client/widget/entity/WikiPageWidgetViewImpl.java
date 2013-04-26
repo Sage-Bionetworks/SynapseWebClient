@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -102,7 +103,21 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Override
-	public void showNoWikiAvailableUI(){
+	public void show404() {
+		removeAll(true);
+		add(new HTML(DisplayUtils.get404Html()));
+		layout(true);
+	}
+	
+	@Override
+	public void show403() {
+		removeAll(true);
+		add(new HTML(DisplayUtils.get403Html()));
+		layout(true);
+	}
+	
+	@Override
+	public void showNoWikiAvailableUI() {
 		removeAll(true);
 		SimplePanel createWikiButtonWrapper = new SimplePanel();
 		createWikiButtonWrapper.addStyleName("span-24 notopmargin margin-bottom-20");
@@ -164,14 +179,16 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		breadcrumbsWrapper.addStyleName("span-"+spanWidth+" notopmargin");
 		if (!isEmbeddedInOwnerPage) {
 			List<LinkData> links = new ArrayList<LinkData>();
-			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(WidgetConstants.WIKI_OWNER_ID_EVALUATION)) {
+			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
 				//point to Home
 				links.add(new LinkData("Home", new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)));
+				breadcrumbsWrapper.add(breadcrumb.asWidget(links, null));
 			} else {
 				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
 				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+				breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
 			}
-			breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
+			
 			layout(true);
 			//TODO: support other object types.  
 		}
@@ -181,8 +198,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private SimplePanel getCommands(Boolean canEdit) {
 		if (commandBarWrapper == null) {
 			commandBarWrapper = new SimplePanel();
-			commandBarWrapper.addStyleName("margin-bottom-20 span-"+spanWidth);
+			commandBarWrapper.addStyleName("margin-bottom-20 span-"+spanWidth + " margin-top-5");
 			commandBar = new HorizontalPanel();
+			commandBar.addStyleName("right");
 			commandBar.setVerticalAlign(VerticalAlignment.MIDDLE);
 			commandBar.setHorizontalAlign(HorizontalAlignment.LEFT);
 			commandBarWrapper.add(commandBar);
@@ -198,8 +216,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		
 		if(addPageButton == null) {
 			addPageButton = getInsertPageButton(false);
-			commandBar.add(addPageButton);
-			commandBar.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
+			commandBar.add(addPageButton);			
 		}
 		
 		commandBarWrapper.setVisible(canEdit);
@@ -372,5 +389,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void clear() {
+		removeAll(true);
 	}
 }

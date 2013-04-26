@@ -107,7 +107,7 @@ public class DisplayConstants {
 	 * Service Constants (move to another file?)
 	 */
 	public static final String SINGLE_SIGN_ON_USERID = "SSO";
-	public static final String OPEN_ID_SAGE_LOGIN_BUTTON_TEXT = "Login with a Google Account";
+	public static final String OPEN_ID_SAGE_LOGIN_BUTTON_TEXT = "Sign in with a Google Account";
 	public static final String OPEN_ID_PROVIDER_GOOGLE_VALUE = "https://www.google.com/accounts/o8/id";
 	public static final String OPEN_ID_PROVIDER_SAGE_VALUE = "https://www.google.com/accounts/o8/site-xrds?hd=sagebase.org";
 
@@ -198,7 +198,7 @@ public class DisplayConstants {
 	public static final String LABEL_NO_PREVIEW_DATA = "A Preview has not been created.";
 	public static final String LABEL_CONTAINS_NO_CHILDREN = "This object contains no children.";
 	public static final String BUTTON_REGISTER = "Register";
-	public static final String LINK_COMMUNITY_FORUM = "Support";
+	public static final String LINK_COMMUNITY_FORUM = "Help";
 	public static final String BUTTON_LOGIN = "Login";
 	public static final String LABEL_WELCOME = "Welcome";
 	public static final String BUTTON_LOGOUT = "Logout";
@@ -517,7 +517,17 @@ public class DisplayConstants {
 	public static final String DOI_REQUEST_SENT_MESSAGE = "Note that it may take a few minutes for the service to create the new DOI.";
 	public static final String DOI_CREATION_ERROR = "There was a problem creating a DOI";
 	public static final String DOI_CREATION_IN_PROGRESS = "Creating a DOI";
-	public static final String LARGE_FILE_ON_UNSUPPORTED_BROWSER = "The file exceeds the maximum file size that Synapse supports for this browser. Please update your browser to the latest version and try again.";	
+	public static final String LARGE_FILE_ON_UNSUPPORTED_BROWSER = "The file exceeds the maximum file size that Synapse supports for this browser. Please update your browser to the latest version and try again.";
+	public static final String PASSWORD = "Password";
+	public static final String SIGN_IN = "Sign in";
+	public static final String REGISTER_BUTTON = "Register for a Synapse Account";
+	public static final String CREATE_PROJECT = "Create Project";
+	public static final String NEW_PROJECT_NAME = "New Project Name";
+	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
+	public static final String USER_GUIDE = "User Guide";
 	
+	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
+	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
+	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
 }
 

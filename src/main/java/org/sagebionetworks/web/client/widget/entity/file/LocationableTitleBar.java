@@ -79,6 +79,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
+		entityEditor.setEntityUpdatedHandler(handler);
 	}
 
 	@Override

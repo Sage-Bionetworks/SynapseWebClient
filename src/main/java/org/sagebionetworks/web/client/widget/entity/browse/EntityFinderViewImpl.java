@@ -173,10 +173,16 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	 * Private Methods
 	 */
 	private void createMyEntityBrowserWidget() {
-		// My Entity Browser
-		EntityTreeBrowser tree = myEntitiesBrowser.getEntityTreeBrowser();
+		// configure tree browsers
+		EntityTreeBrowser tree;
+		tree = myEntitiesBrowser.getEntityTreeBrowser();
 		tree.setMakeLinks(false);
 		tree.setShowContextMenu(false);
+		
+		tree = myEntitiesBrowser.getFavoritesTreeBrowser();
+		tree.setMakeLinks(false);
+		tree.setShowContextMenu(false);		
+		
 		myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
 			@Override
 			public void onSelection(String selectedEntityId) {
@@ -185,6 +191,7 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 				createVersionChooser(selectedEntityId);
 			}
 		});
+
 		myEntitiesBrowserWidget = myEntitiesBrowser.asWidget();
 
 		// list entry

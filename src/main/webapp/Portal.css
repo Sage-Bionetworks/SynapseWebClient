@@ -185,7 +185,6 @@
 	overflow-x: auto;
 }	
 	
-	
 .suggestSearchTerm {
 	color: #7a0402;
 	font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
@@ -541,6 +540,9 @@ a.shortBtn {
 	overflow: hidden;
 	text-align: justify;
 }
+.markdown div{
+	overflow-x: auto;
+}
 
 .markdown ol { 
 	list-style-type: decimal;
@@ -566,7 +568,9 @@ a.shortBtn {
     color: #666666;
     font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
     font-family: Courier,monospace;
-    padding: 0 5px 2px
+    padding: 0 5px 2px;
+    overflow:auto;
+    white-space:pre;
 }
 
 .apitable label {
@@ -634,16 +638,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .scroll-auto {
 	overflow: auto;
-}
-
-.metadata-tag {
-	float:left; 
-	margin-right: 5px;  
-	background-color: #f3f3f3; 
-	padding: 2px 4px 2px 4px;		
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	-moz-border-radius: 4px;	
 }
 
 .markdown {
@@ -860,4 +854,44 @@ ol.lowerroman {
 .pagesTree a{
 	font-family: Verdana,Arial,sans-serif;
 	font-size: 13px;
+}
+.padding-top-15 {
+	padding-top: 15px;
+}
+.howToUseLink {
+	font-size: 16px;
+	font-style: normal !important;
+}
+.whatIsSynapseText {
+	font-size: 13px;
+}
+
+
+.form-signin {
+  max-width: 300px;
+  padding: 19px 29px 29px;
+  margin: 0 auto 20px;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  -webkit-border-radius: 5px;
+     -moz-border-radius: 5px;
+          border-radius: 5px;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+          box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+
+.form-signinInput {
+  font-size: 16px;
+  height: auto;
+  margin-bottom: 15px;
+  padding: 7px 9px;
+}
+
+.form-inputButton {
+	margin-bottom:6px !important;
+}
+
+.displayInline {
+	display: inline;
 }

@@ -31,6 +31,8 @@ import org.sagebionetworks.web.client.widget.entity.Attachments;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 
+import com.google.gwt.event.shared.EventBus;
+
 /**
  * Unit test for the entity editor.
  * @author jmhill
@@ -49,7 +51,6 @@ public class EntityEditorTest {
 	AutoGenFactory autoGenFactory;
 	ObjectSchema versionableSchema;
 	ObjectSchema schema;
-	
 	EntityEditor editor;
 	
 	@Before

@@ -11,7 +11,7 @@ Author URI: http://dev7studios.com
 .theme-default .nivoSlider {
 	position:relative;
 	background:#fff url(loading.gif) no-repeat 50% 50%;
-	height:350px;
+	height:250px;
 	width:900px !important;
 
 }

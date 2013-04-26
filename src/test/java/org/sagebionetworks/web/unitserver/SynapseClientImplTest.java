@@ -37,6 +37,9 @@ import org.mockito.Mockito;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.EvaluationStatus;
+import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -55,6 +58,7 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
@@ -69,7 +73,6 @@ import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.message.ObjectType;
-import org.sagebionetworks.repo.model.provenance.UsedURL;
 import org.sagebionetworks.repo.model.storage.StorageUsage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -83,7 +86,6 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -119,7 +121,10 @@ public class SynapseClientImplTest {
 	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
 	AccessControlList acl;
 	WikiPage page;
-	
+	Evaluation mockEvaluation;
+	Participant mockParticipant;
+	UserSessionData mockUserSessionData;
+	UserProfile mockUserProfile;
 	
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -240,6 +245,18 @@ public class SynapseClientImplTest {
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
 		when(mockSynapse.getAccessRequirements(anyString())).thenReturn(ars);
+		mockEvaluation = Mockito.mock(Evaluation.class);
+		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
+		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
+		mockUserSessionData = Mockito.mock(UserSessionData.class);
+		mockUserProfile = Mockito.mock(UserProfile.class);
+		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
+		when(mockUserProfile.getOwnerId()).thenReturn("MyOwnerID");
+		mockParticipant = Mockito.mock(Participant.class);
+		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(mockParticipant);
+		
+		when(mockSynapse.createParticipant(anyString())).thenReturn(mockParticipant);
 	}
 	
 	@Test
@@ -533,13 +550,13 @@ public class SynapseClientImplTest {
 	public void testCreateWikiPage() throws Exception {
 		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
 		Mockito.when(mockSynapse.createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.createWikiPage("testId", WidgetConstants.WIKI_OWNER_ID_ENTITY, wikiPageJson);
+		synapseClient.createWikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
 	    verify(mockSynapse).createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
 	}
 	
 	@Test
 	public void testDeleteWikiPage() throws Exception {
-		synapseClient.deleteWikiPage(new WikiPageKey("syn123", WidgetConstants.WIKI_OWNER_ID_ENTITY, "20"));
+		synapseClient.deleteWikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
 		verify(mockSynapse).deleteWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
 	}
 	
@@ -547,14 +564,14 @@ public class SynapseClientImplTest {
 	public void testGetWikiHeaderTree() throws Exception {
 		PaginatedResults<WikiHeader> headerTreeResults = new PaginatedResults<WikiHeader>();
 		when(mockSynapse.getWikiHeaderTree(anyString(), any(ObjectType.class))).thenReturn(headerTreeResults);
-		synapseClient.getWikiHeaderTree("testId", WidgetConstants.WIKI_OWNER_ID_ENTITY);
+		synapseClient.getWikiHeaderTree("testId", ObjectType.ENTITY.toString());
 	    verify(mockSynapse).getWikiHeaderTree(anyString(), any(ObjectType.class));
 	}
 	
 	@Test
 	public void testGetWikiPage() throws Exception {
 		Mockito.when(mockSynapse.getWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(page);
-		synapseClient.getWikiPage(new WikiPageKey("syn123", WidgetConstants.WIKI_OWNER_ID_ENTITY, "20"));
+		synapseClient.getWikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
 	    verify(mockSynapse).getWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
 	}
 	
@@ -562,7 +579,7 @@ public class SynapseClientImplTest {
 	public void testUpdateWikiPage() throws Exception {
 		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
 		Mockito.when(mockSynapse.updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.updateWikiPage("testId", WidgetConstants.WIKI_OWNER_ID_ENTITY, wikiPageJson);
+		synapseClient.updateWikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
 		
 		verify(mockSynapse).updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
 	}
@@ -571,7 +588,7 @@ public class SynapseClientImplTest {
 	public void testGetWikiAttachmentHandles() throws Exception {
 		FileHandleResults testResults = new FileHandleResults();
 		Mockito.when(mockSynapse.getWikiAttachmenthHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(testResults);
-		synapseClient.getWikiAttachmentHandles(new WikiPageKey("syn123", WidgetConstants.WIKI_OWNER_ID_ENTITY, "20"));
+		synapseClient.getWikiAttachmentHandles(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
 	    verify(mockSynapse).getWikiAttachmenthHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
 	}
 
@@ -618,7 +635,7 @@ public class SynapseClientImplTest {
 		fileEntityArg = arg.getValue();	//last value captured
 		assertEquals(originalFileEntityName, fileEntityArg.getName());
 	}
-
+	
 	@Test
 	public void testGetEntityDoi() throws Exception {
 		//wiring test
@@ -632,6 +649,14 @@ public class SynapseClientImplTest {
 		synapseClient.getEntityDoi("test entity id", null);
 	    verify(mockSynapse).getEntityDoi(anyString(), anyLong());
 	}
+
+//	@Test
+//	public void testGetParticipant() throws Exception{
+//		//basic wiring test
+//		//String returnJson = synapseClient.createParticipant("myEvalId");
+//		
+//	}
+
 	
 	private FileEntity getTestFileEntity() {
 		FileEntity testFileEntity = new FileEntity();

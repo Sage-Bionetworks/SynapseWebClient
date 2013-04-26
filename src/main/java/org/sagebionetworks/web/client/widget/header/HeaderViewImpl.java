@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Settings;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
@@ -170,8 +171,20 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 		if (userCommands == null){
 			userCommands = new HorizontalPanel();
-        	userCommands.addStyleName("span-2 inner-2 view header-inner-commands-container");
-   		 	Image settings = new Image(iconsImageBundle.settings16());
+        	userCommands.addStyleName("span-3 inner-2 view header-inner-commands-container");
+
+        	Image userGuide = new Image(iconsImageBundle.bookOpen16());
+        	userGuide.addStyleName("imageButton");
+		 	
+        	userGuide.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					globalApplicationState.getPlaceChanger().goTo(new Synapse(DisplayUtils.USER_GUIDE_ID));
+				}
+			});   		 	
+	 		DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.USER_GUIDE, TOOLTIP_POSITION.BOTTOM);
+
+        	Image settings = new Image(iconsImageBundle.settings16());
    		 	settings.addStyleName("imageButton");
 		 	
    		 	settings.addClickHandler(new ClickHandler() {
@@ -179,8 +192,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				public void onClick(ClickEvent event) {
 					globalApplicationState.getPlaceChanger().goTo(new Settings(DisplayUtils.DEFAULT_PLACE_TOKEN));
 				}
-			});
-   		 	
+			});   		 	
 	 		DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, DisplayConstants.TEXT_USER_SETTINGS, TOOLTIP_POSITION.BOTTOM);
 		 	
    		 	Image logout = new Image(iconsImageBundle.logoutGrey16());
@@ -193,6 +205,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
 			DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
 		 	
+			userCommands.add(userGuide);
 		 	userCommands.add(settings);
 		 	userCommands.add(logout);
 		}
@@ -226,22 +239,22 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
 		}
 		if (supportLink == null) {
-			supportLink = new Anchor(DisplayConstants.LINK_COMMUNITY_FORUM, "", "_blank");
+			supportLink = new Anchor(DisplayConstants.LINK_COMMUNITY_FORUM, "http://support.sagebase.org", "_blank");
 			supportLink.addStyleName("headerLink");
 			commandBar.add(supportLink);
 		}
-		presenter.getSupportHRef(new AsyncCallback<String>() {
-			
-			@Override
-			public void onSuccess(String result) {
-				supportLink.setHref(result);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				//should never enter this code.  if the fastpass request fails, it should still return the standard support site url
-			}
-		});
+//		presenter.getSupportHRef(new AsyncCallback<String>() {
+//			
+//			@Override
+//			public void onSuccess(String result) {
+//				supportLink.setHref(result);
+//			}
+//			
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				//should never enter this code.  if the fastpass request fails, it should still return the standard support site url
+//			}
+//		});
 		
 		if(userData != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)

@@ -160,7 +160,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		passwordResetButtonPanel.add(forgotPasswordButton);
 		
 
-		Button registerButton = new Button("Register for a Synapse Account", AbstractImagePrototype.create(iconsImageBundle.userBusiness16()), new SelectionListener<ButtonEvent>() {			
+		Button registerButton = new Button(DisplayConstants.REGISTER_BUTTON, AbstractImagePrototype.create(iconsImageBundle.userBusiness16()), new SelectionListener<ButtonEvent>() {			
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				presenter.goTo(new RegisterAccount(DisplayUtils.DEFAULT_PLACE_TOKEN));
