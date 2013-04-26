@@ -49,7 +49,6 @@ public class NChartUtil {
 			if(!layerToNode.containsKey(i)) continue; // possible with strange shifting in layer creation
 			// process ProvGraphNodes into a list of NChartLayerNodes
 			for(ProvGraphNode node : layerToNode.get(i)) {
-				System.out.println("Layer " + i + " " + node);
 				if(node instanceof ActivityGraphNode) {					
 					List<ProvGraphNode> connectedNodes = getConnectedNodes(graph.getEdges(), node);					
 					layerNodes.add(createActivityLayerNode(jsoProvider, (ActivityGraphNode) node, connectedNodes));
