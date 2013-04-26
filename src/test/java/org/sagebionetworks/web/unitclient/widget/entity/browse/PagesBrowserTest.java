@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -27,7 +28,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowserView;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -84,7 +84,7 @@ public class PagesBrowserTest {
 	@Test
 	public void testConfigureProject() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		pagesBrowser.configure(new WikiPageKey(entityId, WidgetConstants.WIKI_OWNER_ID_ENTITY, null), "syn123", "#!Synapse:syn123", "Project A", true);
+		pagesBrowser.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), "syn123", "#!Synapse:syn123", "Project A", true);
 		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -92,7 +92,7 @@ public class PagesBrowserTest {
 	@Test
 	public void testConfigureProjectRootNotFound() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		pagesBrowser.configure(new WikiPageKey(entityId, WidgetConstants.WIKI_OWNER_ID_ENTITY, null), "syn123", "#!Synapse:syn123", "Project A", true);
+		pagesBrowser.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), "syn123", "#!Synapse:syn123", "Project A", true);
 		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).configure(anyBoolean(), any(TreeItem.class));
 	}

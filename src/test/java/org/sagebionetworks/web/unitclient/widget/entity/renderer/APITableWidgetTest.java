@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -16,6 +15,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -49,7 +49,7 @@ public class APITableWidgetTest {
 	String testJSON = "{totalNumberOfResults=10,results={}}";
 	Map<String, String> descriptor;
 	JSONObjectAdapter testReturnJSONObject;
-	WikiPageKey testWikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
+	WikiPageKey testWikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
