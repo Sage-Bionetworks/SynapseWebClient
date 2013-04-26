@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
+import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -129,6 +130,16 @@ public interface SynapseClientAsync {
 
 	void getFavorites(Integer limit, Integer offset,
 			AsyncCallback<String> callback);
+	
+	void getUserEvaluationState(String evaluationId, AsyncCallback<UserEvaluationState> callback) throws RestServiceException;
+
+	/**
+	 * Returns json string representation of created Participant
+	 * @param evaluationId
+	 * @return
+	 * @throws RestServiceException
+	 */
+	void createParticipant(String evaluationId, AsyncCallback<String> callback) throws RestServiceException;
 	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
 	void getChunkedFileToken(String fileName,  String contentType, long chunkNumber, AsyncCallback<String> callback) throws RestServiceException;

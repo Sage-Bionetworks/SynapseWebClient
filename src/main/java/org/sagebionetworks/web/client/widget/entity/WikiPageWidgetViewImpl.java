@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -178,14 +179,16 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		breadcrumbsWrapper.addStyleName("span-"+spanWidth+" notopmargin");
 		if (!isEmbeddedInOwnerPage) {
 			List<LinkData> links = new ArrayList<LinkData>();
-			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(WidgetConstants.WIKI_OWNER_ID_EVALUATION)) {
+			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
 				//point to Home
 				links.add(new LinkData("Home", new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)));
+				breadcrumbsWrapper.add(breadcrumb.asWidget(links, null));
 			} else {
 				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
 				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+				breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
 			}
-			breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
+			
 			layout(true);
 			//TODO: support other object types.  
 		}
