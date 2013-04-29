@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.SaveCallback;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -413,21 +414,6 @@ public class AccessControlListEditorTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void setOwnerAccessTest() throws Exception {
-		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
-		
-		// update
-		acle.asWidget();
-		acle.setAccess(OWNER_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
-		
-		verify(mockACLEView, times(2)).showErrorMessage(anyString());
-		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
 	public void setAdminAccessTest() throws Exception {
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
@@ -437,7 +423,7 @@ public class AccessControlListEditorTest {
 		acle.setAccess(ADMIN_ID, PermissionLevel.CAN_VIEW);
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 		
-		verify(mockACLEView, times(2)).showErrorMessage(anyString());
+		verify(mockACLEView).showErrorMessage(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
 	}
 	
@@ -451,7 +437,6 @@ public class AccessControlListEditorTest {
 		acle.asWidget();
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 		
-		verify(mockACLEView).showErrorMessage(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
 	}
 	
@@ -466,8 +451,16 @@ public class AccessControlListEditorTest {
 		acle.removeAccess(USER2_ID);
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 
-		verify(mockACLEView, times(2)).showErrorMessage(anyString());
+		verify(mockACLEView).showErrorMessage(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+	}
+
+	@Test
+	public void testUnsavedViewChanges() {
+		acle.setUnsavedViewChanges(true);
+		acle.pushChangesToSynapse(false, null);
+		
+		verify(mockACLEView).alertUnsavedViewChanges(any(SaveCallback.class));
 	}
 	
 }
