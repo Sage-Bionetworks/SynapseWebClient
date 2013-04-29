@@ -30,6 +30,7 @@ public class AclUtilsTest {
 		assertEquals(getEditAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT));
 		assertEquals(getEditDeleteAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT_DELETE));
 		assertEquals(getAdminAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER));
+		assertEquals(getOwnerAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.OWNER));
 	}
 
 	@SuppressWarnings("unchecked")
