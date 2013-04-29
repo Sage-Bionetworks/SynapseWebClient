@@ -204,6 +204,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		locationableTitleBar.setEntityUpdatedHandler(handler);
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		filesBrowser.setEntityUpdatedHandler(handler);
+		entityMetadata.setEntityUpdatedHandler(handler);
 	}
 
 	@Override
