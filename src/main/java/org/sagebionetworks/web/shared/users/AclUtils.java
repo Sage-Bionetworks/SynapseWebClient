@@ -34,6 +34,9 @@ public class AclUtils {
 		accessList.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
 		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, new TreeSet<ACCESS_TYPE>(accessList));
 
+		accessList.add(ACCESS_TYPE.DOWNLOAD);
+		permToACCESS_TYPE.put(PermissionLevel.OWNER, new TreeSet<ACCESS_TYPE>(accessList));
+
 		// Build the reverse mapping from the first map
 		accessTypeToPerm = new HashMap<ACCESS_TYPE, Set<PermissionLevel>>();
 		for (ACCESS_TYPE type : ACCESS_TYPE.values()) {

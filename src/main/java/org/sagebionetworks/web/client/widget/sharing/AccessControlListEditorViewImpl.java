@@ -10,11 +10,11 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.SaveCallback;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -27,9 +27,13 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -40,6 +44,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.FieldSet;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
+import com.extjs.gxt.ui.client.widget.form.SimpleComboValue;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -85,6 +90,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Long publicPrincipalId, authenticatedPrincipalId;
 	private Boolean isPubliclyVisible;
 	private Button publicButton;
+	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
+	private ComboBox<ModelData> peopleCombo;
 	
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
@@ -98,6 +105,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
 		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
+		permissionDisplay.put(PermissionLevel.OWNER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);
 	}
 	
 	@Override
@@ -214,15 +222,21 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			fieldSet.setWidth(FIELD_WIDTH);
 			
 			// user/group combobox
-			final ComboBox<ModelData> peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalId, authenticatedPrincipalId);
+			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalId, authenticatedPrincipalId);
 			peopleCombo.setEmptyText("Enter a user or group name...");
 			peopleCombo.setFieldLabel("User/Group");
 			peopleCombo.setForceSelection(true);
 			peopleCombo.setTriggerAction(TriggerAction.ALL);
+			peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
+				@Override
+				public void selectionChanged(SelectionChangedEvent<ModelData> se) {
+					presenter.setUnsavedViewChanges(true);
+				}
+			});
 			fieldSet.add(peopleCombo);			
 
 			// permission level combobox
-			final SimpleComboBox<PermissionLevelSelect> permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
+			permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
 			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
 			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT), PermissionLevel.CAN_EDIT));
 			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE), PermissionLevel.CAN_EDIT_DELETE));
@@ -233,6 +247,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			permissionLevelCombo.setEditable(false);
 			permissionLevelCombo.setForceSelection(true);
 			permissionLevelCombo.setTriggerAction(TriggerAction.ALL);
+			permissionLevelCombo.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<PermissionLevelSelect>>() {				
+				@Override
+				public void selectionChanged(SelectionChangedEvent<SimpleComboValue<PermissionLevelSelect>> se) {
+					presenter.setUnsavedViewChanges(true);
+				}
+			});
 			fieldSet.add(permissionLevelCombo);
 			
 			// share button and listener
@@ -240,24 +260,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
-					if(peopleCombo.getValue() != null) {
-						ModelData selectedModel = peopleCombo.getValue();
-						String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
-						Long principalId = (Long.parseLong(principalIdStr));
-						
-						if(permissionLevelCombo.getValue() != null) {
-							PermissionLevel level = permissionLevelCombo.getValue().getValue().getLevel();
-							presenter.setAccess(principalId, level);
-							
-							// clear selections
-							peopleCombo.clearSelections();
-							permissionLevelCombo.clearSelections();
-						} else {
-							showAddMessage("Please select a permission level to grant.");
-						}
-					} else {
-						showAddMessage("Please select a user or group to grant permission to.");
-					}
+					addPersonToAcl();
 				}
 			});
 
@@ -421,6 +424,14 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			public void componentSelected(MenuEvent menuEvent) {
 				presenter.setAccess(principalId, PermissionLevel.CAN_EDIT);
+			}
+		});
+		menu.add(item);
+
+		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE));			
+		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+			public void componentSelected(MenuEvent menuEvent) {
+				presenter.setAccess(principalId, PermissionLevel.CAN_EDIT_DELETE);
 			}
 		});
 		menu.add(item);
@@ -594,4 +605,45 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			return display;
 		}
 	}
+
+	
+	
+	@Override
+	public void alertUnsavedViewChanges(final SaveCallback saveCallback) {
+		MessageBox.confirm(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.ADD_ACL_UNSAVED_CHANGES, new Listener<MessageBoxEvent>() {					
+			@Override
+			public void handleEvent(MessageBoxEvent be) { 					
+				Button btn = be.getButtonClicked();
+				if(Dialog.YES.equals(btn.getItemId())) {
+					addPersonToAcl();
+					presenter.setUnsavedViewChanges(false);
+					saveCallback.save();
+				} 				
+			}
+		});
+
+	}
+
+	private void addPersonToAcl() {
+		if(peopleCombo.getValue() != null) {
+			ModelData selectedModel = peopleCombo.getValue();
+			String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
+			Long principalId = (Long.parseLong(principalIdStr));
+			
+			if(permissionLevelCombo.getValue() != null) {
+				PermissionLevel level = permissionLevelCombo.getValue().getValue().getLevel();
+				presenter.setAccess(principalId, level);
+				
+				// clear selections
+				peopleCombo.clearSelections();
+				permissionLevelCombo.clearSelections();
+				presenter.setUnsavedViewChanges(false);
+			} else {
+				showAddMessage("Please select a permission level to grant.");
+			}
+		} else {
+			showAddMessage("Please select a user or group to grant permission to.");
+		}
+	}
+
 }

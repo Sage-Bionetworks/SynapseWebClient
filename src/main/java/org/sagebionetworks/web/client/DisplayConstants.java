@@ -526,6 +526,7 @@ public class DisplayConstants {
 	public static final String NEW_PROJECT_NAME = "New Project Name";
 	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
 	public static final String USER_GUIDE = "User Guide";
+	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
 	
 }
 
