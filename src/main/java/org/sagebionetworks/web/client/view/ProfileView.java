@@ -48,5 +48,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void redirectToViewProfile();
 		
 		void goTo(Place place);
+		
+		String getEmailAddress();
 	}
 }

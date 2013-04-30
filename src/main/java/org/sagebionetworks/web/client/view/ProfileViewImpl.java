@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -35,7 +34,6 @@ import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -97,6 +95,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private TextField<String> industry;
 	private TextArea summary;
 	private TextField<String> location;
+	private TextField<String> email;
 	
 	//View profile widgets
 	private Html profileWidget;
@@ -246,7 +245,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void showUserUpdateSuccess() {
 		changeUserInfoButtonToDefault();
-		presenter.redirectToViewProfile();
 	}
 
 	@Override
@@ -321,9 +319,16 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	     summary.setFieldLabel("Summary");  
 	     summary.setAllowBlank(true);
 	     summary.setHeight(200);
+	   
+	     email = new TextField<String>();  
+	     email.setFieldLabel("Email");  
+	     email.setAllowBlank(false);
+	     email.setRegex(WebConstants.VALID_EMAIL_REGEX);
+	     email.getMessages().setRegexText(WebConstants.INVALID_EMAIL_MESSAGE);
 	     
 	     userFormPanel.add(main, new FormData("100%"));
 	     userFormPanel.add(summary, new FormData("100%"));
+	     userFormPanel.add(email, new FormData("100%"));
 	     
 	     userFormPanel.setButtonAlign(HorizontalAlignment.LEFT);  
 	     updateUserInfoButton = new Button(DisplayConstants.BUTTON_CHANGE_USER_INFO);
@@ -334,9 +339,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    			 MessageBox.alert("Error", "Please enter your first name.", null);
 	    		 } else if(lastName.getValue().trim().equals("") || lastName.getValue() == null) {
 	    			 MessageBox.alert("Error", "Please enter your last name.", null);
+	    		 } else if(!email.isValid()) {
+		    			 MessageBox.alert("Error", email.getErrorMessage(), null);
 	    		 } else {
-	    			 DisplayUtils.changeButtonToSaving(updateUserInfoButton, sageImageBundle);
-	    			 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), null, null);
+	    			 startSave();
 	    		 }
 		
 	    	 }
@@ -369,6 +375,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	 }
 	 
+	 private void startSave() {
+		 DisplayUtils.changeButtonToSaving(updateUserInfoButton, sageImageBundle);
+		 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), email.getValue(), null);
+	 }
+	 
 	 private void updateUserForm(UserProfile profile) {
 		 firstName.setValue(profile.getFirstName());
 		 lastName.setValue(profile.getLastName());
@@ -378,6 +389,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 industry.setValue(profile.getIndustry());
 		 summary.setValue(profile.getSummary());
 		 location.setValue(profile.getLocation());
+		 email.setValue(profile.getEmail());
 	 }
 
 	 private void createViewProfile() {

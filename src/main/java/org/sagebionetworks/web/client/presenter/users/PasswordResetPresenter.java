@@ -27,6 +27,7 @@ import com.google.inject.Inject;
 @SuppressWarnings("unused")
 public class PasswordResetPresenter extends AbstractActivity implements PasswordResetView.Presenter, Presenter<PasswordReset> {
 	public static final String REGISTRATION_TOKEN_PREFIX = "register_";
+	public static final String CHANGE_EMAIL_TOKEN_PREFIX = "change_email_";
 	private PasswordReset place;	
 	private PasswordResetView view;
 	private CookieProvider cookieProvider;
@@ -37,7 +38,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
 	
-	private String registrationToken = null;
+	private String registrationToken, changeEmailToken = null;
 	
 	@Inject
 	public PasswordResetPresenter(PasswordResetView view, CookieProvider cookieProvider, UserAccountServiceAsync userService, AuthenticationController authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator){
@@ -65,6 +66,8 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		this.place = place;
 		view.setPresenter(this);			
 		view.clear(); 
+		registrationToken = null;
+		changeEmailToken = null;
 		
 		// show proper view if token is present
 		if(DisplayUtils.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
@@ -74,6 +77,16 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			// to log them in, but we can still set the password from this token
 			registrationToken = place.toToken();
 			view.showResetForm();
+		} else if (place.toToken().startsWith(CHANGE_EMAIL_TOKEN_PREFIX)) {
+			//this is a change email token.
+			//the user must be logged in for this to work.
+			if (!authenticationController.isLoggedIn()) {
+				view.showMessage("You must be logged in to change your email address.");
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			} else {
+				changeEmailToken = place.toToken();
+				view.showResetForm();
+			}
 		} else {
 			// Show password reset form
 			view.showMessage(AbstractImagePrototype.create(sageImageBundle.loading16()).getHTML() + " Loading Password Reset...");
@@ -131,6 +144,21 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 							view.showErrorMessage(DisplayConstants.PASSWORD_SET_FAILED_TEXT);
 						}
 					});
+		} else if (changeEmailToken != null) {
+				userService.changeEmailAddress(changeEmailToken, newPassword, new AsyncCallback<Void>() {
+							@Override
+							public void onSuccess(Void result) {
+								view.showInfo(DisplayConstants.PASSWORD_AND_EMAIL_SET_TEXT);
+								globalApplicationState.getPlaceChanger().goTo(
+										new LoginPlace(LoginPlace.LOGIN_TOKEN));
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								view.showErrorMessage(DisplayConstants.EMAIL_SET_FAILED_TEXT);
+							}
+						});
+			
 		} else {
 			UserSessionData currentUser = authenticationController.getLoggedInUser();
 			if (currentUser != null) {
