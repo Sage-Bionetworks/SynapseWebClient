@@ -1,9 +1,17 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -11,6 +19,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -43,9 +53,19 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private AutoGenFactory entityFactory;
 	private boolean readOnly = false;
 	private EntityUpdatedHandler entityUpdatedHandler;
+	private SynapseJSNIUtils synapseJSNIUtils;
+	private CookieProvider cookieProvider;
 	
 	@Inject
-	public ActionMenu(ActionMenuView view, NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor, AutoGenFactory entityFactory) {
+	public ActionMenu(ActionMenuView view, NodeModelCreator nodeModelCreator,
+			AuthenticationController authenticationController,
+			EntityTypeProvider entityTypeProvider,
+			GlobalApplicationState globalApplicationState,
+			SynapseClientAsync synapseClient,
+			JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor,
+			AutoGenFactory entityFactory,
+			SynapseJSNIUtils synapseJSNIUtils,
+			CookieProvider cookieProvider) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
@@ -54,6 +74,8 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.entityEditor = entityEditor;
 		this.entityFactory = entityFactory;
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.cookieProvider = cookieProvider;
 		view.setPresenter(this);
 	}	
 	
@@ -64,8 +86,8 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
-
-		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, readOnly);
+		
+		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, readOnly, DisplayUtils.isInTestWebsite(cookieProvider));
 		return view.asWidget();
 	}
 
@@ -235,7 +257,58 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		
 	}
 	
+	@Override
+	public void uploadToGenomespace() {
+		String url = null;
+		if(entityBundle.getEntity() instanceof Locationable) {
+			Locationable locationable = (Locationable)entityBundle.getEntity();
+			List<LocationData> locs = locationable.getLocations();
+			if(locs != null && locs.size() > 0) {
+				LocationData ld = locs.get(0);
+				if(ld != null) {
+					url = ld.getPath();
+				}
+				showUploadGenomeSpaceWindow(url, null);
+			}
+		} else if(entityBundle.getEntity() instanceof FileEntity) {
+			final FileEntity fileEntity = (FileEntity)entityBundle.getEntity();
+			FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+			if(fileHandle != null) {
+				if (fileHandle instanceof ExternalFileHandle) {
+					url = ((ExternalFileHandle) fileHandle).getExternalURL();
+					showUploadGenomeSpaceWindow(url, null);
+				}
+				else if (fileHandle instanceof S3FileHandleInterface){
+					synapseClient.getFileEntityTemporaryUrlForVersion(fileEntity.getId(), fileEntity.getVersionNumber(), new AsyncCallback<String>() {
+						@Override
+						public void onSuccess(String realUrl) {
+							if(realUrl != null && !realUrl.equals(""))
+								showUploadGenomeSpaceWindow(realUrl, fileEntity.getName());
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+						}
+					});							
+				}
+			}
+		}				
+
+	}
+	
 	/*
 	 * Private Methods
 	 */
+	private void showUploadGenomeSpaceWindow(String url, String fileName) {
+		if(url == null || url.equals("")) {
+			view.showErrorMessage("This entity does not contain a file to upload.");
+		} else {
+			url = url.replaceFirst("http://127.0.0.1:8888", "https://www.synapse.org");
+			if(fileName != null)
+				synapseJSNIUtils.uploadUrlToGenomeSpace(url, fileName);
+			else
+				synapseJSNIUtils.uploadUrlToGenomeSpace(url);
+		}
+	}
+	
 }
