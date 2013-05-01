@@ -47,4 +47,8 @@ public interface SynapseJSNIUtils {
 	public void uploadFile(String fileFieldId, String url, XMLHttpRequest xhr, ProgressCallback progressCallback);
 	public String getContentType(String fileFieldId);
 	public double getFileSize(String fileFieldId);
+
+	public void uploadUrlToGenomeSpace(String url);	
+	public void uploadUrlToGenomeSpace(String url, String filename);
+	
 }

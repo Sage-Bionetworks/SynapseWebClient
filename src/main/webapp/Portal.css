@@ -895,3 +895,7 @@ ol.lowerroman {
 .displayInline {
 	display: inline;
 }
+
+.smallerText {
+	font-size: 0.8em;
+}

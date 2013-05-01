@@ -74,6 +74,7 @@ public class FooterViewImpl extends Composite implements FooterView {
 							if(Dialog.YES.equals(btn.getItemId())) {
 								//switch to pre-release test website mode
 								DisplayUtils.setTestWebsite(true, cookies);
+								Window.scrollTo(0, 0);
 								Window.Location.reload();
 							}
 						}
