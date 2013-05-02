@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
-import java.util.List;
-
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
@@ -25,6 +23,7 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 	 * @param canEdit 
 	 * @param isAdministrator 
 	 * @param readOnly 
+	 * @param isInTestMode 
 	 */
 	public void createMenu(
 			EntityBundle entityBundle, 
@@ -32,7 +31,8 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 			AuthenticationController authenticationController,
 			boolean isAdministrator, 
 			boolean canEdit, 
-			boolean readOnly);
+			boolean readOnly, 
+			boolean isInTestMode);
 		
 	/**
 	 * Presenter interface
@@ -58,6 +58,8 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 		public void addNewChild(EntityType type, String parentId);
 
 		void createLink(String selectedEntityId);
+
+		void uploadToGenomespace();
 
 	}
 

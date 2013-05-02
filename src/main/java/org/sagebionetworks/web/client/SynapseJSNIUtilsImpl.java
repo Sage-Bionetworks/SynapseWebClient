@@ -223,4 +223,32 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 		return fileToUploadElement.files[0].size;
 	}-*/;
+
+	@Override
+	public void uploadUrlToGenomeSpace(String url) {
+		_uploadUrlToGenomeSpace(url, null);
+	}
+
+	@Override
+	public void uploadUrlToGenomeSpace(String url, String filename) {
+		_uploadUrlToGenomeSpace(url, filename);		
+	}
+
+	private final static native void _uploadUrlToGenomeSpace(String url, String fileName) /*-{
+		var gsUploadUrl = "https://gsui.genomespace.org/jsui/upload/loadUrlToGenomespace.html?uploadUrl=";
+		var dest = $wnd.encodeURIComponent(url);
+		gsUploadUrl += dest;
+		if(fileName != null) {
+			gsUploadUrl += "&fileName=" + fileName;
+		}
+		var newWin = $wnd.open(gsUploadUrl, "GenomeSpace Upload", "height=340px,width=550px");
+		newWin.focus();
+		newWin.setCallbackOnGSUploadComplete = function(savePath) {
+			alert('outer Saved to GenomeSpace as ' + savePath);
+		}
+		newWin.setCallbackOnGSUploadError = function(savePath) {
+			alert('outer ERROR saving to GenomeSpace as ' + savePath);
+		}
+	}-*/;
+
 }
