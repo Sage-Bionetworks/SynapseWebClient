@@ -102,8 +102,7 @@ public class CrawlFilter implements Filter {
 				String toPage = originalUrl.substring(0, originalUrl.indexOf("#")+1);
 				String replacedWithFullHrefs = html.replace("href=\"#", "href=\""+toPage);
 				
-				String mt = sc.getMimeType(uri);
-				response.setContentType(mt);
+				response.setContentType("text/html");
 				HttpServletResponse httpResponse = (HttpServletResponse) response;
 				httpResponse.setStatus(HttpServletResponse.SC_OK);
 				PrintWriter out = httpResponse.getWriter();
