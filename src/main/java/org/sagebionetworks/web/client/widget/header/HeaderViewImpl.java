@@ -83,7 +83,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private CookieProvider cookies;
 	
 	@Inject
-	public HeaderViewImpl(Binder binder, AuthenticationControllerImpl authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState, SearchBox searchBox, SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
+	public HeaderViewImpl(Binder binder,
+			AuthenticationControllerImpl authenticationController,
+			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
+			GlobalApplicationState globalApplicationState, SearchBox searchBox,
+			SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.iconsImageBundle = iconsImageBundle;
 		this.authenticationController = authenticationController;
@@ -104,8 +108,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 	
 	private FlowPanel getTestPanel() {
-		Anchor goToStandardSite = new Anchor("Take me back to the release version!");
-		goToStandardSite.addStyleName("link");
+		HTMLPanel alpha = new HTMLPanel("Alpha features on&nbsp;");
+		alpha.addStyleName("smallerText displayInline");
+
+		Anchor goToStandardSite = new Anchor("off");		
+		goToStandardSite.addStyleName("link smallerText displayInline");
 		goToStandardSite.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -113,8 +120,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				Window.Location.reload();
 			}
 		});
+		
 		FlowPanel testPanel = new FlowPanel();
-		testPanel.add(new HTMLPanel("<h2>TEST VERSION</h2>"));
+		testPanel.add(alpha);
 		testPanel.add(goToStandardSite);
 		return testPanel;
 	}
