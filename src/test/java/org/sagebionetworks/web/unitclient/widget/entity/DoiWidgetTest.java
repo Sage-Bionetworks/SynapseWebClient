@@ -45,7 +45,7 @@ public class DoiWidgetTest {
 		AsyncMockStubber.callSuccessWith("fake doi json").when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		testDoi = new Doi();
-		testDoi.setDoiStatus(DoiStatus.READY);
+		testDoi.setDoiStatus(DoiStatus.CREATED);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(testDoi);
 		mockStackConfigService = mock(StackConfigServiceAsync.class);
 		doiWidget = new DoiWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockGlobalApplicationState, mockStackConfigService);
@@ -56,7 +56,7 @@ public class DoiWidgetTest {
 	public void testConfigureReadyStatus() throws Exception {
 		doiWidget.configure(entityId, true, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showDoi(DoiStatus.READY);
+		verify(mockView).showDoi(DoiStatus.CREATED);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -64,7 +64,7 @@ public class DoiWidgetTest {
 	public void testConfigureReadyStatusNotEditable() throws Exception {
 		doiWidget.configure(entityId, false, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showDoi(DoiStatus.READY);
+		verify(mockView).showDoi(DoiStatus.CREATED);
 	}
 	
 	@SuppressWarnings("unchecked")
