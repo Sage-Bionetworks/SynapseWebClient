@@ -640,7 +640,7 @@ public class SynapseClientImplTest {
 	public void testGetEntityDoi() throws Exception {
 		//wiring test
 		Doi testDoi = new Doi();
-		testDoi.setDoiStatus(DoiStatus.READY);
+		testDoi.setDoiStatus(DoiStatus.CREATED);
 		testDoi.setId("test doi id");
 		testDoi.setCreatedBy("Test User");
 		testDoi.setCreatedOn(new Date());
