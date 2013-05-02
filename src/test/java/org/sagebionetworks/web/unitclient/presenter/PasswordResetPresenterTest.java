@@ -95,6 +95,30 @@ public class PasswordResetPresenterTest {
 	}
 	
 	@Test
+	public void testChangeEmail() {
+		resetAll();
+		when(place.toToken()).thenReturn(PasswordResetPresenter.CHANGE_EMAIL_TOKEN_PREFIX + "a20session20token");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		presenter = new PasswordResetPresenter(mockView, mockCookieProvider, mockUserService, mockAuthenticationController,mockSageImageBundle,mockIconsImageBundle, mockGlobalApplicationState, mockNodeModelCreator);			
+		presenter.setPlace(place);
+		
+		verify(mockView).showResetForm();
+	}
+
+	
+	@Test
+	public void testChangeEmailNotLoggedIn() {
+		resetAll();
+		when(place.toToken()).thenReturn(PasswordResetPresenter.CHANGE_EMAIL_TOKEN_PREFIX + "a20session20token");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		presenter = new PasswordResetPresenter(mockView, mockCookieProvider, mockUserService, mockAuthenticationController,mockSageImageBundle,mockIconsImageBundle, mockGlobalApplicationState, mockNodeModelCreator);			
+		presenter.setPlace(place);
+		
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+
+	
+	@Test
 	public void testResetPasswordDuringRegistration() {
 		//set the registration token, and mock a successful user service call
 		resetAll();
