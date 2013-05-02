@@ -147,4 +147,6 @@ public interface SynapseClientAsync {
 	void completeChunkedFileUpload(String entityId, String requestJson, String parentEntityId, boolean isRestricted, AsyncCallback<String> callback) throws RestServiceException;
 	void getEntityDoi(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
+
+	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 }
