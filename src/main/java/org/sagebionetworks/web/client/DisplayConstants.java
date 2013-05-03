@@ -49,6 +49,8 @@ public class DisplayConstants {
 	public static final String PASSWORD_SET_FAILED_TEXT = "Password change failed. Please try again.";
 	public static final String PASSWORD_RESET_TEXT = "Your password has been reset.";
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
+	public static final String PASSWORD_AND_EMAIL_SET_TEXT = "Your new email address and password have been set. Please login to verify.";
+	public static final String EMAIL_SET_FAILED_TEXT = "Email address change failed. Please try again.";
 	
 	public static final String PREVIEW_UNAVAILABLE="No Preview Available";	//text shown when FileEntity preview can't be shown
 	

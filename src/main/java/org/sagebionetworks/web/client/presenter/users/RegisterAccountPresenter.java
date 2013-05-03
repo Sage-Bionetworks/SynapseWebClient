@@ -78,5 +78,4 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 			}
 		});
 	}
-
 }

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.Date;
 
-import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -22,7 +21,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.shared.LinkedInInfo;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -46,6 +44,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private CookieProvider cookieProvider;
 	private UserProfile ownerProfile;
 	private GWTWrapper gwt;
+	private JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -56,7 +55,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			CookieProvider cookieProvider,
-			GWTWrapper gwt) {
+			GWTWrapper gwt, JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -66,6 +65,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.gwt = gwt;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 		view.setPresenter(this);
 	}
 
@@ -106,42 +106,34 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							ownerProfile.setIndustry(industry);
 							ownerProfile.setCompany(company);
 							ownerProfile.setDisplayName(firstName + " " + lastName);
-							if (email != null)
+							final boolean isUpdatingEmail = email != null && !email.equals(profile.getEmail()); 
+							if (isUpdatingEmail) {
 								ownerProfile.setEmail(email);
+							}
+								
 							if (pic != null)
 								ownerProfile.setPic(pic);
 							
-							JSONObjectAdapter adapter;
-							adapter = ownerProfile.writeToJSONObject(JSONObjectGwt.createNewAdapter());
+							JSONObjectAdapter adapter = ownerProfile.writeToJSONObject(jsonObjectAdapter.createNew());
 							userProfileJson = adapter.toJSONString();
-						
+
 							synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
 								@Override
 								public void onSuccess(Void result) {
 									view.showUserUpdateSuccess();
-									view.showInfo("Success", "Your profile has been updated.");
-									
-									AsyncCallback<String> callback = new AsyncCallback<String>() {
-										@Override
-										public void onFailure(Throwable caught) { }
-
-										@Override
-										public void onSuccess(String result) {
-											view.refreshHeader();
-										}
-									};
-									
-									if(currentUser.getIsSSO()) {
-										authenticationController.loginUserSSO(currentUser.getSessionToken(), callback);
+									if (isUpdatingEmail) {
+										view.showInfo("Success", "Please check your email to continue to change your email address.");
 									} else {
-										authenticationController.loginUser(currentUser.getSessionToken(), callback);
+										view.showInfo("Success", "Your profile has been updated.");
 									}
+									redirectToViewProfile();
+									updateLoginInfo(currentUser);	
 								}
 								
 								@Override
 								public void onFailure(Throwable caught) {
 									view.userUpdateFailed();
-									view.showErrorMessage("An error occurred. Please try reloading the page.");
+									view.showErrorMessage("An error occurred. Please try reloading the page:\n" + caught.getMessage());
 								}
 							});
 						} catch (JSONObjectAdapterException e) {
@@ -155,6 +147,25 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				});
 				
 		}
+	}
+	
+	private void updateLoginInfo(UserSessionData currentUser) {
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) { }
+
+			@Override
+			public void onSuccess(String result) {
+				view.refreshHeader();
+			}
+		};
+
+		if(currentUser.getIsSSO()) {
+			authenticationController.loginUserSSO(currentUser.getSessionToken(), callback);
+		} else {
+			authenticationController.loginUser(currentUser.getSessionToken(), callback);
+		}
+
 	}
 	
 	@Override
@@ -195,7 +206,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
-
+	
 	/**
 	 * This method will update the current user's profile using LinkedIn
 	 */
@@ -255,6 +266,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());    					    				
 				}
 			});
+	}
+	
+	@Override
+	public String getEmailAddress() {
+		return ownerProfile != null ? ownerProfile.getEmail() : null;
 	}
 	
 	private void showView(Profile place) {
