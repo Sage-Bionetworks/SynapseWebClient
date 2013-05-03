@@ -328,7 +328,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	     
 	     userFormPanel.add(main, new FormData("100%"));
 	     userFormPanel.add(summary, new FormData("100%"));
-	     userFormPanel.add(email, new FormData("100%"));
+		 //TODO: uncomment to add ability to change email
+//	     userFormPanel.add(email, new FormData("100%"));
 	     
 	     userFormPanel.setButtonAlign(HorizontalAlignment.LEFT);  
 	     updateUserInfoButton = new Button(DisplayConstants.BUTTON_CHANGE_USER_INFO);
@@ -339,8 +340,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    			 MessageBox.alert("Error", "Please enter your first name.", null);
 	    		 } else if(lastName.getValue().trim().equals("") || lastName.getValue() == null) {
 	    			 MessageBox.alert("Error", "Please enter your last name.", null);
-	    		 } else if(!email.isValid()) {
-		    			 MessageBox.alert("Error", email.getErrorMessage(), null);
+    			 //TODO: uncomment to add ability to change email
+//	    		 } else if(!email.isValid()) {
+//		    			 MessageBox.alert("Error", email.getErrorMessage(), null);
 	    		 } else {
 	    			 startSave();
 	    		 }
@@ -377,7 +379,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 
 	 private void startSave() {
 		 DisplayUtils.changeButtonToSaving(updateUserInfoButton, sageImageBundle);
-		 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), email.getValue(), null);
+		 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), null, null);
+ //TODO: uncomment to add ability to change email
+//		 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), email.getValue(), null);
 	 }
 	 
 	 private void updateUserForm(UserProfile profile) {
