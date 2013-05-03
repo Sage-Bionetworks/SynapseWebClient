@@ -14,7 +14,7 @@ public interface DoiWidgetView extends IsWidget, SynapseWidgetView {
 	public interface Presenter {
 		public void createDoi();
 		public void getDoiPrefix(AsyncCallback<String> callback);
-		public String getDoiLink(String prefix);
+		public String getDoiHtml(String prefix, boolean isReady);
 	}
 
 }

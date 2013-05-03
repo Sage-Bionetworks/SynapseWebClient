@@ -38,7 +38,7 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	}
 	
 	@Override
-	public void showDoi(DoiStatus doi) {
+	public void showDoi(final DoiStatus doi) {
 		container.clear();
 		
 		if (doi == DoiStatus.ERROR) {
@@ -48,13 +48,13 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 		} else if (doi == DoiStatus.IN_PROCESS) {
 			//show in process UI
 			container.add(new HTMLPanel("<span class=\"margin-left-5\">DOI processing...</span>"));
-		} else if (doi == DoiStatus.CREATED) {
+		} else if (doi == DoiStatus.CREATED || doi == DoiStatus.READY) {
 			//ask for the doi prefix from the presenter, and show a link to that!
 			//first clear old handler, if there is one
 			presenter.getDoiPrefix(new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String prefix) {
-					container.add(new HTMLPanel(presenter.getDoiLink(prefix)));
+					container.add(new HTMLPanel(presenter.getDoiHtml(prefix, doi == DoiStatus.READY)));
 				}
 				
 				@Override

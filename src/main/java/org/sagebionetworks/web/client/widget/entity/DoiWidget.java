@@ -69,7 +69,7 @@ public class DoiWidget implements Presenter {
 				try {
 					doi = nodeModelCreator.createJSONEntity(result, Doi.class);
 					view.showDoi(doi.getDoiStatus());
-					if (doi.getDoiStatus() == DoiStatus.IN_PROCESS && timer == null) {
+					if ((doi.getDoiStatus() == DoiStatus.IN_PROCESS) && timer == null) {
 						timer = new Timer() {
 							public void run() {
 								configureDoi();
@@ -115,7 +115,7 @@ public class DoiWidget implements Presenter {
 	}
 	
 	@Override
-	public String getDoiLink(String prefix) {
+	public String getDoiHtml(String prefix, boolean isReady) {
 		String html = "";
 		if (prefix != null && prefix.length() > 0) {
 			String versionString = "";
@@ -125,15 +125,23 @@ public class DoiWidget implements Presenter {
 			
 			String fullDoi = prefix + entityId + versionString;
 			String doiName = prefix.substring(DOI.length()) + entityId + versionString;
-			html = getDoiLink(fullDoi, doiName);	
+			if (isReady)
+				html = getDoiLink(fullDoi, doiName);
+			else
+				html = getDoiSpan(fullDoi);
 		}
 		return html;
 	}
 	
 	public static String getDoiLink(String fullDoi, String doiName){
-		return "<a target=\"_blank\" class=\"link margin-left-5\" href=\"http://dx.doi.org/" +
+		return "<a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/" +
 				doiName + "\">" + fullDoi +"</a>";
 	}
+	
+	public static String getDoiSpan(String fullDoi){
+		return "<span>" + fullDoi +"</span>";
+	}
+
 	
 	public void clear() {
 		view.clear();
