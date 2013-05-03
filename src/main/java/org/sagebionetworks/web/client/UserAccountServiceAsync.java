@@ -53,6 +53,8 @@ public interface UserAccountServiceAsync {
 
 	void setRegistrationUserPassword(String registrationToken, String newPassword, AsyncCallback<Void> callback);
 	
+	void changeEmailAddress(String changeEmailToken, String newPassword, AsyncCallback<Void> callback);
+	
 	/**
 	 * This needs to be replaced with a Synapse Java Client call
 	 * return the StorageUsageSummaryList json for the current user
