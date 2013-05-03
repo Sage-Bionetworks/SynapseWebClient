@@ -115,7 +115,7 @@ public class DoiWidget implements Presenter {
 	}
 	
 	@Override
-	public String getDoiLink(String prefix) {
+	public String getDoiHtml(String prefix, boolean isReady) {
 		String html = "";
 		if (prefix != null && prefix.length() > 0) {
 			String versionString = "";
@@ -125,7 +125,10 @@ public class DoiWidget implements Presenter {
 			
 			String fullDoi = prefix + entityId + versionString;
 			String doiName = prefix.substring(DOI.length()) + entityId + versionString;
-			html = getDoiLink(fullDoi, doiName);	
+			if (isReady)
+				html = getDoiLink(fullDoi, doiName);
+			else
+				html = getDoiSpan(fullDoi);
 		}
 		return html;
 	}
@@ -134,6 +137,11 @@ public class DoiWidget implements Presenter {
 		return "<a target=\"_blank\" class=\"link margin-left-5\" href=\"http://dx.doi.org/" +
 				doiName + "\">" + fullDoi +"</a>";
 	}
+	
+	public static String getDoiSpan(String fullDoi){
+		return "<span>" + fullDoi +"</span>";
+	}
+
 	
 	public void clear() {
 		view.clear();
