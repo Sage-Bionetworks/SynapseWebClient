@@ -55,6 +55,7 @@ import com.google.inject.Inject;
 public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuView {
 
 	private Presenter presenter;
+	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private AccessControlListEditor accessControlListEditor;
 	private Uploader uploader;
@@ -67,6 +68,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private Button shareButton;
 	private Button toolsButton;
 	private Button deleteButton;
+	private boolean isInTestMode;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
@@ -77,6 +79,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			EntityTypeProvider typeProvider,
 			SynapseJSNIUtils synapseJSNIUtils,
 			EntityFinder entityFinder) {
+		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.uploader = locationableUploader;
@@ -94,8 +97,10 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			AuthenticationController authenticationController,
 			boolean isAdministrator,
 			boolean canEdit, 
-			boolean readOnly) {
+			boolean readOnly,
+			boolean isInTestMode) {
 		this.readOnly = readOnly;
+		this.isInTestMode = isInTestMode;
 		Entity entity = entityBundle.getEntity();
 
 		UserSessionData sessionData = authenticationController.getLoggedInUser();
@@ -301,6 +306,10 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			addMoveItem(menu, entity, entityType);
 		}
 
+		if(isInTestMode && (entity instanceof Locationable || entity instanceof FileEntity)) {
+			addUploadToGenomeSpace(menu, entityBundle);
+		}
+		
 		toolsButton.setMenu(menu);
 		if(menu.getItemCount() == 0) {
 			toolsButton.disable();
@@ -440,5 +449,16 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			}
 		});
 		menu.add(itemMove);
+	}
+
+	private void addUploadToGenomeSpace(final Menu menu, final EntityBundle bundle) {
+		MenuItem item = new MenuItem("Upload to " + AbstractImagePrototype.create(sageImageBundle.genomeSpaceLogoTitle16()).getHTML());		
+		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				presenter.uploadToGenomespace();
+			}
+		});
+		menu.add(item);
 	}
 }

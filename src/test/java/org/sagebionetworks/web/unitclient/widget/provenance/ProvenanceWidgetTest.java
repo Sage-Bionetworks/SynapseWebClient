@@ -402,6 +402,18 @@ public class ProvenanceWidgetTest {
 				// TODO Auto-generated method stub
 				return 0;
 			}
+
+			@Override
+			public void uploadUrlToGenomeSpace(String url) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void uploadUrlToGenomeSpace(String url, String filename) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 

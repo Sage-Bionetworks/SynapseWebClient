@@ -128,6 +128,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/flag-small-16.png")
 	ImageResource flagSmall16();
 
+	@Source("images/icons/genomespace-16.png")
+	ImageResource genomespace16();  
+
 	@Source("images/icons/github-16.png")
 	ImageResource github16();	
 	

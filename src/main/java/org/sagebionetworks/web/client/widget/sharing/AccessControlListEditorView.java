@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.SaveCallback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.VoidCallback;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -46,6 +47,12 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 	void showInfoSuccess(String title, String message);
 
 	/**
+	 * Prompt about unsaved view changes
+	 * @param saveCallback 
+	 */
+	public void alertUnsavedViewChanges(SaveCallback saveCallback);
+	
+	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
@@ -88,5 +95,11 @@ public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView
 		 * consequently inherit access permissions from this entity's ACL.
 		 */
 		void pushChangesToSynapse(boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback);
+		
+		/**
+		 * The view tells the presenter that there are unsaved changes in the view
+		 * @param unsavedChanges
+		 */
+		public void setUnsavedViewChanges(boolean unsavedChanges);
 	}
 }

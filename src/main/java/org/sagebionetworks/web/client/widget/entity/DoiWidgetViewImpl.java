@@ -48,7 +48,7 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 		} else if (doi == DoiStatus.IN_PROCESS) {
 			//show in process UI
 			container.add(new HTMLPanel("<span class=\"margin-left-5\">DOI processing...</span>"));
-		} else if (doi == DoiStatus.READY) {
+		} else if (doi == DoiStatus.CREATED) {
 			//ask for the doi prefix from the presenter, and show a link to that!
 			//first clear old handler, if there is one
 			presenter.getDoiPrefix(new AsyncCallback<String>() {

@@ -91,6 +91,7 @@ public class DisplayConstants {
 	public static final String MENU_PERMISSION_LEVEL_IS_OWNER = "Is Owner";
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT = "Can edit";
+	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE = "Edit & Delete";
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
 	public static final String LABEL_PERMISSION_TEXT_ADD_PEOPLE = "Add People";
 	public static final String BUTTON_SHOW_R_CLIENT_INSTALL = "Show R Client Installation Code";
@@ -525,6 +526,7 @@ public class DisplayConstants {
 	public static final String NEW_PROJECT_NAME = "New Project Name";
 	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
 	public static final String USER_GUIDE = "User Guide";
+	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
 	
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";

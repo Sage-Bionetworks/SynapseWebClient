@@ -30,10 +30,7 @@ public class NChartUtil {
 			if(n.isStartingNode()) startNodes.add(n);			
 		} 
 				
-		// depth first traverse graph for each start node. Prioritize deeper placement in layers
-		for(ProvGraphNode startNode : startNodes) {
-			processLayer(0, startNode, nodeToLayer, graph);
-		}
+		calculateNodeToLayer(graph, nodeToLayer, startNodes);		
 		
 		// build reverse lookup
 		int maxLayer = 0;
@@ -49,6 +46,7 @@ public class NChartUtil {
 		List<NChartLayer> layers = new ArrayList<NChartLayer>();
 		for(int i=0; i<=maxLayer; i++) {
 			List<NChartLayerNode> layerNodes = new ArrayList<NChartLayerNode>();
+			if(!layerToNode.containsKey(i)) continue; // possible with strange shifting in layer creation
 			// process ProvGraphNodes into a list of NChartLayerNodes
 			for(ProvGraphNode node : layerToNode.get(i)) {
 				if(node instanceof ActivityGraphNode) {					
@@ -72,6 +70,31 @@ public class NChartUtil {
 		NChartLayersArray layersArray = jsoProvider.newNChartLayersArray();
 		layersArray.setLayers(layers);
 		return layersArray;
+	}
+
+	private static void calculateNodeToLayer(ProvGraph graph,
+			Map<ProvGraphNode, Integer> nodeToLayer,
+			List<ProvGraphNode> startNodes) {
+		// depth first traverse graph for each start node. Prioritize deeper placement in layers
+		for(ProvGraphNode startNode : startNodes) {
+			processLayer(0, startNode, nodeToLayer, graph);
+		}
+		
+		// 2nd pass over graph to make assure all activities are lower than their used nodes (SWC-580)
+		for(ProvGraphNode node : graph.getNodes()) {
+			if(node instanceof ActivityGraphNode) {
+				Integer activityDepth = nodeToLayer.get(node);
+				EdgesForNode nodeEdges = getEdgesForNode(graph.getEdges(), node);
+				// check used (outgoing) nodes and if they are lower, reassign this activity node's depth
+				for(ProvGraphEdge edge : nodeEdges.out) {
+					Integer outDepth = nodeToLayer.get(edge.getSink());
+					if(activityDepth >= outDepth) {
+						Integer newDepth = outDepth-1 < 0 ? 0 : outDepth-1;
+						nodeToLayer.put(node, newDepth);
+					}
+				}
+			}
+		}			
 	}	
 
 	/**
@@ -212,12 +235,12 @@ public class NChartUtil {
 
 		EdgesForNode nodeEdges = getEdgesForNode(graph.getEdges(), node);
 		
-		// assign layer for leafs and also maximal layer depth for incoming edges 
+		// assign layer for leafs and also maximal layer depth for incoming edges (looking back down) 
 		for(ProvGraphEdge incomingEdge : nodeEdges.in) {
 			setLayerValue(layer-1, incomingEdge.getSource(), nodeToLayer);
 		}
 		
-		// process outgoing edges
+		// process outgoing edges 
 		for(ProvGraphEdge outgoingEdge : nodeEdges.out) {
 			processLayer(layer+1, outgoingEdge.getSink(), nodeToLayer, graph);
 		}
@@ -228,7 +251,7 @@ public class NChartUtil {
 			Map<ProvGraphNode, Integer> nodeToLayer) {
 		Integer existingLayer = nodeToLayer.get(node);
 		if(existingLayer == null || existingLayer < layer) {
-			nodeToLayer.put(node, layer);
+			nodeToLayer.put(node, layer);			
 		}
 	}
 	
