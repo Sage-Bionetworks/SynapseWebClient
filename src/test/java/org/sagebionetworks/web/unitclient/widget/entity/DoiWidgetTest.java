@@ -132,7 +132,7 @@ public class DoiWidgetTest {
 		String prefix = "10.5072/FK2.";
 		Long version = 42l;
 		doiWidget.configure(entityId, true, version);
-		String link = doiWidget.getDoiLink(prefix);
+		String link = doiWidget.getDoiHtml(prefix, true);
 		assertTrue(link.contains(entityId));
 		assertTrue(link.contains(version.toString()));
 		assertTrue(link.contains(prefix));
@@ -144,9 +144,9 @@ public class DoiWidgetTest {
 		String prefix = "";
 		Long version = 42l;
 		doiWidget.configure(entityId, true, version);
-		String link = doiWidget.getDoiLink(prefix);
+		String link = doiWidget.getDoiHtml(prefix, true);
 		assertTrue(link.length() == 0);
-		link = doiWidget.getDoiLink(null);
+		link = doiWidget.getDoiHtml(null, true);
 		assertTrue(link.length() == 0);
 	}
 	
