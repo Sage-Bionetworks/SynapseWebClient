@@ -223,6 +223,54 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			
 			throw new RestClientException("An error occurred. Please try again.");
 	}
+	
+	
+	@Override
+	public void changeEmailAddress(String changeEmailToken, String newPassword) {
+		// First make sure the service is ready to go.
+			validateService();
+			
+			JSONObject obj = new JSONObject();
+			try {
+				obj.put("registrationToken", changeEmailToken);
+				obj.put("password", newPassword);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			
+			// Build up the path
+			String url = urlProvider.getPrivateAuthBaseUrl() + "/" + ServiceUtils.AUTHSVC_CHANGE_USER_EMAIL_PATH;
+			String jsonString = obj.toString();
+			
+			// Setup the header
+			HttpHeaders headers = new HttpHeaders();
+			UserDataProvider.addUserDataToHeader(this.getThreadLocalRequest(), headers);
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			HttpEntity<String> entity = new HttpEntity<String>(jsonString, headers);
+			HttpMethod method = HttpMethod.POST;
+			
+			logger.info(method.toString() + ": " + url + ", with change email token " + changeEmailToken); 
+			
+			// Make the actual call.
+			try {
+				ResponseEntity<String> response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
+				if(response.getBody().equals("")) {
+					return;
+				}
+			} catch (RestClientException ex) {
+				if (ex.getMessage().toLowerCase().contains("no content-type found"))
+					return;
+				else throw ex;
+			} catch (UnexpectedException ex) {
+				return;
+			} catch (NullPointerException nex) {
+				// TODO : change this to properly deal with a 204!!!
+				return; // this is expected
+			}
+			
+			throw new RestClientException("An error occurred. Please try again.");
+	}
+
 
 	@Override
 	public void setPassword(String newPassword) {
