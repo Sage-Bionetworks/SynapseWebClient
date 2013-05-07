@@ -3,8 +3,8 @@ package org.sagebionetworks.web.unitclient.place;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.place.Wiki;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 /**
  * Wiki Place token test
@@ -18,7 +18,7 @@ public class WikiTest {
 	@Before
 	public void setup(){
 		testOwnerId = "syn1234";
-		testOwnerType = WidgetConstants.WIKI_OWNER_ID_ENTITY;
+		testOwnerType = ObjectType.ENTITY.toString();
 		testWikiId = "20";
 	}	
 	

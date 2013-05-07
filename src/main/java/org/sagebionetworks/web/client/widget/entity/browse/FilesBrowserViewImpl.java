@@ -160,7 +160,13 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		};
 		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
-		final Window window = new Window();  
+		final Window window = new Window(); 
+		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		}));
 		uploader.clearHandlers();
 		// add user defined handler
 		uploader.addPersistSuccessHandler(handler);
@@ -184,11 +190,11 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			public void componentSelected(ButtonEvent ce) {
 					//let the uploader create the FileEntity
 					window.removeAll();
-					window.setSize(400, 320);
+					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 					window.setPlain(true);
 					window.setModal(true);		
 					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-					window.setLayout(new FitLayout());			
+					window.setLayout(new FitLayout());
 					window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
 					window.show();
 			}

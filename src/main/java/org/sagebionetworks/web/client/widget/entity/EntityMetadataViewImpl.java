@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -17,7 +16,6 @@ import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.IconMenu;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
@@ -60,13 +58,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.resources.client.CssResource;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -89,6 +85,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static final int VERSION_LIMIT = 100;
 	private static final int NAME_TIME_STUB_LENGTH = 7;
 	private FavoriteWidget favoriteWidget;
+	private DoiWidget doiWidget;
 	
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
@@ -134,6 +131,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	SimplePanel favoritePanel;
 
 	@UiField
+	SimplePanel doiPanel;
+
+	@UiField
 	LayoutContainer previousVersions;
 
 	@UiField
@@ -167,10 +167,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget) {
+			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget, DoiWidget doiWidget) {
 		this.icons = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
+		this.doiWidget = doiWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 
 		versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(allVersions, previousVersions));
@@ -236,7 +237,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
-				
+		
+		doiPanel.addStyleName("inline-block");
+		doiPanel.setWidget(doiWidget.asWidget());
+		
 		previousVersions.setLayout(new FlowLayout(10));
 	}
 
@@ -255,29 +259,38 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.readOnly.setVisible(readOnly);
 		
 		sharingContainer.clear();
-		sharingContainer.add(createShareSettingsWidget(bundle.getPermissions().getCanPublicRead()));
+		sharingContainer.add(DisplayUtils.getShareSettingsDisplay("<span style=\"margin-right: 5px;\" class=\"boldText\">Sharing:</span>", bundle.getPermissions().getCanPublicRead(), synapseJSNIUtils));
 
-		setCreatedBy(e.getCreatedBy(), synapseJSNIUtils.convertDateToSmallString(e.getCreatedOn()));
-		setModified(e.getModifiedBy(), synapseJSNIUtils.convertDateToSmallString(e.getModifiedOn()));
+		setCreatedBy(e.getCreatedBy(), DisplayUtils.converDataToPrettyString(e.getCreatedOn()));
+		setModified(e.getModifiedBy(), DisplayUtils.converDataToPrettyString(e.getModifiedOn()));
 			
 		dataUseContainer.clear();
-		Widget dataUse = createRestrictionWidget();
-		if(dataUse != null) {
-			dataUseContainer.setVisible(true);
-			dataUseContainer.add(dataUse);
+		if(bundle.getPermissions().getCanPublicRead()) {
+			Widget dataUse = createRestrictionWidget();
+			if(dataUse != null) {
+				dataUseContainer.setVisible(true);
+				dataUseContainer.add(dataUse);
+			} else {
+				dataUseContainer.setVisible(false);
+			}		
 		} else {
 			dataUseContainer.setVisible(false);
 		}
 		
 		setVersionsVisible(false);
+		Long versionNumber = null;
 		if (e instanceof Versionable) {
 			setVersionsVisible(true);
 			Versionable vb = (Versionable) e;
 			setVersionInfo(vb);
 			setEntityVersions(vb);
 			versionAnimation.hide();
+			versionNumber = vb.getVersionNumber();
 		}
 		favoriteWidget.configure(bundle.getEntity().getId());
+		
+		//doi widget
+		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanEdit(), versionNumber);
 	}
 
 	private void clear() {
@@ -286,6 +299,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setVersionsVisible(false);
 		previousVersions.setVisible(false);
 		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+		doiWidget.clear();
 	}
 
 	@Override
@@ -318,28 +332,25 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	public void setCreatedBy(String who, String when) {
-		String text =  DisplayConstants.CREATED + " by " + who + "<br/>" + when; 
-		DisplayUtils.addTooltip(synapseJSNIUtils, addedBy, text, TOOLTIP_POSITION.BOTTOM);		
-		addedBy.clear();
-		addedBy.add(new HTML(DisplayConstants.CREATED + " By"));
+		addedBy.clear();		
+		addedBy.add(new HTML("<span class=\"boldText\">" + DisplayConstants.CREATED + " by:</span> " + who + ", " + when));
 	}
 
 	public void setModified(String who, String when) {
-		String text =  DisplayConstants.MODIFIED + " by " + who + "<br/>" + when;
-		DisplayUtils.addTooltip(synapseJSNIUtils, modifiedBy, text, TOOLTIP_POSITION.BOTTOM);
 		modifiedBy.clear();
-		modifiedBy.add(new HTML(DisplayConstants.MODIFIED + " By"));		
+		modifiedBy.add(new HTML("<span class=\"boldText\">" + DisplayConstants.MODIFIED + " by:</span> " + who + ", " + when));		
 	}
 
 	public void setVersionInfo(Versionable vb) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(vb.getVersionLabel());
 
-		if (vb.getVersionComment() != null) {
-			DisplayUtils.addTooltip(synapseJSNIUtils, versions, vb.getVersionComment(), TOOLTIP_POSITION.BOTTOM);
-		} else {
-			DisplayUtils.addTooltip(synapseJSNIUtils, versions, DisplayConstants.NO_VERSION_COMMENT, TOOLTIP_POSITION.BOTTOM);
-		}
+		// TODO : figure out a mobile-friendly way to display the version comment
+//		if (vb.getVersionComment() != null) {
+//			DisplayUtils.addTooltip(synapseJSNIUtils, versions, vb.getVersionComment(), TOOLTIP_POSITION.BOTTOM);
+//		} else {
+//			DisplayUtils.addTooltip(synapseJSNIUtils, versions, DisplayConstants.NO_VERSION_COMMENT, TOOLTIP_POSITION.BOTTOM);
+//		}
 		
 		label.setInnerText(sb.toString());
 	}
@@ -350,8 +361,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	public void setVersionsVisible(boolean visible) {
-		if(visible) versions.addStyleName("metadata-tag"); 
-		else versions.removeStyleName("metadata-tag");
 		versions.setVisible(visible);
 	}
 
@@ -497,26 +506,27 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			private Object setupIconMenu(final ModelData model, boolean currentVersion) {
 				IconMenu menu = new IconMenu();
 				final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
-				if (!currentVersion) {
-					menu.addIcon(icons.arrowTurnLeftGrey16(),
-							"Promote Version to Top", new ClickHandler() {
-								@Override
-								public void onClick(ClickEvent event) {
-									MessageBox.confirm("Promote "+ versionLabel,
-											DisplayConstants.PROMPT_SURE_PROMOTE,
-											new Listener<MessageBoxEvent>() {
-												@Override
-												public void handleEvent(MessageBoxEvent be) {
-													Button btn = be.getButtonClicked();
-													if (Dialog.YES.equals(btn.getItemId())) {
-														presenter.promoteVersion((String) model.get(VERSION_KEY_ID),
-																				(Long) model.get(VERSION_KEY_NUMBER));
-													}
-												}
-											});
-								}
-							});
-				} else {
+//				if (!currentVersion) {
+//					menu.addIcon(icons.arrowTurnLeftGrey16(),
+//							"Promote Version to Top", new ClickHandler() {
+//								@Override
+//								public void onClick(ClickEvent event) {
+//									MessageBox.confirm("Promote "+ versionLabel,
+//											DisplayConstants.PROMPT_SURE_PROMOTE,
+//											new Listener<MessageBoxEvent>() {
+//												@Override
+//												public void handleEvent(MessageBoxEvent be) {
+//													Button btn = be.getButtonClicked();
+//													if (Dialog.YES.equals(btn.getItemId())) {
+//														presenter.promoteVersion((String) model.get(VERSION_KEY_ID),
+//																				(Long) model.get(VERSION_KEY_NUMBER));
+//													}
+//												}
+//											});
+//								}
+//							});
+//				} else {
+				if (currentVersion) {
 					menu.addIcon(icons.editGrey16(), "Edit Version Info",
 							new ClickHandler() {
 								@Override
@@ -591,24 +601,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		return new ColumnModel(columns);
 	}
 
-	private Widget createShareSettingsWidget(boolean isPublic) {
-		final SimplePanel lc = new SimplePanel();
-		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
-		String description = isPublic ? DisplayConstants.PUBLIC_ACL_ENTITY_PAGE : DisplayConstants.PRIVATE_ACL_ENTITY_PAGE;
-		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
-
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\">Sharing:</span><div class=\"" + styleName+ "\" style=\"display:inline-block; position:absolute\"></div>");
-		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
-
-		//form the html
-		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
-		lc.add(htmlPanel);
-
-		return lc;
-	}
 	
 	private Widget createRestrictionWidget() {
 		if (!presenter.includeRestrictionWidget()) return null;

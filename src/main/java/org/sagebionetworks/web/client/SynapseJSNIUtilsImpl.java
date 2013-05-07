@@ -16,9 +16,12 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
+import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
-
+	
+	private static ProgressCallback progressCallback;
+	
 	@Override
 	public void recordPageVisit(String token) {
 		_recordPageVisit(token);
@@ -39,7 +42,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private static native void _bindBootstrapTooltip(String id) /*-{
-		$wnd.jQuery('#'+id).tooltip();
+		$wnd.jQuery('#'+id).tooltip().tooltip('fixTitle');	//update title from data-original-title, if necessary
 	}-*/;
 
 	@Override
@@ -50,7 +53,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native void _hideBootstrapTooltip(String id) /*-{
 		$wnd.jQuery('#'+id).tooltip('hide');
 	}-*/;
-
 	
 	@Override
 	public void bindBootstrapPopover(String id) {
@@ -64,6 +66,15 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	public static native void _highlightCodeBlocks() /*-{
 	  $wnd.jQuery('code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
+	}-*/;
+	
+	@Override
+	public void tablesorter(String id) {
+		_tablesorter(id);
+	}
+	
+	private static native void _tablesorter(String id) /*-{
+		$wnd.jQuery('#'+id).tablesorter();
 	}-*/;
 	
 	private static native void _bindBootstrapPopover(String id) /*-{
@@ -151,5 +162,93 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		    }
 		}
 	}
+	@Override
+	public boolean isDirectUploadSupported() {
+		return _isDirectUploadSupported();
+	}
 	
+	private final static native boolean _isDirectUploadSupported() /*-{ 
+		//if Safari, direct upload is not supported
+		if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)
+			return false;
+		var xhr = new XMLHttpRequest();
+		// This test is from http://blogs.msdn.com/b/ie/archive/2012/02/09/cors-for-xhr-in-ie10.aspx
+		return ("withCredentials" in xhr);
+	}-*/;
+
+	@Override
+	public void uploadFile(String fileFieldId, String url, XMLHttpRequest xhr, ProgressCallback callback) {
+		SynapseJSNIUtilsImpl.progressCallback = callback;
+		_directUploadFile(fileFieldId, url, xhr);
+	}
+	private final static native void _directUploadFile(String fileFieldId, String url, XMLHttpRequest xhr) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		var fileToUpload = fileToUploadElement.files[0];
+		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
+  		xhr.open('PUT', url, true);
+		xhr.send(fileToUpload);
+	}-*/;
+	
+	public static void updateProgress(JavaScriptObject evt) {
+		if (SynapseJSNIUtilsImpl.progressCallback != null) {
+			//parse out value
+			double currentProgress = _getProgress(evt);
+			int percent = (int)Math.floor(currentProgress*100.0);
+			String text = percent+"%";
+			SynapseJSNIUtilsImpl.progressCallback.updateProgress(currentProgress, text);
+		}
+	}
+	
+	private final static native double _getProgress(JavaScriptObject evt) /*-{
+		if (evt.lengthComputable) {
+			return evt.loaded / evt.total;
+		}
+		return 0;
+	}-*/;
+	
+	@Override
+	public String getContentType(String fileFieldId) {
+		return _getContentType(fileFieldId);
+	}
+	private final static native String _getContentType(String fileFieldId) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		return fileToUploadElement.files[0].type;
+	}-*/;
+	
+	@Override
+	public double getFileSize(String fileFieldId) {
+		return _getFileSize(fileFieldId);
+	}
+	private final static native double _getFileSize(String fileFieldId) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		return fileToUploadElement.files[0].size;
+	}-*/;
+
+	@Override
+	public void uploadUrlToGenomeSpace(String url) {
+		_uploadUrlToGenomeSpace(url, null);
+	}
+
+	@Override
+	public void uploadUrlToGenomeSpace(String url, String filename) {
+		_uploadUrlToGenomeSpace(url, filename);		
+	}
+
+	private final static native void _uploadUrlToGenomeSpace(String url, String fileName) /*-{
+		var gsUploadUrl = "https://gsui.genomespace.org/jsui/upload/loadUrlToGenomespace.html?uploadUrl=";
+		var dest = $wnd.encodeURIComponent(url);
+		gsUploadUrl += dest;
+		if(fileName != null) {
+			gsUploadUrl += "&fileName=" + fileName;
+		}
+		var newWin = $wnd.open(gsUploadUrl, "GenomeSpace Upload", "height=340px,width=550px");
+		newWin.focus();
+		newWin.setCallbackOnGSUploadComplete = function(savePath) {
+			alert('outer Saved to GenomeSpace as ' + savePath);
+		}
+		newWin.setCallbackOnGSUploadError = function(savePath) {
+			alert('outer ERROR saving to GenomeSpace as ' + savePath);
+		}
+	}-*/;
+
 }

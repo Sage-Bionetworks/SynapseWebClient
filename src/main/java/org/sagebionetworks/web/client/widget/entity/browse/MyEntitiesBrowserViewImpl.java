@@ -134,7 +134,12 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 	public EntityTreeBrowser getEntityTreeBrowser() {
 		return myTreeBrowser;
 	}
-	
+
+	@Override
+	public EntityTreeBrowser getFavoritesTreeBrowser() {
+		return favoritesTreeBrowser;
+	}
+
 	/*
 	 * Private Methods
 	 */

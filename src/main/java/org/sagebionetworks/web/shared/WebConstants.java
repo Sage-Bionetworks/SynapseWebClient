@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.shared;
+
 import org.sagebionetworks.repo.model.util.ModelConstants;
 
 
@@ -22,6 +23,8 @@ public class WebConstants {
 	public static final String VALID_ENTITY_NAME_REGEX = ModelConstants.VALID_ENTITY_NAME_REGEX;
 	
 	public static final String INVALID_ENTITY_NAME_MESSAGE = "Entity names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
+	
+	public static final String INVALID_EMAIL_MESSAGE = "Invalid email address";
 
 	public static final String PROVENANCE_API_URL = "https://sagebionetworks.jira.com/wiki/display/PLFM/Analysis+Provenance+in+Synapse";
 	
@@ -32,6 +35,7 @@ public class WebConstants {
 	 */
 	public static final String VALID_ANNOTATION_NAME_REGEX = "^[a-z,A-Z,0-9,_,.]+";
 	public static final String VALID_URL_REGEX = "^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+	public static final String VALID_EMAIL_REGEX = "^[_A-Za-z0-9-+.]+@[_A-Za-z0-9.]+";
 	public static final String WIDGET_NAME_REGEX = "[a-z,A-Z,0-9,., ,\\-,\\+,(,)]";
 	public static final String VALID_WIDGET_NAME_REGEX = "^"+WIDGET_NAME_REGEX+"+";
 	public static final String VALID_ENTITY_ID_REGEX = "^[Ss]{1}[Yy]{1}[Nn]{1}\\d+";
@@ -76,4 +80,49 @@ public class WebConstants {
 
 	public static final int MAX_COLUMNS_IN_GRID = 100;
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
+	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
+
+	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
+
+	public static final String PROXY_PARAM_KEY = "proxy";
+
+	public static final String ENTITY_PARENT_ID_KEY = "parentId";
+
+	public static final String ENTITY_EULA_ID_KEY = "eulaId";
+
+	public static final String ENTITY_PARAM_KEY = "entityId";
+
+	public static final String ENTITY_VERSION_PARAM_KEY = "version";
+
+	public static final String WIKI_OWNER_ID_PARAM_KEY = "ownerId";
+
+	public static final String WIKI_OWNER_TYPE_PARAM_KEY = "ownerType";
+
+	public static final String WIKI_ID_PARAM_KEY = "wikiId";
+
+	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
+
+	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
+
+	public static final String FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY = "createFileEntity";
+
+	public static final String FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY = "fileEntityParentId";
+
+	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
+
+	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
+
+	public static final String USER_PROFILE_PARAM_KEY = "userId";
+
+	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
+
+	public static final String WAIT_FOR_URL = "waitForUrl";
+
+	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "createdByPrincipalId";
+
+	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
+
+	public static final String ETAG_KEY = "etag";
+
+	public static final String ENTITY_VERSION_STRING = "/version/";
 }

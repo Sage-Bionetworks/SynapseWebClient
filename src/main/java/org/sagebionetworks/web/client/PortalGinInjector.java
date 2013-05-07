@@ -1,11 +1,27 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.web.client.place.BCCOverview;
+import org.sagebionetworks.web.client.place.ComingSoon;
+import org.sagebionetworks.web.client.place.Governance;
+import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.ProjectsHome;
+import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.Settings;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.place.WikiPlace;
+import org.sagebionetworks.web.client.place.users.PasswordReset;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.EvaluationPresenter;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
@@ -19,10 +35,12 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
@@ -32,12 +50,15 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
@@ -54,43 +75,46 @@ public interface PortalGinInjector extends Ginjector {
 
 	public GlobalApplicationState getGlobalApplicationState();
 	
-	public HomePresenter getHomePresenter();
+	public PresenterProxy<HomePresenter, Home> getHomePresenter();
 
-	public EntityPresenter getEntityPresenter();
+	public PresenterProxy<EntityPresenter, Synapse> getEntityPresenter();
 	
-	public ProjectsHomePresenter getProjectsHomePresenter();
+	public PresenterProxy<ProjectsHomePresenter, ProjectsHome> getProjectsHomePresenter();
 	
-	public LoginPresenter getLoginPresenter();
+	public PresenterProxy<LoginPresenter, LoginPlace> getLoginPresenter();
 	
 	public AuthenticationController getAuthenticationController();
 	
-	public PasswordResetPresenter getPasswordResetPresenter();
+	public PresenterProxy<PasswordResetPresenter, PasswordReset> getPasswordResetPresenter();
 	
-	public RegisterAccountPresenter getRegisterAccountPresenter();
+	public PresenterProxy<RegisterAccountPresenter, RegisterAccount> getRegisterAccountPresenter();
 
-	public ProfilePresenter getProfilePresenter();
+	public PresenterProxy<ProfilePresenter, Profile> getProfilePresenter();
 
-	public SettingsPresenter getSettingsPresenter();
+	public PresenterProxy<SettingsPresenter, Settings> getSettingsPresenter();
 	
-	public ComingSoonPresenter getComingSoonPresenter();
+	public PresenterProxy<ComingSoonPresenter, ComingSoon> getComingSoonPresenter();
 	
-	public BCCOverviewPresenter getBCCOverviewPresenter();
+	public PresenterProxy<BCCOverviewPresenter, BCCOverview> getBCCOverviewPresenter();
 	
-	public GovernancePresenter getGovernancePresenter();
+	public PresenterProxy<GovernancePresenter, Governance> getGovernancePresenter();
 	
-	public SearchPresenter getSearchPresenter();
+	public PresenterProxy<SearchPresenter, Search> getSearchPresenter();
 	
-	public SynapseWikiPresenter getSynapseWikiPresenter();
+	public PresenterProxy<SynapseWikiPresenter, Wiki> getSynapseWikiPresenter();
 	
-	public BCCSignup getBCCSignup();
+	public PresenterProxy<WikiPresenter, WikiPlace> getWikiPresenter();
 	
-	public WikiPresenter getWikiPresenter();
+	public EvaluationPresenter getEvaluationPresenter();
 	
 	public EventBus getEventBus();
 	
 	public JiraURLHelper getJiraURLHelper();
 
-	// Widgets
+
+	/*
+	 *  Markdown Widgets
+	 */
 	////// Editors
 	public YouTubeConfigEditor getYouTubeConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
@@ -101,6 +125,8 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableConfigEditor getSynapseAPICallConfigEditor();
 	public TabbedTableConfigEditor getTabbedTableConfigEditor();
 	public EntityTreeBrowser getEntityTreeBrowser();
+	public EntityListConfigEditor getEntityListConfigEditor();
+	public ShinySiteConfigEditor getShinySiteConfigEditor();
 
 	////// Renderers
 	public YouTubeWidget getYouTubeRenderer();
@@ -111,6 +137,8 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableWidget getSynapseAPICallRenderer();
 	public TableOfContentsWidget getTableOfContentsRenderer();
 	public WikiFilesPreviewWidget getWikiFilesPreviewRenderer();
+	public EntityListWidget getEntityListRenderer();
+	public ShinySiteWidget getShinySiteRenderer(); 
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
@@ -118,5 +146,8 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableColumnRendererDate getAPITableColumnRendererDate();
 	public APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
 	public APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
-
+	
+	// Other widgets
+	public UserBadge getUserBadgeWidget();
+	
 }

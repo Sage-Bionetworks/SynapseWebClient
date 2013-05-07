@@ -261,7 +261,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			@Override
 			public void onFailure(Throwable caught) {
 				//preview failed
-				showErrorMessage(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT + caught.getMessage());
+				showErrorMessage(DisplayConstants.PREVIEW_FAILED_TEXT + caught.getMessage());
 			}
 		});	
 	}
@@ -284,6 +284,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		else{
 			panel = new HTMLPanel(result);
 		}
+		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
 		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
@@ -313,6 +314,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 
 	private Menu createWidgetMenu(final WidgetDescriptorUpdatedHandler callback) {
 	    Menu menu = new Menu();
+	    menu.setEnableScrolling(false);
 	    if (isWikiEditor) {
 		    menu.add(getNewCommand("Attachment", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
@@ -320,6 +322,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    	};
 			}));
 	    }
+	    menu.add(getNewCommand(WidgetConstants.ENTITYLIST_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	@Override
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.ENTITYLIST_CONTENT_TYPE, callback);
+	    	}
+	    }));	    
 	    menu.add(getNewCommand("Image", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
@@ -335,7 +343,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.PROVENANCE_CONTENT_TYPE, callback);
 	    	};
 		}));
-    	menu.add(getNewCommand("Table", new SelectionListener<ComponentEvent>() {
+	    menu.add(getNewCommand("Table", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, callback);
 	    	};
@@ -356,7 +364,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	     */
 	    if (DisplayUtils.isInTestWebsite(cookies)) {
 	    	menu.add(new SeparatorMenuItem());
-		    menu.add(getNewCommand("Synapse API SuperTable", new SelectionListener<ComponentEvent>() {
+	    	menu.add(getNewCommand(WidgetConstants.SHINYSITE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		handleInsertWidgetCommand(WidgetConstants.SHINYSITE_CONTENT_TYPE, callback);
+		    	};
+			}));
+	    	menu.add(getNewCommand("Synapse API SuperTable", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
 		    		handleInsertWidgetCommand(WidgetConstants.API_TABLE_CONTENT_TYPE, callback);
 		    	};

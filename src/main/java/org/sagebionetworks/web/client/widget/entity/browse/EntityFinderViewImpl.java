@@ -104,7 +104,6 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		}
 		selectedRef = new Reference();
 		presenter.setSelectedEntity(selectedRef);
-
 		
 		// left and right
 		left = new LayoutContainer();
@@ -174,10 +173,16 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	 * Private Methods
 	 */
 	private void createMyEntityBrowserWidget() {
-		// My Entity Browser
-		EntityTreeBrowser tree = myEntitiesBrowser.getEntityTreeBrowser();
+		// configure tree browsers
+		EntityTreeBrowser tree;
+		tree = myEntitiesBrowser.getEntityTreeBrowser();
 		tree.setMakeLinks(false);
 		tree.setShowContextMenu(false);
+		
+		tree = myEntitiesBrowser.getFavoritesTreeBrowser();
+		tree.setMakeLinks(false);
+		tree.setShowContextMenu(false);		
+		
 		myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
 			@Override
 			public void onSelection(String selectedEntityId) {
@@ -186,6 +191,7 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 				createVersionChooser(selectedEntityId);
 			}
 		});
+
 		myEntitiesBrowserWidget = myEntitiesBrowser.asWidget();
 
 		// list entry
@@ -306,10 +312,12 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	}
 
 	private void replaceRightWidget(Widget widget) {
-		rightTop.removeAll();
-		versionChooser = null;
-		rightTop.add(widget, MARGIN_10);
-		rightTop.layout(true);
+		if(rightTop != null && widget != null) {
+			rightTop.removeAll();
+			versionChooser = null;
+			rightTop.add(widget, MARGIN_10);
+			rightTop.layout(true);
+		}
 	}
 	
 	private void createSelectedWidget() {
@@ -491,6 +499,11 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	@Override
 	public int getViewHeight() {
 		return HEIGHT_PX + 80;
+	}
+
+	@Override
+	public void refresh() {
+		replaceRightWidget(myEntitiesBrowserWidget);
 	}
 	
 }

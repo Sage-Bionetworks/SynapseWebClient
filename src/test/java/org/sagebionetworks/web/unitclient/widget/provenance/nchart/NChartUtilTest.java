@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.transform.JsoProvider;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
@@ -50,27 +51,27 @@ public class NChartUtilTest {
 	
 	@Before
 	public void setup() {
-		jsoProvider = mock(JsoProvider.class);			
+		jsoProvider = mock(JsoProvider.class);
 		d1 = new EntityGraphNode("d1",null,null,null,null,null,false,false);		
 		d2 = new EntityGraphNode("d2",null,null,null,null,null,false,false);
 		d3 = new EntityGraphNode("d3",null,null,null,null,null,false,false);
 		d4 = new EntityGraphNode("d4",null,null,null,null,null,false,false);
 		d5 = new EntityGraphNode("d5",null,null,null,null,null,false,false);
 		d6 = new EntityGraphNode("d6",null,null,null,null,null,false,false);
-		a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,false);
-		b = new ActivityGraphNode("B","2","Step B", ActivityType.MANUAL,false);
-		c = new ActivityGraphNode("C","2","Step C", ActivityType.MANUAL,false);
-		d = new ActivityGraphNode("D","4","Step D", ActivityType.MANUAL,false);
+		a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL, "1", new Date(), false);
+		b = new ActivityGraphNode("B","2","Step B", ActivityType.MANUAL,"1", new Date(), false);
+		c = new ActivityGraphNode("C","2","Step C", ActivityType.MANUAL,"1", new Date(), false);
+		d = new ActivityGraphNode("D","4","Step D", ActivityType.MANUAL,"1", new Date(), false);
 	}
 	
 	/**
 	 * d1 and d2 starting 
-	 *    0   1 2 
-	 *    d1'   d3 
-	 *       \ /
-	 *        A
-	 *       / \
-	 *    d2'   d4
+	 *    0        1      2 
+	 *    d3'         --> d1 
+	 *       \      /
+	 *         --> A
+	 *       /      \
+	 *    d4'         --> d2
 	 *            
 	 */
 	@Test
@@ -81,12 +82,12 @@ public class NChartUtilTest {
 		graph.addNode(d2);
 		graph.addNode(d3);
 		graph.addNode(d4);		
-		graph.addEdge(new ProvGraphEdge(d1, a));
-		graph.addEdge(new ProvGraphEdge(d2, a));
-		graph.addEdge(new ProvGraphEdge(a, d3));
-		graph.addEdge(new ProvGraphEdge(a, d4));		
-		d1.setStartingNode(true);
-		d2.setStartingNode(true);
+		graph.addEdge(new ProvGraphEdge(d3, a));
+		graph.addEdge(new ProvGraphEdge(d4, a));
+		graph.addEdge(new ProvGraphEdge(a, d1));
+		graph.addEdge(new ProvGraphEdge(a, d2));		
+		d3.setStartingNode(true);
+		d4.setStartingNode(true);
 		
 		// execute
 		NChartLayersArrayTestImpl ncLayersArray = (NChartLayersArrayTestImpl) NChartUtil.createLayers(jsoProvider, graph);
@@ -110,8 +111,8 @@ public class NChartUtilTest {
 		// layer 0
 		layerIdx = 0;
 		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();		
-		assertTrue(layerNodes.contains(lnD1));
-		assertTrue(layerNodes.contains(lnD2));
+		assertTrue(layerNodes.contains(lnD3));
+		assertTrue(layerNodes.contains(lnD4));
 		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		// layer 1
 		layerIdx = 1;
@@ -121,8 +122,8 @@ public class NChartUtilTest {
 		// layer 2
 		layerIdx = 2;
 		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();
-		assertTrue(layerNodes.contains(lnD3));
-		assertTrue(layerNodes.contains(lnD4));
+		assertTrue(layerNodes.contains(lnD1));
+		assertTrue(layerNodes.contains(lnD2));
 		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
 		
 	}
@@ -243,11 +244,90 @@ public class NChartUtilTest {
 		
 	}
 
+	/**
+	 * d4 start, d1 used multiple times, ( -> denotes generatedBy or used)
+	 *    newer                 older
+	 *    0     1    2      3   4
+	 *            ------------> d1  
+	 *          /           /        
+	 *    d4 -> B -> d3 -> A -> d2
+	 *         
+	 *  Regression Test from SWC-580          
+	 */
+	@Test
+	public void testCreateLayersUsedMultipleTimes() {
+		jsoProvider = new JsoProviderTestImpl(); // use real classes
+		ProvGraph graph = new ProvGraph();		
+		graph.addNode(d1);
+		graph.addNode(d2);
+		graph.addNode(d3);
+		graph.addNode(d4);		
+		graph.addEdge(new ProvGraphEdge(d4, b));
+		graph.addEdge(new ProvGraphEdge(b, d1));		
+		graph.addEdge(new ProvGraphEdge(b, d3));
+		graph.addEdge(new ProvGraphEdge(d3, a));
+		graph.addEdge(new ProvGraphEdge(a, d1));
+		graph.addEdge(new ProvGraphEdge(a, d2));
+		d4.setStartingNode(true);		
+		
+		// execute
+		NChartLayersArrayTestImpl ncLayersArray = (NChartLayersArrayTestImpl) NChartUtil.createLayers(jsoProvider, graph);
+		
+		// verify
+		List<NChartLayer> layers = ncLayersArray.getLayers();		
+		NChartLayerNode lnD1 = NChartUtil.createEntityLayerNode(jsoProvider, d1);
+		NChartLayerNode lnD2 = NChartUtil.createEntityLayerNode(jsoProvider, d2);
+		NChartLayerNode lnD3 = NChartUtil.createEntityLayerNode(jsoProvider, d3);
+		NChartLayerNode lnD4 = NChartUtil.createEntityLayerNode(jsoProvider, d4);
+		List<ProvGraphNode> aConnectedNodes = new ArrayList<ProvGraphNode>();
+		aConnectedNodes.add(d1);
+		aConnectedNodes.add(d2);
+		aConnectedNodes.add(d3);
+		NChartLayerNodeTestImpl lnA = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(jsoProvider, a, aConnectedNodes);
+		List<ProvGraphNode> bConnectedNodes = new ArrayList<ProvGraphNode>();
+		bConnectedNodes.add(d1);
+		bConnectedNodes.add(d3);
+		bConnectedNodes.add(d4);
+		NChartLayerNodeTestImpl lnB = (NChartLayerNodeTestImpl) NChartUtil.createActivityLayerNode(jsoProvider, b, bConnectedNodes);
+
+		int layerIdx;
+		List<NChartLayerNode> layerNodes;		
+		
+		// layer 0
+		layerIdx = 0;
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();		
+		assertTrue(layerNodes.contains(lnD4));
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
+		// layer 1
+		layerIdx = 1;
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();		
+		assertChartLayerNodeEqual(lnB, (NChartLayerNodeTestImpl) layerNodes.get(0));		
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
+		// layer 2
+		layerIdx = 2;
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();
+		assertTrue(layerNodes.contains(lnD3));
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
+		// layer 3
+		layerIdx = 3;
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();		
+		assertChartLayerNodeEqual(lnA, (NChartLayerNodeTestImpl) layerNodes.get(0));		
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
+		// layer 4
+		layerIdx = 4;
+		layerNodes = ((NChartLayerTestImpl) layers.get(layerIdx)).getNodes();
+		assertTrue(layerNodes.contains(lnD1));
+		assertTrue(layerNodes.contains(lnD2));
+		assertEquals(DEFAULT_DURATION, ((NChartLayerTestImpl) layers.get(layerIdx)).getDuration());
+		
+	}
+	
+	
 	@Test
 	public void testCreateNChartCharacters() {
 		EntityGraphNode d1 = new EntityGraphNode("d1",null,null,null,null,null,false,false);		
 		EntityGraphNode d2 = new EntityGraphNode("d2",null,null,null,null,null,false,false);
-		ActivityGraphNode a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,false);
+		ActivityGraphNode a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,"1", new Date(), false);
 		Set<ProvGraphNode> graphNodes = new HashSet<ProvGraphNode>();
 		graphNodes.add(d1);
 		graphNodes.add(d2);
@@ -271,7 +351,7 @@ public class NChartUtilTest {
 	public void testCreateActivityLayerNode() {
 		EntityGraphNode d1 = new EntityGraphNode("d1",null,null,null,null,null,false,false);		
 		EntityGraphNode d2 = new EntityGraphNode("d2",null,null,null,null,null,false,false);
-		ActivityGraphNode a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,false);
+		ActivityGraphNode a = new ActivityGraphNode("A","1","Step A", ActivityType.MANUAL,"1", new Date(), false);
 		List<ProvGraphNode> graphNodes = new ArrayList<ProvGraphNode>();
 		graphNodes.add(d1);
 		graphNodes.add(d2);
@@ -335,8 +415,8 @@ public class NChartUtilTest {
 		assertTrue((int)(1*NChartUtil.SCALE_X) == d1.getxPos());
 		
 		assertTrue(0 == d2.getyPos());
-		assertTrue(100 == a.getyPos());
-		assertTrue(200 == d1.getyPos());
+		assertTrue((int)(100*NChartUtil.SCALE_Y) == a.getyPos());
+		assertTrue((int)(200*NChartUtil.SCALE_Y) == d1.getyPos());	
 	}
 	
 	/*

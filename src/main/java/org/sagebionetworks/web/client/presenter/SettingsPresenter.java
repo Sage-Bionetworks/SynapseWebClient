@@ -22,7 +22,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class SettingsPresenter extends AbstractActivity implements SettingsView.Presenter {
+public class SettingsPresenter extends AbstractActivity implements SettingsView.Presenter, Presenter<Settings> {
 		
 	private Settings place;
 	private SettingsView view;
@@ -58,6 +58,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		
 	}
 
+	@Override
 	public void setPlace(Settings place) {
 		this.place = place;
 		this.view.setPresenter(this);

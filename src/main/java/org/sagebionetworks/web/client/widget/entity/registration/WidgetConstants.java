@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.registration;
 
+
 public class WidgetConstants {
-	public static final String WIKI_OWNER_ID_ENTITY = "ENTITY";
-	public static final String WIKI_OWNER_ID_COMPETITION = "COMPETITION";
-	
 	public static final String YOUTUBE_CONTENT_TYPE = "youtube";
 	public static final String YOUTUBE_FRIENDLY_NAME = "YouTube";
 	
@@ -24,6 +22,15 @@ public class WidgetConstants {
 	
 	public static final String API_TABLE_CONTENT_TYPE = "supertable";
 	public static final String API_TABLE_FRIENDLY_NAME = "Super Table (Synapse API Based)";
+
+	public static final String ENTITYLIST_CONTENT_TYPE = "entitylist";
+	public static final String ENTITYLIST_FRIENDLY_NAME ="Entity List";
+	
+	public static final String SHINYSITE_CONTENT_TYPE = "iframe";
+	public static final String SHINYSITE_FRIENDLY_NAME ="Shiny Site";
+	
+	public static final String USERBADGE_CONTENT_TYPE = "userbadge";
+	public static final String USERBADGE_FRIENDLY_NAME ="User Badge";
 	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
@@ -37,9 +44,13 @@ public class WidgetConstants {
 	 * Widget parameter keys
 	 */
 	public static final String IMAGE_WIDGET_FILE_NAME_KEY = "fileName";
-	public static final String IMAGE_WIDGET_WIDTH_KEY = "width";
+	public static final String IMAGE_WIDGET_SCALE_KEY = "scale";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
-
+	public static final String IMAGE_WIDGET_SYNAPSE_ID_KEY = "synapseId";
+	public static final String FLOAT_NONE = "None";
+	public static final String FLOAT_LEFT = "Left";
+	public static final String FLOAT_RIGHT = "Right";
+	
 	@Deprecated
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
 	public static final String PROV_WIDGET_ENTITY_LIST_KEY = "entityList";
@@ -55,14 +66,16 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY = "showRowNumber";
 	public static final String API_TABLE_WIDGET_RESULTS_KEY = "jsonResultsKeyName";
 	public static final String API_TABLE_WIDGET_CSS_STYLE = "cssStyle";
+	public static final String API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX = "columnConfig";
 	public static final String API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY = "rowNumberDisplayName";
 	public static final String API_TABLE_WIDGET_WIDTH_KEY = "width";
 	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
-	public static final String API_TABLE_WIDGET_COLUMNS_KEY = "columns";
-	public static final String API_TABLE_WIDGET_DISPLAY_COLUMN_NAMES_KEY = "displayNames";
-	public static final String API_TABLE_WIDGET_RENDERERS_KEY = "renderers";
+	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
+	public static final String USERBADGE_WIDGET_ID_KEY = "id";
 	
-	
+	public static final String SHINYSITE_SITE_KEY = "site";	
+	public static final String SHINYSITE_HEIGHT_KEY = "height";
+	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
 	/**
 	 * API Table Column Renderers
@@ -72,6 +85,8 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_DATE = "date";
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
+	
 	public static final String MARKDOWN_HEADING_ID_PREFIX = "synapseheading";
+	public static final String MARKDOWN_TABLE_ID_PREFIX = "markdown-table-";
 
 }

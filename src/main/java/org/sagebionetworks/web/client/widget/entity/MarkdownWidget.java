@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -46,11 +47,11 @@ public class MarkdownWidget extends LayoutContainer {
 	 * @param attachmentBaseUrl if null, will use file handles
 	 */
 	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isWiki, final boolean isPreview) {
-		this.removeAll();
 		synapseClient.markdown2Html(md, isPreview, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
+					removeAll();
 					HTMLPanel panel;
 					if(result == null || "".equals(result)) {
 				    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%;margin-bottom:30px\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>"));
@@ -62,6 +63,7 @@ public class MarkdownWidget extends LayoutContainer {
 					add(panel);
 					layout();
 					synapseJSNIUtils.highlightCodeBlocks();
+					DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
 					//asynchronously load the widgets
 					loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview);
 				} catch (JSONObjectAdapterException e) {
@@ -70,6 +72,7 @@ public class MarkdownWidget extends LayoutContainer {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				removeAll();
 				showErrorMessage(DisplayConstants.ERROR_LOADING_MARKDOWN_FAILED+caught.getMessage());
 			}
 		});
@@ -87,10 +90,10 @@ public class MarkdownWidget extends LayoutContainer {
 	 * @throws JSONObjectAdapterException 
 	 */
 	public static void loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, boolean isWiki, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, IconsImageBundle iconsImageBundle, Boolean isPreview) throws JSONObjectAdapterException {
-		final String suffix = isPreview ? DisplayConstants.DIV_ID_PREVIEW_SUFFIX : "";
+		final String suffix = isPreview ? WebConstants.DIV_ID_PREVIEW_SUFFIX : "";
 		//look for every element that has the right format
 		int i = 0;
-		String currentWidgetDiv = DisplayConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+		String currentWidgetDiv = WebConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 		Element el = panel.getElementById(currentWidgetDiv);
 		while (el != null) {
 				//based on the contents of the element, create the correct widget descriptor and renderer
@@ -102,16 +105,19 @@ public class MarkdownWidget extends LayoutContainer {
 						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
 						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, isWiki);
 						if (presenter == null)
-							throw new IllegalArgumentException("unable to render widget from the specified markdown:" + innerText);
+							throw new IllegalArgumentException("Unable to render widget from the specified markdown.");
 						panel.add(presenter.asWidget(), currentWidgetDiv);
-					}catch(IllegalArgumentException e) {
+					}catch(Throwable e) {
 						//try our best to load all of the widgets. if one fails to load, then fail quietly.
-						panel.add(new HTMLPanel(DisplayUtils.getIconHtml(iconsImageBundle.error16()) + innerText), currentWidgetDiv);
+						String message = innerText;
+						if (e.getMessage() != null)
+							message += "<br>" + e.getMessage();
+						panel.add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(message)), currentWidgetDiv);
 					}
 				}
 			
 			i++;
-			currentWidgetDiv = DisplayConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+			currentWidgetDiv = WebConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 			el = panel.getElementById(currentWidgetDiv);
 		}
 	}

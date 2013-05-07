@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.provenance;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -7,7 +10,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,8 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import javax.validation.constraints.AssertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,9 @@ import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -37,9 +39,9 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.JsoProvider;
@@ -60,12 +62,12 @@ import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTestImpl;
 
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class ProvenanceWidgetTest {
 		
@@ -85,7 +87,7 @@ public class ProvenanceWidgetTest {
 	String referenceListJSON;
 	String referenceHeadersJSON;
 	Exception someException = new Exception();
-	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
+	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	JsoProvider jsoProvider;
 	Map<String, String> descriptor;
 	Activity act;
@@ -123,7 +125,7 @@ public class ProvenanceWidgetTest {
 		header456.setVersionNumber(ref456.getTargetVersionNumber());
 		UsedEntity ue = new UsedEntity();
 		ue.setReference(ref456);
-		Set<UsedEntity> used = new HashSet<UsedEntity>();
+		Set<Used> used = new HashSet<Used>();
 		used.add(ue);
 		act.setUsed(used);
 		ReferenceList referenceList = new ReferenceList();
@@ -378,6 +380,40 @@ public class ProvenanceWidgetTest {
 			
 			@Override
 			public void setPageTitle(String newTitle) {};
+			
+			@Override
+			public void tablesorter(String id) {}
+			@Override
+			public boolean isDirectUploadSupported() {
+				return false;
+			}
+			@Override
+			public String getContentType(String fileFieldId) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public void uploadFile(String fileFieldId, String url,
+					XMLHttpRequest xhr, ProgressCallback progressCallback) {
+				// TODO Auto-generated method stub
+			}
+			@Override
+			public double getFileSize(String fileFieldId) {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public void uploadUrlToGenomeSpace(String url) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void uploadUrlToGenomeSpace(String url, String filename) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 

@@ -80,6 +80,11 @@
 	padding: 10px;
 }
 
+.mainPageLoading {
+	border: 0;
+	padding: 10px;
+}
+
 .boldRight {
 	text-align: left;
 	width: 100px;
@@ -98,7 +103,17 @@
   transition:.2s; }
 .headerLink:hover { color: #BC3226; text-decoration:none; }
 
-.headerUsernameLink { font-weight: bold; color: #6e6e6e !important; padding: 0px 2px 0px 0px; text-align: left;}
+.headerUsernameLink { 
+	font-weight: bold; 
+	color: #6e6e6e !important; 
+	padding: 0px 2px 0px 0px; 
+	text-align: left;
+}
+
+.usernameLink { 
+	padding: 0px 2px 0px 0px; 
+	text-align: left;
+}
 
 /* Removes annoying FireFox dotted border */
 :focus {
@@ -108,6 +123,14 @@
 .imageButton, .gwt-Anchor, .previewDisclosureFace {
 	cursor: pointer;
 	cursor: hand;
+}
+
+.userProfileImage {
+	margin:auto; 
+	display:block;
+	border-radius: 3px;
+	margin-right: 5px;
+	box-shadow: 0 1px 2px #000000;
 }
 
 /* Search loading image */
@@ -161,7 +184,6 @@
 	padding: 5px 8px 5px 8px;
 	overflow-x: auto;
 }	
-	
 	
 .suggestSearchTerm {
 	color: #7a0402;
@@ -337,24 +359,6 @@ a.shortBtn {
   background-image: url(/images/icons/list-trigger.gif);
 }
 
-.red-shield {
-	background-image: url(images/icons/shield-red-16.png);
-	width: 16px;
-	height: 16px;
-}
-
-.yellow-shield {
-	background-image: url(images/icons/shield-yellow-16.png);
-	width: 16px;
-	height: 16px;
-}
-
-.green-shield {
-	background-image: url(images/icons/shield-green-16.png);
-	width: 16px;
-	height: 16px;
-}
-
 .image-loading {
 	 background: white url(images/ui-anim_basic_16x16.gif) no-repeat center center;
 }
@@ -393,6 +397,11 @@ a.shortBtn {
 	float: left;
 }
 
+.floatright {
+	float: right;
+}
+
+
 .clearleft {
 	clear:left;	
 }
@@ -422,6 +431,11 @@ a.shortBtn {
 .margin-right-5 {
 	margin-right: 5px;
 }
+
+.margin-right-10 {
+	margin-right: 10px;
+}
+
 
 .user-profile-edit-table td {
 	padding-bottom: 5px;
@@ -491,10 +505,43 @@ a.shortBtn {
 .margin-left-725 {
 	margin-left: 725px;
 }
+
+.file-preview {
+    position: relative;
+    margin: 15px 0;
+    padding: 39px 19px 14px;
+    background-color: white;
+    border: 1px solid #DDD;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+}
+ 
+.file-preview::after {
+    content: "Preview";
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    background-color: whiteSmoke;
+    border: 1px solid #DDD;
+    color: #9DA0A4;
+    -webkit-border-radius: 4px 0 4px 0;
+    -moz-border-radius: 4px 0 4px 0;
+    border-radius: 4px 0 4px 0;
+}
+
+
 .markdown {
 	word-wrap:break-word;
 	overflow: hidden;
 	text-align: justify;
+}
+.markdown div{
+	overflow-x: auto;
 }
 
 .markdown ol { 
@@ -507,17 +554,12 @@ a.shortBtn {
 }
 .markdown strong { font-weight: bold; }
 .markdown em { font-style: italic; }
-a.auto-detected-synapse-link, a.auto-detected-synapse-link:hover, a.auto-detected-synapse-link:visited {}
-a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
 .markdown a, a:hover, a:visited {}
 .markdown blockquote {
 	margin: 1em 3em;
 	padding: .5em 1em;
 	border-left: 5px solid #fce27c;
 	background-color: #f6ebc1; }
-.markdown img {
-	max-width: 940px;
-}
 
 .markdown code {
 	background-clip: padding-box;
@@ -526,11 +568,19 @@ a.auto-detected-url, a.auto-detected-url:hover, a.auto-detected-url:visited {}
     color: #666666;
     font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
     font-family: Courier,monospace;
-    padding: 0 5px 2px
+    padding: 0 5px 2px;
+    overflow:auto;
+    white-space:pre;
+}
+
+.apitable label {
+	margin-left:5px;
+	display:inline;
 }
 
 .wiki-description {
-	color: #666666;
+	color: #000000;
+	font-size: 13px;
 }
 
 .entity-description-preview-wrapper {
@@ -590,17 +640,15 @@ h1, h2, h3, h4, h5, h6 {
 	overflow: auto;
 }
 
-.metadata-tag {
-	float:left; 
-	margin-right: 5px;  
-	background-color: #f3f3f3; 
-	padding: 2px 4px 2px 4px;		
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	-moz-border-radius: 4px;	
+.markdown {
+	color: #000000;
 }
 
-.markdown table {
+.markdown p {
+	margin: 0px;
+}
+
+.markdowntable {
   border: 1px solid #dddddd;
   border-collapse: separate;
   *border-collapse: collapsed;
@@ -610,43 +658,43 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 4px;
 }
 
-.markdown table td {
+.markdowntable td {
   border-left: 1px solid #dddddd;
   border-top: 1px solid #dddddd;
   padding: 2px 4px;
 }
-.markdown table th {
+.markdowntable th {
   border-left: 1px solid #dddddd;
   border-top: 1px solid #dddddd;
   padding: 2px 4px;
   font-weight: bold;
 }
 
-.markdown table caption + thead tr:first-child th,
-.markdown table caption + tbody tr:first-child th,
-.markdown table caption + tbody tr:first-child td,
-.markdown table colgroup + thead tr:first-child th,
-.markdown table colgroup + tbody tr:first-child th,
-.markdown table colgroup + tbody tr:first-child td,
-.markdown table thead:first-child tr:first-child th,
-.markdown table tbody:first-child tr:first-child th,
-.markdown table tbody:first-child tr:first-child td {
+.markdowntable caption + thead tr:first-child th,
+.markdowntable caption + tbody tr:first-child th,
+.markdowntable caption + tbody tr:first-child td,
+.markdowntable colgroup + thead tr:first-child th,
+.markdowntable colgroup + tbody tr:first-child th,
+.markdowntable colgroup + tbody tr:first-child td,
+.markdowntable thead:first-child tr:first-child th,
+.markdowntable tbody:first-child tr:first-child th,
+.markdowntable tbody:first-child tr:first-child td {
   border-top: 0;
 }
-.markdown table thead:first-child tr:first-child th:first-child,
-.markdown table tbody:first-child tr:first-child td:first-child {
+.markdowntable thead:first-child tr:first-child th:first-child,
+.markdowntable tbody:first-child tr:first-child td:first-child {
   -webkit-border-top-left-radius: 4px;
   border-top-left-radius: 4px;
   -moz-border-radius-topleft: 4px;
 }
-.markdown table thead:first-child tr:first-child th:last-child,
-.markdown table tbody:first-child tr:first-child td:last-child {
+.markdowntable thead:first-child tr:first-child th:last-child,
+.markdowntable tbody:first-child tr:first-child td:last-child {
   -webkit-border-top-right-radius: 4px;
   border-top-right-radius: 4px;
   -moz-border-radius-topright: 4px;
 }
-.markdown table thead:last-child tr:last-child th:first-child,
-.markdown table tbody:last-child tr:last-child td:first-child {
+.markdowntable thead:last-child tr:last-child th:first-child,
+.markdowntable tbody:last-child tr:last-child td:first-child {
   -webkit-border-radius: 0 0 0 4px;
   -moz-border-radius: 0 0 0 4px;
   border-radius: 0 0 0 4px;
@@ -654,8 +702,8 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom-left-radius: 4px;
   -moz-border-radius-bottomleft: 4px;
 }
-.markdown table thead:last-child tr:last-child th:last-child,
-.markdown table tbody:last-child tr:last-child td:last-child {
+.markdowntable thead:last-child tr:last-child th:last-child,
+.markdowntable tbody:last-child tr:last-child td:last-child {
   -webkit-border-bottom-right-radius: 4px;
   border-bottom-right-radius: 4px;
   -moz-border-radius-bottomright: 4px;
@@ -709,6 +757,10 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 940px;
 }
 
+.max-height-200 {
+	max-height: 200px;
+}
+
 .wikifilepreview {
 	width: 940px;
 }
@@ -739,12 +791,11 @@ h1, h2, h3, h4, h5, h6 {
 	background-color: #bfbfbf; 
 	text-decoration:none; 
 }
+
 .sidebarMenu:hover { 
 	background-color: #efefef; 
 	text-decoration:none; 
 }
-
-	
 
 .gwt-TreeItem-selected {
   background: #ffffff !important;
@@ -773,3 +824,80 @@ h1, h2, h3, h4, h5, h6 {
 	font-size: 0.9em;
 	margin-left: 30px;
 }	
+
+strong {
+	font-weight: bold;
+}
+.underline {
+	text-decoration: underline;
+}
+ol.decimal {	
+	list-style: decimal outside;
+	padding: 0 0 0 30px;
+}
+ol.loweralpha {	
+	list-style: lower-alpha outside;
+	padding: 0 0 0 30px;
+}
+ol.lowerroman {	
+	list-style: lower-roman outside;
+	padding: 0 0 0 30px;
+}
+.blackText {
+	color: #000000;
+}
+
+.pagesTree img{
+	padding-right:7px;
+}
+
+.pagesTree a{
+	font-family: Verdana,Arial,sans-serif;
+	font-size: 13px;
+}
+.padding-top-15 {
+	padding-top: 15px;
+}
+.howToUseLink {
+	font-size: 16px;
+	font-style: normal !important;
+}
+.whatIsSynapseText {
+	font-size: 13px;
+}
+
+
+.form-signin {
+  max-width: 300px;
+  padding: 19px 29px 29px;
+  margin: 0 auto 20px;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  -webkit-border-radius: 5px;
+     -moz-border-radius: 5px;
+          border-radius: 5px;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+          box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+
+.form-signinInput {
+  font-size: 16px;
+  height: auto;
+  margin-bottom: 15px;
+  padding: 7px 9px;
+}
+
+.form-inputButton {
+	margin-bottom:6px !important;
+}
+
+.displayInline {
+	display: inline;
+}
+
+.smallerText {
+	font-size: 0.8em;
+}
+
+

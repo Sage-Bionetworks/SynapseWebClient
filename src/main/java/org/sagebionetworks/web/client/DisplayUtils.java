@@ -17,7 +17,6 @@ import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -32,10 +31,11 @@ import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.search.query.KeyValue;
-import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -46,6 +46,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
@@ -53,11 +54,12 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
-import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -66,19 +68,21 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -103,15 +107,21 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
 
+	public static final String HELP_EMAIL_ADDRESS = "synapseInfo@sagebase.org";
+	public static final String HELP_EMAIL_ADDRESS_LINK = "<a href=\""+ DisplayUtils.HELP_EMAIL_ADDRESS +"\" class=\"link\">contact us</a>";
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
 	public static final String SUPPORT_FEED_URL = "http://api.getsatisfaction.com/companies/sagebase/topics/";
 	public static final String SUPPORT_RECENT_ACTIVITY_URL = "http://support.sagebase.org/sagebase?view=recent";
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
+	public static final String USER_GUIDE_ID = "syn1669771";
+	
 	public static final String BCC_CONTENT_PAGE_ID = "24084517";
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
@@ -154,37 +164,22 @@ public class DisplayUtils {
 
 	
 	private static final String ERROR_OBJ_REASON_KEY = "reason";
-	public static final String ENTITY_PARENT_ID_KEY = "parentId";
-	public static final String ENTITY_EULA_ID_KEY = "eulaId";
-	public static final String ENTITY_PARAM_KEY = "entityId";
-	public static final String ENTITY_VERSION_PARAM_KEY = "version";
-	public static final String WIKI_OWNER_ID_PARAM_KEY = "ownerId";
-	public static final String WIKI_OWNER_TYPE_PARAM_KEY = "ownerType";
-	public static final String WIKI_ID_PARAM_KEY = "wikiId";
-	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
-	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
-	public static final String FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY = "createFileEntity";
-	public static final String FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY = "fileEntityParentId";
-	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
-	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
-	public static final String USER_PROFILE_PARAM_KEY = "userId";
-	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
-	public static final String WAIT_FOR_URL = "waitForUrl";
-	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "createdByPrincipalId";
-	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
-	public static final String ETAG_KEY = "etag";
-	public static final String ENTITY_VERSION_STRING = "/version/";
-	
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
 	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
 	public static final int BIG_BUTTON_HEIGHT_PX = 36;
+	private static final int MARKDOWN_WIDTH_WIDE_PX = 940;
+	private static final int MARKDOWN_WIDTH_NARROW_PX = 660;
+
 	
 	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
 	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
 	
-	private static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
+	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/gif","image/png"};
+	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
+	
+	public static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
 	/**
 	 * Sometimes we are forced to use a table to center an image in a fixed space. 
@@ -205,24 +200,10 @@ public class DisplayUtils {
 	public static final String STYLE_SMALL_SEARCHBOX = "smallsearchbox";
 	public static final String STYLE_OTHER_SEARCHBOX = "othersearchbox";
 	public static final String STYLE_BREAK_WORD = "break-word";
-
-
-	/*
-	 * Search
-	 */
-	public final static String SEARCH_KEY_NODE_TYPE = "node_type";
-	public final static String SEARCH_KEY_SPECIES = "species";
-	public final static String SEARCH_KEY_DISEASE = "disease";
-	public final static String SEARCH_KEY_MODIFIED_ON = "modified_on";
-	public final static String SEARCH_KEY_CREATED_ON = "created_on";
-	public final static String SEARCH_KEY_TISSUE = "tissue";
-	public final static String SEARCH_KEY_NUM_SAMPLES = "num_samples";
-	public final static String SEARCH_KEY_CREATED_BY = "created_by";
-	public final static List<String> FACETS_DISPLAY_ORDER = Arrays
-			.asList(new String[] { SEARCH_KEY_NODE_TYPE, SEARCH_KEY_SPECIES,
-					SEARCH_KEY_DISEASE, SEARCH_KEY_MODIFIED_ON,
-					SEARCH_KEY_CREATED_ON, SEARCH_KEY_TISSUE,
-					SEARCH_KEY_NUM_SAMPLES, SEARCH_KEY_CREATED_BY });
+	public static final String STYLE_WHITE_BACKGROUND = "whiteBackground";
+	public static final String STYLE_DISPLAY_INLINE = "inline-block";
+	public static final String STYLE_BLACK_TEXT = "blackText";
+	
 	public static final String UPLOAD_SUCCESS = "Upload Success";
 	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
@@ -231,26 +212,6 @@ public class DisplayUtils {
 			Analysis.class.getName(), Step.class.getName(), 
 			RObject.class.getName(), PhenotypeData.class.getName(), 
 			ExpressionData.class.getName(),	GenotypeData.class.getName() };
-	
-	public static SearchQuery getDefaultSearchQuery() {		
-		SearchQuery query = new SearchQuery();
-		// start with a blank, valid query
-		query.setQueryTerm(Arrays.asList(new String[] {""}));		
-		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));
-		
-		// exclude links
-		List<KeyValue> bq = new ArrayList<KeyValue>();
-		KeyValue kv = new KeyValue();
-		kv.setKey("node_type");
-		kv.setValue("link");
-		kv.setNot(true);
-		bq.add(kv);
-		query.setBooleanQuery(bq);
-		
-		query.setFacet(FACETS_DISPLAY_ORDER);
-		
-		return query;
-	}
 	
 	/**
 	 * Returns a properly aligned icon from an ImageResource
@@ -601,6 +562,14 @@ public class DisplayUtils {
 		return title;
 	}
 	
+	public static String getMarkdownWidgetWarningHtml(String warningText) {
+		return getWarningHtml(DisplayConstants.MARKDOWN_WIDGET_WARNING, warningText);
+	}
+	
+	public static String getWarningHtml(String title, String warningText) {
+		return "<div class=\"alert alert-block\"><strong>"+ title + "</strong><br/> " + warningText + "</div>";
+	}
+	
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}
@@ -611,10 +580,15 @@ public class DisplayUtils {
 		return ISODateTimeFormat.dateTime().print(dt);
 	}
 	
+	/**
+	 * YYYY-MM-DD HH:mm:ss
+	 * @param toFormat
+	 * @return
+	 */
 	public static String converDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
 		DateTime dt = new DateTime(toFormat.getTime());
-		return ISODateTimeFormat.dateTime().print(dt);		
+		return ISODateTimeFormat.dateHourMinuteSecond().print(dt).replaceAll("T", " ");		
 	}
 	
 	
@@ -651,7 +625,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryToken(String entityId) {
-		return "#!" + getSynapseHistoryTokenNoHash(entityId, null);
+		return "#" + getSynapseHistoryTokenNoHash(entityId, null);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId) {
@@ -659,14 +633,20 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryToken(String entityId, Long versionNumber) {
-		return "#!" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
+		return "#" + getSynapseHistoryTokenNoHash(entityId, versionNumber);
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
 		Synapse place = new Synapse(entityId, versionNumber);
-		return getPlaceString(Synapse.class) + ":" + place.toToken();
+		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
+	/**
+	 * Stub the string removing the last partial word
+	 * @param str
+	 * @param length
+	 * @return
+	 */
 	public static String stubStr(String str, int length) {
 		if(str == null) {
 			return "";
@@ -678,6 +658,22 @@ public class DisplayUtils {
 		return str; 
 	}
 
+	/**
+	 * Stub the string with partial word at end left in 
+	 * @param contents
+	 * @param maxLength
+	 * @return
+	 */
+	public static String stubStrPartialWord(String contents, int maxLength) {
+		String stub = contents;
+		if(contents != null && contents.length() > maxLength) {
+			stub = contents.substring(0, maxLength-3);
+			stub += " ..";
+		}
+		return stub; 
+	}
+
+	
 	
 	/*
 	 * Private methods
@@ -862,7 +858,7 @@ public class DisplayUtils {
 		attachmentMap.put("bmp", DEFAULT_IMAGE_ICON);
 		attachmentMap.put("wbmp", DEFAULT_IMAGE_ICON);
 	}
-
+	
 	/**
 	 * Get the icon to be used with a given file type.
 	 */
@@ -908,7 +904,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createAttachmentUrl(String baseURl, String entityId, String tokenId, String fileName){
-		return createAttachmentUrl(baseURl, entityId, tokenId, fileName, DisplayUtils.ENTITY_PARAM_KEY);
+		return createAttachmentUrl(baseURl, entityId, tokenId, fileName, WebConstants.ENTITY_PARAM_KEY);
 	}
 	
 
@@ -921,7 +917,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String tokenId, String fileName){
-		return createAttachmentUrl(baseURl, userId, tokenId, fileName, DisplayUtils.USER_PROFILE_PARAM_KEY);
+		return createAttachmentUrl(baseURl, userId, tokenId, fileName, WebConstants.USER_PROFILE_PARAM_KEY);
 	}
 	
 	/**
@@ -937,9 +933,9 @@ public class DisplayUtils {
 		builder.append(baseURl);
 		builder.append("?"+paramKey+"=");
 		builder.append(id);
-		builder.append("&"+DisplayUtils.TOKEN_ID_PARAM_KEY+"=");
+		builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
-		builder.append("&"+DisplayUtils.WAIT_FOR_URL+"=true");
+		builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
 		return builder.toString();
 	}
 	
@@ -1022,7 +1018,8 @@ public class DisplayUtils {
 	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
 		final Element el = widget.getElement();
 
-		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId(); 
+		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId();
+		el.setId(id);
 		optionsMap.put("id", id);
 		optionsMap.put("rel", "tooltip");
 
@@ -1199,7 +1196,7 @@ public class DisplayUtils {
 		}
 		return videoId;
 	}
-
+	
 	public static Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
 		Anchor anchor = new Anchor();
 		anchor.setHTML(icon.getHTML());
@@ -1254,23 +1251,29 @@ public class DisplayUtils {
 	 * @param entityType 
 	 */
 	public static Widget getUploadButton(final EntityBundle entityBundle,
-			EntityType entityType, final Uploader locationableUploader,
+			EntityType entityType, final Uploader uploader,
 			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
 		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 		uploadButton.setHeight(25);
 		final Window window = new Window();  
-		locationableUploader.clearHandlers();
+		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		}));
+		uploader.clearHandlers();
 		// add user defined handler
-		locationableUploader.addPersistSuccessHandler(handler);
+		uploader.addPersistSuccessHandler(handler);
 		
 		// add handlers for closing the window
-		locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
+		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				window.hide();
 			}
 		});
-		locationableUploader.addCancelHandler(new CancelHandler() {				
+		uploader.addCancelHandler(new CancelHandler() {				
 			@Override
 			public void onCancel(CancelEvent event) {
 				window.hide();
@@ -1281,12 +1284,12 @@ public class DisplayUtils {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				window.removeAll();
-				window.setSize(400, 320);
+				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 				window.setPlain(true);
 				window.setModal(true);		
 				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 				window.setLayout(new FitLayout());			
-				window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+				window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
 				window.show();
 			}
 		});
@@ -1326,7 +1329,7 @@ public class DisplayUtils {
 		}
 	}
 	
-	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
+	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";	
 
 	/**
 		 * Create the url to a wiki filehandle.
@@ -1345,31 +1348,36 @@ public class DisplayUtils {
 //				+"/wiki/" 
 //				+wikiKey.getWikiPageId()
 //				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
-		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
+		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
 
 			//if preview, then avoid cache
 			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
 		return baseFileHandleUrl + "?" +
-				WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
-				WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
-				WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
-					FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
+				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
+				WebConstants.WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
+					WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
 					wikiIdParam + nocacheParam;
 	}
 		
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
+	}
+
 	/**
 	 * Create the url to a FileEntity filehandle.
 	 * @param baseURl
 	 * @param entityid
 	 * @return
 	 */
-	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
-		String versionParam = versionNumber == null ? "" : "&" + ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
+		String versionParam = versionNumber == null ? "" : "&" + WebConstants.ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
 		//if preview, then avoid cache
 		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
 		return baseFileHandleUrl + "?" +
-				ENTITY_PARAM_KEY + "=" + entityId + "&" +
-				FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
+				WebConstants.ENTITY_PARAM_KEY + "=" + entityId + "&" +
+				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
+				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
 				versionParam + nocacheParam;
 	}
 
@@ -1379,12 +1387,12 @@ public class DisplayUtils {
 	
 	public static String createEntityVersionString(String id, Long version) {
 		if(version != null)
-			return id+ENTITY_VERSION_STRING+version;
+			return id+WebConstants.ENTITY_VERSION_STRING+version;
 		else 
 			return id;		
 	}
 	public static Reference parseEntityVersionString(String entityVersion) {
-		String[] parts = entityVersion.split(ENTITY_VERSION_STRING);
+		String[] parts = entityVersion.split(WebConstants.ENTITY_VERSION_STRING);
 		Reference ref = null;
 		if(parts.length > 0) {
 			ref = new Reference();
@@ -1399,18 +1407,119 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isWikiSupportedType(Entity entity) {
-		//TODO: add Folder and Project once they are migrated (description goes to Wiki markdown, attachments to wiki FileHandles)
-		return (entity instanceof FileEntity);
+		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project); 
+	}
+		
+	public static boolean isRecognizedImageContentType(String contentType) {
+		String lowerContentType = contentType.toLowerCase();
+		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
 	}
 	
-	public static boolean hasRecognizedImageExtension(String fileName) {
-		String lowerFileName = fileName.toLowerCase();
-		return lowerFileName.endsWith(".png") ||
-				lowerFileName.endsWith(".jpg") ||
-				lowerFileName.endsWith(".jpeg") ||
-				lowerFileName.endsWith(".tiff") ||
-				lowerFileName.endsWith(".gif") ||
-				lowerFileName.endsWith(".bmp");
+	public static boolean isTextType(String contentType) {
+		return contentType.toLowerCase().startsWith("text/");
 	}
 	
+	public static boolean isCSV(String contentType) {
+		return contentType.toLowerCase().startsWith("text/csv");
+	}
+
+	/**
+	 * Return a preview filehandle associated with this bundle (or null if unavailable)
+	 * @param bundle
+	 * @return
+	 */
+	public static PreviewFileHandle getPreviewFileHandle(EntityBundle bundle) {
+		PreviewFileHandle fileHandle = null;
+		if (bundle.getFileHandles() != null) {
+			for (FileHandle fh : bundle.getFileHandles()) {
+				if (fh instanceof PreviewFileHandle) {
+					fileHandle = (PreviewFileHandle) fh;
+					break;
+				}
+			}
+		}
+		return fileHandle;
+	}
+
+	/**
+	 * Return the filehandle associated with this bundle (or null if unavailable)
+	 * @param bundle
+	 * @return
+	 */
+	public static FileHandle getFileHandle(EntityBundle bundle) {
+		FileHandle fileHandle = null;
+		if (bundle.getFileHandles() != null) {
+			FileEntity entity = (FileEntity)bundle.getEntity();
+			String targetId = entity.getDataFileHandleId();
+			for (FileHandle fh : bundle.getFileHandles()) {
+				if (fh.getId().equals(targetId)) {
+					fileHandle = fh;
+					break;
+				}
+			}
+		}
+		return fileHandle;
+	}
+
+	public interface SelectedHandler<T> {
+		public void onSelected(T selected);		
+	}
+	
+	public static void configureAndShowEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
+		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
+		window.setPlain(true);
+		window.setModal(true);
+		window.setHeading(DisplayConstants.FIND_ENTITIES);
+		window.setLayout(new FitLayout());
+		window.add(entityFinder.asWidget(), new FitData(4));				
+		window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				Reference selected = entityFinder.getSelectedEntity();
+				handler.onSelected(selected);
+			}
+		}));
+		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		}));
+		window.setButtonAlign(HorizontalAlignment.RIGHT);
+		window.show();
+		entityFinder.refresh();
+	}
+
+	public static void loadTableSorters(final HTMLPanel panel, SynapseJSNIUtils synapseJSNIUtils) {
+		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
+		int i = 0;
+		Element table = panel.getElementById(id + i);
+		while (table != null) {
+			synapseJSNIUtils.tablesorter(id+i);
+			i++;
+			table = panel.getElementById(id + i);
+		}
+	}
+
+	public static Widget getShareSettingsDisplay(String prefix, boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
+		if(prefix == null) prefix = "";
+		final SimplePanel lc = new SimplePanel();
+		lc.addStyleName(STYLE_DISPLAY_INLINE);
+		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
+		String description = isPublic ? DisplayConstants.PUBLIC_ACL_ENTITY_PAGE : DisplayConstants.PRIVATE_ACL_ENTITY_PAGE;
+		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
+
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(prefix + "<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
+		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
+
+		//form the html
+		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
+		htmlPanel.addStyleName("inline-block");
+		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
+		lc.add(htmlPanel);
+
+		return lc;
+	}
+		
 }

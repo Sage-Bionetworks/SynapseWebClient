@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.search;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -15,6 +16,7 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.SearchQueryUtils;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,6 +32,8 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 	private Entity entity;
 	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
+	
+	private boolean searchAll = false;
 	
 	@Inject
 	public HomeSearchBox(HomeSearchBoxView view, 
@@ -60,7 +64,16 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 	}
     
 	@Override
-	public void search(String value) {		
+	public void search(String value) {
+		if(searchAll) {
+			SearchQuery query = SearchQueryUtils.getAllTypesSearchQuery();
+			query.setQueryTerm(Arrays.asList(value.split(" ")));
+			try {
+				value = query.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
+			} catch (JSONObjectAdapterException e) {
+				// if fail, fall back on regular search
+			}
+		}
 		globalApplicationState.getPlaceChanger().goTo(new Search(value));
 	}
 
@@ -84,15 +97,20 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("code"));
 	}
 	
+	@Override
+	public void setSearchAll(boolean searchAll) {
+		this.searchAll = searchAll;
+	}
+	
 	/*
 	 * Private Methods
 	 */
 	private String getSearchQueryForType(String entityType) {
 		String json = null;
-		SearchQuery query = DisplayUtils.getDefaultSearchQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		ArrayList<KeyValue> bq = new ArrayList<KeyValue>();
 		KeyValue kv = new KeyValue();
-		kv.setKey(DisplayUtils.SEARCH_KEY_NODE_TYPE);				
+		kv.setKey(SearchQueryUtils.SEARCH_KEY_NODE_TYPE);				
 		kv.setValue(entityType); 
 		bq.add(kv);
 		query.setBooleanQuery(bq);

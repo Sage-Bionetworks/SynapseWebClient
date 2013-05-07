@@ -33,6 +33,7 @@ import org.sagebionetworks.web.server.servlet.FileUpload;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.unitserver.TestUtils;
 
 import com.sun.istack.logging.Logger;
@@ -93,8 +94,8 @@ public class FileUploadTest {
 		when(mockRequest.getInputStream()).thenReturn(inputStream);
 		when(mockRequest.getContentLength()).thenReturn(1);
 		when(mockRequest.getCharacterEncoding()).thenReturn("UTF-8");
-		when(mockRequest.getParameter(DisplayUtils.ENTITY_PARAM_KEY)).thenReturn(entityId);
-		when(mockRequest.getParameter(DisplayUtils.IS_RESTRICTED_PARAM_KEY)).thenReturn("true");
+		when(mockRequest.getParameter(WebConstants.ENTITY_PARAM_KEY)).thenReturn(entityId);
+		when(mockRequest.getParameter(WebConstants.IS_RESTRICTED_PARAM_KEY)).thenReturn("true");
 		hasNext = true;
 		
 		// setup response
@@ -135,7 +136,7 @@ public class FileUploadTest {
 	@Test(expected=RuntimeException.class)
 	public void testDoPostNoEntityIdParam() throws Exception {		
 		// set parameter to null
-		when(mockRequest.getParameter(DisplayUtils.ENTITY_PARAM_KEY)).thenReturn(null);
+		when(mockRequest.getParameter(WebConstants.ENTITY_PARAM_KEY)).thenReturn(null);
 				
 		servlet.doPost(mockRequest, mockResponse);
 	}

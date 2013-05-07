@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.CancelEvent;
@@ -32,14 +33,27 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.xhr.client.ReadyStateChangeHandler;
+import com.google.gwt.xhr.client.XMLHttpRequest;
 import com.google.inject.Inject;
 
+/**
+ * This Uploader class supports 3 use cases:
+ * A. Legacy data types (like the Data Entity): Uploads to the FileUpload servlet, using the Form submit (POST).  @see org.sagebionetworks.web.server.servlet.FileUpload
+ * B. File Entity, older client browser: Uploads to the FileHandleServlet servlet, using the Form submit (POST).  @see org.sagebionetworks.web.server.servlet.FileHandleServlet
+ * C. File Entity, newer client browser: Direct upload to S3, using a PUT to a presigned URL.
+ * 
+ * Case C will be the most common case.
+ */
 public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable {
+	
+	public static final double OLD_BROWSER_MAX_SIZE = DisplayUtils.MB * 5; //5MB
 	
 	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
@@ -52,12 +66,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private JSONObjectAdapter jsonObjectAdapter;
 	private AdapterFactory adapterFactory;
 	private AutoGenFactory autogenFactory;
+	private boolean isDirectUploading;
 
 	private SynapseClientAsync synapseClient;
 	private JiraURLHelper jiraURLHelper;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private GWTWrapper gwt;
-	
+	private String requestJson;
+	private boolean isUploadRestricted;
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -120,20 +136,133 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	@Override
-	public String getUploadActionUrl(boolean isRestricted) {
+	public String getDefaultUploadActionUrl(boolean isRestricted) {
+		isUploadRestricted = isRestricted;
 		boolean isFileEntity = entity == null || entity instanceof FileEntity;
-		String entityParentString = entity==null && parentEntityId != null ? DisplayUtils.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY + "=" + parentEntityId + "&": "";
-		String entityIdString = entity != null ? DisplayUtils.ENTITY_PARAM_KEY + "=" + entity.getId() + "&" : "";
+		String entityParentString = entity==null && parentEntityId != null ? WebConstants.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY + "=" + parentEntityId + "&": "";
+		String entityIdString = entity != null ? WebConstants.ENTITY_PARAM_KEY + "=" + entity.getId() + "&" : "";
 		String uploadUrl = isFileEntity ? 
 				//new way
-				synapseJsniUtils.getBaseFileHandleUrl() + "?" + DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted + "&" +
-						DisplayUtils.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY  + "=" + Boolean.toString(entity == null) + "&" + entityParentString + entityIdString: 
+				synapseJsniUtils.getBaseFileHandleUrl() + "?" + WebConstants.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted + "&" +
+						WebConstants.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY  + "=" + Boolean.toString(entity == null) + "&" + entityParentString + entityIdString: 
 				//old way
 				gwt.getModuleBaseURL() + "upload" + "?" + 
 					entityIdString +
-					DisplayUtils.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
+					WebConstants.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
 		return uploadUrl;
 	}
+	
+	@Override
+	public void handleUpload(String fileName) {
+		boolean isFileEntity = entity == null || entity instanceof FileEntity;
+		isDirectUploading = isFileEntity && synapseJsniUtils.isDirectUploadSupported();
+		if (isDirectUploading) {
+			//use case C from above
+			directUploadStep1(fileName);
+		}
+		else {
+			//use case A and B from above
+			//uses the default action url
+			//if using this method, block if file size is > MAX_SIZE
+			if (isFileEntity) {
+				try {
+					double fileSize = synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
+					//check
+					if (fileSize > OLD_BROWSER_MAX_SIZE) {
+						view.showErrorMessage(DisplayConstants.LARGE_FILE_ON_UNSUPPORTED_BROWSER);
+						fireCancelEvent();
+					}
+				} catch (Exception e) {
+					view.showErrorMessage(e.getMessage());
+				}
+			}
+			view.submitForm();
+		}
+	}
+	
+	public void directUploadStep1(String fileName){
+		this.requestJson = null;
+		//get the chunked file request (includes token)
+		try {
+			//get the content type
+			String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID);
+			synapseClient.getChunkedFileToken(fileName, contentType, 1l, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					requestJson = result;
+					directUploadStep2();
+				}
+				@Override
+				public void onFailure(Throwable t) {
+					uploadError();
+				}
+			});
+		} catch (RestServiceException e) {
+			uploadError();
+		}
+	}
+	
+
+	public void directUploadStep2(){
+		//get the presigned upload url
+		//and upload the file
+		try {
+			synapseClient.getChunkedPresignedUrl(requestJson, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String urlString) {
+					XMLHttpRequest xhr = gwt.createXMLHttpRequest();
+					if (xhr != null) {
+						xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
+							@Override
+							public void onReadyStateChange(XMLHttpRequest xhr) {
+								if (xhr.getReadyState() == 4) { //XMLHttpRequest.DONE=4, posts suggest this value is not resolved in some browsers
+									if (xhr.getStatus() == 200) //OK
+										directUploadStep3(view.isNewlyRestricted());
+									else
+										uploadError();
+								}
+							}
+						});
+					}
+					view.resetProgresBar();
+					synapseJsniUtils.uploadFile(UploaderViewImpl.FILE_FIELD_ID, urlString, xhr, new ProgressCallback() {
+						@Override
+						public void updateProgress(double value, String text) {
+							view.updateProgress(value, text);
+						}
+					});
+				}
+				@Override
+				public void onFailure(Throwable t) {
+					uploadError();		
+				}
+			});
+		} catch (RestServiceException e) {
+			uploadError();
+		}
+	}
+	
+	public void directUploadStep3(final boolean isNewlyRestricted){
+		//complete the file upload, and refresh
+		try {
+			String entityId = entity==null ? null : entity.getId();
+			synapseClient.completeChunkedFileUpload(entityId, requestJson,parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String entityId) {
+					//to new file handle id, or create new file entity with this file handle id
+					view.hideLoading();
+					refreshAfterSuccessfulUpload(entityId, isNewlyRestricted);
+				}
+				@Override
+				public void onFailure(Throwable t) {
+					uploadError();		
+				}
+			});
+		} catch (RestServiceException e) {
+			uploadError();
+		}
+	}
+	
 	
 	@Override
 	public void setExternalFilePath(String path, final boolean isNewlyRestricted) {
@@ -245,15 +374,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
 	}
 
-	@Override
-	public void closeButtonSelected() {
-		handlerManager.fireEvent(new CancelEvent());
-	}
-
 	public void entityUpdated() {
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 	
+	/**
+	 * This method is called after the form submit is complete. Note that this is used for use case A and B (see above).
+	 */
 	@Override
 	public void handleSubmitResult(String resultHtml, final boolean isNewlyRestricted) {
 		if(resultHtml == null) resultHtml = "";
@@ -266,22 +393,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				//upload result has the entity id that was created by the FileHandleServlet
 				String entityId = uploadResult.getMessage();
 				//get the entity, and report success
-				synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
-					@Override
-					public void onSuccess(EntityWrapper result) {
-						try {
-							entity = nodeModelCreator.createEntity(result);
-							uploadSuccess(isNewlyRestricted);
-						} catch (JSONObjectAdapterException e) {
-							view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-						}
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage(caught.getMessage());
-					}
-				});
-				
+				refreshAfterSuccessfulUpload(entityId, isNewlyRestricted);
 			}else {
 				uploadError();
 			}
@@ -296,10 +408,33 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
+	private void refreshAfterSuccessfulUpload(String entityId, final boolean isNewlyRestricted) {
+		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				try {
+					entity = nodeModelCreator.createEntity(result);
+					uploadSuccess(isNewlyRestricted);
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
 	private void uploadError() {
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD);
+		fireCancelEvent();
+	}
+	
+	private void fireCancelEvent(){
+		view.hideLoading();
 		handlerManager.fireEvent(new CancelEvent());
 	}
+	
 	private void uploadSuccess(boolean isNewlyRestricted) {
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		if (isNewlyRestricted) {
@@ -313,12 +448,19 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return GovernanceServiceHelper.entityRestrictionLevel(accessRequirements)!=RESTRICTION_LEVEL.OPEN;
 	}
 	
-	
 	@Override
 	public String getJiraRestrictionLink() {
 		UserProfile userProfile = authenticationController.getLoggedInUser().getProfile();
 		if (userProfile==null) throw new NullPointerException("User profile cannot be null.");
 		return jiraURLHelper.createAccessRestrictionIssue(
 				userProfile.getUserName(), userProfile.getDisplayName(), entity.getId());
+	}
+
+	public int getDisplayHeight() {
+		return view.getDisplayHeight();
+	}
+	
+	public int getDisplayWidth() {
+		return view.getDisplayWidth();
 	}
 }

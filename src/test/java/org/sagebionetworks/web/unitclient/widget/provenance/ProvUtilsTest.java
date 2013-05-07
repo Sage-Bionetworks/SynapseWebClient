@@ -23,9 +23,11 @@ import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -42,6 +44,9 @@ import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
+
+import com.extjs.gxt.ui.client.widget.ProgressBar;
+import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class ProvUtilsTest {
 		
@@ -92,7 +97,7 @@ public class ProvUtilsTest {
 		
 		UsedEntity ue = new UsedEntity();
 		ue.setReference(ref2);
-		Set<UsedEntity> used = new HashSet<UsedEntity>();
+		Set<Used> used = new HashSet<Used>();
 		used.add(ue);
 		act.setUsed(used);
 
@@ -165,7 +170,7 @@ public class ProvUtilsTest {
 		Reference ref2 = new Reference();
 		ref2.setTargetId(entId2);
 
-		Set<UsedEntity> used = new HashSet<UsedEntity>();
+		Set<Used> used = new HashSet<Used>();
 		UsedEntity ue;
 		ue = new UsedEntity();
 		ue.setReference(ref);
@@ -287,6 +292,43 @@ public class ProvUtilsTest {
 			}
 			@Override
 			public void setPageTitle(String newTitle) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void tablesorter(String id) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public boolean isDirectUploadSupported() {
+				return false;
+			}
+			@Override
+			public String getContentType(String fileFieldId) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public void uploadFile(String fileFieldId, String url,
+					XMLHttpRequest xhr, ProgressCallback progressCallback) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public double getFileSize(String fileFieldId) {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public void uploadUrlToGenomeSpace(String url) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void uploadUrlToGenomeSpace(String url, String filename) {
 				// TODO Auto-generated method stub
 				
 			}

@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -16,6 +17,7 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -33,7 +35,6 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -47,10 +48,10 @@ public class EntityMetadata implements Presenter {
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityTypeProvider entityTypeProvider;
 	private JiraURLHelper jiraURLHelper;
-	private EventBus bus;
 	private GlobalApplicationState globalApplicationState;
 	private EntityBundle bundle;	
-
+	private EntityUpdatedHandler entityUpdatedHandler;
+	
 	@Inject
 	public EntityMetadata(EntityMetadataView view,
 			SynapseClientAsync synapseClient,
@@ -58,8 +59,7 @@ public class EntityMetadata implements Presenter {
 			AuthenticationController authenticationController,
 			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState,
-			EntityTypeProvider entityTypeProvider, JiraURLHelper jiraURLHelper,
-			EventBus bus) {
+			EntityTypeProvider entityTypeProvider, JiraURLHelper jiraURLHelper) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -69,7 +69,6 @@ public class EntityMetadata implements Presenter {
 		this.globalApplicationState = globalApplicationState;
 		this.entityTypeProvider = entityTypeProvider;
 		this.jiraURLHelper = jiraURLHelper;
-		this.bus = bus;
 	}
 
 	@Override
@@ -114,8 +113,9 @@ public class EntityMetadata implements Presenter {
 		else {
 			//TODO: delete this after migration to FileHandle system.  This corresponds to the old logic
 			boolean isLocationable = bundle.getEntity() instanceof Locationable;
-			showDetailedMetadata = !isLocationable || LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
-			showEntityName = !isLocationable || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
+			boolean isStudy = bundle.getEntity() instanceof Study; //if study, always show metadata and entity name
+			showDetailedMetadata = !isLocationable || isStudy || LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
+			showEntityName = !isLocationable || isStudy || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
 		}
 		view.setDetailedMetadataVisible(showDetailedMetadata);
 		view.setEntityNameVisible(showEntityName);
@@ -230,11 +230,16 @@ public class EntityMetadata implements Presenter {
 		};
 	}
 
+	
 	@Override
 	public void fireEntityUpdatedEvent() {
-		bus.fireEvent(new EntityUpdatedEvent());
+		if (entityUpdatedHandler != null)
+			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
 	}
-
+	
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		this.entityUpdatedHandler = handler;
+	}
 	
 	@Override
 	public Callback getImposeRestrictionsCallback() {

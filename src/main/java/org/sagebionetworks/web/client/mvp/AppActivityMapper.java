@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.place.ComingSoon;
+import org.sagebionetworks.web.client.place.Evaluation;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -28,12 +29,15 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.EvaluationPresenter;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
+import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.WikiPresenter;
@@ -79,6 +83,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(BCCOverview.class);
 		openAccessPlaces.add(Search.class);
 		openAccessPlaces.add(WikiPlace.class);
+		openAccessPlaces.add(Evaluation.class);
 	}
 
 	@Override
@@ -115,74 +120,81 @@ public class AppActivityMapper implements ActivityMapper {
 		// We use GIN to generate and inject all presenters with 
 		// their dependencies.
 		if(place instanceof Home) {
-			HomePresenter presenter = ginjector.getHomePresenter();
+			// Split the code
+			PresenterProxy<HomePresenter, Home> presenter = ginjector.getHomePresenter();
 			presenter.setPlace((Home)place);
 			return presenter;
 		} else if(place instanceof Synapse){
-			EntityPresenter presenter = ginjector.getEntityPresenter();
+			PresenterProxy<EntityPresenter, Synapse> presenter = ginjector.getEntityPresenter();
 			presenter.setPlace((Synapse)place);
 			return presenter;
 		}else if (place instanceof ProjectsHome) {
 			// Projects Home 
-			ProjectsHomePresenter presenter = ginjector.getProjectsHomePresenter();
+			PresenterProxy<ProjectsHomePresenter, ProjectsHome> presenter = ginjector.getProjectsHomePresenter();
 			presenter.setPlace((ProjectsHome)place);
 			return presenter;
 		}else if (place instanceof LoginPlace) {
 			// login view
-			LoginPresenter presenter = ginjector.getLoginPresenter();
+			PresenterProxy<LoginPresenter, LoginPlace> presenter = ginjector.getLoginPresenter();
 			presenter.setPlace((LoginPlace)place);
 			return presenter;
 		} else if (place instanceof PasswordReset) {
 			// reset passwords
-			PasswordResetPresenter presenter = ginjector.getPasswordResetPresenter();
+			PresenterProxy<PasswordResetPresenter, PasswordReset> presenter = ginjector.getPasswordResetPresenter();
 			presenter.setPlace((PasswordReset)place);
 			return presenter;
 		} else if (place instanceof RegisterAccount) {
 			// register for a new account
-			RegisterAccountPresenter presenter = ginjector.getRegisterAccountPresenter();
+			PresenterProxy<RegisterAccountPresenter, RegisterAccount> presenter = ginjector.getRegisterAccountPresenter();
 			presenter.setPlace((RegisterAccount)place);
 			return presenter;
 		} else if (place instanceof Profile) {
 			// user's profile page
-			ProfilePresenter presenter = ginjector.getProfilePresenter();
+			PresenterProxy<ProfilePresenter, Profile> presenter = ginjector.getProfilePresenter();
 			presenter.setPlace((Profile)place);
 			return presenter;
 		} else if (place instanceof Settings) {
 			// user's profile page
-			SettingsPresenter presenter = ginjector.getSettingsPresenter();
+			PresenterProxy<SettingsPresenter, Settings> presenter = ginjector.getSettingsPresenter();
 			presenter.setPlace((Settings)place);
 			return presenter;
 		} else if (place instanceof ComingSoon) {
 			// user's profile page
-			ComingSoonPresenter presenter = ginjector.getComingSoonPresenter();
+			PresenterProxy<ComingSoonPresenter, ComingSoon> presenter = ginjector.getComingSoonPresenter();
 			presenter.setPlace((ComingSoon)place);
 			return presenter;
 		} else if (place instanceof Governance) {
 			// user's profile page
-			GovernancePresenter presenter = ginjector.getGovernancePresenter();
+			PresenterProxy<GovernancePresenter, Governance> presenter = ginjector.getGovernancePresenter();
 			presenter.setPlace((Governance)place);
 			return presenter;
 		} else if (place instanceof BCCOverview) {
 			// user's profile page
-			BCCOverviewPresenter presenter = ginjector.getBCCOverviewPresenter();
+			PresenterProxy<BCCOverviewPresenter, BCCOverview> presenter = ginjector.getBCCOverviewPresenter();
 			presenter.setPlace((BCCOverview)place);
 			return presenter;
 		} else if (place instanceof Search) {
 			// search results page
-			SearchPresenter presenter = ginjector.getSearchPresenter();
-			presenter.setPlace((Search)place);
-			Place forwardTo = presenter.getRedirect(); 
-			if(forwardTo != null) {
-				return getActivity(forwardTo);
+			Search searchPlace = (Search) place;
+			Synapse redirect = SearchUtil.willRedirect(searchPlace);
+			if(redirect != null){
+				return getActivity(redirect);
 			}
+			PresenterProxy<SearchPresenter, Search> presenter = ginjector.getSearchPresenter();
+			presenter.setPlace((Search)place);
 			return presenter;
 		} else if (place instanceof WikiPlace) {
 			// wiki page
-			WikiPresenter presenter = ginjector.getWikiPresenter();
+			PresenterProxy<WikiPresenter, WikiPlace> presenter = ginjector.getWikiPresenter();
 			presenter.setPlace((WikiPlace)place);
 			return presenter;
+		} else if (place instanceof Evaluation) {
+			// evaluation
+			EvaluationPresenter presenter = ginjector.getEvaluationPresenter();
+			presenter.setPlace((Evaluation)place);
+			return presenter;
 		} else if(place instanceof Wiki){
-			SynapseWikiPresenter presenter = ginjector.getSynapseWikiPresenter();
+			PresenterProxy<SynapseWikiPresenter, Wiki> presenter = ginjector.getSynapseWikiPresenter();
 			presenter.setPlace((Wiki)place);
 			return presenter;
 		} else {

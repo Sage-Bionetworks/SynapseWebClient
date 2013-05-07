@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -17,14 +21,19 @@ public interface HomeView extends IsWidget, SynapseView {
 	public void refresh();
 	
 	public void showNews(String html);
-	public void showSupportFeed(String html);
-	public void showBccOverview(String description);
 	
 	public interface Presenter extends SynapsePresenter {
 
 		boolean showLoggedInDetails();	
-		void loadBccOverviewDescription();
-		void showBCCSignup(AsyncCallback<String> callback);			
+		void createProject(String name);			
 	}
+
+	public void setMyProjects(List<EntityHeader> result);
+
+	public void setMyProjectsError(String string);
+
+	public void setFavorites(List<EntityHeader> result);
+
+	public void setFavoritesError(String string);
 
 }

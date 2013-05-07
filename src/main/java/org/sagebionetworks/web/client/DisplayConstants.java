@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.client.Element;
 
 
 public class DisplayConstants {
@@ -48,6 +49,8 @@ public class DisplayConstants {
 	public static final String PASSWORD_SET_FAILED_TEXT = "Password change failed. Please try again.";
 	public static final String PASSWORD_RESET_TEXT = "Your password has been reset.";
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
+	public static final String PASSWORD_AND_EMAIL_SET_TEXT = "Your new email address and password have been set. Please login to verify.";
+	public static final String EMAIL_SET_FAILED_TEXT = "Email address change failed. Please try again.";
 	
 	public static final String PREVIEW_UNAVAILABLE="No Preview Available";	//text shown when FileEntity preview can't be shown
 	
@@ -90,6 +93,7 @@ public class DisplayConstants {
 	public static final String MENU_PERMISSION_LEVEL_IS_OWNER = "Is Owner";
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT = "Can edit";
+	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE = "Edit & Delete";
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
 	public static final String LABEL_PERMISSION_TEXT_ADD_PEOPLE = "Add People";
 	public static final String BUTTON_SHOW_R_CLIENT_INSTALL = "Show R Client Installation Code";
@@ -106,7 +110,7 @@ public class DisplayConstants {
 	 * Service Constants (move to another file?)
 	 */
 	public static final String SINGLE_SIGN_ON_USERID = "SSO";
-	public static final String OPEN_ID_SAGE_LOGIN_BUTTON_TEXT = "Login with a Google Account";
+	public static final String OPEN_ID_SAGE_LOGIN_BUTTON_TEXT = "Sign in with a Google Account";
 	public static final String OPEN_ID_PROVIDER_GOOGLE_VALUE = "https://www.google.com/accounts/o8/id";
 	public static final String OPEN_ID_PROVIDER_SAGE_VALUE = "https://www.google.com/accounts/o8/site-xrds?hd=sagebase.org";
 
@@ -134,6 +138,7 @@ public class DisplayConstants {
 	public static final String LABEL_SEARCHING = "Searching...";
 	public static final String LABEL_FOUND_FORWARDING = "Found. Forwarding now.";
 	public static final String LABEL_ENTITY_NOT_FOUND = "Sorry, that Synapse Id could not be located.";
+	public static final String ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN = "Specified input column is missing from the service response: ";
 	public static final String ERROR_GETTING_PERMISSIONS_TEXT = "READ ONLY MODE. Reason: An error occurred in retrieving your level of access.";	
 	public static final String ERROR_ACL_RETRIEVAL_FAILED = "Retrieval of sharing settings failed. Please try again.";
 	public static final String ERROR_LOCAL_ACL_CREATION_FAILED = "Creation of local sharing settings failed. Please try again.";
@@ -148,6 +153,7 @@ public class DisplayConstants {
 	public static final String ERROR_BAD_REQUEST_MESSAGE = "An unknown communication error occurred. Please reload the page.";
 	public static final String ERROR_DUPLICATE_ENTITY_MESSAGE = "An entity with this name already exists. Please enter a different name.";
 	public static final String ERROR_INVALID_ENTITY_NAME = "Name contains contains an invalid character";
+	public static final String NO_HEADERS_FOUND = "No Headers were found on this page.";
 	public static final String ERROR_TITLE_LOGIN_REQUIRED = "Login Required";
 	public static final String ERROR_LOGIN_REQUIRED = "You will need to login for access to that resource.";
 	public static final String ERROR_TITLE_VALIDATION_ERROR = "Validation Error";
@@ -195,7 +201,7 @@ public class DisplayConstants {
 	public static final String LABEL_NO_PREVIEW_DATA = "A Preview has not been created.";
 	public static final String LABEL_CONTAINS_NO_CHILDREN = "This object contains no children.";
 	public static final String BUTTON_REGISTER = "Register";
-	public static final String LINK_COMMUNITY_FORUM = "Support";
+	public static final String LINK_COMMUNITY_FORUM = "Help";
 	public static final String BUTTON_LOGIN = "Login";
 	public static final String LABEL_WELCOME = "Welcome";
 	public static final String BUTTON_LOGOUT = "Logout";
@@ -208,16 +214,17 @@ public class DisplayConstants {
 	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
 	public static final String TEXT_USER_SETTINGS = "Settings";
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
-	public static final String LABEL_UPLOAD_TO_SYNAPSE = "To Synapse";
-	public static final String LABEL_TO_EXTERNAL = "Link External Location";
+	public static final String UPLOAD_FILE = "Upload File";
+	public static final String LINK_TO_URL = "Link to URL";
 	public static final String TEXT_LINK_FILE = "Link File";
 	public static final String TEXT_LINK_SUCCESS = "Link successfully updated in Synapse";
 	public static final String TEXT_LINK_FAILED = "An error occurred while creating the link. Please check the URL and try again.";
-	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
+ 	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
 	public static final String TEXT_ATTACHMENT_SUCCESS = "Attachment Uploaded to Synapse";
 	public static final String TEXT_PROFILE_PICTURE_SUCCESS = "Profile Photo Uploaded to Synapse";
 	public static final String ERROR_UPLOAD = "An error occurred during upload. Please try again.";
 	public static final String LABEL_UPLOADING = "Uploading...";
+	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
 	public static final String LABEL_WHERE_SAVE_LINK = "Where would you like to save a Link to this page?";
 	public static final String ERROR_NOT_FOUND = "Sorry, the requested object was not found or no longer exists.";
@@ -247,6 +254,7 @@ public class DisplayConstants {
 	public static final String LABEL_UPDATED = "Upated";
 	public static final String TEXT_USER_PROFILE_UPDATED = "Change save to your User Profile.";
 	public static final String TEXT_NO_ATTACHMENTS = "No Attachments.";
+	public static final String TEXT_NO_COLUMNS = "No Columns.";
 	public static final String ERROR_DELETING_ATTACHMENT = "An error occurred deleting the Attachment. Please try again.";
 	public static final String LABEL_DELETED = "deleted";
 	public static final String ERROR_LOADING_DESCRIPTION_FAILED = "Failed to load the description: ";
@@ -298,9 +306,10 @@ public class DisplayConstants {
 	public static final String HIDE_VERSIONS = "hide all versions";
 	public static final String NOT_FOUND = "Not Found";
 	public static final String ERROR_LOADING = "Error Loading";
-	public static final String ENTITY_DESCRIPTION_PREVIEW_FAILED_TEXT = "Preview failed: ";
+	public static final String PREVIEW_FAILED_TEXT = "Preview failed: ";
 	public static final String ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT = "Preview";
 	public static final String ENTITY_DESCRIPTION_INSERT_IMAGE_BUTTON_TEXT = "Insert Attachment";
+	public static final String ENTITY_DESCRIPTION_TOOLTIP = "Enter a short description that will be displayed prominently on the page and used in search results.";
 	public static final String ENTITY_DESCRIPTION_TIPS_TEXT = "Formatting Guide";
 	public static final String ENTITY_DESCRIPTION_HIDE_WIDGETS_TEXT = "Hide Widget Manager";
 	public static final String ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT = "Show Widget Manager";
@@ -315,8 +324,6 @@ public class DisplayConstants {
 	public static final String ENTITY = "Entity";
 	public static final String LOADING = "Loading";
 	public static final String ACTIVITY = "Activity";
-	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
-	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
 	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	public static final String ERROR_WIDGET_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, hypens, periods, plus signs, and parentheses.";
 
@@ -328,8 +335,10 @@ public class DisplayConstants {
 	public static final String IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE = "Please enter valid alternate text for the URL";
 	public static final String IMAGE_CONFIG_UPLOAD = "Upload";
 	public static final String IMAGE_CONFIG_FROM_THE_WEB = "From the Web";
+	public static final String IMAGE_CONFIG_FROM_SYNAPSE = "From Synapse File";
 	public static final String IMAGE_CONFIG_URL_LABEL = "Image URL:";
 	public static final String IMAGE_CONFIG_ALT_TEXT = "Alternate Text:";
+	public static final String IMAGE_FAILED_TO_LOAD = "Image failed to load: ";
 	public static final String URL_LABEL = "URL:";
 	public static final String TABLE_LABEL = "Tab Delimitted Table Contents:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
@@ -345,6 +354,10 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_WIDTH = "Width (% or pixels)";
 	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
 	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
+	public static final String SHINYSITE_SITE_LABEL = "Shiny Site URL";
+	public static final String WIDTH = "Width";
+	public static final String HEIGHT = "Height";
+	public static final String SYNAPSE_API_CALL_COL_CONFIGS_COL_NAME = "Column Configurations:";
 	
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
 	public static final String SHOW_EXPAND = "Show Expand";
@@ -386,9 +399,8 @@ public class DisplayConstants {
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
 
 	// constants used in GovernanceDialogHelper	
-	public static final String OPEN = "Open";
-	public static final String RESTRICTED = "Restricted";
-	public static final String CONTROLLED = "Controlled";
+	public static final String RESTRICTED_USE = "Restricted Use";
+	public static final String CONTROLLED_USE = "Controlled Use";
 	public static final String MODIFY = "modify";
 	public static final String INFO = "info";
 	public static final String GAIN_ACCESS = "gain access";
@@ -409,9 +421,9 @@ public class DisplayConstants {
 	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to these data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
 	
-	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Rules for Sharing and Using Human Data in Synapse</a>";
+	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Data Use Restrictions for Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
-	public static String GOVERNANCE_REFERENCE = "For more information on data access conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
+	public static String GOVERNANCE_REFERENCE = "For more information on Data Use conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
 	
 	public static String ADMIN_GOVERNANCE_REFERENCE = "You are responsible to ensure your data is shared in compliance with the "+
 	SYNAPSE_GUIDELINES_LINK+" and all applicable laws. ";
@@ -423,15 +435,13 @@ public class DisplayConstants {
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
-	public static final String FILE_DOWNLOAD_NOTE = 
-		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
-		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
-		"without restrictions select \"Open\", below.  Otherwise select \"Restricted / Controlled\".";
-
-	public static final String EXTERNAL_LINK_NOTE = 
-		"You are responsible to ensure your data is shared in compliance with the "+SYNAPSE_GUIDELINES_LINK+
-		" and all applicable laws. If the data may be accessed by all registered Synapse users "+
-		"without restrictions select \"save unrestricted\", below.  Otherwise select \"save restricted\".";
+	public static final String DATA_USE_BANNER = "Data Use Restrictions for Public Data";
+	public static final String DATA_USE_BANNER_SUB1 = "If you change Sharing to be ";
+	public static final String DATA_USE_BANNER_SUB2 = ", who can use these data?";
+	public static final String DATA_USE_NOTE = 
+		"You are responsible to ensure your data is used in compliance with the "+SYNAPSE_GUIDELINES_LINK+
+		" and all applicable laws. If/when you make this file public, can its data be used by any registered Synapse user "+
+		"without restriction? If so, then select \"Any Use\", below.  Otherwise select \"Restricted / Controlled\".";
 	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 	
 	
@@ -480,6 +490,8 @@ public class DisplayConstants {
 	public static final String DISPLAY_HEIGHT = "Display Height";
 	public static final String DEFAULT = "Default";
 	public static final String ENTITY_LIST = "Entity List";
+	public static final String IMAGE_FILE_ENTITY = "Image File Entity";
+	public static final String FIND_IMAGE_ENTITY = "Find Image File Entity";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
 	public static final String FIND_ENTITIES = "Find Entities";
 	
@@ -497,6 +509,29 @@ public class DisplayConstants {
 	public static final String FAVORITES = "Favorites";
 	public static final String ERROR_LOADING_FAVORITES = "Error loading Favorites.";
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
+	public static final String EXTERNAL_URL = "External URL";
+	public static final String ADD_ENTITY = "Add Entity";
+	public static final String INVALID_SHINY_SITE = " is not a valid Shiny Site URL. Please " + DisplayUtils.HELP_EMAIL_ADDRESS_LINK + " if you would like your Shiny Server added to our white list.";
+	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
+	public static final String ACCESS_WILL_BE = "Access Will Be";
+	public static final String ANY_USE = "Any Use";
+	public static final String SELECT_DATA_USE = "Please select a Data Use Level";
+	public static final String DOI_REQUEST_SENT_TITLE = "The request to create a new DOI has been sent.";	
+	public static final String DOI_REQUEST_SENT_MESSAGE = "Note that it may take a few minutes for the service to create the new DOI.";
+	public static final String DOI_CREATION_ERROR = "There was a problem creating a DOI";
+	public static final String DOI_CREATION_IN_PROGRESS = "Creating a DOI";
+	public static final String LARGE_FILE_ON_UNSUPPORTED_BROWSER = "The file exceeds the maximum file size that Synapse supports for this browser. Please update your browser to the latest version and try again.";
+	public static final String PASSWORD = "Password";
+	public static final String SIGN_IN = "Sign in";
+	public static final String REGISTER_BUTTON = "Register for a Synapse Account";
+	public static final String CREATE_PROJECT = "Create Project";
+	public static final String NEW_PROJECT_NAME = "New Project Name";
+	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
+	public static final String USER_GUIDE = "User Guide";
+	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
 	
+	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
+	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
+	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
 }
 

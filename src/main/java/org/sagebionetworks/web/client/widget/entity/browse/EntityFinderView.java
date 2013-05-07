@@ -38,4 +38,6 @@ public interface EntityFinderView extends IsWidget, SynapseWidgetView {
 		boolean showVersions();
 	}
 
+	public void refresh();
+
 }

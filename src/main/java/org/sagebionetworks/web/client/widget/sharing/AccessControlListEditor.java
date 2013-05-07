@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -24,7 +23,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -42,11 +40,14 @@ import com.google.inject.Inject;
  */
 public class AccessControlListEditor implements AccessControlListEditorView.Presenter {
 	
-	private static final String ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS = "Active user permissions cannot be modified. Please select a different user.";
-	private static final String ERROR_CANNOT_MODIFY_ENTITY_OWNER_PERMISSIONS = "Owner permissions cannot be modified. Please select a different user.";
+	private static final String ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS = "Current user permissions cannot be modified. Please select a different user.";
 	private static final String NULL_UEP_MESSAGE = "User's entity permissions are missing.";
 	private static final String NULL_ACL_MESSAGE = "ACL is missing.";
 	private static final String NULL_ENTITY_MESSAGE = "Entity is missing.";
+	
+	public interface SaveCallback {
+		void save(); 
+	}
 	
 	// Editor components
 	private AccessControlListEditorView view;
@@ -56,6 +57,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private JSONObjectAdapter jsonObjectAdapter;
 	private AuthenticationController authenticationController;
 	private boolean unsavedChanges;
+	private boolean unsavedViewChanges;
 	private boolean hasLocalACL_inRepo;
 	private Long publicAclPrincipalId = null;
 	private Long authenticatedAclPrincipalId = null;
@@ -101,8 +103,12 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		return entity == null ? null : entity.getId();
 	}
 	
-	public boolean hasUnsavedChanges() {
-		return unsavedChanges;
+	public boolean hasUnsavedChanges() {		
+		return unsavedChanges || unsavedViewChanges;
+	}
+	
+	public void setUnsavedViewChanges(boolean unsavedViewChanges) {
+		this.unsavedViewChanges = unsavedViewChanges;
 	}
 	
 	/**
@@ -247,10 +253,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	public void setAccess(Long principalId, PermissionLevel permissionLevel) {
 		validateEditorState();
 		String currentUserId = getCurrentUserId();
-		if (uep != null && principalId.equals(uep.getOwnerPrincipalId())) {
-			showErrorMessage(ERROR_CANNOT_MODIFY_ENTITY_OWNER_PERMISSIONS);
-			return;
-		} else if (currentUserId != null && principalId.toString().equals(currentUserId)) {
+		if (currentUserId != null && principalId.toString().equals(currentUserId)) {
 			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
 			return;
 		}
@@ -294,10 +297,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	public void removeAccess(Long principalIdToRemove) {
 		validateEditorState();
 		String currentUserId = getCurrentUserId();
-		if (uep != null && principalIdToRemove.equals(uep.getOwnerPrincipalId())) {
-			showErrorMessage(ERROR_CANNOT_MODIFY_ENTITY_OWNER_PERMISSIONS);
-			return;
-		} else if (currentUserId != null && principalIdToRemove.toString().equals(currentUserId)) {
+		if (currentUserId != null && principalIdToRemove.toString().equals(currentUserId)) {	
 			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
 			return;
 		}
@@ -378,12 +378,21 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	@Override
-	public void pushChangesToSynapse(boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback) {
-		// TODO: Make recursive option for "Create"
-		if (!unsavedChanges) {
-			showErrorMessage("No changes have been made");
+	public void pushChangesToSynapse(final boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback) {
+		if(unsavedViewChanges) {
+			view.alertUnsavedViewChanges(new SaveCallback() {				
+				@Override
+				public void save() {
+					pushChangesToSynapse(recursive, changesPushedCallback);
+				}
+			});
 			return;
 		}
+		
+		// TODO: Make recursive option for "Create"
+		if (!unsavedChanges) {			
+			return;
+		} 
 		validateEditorState();
 		
 		// Wrap the current ACL

@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -20,11 +19,11 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 	
 	private LocationableTitleBarView view;
 	private AuthenticationController authenticationController;
-	private HandlerManager handlerManager = new HandlerManager(this);
 	private EntityBundle entityBundle;
 	private EntityTypeProvider entityTypeProvider;
 	private SynapseClientAsync synapseClient;
 	private EntityEditor entityEditor;
+	private EntityUpdatedHandler entityUpdatedHandler;
 	
 	@Inject
 	public LocationableTitleBar(LocationableTitleBarView view, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, SynapseClientAsync synapseClient, EntityEditor entityEditor) {
@@ -61,7 +60,6 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 	public void clearState() {
 		view.clear();
 		// remove handlers
-		handlerManager = new HandlerManager(this);		
 		this.entityBundle = null;		
 	}
 
@@ -75,11 +73,13 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
     
 	@Override
 	public void fireEntityUpdatedEvent() {
-		handlerManager.fireEvent(new EntityUpdatedEvent());
+		if (entityUpdatedHandler != null)
+			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
 	}
 	
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		this.entityUpdatedHandler = handler;
+		entityEditor.setEntityUpdatedHandler(handler);
 	}
 
 	@Override

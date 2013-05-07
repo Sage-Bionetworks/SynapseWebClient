@@ -1,15 +1,15 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -17,6 +17,7 @@ import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
@@ -35,7 +36,8 @@ import com.google.inject.Inject;
 public class ProvenanceWidgetViewImpl extends LayoutContainer implements ProvenanceWidgetView {
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;		
+	private IconsImageBundle iconsImageBundle;
+	private PortalGinInjector ginInjector;
 	private ProvGraph graph;
 	private LayoutContainer debug;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -45,10 +47,11 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	
 	@Inject
 	public ProvenanceWidgetViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils) {
+			IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.ginInjector = ginInjector;
 	}
 		
 	
@@ -140,7 +143,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			addToolTipToContainer(node, container, DisplayConstants.ENTITY);			
 			return container;
 		} else if(node instanceof ActivityGraphNode) {
-			LayoutContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle);
+			LayoutContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle, ginInjector);
 			// create tool tip for defined activities only
 			if(((ActivityGraphNode) node).getType() == ActivityType.UNDEFINED) {
 				addUndefinedToolTip(container);
@@ -150,18 +153,22 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			return container;
 		} else if(node instanceof ExpandGraphNode) {
 			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, sageImageBundle, presenter);
+		} else if(node instanceof ExternalGraphNode) {			
+			LayoutContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node, iconsImageBundle);
+			addToolTipToContainer(node, container, DisplayConstants.EXTERNAL_URL);
+			return container;
 		}
 		return null;
 	}
 
-	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer container, final String title) {		
-		container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayUtils.getLoadingHtml(sageImageBundle)));			
+	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer container, final String title) {					
+		//container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayUtils.getLoadingHtml(sageImageBundle)));			
 		container.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {	
 				// load the tooltip contents only once
 				if(filledPopoverIds.containsKey(node.getId())) {															
-					container.setToolTip(ProvViewUtil.createTooltipConfig(title, filledPopoverIds.get(node.getId())));
+//					container.setToolTip(ProvViewUtil.createTooltipConfig(title, filledPopoverIds.get(node.getId())));
 					return;
 				}															
 				// retrieve info
@@ -170,12 +177,15 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 					public void onSuccess(KeyValueDisplay<String> result) {
 						String rendered = ProvViewUtil.createEntityPopoverHtml(result).asString();
 						filledPopoverIds.put(container.getId(), rendered);
-					    container.setToolTip(ProvViewUtil.createTooltipConfig(title, rendered));										
+					    //container.setToolTip(ProvViewUtil.createTooltipConfig(title, rendered));
+						//DisplayUtils.addTooltipSpecial(synapseJSNIUtils, container, rendered, TOOLTIP_POSITION.RIGHT);
+						container.setTitle(rendered);
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayConstants.ERROR_GENERIC_RELOAD));
+						//container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayConstants.ERROR_GENERIC_RELOAD));
+						container.setTitle(DisplayConstants.ERROR_GENERIC_RELOAD);
 					}
 				});
 			}

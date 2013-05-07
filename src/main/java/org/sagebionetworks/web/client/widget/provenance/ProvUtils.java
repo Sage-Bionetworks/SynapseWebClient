@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,9 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
+import org.sagebionetworks.repo.model.provenance.UsedURL;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -27,6 +30,7 @@ import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.ActivityTypeUtil;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
@@ -45,6 +49,7 @@ public class ProvUtils {
 			Set<Reference> startRefs, Set<Reference> noExpandNode) {
 		ProvGraph graph = new ProvGraph();
 		Integer sequence = 0;
+		Set<ProvGraphNode> nodeHasExpandNode = new HashSet<ProvGraphNode>();
 		
 		// maps for local building retrieval
 		Map<Reference,EntityGraphNode> entityNodes = new HashMap<Reference,EntityGraphNode>();
@@ -77,6 +82,8 @@ public class ProvUtils {
 						act.getId(),
 						act.getName(), 
 						type,
+						act.getModifiedBy(),
+						act.getModifiedOn(),
 						false);			
 			idToNode.put(activityNode.getId(), activityNode);
 			graph.addNode(activityNode);
@@ -84,18 +91,28 @@ public class ProvUtils {
 			
 			// add used edges
 			if(act.getUsed() != null) {
-				Iterator<UsedEntity> itr = act.getUsed().iterator();
+				Iterator<Used> itr = act.getUsed().iterator();
 				while(itr.hasNext()) {
-					UsedEntity ue = itr.next();					
-					Reference ref = ue.getReference();			
-					EntityGraphNode entityNode = entityNodes.get(ref);
-					graph.addEdge(new ProvGraphEdge(activityNode, entityNode));				
-					
-					// create expand nodes for those that don't have generatedBy activities defined
-					if(showExpand && !generatedByActivityId.containsKey(ref) && !noExpandNode.contains(ref)) {
-						ProvGraphNode expandNode = new ExpandGraphNode(createUniqueNodeId(), ref.getTargetId(), ref.getTargetVersionNumber());
-						idToNode.put(expandNode.getId(), expandNode);
-						graph.addEdge(new ProvGraphEdge(entityNode, expandNode));
+					Used used = itr.next();
+					if(used instanceof UsedEntity) {
+						UsedEntity ue = (UsedEntity)used;
+						Reference ref = ue.getReference();			
+						EntityGraphNode entityNode = entityNodes.get(ref);
+						graph.addEdge(new ProvGraphEdge(activityNode, entityNode));				
+						
+						// create expand nodes for those that don't have generatedBy activities defined
+						if(showExpand && !generatedByActivityId.containsKey(ref) && !noExpandNode.contains(ref) && !nodeHasExpandNode.contains(entityNode)) {
+							ProvGraphNode expandNode = new ExpandGraphNode(createUniqueNodeId(), ref.getTargetId(), ref.getTargetVersionNumber());
+							idToNode.put(expandNode.getId(), expandNode);
+							graph.addEdge(new ProvGraphEdge(entityNode, expandNode));
+							nodeHasExpandNode.add(entityNode);
+						}
+					} else if(used instanceof UsedURL) {
+						UsedURL ue = (UsedURL)used;									
+						ExternalGraphNode externalGraphNode = new ExternalGraphNode(createUniqueNodeId(), ue.getName(), ue.getUrl(), ue.getWasExecuted());
+						idToNode.put(externalGraphNode.getId(), externalGraphNode);
+						graph.addNode(externalGraphNode);
+						graph.addEdge(new ProvGraphEdge(activityNode, externalGraphNode));						
 					}
 				}
 				
@@ -128,9 +145,12 @@ public class ProvUtils {
 		for(Activity act : activities) {
 			if(act.getUsed() == null) continue;
 		
-			for(UsedEntity ue : act.getUsed()) {
-				if(ue != null && ue.getReference() != null) {
-					allRefs.add(ue.getReference());
+			for(Used used : act.getUsed()) {
+				if(used instanceof UsedEntity) {
+					UsedEntity ue = (UsedEntity)used;
+					if(ue != null && ue.getReference() != null) {
+						allRefs.add(ue.getReference());
+					}
 				}
 			}
 		}
@@ -177,38 +197,32 @@ public class ProvUtils {
 			
 		order.add("Name");
 		map.put("Name", activity.getName());				
-
-		UsedEntity executed = ActivityTypeUtil.getExecuted(activity);
-		if(executed != null) {
-			order.add("Executed Entity");
-			map.put("Executed Entity", DisplayUtils.getVersionDisplay(executed.getReference()));
-		}
 		
-		String used = null;
-		if(activity.getUsed() != null) {
-			for(UsedEntity ue : activity.getUsed()) {
-				Reference ref = ue.getReference();
-				if(used == null) {
-					used = DisplayUtils.getVersionDisplay(ref);
-				} else {
-					used += ", " + DisplayUtils.getVersionDisplay(ref);
-				}
-			}
-			order.add("Entities Used");
-			map.put("Entities Used", used);
-			
-			order.add("Modified By");
-			map.put("Modified By", activity.getModifiedBy());
-			
-			order.add("Modified On");
-			map.put("Modified On", DisplayUtils.converDataToPrettyString(activity.getModifiedOn()));		
-			
-			order.add("Description");
-			map.put("Description", activity.getDescription());				
-		}
+		order.add("Modified By");
+		map.put("Modified By", activity.getModifiedBy());
+		
+		order.add("Modified On");
+		map.put("Modified On", DisplayUtils.converDataToPrettyString(activity.getModifiedOn()));		
+		
+		order.add("Description");
+		map.put("Description", activity.getDescription());				
+
 		return new KeyValueDisplay<String>(map, order);
 	}
 
+	public static KeyValueDisplay<String> externalNodeToKeyValueDisplay(ExternalGraphNode externalNode) {
+		Map<String,String> map = new HashMap<String, String>();
+		List<String> order = new ArrayList<String>();
+		
+		order.add("Name");
+		map.put("Name", externalNode.getName());
+		
+		order.add("URL");
+		map.put("URL", externalNode.getUrl());
+		
+		return new KeyValueDisplay<String>(map, order);
+	}
+	
 	/**
 	 * Returns a KeyValueDisplay to the callback for the given ProvGraphNode nodeId (NOTE: nodeId is not entity id!)
 	 * @param nodeId ProvGraphNode id
@@ -232,6 +246,8 @@ public class ProvUtils {
 			getInfoEntityTreeNode(synapseClient, nodeModelCreator, callback, (EntityGraphNode)node);
 		} else if(node instanceof ActivityGraphNode) { 
 			getInfoActivityTreeNode(synapseClient, nodeModelCreator, callback, (ActivityGraphNode)node);
+		} else if(node instanceof ExternalGraphNode) {
+			callback.onSuccess(ProvUtils.externalNodeToKeyValueDisplay((ExternalGraphNode) node));
 		}
 	}
 	
@@ -282,7 +298,7 @@ public class ProvUtils {
 			}
 		});
 	}
-	
+		
 }
 
 

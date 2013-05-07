@@ -38,6 +38,12 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/paper-clip-16.png")
 	ImageResource attachment16();
 	
+	@Source("images/icons/book-brown-16.png")
+	ImageResource bookBrown16();
+	
+	@Source("images/icons/book-open-16.png")
+	ImageResource bookOpen16();
+	
 	@Source("images/icons/tick-16.png")
 	ImageResource checkGreen16();
 
@@ -64,6 +70,12 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/document--pencil-16.png")
 	ImageResource documentEdit16();
+
+	@Source("images/icons/document-export-16.png")
+	ImageResource documentExport16();
+
+	@Source("images/icons/document-external-16.png")
+	ImageResource documentExternal16();
 
 	@Source("images/icons/document-text-16.png")
 	ImageResource documentText16();
@@ -116,6 +128,15 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/flag-small-16.png")
 	ImageResource flagSmall16();
 
+	@Source("images/icons/genomespace-16.png")
+	ImageResource genomespace16();  
+
+	@Source("images/icons/github-16.png")
+	ImageResource github16();	
+	
+	@Source("images/icons/github-24.png")
+	ImageResource github24();	
+	
 	@Source("images/icons/globe-green-16.png")
 	ImageResource globe16();	
 	

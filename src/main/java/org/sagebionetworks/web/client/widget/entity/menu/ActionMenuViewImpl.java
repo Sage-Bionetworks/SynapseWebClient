@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
@@ -12,6 +10,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -56,9 +55,10 @@ import com.google.inject.Inject;
 public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuView {
 
 	private Presenter presenter;
+	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private AccessControlListEditor accessControlListEditor;
-	private Uploader locationableUploader;
+	private Uploader uploader;
 	private EntityTypeProvider typeProvider;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityFinder entityFinder;
@@ -68,6 +68,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private Button shareButton;
 	private Button toolsButton;
 	private Button deleteButton;
+	private boolean isInTestMode;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
@@ -78,9 +79,10 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			EntityTypeProvider typeProvider,
 			SynapseJSNIUtils synapseJSNIUtils,
 			EntityFinder entityFinder) {
+		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
-		this.locationableUploader = locationableUploader;
+		this.uploader = locationableUploader;
 		this.typeProvider = typeProvider;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.entityFinder = entityFinder;
@@ -95,8 +97,10 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			AuthenticationController authenticationController,
 			boolean isAdministrator,
 			boolean canEdit, 
-			boolean readOnly) {
+			boolean readOnly,
+			boolean isInTestMode) {
 		this.readOnly = readOnly;
+		this.isInTestMode = isInTestMode;
 		Entity entity = entityBundle.getEntity();
 
 		UserSessionData sessionData = authenticationController.getLoggedInUser();
@@ -302,6 +306,10 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			addMoveItem(menu, entity, entityType);
 		}
 
+		if(isInTestMode && (entity instanceof Locationable || entity instanceof FileEntity)) {
+			addUploadToGenomeSpace(menu, entityBundle);
+		}
+		
 		toolsButton.setMenu(menu);
 		if(menu.getItemCount() == 0) {
 			toolsButton.disable();
@@ -343,16 +351,22 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
 			MenuItem item = new MenuItem(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 			item.setIcon(AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
-			final Window window = new Window();  
-			locationableUploader.clearHandlers();
-			locationableUploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
+			final Window window = new Window();
+			window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					window.hide();
+				}
+			}));
+			uploader.clearHandlers();
+			uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
 				@Override
 				public void onPersistSuccess(EntityUpdatedEvent event) {
 					window.hide();
 					presenter.fireEntityUpdatedEvent();
 				}
 			});
-			locationableUploader.addCancelHandler(new CancelHandler() {				
+			uploader.addCancelHandler(new CancelHandler() {				
 				@Override
 				public void onCancel(CancelEvent event) {
 					window.hide();
@@ -362,12 +376,12 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 				@Override
 				public void componentSelected(MenuEvent ce) {
 					window.removeAll();
-					window.setSize(400, 320);
+					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 					window.setPlain(true);
 					window.setModal(true);		
 					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 					window.setLayout(new FitLayout());			
-					window.add(locationableUploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+					window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
 					window.show();
 				}
 			});			
@@ -388,19 +402,11 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {				
-				final Window window = new Window();  
-	
 				entityFinder.configure(false);				
-				window.setSize(839, 582);
-				window.setPlain(true);
-				window.setModal(true);
-				window.setHeading(DisplayConstants.LABEL_WHERE_SAVE_LINK);
-				window.setLayout(new FitLayout());
-				window.add(entityFinder.asWidget(), new FitData(4));				
-				window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
+				final Window window = new Window();
+				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
 					@Override
-					public void componentSelected(ButtonEvent ce) {
-						Reference selected = entityFinder.getSelectedEntity();
+					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {
 							presenter.createLink(selected.getTargetId());
 							window.hide();
@@ -408,16 +414,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
 					}
-				}));
-				window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						window.hide();
-					}
-				}));
-				window.setButtonAlign(HorizontalAlignment.RIGHT);
-				window.show();
-	
+				});					
 			}
 		});
 		menu.add(item);
@@ -436,19 +433,11 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		itemMove.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {				
-				final Window window = new Window();  
-
 				entityFinder.configure(false);				
-				window.setSize(839, 582);
-				window.setPlain(true);
-				window.setModal(true);
-				window.setHeading(DisplayConstants.SELECT_NEW_PARENT + " " + typeDisplay);
-				window.setLayout(new FitLayout());
-				window.add(entityFinder.asWidget(), new FitData(4)); 				
-				window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
+				final Window window = new Window();
+				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
 					@Override
-					public void componentSelected(ButtonEvent ce) {
-						Reference selected = entityFinder.getSelectedEntity();
+					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {
 							presenter.moveEntity(selected.getTargetId());
 							window.hide();
@@ -456,18 +445,20 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
 					}
-				}));
-				window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						window.hide();
-					}
-				}));
-				window.setButtonAlign(HorizontalAlignment.RIGHT);
-				window.show();
-	
+				});				
 			}
 		});
 		menu.add(itemMove);
+	}
+
+	private void addUploadToGenomeSpace(final Menu menu, final EntityBundle bundle) {
+		MenuItem item = new MenuItem("Upload to " + AbstractImagePrototype.create(sageImageBundle.genomeSpaceLogoTitle16()).getHTML());		
+		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				presenter.uploadToGenomespace();
+			}
+		});
+		menu.add(item);
 	}
 }

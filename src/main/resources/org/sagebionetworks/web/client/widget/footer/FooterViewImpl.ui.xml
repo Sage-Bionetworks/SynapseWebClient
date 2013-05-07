@@ -47,7 +47,7 @@
                         <div class="span-3 notopmargin last">
                             <h6>Contact info</h6>
                             <p class="small">
-                            	Sage Bionetworks<br/>
+                            	<a href="http://www.sagebase.org">Sage Bionetworks</a><br/>
                             	1100 Fairview Ave N<br/>
                             	Seattle, WA 98109<br/>
                             	<a href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a>                             	
@@ -62,13 +62,13 @@
             <div class="footer-container">
             	<div class="span-24 notopmargin footer-line">
                     <div class="span-8 notopmargin">
-                        <p>Copyright 2013 <a class="link" href="http://www.sagebase.org">Sage Bionetworks</a></p>
+                        <p>Copyright <span ui:field="copyrightYear" /> <a href="http://www.sagebase.org">Sage Bionetworks</a></p>
                     </div>
                     <div class="span-16 notopmargin last">
                     	<p class="right">
-	                    	<a class="link" href="#!Home:0">Home</a> / 
-							<a class="link" href="#!Governance:0">Governance</a> /
-							<a class="link" href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a> / 
+	                    	<a href="#!Home:0">Home</a> / 
+							<a href="#!Governance:0">Governance</a> /
+							<a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a> / 
 							<g:FlowPanel ui:field="debugModePanel" />
                     	</p>
                 	</div>

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -13,7 +14,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
-import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -35,6 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -62,7 +64,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -107,6 +108,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private FilesBrowser filesBrowser;
 	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
+	private PreviewWidget previewWidget;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -119,7 +121,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget) {
+			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget, PreviewWidget previewWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -134,7 +136,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.fileTitleBar = fileTitleBar;
 		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
-
+		this.previewWidget = previewWidget;
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
 		
@@ -167,7 +169,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Custom layouts for certain entities
 		if (bundle.getEntity() instanceof Project) {
 			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
-		} else if (bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study) {  //render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
+		} else if (bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis) {
+			//render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
 			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		} else if (bundle.getEntity() instanceof Summary) {
 		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
@@ -175,7 +178,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			// default entity view
 			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, readOnly, widgetMargin);
 		}
-		synapseJSNIUtils.setPageTitle(bundle.getEntity().getId() + ": " + bundle.getEntity().getName());
+		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
 
 		colLeftContainer.layout(true);
@@ -197,10 +200,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		actionMenu.addEntityUpdatedHandler(handler);
-		locationableTitleBar.addEntityUpdatedHandler(handler);
-		fileTitleBar.addEntityUpdatedHandler(handler);
-		filesBrowser.addEntityUpdatedHandler(handler);
+		actionMenu.setEntityUpdatedHandler(handler);
+		locationableTitleBar.setEntityUpdatedHandler(handler);
+		fileTitleBar.setEntityUpdatedHandler(handler);
+		filesBrowser.setEntityUpdatedHandler(handler);
+		entityMetadata.setEntityUpdatedHandler(handler);
 	}
 
 	@Override
@@ -252,10 +256,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 		
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
-			// show Wiki
-			addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
-		}
+		// show Wiki
+		addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
 				
 
 		// ** RIGHT **
@@ -269,37 +271,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Attachments
 		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly, false), widgetMargin);
 		
-		// ** FULL WIDTH **
-		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************
-		// Child Browser
-		if(DisplayUtils.hasChildrenOrPreview(bundle)){
-			colLeftContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
-		}
+		//these types should not have children to show (and don't show deprecated Preview child object)
+		
 		// ************************************************************************************************		
 	}
 	
-	private HTMLPanel getFilePreview(EntityBundle bundle) {
-		StringBuilder sb = new StringBuilder();
-		FileHandle handle = FileTitleBar.getFileHandle(bundle);
-		if (handle != null) {
-			String fileName = handle.getFileName();
-			if (fileName != null) {
-				boolean looksLikeAnImage = DisplayUtils.hasRecognizedImageExtension(fileName);
-				if (looksLikeAnImage) {
-					FileEntity fileEntity = (FileEntity)bundle.getEntity();
-					//add a html panel that contains the image src from the attachments server (to pull asynchronously)
-					//create img
-					sb.append("<a href=\"");
-					
-					sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false));
-					sb.append("\"><img alt=\""+DisplayConstants.PREVIEW_UNAVAILABLE+"\" class=\"imageDescriptor\" ");
-					sb.append(" src=\"");
-					sb.append(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
-					sb.append("\"></img></a>");
-				}
-			}
-		}
-		return new HTMLPanel(sb.toString());
+	private Widget getFilePreview(EntityBundle bundle) {
+		previewWidget.configure(bundle);
+		Widget preview = previewWidget.asWidget();
+		preview.addStyleName("span-17 notopmargin padding-top-15");		
+		return preview;
 	}
 	
 	// Render the Folder entity
@@ -370,10 +351,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, int spanWidth) {
+		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
-			container.add(wikiPageWidget);
-			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), WidgetConstants.WIKI_OWNER_ID_ENTITY, null), canEdit, new WikiPageWidget.Callback() {
+			container.add(wikiPageWidget.asWidget());
+			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), null), canEdit, new WikiPageWidget.Callback() {
 				@Override
 				public void pageUpdated() {
 					presenter.fireEntityUpdatedEvent();
@@ -524,7 +506,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    if(description != null && !("".equals(description))) {
 	    	if (!DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 				lc.add(markdownWidget);
-		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  WidgetConstants.WIKI_OWNER_ID_ENTITY, null), false, false);
+		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  ObjectType.ENTITY.toString(), null), false, false);
 	    	}
 	    	else {
 	    		Label plainDescriptionText = new Label();
@@ -539,16 +521,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	private LayoutContainer createPropertyWidget(EntityBundle bundle) {
-		LayoutContainer lc = new LayoutContainer();
-		lc.setAutoWidth(true);
-		lc.setAutoHeight(true);
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.ANNOTATIONS + "</h4>")));
-
 	    // Create the property body
 	    // the headers for properties.
 	    propertyWidget.setEntityBundle(bundle);
-	    lc.add(propertyWidget.asWidget());
-	    lc.layout();
+	    LayoutContainer lc = new LayoutContainer();
+		lc.setAutoWidth(true);
+		lc.setAutoHeight(true);
+		if (!propertyWidget.isEmpty()) {
+			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.ANNOTATIONS + "</h4>")));
+		    // Create the property body
+		    // the headers for properties.
+		    lc.add(propertyWidget.asWidget());
+		}
+		lc.layout();
 		return lc;
 	}
 
@@ -567,7 +552,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         flex.setFlex(1);
 
         final String baseURl = GWT.getModuleBaseURL()+"attachment";
-        final String actionUrl =  baseURl+ "?" + DisplayUtils.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId() ;
+        final String actionUrl =  baseURl+ "?" + WebConstants.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId() ;
 
         if(canEdit && !readOnly) {
 	        Anchor addBtn = new Anchor();

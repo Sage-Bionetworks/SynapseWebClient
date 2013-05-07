@@ -16,12 +16,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AccessControlList;
+import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
+import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
@@ -44,6 +49,11 @@ public class HomePresenterTest {
 	StackConfigServiceAsync mockStackConfigService;
 	RssServiceAsync mockRssService;
 	NodeModelCreator mockNodeModelCreator;
+	SearchServiceAsync mockSearchService; 
+	SynapseClientAsync mockSynapseClient; 
+	AutoGenFactory autoGenFactory;
+	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+
 	
 	RSSFeed testFeed = null;
 	
@@ -55,7 +65,10 @@ public class HomePresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockRssService = mock(RssServiceAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-
+		mockSearchService = mock(SearchServiceAsync.class);
+		mockSynapseClient = mock(SynapseClientAsync.class);
+		autoGenFactory = new AutoGenFactory();
+		
 		testFeed = new RSSFeed();
 		RSSEntry entry = new RSSEntry();
 		entry.setTitle("A Title");
@@ -71,7 +84,11 @@ public class HomePresenterTest {
 				mockGlobalApplicationState,
 				mockStackConfigService,
 				mockRssService,
-				mockNodeModelCreator);
+				mockNodeModelCreator,
+				mockSearchService,
+				mockSynapseClient,
+				autoGenFactory,
+				jsonObjectAdapter);
 		verify(mockView).setPresenter(homePresenter);
 	}	
 	
@@ -80,14 +97,6 @@ public class HomePresenterTest {
 		Home place = Mockito.mock(Home.class);
 		homePresenter.setPlace(place);
 	}
-	
-	@Test
-	public void testBccLoad() {
-		String result = "challenge description";
-		AsyncMockStubber.callSuccessWith(result).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));		
-		homePresenter.loadBccOverviewDescription();
-		verify(mockView).showBccOverview(result);
-	}	
 	
 	@Test
 	public void testNewsFeed() throws JSONObjectAdapterException {
@@ -99,13 +108,4 @@ public class HomePresenterTest {
 		verify(mockView).showNews(anyString());
 	}	
 	
-	@Test
-	public void testSupportFeed() throws JSONObjectAdapterException {
-		//when support feed is loaded, the view should be updated with the service result
-		String exampleSupportFeedResult = "support feed";
-		AsyncMockStubber.callSuccessWith(exampleSupportFeedResult).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(RSSFeed.class))).thenReturn(testFeed);
-		homePresenter.loadSupportFeed();
-		verify(mockView).showSupportFeed(anyString());
-	}	
 }

@@ -3,8 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.Favorite;
-import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -12,7 +11,6 @@ import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -214,4 +212,19 @@ public interface SynapseClient extends RemoteService {
 	public void removeFavorite(String entityId) throws RestServiceException;
 	
 	public String getFavorites(Integer limit, Integer offset) throws RestServiceException;
+	
+	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException;
+	
+	public String createParticipant(String evaluationId) throws RestServiceException;
+	
+	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
+	
+	public String getChunkedFileToken(String fileName, String contentType, long chunkNumber) throws RestServiceException;
+	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException;
+	public String completeChunkedFileUpload(String entityId, String requestJson,String parentEntityId, boolean isRestricted) throws RestServiceException;
+	
+	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
+	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;
+	
+	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException;
 }

@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.shared.LicenseAgreement;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -59,6 +58,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraUrlHelper;
+	private boolean isDirectDownloadSupported; 
 	
 	// for testing
 	public void setUserProfile(UserProfile userProfile) {this.userProfile=userProfile;}
@@ -122,6 +122,16 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	}
 	
 	/**
+	 * If no access restrictions are present, then this will return the download url for the FileEntity FileHandle.  Otherwise, it will return null.
+	 * @return
+	 */
+	public String getDirectDownloadURL() {
+		if (isDirectDownloadSupported)
+			return view.getDirectDownloadURL();
+		else return null; 
+	}
+	
+	/**
 	 * Returns a standard download button
 	 * @param entity
 	 * @param showDownloadLocations
@@ -152,7 +162,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			if (entityBundle.getEntity() instanceof FileEntity) {
 				FileEntity fileEntity = (FileEntity)entityBundle.getEntity();
 				if (this.authenticationController.isLoggedIn()) {
-					FileHandle fileHandle = FileTitleBar.getFileHandle(entityBundle);
+					FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 					if (fileHandle != null) {
 						String md5 = null;
 						if (fileHandle instanceof S3FileHandleInterface) {
@@ -203,8 +213,10 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		accessRequirementToDisplay = GovernanceServiceHelper.selectAccessRequirement(allARs, unmetARs);
 		setRestrictionLevel(GovernanceServiceHelper.entityRestrictionLevel(allARs));
 		if (unmetARs==null || unmetARs.isEmpty()) {
+			isDirectDownloadSupported = true; 
 			setApprovalType(APPROVAL_TYPE.NONE);
 		} else {
+			isDirectDownloadSupported = false; 
 			setApprovalType(GovernanceServiceHelper.accessRequirementApprovalType(accessRequirementToDisplay));
 		}
 		

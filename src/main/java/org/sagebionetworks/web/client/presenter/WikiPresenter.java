@@ -14,7 +14,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class WikiPresenter extends AbstractActivity implements WikiView.Presenter {
+public class WikiPresenter extends AbstractActivity implements WikiView.Presenter, Presenter<WikiPlace> {
 		
 	private WikiPlace place;
 	private WikiView view;
@@ -43,6 +43,7 @@ public class WikiPresenter extends AbstractActivity implements WikiView.Presente
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(WikiPlace place) {
 		this.place = place;
 		this.view.setPresenter(this);

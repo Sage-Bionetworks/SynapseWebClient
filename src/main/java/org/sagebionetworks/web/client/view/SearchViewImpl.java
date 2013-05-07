@@ -215,8 +215,29 @@ public class SearchViewImpl extends Composite implements SearchView {
 		currentFacets.setAutoHeight(true);
 		for(final KeyValue facet : presenter.getAppliedFacets()) {
 			// Don't display the !link node_type facet
-			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()) && Boolean.TRUE.equals(facet.getNot()))
+			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()))
 				continue;
+			
+			// show project facet differently
+			if("project".equals(facet.getValue()) && "node_type".equals(facet.getKey())) {
+				Button btn = new Button("Show Results for All Types", AbstractImagePrototype.create(iconsImageBundle.magnify16()));
+				btn.addStyleName("floatleft");
+				btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {				
+						// disable all buttons to allow only one click
+						for(Button btn : facetButtons) {
+							btn.disable();
+						}
+						Window.scrollTo(0, 0);
+						presenter.removeFacet(facet.getKey(), facet.getValue());						
+					}
+				});
+				currentFacets.insert(btn, 1, new MarginData(6, 5, 0, 0));
+				facetButtons.add(0, btn);				
+				continue;
+			}
+			
 			String text = facet.getValue();
 			if(text.contains("..")) {				
 				text = presenter.getDisplayForTimeFacet(facet.getKey(), facet.getValue());

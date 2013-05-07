@@ -22,7 +22,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class ProjectsHomePresenter extends AbstractActivity implements ProjectsHomeView.Presenter {
+public class ProjectsHomePresenter extends AbstractActivity implements ProjectsHomeView.Presenter, Presenter<ProjectsHome>{
 		
 	private ProjectsHome place;
 	private ProjectsHomeView view;
@@ -56,6 +56,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 		panel.setWidget(view);
 	}
 
+	@Override
 	public void setPlace(ProjectsHome place) {
 		this.place = place;
 		view.setPresenter(this);
@@ -69,6 +70,32 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 
 	@Override
 	public void createProject(final String name) {
+		createProject(name, autoGenFactory, synapseClient, jsonObjectAdapter, globalApplicationState, authenticationController, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String newProjectId) {
+				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(newProjectId));						
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(caught instanceof ConflictException) {
+					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
+				} else {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
+						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					} 
+				}
+			}
+		});
+	}
+
+	public static void createProject(final String name,
+			AutoGenFactory autoGenFactory, SynapseClientAsync synapseClient,
+			JSONObjectAdapter jsonObjectAdapter,
+			final GlobalApplicationState globalApplicationState,
+			final AuthenticationController authenticationController,
+			final AsyncCallback<String> callback) {
 		Project proj = (Project) autoGenFactory.newInstance(Project.class.getName());
 		proj.setEntityType(Project.class.getName());
 		proj.setName(name);
@@ -78,25 +105,17 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 			synapseClient.createOrUpdateEntity(json.toJSONString(), null, true, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String newProjectId) {
-					view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(newProjectId));						
+					callback.onSuccess(newProjectId);
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(caught instanceof ConflictException) {
-						view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
-					} else {
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
-							view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-						} 
-					}
+					callback.onFailure(caught);
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
-		}
-		
+			callback.onFailure(e);
+		}		
 	}
 	
 }

@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +13,9 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Page;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
@@ -21,16 +25,19 @@ public class ImageWidgetTest {
 		
 	ImageWidget widget;
 	ImageWidgetView mockView;
+	AuthenticationController mockAuthenticationController;
 	Page testPage;
 	Map<String, String> descriptor;
-	WikiPageKey wikiKey = new WikiPageKey("", WidgetConstants.WIKI_OWNER_ID_ENTITY, null);
+	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		mockView = mock(ImageWidgetView.class);
-		widget = new ImageWidget(mockView);
+		mockAuthenticationController = mock(AuthenticationController.class);
+		widget = new ImageWidget(mockView, mockAuthenticationController);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 	}
 	
 	@Test
@@ -42,6 +49,6 @@ public class ImageWidgetTest {
 	@Test
 	public void testConfigure() {
 		widget.configure(wikiKey,descriptor);
-		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString());
+		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
 	}
 }

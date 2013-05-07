@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.download;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -20,8 +21,11 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.events.CancelEvent;
+import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
@@ -33,7 +37,10 @@ import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.xhr.client.XMLHttpRequest;
+
 
 public class UploaderTest {
 	
@@ -43,6 +50,7 @@ public class UploaderTest {
 	SynapseClientAsync synapseClient;
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils synapseJsniUtils;
+	
 	// JSON utility components
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
@@ -53,6 +61,7 @@ public class UploaderTest {
 	Uploader uploader;
 	GWTWrapper gwt;
 	FileEntity testEntity;
+	CancelHandler cancelHandler;
 	
 	@Before
 	public void before() throws Exception {
@@ -75,12 +84,23 @@ public class UploaderTest {
 		UserSessionData sessionData = new UserSessionData();
 		sessionData.setProfile(new UserProfile());
 		when(authenticationController.getLoggedInUser()).thenReturn(sessionData);
+		//direct upload
+		//by default, do not support direct upload (direct upload tests will turn on)
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(false);
+		when(synapseJsniUtils.getContentType(anyString())).thenReturn("image/png");
+		AsyncMockStubber.callSuccessWith("fake request json").when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("syn12345").when(synapseClient).completeChunkedFileUpload(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		when(gwt.createXMLHttpRequest()).thenReturn(null);
+		cancelHandler = mock(CancelHandler.class);
+		
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalFile(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createAccessRequirement(any(EntityWrapper.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), any(AsyncCallback.class));
 		uploader=new Uploader(view,nodeModelCreator,authenticationController, entityTypeProvider, synapseClient, jiraURLHelper, jsonObjectAdapter, synapseJsniUtils, adapterFactory, autogenFactory, gwt);
+		uploader.addCancelHandler(cancelHandler);
 	}
 	
 	@Test
@@ -88,7 +108,7 @@ public class UploaderTest {
 		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId, null);
 		
-		uploader.getUploadActionUrl(true);
+		uploader.getDefaultUploadActionUrl(true);
 		verify(synapseJsniUtils).getBaseFileHandleUrl();
 	}
 	
@@ -96,7 +116,7 @@ public class UploaderTest {
 	public void testGetUploadActionUrlWithFileEntity() {
 		FileEntity fileEntity = new FileEntity();
 		uploader.asWidget(fileEntity, null);
-		uploader.getUploadActionUrl(true);
+		uploader.getDefaultUploadActionUrl(true);
 		verify(synapseJsniUtils).getBaseFileHandleUrl();
 	}
 	
@@ -104,7 +124,7 @@ public class UploaderTest {
 	public void testGetUploadActionUrlWithData() {
 		Data data = new Data();
 		uploader.asWidget(data, null);
-		uploader.getUploadActionUrl(true);
+		uploader.getDefaultUploadActionUrl(true);
 		verify(gwt).getModuleBaseURL();
 	}
 	
@@ -175,7 +195,50 @@ public class UploaderTest {
 		verify(synapseClient).createAccessRequirement(any(EntityWrapper.class), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 		verify(view).openNewBrowserTab(anyString());
+	}
 
+	@Test
+	public void testDirectUploadHappyCase() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		uploader.handleUpload("newFile.txt");
+		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyLong(), any(AsyncCallback.class));
+		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
+		verify(synapseJsniUtils).uploadFile(anyString(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
+		//kick off what would happen after a successful upload
+		uploader.directUploadStep3(false);
+		verify(synapseClient).completeChunkedFileUpload(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(view).hideLoading();
+	}
+	
+	private void verifyUploadError() {
+		verify(view).showErrorMessage(anyString());
+		verify(cancelHandler).onCancel(any(CancelEvent.class));
+	}
+	
+	@Test
+	public void testDirectUploadStep1Failure() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyLong(), any(AsyncCallback.class));
+		uploader.handleUpload("newFile.txt");
+		verifyUploadError();
+	}
+
+	@Test
+	public void testDirectUploadStep2Failure() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
+		uploader.handleUpload("newFile.txt");
+		verifyUploadError();
+	}
+
+	@Test
+	public void testDirectUploadStep3Failure() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).completeChunkedFileUpload(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		uploader.handleUpload("newFile.txt");
+		//kick off what would happen after a successful upload
+		uploader.directUploadStep3(false);
+		verifyUploadError();
 	}
 
 }

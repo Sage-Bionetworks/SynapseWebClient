@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -18,8 +19,11 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +36,10 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.EvaluationStatus;
+import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -50,12 +58,20 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.doi.DoiStatus;
+import org.sagebionetworks.repo.model.file.ChunkRequest;
+import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
+import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.storage.StorageUsage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
@@ -70,7 +86,6 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -78,11 +93,10 @@ import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-
-import com.google.gwt.dev.javac.testing.impl.MockJavaResource;
 
 /**
  * Test for the SynapseClientImpl
@@ -107,7 +121,10 @@ public class SynapseClientImplTest {
 	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
 	AccessControlList acl;
 	WikiPage page;
-	
+	Evaluation mockEvaluation;
+	Participant mockParticipant;
+	UserSessionData mockUserSessionData;
+	UserProfile mockUserProfile;
 	
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -221,6 +238,25 @@ public class SynapseClientImplTest {
 		page.setMarkdown("my markdown");
 		page.setParentWikiId(null);
 		page.setTitle("A Title");
+		S3FileHandle handle = new S3FileHandle();
+		handle.setId("4422");
+		when(mockSynapse.completeChunkFileUpload(any(CompleteChunkedFileRequest.class))).thenReturn(handle);
+		VariableContentPaginatedResults<AccessRequirement> ars = new VariableContentPaginatedResults<AccessRequirement>();
+		ars.setTotalNumberOfResults(0);
+		ars.setResults(new ArrayList<AccessRequirement>());
+		when(mockSynapse.getAccessRequirements(anyString())).thenReturn(ars);
+		mockEvaluation = Mockito.mock(Evaluation.class);
+		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
+		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
+		mockUserSessionData = Mockito.mock(UserSessionData.class);
+		mockUserProfile = Mockito.mock(UserProfile.class);
+		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
+		when(mockUserProfile.getOwnerId()).thenReturn("MyOwnerID");
+		mockParticipant = Mockito.mock(Participant.class);
+		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(mockParticipant);
+		
+		when(mockSynapse.createParticipant(anyString())).thenReturn(mockParticipant);
 	}
 	
 	@Test
@@ -514,13 +550,13 @@ public class SynapseClientImplTest {
 	public void testCreateWikiPage() throws Exception {
 		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
 		Mockito.when(mockSynapse.createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.createWikiPage("testId", WidgetConstants.WIKI_OWNER_ID_ENTITY, wikiPageJson);
+		synapseClient.createWikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
 	    verify(mockSynapse).createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
 	}
 	
 	@Test
 	public void testDeleteWikiPage() throws Exception {
-		synapseClient.deleteWikiPage(new WikiPageKey("syn123", WidgetConstants.WIKI_OWNER_ID_ENTITY, "20"));
+		synapseClient.deleteWikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
 		verify(mockSynapse).deleteWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
 	}
 	
@@ -528,14 +564,14 @@ public class SynapseClientImplTest {
 	public void testGetWikiHeaderTree() throws Exception {
 		PaginatedResults<WikiHeader> headerTreeResults = new PaginatedResults<WikiHeader>();
 		when(mockSynapse.getWikiHeaderTree(anyString(), any(ObjectType.class))).thenReturn(headerTreeResults);
-		synapseClient.getWikiHeaderTree("testId", WidgetConstants.WIKI_OWNER_ID_ENTITY);
+		synapseClient.getWikiHeaderTree("testId", ObjectType.ENTITY.toString());
 	    verify(mockSynapse).getWikiHeaderTree(anyString(), any(ObjectType.class));
 	}
 	
 	@Test
 	public void testGetWikiPage() throws Exception {
 		Mockito.when(mockSynapse.getWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(page);
-		synapseClient.getWikiPage(new WikiPageKey("syn123", WidgetConstants.WIKI_OWNER_ID_ENTITY, "20"));
+		synapseClient.getWikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
 	    verify(mockSynapse).getWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
 	}
 	
@@ -543,7 +579,7 @@ public class SynapseClientImplTest {
 	public void testUpdateWikiPage() throws Exception {
 		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
 		Mockito.when(mockSynapse.updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.updateWikiPage("testId", WidgetConstants.WIKI_OWNER_ID_ENTITY, wikiPageJson);
+		synapseClient.updateWikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
 		
 		verify(mockSynapse).updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
 	}
@@ -552,7 +588,7 @@ public class SynapseClientImplTest {
 	public void testGetWikiAttachmentHandles() throws Exception {
 		FileHandleResults testResults = new FileHandleResults();
 		Mockito.when(mockSynapse.getWikiAttachmenthHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(testResults);
-		synapseClient.getWikiAttachmentHandles(new WikiPageKey("syn123", WidgetConstants.WIKI_OWNER_ID_ENTITY, "20"));
+		synapseClient.getWikiAttachmentHandles(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
 	    verify(mockSynapse).getWikiAttachmenthHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
 	}
 
@@ -599,5 +635,128 @@ public class SynapseClientImplTest {
 		fileEntityArg = arg.getValue();	//last value captured
 		assertEquals(originalFileEntityName, fileEntityArg.getName());
 	}
+	
+	@Test
+	public void testGetEntityDoi() throws Exception {
+		//wiring test
+		Doi testDoi = new Doi();
+		testDoi.setDoiStatus(DoiStatus.CREATED);
+		testDoi.setId("test doi id");
+		testDoi.setCreatedBy("Test User");
+		testDoi.setCreatedOn(new Date());
+		testDoi.setObjectId("syn1234");
+		Mockito.when(mockSynapse.getEntityDoi(anyString(), anyLong())).thenReturn(testDoi);
+		synapseClient.getEntityDoi("test entity id", null);
+	    verify(mockSynapse).getEntityDoi(anyString(), anyLong());
+	}
 
+//	@Test
+//	public void testGetParticipant() throws Exception{
+//		//basic wiring test
+//		//String returnJson = synapseClient.createParticipant("myEvalId");
+//		
+//	}
+
+	
+	private FileEntity getTestFileEntity() {
+		FileEntity testFileEntity = new FileEntity();
+		testFileEntity.setId("5544");
+		testFileEntity.setName("testFileEntity.R");
+		return testFileEntity;
+	}
+	
+	@Test (expected=NotFoundException.class)
+	public void testGetEntityDoiNotFound() throws Exception {
+		//wiring test
+		Mockito.when(mockSynapse.getEntityDoi(anyString(), anyLong())).thenThrow(new SynapseNotFoundException());
+		synapseClient.getEntityDoi("test entity id", null);
+	}
+	
+	@Test
+	public void testCreateDoi() throws Exception {
+		//wiring test
+		synapseClient.createDoi("test entity id", null);
+		verify(mockSynapse).createEntityDoi(anyString(), anyLong());
+	}
+
+	
+	private String getTestChunkRequestJson() throws JSONObjectAdapterException {
+		ChunkRequest chunkRequest = new ChunkRequest();
+		ChunkedFileToken token = new ChunkedFileToken();
+		token.setKey("test key");
+		chunkRequest.setChunkedFileToken(token);
+		chunkRequest.setChunkNumber(1l);
+		return EntityFactory.createJSONStringForEntity(chunkRequest);
+	}
+	
+	/**
+	 * Direct upload tests.  Most of the methods are simple pass-throughs to the Java Synapse client, but completeChunkedFileUpload has
+	 * additional logic
+	 * @throws JSONObjectAdapterException 
+	 * @throws SynapseException 
+	 * @throws RestServiceException 
+	 */
+	@Test
+	public void testCompleteChunkedFileUpload() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		String chunkRequestJson = getTestChunkRequestJson();
+		FileEntity testFileEntity = getTestFileEntity();
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
+		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
+		boolean isRestricted = true;
+		synapseClient.completeChunkedFileUpload(null, chunkRequestJson, "syn1", isRestricted);
+		
+		verify(mockSynapse).completeChunkFileUpload(any(CompleteChunkedFileRequest.class));
+		//it should have tried to create a new entity (since entity id was null)
+		verify(mockSynapse).createEntity(any(FileEntity.class));
+		//and update the name
+		verify(mockSynapse).putEntity(any(FileEntity.class));
+		//and lock down
+		verify(mockSynapse).createAccessRequirement(any(AccessRequirement.class));
+	}
+	
+	@Test
+	public void testCompleteChunkedFileUploadExistingEntity() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		String chunkRequestJson = getTestChunkRequestJson();
+		FileEntity testFileEntity = getTestFileEntity();
+		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
+		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
+		boolean isRestricted = false;
+		synapseClient.completeChunkedFileUpload(entityId, chunkRequestJson, "syn1", isRestricted);
+		
+		verify(mockSynapse).completeChunkFileUpload(any(CompleteChunkedFileRequest.class));
+		//it should have tried to find the entity
+		verify(mockSynapse).getEntityById(anyString());
+		//update the data file handle id, and update the name
+		verify(mockSynapse, Mockito.times(2)).putEntity(any(FileEntity.class));
+		//do not lock down (restricted=false)
+		verify(mockSynapse, Mockito.times(0)).createAccessRequirement(any(AccessRequirement.class));
+	}
+
+	@Test
+	public void testGetChunkedFileToken() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		String fileName = "test file.zip";
+		Long chunkNumber = 222l;
+		String contentType = "application/test";
+		ChunkedFileToken testToken = new ChunkedFileToken();
+		testToken.setFileName(fileName);
+		testToken.setKey("a key 42");
+		testToken.setUploadId("upload ID 123");
+		when(mockSynapse.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class))).thenReturn(testToken);
+		
+		String requestJson = synapseClient.getChunkedFileToken(fileName, contentType, chunkNumber);
+		ChunkRequest request = EntityFactory.createEntityFromJSONString(requestJson, ChunkRequest.class);
+		verify(mockSynapse).createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class));
+		assertEquals(testToken, request.getChunkedFileToken());
+		assertEquals(chunkNumber, request.getChunkNumber());
+	}
+	
+	@Test
+	public void testGetChunkedPresignedUrl() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		URL testUrl = new URL("http://test.presignedurl.com/foo");
+		when(mockSynapse.createChunkedPresignedUrl(any(ChunkRequest.class))).thenReturn(testUrl);
+		String presignedUrl = synapseClient.getChunkedPresignedUrl(getTestChunkRequestJson());
+		verify(mockSynapse).createChunkedPresignedUrl(any(ChunkRequest.class));
+		assertEquals(testUrl.toString(), presignedUrl);
+	}
 }
