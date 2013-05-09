@@ -40,5 +40,9 @@ public interface ProvenanceWidgetView extends IsWidget, SynapseWidgetView {
 	public void setGraph(ProvGraph graph);
 
 	public void setHeight(int height);
+
+	public int getDefaultHeight();
+	
+	public void setBlockCloseFullscreen(boolean blockClose);
 	
 }

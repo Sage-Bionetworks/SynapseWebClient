@@ -110,7 +110,7 @@ public class ServerMarkdownUtilsTest {
 	@Test
 	public void testAddWidgetDivs(){
 		String testString = "<p>Line of widgets: <ul><li>${type1:aWidgetParam=1}</li><li>${type2:aWidgetParam=2}</li></ul></p>";
-		String expectedResult = "<html>\n <head></head>\n <body>\n  <p>Line of widgets: </p>\n  <ul>\n   <li>\n    <div>\n     <div id=\"widget_0\" widgetparams=\"type1:aWidgetParam=1\"></div>\n    </div></li>\n   <li>\n    <div>\n     <div id=\"widget_1\" widgetparams=\"type2:aWidgetParam=2\"></div>\n    </div></li>\n  </ul>\n </body>\n</html>";
+		String expectedResult = "<html>\n <head></head>\n <body>\n  <p>Line of widgets: </p>\n  <ul>\n   <li>\n    <div>\n     <div id=\"widget_0\" class=\"widgetContainer\" widgetparams=\"type1:aWidgetParam=1\"></div>\n    </div></li>\n   <li>\n    <div>\n     <div id=\"widget_1\" class=\"widgetContainer\" widgetparams=\"type2:aWidgetParam=2\"></div>\n    </div></li>\n  </ul>\n </body>\n</html>";
 		Document htmlDoc = Jsoup.parse(testString);
 		ServerMarkdownUtils.addWidgets(htmlDoc, false);
 		String actualResult = htmlDoc.html();

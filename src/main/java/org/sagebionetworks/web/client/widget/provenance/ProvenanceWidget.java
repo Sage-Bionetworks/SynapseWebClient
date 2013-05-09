@@ -102,6 +102,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+		view.setPresenter(this);
+		view.showLoading();
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;		
 
@@ -483,6 +485,10 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		public void setActivity(Activity activity) {
 			this.activity = activity;
 		}		
+	}
+
+	public int getDefaultHeight() {
+		return view.getDefaultHeight();
 	}
 	
 }
