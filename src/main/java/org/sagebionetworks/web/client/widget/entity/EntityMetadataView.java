@@ -63,8 +63,6 @@ public interface EntityMetadataView extends IsWidget {
 
 		void editCurrentVersionInfo(String entityId, String version, String comment);
 
-		void promoteVersion(String entityId, Long versionNumber);
-
 		void deleteVersion(String entityId, Long versionNumber);
 		
 	}
