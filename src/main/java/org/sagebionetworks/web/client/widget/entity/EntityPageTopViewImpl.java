@@ -407,8 +407,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 	    // Create the property body
 	    // the headers for properties.
-		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();				
-		provenanceWidget.setHeight(provenanceWidget.getDefaultHeight());		
+		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();						
 		
 		Map<String,String> configMap = new HashMap<String,String>();
 		Long version = bundle.getEntity() instanceof Versionable ? ((Versionable)bundle.getEntity()).getVersionNumber() : null; 

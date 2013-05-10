@@ -486,9 +486,5 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			this.activity = activity;
 		}		
 	}
-
-	public int getDefaultHeight() {
-		return view.getDefaultHeight();
-	}
 	
 }

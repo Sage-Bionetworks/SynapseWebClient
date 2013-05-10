@@ -56,8 +56,6 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	private HashMap<String,String> filledPopoverIds;
 		
 	private int height = WidgetConstants.PROV_WIDGET_HEIGHT_DEFAULT;
-	private static final int PROVENANCE_HEIGHT_PX = 255;
-	private static final int PROVENANCE_WIDTH_PX = 254;
 	private static final LayoutData TOP3_LEFT3 = new MarginData(3, 0, 0, 3);
 	
 	private LayoutContainer container;
@@ -136,13 +134,6 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	public void setHeight(int height) {
 		this.height = height;
 	}
-
-
-	@Override
-	public int getDefaultHeight() {
-		return PROVENANCE_HEIGHT_PX;
-	}
-
 	
 	/*
 	 * Private Methods
