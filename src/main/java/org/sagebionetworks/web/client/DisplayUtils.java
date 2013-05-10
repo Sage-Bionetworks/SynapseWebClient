@@ -506,7 +506,11 @@ public class DisplayUtils {
 	}
 	
 	public static String getLoadingHtml(SageImageBundle sageImageBundle) {
-		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " " + DisplayConstants.LOADING + "...";
+		return getLoadingHtml(sageImageBundle, DisplayConstants.LOADING);
+	}
+
+	public static String getLoadingHtml(SageImageBundle sageImageBundle, String message) {
+		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " " + message + "...";
 	}
 
 
@@ -758,12 +762,24 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static HorizontalPanel createFullWidthLoadingPanel(SageImageBundle sageImageBundle) {
+		return createFullWidthLoadingPanel(sageImageBundle, " Loading...");
+	}
+
+	/**
+	 * Create a loading panel with a centered spinner.
+	 * 
+	 * @param sageImageBundle
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public static HorizontalPanel createFullWidthLoadingPanel(SageImageBundle sageImageBundle, String message) {
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		hp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		hp.setPixelSize(FULL_ENTITY_PAGE_WIDTH, FULL_ENTITY_PAGE_HEIGHT);
 		Widget w = new HTML(SafeHtmlUtils.fromSafeConstant(
-				DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " Loading..."));	
+				DisplayUtils.getIconHtml(sageImageBundle.loading31()) +" "+ message));	
 		hp.add(w);
 		return hp;
 	}
