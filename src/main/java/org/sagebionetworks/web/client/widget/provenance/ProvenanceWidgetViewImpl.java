@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -22,14 +21,27 @@ import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.Window;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.layout.FitData;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.LayoutData;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -44,6 +56,15 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	private HashMap<String,String> filledPopoverIds;
 		
 	private int height = WidgetConstants.PROV_WIDGET_HEIGHT_DEFAULT;
+	private static final LayoutData TOP3_LEFT3 = new MarginData(3, 0, 0, 3);
+	
+	private LayoutContainer container;
+	private LayoutContainer thisLayoutContainer;
+	private Anchor fullScreenAnchor;
+	private LayoutContainer prov;
+	private HTML loadingContainer;
+	private boolean blockCloseFullscreen = false;
+	private boolean inFullScreen = false;
 	
 	@Inject
 	public ProvenanceWidgetViewImpl(SageImageBundle sageImageBundle,
@@ -52,14 +73,20 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.ginInjector = ginInjector;
-	}
 		
-	
+		container = new LayoutContainer();
+		this.thisLayoutContainer = this;
+		
+		createFullScreenButton(iconsImageBundle);	
+		loadingContainer = new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, "Loading provenance"));
+	}
+
 	@Override
 	protected void onRender(Element parent, int index) {
 		// TODO Auto-generated method stub
 		super.onRender(parent, index);
 		initJsPlumb();
+		this.add(container);
 		createGraph();
 	}
 
@@ -88,6 +115,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 	@Override
 	public void showLoading() {
+		container.add(loadingContainer, TOP3_LEFT3);
+		container.layout(true);
 	}
 
 	@Override
@@ -97,30 +126,38 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 	@Override
 	public void clear() {
+		container.removeAll();
 	}
+	
 
+	@Override
+	public void setHeight(int height) {
+		this.height = height;
+	}
 	
 	/*
 	 * Private Methods
 	 */	
 	private void createGraph() {
-		this.removeAll(true);
 		this.filledPopoverIds = new HashMap<String,String>();
-		LayoutContainer prov = new LayoutContainer();
+		blockCloseFullscreen = false;
+		prov = new LayoutContainer();
 		prov.setStyleAttribute("position", "relative");		
 		prov.setHeight(height);				
 		
-		if(graph != null) {
+		if(graph != null) {			
+			container.removeAll();			
+			if(!inFullScreen) addFullScreenAnchor();			
 			// add nodes to graph
 			Set<ProvGraphNode> nodes = graph.getNodes();
 			for(ProvGraphNode node : nodes) {			
 				prov.add(getNodeContainer(node));
-			}			
+			}						
 		}
 		
-		this.add(prov, new MarginData(5));
+		container.add(prov, new MarginData(5));
 		this.addStyleName("scroll-auto");
-		this.layout(true);
+		container.layout(true);
 		
 		// make connections (assure DOM elements are in before asking jsPlumb to connect them)
 		if(graph != null) {			
@@ -152,7 +189,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			}
 			return container;
 		} else if(node instanceof ExpandGraphNode) {
-			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, sageImageBundle, presenter);
+			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, sageImageBundle, presenter, this);
 		} else if(node instanceof ExternalGraphNode) {			
 			LayoutContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node, iconsImageBundle);
 			addToolTipToContainer(node, container, DisplayConstants.EXTERNAL_URL);
@@ -249,9 +286,76 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	
 	}-*/;
 
-	@Override
-	public void setHeight(int height) {
-		this.height = height;
+	
+	private void createFullScreenButton(IconsImageBundle iconsImageBundle) {
+		fullScreenAnchor = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.fullScreen16())));
+		//fullSizeButton.setStyleName("z-index-10");
+		fullScreenAnchor.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				// remove graph from on page container
+				thisLayoutContainer.remove(container);
+				container.remove(fullScreenAnchor);
+				thisLayoutContainer.layout(true);
+				
+				// add it to window
+				container.addStyleName("scroll-auto");				
+				final Window window = new Window();
+				// 90% h/w
+				window.setSize(
+						new Double(com.google.gwt.user.client.Window.getClientWidth() * .97).intValue(),
+						new Double(com.google.gwt.user.client.Window.getClientHeight() * .97).intValue()); 
+				window.setPlain(true);
+				window.setModal(false);
+				window.setHeaderVisible(true);
+				window.setHeading(DisplayConstants.PROVENANCE);
+				window.addListener(Events.OnClick, new Listener<BaseEvent>() {
+					@Override
+					public void handleEvent(BaseEvent be) {
+						if(!blockCloseFullscreen) {
+							window.hide();
+						}
+					}
+				});
+				window.addListener(Events.Hide, new Listener<ComponentEvent>() {
+			        @Override
+			        public void handleEvent(ComponentEvent be) {
+			        	addFullScreenAnchor();
+			        	container.removeStyleName("scroll-auto");
+			        	thisLayoutContainer.add(container);
+			        	container.setSize(prov.getWidth(), height); // reset height as window alters it 
+			        	prov.setHeight(height);
+			        	thisLayoutContainer.layout(true);
+			        	inFullScreen = false;
+			        }
+
+			    });
+				window.setLayout(new FitLayout());
+				LayoutContainer white = new LayoutContainer(new FitLayout());
+				white.addStyleName("whiteBackground");
+				white.add(container, new FitData(4));
+				window.add(white);				
+				window.addButton(new Button(DisplayConstants.CLOSE, new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						window.hide();
+					}
+				}));
+				window.setButtonAlign(HorizontalAlignment.RIGHT);
+				inFullScreen = true;
+				window.show();
+			}
+		});
 	}
+		
+	private void addFullScreenAnchor() {
+		container.insert(fullScreenAnchor, 0, new MarginData(1, 0, 0, 1));
+	}
+
+	@Override
+	public void setBlockCloseFullscreen(boolean blockClose) {
+		blockCloseFullscreen = blockClose;
+	}
+	
 	
 }

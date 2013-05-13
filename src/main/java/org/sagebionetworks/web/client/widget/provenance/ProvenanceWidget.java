@@ -102,6 +102,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+		view.setPresenter(this);
+		view.showLoading();
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;		
 

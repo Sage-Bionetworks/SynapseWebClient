@@ -540,9 +540,6 @@ a.shortBtn {
 	overflow: hidden;
 	text-align: justify;
 }
-.markdown div{
-	overflow-x: auto;
-}
 
 .markdown ol { 
 	list-style-type: decimal;
@@ -900,4 +897,6 @@ ol.lowerroman {
 	font-size: 0.8em;
 }
 
-
+.widgetContainer {
+	overflow-x: auto;
+}
