@@ -29,8 +29,8 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/application--plus-16.png")
 	ImageResource applicationPlus16();	
 
-	@Source("images/icons/application-resize-16.png")
-	ImageResource applicationResize16();
+	@Source("images/icons/full-screen-16.png")
+	ImageResource fullScreen16();
 
 	@Source("images/icons/arrow-curve-16.png")
 	ImageResource arrowCurve16();

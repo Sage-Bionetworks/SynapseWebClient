@@ -320,33 +320,6 @@ public class EntityMetadata implements Presenter {
 	}
 
 	@Override
-	public void promoteVersion(final String entityId, final Long versionNumber) {
-		synapseClient.promoteEntityVersion(entityId, versionNumber, new AsyncCallback<String>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught,
-						globalApplicationState.getPlaceChanger(),
-						authenticationController.getLoggedInUser())) {
-					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_PROMOTE_FAILURE+ "\n "+ caught.getMessage());
-				}
-			}
-			@Override
-			public void onSuccess(String result) {
-				VersionInfo info = new VersionInfo();
-				try {
-					JSONObjectAdapter joa = jsonObjectAdapter.createNew(result);
-					info.initializeFromJSONObject(joa);
-					view.showInfo("Version promoted", "Version "+ info.getVersionLabel() + " of " + info.getId() + 
-							DisplayConstants.LABEL_PROMOTED);
-					fireEntityUpdatedEvent();
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INVALID_VERSION_FORMAT);
-				}
-			}
-		});
-	}
-
-	@Override
 	public void deleteVersion(final String entityId, final Long versionNumber) {
 		synapseClient.deleteEntityVersionById(entityId, versionNumber, new AsyncCallback<Void>() {
 			@Override

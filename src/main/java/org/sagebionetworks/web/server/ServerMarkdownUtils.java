@@ -321,7 +321,7 @@ public class ServerMarkdownUtils {
 					if (previousFoundIndex < oldText.length() - 1)
 						// substring, go from the previously found index to the end
 						sb.append(oldText.substring(previousFoundIndex));
-					Element newElement = doc.createElement("div"); //wrap new html in a span, since it needs a container!
+					Element newElement = doc.createElement("div"); //wrap new html in a div, since it needs a container!					
 					newElement.html(sb.toString());
 					childNode.replaceWith(newElement);
 				}
@@ -348,7 +348,7 @@ public class ServerMarkdownUtils {
 		sb.append(WebConstants.DIV_ID_WIDGET_PREFIX);
 		sb.append(widgetIndex);
 		sb.append(suffix);
-		sb.append("\" widgetParams=\"");
+		sb.append("\" class=\"widgetContainer\" widgetParams=\"");
 		sb.append(widgetProperties);
 		sb.append("\">");
 		sb.append("</div>");

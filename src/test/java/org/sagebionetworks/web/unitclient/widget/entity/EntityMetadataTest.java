@@ -171,12 +171,6 @@ public class EntityMetadataTest {
 	}
 
 	@Test
-	public void testPromoteVersion() throws Exception {
-		entityMetadata.promoteVersion(vb.getId(), vb.getVersionNumber());
-		verify(mockSynapseClient).promoteEntityVersion(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<String>) any());
-	}
-
-	@Test
 	public void testDeleteVersion() throws Exception {
 		entityMetadata.deleteVersion(vb.getId(), vb.getVersionNumber());
 		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
