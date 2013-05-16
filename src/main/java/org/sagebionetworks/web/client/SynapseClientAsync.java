@@ -4,6 +4,8 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -87,6 +89,13 @@ public interface SynapseClientAsync {
 	public void createAccessRequirement(EntityWrapper arEW, AsyncCallback<EntityWrapper> callback);
 
 	public void getUnmetAccessRequirements(String entityId, AsyncCallback<AccessRequirementsTransport> callback);
+	
+	/**
+	 * 
+	 * @param evalId the evaluation identifier
+	 * @param callback returns VariableContentPaginatedResults<AccessRequirement> json
+	 */
+	public void getUnmetEvaluationAccessRequirements(String evalId, AsyncCallback<String> callback);
 
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
 

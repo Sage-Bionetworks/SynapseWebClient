@@ -1,21 +1,30 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -132,6 +141,37 @@ public class EvaluationViewImpl extends Composite implements EvaluationView {
 			panel.add(container);
 		}
 		return container;
+	}
+	
+	public void showAccessRequirement(
+			String arText,
+			final Callback touAcceptanceCallback) {
+		final Dialog dialog = new Dialog();
+       	dialog.setMaximizable(false);
+        dialog.setSize(500, 600);
+        dialog.setPlain(true); 
+        dialog.setModal(true); 
+        dialog.setAutoHeight(true);
+        dialog.setResizable(false);
+        TextArea textArea = new TextArea();
+        textArea.setText(arText);
+        textArea.setEnabled(false);
+        textArea.setStyleName(DisplayUtils.EVALUATION_TERMS_BOX_STYLE_NAME);
+        dialog.setBorders(false);
+        dialog.add(textArea);
+ 		dialog.setHeading("Terms of Use");
+		// agree to TOU, cancel
+        dialog.okText = DisplayConstants.BUTTON_TEXT_ACCEPT_TERMS_OF_USE;
+        dialog.setButtons(Dialog.OKCANCEL);
+        Button touButton = dialog.getButtonById(Dialog.OK);
+        touButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				touAcceptanceCallback.invoke();
+			}
+        });
+        dialog.setHideOnButtonClick(true);		
+		dialog.show();		
 	}
 
 }
