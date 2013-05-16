@@ -16,15 +16,15 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -148,17 +148,15 @@ public class EvaluationViewImpl extends Composite implements EvaluationView {
 			final Callback touAcceptanceCallback) {
 		final Dialog dialog = new Dialog();
        	dialog.setMaximizable(false);
-        dialog.setSize(500, 600);
+        dialog.setSize(640, 480);
         dialog.setPlain(true); 
         dialog.setModal(true); 
         dialog.setAutoHeight(true);
         dialog.setResizable(false);
-        TextArea textArea = new TextArea();
-        textArea.setText(arText);
-        textArea.setEnabled(false);
-        textArea.setStyleName(DisplayUtils.EVALUATION_TERMS_BOX_STYLE_NAME);
-        dialog.setBorders(false);
-        dialog.add(textArea);
+        ScrollPanel panel = new ScrollPanel(new HTML(arText));
+        panel.addStyleName("margin-top-left-10");
+        panel.setSize("605px", "450px");
+        dialog.add(panel);
  		dialog.setHeading("Terms of Use");
 		// agree to TOU, cancel
         dialog.okText = DisplayConstants.BUTTON_TEXT_ACCEPT_TERMS_OF_USE;

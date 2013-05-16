@@ -35,6 +35,8 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -857,8 +859,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public AccessRequirementsTransport getUnmetAccessRequirements(String entityId) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
+			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
+			subjectId.setId(entityId);
+			subjectId.setType(RestrictableObjectType.ENTITY);
+
 			VariableContentPaginatedResults<AccessRequirement> accessRequirements = 
-				synapseClient.getUnmetAccessReqAccessRequirements(entityId);
+				synapseClient.getUnmetAccessRequirements(subjectId);
 			JSONObjectAdapter arJson = accessRequirements.writeToJSONObject(adapterFactory.createNew());
 			AccessRequirementsTransport transport = new AccessRequirementsTransport();
 			transport.setAccessRequirementsString(arJson.toJSONString());	
@@ -878,8 +884,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String getUnmetEvaluationAccessRequirements(String evalId) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
+			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
+			subjectId.setId(evalId);
+			subjectId.setType(RestrictableObjectType.EVALUATION);
+
 			VariableContentPaginatedResults<AccessRequirement> accessRequirements = 
-				synapseClient.getUnmetEvaluationAccessReqAccessRequirements(evalId);
+				synapseClient.getUnmetAccessRequirements(subjectId);
 			JSONObjectAdapter arJson = accessRequirements.writeToJSONObject(adapterFactory.createNew());
 			return arJson.toJSONString();
 		} catch (SynapseException e) {

@@ -339,12 +339,6 @@
 	margin: 4px 10px 0 0; 
 }
 
-.evalTermsBox {
-	width: 470px;
-	border: 0px;
-}
-
-
 /* Clear out GWT's link color */
 a, a:visited, a:hover {
   color: inherit;

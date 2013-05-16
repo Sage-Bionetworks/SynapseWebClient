@@ -197,7 +197,6 @@ public class DisplayUtils {
 	public static final String STYLE_CODE_CONTENT = "codeContent";
 	public static final String STYLE_SMALL_GREY_TEXT = "smallGreyText";
 	public static final String HOMESEARCH_BOX_STYLE_NAME = "homesearchbox";
-	public static final String EVALUATION_TERMS_BOX_STYLE_NAME = "evalTermsBox";
 	public static final String STYLE_SMALL_SEARCHBOX = "smallsearchbox";
 	public static final String STYLE_OTHER_SEARCHBOX = "othersearchbox";
 	public static final String STYLE_BREAK_WORD = "break-word";

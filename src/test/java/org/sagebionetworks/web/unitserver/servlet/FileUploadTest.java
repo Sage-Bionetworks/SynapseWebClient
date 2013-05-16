@@ -26,6 +26,7 @@ import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -125,7 +126,7 @@ public class FileUploadTest {
 		when(mockSynapse.uploadLocationableToSynapse(eq(entity), any(File.class))).thenReturn(entity);
 		VariableContentPaginatedResults<AccessRequirement> currentARs = new VariableContentPaginatedResults<AccessRequirement>();
 		currentARs.setTotalNumberOfResults(0L);
-		when(mockSynapse.getAccessRequirements(anyString())).thenReturn(currentARs);
+		when(mockSynapse.getAccessRequirements(any(RestrictableObjectDescriptor.class))).thenReturn(currentARs);
 		// setup fileupload
 		servlet.setServiceUrlProvider(new ServiceUrlProvider());
 		servlet.setSynapseProvider(mockSynapseProvider);
