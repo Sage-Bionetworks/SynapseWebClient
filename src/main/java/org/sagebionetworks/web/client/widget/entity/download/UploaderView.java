@@ -22,7 +22,8 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 	public void hideLoading();
 	public boolean isNewlyRestricted();
 	public void updateProgress(double value, String text);
-	public void resetProgresBar();
+	public void showProgressBar();
+	public void showFinishingProgress();
 	
 	/**
 	 * Presenter interface

@@ -140,9 +140,9 @@ public interface SynapseClientAsync {
 	void createParticipant(String evaluationId, AsyncCallback<String> callback) throws RestServiceException;
 	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
-	void getChunkedFileToken(String fileName,  String contentType, long chunkNumber, AsyncCallback<String> callback) throws RestServiceException;
+	void getChunkedFileToken(String fileName,  String contentType, AsyncCallback<String> callback) throws RestServiceException;
 	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
-	void completeChunkedFileUpload(String entityId, String requestJson, String parentEntityId, boolean isRestricted, AsyncCallback<String> callback) throws RestServiceException;
+	void completeChunkedFileUpload(String entityId, List<String> requests, String parentEntityId, boolean isRestricted, AsyncCallback<String> callback) throws RestServiceException;
 	void getEntityDoi(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 

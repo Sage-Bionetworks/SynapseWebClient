@@ -1286,7 +1286,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String getChunkedFileToken(String fileName, String contentType, long chunkNumber) throws RestServiceException {
+	public String getChunkedFileToken(String fileName, String contentType) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
 			CreateChunkedFileTokenRequest ccftr = new CreateChunkedFileTokenRequest();
@@ -1294,11 +1294,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			ccftr.setContentType(contentType);
 			// Start the upload
 			ChunkedFileToken token = synapseClient.createChunkedFileUploadToken(ccftr);
-			ChunkRequest request = new ChunkRequest();
-			request.setChunkedFileToken(token);
-			request.setChunkNumber(chunkNumber);
 			
-			JSONObjectAdapter requestJson = request.writeToJSONObject(adapterFactory.createNew());
+			JSONObjectAdapter requestJson = token.writeToJSONObject(adapterFactory.createNew());
 			return requestJson.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1322,21 +1319,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String completeChunkedFileUpload(String entityId, String requestJson, String parentEntityId, boolean isRestricted) throws RestServiceException {
+	public String completeChunkedFileUpload(String entityId, List<String> requests, String parentEntityId, boolean isRestricted) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			//re-create the request
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			ChunkRequest request = jsonEntityFactory.createEntity(requestJson, ChunkRequest.class);
-			
-			//create the chunkresult
-			ChunkResult result = synapseClient.addChunkToFile(request);
 			List<ChunkResult> results = new ArrayList<ChunkResult>();
-			results.add(result);
+			
+			//re-create each request
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			ChunkedFileToken token=null;
+			for (String requestJson : requests) {
+				ChunkRequest request = jsonEntityFactory.createEntity(requestJson, ChunkRequest.class);
+				token = request.getChunkedFileToken();
+				//create the chunkresult
+				ChunkResult result = synapseClient.addChunkToFile(request);
+				results.add(result);
+			}
 
 			// And complete the upload
 			CompleteChunkedFileRequest ccfr = new CompleteChunkedFileRequest();
-			ccfr.setChunkedFileToken(request.getChunkedFileToken());
+			ccfr.setChunkedFileToken(token);
 			ccfr.setChunkResults(results);
 			// Complete the upload
 			S3FileHandle newHandle = synapseClient.completeChunkFileUpload(ccfr);

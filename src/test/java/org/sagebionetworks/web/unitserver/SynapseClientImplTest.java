@@ -680,13 +680,16 @@ public class SynapseClientImplTest {
 	}
 
 	
-	private String getTestChunkRequestJson() throws JSONObjectAdapterException {
+	private List<String> getTestChunkRequestJson() throws JSONObjectAdapterException {
 		ChunkRequest chunkRequest = new ChunkRequest();
 		ChunkedFileToken token = new ChunkedFileToken();
 		token.setKey("test key");
 		chunkRequest.setChunkedFileToken(token);
 		chunkRequest.setChunkNumber(1l);
-		return EntityFactory.createJSONStringForEntity(chunkRequest);
+		String chunkRequestJson = EntityFactory.createJSONStringForEntity(chunkRequest);
+		List<String> chunkRequests = new ArrayList<String>();
+		chunkRequests.add(chunkRequestJson);
+		return chunkRequests;
 	}
 	
 	/**
@@ -698,12 +701,12 @@ public class SynapseClientImplTest {
 	 */
 	@Test
 	public void testCompleteChunkedFileUpload() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		String chunkRequestJson = getTestChunkRequestJson();
+		List<String> chunkRequests = getTestChunkRequestJson();
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = true;
-		synapseClient.completeChunkedFileUpload(null, chunkRequestJson, "syn1", isRestricted);
+		synapseClient.completeChunkedFileUpload(null, chunkRequests, "syn1", isRestricted);
 		
 		verify(mockSynapse).completeChunkFileUpload(any(CompleteChunkedFileRequest.class));
 		//it should have tried to create a new entity (since entity id was null)
@@ -716,13 +719,13 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testCompleteChunkedFileUploadExistingEntity() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		String chunkRequestJson = getTestChunkRequestJson();
+		List<String> chunkRequests = getTestChunkRequestJson();
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = false;
-		synapseClient.completeChunkedFileUpload(entityId, chunkRequestJson, "syn1", isRestricted);
+		synapseClient.completeChunkedFileUpload(entityId, chunkRequests, "syn1", isRestricted);
 		
 		verify(mockSynapse).completeChunkFileUpload(any(CompleteChunkedFileRequest.class));
 		//it should have tried to find the entity
@@ -736,7 +739,6 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetChunkedFileToken() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String fileName = "test file.zip";
-		Long chunkNumber = 222l;
 		String contentType = "application/test";
 		ChunkedFileToken testToken = new ChunkedFileToken();
 		testToken.setFileName(fileName);
@@ -744,18 +746,17 @@ public class SynapseClientImplTest {
 		testToken.setUploadId("upload ID 123");
 		when(mockSynapse.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class))).thenReturn(testToken);
 		
-		String requestJson = synapseClient.getChunkedFileToken(fileName, contentType, chunkNumber);
-		ChunkRequest request = EntityFactory.createEntityFromJSONString(requestJson, ChunkRequest.class);
+		String chunkTokenJson = synapseClient.getChunkedFileToken(fileName, contentType);
+		ChunkedFileToken token = EntityFactory.createEntityFromJSONString(chunkTokenJson, ChunkedFileToken.class);
 		verify(mockSynapse).createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class));
-		assertEquals(testToken, request.getChunkedFileToken());
-		assertEquals(chunkNumber, request.getChunkNumber());
+		assertEquals(testToken, token);
 	}
 	
 	@Test
 	public void testGetChunkedPresignedUrl() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
 		URL testUrl = new URL("http://test.presignedurl.com/foo");
 		when(mockSynapse.createChunkedPresignedUrl(any(ChunkRequest.class))).thenReturn(testUrl);
-		String presignedUrl = synapseClient.getChunkedPresignedUrl(getTestChunkRequestJson());
+		String presignedUrl = synapseClient.getChunkedPresignedUrl(getTestChunkRequestJson().get(0));
 		verify(mockSynapse).createChunkedPresignedUrl(any(ChunkRequest.class));
 		assertEquals(testUrl.toString(), presignedUrl);
 	}
