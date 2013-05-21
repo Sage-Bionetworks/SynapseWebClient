@@ -339,8 +339,6 @@
 	margin: 4px 10px 0 0; 
 }
 
-
-
 /* Clear out GWT's link color */
 a, a:visited, a:hover {
   color: inherit;

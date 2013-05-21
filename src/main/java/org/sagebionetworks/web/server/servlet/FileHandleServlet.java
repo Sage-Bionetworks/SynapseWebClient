@@ -28,6 +28,8 @@ import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
@@ -314,7 +316,11 @@ public class FileHandleServlet extends HttpServlet {
 		// now lock down restricted data
 		if (isRestricted) {
 			// we only proceed if there aren't currently any access restrictions
-			VariableContentPaginatedResults<AccessRequirement> currentARs = client.getAccessRequirements(fileEntity.getId());
+			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
+			subjectId.setId(fileEntity.getId());
+			subjectId.setType(RestrictableObjectType.ENTITY);
+
+			VariableContentPaginatedResults<AccessRequirement> currentARs = client.getAccessRequirements(subjectId);
 			if (currentARs.getTotalNumberOfResults()==0L) {
 				AccessRequirement ar = EntityUtil.createLockDownDataAccessRequirement(fileEntity.getId());
 				client.createAccessRequirement(ar);

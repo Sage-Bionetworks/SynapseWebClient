@@ -55,6 +55,8 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -213,7 +215,10 @@ public class SynapseClientImplTest {
 		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
 		accessRequirements.add(accessRequirement);
 		accessRequirement.setEntityType(TermsOfUseAccessRequirement.class.getName());
-		accessRequirement.setEntityIds(Arrays.asList(new String[]{"101"}));
+		RestrictableObjectDescriptor descriptor = new RestrictableObjectDescriptor();
+		descriptor.setId("101");
+		descriptor.setType(RestrictableObjectType.ENTITY);
+		accessRequirement.setSubjectIds(Arrays.asList(new RestrictableObjectDescriptor[]{descriptor}));
 		
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | 
 		HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
@@ -244,7 +249,7 @@ public class SynapseClientImplTest {
 		VariableContentPaginatedResults<AccessRequirement> ars = new VariableContentPaginatedResults<AccessRequirement>();
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
-		when(mockSynapse.getAccessRequirements(anyString())).thenReturn(ars);
+		when(mockSynapse.getAccessRequirements(any(RestrictableObjectDescriptor.class))).thenReturn(ars);
 		mockEvaluation = Mockito.mock(Evaluation.class);
 		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
