@@ -28,7 +28,7 @@ public class EntityUtilTest {
 		AccessRequirement ar = jsonEntityFactory.createEntity(ew.getEntityJson(), 
 				(Class<AccessRequirement>)Class.forName(ew.getEntityClassName()));
 	
-		assertEquals(entityId, ar.getEntityIds().get(0));
+		assertEquals(entityId, ar.getSubjectIds().get(0).getId());
 		assertTrue(ar instanceof ACTAccessRequirement);
 	}
 

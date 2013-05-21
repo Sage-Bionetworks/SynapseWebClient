@@ -5,6 +5,8 @@ import java.util.Arrays;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 
@@ -20,7 +22,10 @@ public class EntityUtil {
 		ACTAccessRequirement ar = new ACTAccessRequirement();
 		ar.setAccessType(ACCESS_TYPE.DOWNLOAD);
 		ar.setActContactInfo("Access restricted pending review by Synapse Access and Compliance Team.");
-		ar.setEntityIds(Arrays.asList(new String[]{entityId}));
+		RestrictableObjectDescriptor descriptor = new RestrictableObjectDescriptor();
+		descriptor.setId(entityId);
+		descriptor.setType(RestrictableObjectType.ENTITY);
+		ar.setSubjectIds(Arrays.asList(new RestrictableObjectDescriptor[]{descriptor}));
 		return ar;
 	}
 	
