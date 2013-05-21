@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityViewUtils;
@@ -46,6 +47,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
+	private SageImageBundle sageImageBundle;
+	
 	TextField<String> pathField;
 	
 	// initialized in constructor
@@ -62,15 +65,18 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private Button saveExternalLinkButton;
 	private String fileName;
 	
+	private HTML spinningProgressContainer;
+	
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	private JavaScriptObject window;
 	
 	LayoutContainer container;
 	IconsImageBundle iconsImageBundle;
 	@Inject
-	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, IconsImageBundle iconsImageBundle) {
+	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.iconsImageBundle = iconsImageBundle;
+		this.sageImageBundle = sageImageBundle;
 		
 		// initialize graphic elements
 		this.fileUploadOpenRadio = new Radio();
@@ -81,7 +87,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.progressBar = new ProgressBar();
 		this.formPanel = new FormPanel();
 		this.fileUploadField = new FileUploadField();
-		
+		spinningProgressContainer = new HTML();
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 	}
@@ -103,6 +109,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 	@Override
 	public void showLoading() {
+		spinningProgressContainer = new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_INITIALIZING));
 	}
 
 	@Override
@@ -290,7 +297,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
 					return;
 				}
-				initializeProgressBar();
+				initializeProgress();
 				// this is used in the 'handleEvent' listener, but must
 				// be created in the original thread.  for more, see
 				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
@@ -302,6 +309,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		};
 		uploadBtn.addSelectionListener(uploadListener);
 		progressBar.setVisible(false);
+		formPanel.add(spinningProgressContainer);
 		formPanel.add(progressBar);
 		formPanel.addButton(uploadBtn);
 		formPanel.layout(true);
@@ -312,18 +320,39 @@ public class UploaderViewImpl extends LayoutContainer implements
 		//try to hide the loading progress bar.  ignore any errors
 		progressBar.reset();
 		progressBar.setVisible(false);
+		spinningProgressContainer.setHTML("");
+		spinningProgressContainer.setVisible(false);
 	}
 	
 	@Override
 	public void submitForm() {
-		progressBar.updateText(DisplayConstants.LABEL_UPLOADING);
+		showSpinningProgress();
+		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));
 		formPanel.submit();	
 	}
 	
-	private void initializeProgressBar() {
-		progressBar.auto();
-		progressBar.updateText(DisplayConstants.LABEL_INITIALIZING);
+	private void initializeProgress() {
+		showSpinningProgress();
+		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_INITIALIZING));
+	}
+	
+	@Override
+	public void showProgressBar() {
 		progressBar.setVisible(true);
+		progressBar.reset();
+		spinningProgressContainer.setVisible(false);
+	}
+	
+	private void showSpinningProgress() {
+		spinningProgressContainer.setVisible(true);
+		progressBar.reset();
+		progressBar.setVisible(false);
+	}
+	
+	@Override
+	public void showFinishingProgress() {
+		showSpinningProgress();
+		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_FINISHING));
 	}
 	
 	private void addRadioButtonsToContainer(
@@ -480,10 +509,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		return externalLinkFormPanel;
 	}
 	
-	@Override
-	public void resetProgresBar() {
-		progressBar.reset();
-	}
 	@Override
 	public void updateProgress(double value, String text) {
 		progressBar.updateProgress(value, text);

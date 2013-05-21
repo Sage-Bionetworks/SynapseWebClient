@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -9,6 +10,8 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.file.ChunkRequest;
+import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -37,6 +40,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
@@ -47,13 +51,15 @@ import com.google.inject.Inject;
  * This Uploader class supports 3 use cases:
  * A. Legacy data types (like the Data Entity): Uploads to the FileUpload servlet, using the Form submit (POST).  @see org.sagebionetworks.web.server.servlet.FileUpload
  * B. File Entity, older client browser: Uploads to the FileHandleServlet servlet, using the Form submit (POST).  @see org.sagebionetworks.web.server.servlet.FileHandleServlet
- * C. File Entity, newer client browser: Direct upload to S3, using a PUT to a presigned URL.
+ * C. File Entity, newer client browser: Direct multipart upload to S3, using a PUT to presigned URLs.
  * 
  * Case C will be the most common case.
  */
 public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable {
 	
 	public static final double OLD_BROWSER_MAX_SIZE = DisplayUtils.MB * 5; //5MB
+	public static final int BYTES_PER_CHUNK = (int)DisplayUtils.MB * 5; //5MB
+	public static final int MAX_RETRY = 3;
 	
 	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
@@ -72,8 +78,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private JiraURLHelper jiraURLHelper;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private GWTWrapper gwt;
-	private String requestJson;
+	private ChunkedFileToken token;
 	private boolean isUploadRestricted;
+	NumberFormat percentFormat;
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -100,7 +107,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.adapterFactory = adapterFactory;
 		this.autogenFactory = autogenFactory;
 		this.gwt = gwt;
-		view.setPresenter(this);		
+		view.setPresenter(this);
+		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
 	}		
 		
@@ -171,9 +179,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					if (fileSize > OLD_BROWSER_MAX_SIZE) {
 						view.showErrorMessage(DisplayConstants.LARGE_FILE_ON_UNSUPPORTED_BROWSER);
 						fireCancelEvent();
+						return;
 					}
 				} catch (Exception e) {
 					view.showErrorMessage(e.getMessage());
+					return;
 				}
 			}
 			view.submitForm();
@@ -181,16 +191,23 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void directUploadStep1(String fileName){
-		this.requestJson = null;
+		this.token = null;
 		//get the chunked file request (includes token)
 		try {
 			//get the content type
-			String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID);
-			synapseClient.getChunkedFileToken(fileName, contentType, 1l, new AsyncCallback<String>() {
+			final String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID);
+			synapseClient.getChunkedFileToken(fileName, contentType, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
-					requestJson = result;
-					directUploadStep2();
+					try {
+						token = nodeModelCreator.createJSONEntity(result, ChunkedFileToken.class);
+						double fileSize = synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
+						long totalChunkCount = (long)Math.ceil(fileSize / BYTES_PER_CHUNK);;
+						view.showProgressBar();
+						directUploadStep2(contentType, 1, 1, totalChunkCount, (int)fileSize, new ArrayList<String>());
+					} catch (JSONObjectAdapterException e) {
+						onFailure(e);
+					}
 				}
 				@Override
 				public void onFailure(Throwable t) {
@@ -203,10 +220,23 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 
-	public void directUploadStep2(){
+	/**
+	 * 
+	 * @param currentChunkNumber The chunk number that should be uploaded
+	 * @param currentAttempt This is our nth attempt at uploading this chunk (starting at 1, trying up to MAX_RETRY times)
+	 * @param totalChunkCount The total number of chunks to complete upload of the file
+	 */
+	public void directUploadStep2(final String contentType, final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final int fileSize, final List<String> requestList){
 		//get the presigned upload url
 		//and upload the file
 		try {
+			//create a request for each chunk, and try to upload each one
+			ChunkRequest request = new ChunkRequest();
+			request.setChunkedFileToken(token);
+			request.setChunkNumber((long) currentChunkNumber);
+			JSONObjectAdapter json = jsonObjectAdapter.createNew();
+			request.writeToJSONObject(json);
+			final String requestJson = json.toJSONString();
 			synapseClient.getChunkedPresignedUrl(requestJson, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String urlString) {
@@ -216,19 +246,25 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							@Override
 							public void onReadyStateChange(XMLHttpRequest xhr) {
 								if (xhr.getReadyState() == 4) { //XMLHttpRequest.DONE=4, posts suggest this value is not resolved in some browsers
-									if (xhr.getStatus() == 200) //OK
-										directUploadStep3(view.isNewlyRestricted());
-									else
-										uploadError();
+									if (xhr.getStatus() == 200) { //OK
+										chunkUploadSuccess(requestJson, contentType, currentChunkNumber, totalChunkCount, fileSize, requestList);
+									}
+									else {
+										chunkUploadFailure(contentType, currentChunkNumber, currentAttempt, totalChunkCount, fileSize, requestList);
+									}
 								}
 							}
 						});
 					}
-					view.resetProgresBar();
-					synapseJsniUtils.uploadFile(UploaderViewImpl.FILE_FIELD_ID, urlString, xhr, new ProgressCallback() {
+					ByteRange range = getByteRange(currentChunkNumber, fileSize);
+					synapseJsniUtils.uploadFileChunk(contentType, UploaderViewImpl.FILE_FIELD_ID, range.getStart(), range.getEnd(), urlString, xhr, new ProgressCallback() {
 						@Override
-						public void updateProgress(double value, String text) {
-							view.updateProgress(value, text);
+						public void updateProgress(double value) {
+							//Note:  0 <= value <= 1
+							//And we need to add this to the chunks that have already been uploaded.  And divide by the total chunk count
+							double currentProgress = (((double)(currentChunkNumber-1)) + value)/((double)totalChunkCount);
+							String progressText = percentFormat.format(currentProgress*100.0) + "%";
+							view.updateProgress(currentProgress, progressText);
 						}
 					});
 				}
@@ -239,14 +275,74 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			});
 		} catch (RestServiceException e) {
 			uploadError();
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+			fireCancelEvent();
 		}
 	}
 	
-	public void directUploadStep3(final boolean isNewlyRestricted){
+	/**
+	 * Called when a chunk is successfully uploaded
+	 * @param requestJson
+	 * @param contentType
+	 * @param currentChunkNumber
+	 * @param totalChunkCount
+	 * @param fileSize
+	 * @param requestList
+	 */
+	public void chunkUploadSuccess(String requestJson, String contentType, int currentChunkNumber, long totalChunkCount, int fileSize, List<String> requestList){
+		//are there more chunks to upload?
+		requestList.add(requestJson);
+		if (currentChunkNumber >= totalChunkCount)
+			directUploadStep3(view.isNewlyRestricted(), requestList);
+		else
+			directUploadStep2(contentType, currentChunkNumber+1, 1, totalChunkCount, fileSize, requestList);
+	}
+	
+	/**
+	 * Called when chunk upload fails
+	 * @param contentType
+	 * @param currentChunkNumber
+	 * @param currentAttempt
+	 * @param totalChunkCount
+	 * @param fileSize
+	 * @param requestList
+	 */
+	public void chunkUploadFailure(String contentType, int currentChunkNumber, int currentAttempt, long totalChunkCount, int fileSize, List<String> requestList) {
+		if (currentAttempt >= MAX_RETRY)
+			uploadError();
+		else //retry
+			directUploadStep2(contentType, currentChunkNumber, currentAttempt+1, totalChunkCount, fileSize, requestList);
+	}
+	
+	public class ByteRange {
+		private int start, end;
+		public ByteRange(int start, int end) {
+			this.start = start;
+			this.end = end;
+		}
+		public int getEnd() {
+			return end;
+		}
+		public int getStart() {
+			return start;
+		}
+	}
+	
+	public ByteRange getByteRange(int currentChunkNumber, int fileSize) {
+		int startByte = (currentChunkNumber-1) * BYTES_PER_CHUNK;
+		int endByte = currentChunkNumber * BYTES_PER_CHUNK - 1;
+		if (endByte >= fileSize)
+			endByte = fileSize-1;
+		return new ByteRange(startByte, endByte);
+	}
+	
+	public void directUploadStep3(final boolean isNewlyRestricted, List<String> requestList){
 		//complete the file upload, and refresh
 		try {
+			view.showFinishingProgress();
 			String entityId = entity==null ? null : entity.getId();
-			synapseClient.completeChunkedFileUpload(entityId, requestJson,parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
+			synapseClient.completeChunkedFileUpload(entityId, requestList,parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String entityId) {
 					//to new file handle id, or create new file entity with this file handle id
@@ -431,6 +527,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	private void fireCancelEvent(){
+		//Verified that when this method is called, the input field used for direct upload is no longer available, 
+		//so that this effectively cancels chunked upload too (after the current chunk upload completes)
 		view.hideLoading();
 		handlerManager.fireEvent(new CancelEvent());
 	}
