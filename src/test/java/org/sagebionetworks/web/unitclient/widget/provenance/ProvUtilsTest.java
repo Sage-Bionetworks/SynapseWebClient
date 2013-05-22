@@ -310,10 +310,10 @@ public class ProvUtilsTest {
 				return null;
 			}
 			@Override
-			public void uploadFile(String fileFieldId, String url,
-					XMLHttpRequest xhr, ProgressCallback progressCallback) {
+			public void uploadFileChunk(String contentType, String fileFieldId,
+					int startByte, int endByte, String url, XMLHttpRequest xhr,
+					ProgressCallback callback) {
 				// TODO Auto-generated method stub
-				
 			}
 			@Override
 			public double getFileSize(String fileFieldId) {

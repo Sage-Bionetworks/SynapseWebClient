@@ -44,7 +44,7 @@ public interface SynapseJSNIUtils {
 
 	public boolean isDirectUploadSupported();
 	
-	public void uploadFile(String fileFieldId, String url, XMLHttpRequest xhr, ProgressCallback progressCallback);
+	public void uploadFileChunk(String contentType, String fileFieldId, int startByte, int endByte, String url, XMLHttpRequest xhr, ProgressCallback callback);
 	public String getContentType(String fileFieldId);
 	public double getFileSize(String fileFieldId);
 
