@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitshared.exceptions;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -61,6 +62,15 @@ public class ExceptionUtilTest {
 		RestServiceException ex = ExceptionUtil.convertSynapseException(synapseException);
 		assertNotNull(ex);
 		assertEquals(restServiceException, ex.getClass());		
+	}
+	
+	/**
+	 * Regression test for SWC-507
+	 */
+	@Test
+	public void testAnonymous403Error_SWC507() {
+		assertTrue(ExceptionUtil.convertSynapseException(new SynapseForbiddenException("anonymous@sagebase.org lacks read access to the requested object.")) instanceof UnauthorizedException);
+		assertTrue(ExceptionUtil.convertSynapseException(new SynapseForbiddenException("some other message")) instanceof ForbiddenException);
 	}
 		
 }
