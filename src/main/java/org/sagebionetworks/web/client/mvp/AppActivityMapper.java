@@ -55,6 +55,7 @@ public class AppActivityMapper implements ActivityMapper {
 	private PortalGinInjector ginjector;
 	@SuppressWarnings("rawtypes")
 	private List<Class> openAccessPlaces; 
+	private List<Class> excludeFromLastPlace;
 	private SynapseJSNIUtils synapseJSNIUtils;
 
 	/**
@@ -84,6 +85,11 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Search.class);
 		openAccessPlaces.add(WikiPlace.class);
 		openAccessPlaces.add(Evaluation.class);
+		
+		excludeFromLastPlace = new ArrayList<Class>();
+		excludeFromLastPlace.add(LoginPlace.class);
+		excludeFromLastPlace.add(PasswordReset.class);
+		excludeFromLastPlace.add(RegisterAccount.class);		
 	}
 
 	@Override
@@ -98,11 +104,9 @@ public class AppActivityMapper implements ActivityMapper {
 		
 		// set current and last places
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
-		if(storedCurrentPlace != null && !(storedCurrentPlace instanceof PasswordReset) && !(storedCurrentPlace instanceof RegisterAccount)) {
-			if(!(storedCurrentPlace instanceof LoginPlace) && !(place instanceof LoginPlace)) {
-				// only update last place if we are not going from login to login place (this is due to SSO vs regular login difference)
-				globalApplicationState.setLastPlace(storedCurrentPlace);
-			}
+		// only update move storedCurrentPlace to storedLastPlace if storedCurrentPlace is  
+		if(storedCurrentPlace != null && !excludeFromLastPlace.contains(storedCurrentPlace.getClass())) {
+				globalApplicationState.setLastPlace(storedCurrentPlace);			
 		}
 		
 		globalApplicationState.setCurrentPlace(place);

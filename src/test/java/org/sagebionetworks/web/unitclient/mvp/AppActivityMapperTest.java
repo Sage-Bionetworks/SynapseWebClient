@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.unitclient.mvp;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +16,10 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
+import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
@@ -34,7 +39,7 @@ public class AppActivityMapperTest {
 	PresenterProxy<HomePresenter, Home> mockAll;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	
+	AppActivityMapper appActivityMapper;
 	String historyToken = "Home:0";
 	
 	@Before
@@ -58,11 +63,8 @@ public class AppActivityMapperTest {
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		when(mockInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		
+		appActivityMapper = new AppActivityMapper(mockInjector, mockSynapseJSNIUtils);
 	}
-	
-	
-
-	
 	
 	@Test
 	public void testUnknown(){
@@ -71,8 +73,7 @@ public class AppActivityMapperTest {
 		Place unknownPlace = new Place(){}; 
 
 		// Create the mapper
-		AppActivityMapper mapper = new AppActivityMapper(mockInjector, mockSynapseJSNIUtils);
-		Activity object = mapper.getActivity(unknownPlace);
+		Activity object = appActivityMapper.getActivity(unknownPlace);
 		assertNotNull(object);
 		
 		// Validate that the place was set.
@@ -80,6 +81,37 @@ public class AppActivityMapperTest {
 		
 		// validate that the place change was recorded
 		verify(mockSynapseJSNIUtils, Mockito.times(2)).recordPageVisit(historyToken);
+	}
+	
+	/*
+	 * Regression Test for SWC-484
+	 * 
+	 * Have the currently stored place be a valid history place (like an Synapse entity page). 
+	 * Part 1: Then go to the login page and verify that the entity place is stored.
+	 * Part 2: Then go back to the login page (SSO simulation) and assure that last place is still the entity place and not the first login page visit
+	 */
+	@SuppressWarnings("unchecked")
+	@Test 
+	public void testSetLastPlace() {
+		// Part 1
+		Place entityPlace = new Synapse("token");
+		Place loginPlace1 = new LoginPlace("0");
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(entityPlace);		
+		PresenterProxy<LoginPresenter, LoginPlace> loginPresenterProxy = mock(PresenterProxy.class);		
+		when(mockInjector.getLoginPresenter()).thenReturn(loginPresenterProxy);
+		
+		appActivityMapper.getActivity(loginPlace1);
+		verify(mockGlobalApplicationState).setLastPlace(entityPlace);
+		verify(mockGlobalApplicationState).setCurrentPlace(loginPlace1);
+		
+		// Part 2
+		reset(mockGlobalApplicationState);
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(loginPlace1);
+		when(mockGlobalApplicationState.getLastPlace()).thenReturn(entityPlace);
+		Place loginPlace2 = new LoginPlace("EXAMPLE_SSO_TOKEN");
+		appActivityMapper.getActivity(loginPlace2);		
+		verify(mockGlobalApplicationState, times(0)).setLastPlace(any(Place.class));
+		verify(mockGlobalApplicationState).setCurrentPlace(loginPlace2);
 	}
 
 }
