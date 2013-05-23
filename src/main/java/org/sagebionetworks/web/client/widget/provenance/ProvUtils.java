@@ -198,6 +198,9 @@ public class ProvUtils {
 		order.add("Name");
 		map.put("Name", activity.getName());				
 		
+		order.add("Activity id");
+		map.put("Activity id", activity.getId());				
+		
 		order.add("Modified By");
 		map.put("Modified By", activity.getModifiedBy());
 		
