@@ -794,15 +794,15 @@ public class DisplayUtils {
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseAnalysis24();			
 		} else if(Code.class.getName().equals(className)) {
 			// Code
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseCode16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseCode24();			
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
 		} else if(Data.class.getName().equals(className) ||
 				ExpressionData.class.getName().equals(className) ||
 				GenotypeData.class.getName().equals(className) ||
 				PhenotypeData.class.getName().equals(className)) {
 			// Data
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseData24();			
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
 		} else if(Folder.class.getName().equals(className)) {
 			// Folder
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
@@ -811,10 +811,6 @@ public class DisplayUtils {
 			// File
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
-//		} else if(Model.class.getName().equals(className)) {
-			// Model
-//			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
-//			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseModel24();			
 		} else if(Project.class.getName().equals(className)) {
 			// Project
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseProject16();
@@ -833,8 +829,8 @@ public class DisplayUtils {
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStep24();			
 		} else if(Study.class.getName().equals(className)) {
 			// Study
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStudy16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStudy24();
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();
 		} else if(Page.class.getName().equals(className)) {
 			// Page
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
