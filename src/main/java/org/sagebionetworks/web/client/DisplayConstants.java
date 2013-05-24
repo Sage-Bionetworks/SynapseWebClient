@@ -227,9 +227,9 @@ public class DisplayConstants {
 	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String LABEL_FINISHING = "Finishing...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
-	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit To Evaluation";
+	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit For Evaluation";
 	public static final String SUBMITTED_TITLE = "Submitted";
-	public static final String SUBMITTED_TO_EVALUATION = "Submitted this to the selected evaluation(s)";
+	public static final String SUBMITTED_TO_EVALUATION = "Submitted to the selected evaluation(s)";
 	
 	public static final String LABEL_WHERE_SAVE_LINK = "Where would you like to save a Link to this page?";
 	public static final String ERROR_NOT_FOUND = "Sorry, the requested object was not found or no longer exists.";
