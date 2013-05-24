@@ -21,7 +21,9 @@ public class ExceptionUtil {
 	 */
 	public static RestServiceException convertSynapseException(SynapseException ex) {
 		log.error(ex);
-		if(ex instanceof SynapseForbiddenException) {
+		if(ex instanceof SynapseForbiddenException) {			
+			// special handling of 403 for anonymous
+			if(ex.getMessage().contains("anonymous@sagebase.org lacks read access")) return new UnauthorizedException(ex.getMessage());
 			return new ForbiddenException(ex.getMessage());
 		} else if(ex instanceof SynapseBadRequestException) {
 			return new BadRequestException(ex.getMessage());
