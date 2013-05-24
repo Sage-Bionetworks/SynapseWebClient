@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -64,7 +65,9 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -423,7 +426,13 @@ public class DisplayUtils {
 			MessageBox.info("Not Found", DisplayConstants.ERROR_NOT_FOUND, null);
 			placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			return true;
-		} 			
+		} else if(ex instanceof ReadOnlyModeException) {
+			MessageBox.info(DisplayConstants.READ_ONLY_MODE, DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE, null);
+			return true;
+		} else if(ex instanceof SynapseDownException) {
+			placeChanger.goTo(new Down(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			return true;
+		}
 		
 		// For other exceptions, allow the consumer to send a good message to the user
 		return false;
@@ -794,15 +803,15 @@ public class DisplayUtils {
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseAnalysis24();			
 		} else if(Code.class.getName().equals(className)) {
 			// Code
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseCode16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseCode24();			
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
 		} else if(Data.class.getName().equals(className) ||
 				ExpressionData.class.getName().equals(className) ||
 				GenotypeData.class.getName().equals(className) ||
 				PhenotypeData.class.getName().equals(className)) {
 			// Data
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseData24();			
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
 		} else if(Folder.class.getName().equals(className)) {
 			// Folder
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
@@ -811,10 +820,6 @@ public class DisplayUtils {
 			// File
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
-//		} else if(Model.class.getName().equals(className)) {
-			// Model
-//			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
-//			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseModel24();			
 		} else if(Project.class.getName().equals(className)) {
 			// Project
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseProject16();
@@ -833,8 +838,8 @@ public class DisplayUtils {
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStep24();			
 		} else if(Study.class.getName().equals(className)) {
 			// Study
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStudy16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStudy24();
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();
 		} else if(Page.class.getName().equals(className)) {
 			// Page
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();

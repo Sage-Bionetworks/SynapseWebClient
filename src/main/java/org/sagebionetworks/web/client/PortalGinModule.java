@@ -24,6 +24,8 @@ import org.sagebionetworks.web.client.view.ColumnsPopupView;
 import org.sagebionetworks.web.client.view.ColumnsPopupViewImpl;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
+import org.sagebionetworks.web.client.view.DownView;
+import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.view.EntityViewImpl;
 import org.sagebionetworks.web.client.view.EvaluationView;
@@ -314,7 +316,11 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// WikiView
 		bind(WikiViewImpl.class).in(Singleton.class);
-		bind(WikiView.class).to(WikiViewImpl.class);	
+		bind(WikiView.class).to(WikiViewImpl.class);
+		
+		// Down
+		bind(DownViewImpl.class).in(Singleton.class);
+		bind(DownView.class).to(DownViewImpl.class);
 
 		//Synapse Wiki Pages
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
