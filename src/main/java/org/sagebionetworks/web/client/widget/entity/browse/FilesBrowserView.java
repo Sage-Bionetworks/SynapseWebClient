@@ -16,14 +16,14 @@ public interface FilesBrowserView extends IsWidget, SynapseWidgetView {
 	 * Configure the view with the parent id
 	 * @param entityId
 	 */
-	public void configure(String entityId);
+	public void configure(String entityId, boolean canEdit);
 
 	/**
 	 * Configure the view with the parent id and title
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(String entityId, String title);
+	public void configure(String entityId, boolean canEdit, String title);
 
 	public void refreshTreeView(String entityId);
 	
