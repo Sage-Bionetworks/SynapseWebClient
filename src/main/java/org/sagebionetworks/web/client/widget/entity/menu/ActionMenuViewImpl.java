@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
+import java.util.List;
+
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
@@ -7,6 +10,7 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
@@ -22,6 +26,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.widget.entity.EvaluationList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
@@ -48,7 +53,9 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -62,6 +69,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private EntityTypeProvider typeProvider;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityFinder entityFinder;
+	private EvaluationList evaluationList;
 	
 	private boolean readOnly;	
 	private Button editButton;
@@ -69,6 +77,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private Button toolsButton;
 	private Button deleteButton;
 	private boolean isInTestMode;
+	private EntityBundle entityBundle;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
@@ -78,7 +87,8 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			Uploader locationableUploader, 
 			EntityTypeProvider typeProvider,
 			SynapseJSNIUtils synapseJSNIUtils,
-			EntityFinder entityFinder) {
+			EntityFinder entityFinder,
+			EvaluationList evaluationList) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
@@ -86,6 +96,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		this.typeProvider = typeProvider;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.entityFinder = entityFinder;
+		this.evaluationList = evaluationList;
 		this.setHorizontalAlign(HorizontalAlignment.RIGHT);
 		this.setTableWidth("100%");
 	}
@@ -100,6 +111,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			boolean readOnly,
 			boolean isInTestMode) {
 		this.readOnly = readOnly;
+		this.entityBundle = entityBundle;
 		this.isInTestMode = isInTestMode;
 		Entity entity = entityBundle.getEntity();
 
@@ -297,6 +309,11 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		if(canEdit) {
 			addUploadItem(menu, entityBundle, entityType);
 		}
+		
+		if (canEdit && entity instanceof Versionable) {
+			addSubmitToEvaluationItem(menu, entity, entityType);
+		}
+		
 		// create link
 		if(authenticated) {
 			addCreateShortcutItem(menu, entity, entityType);
@@ -420,6 +437,49 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		menu.add(item);
 	}
 
+	private void addSubmitToEvaluationItem(Menu menu, Entity entity,EntityType entityType) {
+		MenuItem item = new MenuItem(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION);
+		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+			@Override
+			public void componentSelected(MenuEvent ce) {
+				//ask the presenter to query for all available evaluations, and it may call the view back for the user to select evaluation(s) to submit to
+				presenter.showAvailableEvaluations();
+			}
+		});
+		menu.add(item);
+	}
+	
+	@Override
+	public void popupEvaluationSelector(List<Evaluation> list) {
+		final Dialog window = new Dialog();
+        window.setMaximizable(false);
+        window.setSize(450, 215);
+        window.setPlain(true); 
+        window.setModal(true); 
+        
+        window.setHeading("Evaluation Selection"); 
+        window.setButtons(Dialog.OKCANCEL);
+        window.setHideOnButtonClick(true);
+
+        window.setLayout(new FitLayout());
+        
+        evaluationList.configure(list);
+        
+        Button okButton = window.getButtonById(Dialog.OK);	    
+        okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				presenter.submitToEvaluations(evaluationList.getSelectedEvaluationIds());
+			}
+	    });
+        FlowPanel panel = new FlowPanel();
+        panel.add(new HTML("<h6 class=\"margin-top-left-10\">Select the Evaluations below that you would like to submit to:</h6>"));
+        panel.add(evaluationList.asWidget());
+        
+	    window.add(panel);
+	    window.show();
+	}
+	
 	/**
 	 * 'Move Entity' item
 	 * @param menu

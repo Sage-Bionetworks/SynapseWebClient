@@ -211,11 +211,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				}
 				@Override
 				public void onFailure(Throwable t) {
-					uploadError();
+					uploadError(t.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
-			uploadError();
+			uploadError(e.getMessage());
 		}
 	}
 	
@@ -270,11 +270,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				}
 				@Override
 				public void onFailure(Throwable t) {
-					uploadError();		
+					uploadError(t.getMessage());		
 				}
 			});
 		} catch (RestServiceException e) {
-			uploadError();
+			uploadError(e.getMessage());
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 			fireCancelEvent();
@@ -310,7 +310,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 */
 	public void chunkUploadFailure(String contentType, int currentChunkNumber, int currentAttempt, long totalChunkCount, int fileSize, List<String> requestList) {
 		if (currentAttempt >= MAX_RETRY)
-			uploadError();
+			uploadError("Exceeded the maximum number of attempts to upload a single file chunk.");
 		else //retry
 			directUploadStep2(contentType, currentChunkNumber, currentAttempt+1, totalChunkCount, fileSize, requestList);
 	}
@@ -351,11 +351,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				}
 				@Override
 				public void onFailure(Throwable t) {
-					uploadError();		
+					uploadError(t.getMessage());		
 				}
 			});
 		} catch (RestServiceException e) {
-			uploadError();
+			uploadError(e.getMessage());
 		}
 	}
 	
@@ -491,13 +491,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				//get the entity, and report success
 				refreshAfterSuccessfulUpload(entityId, isNewlyRestricted);
 			}else {
-				uploadError();
+				uploadError(null);
 			}
 		} catch (Throwable th) {};//wasn't an UplaodResult
 		
 		if (uploadResult == null) {
 			if(!resultHtml.contains(DisplayUtils.UPLOAD_SUCCESS)) {
-				uploadError();
+				uploadError(null);
 			} else {
 				uploadSuccess(isNewlyRestricted);
 			}
@@ -521,8 +521,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			}
 		});
 	}
-	private void uploadError() {
-		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD);
+	private void uploadError(String message) {
+		String details = "";
+		if (message != null && message.length() > 0)
+			details = "  \n" + message;
+		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
 		fireCancelEvent();
 	}
 	
