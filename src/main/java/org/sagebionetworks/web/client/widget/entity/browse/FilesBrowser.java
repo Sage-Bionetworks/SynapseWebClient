@@ -26,6 +26,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private AdapterFactory adapterFactory;
 	private AutoGenFactory autogenFactory;
 	private EntityUpdatedHandler entityUpdatedHandler;
+	boolean canEdit = false;
 	
 	@Inject
 	public FilesBrowser(FilesBrowserView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
@@ -44,12 +45,16 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	 */
 	public void configure(String entityId) {
 		this.configuredEntityId = entityId;		
-		view.configure(entityId);
+		view.configure(entityId, canEdit);
 	}
 	
 	public void configure(String entityId, String title) {
 		this.configuredEntityId = entityId;
-		view.configure(entityId, title);
+		view.configure(entityId, canEdit, title);
+	}
+	
+	public void setCanEdit(boolean canEdit) {
+		this.canEdit = canEdit;
 	}
 	
 	public void clearState() {
