@@ -122,7 +122,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget, PreviewWidget previewWidget) {
+			PortalGinInjector ginInjector, 
+			FilesBrowser filesBrowser, 
+			MarkdownWidget markdownWidget, 
+			WikiPageWidget wikiPageWidget, 
+			PreviewWidget previewWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -297,7 +301,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// ** FULL WIDTH **
 		// Child Browser
-		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false));
+		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 
@@ -332,7 +336,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(fullWidthContainer, bundle, canEdit, 24);
 			
 		// Child File Browser
-		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
+		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true, canEdit));
 
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -442,7 +446,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    return lc;
 	}
 
-	private Widget createEntityFilesBrowserWidget(Entity entity, boolean showTitle) {
+	private Widget createEntityFilesBrowserWidget(Entity entity, boolean showTitle, boolean canEdit) {
+		filesBrowser.setCanEdit(canEdit);
 		if(showTitle) 
 			filesBrowser.configure(entity.getId(), DisplayConstants.FILES);
 		else 
