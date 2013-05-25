@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.place.ComingSoon;
+import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Evaluation;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
+import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.EvaluationPresenter;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
@@ -55,6 +57,7 @@ public class AppActivityMapper implements ActivityMapper {
 	private PortalGinInjector ginjector;
 	@SuppressWarnings("rawtypes")
 	private List<Class> openAccessPlaces; 
+	private List<Class> excludeFromLastPlace;
 	private SynapseJSNIUtils synapseJSNIUtils;
 
 	/**
@@ -84,6 +87,12 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Search.class);
 		openAccessPlaces.add(WikiPlace.class);
 		openAccessPlaces.add(Evaluation.class);
+		openAccessPlaces.add(Down.class);
+		
+		excludeFromLastPlace = new ArrayList<Class>();
+		excludeFromLastPlace.add(LoginPlace.class);
+		excludeFromLastPlace.add(PasswordReset.class);
+		excludeFromLastPlace.add(RegisterAccount.class);		
 	}
 
 	@Override
@@ -98,11 +107,9 @@ public class AppActivityMapper implements ActivityMapper {
 		
 		// set current and last places
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
-		if(storedCurrentPlace != null && !(storedCurrentPlace instanceof PasswordReset) && !(storedCurrentPlace instanceof RegisterAccount)) {
-			if(!(storedCurrentPlace instanceof LoginPlace) && !(place instanceof LoginPlace)) {
-				// only update last place if we are not going from login to login place (this is due to SSO vs regular login difference)
-				globalApplicationState.setLastPlace(storedCurrentPlace);
-			}
+		// only update move storedCurrentPlace to storedLastPlace if storedCurrentPlace is  
+		if(storedCurrentPlace != null && !excludeFromLastPlace.contains(storedCurrentPlace.getClass())) {
+				globalApplicationState.setLastPlace(storedCurrentPlace);			
 		}
 		
 		globalApplicationState.setCurrentPlace(place);
@@ -196,6 +203,10 @@ public class AppActivityMapper implements ActivityMapper {
 		} else if(place instanceof Wiki){
 			PresenterProxy<SynapseWikiPresenter, Wiki> presenter = ginjector.getSynapseWikiPresenter();
 			presenter.setPlace((Wiki)place);
+			return presenter;
+		} else if(place instanceof Down) {
+			PresenterProxy<DownPresenter, Down> presenter = ginjector.getDownPresenter();
+			presenter.setPlace((Down) place);
 			return presenter;
 		} else {
 			// Log that we have an unknown place but send the user to the default

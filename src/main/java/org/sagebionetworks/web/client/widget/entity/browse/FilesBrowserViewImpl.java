@@ -57,12 +57,12 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	};
 
 	@Override
-	public void configure(String entityId) {
-		configure(entityId, null);
+	public void configure(String entityId, boolean canEdit) {
+		configure(entityId, canEdit, null);
 	}		
 	
 	@Override
-	public void configure(String entityId, String title) {
+	public void configure(String entityId, boolean canEdit, String title) {
 		this.removeAll(true);
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("span-24 notopmargin");
@@ -83,7 +83,6 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 
 		Button upload = getUploadButton(entityId); 
 		upload.addStyleName("right last");
-		right.add(upload);
 
 		Button addFolder = new Button(DisplayConstants.ADD_FOLDER, AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16()), new SelectionListener<ButtonEvent>() {
 			@Override
@@ -100,7 +99,11 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		//SWC-363: explicitly set the width, since the auto-width is not calculated correctly in Chrome (but it is in Firefox).
 		addFolder.setWidth(90);
 		addFolder.addStyleName("right");
-		right.add(addFolder, new MarginData(0, 3, 0, 0));
+
+		if(canEdit) {
+			right.add(upload);
+			right.add(addFolder, new MarginData(0, 3, 0, 0));
+		}
 		
 		LayoutContainer files = new LayoutContainer();
 		files.setStyleName("span-24 notopmargin");
