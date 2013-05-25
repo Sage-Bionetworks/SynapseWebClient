@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
+import java.util.List;
+
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetView;
@@ -33,7 +36,9 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 			boolean canEdit, 
 			boolean readOnly, 
 			boolean isInTestMode);
-		
+	
+	void popupEvaluationSelector(List<Evaluation> list);
+	
 	/**
 	 * Presenter interface
 	 */
@@ -60,7 +65,10 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 		void createLink(String selectedEntityId);
 
 		void uploadToGenomespace();
-
+		
+		void submitToEvaluations(List<String> evaluationIds);
+		
+		void showAvailableEvaluations();
 	}
 
 }

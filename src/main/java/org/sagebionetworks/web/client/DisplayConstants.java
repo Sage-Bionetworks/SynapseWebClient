@@ -227,6 +227,10 @@ public class DisplayConstants {
 	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String LABEL_FINISHING = "Finishing...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
+	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit For Evaluation";
+	public static final String SUBMITTED_TITLE = "Submitted";
+	public static final String SUBMITTED_TO_EVALUATION = "Submitted to the selected evaluation(s)";
+	
 	public static final String LABEL_WHERE_SAVE_LINK = "Where would you like to save a Link to this page?";
 	public static final String ERROR_NOT_FOUND = "Sorry, the requested object was not found or no longer exists.";
 	public static final String ERROR_NOT_AUTHORIZED = "Sorry, you are not authorized to modify the requested entity.";
@@ -534,6 +538,7 @@ public class DisplayConstants {
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
+	public static final String NOT_PARTICIPATING_IN_ANY_EVALUATIONS = "You are not currently participating in an Evaluation/Challenge. Please join one and try again.";
 	public static final String READ_ONLY_MODE = "Read Only Mode";
 	public static final String SYNAPSE_IN_READ_ONLY_MODE = "Synapse is in READ_ONLY mode for maintenance. You can continue to browse, but can not modify during this period.";
 }
