@@ -156,4 +156,13 @@ public interface SynapseClientAsync {
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
+	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
+	
+	/**
+	 * Create a new Submission object.  Callback returning the updated version of the Submission object
+	 * @param submissionJson
+	 * @param etag
+	 * @param callback
+	 */
+	void createSubmission(String submissionJson, String etag, AsyncCallback<String> callback) throws RestServiceException;
 }

@@ -17,7 +17,10 @@ import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
+import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
@@ -401,6 +404,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return null;
 	}
 
+	// before we hit this limit we will use another mechanism to find users
+	private static final int EVALUATION_PAGINATION_LIMIT = Integer.MAX_VALUE;
+	private static final int EVALUATION_PAGINATION_OFFSET = 0;
+		
 	private static final int USER_PAGINATION_OFFSET = 0;
 	// before we hit this limit we will use another mechanism to find users
 	private static final int USER_PAGINATION_LIMIT = 1000; 
@@ -1404,4 +1411,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	}
 	
+	@Override
+	public String getAvailableEvaluations() throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			JSONObjectAdapter evaluationsJson = results.writeToJSONObject(adapterFactory.createNew());
+			return evaluationsJson.toJSONString();
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	public String createSubmission(String submissionJson, String etag) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			Submission sub = jsonEntityFactory.createEntity(submissionJson, Submission.class);
+			Submission updatedSubmission = synapseClient.createSubmission(sub, etag);
+			JSONObjectAdapter updatedSubmissionJson = updatedSubmission.writeToJSONObject(adapterFactory.createNew());
+			return updatedSubmissionJson.toJSONString();
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 }

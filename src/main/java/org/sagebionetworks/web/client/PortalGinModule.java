@@ -68,6 +68,8 @@ import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EvaluationListView;
+import org.sagebionetworks.web.client.widget.entity.EvaluationListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -421,6 +423,9 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// Wiki Attachments		
 		bind(WikiAttachmentsView.class).to(WikiAttachmentsViewImpl.class);
+		
+		//Evaluation selector
+		bind(EvaluationListView.class).to(EvaluationListViewImpl.class);
 		
 		// SnapshotWidget		
 		bind(SnapshotWidgetView.class).to(SnapshotWidgetViewImpl.class);

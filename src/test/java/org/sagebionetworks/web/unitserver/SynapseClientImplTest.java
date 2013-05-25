@@ -40,6 +40,7 @@ import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
+import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -764,5 +765,27 @@ public class SynapseClientImplTest {
 		String presignedUrl = synapseClient.getChunkedPresignedUrl(getTestChunkRequestJson().get(0));
 		verify(mockSynapse).createChunkedPresignedUrl(any(ChunkRequest.class));
 		assertEquals(testUrl.toString(), presignedUrl);
+	}
+	
+	@Test
+	public void testGetAvailableEvaluations() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
+		Evaluation e = new Evaluation();
+		e.setId("A test ID");
+		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(testResults);
+		String evaluationsJson = synapseClient.getAvailableEvaluations();
+		verify(mockSynapse).getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt());
+		String expectedJson = EntityFactory.createJSONStringForEntity(testResults);
+		assertEquals(expectedJson, evaluationsJson);
+	}
+	@Test
+	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		Submission inputSubmission = new Submission();
+		inputSubmission.setId("my submission id");
+		String submissionJson = EntityFactory.createJSONStringForEntity(inputSubmission);
+		when(mockSynapse.createSubmission(any(Submission.class), anyString())).thenReturn(inputSubmission);
+		String returnSubmissionJson = synapseClient.createSubmission(submissionJson, "fakeEtag");
+		verify(mockSynapse).createSubmission(any(Submission.class), anyString());
+		assertEquals(submissionJson, returnSubmissionJson);
 	}
 }
