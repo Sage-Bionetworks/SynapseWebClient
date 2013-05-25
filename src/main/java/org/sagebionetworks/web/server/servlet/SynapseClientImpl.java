@@ -405,7 +405,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	// before we hit this limit we will use another mechanism to find users
-	private static final int EVALUATION_PAGINATION_LIMIT = 1000;
+	private static final int EVALUATION_PAGINATION_LIMIT = Integer.MAX_VALUE;
 	private static final int EVALUATION_PAGINATION_OFFSET = 0;
 		
 	private static final int USER_PAGINATION_OFFSET = 0;

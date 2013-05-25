@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.grid.CheckBoxSelectionModel;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
@@ -17,6 +18,8 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
+import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -116,14 +119,19 @@ public class EvaluationListViewImpl extends LayoutContainer implements Evaluatio
 			public Object render(BaseModelData model, String property,
 					ColumnData config, final int rowIndex, int colIndex,
 					ListStore<BaseModelData> store, Grid<BaseModelData> grid) {
+				
+				
 				String value = model.get(property);
 				if (value == null) {
 					value = "";
-				}
-				//from the value, create an anchor (with click handler)
-				HTML valueHtml = new HTML(value);
-				
-				return valueHtml;
+				} 
+				SafeHtmlBuilder builder = new SafeHtmlBuilder();
+				builder.appendHtmlConstant("<div style='font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;'>");
+				builder.appendEscaped(value);
+				builder.appendHtmlConstant("</div>");
+				Html html = new Html(builder.toSafeHtml().asString());
+			    
+				return html;
 			}
 
 		};

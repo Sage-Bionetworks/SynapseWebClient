@@ -158,14 +158,8 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 						List<Evaluation> list = results.getResults();
 						if (list == null || list.size() == 0) {
 							//no available evaluations, pop up an info dialog
-							view.showErrorMessage("You are not currently participating in an Evaluation.  Please join an Evaluation and try again.");
-						} else if (list.size() == 1) {
-							//no need to pop on up, just select the single eval
-							List<String> evalIdList = new ArrayList<String>();
-							evalIdList.add(list.get(0).getId());
-							submitToEvaluations(evalIdList);
-						}
-						else {
+							view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
+						} else {
 							view.popupEvaluationSelector(results.getResults());	
 						}
 					} catch (JSONObjectAdapterException e) {
