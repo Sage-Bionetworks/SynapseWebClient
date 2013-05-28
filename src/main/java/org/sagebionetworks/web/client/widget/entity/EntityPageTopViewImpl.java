@@ -40,7 +40,11 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Padding;
@@ -72,9 +76,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
-
-	private static final int PROVENANCE_HEIGHT_PX = 255;
-	private static final int PROVENANCE_WIDTH_PX = 254;
 
 	@UiField
 	SimplePanel colLeftPanel;
@@ -121,7 +122,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, FilesBrowser filesBrowser, MarkdownWidget markdownWidget, WikiPageWidget wikiPageWidget, PreviewWidget previewWidget) {
+			PortalGinInjector ginInjector, 
+			FilesBrowser filesBrowser, 
+			MarkdownWidget markdownWidget, 
+			WikiPageWidget wikiPageWidget, 
+			PreviewWidget previewWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -296,7 +301,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// ** FULL WIDTH **
 		// Child Browser
-		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false));
+		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 
@@ -331,7 +336,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(fullWidthContainer, bundle, canEdit, 24);
 			
 		// Child File Browser
-		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true));
+		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true, canEdit));
 
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -406,8 +411,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 	    // Create the property body
 	    // the headers for properties.
-		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();				
-		provenanceWidget.setHeight(PROVENANCE_HEIGHT_PX);		
+		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();						
 		
 		Map<String,String> configMap = new HashMap<String,String>();
 		Long version = bundle.getEntity() instanceof Versionable ? ((Versionable)bundle.getEntity()).getVersionNumber() : null; 
@@ -424,41 +428,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		LayoutContainer menu = new LayoutContainer();		
 		menu.addStyleName("floatleft");
-		Anchor fullSizeButton = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.applicationResize16())));
-		fullSizeButton.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				border.remove(provViewWidget);
-				border.layout(true);
-				final Window window = new Window();
-				// 90% h/w
-				window.setSize(
-						new Double(com.google.gwt.user.client.Window.getClientWidth() * .9).intValue(),
-						new Double(com.google.gwt.user.client.Window.getClientHeight() * .9).intValue()); 
-				window.setPlain(true);
-				window.setModal(true);
-				window.setClosable(false);
-				window.setHeading(DisplayConstants.PROVENANCE);
-				//window.setBodyStyle("background-color: white;");
-				window.setLayout(new FitLayout());
-				LayoutContainer white = new LayoutContainer(new FitLayout());
-				white.addStyleName("whiteBackground");
-				white.add(provViewWidget, new FitData(4));
-				window.add(white);				
-				window.addButton(new Button(DisplayConstants.CLOSE, new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						border.add(provViewWidget);
-						provViewWidget.setSize(PROVENANCE_WIDTH_PX+"px", PROVENANCE_HEIGHT_PX+"px");
-						border.layout(true);
-						window.hide();
-					}
-				}));
-				window.setButtonAlign(HorizontalAlignment.RIGHT);
-				window.show();
-			}
-		});		
-		menu.add(fullSizeButton);		
 		topbar.add(menu, new MarginData(8,0,0,5));
 		
 	    lc.add(border);
@@ -477,7 +446,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    return lc;
 	}
 
-	private Widget createEntityFilesBrowserWidget(Entity entity, boolean showTitle) {
+	private Widget createEntityFilesBrowserWidget(Entity entity, boolean showTitle, boolean canEdit) {
+		filesBrowser.setCanEdit(canEdit);
 		if(showTitle) 
 			filesBrowser.configure(entity.getId(), DisplayConstants.FILES);
 		else 

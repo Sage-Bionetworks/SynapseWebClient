@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -23,6 +24,7 @@ public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements 
 		this.removeAll();
 		//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 		//create img
+		this.setStyleName("displayInline");
 		StringBuilder sb = new StringBuilder();
 		sb.append("<a class=\"link\" href=\"");
 		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
@@ -43,8 +45,9 @@ public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements 
 			sb.append(fileName);
 		}
 		sb.append("</a>");
-	
-		add(new HTMLPanel(sb.toString()));
+		HTMLPanel htmlPanel = new HTMLPanel(sb.toString());
+		htmlPanel.setStyleName("displayInline");
+		add(htmlPanel);
 		this.layout(true);
 	}
 	

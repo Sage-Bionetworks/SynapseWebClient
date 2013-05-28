@@ -49,6 +49,8 @@ public class DisplayConstants {
 	public static final String PASSWORD_SET_FAILED_TEXT = "Password change failed. Please try again.";
 	public static final String PASSWORD_RESET_TEXT = "Your password has been reset.";
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
+	public static final String PASSWORD_AND_EMAIL_SET_TEXT = "Your new email address and password have been set. Please login to verify.";
+	public static final String EMAIL_SET_FAILED_TEXT = "Email address change failed. Please try again.";
 	
 	public static final String PREVIEW_UNAVAILABLE="No Preview Available";	//text shown when FileEntity preview can't be shown
 	
@@ -223,7 +225,12 @@ public class DisplayConstants {
 	public static final String ERROR_UPLOAD = "An error occurred during upload. Please try again.";
 	public static final String LABEL_UPLOADING = "Uploading...";
 	public static final String LABEL_INITIALIZING = "Initializing...";
+	public static final String LABEL_FINISHING = "Finishing...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
+	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit For Evaluation";
+	public static final String SUBMITTED_TITLE = "Submitted";
+	public static final String SUBMITTED_TO_EVALUATION = "Submitted to the selected evaluation(s)";
+	
 	public static final String LABEL_WHERE_SAVE_LINK = "Where would you like to save a Link to this page?";
 	public static final String ERROR_NOT_FOUND = "Sorry, the requested object was not found or no longer exists.";
 	public static final String ERROR_NOT_AUTHORIZED = "Sorry, you are not authorized to modify the requested entity.";
@@ -531,5 +538,8 @@ public class DisplayConstants {
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
+	public static final String NOT_PARTICIPATING_IN_ANY_EVALUATIONS = "You are not currently participating in an Evaluation/Challenge. Please join one and try again.";
+	public static final String READ_ONLY_MODE = "Read Only Mode";
+	public static final String SYNAPSE_IN_READ_ONLY_MODE = "Synapse is in READ_ONLY mode for maintenance. You can continue to browse, but can not modify during this period.";
 }
 

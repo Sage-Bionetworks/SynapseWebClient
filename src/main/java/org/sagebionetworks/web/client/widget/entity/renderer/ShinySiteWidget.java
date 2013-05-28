@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -14,10 +15,11 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	private static final String[] VALID_URL_BASES = { "http://glimmer.rstudio.com", "http://shiny.synapse.org" };
 	private ShinySiteWidgetView view;
 	private Map<String, String> descriptor;
-	
+	private AuthenticationController authenticationController;
 	@Inject
-	public ShinySiteWidget(ShinySiteWidgetView view) {
+	public ShinySiteWidget(ShinySiteWidgetView view, AuthenticationController authenticationController) {
 		this.view = view;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}
 	
@@ -27,8 +29,16 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 		descriptor = widgetDescriptor;
 		int height = getHeightFromDescriptor(descriptor);
 		String siteUrl = descriptor.get(WidgetConstants.SHINYSITE_SITE_KEY);
-		if(isValidShinySite(siteUrl))
+		if(isValidShinySite(siteUrl)) {
+			boolean includePrincipleId = isIncludePrincipalId(descriptor);
+			//if we should include the current user's principal id, then append ?principal=<principal> to the siteUrl
+			if (includePrincipleId && authenticationController.isLoggedIn() && authenticationController.getLoggedInUser().getProfile() != null) {
+				String delimiter = siteUrl.contains("?") ? "&" : "?";
+				siteUrl = siteUrl + delimiter + "principalId=" + authenticationController.getLoggedInUser().getProfile().getOwnerId();
+			}
 			view.configure(siteUrl, height);
+		}
+			
 		else 
 			view.showInvalidSiteUrl(siteUrl);
 	}
@@ -53,6 +63,19 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 		}
 		return height;
 	}
+	
+	public static boolean isIncludePrincipalId(Map<String, String> descriptor) {
+		boolean isIncludePrincipleId = false; // default
+		if(descriptor.containsKey(WidgetConstants.SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY)) {
+			try {
+				isIncludePrincipleId = Boolean.parseBoolean(descriptor.get(WidgetConstants.SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY));
+			} catch (Throwable e) {
+				// fall back to default
+			}
+		}
+		return isIncludePrincipleId;
+	}
+
 
 	public static boolean isValidShinySite(String siteUrl) {
 		if(siteUrl != null) {

@@ -97,7 +97,7 @@ public class ProvViewUtil {
 		return container;
 	}
 	
-	public static LayoutContainer createExpandContainer(final ExpandGraphNode node, final SageImageBundle sageImageBundle, final Presenter presenter) {
+	public static LayoutContainer createExpandContainer(final ExpandGraphNode node, final SageImageBundle sageImageBundle, final Presenter presenter, final ProvenanceWidgetView view) {
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();		
 		builder.appendHtmlConstant(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML());
 		
@@ -106,6 +106,7 @@ public class ProvViewUtil {
 		link.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
+				view.setBlockCloseFullscreen(true);
 				link.setHTML(AbstractImagePrototype.create(sageImageBundle.loading16()).getHTML());
 				presenter.expand(node);
 			}

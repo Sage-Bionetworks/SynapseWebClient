@@ -177,25 +177,38 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
 	@Override
-	public void uploadFile(String fileFieldId, String url, XMLHttpRequest xhr, ProgressCallback callback) {
+	public void uploadFileChunk(String contentType, String fileFieldId, int startByte, int endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
 		SynapseJSNIUtilsImpl.progressCallback = callback;
-		_directUploadFile(fileFieldId, url, xhr);
+		_directUploadFile(contentType, fileFieldId, startByte, endByte, url, xhr);
 	}
-	private final static native void _directUploadFile(String fileFieldId, String url, XMLHttpRequest xhr) /*-{
+	
+	private final static native void _directUploadFile(String contentType, String fileFieldId, int startByte, int endByte, String url, XMLHttpRequest xhr) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 		var fileToUpload = fileToUploadElement.files[0];
+		var start = parseInt(startByte) || 0;
+		var end = parseInt(endByte) || fileToUpload.size - 1;
+		var fileSliceToUpload;
+		//in versions later than Firefox 13 and Chrome 21, Blob.slice() is not prefixed (and the vendor prefixed methods are deprecated)
+		if (fileToUpload.slice) {
+        	fileSliceToUpload = fileToUpload.slice(start, end+1, contentType);
+	    }else if (fileToUpload.mozSlice) {
+        	fileSliceToUpload = fileToUpload.mozSlice(start, end+1, contentType);
+	    } else if (fileToUpload.webkitSlice) {
+	        fileSliceToUpload = fileToUpload.webkitSlice(start, end+1, contentType);
+	    } else {
+	        throw new Error("Unable to slice file.");
+	    }
 		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
   		xhr.open('PUT', url, true);
-		xhr.send(fileToUpload);
+		xhr.send(fileSliceToUpload);
 	}-*/;
+	
 	
 	public static void updateProgress(JavaScriptObject evt) {
 		if (SynapseJSNIUtilsImpl.progressCallback != null) {
 			//parse out value
 			double currentProgress = _getProgress(evt);
-			int percent = (int)Math.floor(currentProgress*100.0);
-			String text = percent+"%";
-			SynapseJSNIUtilsImpl.progressCallback.updateProgress(currentProgress, text);
+			SynapseJSNIUtilsImpl.progressCallback.updateProgress(currentProgress);
 		}
 	}
 	

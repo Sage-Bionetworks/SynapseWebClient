@@ -40,6 +40,7 @@ import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
+import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -55,6 +56,8 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -213,7 +216,10 @@ public class SynapseClientImplTest {
 		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
 		accessRequirements.add(accessRequirement);
 		accessRequirement.setEntityType(TermsOfUseAccessRequirement.class.getName());
-		accessRequirement.setEntityIds(Arrays.asList(new String[]{"101"}));
+		RestrictableObjectDescriptor descriptor = new RestrictableObjectDescriptor();
+		descriptor.setId("101");
+		descriptor.setType(RestrictableObjectType.ENTITY);
+		accessRequirement.setSubjectIds(Arrays.asList(new RestrictableObjectDescriptor[]{descriptor}));
 		
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | 
 		HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
@@ -244,7 +250,7 @@ public class SynapseClientImplTest {
 		VariableContentPaginatedResults<AccessRequirement> ars = new VariableContentPaginatedResults<AccessRequirement>();
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
-		when(mockSynapse.getAccessRequirements(anyString())).thenReturn(ars);
+		when(mockSynapse.getAccessRequirements(any(RestrictableObjectDescriptor.class))).thenReturn(ars);
 		mockEvaluation = Mockito.mock(Evaluation.class);
 		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
@@ -680,13 +686,16 @@ public class SynapseClientImplTest {
 	}
 
 	
-	private String getTestChunkRequestJson() throws JSONObjectAdapterException {
+	private List<String> getTestChunkRequestJson() throws JSONObjectAdapterException {
 		ChunkRequest chunkRequest = new ChunkRequest();
 		ChunkedFileToken token = new ChunkedFileToken();
 		token.setKey("test key");
 		chunkRequest.setChunkedFileToken(token);
 		chunkRequest.setChunkNumber(1l);
-		return EntityFactory.createJSONStringForEntity(chunkRequest);
+		String chunkRequestJson = EntityFactory.createJSONStringForEntity(chunkRequest);
+		List<String> chunkRequests = new ArrayList<String>();
+		chunkRequests.add(chunkRequestJson);
+		return chunkRequests;
 	}
 	
 	/**
@@ -698,12 +707,12 @@ public class SynapseClientImplTest {
 	 */
 	@Test
 	public void testCompleteChunkedFileUpload() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		String chunkRequestJson = getTestChunkRequestJson();
+		List<String> chunkRequests = getTestChunkRequestJson();
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = true;
-		synapseClient.completeChunkedFileUpload(null, chunkRequestJson, "syn1", isRestricted);
+		synapseClient.completeChunkedFileUpload(null, chunkRequests, "syn1", isRestricted);
 		
 		verify(mockSynapse).completeChunkFileUpload(any(CompleteChunkedFileRequest.class));
 		//it should have tried to create a new entity (since entity id was null)
@@ -716,13 +725,13 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testCompleteChunkedFileUploadExistingEntity() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		String chunkRequestJson = getTestChunkRequestJson();
+		List<String> chunkRequests = getTestChunkRequestJson();
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = false;
-		synapseClient.completeChunkedFileUpload(entityId, chunkRequestJson, "syn1", isRestricted);
+		synapseClient.completeChunkedFileUpload(entityId, chunkRequests, "syn1", isRestricted);
 		
 		verify(mockSynapse).completeChunkFileUpload(any(CompleteChunkedFileRequest.class));
 		//it should have tried to find the entity
@@ -736,7 +745,6 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetChunkedFileToken() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String fileName = "test file.zip";
-		Long chunkNumber = 222l;
 		String contentType = "application/test";
 		ChunkedFileToken testToken = new ChunkedFileToken();
 		testToken.setFileName(fileName);
@@ -744,19 +752,40 @@ public class SynapseClientImplTest {
 		testToken.setUploadId("upload ID 123");
 		when(mockSynapse.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class))).thenReturn(testToken);
 		
-		String requestJson = synapseClient.getChunkedFileToken(fileName, contentType, chunkNumber);
-		ChunkRequest request = EntityFactory.createEntityFromJSONString(requestJson, ChunkRequest.class);
+		String chunkTokenJson = synapseClient.getChunkedFileToken(fileName, contentType);
+		ChunkedFileToken token = EntityFactory.createEntityFromJSONString(chunkTokenJson, ChunkedFileToken.class);
 		verify(mockSynapse).createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class));
-		assertEquals(testToken, request.getChunkedFileToken());
-		assertEquals(chunkNumber, request.getChunkNumber());
+		assertEquals(testToken, token);
 	}
 	
 	@Test
 	public void testGetChunkedPresignedUrl() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
 		URL testUrl = new URL("http://test.presignedurl.com/foo");
 		when(mockSynapse.createChunkedPresignedUrl(any(ChunkRequest.class))).thenReturn(testUrl);
-		String presignedUrl = synapseClient.getChunkedPresignedUrl(getTestChunkRequestJson());
+		String presignedUrl = synapseClient.getChunkedPresignedUrl(getTestChunkRequestJson().get(0));
 		verify(mockSynapse).createChunkedPresignedUrl(any(ChunkRequest.class));
 		assertEquals(testUrl.toString(), presignedUrl);
+	}
+	
+	@Test
+	public void testGetAvailableEvaluations() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
+		Evaluation e = new Evaluation();
+		e.setId("A test ID");
+		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(testResults);
+		String evaluationsJson = synapseClient.getAvailableEvaluations();
+		verify(mockSynapse).getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt());
+		String expectedJson = EntityFactory.createJSONStringForEntity(testResults);
+		assertEquals(expectedJson, evaluationsJson);
+	}
+	@Test
+	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		Submission inputSubmission = new Submission();
+		inputSubmission.setId("my submission id");
+		String submissionJson = EntityFactory.createJSONStringForEntity(inputSubmission);
+		when(mockSynapse.createSubmission(any(Submission.class), anyString())).thenReturn(inputSubmission);
+		String returnSubmissionJson = synapseClient.createSubmission(submissionJson, "fakeEtag");
+		verify(mockSynapse).createSubmission(any(Submission.class), anyString());
+		assertEquals(submissionJson, returnSubmissionJson);
 	}
 }

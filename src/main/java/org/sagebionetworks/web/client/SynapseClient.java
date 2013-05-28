@@ -11,6 +11,7 @@ import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -164,6 +165,9 @@ public interface SynapseClient extends RemoteService {
 
 	AccessRequirementsTransport getUnmetAccessRequirements(String entityId)
 			throws RestServiceException;
+	
+	String getUnmetEvaluationAccessRequirements(String evalId)
+			throws RestServiceException;
 
 	EntityWrapper createAccessApproval(EntityWrapper aaEW)
 			throws RestServiceException;
@@ -190,8 +194,7 @@ public interface SynapseClient extends RemoteService {
 	public String getActivity(String activityId) throws RestServiceException;
 	
 	public String getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset) throws RestServiceException;
-	
-	String promoteEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
+
 	public EntityWrapper removeAttachmentFromEntity(String entityId, String attachmentName) throws RestServiceException;
 	public String getJSONEntity(String repoUri) throws RestServiceException;
 	
@@ -219,12 +222,15 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	
-	public String getChunkedFileToken(String fileName, String contentType, long chunkNumber) throws RestServiceException;
+	public String getChunkedFileToken(String fileName, String contentType) throws RestServiceException;
 	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException;
-	public String completeChunkedFileUpload(String entityId, String requestJson,String parentEntityId, boolean isRestricted) throws RestServiceException;
-	
+	public String completeChunkedFileUpload(String entityId, List<String> requests, String parentEntityId, boolean isRestricted) throws RestServiceException;
 	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;
 	
 	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException;
+	
+	public String getAvailableEvaluations() throws RestServiceException;
+	
+	public String createSubmission(String submissionJson, String etag) throws RestServiceException;
 }

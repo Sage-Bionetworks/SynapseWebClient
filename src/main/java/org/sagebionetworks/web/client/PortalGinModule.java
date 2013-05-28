@@ -24,6 +24,8 @@ import org.sagebionetworks.web.client.view.ColumnsPopupView;
 import org.sagebionetworks.web.client.view.ColumnsPopupViewImpl;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
+import org.sagebionetworks.web.client.view.DownView;
+import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.view.EntityViewImpl;
 import org.sagebionetworks.web.client.view.EvaluationView;
@@ -66,6 +68,8 @@ import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EvaluationListView;
+import org.sagebionetworks.web.client.widget.entity.EvaluationListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -314,7 +318,11 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// WikiView
 		bind(WikiViewImpl.class).in(Singleton.class);
-		bind(WikiView.class).to(WikiViewImpl.class);	
+		bind(WikiView.class).to(WikiViewImpl.class);
+		
+		// Down
+		bind(DownViewImpl.class).in(Singleton.class);
+		bind(DownView.class).to(DownViewImpl.class);
 
 		//Synapse Wiki Pages
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
@@ -415,6 +423,9 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// Wiki Attachments		
 		bind(WikiAttachmentsView.class).to(WikiAttachmentsViewImpl.class);
+		
+		//Evaluation selector
+		bind(EvaluationListView.class).to(EvaluationListViewImpl.class);
 		
 		// SnapshotWidget		
 		bind(SnapshotWidgetView.class).to(SnapshotWidgetViewImpl.class);

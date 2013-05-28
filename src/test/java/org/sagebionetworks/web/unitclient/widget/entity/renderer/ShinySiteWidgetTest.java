@@ -5,8 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +13,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
@@ -23,6 +23,7 @@ public class ShinySiteWidgetTest {
 		
 	ShinySiteWidget widget;
 	ShinySiteWidgetView mockView;
+	AuthenticationController mockAuthenticationController;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
 
@@ -31,7 +32,9 @@ public class ShinySiteWidgetTest {
 	@Before
 	public void setup(){
 		mockView = mock(ShinySiteWidgetView.class);
-		widget = new ShinySiteWidget(mockView);
+		mockAuthenticationController = mock(AuthenticationController.class);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		widget = new ShinySiteWidget(mockView, mockAuthenticationController);
 	}
 	
 	@Test
@@ -71,6 +74,22 @@ public class ShinySiteWidgetTest {
 		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl.toUpperCase()));
 		assertFalse(ShinySiteWidget.isValidShinySite(invalidSiteUrl));
 		assertFalse(ShinySiteWidget.isValidShinySite(null));
+	}
+	
+	@Test
+	public void testIsIncludePrincipalId() {
+		Map<String, String> descriptor = new HashMap<String, String>();
+		//default false
+		assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
+		//explicitly false
+		descriptor.put(WidgetConstants.SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY, "false");
+		assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
+		//parse true
+		descriptor.put(WidgetConstants.SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY, "tRuE");
+		assertTrue(ShinySiteWidget.isIncludePrincipalId(descriptor));
+		//invalid param should default to false
+		descriptor.put(WidgetConstants.SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY, "invalid");
+		assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
 	}
 	
 	

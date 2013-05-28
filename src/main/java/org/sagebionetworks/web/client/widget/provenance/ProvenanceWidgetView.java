@@ -41,4 +41,6 @@ public interface ProvenanceWidgetView extends IsWidget, SynapseWidgetView {
 
 	public void setHeight(int height);
 	
+	public void setBlockCloseFullscreen(boolean blockClose);
+	
 }

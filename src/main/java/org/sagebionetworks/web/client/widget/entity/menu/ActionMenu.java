@@ -1,14 +1,19 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
@@ -31,9 +36,12 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -55,6 +63,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookieProvider;
+	private  NodeModelCreator nodeModelCreator;
 	
 	@Inject
 	public ActionMenu(ActionMenuView view, NodeModelCreator nodeModelCreator,
@@ -76,6 +85,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.entityFactory = entityFactory;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookieProvider = cookieProvider;
+		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}	
 	
@@ -90,7 +100,84 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, readOnly, DisplayUtils.isInTestWebsite(cookieProvider));
 		return view.asWidget();
 	}
-
+	
+	@Override
+	public void submitToEvaluations(List<String> evaluationIds) {
+		//set up shared values across all submissions
+		Entity entity = entityBundle.getEntity();
+		Submission newSubmission = new Submission();
+		newSubmission.setEntityId(entity.getId());
+		newSubmission.setUserId(authenticationController.getLoggedInUser().getProfile().getOwnerId());
+		if (entity instanceof Versionable) {
+			newSubmission.setVersionNumber(((Versionable)entity).getVersionNumber());
+		}
+		if (evaluationIds.size() > 0)
+			submitToEvaluations(newSubmission, entity.getEtag(), evaluationIds, 0);
+	}
+	
+	public void submitToEvaluations(final Submission newSubmission, final String etag, final List<String> evaluationIds, final int index) {
+		//and create a new submission for each evaluation
+		String evalId = evaluationIds.get(index);
+		newSubmission.setEvaluationId(evalId);
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		try {
+			newSubmission.writeToJSONObject(adapter);
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
+		}
+		try {
+			synapseClient.createSubmission(adapter.toJSONString(), etag, new AsyncCallback<String>() {			
+				@Override
+				public void onSuccess(String result) {
+					//result is the updated submission
+					if (index == evaluationIds.size()-1) {
+						view.showInfo(DisplayConstants.SUBMITTED_TITLE, DisplayConstants.SUBMITTED_TO_EVALUATION);				
+					} else {
+						submitToEvaluations(newSubmission, etag, evaluationIds, index+1);
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});
+		} catch (RestServiceException e) {
+			view.showErrorMessage(e.getMessage());
+		}
+	}
+	
+	@Override
+	public void showAvailableEvaluations() {
+		try {
+			synapseClient.getAvailableEvaluations(new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String jsonString) {
+					try {
+						PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
+						List<Evaluation> list = results.getResults();
+						if (list == null || list.size() == 0) {
+							//no available evaluations, pop up an info dialog
+							view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
+						} else {
+							view.popupEvaluationSelector(results.getResults());	
+						}
+					} catch (JSONObjectAdapterException e) {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});
+		} catch (RestServiceException e) {
+			view.showErrorMessage(e.getMessage());
+		}
+		
+	}
+	
 	public void clearState() {
 		view.clear();
 		// remove handlers

@@ -56,12 +56,12 @@ public class FilesBrowserTest {
 	public void testConfigure() {		
 		String entityId = "syn123";
 		filesBrowser.configure(entityId);
-		verify(mockView).configure(entityId);
+		verify(mockView).configure(entityId, false);
 		reset(mockView);
 		
 		String title = "title";
 		filesBrowser.configure(entityId, title);
-		verify(mockView).configure(entityId, title);
+		verify(mockView).configure(entityId, false, title);
 		reset(mockView);
 	}
 	

@@ -4,6 +4,8 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -87,6 +89,13 @@ public interface SynapseClientAsync {
 	public void createAccessRequirement(EntityWrapper arEW, AsyncCallback<EntityWrapper> callback);
 
 	public void getUnmetAccessRequirements(String entityId, AsyncCallback<AccessRequirementsTransport> callback);
+	
+	/**
+	 * 
+	 * @param evalId the evaluation identifier
+	 * @param callback returns VariableContentPaginatedResults<AccessRequirement> json
+	 */
+	public void getUnmetEvaluationAccessRequirements(String evalId, AsyncCallback<String> callback);
 
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
 
@@ -105,8 +114,6 @@ public interface SynapseClientAsync {
 	void getActivityForEntity(String entityId, AsyncCallback<String> callback);
 
 	void getActivity(String activityId, AsyncCallback<String> callback);
-	
-	void promoteEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	
 	void removeAttachmentFromEntity(String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 	
@@ -142,11 +149,20 @@ public interface SynapseClientAsync {
 	void createParticipant(String evaluationId, AsyncCallback<String> callback) throws RestServiceException;
 	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
-	void getChunkedFileToken(String fileName,  String contentType, long chunkNumber, AsyncCallback<String> callback) throws RestServiceException;
+	void getChunkedFileToken(String fileName,  String contentType, AsyncCallback<String> callback) throws RestServiceException;
 	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
-	void completeChunkedFileUpload(String entityId, String requestJson, String parentEntityId, boolean isRestricted, AsyncCallback<String> callback) throws RestServiceException;
+	void completeChunkedFileUpload(String entityId, List<String> requests, String parentEntityId, boolean isRestricted, AsyncCallback<String> callback) throws RestServiceException;
 	void getEntityDoi(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
+	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
+	
+	/**
+	 * Create a new Submission object.  Callback returning the updated version of the Submission object
+	 * @param submissionJson
+	 * @param etag
+	 * @param callback
+	 */
+	void createSubmission(String submissionJson, String etag, AsyncCallback<String> callback) throws RestServiceException;
 }

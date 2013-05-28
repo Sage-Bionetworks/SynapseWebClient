@@ -339,8 +339,6 @@
 	margin: 4px 10px 0 0; 
 }
 
-
-
 /* Clear out GWT's link color */
 a, a:visited, a:hover {
   color: inherit;
@@ -540,13 +538,10 @@ a.shortBtn {
 	overflow: hidden;
 	text-align: justify;
 }
-.markdown div{
-	overflow-x: auto;
-}
 
 .markdown ol { 
 	list-style-type: decimal;
-	padding-left: 17px;
+	padding-left: 24px;
 }
 .markdown ul { 
 	list-style-type: square;
@@ -900,4 +895,7 @@ ol.lowerroman {
 	font-size: 0.8em;
 }
 
-
+.widgetContainer {
+	overflow-x: auto;
+	display: inline;
+}
