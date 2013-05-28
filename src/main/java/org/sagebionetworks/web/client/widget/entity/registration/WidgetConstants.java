@@ -74,6 +74,7 @@ public class WidgetConstants {
 	public static final String USERBADGE_WIDGET_ID_KEY = "id";
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	
+	public static final String SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY = "includePrincipalId";
 	public static final String SHINYSITE_HEIGHT_KEY = "height";
 	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
