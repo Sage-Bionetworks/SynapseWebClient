@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.List;
 
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
@@ -22,7 +23,9 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -168,6 +171,17 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	private void loadProjectsAndFavorites() {
+		loadEvaluations(new AsyncCallback<List<Evaluation>>() {
+			@Override
+			public void onSuccess(List<Evaluation> result) {
+				view.setMyEvaluationList(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setMyEvaluationsError("Could not load My Evaluations");
+			}
+		});
+		
 		EntityBrowserUtils.loadUserUpdateable(searchService, nodeModelCreator, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
@@ -191,6 +205,31 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 
+	private void loadEvaluations(final AsyncCallback<List<Evaluation>> callback){
+		try {
+			synapseClient.getAvailableEvaluations(new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String jsonString) {
+					try {
+						PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
+						List<Evaluation> list = results.getResults();
+						callback.onSuccess(list);
+					} catch (JSONObjectAdapterException e) {
+						callback.onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+			});
+		} catch (RestServiceException e) {
+			callback.onFailure(e);
+		}
+
+	}
+	
 	@Override
 	public void createProject(final String name) {
 		ProjectsHomePresenter.createProject(name, autoGenFactory, synapseClient, jsonObjectAdapter, globalApplicationState, authenticationController, new AsyncCallback<String>() {

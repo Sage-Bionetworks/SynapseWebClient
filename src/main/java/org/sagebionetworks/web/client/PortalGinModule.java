@@ -74,6 +74,8 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
+import org.sagebionetworks.web.client.widget.entity.MyEvaluationsListView;
+import org.sagebionetworks.web.client.widget.entity.MyEvaluationsListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
@@ -426,6 +428,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//Evaluation selector
 		bind(EvaluationListView.class).to(EvaluationListViewImpl.class);
+		
+		//My Evaluations
+		bind(MyEvaluationsListView.class).to(MyEvaluationsListViewImpl.class);
 		
 		// SnapshotWidget		
 		bind(SnapshotWidgetView.class).to(SnapshotWidgetViewImpl.class);
