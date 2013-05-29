@@ -205,7 +205,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 
-	private void loadEvaluations(final AsyncCallback<List<Evaluation>> callback){
+	public void loadEvaluations(final AsyncCallback<List<Evaluation>> callback){
 		try {
 			synapseClient.getAvailableEvaluations(new AsyncCallback<String>() {
 				@Override
