@@ -204,6 +204,9 @@ public class FileHandleServlet extends HttpServlet {
 				String name = item.getFieldName();
 				InputStream stream = item.openStream();
 				String fileName = item.getName();
+				if (fileName.contains("\\")){
+					fileName = fileName.substring(fileName.lastIndexOf("\\")+1);
+				}
                 File tempDir = Files.createTempDir();
 				File temp = new File(tempDir.getAbsolutePath() + File.separator + fileName);
 

@@ -483,6 +483,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		// response from server
 		//try to parse
 		UploadResult uploadResult = null;
+		String detailedErrorMessage = null;
 		try{
 			uploadResult = AddAttachmentDialog.getUploadResult(resultHtml);
 			if (uploadResult.getUploadStatus() == UploadStatus.SUCCESS) {
@@ -491,13 +492,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				//get the entity, and report success
 				refreshAfterSuccessfulUpload(entityId, isNewlyRestricted);
 			}else {
-				uploadError(null);
+				uploadError("Upload result status indicated upload was unsuccessful.");
 			}
-		} catch (Throwable th) {};//wasn't an UplaodResult
+		} catch (Throwable th) {detailedErrorMessage = th.getMessage();};//wasn't an UplaodResult
 		
 		if (uploadResult == null) {
 			if(!resultHtml.contains(DisplayUtils.UPLOAD_SUCCESS)) {
-				uploadError(null);
+				uploadError(detailedErrorMessage);
 			} else {
 				uploadSuccess(isNewlyRestricted);
 			}
