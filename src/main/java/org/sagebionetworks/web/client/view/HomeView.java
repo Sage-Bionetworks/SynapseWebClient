@@ -2,12 +2,11 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface HomeView extends IsWidget, SynapseView {
@@ -35,5 +34,7 @@ public interface HomeView extends IsWidget, SynapseView {
 	public void setFavorites(List<EntityHeader> result);
 
 	public void setFavoritesError(String string);
-
+	
+	public void setMyEvaluationList(List<Evaluation> myEvaluations);
+	public void setMyEvaluationsError(String string);
 }

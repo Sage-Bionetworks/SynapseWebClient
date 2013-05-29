@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.RSSEntry;
@@ -34,6 +35,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -53,12 +55,12 @@ public class HomePresenterTest {
 	SynapseClientAsync mockSynapseClient; 
 	AutoGenFactory autoGenFactory;
 	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
-
+	List<Evaluation> testEvaluationResults;
 	
 	RSSFeed testFeed = null;
 	
 	@Before
-	public void setup(){
+	public void setup() throws RestServiceException, JSONObjectAdapterException{
 		mockView = mock(HomeView.class);
 		cookieProvider = mock(CookieProvider.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
@@ -68,7 +70,16 @@ public class HomePresenterTest {
 		mockSearchService = mock(SearchServiceAsync.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		autoGenFactory = new AutoGenFactory();
-		
+		PaginatedResults<Evaluation> testPaginatedResults = new PaginatedResults<Evaluation>();
+		testEvaluationResults = new ArrayList<Evaluation>();
+		Evaluation testEvaluation = new Evaluation();
+		testEvaluation.setId("eval id 1");
+		testEvaluation.setName("My Test Evaluation");
+		testEvaluationResults.add(testEvaluation);
+		testPaginatedResults.setTotalNumberOfResults(1);
+		testPaginatedResults.setResults(testEvaluationResults);
+		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(testPaginatedResults);
+		AsyncMockStubber.callSuccessWith("fake paginated evaluation results json").when(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
 		testFeed = new RSSFeed();
 		RSSEntry entry = new RSSEntry();
 		entry.setTitle("A Title");
@@ -108,4 +119,22 @@ public class HomePresenterTest {
 		verify(mockView).showNews(anyString());
 	}	
 	
+	@Test
+	public void testLoadEvaluations() {
+		//happy case
+		AsyncCallback<List<Evaluation>> mockCallback = mock(AsyncCallback.class);
+		homePresenter.loadEvaluations(mockCallback);
+		verify(mockCallback).onSuccess(testEvaluationResults);
+	}
+	
+	
+	@Test
+	public void testLoadEvaluationsFailure() throws RestServiceException {
+		Exception simulatedException = new Exception("Simulated Error");
+		AsyncMockStubber.callFailureWith(simulatedException).when(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
+		AsyncCallback<List<Evaluation>> mockCallback = mock(AsyncCallback.class);
+		homePresenter.loadEvaluations(mockCallback);
+		verify(mockCallback).onFailure(simulatedException);
+	}
+
 }

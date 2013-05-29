@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -11,6 +12,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.widget.entity.MyEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -69,6 +71,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private EntityTreeBrowser myProjectsTreeBrowser;
 	private EntityTreeBrowser favoritesTreeBrowser;
 	IconsImageBundle iconsImageBundle;
+	private MyEvaluationsList myEvaluationsList;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget,
@@ -77,7 +80,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 			final GlobalApplicationState globalApplicationState,
 			HomeSearchBox homeSearchBox, 
 			EntityTreeBrowser myProjectsTreeBrowser,
-			EntityTreeBrowser favoritesTreeBrowser) {
+			EntityTreeBrowser favoritesTreeBrowser,
+			MyEvaluationsList myEvaluationsList) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -86,6 +90,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
 		this.favoritesTreeBrowser = favoritesTreeBrowser;
 		this.iconsImageBundle = icons;
+		this.myEvaluationsList = myEvaluationsList;
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -205,21 +210,13 @@ public class HomeViewImpl extends Composite implements HomeView {
 		LayoutContainer container = new LayoutContainer();
 		container.setStyleName("span-16 notopmargin last");			
 		
-		// My Projects
-		LayoutContainer myProjContainer = new LayoutContainer();
-		myProjContainer.setStyleName("span-8 notopmargin");
-		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
-		myProjContainer.add(myProjectsTreeBrowser.asWidget());					
-		container.add(myProjContainer);
-
-		// Favorites
-		LayoutContainer favoritesContainer = new LayoutContainer();
-		favoritesContainer.setStyleName("span-8 notopmargin last");
-		favoritesContainer.add(
-				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
-		favoritesContainer.add(favoritesTreeBrowser.asWidget());
-		container.add(favoritesContainer);
-
+		LayoutContainer evalsAndProjects = new LayoutContainer();
+		evalsAndProjects.setStyleName("span-8 notopmargin");
+		evalsAndProjects.add(getMyEvaluationsContainer());
+		evalsAndProjects.add(getMyProjectsContainer());
+		container.add(evalsAndProjects);
+		container.add(getFavoritesContainer());
+		
 		// Create a project
 		LayoutContainer createProjectContainer = new LayoutContainer();
 		createProjectContainer.addStyleName("span-16 last");		
@@ -254,7 +251,31 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 		projectPanel.add(container);		
 	}
-
+	
+	private LayoutContainer getFavoritesContainer() {
+		LayoutContainer favoritesContainer = new LayoutContainer();
+		favoritesContainer.setStyleName("span-8 notopmargin last");
+		favoritesContainer.add(
+				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
+		favoritesContainer.add(favoritesTreeBrowser.asWidget());
+		return favoritesContainer;
+	}
+	
+	private LayoutContainer getMyEvaluationsContainer() {
+		//My Evaluations
+		LayoutContainer myEvaluations = new LayoutContainer();
+		myEvaluations.setStyleName("span-8 notopmargin");
+		myEvaluations.add(myEvaluationsList.asWidget());					
+		return myEvaluations;
+	}
+	
+	private LayoutContainer getMyProjectsContainer() {
+		LayoutContainer myProjContainer = new LayoutContainer();
+		myProjContainer.setStyleName("span-8 notopmargin");
+		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
+		myProjContainer.add(myProjectsTreeBrowser.asWidget());					
+		return myProjContainer;
+	}
 
 	@Override
 	public void setMyProjects(List<EntityHeader> myProjects) {
@@ -274,4 +295,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void setFavoritesError(String string) {
 	}
 	
+	@Override
+	public void setMyEvaluationList(List<Evaluation> myEvaluations) {
+		myEvaluationsList.configure(myEvaluations);
+	}
+	
+	@Override
+	public void setMyEvaluationsError(String string) {
+	}
 }
