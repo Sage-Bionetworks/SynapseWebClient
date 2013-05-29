@@ -899,3 +899,21 @@ ol.lowerroman {
 	overflow-x: auto;
 	display: inline;
 }
+
+.myEvaluationListContainer {
+	border:1px solid #D0D0D0; 
+	padding-left:7px;
+	margin-bottom: 35px;
+}
+
+.myEvaluationLink,.myEvaluationLink:hover,.myEvaluationLink:visited{
+	color: black;
+    display: inline-block;
+    font: 11px arial,tahoma,helvetica,sans-serif;
+    overflow: hidden;
+    padding: 0 0 5px 3px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 270px;
+    vertical-align: middle;
+}
