@@ -170,7 +170,9 @@ public class AddAttachmentDialog {
 			GwtAdapterFactory factory = new GwtAdapterFactory();
 			//search for the first ">" (end of the pre tag)
 			int closeIndex = html.indexOf(">")+1;
-			String json = html.substring(closeIndex, (html.length()-"</pre>".length()));
+			String json = html;
+			if (html.contains("</pre>"))
+				json = html.substring(closeIndex, (html.length()-"</pre>".length()));
 			JSONObjectAdapter adapter;
 			try {
 				adapter = factory.createNew(json);
