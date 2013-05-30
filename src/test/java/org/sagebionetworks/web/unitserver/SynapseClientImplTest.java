@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -56,6 +57,7 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -787,5 +789,68 @@ public class SynapseClientImplTest {
 		String returnSubmissionJson = synapseClient.createSubmission(submissionJson, "fakeEtag");
 		verify(mockSynapse).createSubmission(any(Submission.class), anyString());
 		assertEquals(submissionJson, returnSubmissionJson);
+	}
+	
+	private void setupTestSubmitterAliases() throws SynapseException{
+		//set up 2 available evaluations
+		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
+		List<Evaluation> evalResults = new ArrayList<Evaluation>();
+		Evaluation e = new Evaluation();
+		e.setId("evaluation1");
+		evalResults.add(e);
+		e = new Evaluation();
+		e.setId("evaluation2");
+		evalResults.add(e);
+		availableEvaluations.setResults(evalResults);
+		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(availableEvaluations);
+		
+		//test sorting, uniqueness, and empty/null values
+		Submission[] submissions = new Submission[6];
+		Date date = new Date();
+		for (int i = 0; i < submissions.length; i++) {
+			submissions[i] = new Submission();
+			//submission 0 is the most recently used (largest date time), and submission 6 is the oldest
+			submissions[i].setCreatedOn(new Date(date.getTime() - i));	 
+			submissions[i].setSubmitterAlias("Alias " + i);
+		}
+		//set a duplicate
+		submissions[3].setSubmitterAlias("Alias 0");
+		//and add a null and empty string submitter alias, to verify that these are removed
+		submissions[4].setSubmitterAlias(null);
+		submissions[5].setSubmitterAlias("");
+		
+		//assign 2 submissions to evaluation1, and the other 4 submissions to evaluation2
+		//mix them up to test sort
+		PaginatedResults<Submission> submissionSet1 = new PaginatedResults<Submission>();
+		List<Submission> submissionList = new ArrayList<Submission>();
+		submissionList.add(submissions[0]);
+		submissionList.add(submissions[2]);
+		submissionSet1.setTotalNumberOfResults(2);
+		submissionSet1.setResults(submissionList);
+		
+		PaginatedResults<Submission> submissionSet2 = new PaginatedResults<Submission>();
+		submissionList = new ArrayList<Submission>();
+		submissionList.add(submissions[1]);
+		submissionList.add(submissions[3]);
+		submissionList.add(submissions[4]);
+		submissionList.add(submissions[5]);
+		submissionSet2.setTotalNumberOfResults(4);
+		submissionSet2.setResults(submissionList);
+		when(mockSynapse.getMySubmissions(anyString(), anyLong(), anyLong())).thenReturn(submissionSet1, submissionSet2);
+	}
+	
+	@Test
+	public void testGetAvailableEvaluationSubmitterAliases() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		setupTestSubmitterAliases();
+		String resourceListJson = synapseClient.getAvailableEvaluationsSubmitterAliases();
+		RestResourceList resourceList = EntityFactory.createEntityFromJSONString(resourceListJson, RestResourceList.class);
+		List<String> submitterAliasList = resourceList.getList();
+		//3 unique submitter aliases across the evaluations
+		assertEquals(3, submitterAliasList.size());
+		
+		//order should be Alias 0, Alias 1, Alias 2
+		for (int i = 0; i < submitterAliasList.size(); i++) {
+			assertEquals("Alias " + i, submitterAliasList.get(i));
+		}
 	}
 }

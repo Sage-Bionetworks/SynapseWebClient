@@ -161,11 +161,20 @@ public class ActionMenuTest {
 	}
 	
 	@Test
-	public void testShowAvailableEvaluationsFailure() throws RestServiceException, JSONObjectAdapterException {
+	public void testShowAvailableEvaluationsFailure1() throws RestServiceException, JSONObjectAdapterException {
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
 		actionMenu.showAvailableEvaluations();
 		verify(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
 		//no evaluations to join error message
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testShowAvailableEvaluationsFailure2() throws RestServiceException, JSONObjectAdapterException {
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getAvailableEvaluationsSubmitterAliases(any(AsyncCallback.class));
+		actionMenu.showAvailableEvaluations();
+		verify(mockSynapseClient).getAvailableEvaluationsSubmitterAliases(any(AsyncCallback.class));
+		//Failure when asking for submitter aliases
 		verify(mockView).showErrorMessage(anyString());
 	}
 }

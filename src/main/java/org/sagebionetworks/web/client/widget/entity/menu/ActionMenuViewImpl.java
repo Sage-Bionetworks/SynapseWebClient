@@ -443,6 +443,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 
 	private void addSubmitToEvaluationItem(Menu menu, Entity entity,EntityType entityType) {
 		MenuItem item = new MenuItem(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION);
+		item.setIcon(AbstractImagePrototype.create(iconsImageBundle.synapseStep16()));
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			@Override
 			public void componentSelected(MenuEvent ce) {
