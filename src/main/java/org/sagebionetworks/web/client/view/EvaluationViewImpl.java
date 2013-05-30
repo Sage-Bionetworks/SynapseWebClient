@@ -91,7 +91,7 @@ public class EvaluationViewImpl extends Composite implements EvaluationView {
 	}
 
 	@Override
-	public void showPage(final WikiPageKey wikiKey, UserEvaluationState state, final boolean canEdit){
+	public void showPage(final WikiPageKey wikiKey, final boolean canEdit){
 		fullWidthContainer = initContainerAndPanel(fullWidthContainer, fullWidthPanel);
 		fullWidthContainer.removeAll();
 		
@@ -103,30 +103,6 @@ public class EvaluationViewImpl extends Composite implements EvaluationView {
 			}
 		}, false, 24);
 
-		if (!UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE.equals(state)) {
-			//show a register/unregister button
-			SimplePanel buttonContainer = new SimplePanel();
-			buttonContainer.addStyleName("span-24");
-			
-			if (UserEvaluationState.EVAL_OPEN_USER_NOT_REGISTERED.equals(state)) {
-				LayoutContainer megaButton = new LayoutContainer();
-				megaButton.setStyleName("mega-button");
-				megaButton.setStyleAttribute("margin-top", "10px;");
-				megaButton.setStyleAttribute("float", "left;");
-				
-				Anchor applyForChallengeLink = new Anchor();
-				applyForChallengeLink.setText("Join!");
-				applyForChallengeLink.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						presenter.register();
-					}
-				});
-				megaButton.add(applyForChallengeLink);
-				buttonContainer.add(megaButton);
-			}
-			fullWidthContainer.add(buttonContainer);
-		}
 		fullWidthContainer.layout(true);
 	}
 
@@ -142,34 +118,4 @@ public class EvaluationViewImpl extends Composite implements EvaluationView {
 		}
 		return container;
 	}
-	
-	public void showAccessRequirement(
-			String arText,
-			final Callback touAcceptanceCallback) {
-		final Dialog dialog = new Dialog();
-       	dialog.setMaximizable(false);
-        dialog.setSize(640, 480);
-        dialog.setPlain(true); 
-        dialog.setModal(true); 
-        dialog.setAutoHeight(true);
-        dialog.setResizable(false);
-        ScrollPanel panel = new ScrollPanel(new HTML(arText));
-        panel.addStyleName("margin-top-left-10");
-        panel.setSize("605px", "450px");
-        dialog.add(panel);
- 		dialog.setHeading("Terms of Use");
-		// agree to TOU, cancel
-        dialog.okText = DisplayConstants.BUTTON_TEXT_ACCEPT_TERMS_OF_USE;
-        dialog.setButtons(Dialog.OKCANCEL);
-        Button touButton = dialog.getButtonById(Dialog.OK);
-        touButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				touAcceptanceCallback.invoke();
-			}
-        });
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();		
-	}
-
 }

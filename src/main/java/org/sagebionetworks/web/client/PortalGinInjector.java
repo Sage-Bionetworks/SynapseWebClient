@@ -54,6 +54,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
@@ -142,7 +143,8 @@ public interface PortalGinInjector extends Ginjector {
 	public TableOfContentsWidget getTableOfContentsRenderer();
 	public WikiFilesPreviewWidget getWikiFilesPreviewRenderer();
 	public EntityListWidget getEntityListRenderer();
-	public ShinySiteWidget getShinySiteRenderer(); 
+	public ShinySiteWidget getShinySiteRenderer();
+	public JoinWidget getJoinWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
