@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
+import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 
@@ -61,6 +62,8 @@ public class ActionMenuTest {
 	CookieProvider mockCookieProvider;
 	FileEntity entity;
 	EntityBundle bundle;
+	String submitterAlias = "MyAlias";
+	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{	
 		mockView = mock(ActionMenuView.class);
@@ -80,7 +83,7 @@ public class ActionMenuTest {
 		when(mockUser.getProfile()).thenReturn(mockProfile);
 		when(mockProfile.getOwnerId()).thenReturn("test owner ID");
 		AsyncMockStubber.callSuccessWith("fake submission result json").when(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
-		
+		AsyncMockStubber.callSuccessWith("fake submitter alias results json").when(mockSynapseClient).getAvailableEvaluationsSubmitterAliases(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake evaluation results json").when(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
 		
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
@@ -98,6 +101,12 @@ public class ActionMenuTest {
 
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(availableEvaluations);
 		
+		RestResourceList submitterAliases = new RestResourceList();
+		List<String> submitterAliasList = new ArrayList<String>();
+		submitterAliasList.add("Mr. F");
+		submitterAliases.setList(submitterAliasList);
+		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(submitterAliases);
+		
 		entity = new FileEntity();
 		entity.setVersionNumber(5l);
 		entity.setId("file entity test id");
@@ -109,10 +118,11 @@ public class ActionMenuTest {
 	@Test
 	public void testSubmitToEvaluations() throws RestServiceException {
 		List<String> evalIds = new ArrayList<String>();
-		actionMenu.submitToEvaluations(evalIds);
+		
+		actionMenu.submitToEvaluations(evalIds, submitterAlias);
 		verify(mockSynapseClient, times(0)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 		evalIds.add("test evaluation id");
-		actionMenu.submitToEvaluations(evalIds);
+		actionMenu.submitToEvaluations(evalIds, submitterAlias);
 		verify(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 		//submitted status shown
 		verify(mockView).showInfo(anyString(), anyString());
@@ -123,7 +133,7 @@ public class ActionMenuTest {
 		List<String> evalIds = new ArrayList<String>();
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 		evalIds.add("test evaluation id");
-		actionMenu.submitToEvaluations(evalIds);
+		actionMenu.submitToEvaluations(evalIds, submitterAlias);
 		verify(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 		//submitted status shown
 		verify(mockView).showErrorMessage(anyString());
@@ -133,7 +143,7 @@ public class ActionMenuTest {
 	public void testShowAvailableEvaluations() throws RestServiceException {
 		actionMenu.showAvailableEvaluations();
 		verify(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
-		verify(mockView).popupEvaluationSelector(any(List.class));
+		verify(mockView).popupEvaluationSelector(any(List.class), any(List.class));
 	}
 	
 	@Test
