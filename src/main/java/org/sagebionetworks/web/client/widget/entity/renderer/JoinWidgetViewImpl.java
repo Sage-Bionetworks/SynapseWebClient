@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -38,7 +39,7 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 				LayoutContainer megaButton = new LayoutContainer();
 				megaButton.setStyleName("mega-button");
 				megaButton.setStyleAttribute("margin-top", "10px;");
-				megaButton.setStyleAttribute("float", "left;");
+				megaButton.setStyleAttribute("float", "none;");
 				
 				Anchor applyForChallengeLink = new Anchor();
 				applyForChallengeLink.setText("Join!");
@@ -49,7 +50,9 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 					}
 				});
 				megaButton.add(applyForChallengeLink);
-				add(megaButton);
+				SimplePanel wrapper = new SimplePanel();
+				wrapper.add(megaButton);
+				add(wrapper);
 			}
 		}
 		
