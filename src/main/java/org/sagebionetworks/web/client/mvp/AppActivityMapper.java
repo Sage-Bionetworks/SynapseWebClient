@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -14,7 +15,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.BCCOverview;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.Evaluation;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
-import org.sagebionetworks.web.client.presenter.EvaluationPresenter;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -86,7 +85,6 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(BCCOverview.class);
 		openAccessPlaces.add(Search.class);
 		openAccessPlaces.add(WikiPlace.class);
-		openAccessPlaces.add(Evaluation.class);
 		openAccessPlaces.add(Down.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
@@ -194,11 +192,6 @@ public class AppActivityMapper implements ActivityMapper {
 			// wiki page
 			PresenterProxy<WikiPresenter, WikiPlace> presenter = ginjector.getWikiPresenter();
 			presenter.setPlace((WikiPlace)place);
-			return presenter;
-		} else if (place instanceof Evaluation) {
-			// evaluation
-			EvaluationPresenter presenter = ginjector.getEvaluationPresenter();
-			presenter.setPlace((Evaluation)place);
 			return presenter;
 		} else if(place instanceof Wiki){
 			PresenterProxy<SynapseWikiPresenter, Wiki> presenter = ginjector.getSynapseWikiPresenter();

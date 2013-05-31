@@ -37,7 +37,7 @@ public class MyEvaluationsListViewImpl extends LayoutContainer implements MyEval
 				htmlBuilder.append("<div>");
 				htmlBuilder.append(iconHtml);
 				htmlBuilder.append("<a class=\"myEvaluationLink\" href=\"");
-				htmlBuilder.append(DisplayUtils.getEvaluationHistoryToken(evaluation.getId()));
+				htmlBuilder.append(DisplayUtils.getSynapseHistoryToken(evaluation.getContentSource()));
 				htmlBuilder.append("\">");
 				htmlBuilder.append(evaluation.getName());
 				htmlBuilder.append("</a></div>");
