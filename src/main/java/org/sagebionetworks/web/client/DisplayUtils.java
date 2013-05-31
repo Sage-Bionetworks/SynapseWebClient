@@ -44,7 +44,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.Evaluation;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
@@ -622,11 +621,6 @@ public class DisplayUtils {
 		return "#!" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
 	}
 	
-	public static String getEvaluationHistoryToken(String evaluationId) {
-		Evaluation place = new Evaluation(evaluationId);
-		return "#!" + getEvaluationPlaceString(Evaluation.class) + ":" + place.toToken();
-	}
-	
 	public static String getSearchHistoryToken(String searchQuery) {
 		Search place = new Search(searchQuery);
 		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
@@ -709,14 +703,7 @@ public class DisplayUtils {
 		return fullPlaceName;
 	}
 	
-	private static String getEvaluationPlaceString(Class<Evaluation> place) {
-		String fullPlaceName = place.getName();
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
-	}
-
-
-
+	
 	/**
 	 * Returns the offending character given a regex string
 	 * @param key
