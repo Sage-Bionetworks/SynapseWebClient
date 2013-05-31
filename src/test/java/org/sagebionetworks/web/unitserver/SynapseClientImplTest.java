@@ -796,10 +796,12 @@ public class SynapseClientImplTest {
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
 		List<Evaluation> evalResults = new ArrayList<Evaluation>();
 		Evaluation e = new Evaluation();
-		e.setId("evaluation1");
+		String eval1Id ="evaluation1"; 
+		e.setId(eval1Id);
 		evalResults.add(e);
 		e = new Evaluation();
-		e.setId("evaluation2");
+		String eval2Id = "evaluation2";
+		e.setId(eval2Id);
 		evalResults.add(e);
 		availableEvaluations.setResults(evalResults);
 		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(availableEvaluations);
@@ -836,7 +838,8 @@ public class SynapseClientImplTest {
 		submissionList.add(submissions[5]);
 		submissionSet2.setTotalNumberOfResults(4);
 		submissionSet2.setResults(submissionList);
-		when(mockSynapse.getMySubmissions(anyString(), anyLong(), anyLong())).thenReturn(submissionSet1, submissionSet2);
+		when(mockSynapse.getMySubmissions(eq(eval1Id), anyLong(), anyLong())).thenReturn(submissionSet1);
+		when(mockSynapse.getMySubmissions(eq(eval2Id), anyLong(), anyLong())).thenReturn(submissionSet2);
 	}
 	
 	@Test
