@@ -297,25 +297,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-	@Override
-	public Long getStorageUsage(String entityId) throws RestServiceException{
-		//direct call to the Synapse Client (made available there)
-		Synapse synapseClient = createSynapseClient();
-		Long size = -1l;
-		try {
-			PaginatedResults<StorageUsage> usageResults = synapseClient.getItemizedStorageUsageForNode(entityId, 0, 1);
-			if (usageResults.getResults().size() > 0)
-				size = usageResults.getResults().get(0).getContentSize();
-		} catch (SynapseException e) {
-			log.error(e);
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-		if (size < 0)
-			throw new RuntimeException(DisplayConstants.ENTITY_STORAGE_NOT_FOUND_ERROR + entityId);
-		return size;
-	}
-
 
 	/*
 	 * Private Methods

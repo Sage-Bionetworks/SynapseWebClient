@@ -55,26 +55,6 @@ public class FileTitleBarTest {
 	}
 	
 	@Test
-	public void testUpdateNodeStorageUsage() {
-		//updating node storage usage is wired to synapse client getStorageUsage (and result is completely based on the return of that call)
-		final Long testSize = 1234l;
-		fileTitleBar.setEntityBundle(new EntityBundle(new Project(), null, null, null, null, null, null, null));
-		AsyncMockStubber.callSuccessWith(testSize).when(mockSynapseClient).getStorageUsage(anyString(), any(AsyncCallback.class));
-		fileTitleBar.updateNodeStorageUsage(new AsyncCallback<Long>() {
-			@Override
-			public void onSuccess(Long result) {
-				Assert.assertEquals(testSize, result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				Assert.fail(caught.getMessage());
-			}
-		});
-		
-		verify(mockSynapseClient).getStorageUsage(anyString(), (AsyncCallback<Long>) any());
-	}
-	
-	@Test
 	public void testIsDataNotInFile() {
 		FileEntity fileEntity = new FileEntity();
 		fileEntity.setDataFileHandleId(null);

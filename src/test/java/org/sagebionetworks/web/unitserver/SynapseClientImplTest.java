@@ -505,24 +505,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetStorageUsage() throws Exception {
-		//verify call is directly calling the synapse client provider.
-		PaginatedResults<StorageUsage> testPaginatedResults = new PaginatedResults<StorageUsage>();
-		StorageUsage expectedUsage = new StorageUsage();
-		Long expectedSize = 12345l;
-		expectedUsage.setId("usageId");
-		expectedUsage.setContentSize(expectedSize);
-		List<StorageUsage> list = new ArrayList<StorageUsage>();
-		list.add(expectedUsage);
-		testPaginatedResults.setResults(list);
-		testPaginatedResults.setTotalNumberOfResults(1l);
-		
-		when(mockSynapse.getItemizedStorageUsageForNode(anyString(), anyInt(), anyInt())).thenReturn(testPaginatedResults);
-		Long actual = synapseClient.getStorageUsage(entityId);
-		assertEquals(expectedSize, actual);
-	}
-	
-	@Test
 	public void testRemoveAttachmentFromEntity() throws Exception {
 
 		Mockito.when(mockSynapse.putEntity(any(ExampleEntity.class))).thenReturn(entity);

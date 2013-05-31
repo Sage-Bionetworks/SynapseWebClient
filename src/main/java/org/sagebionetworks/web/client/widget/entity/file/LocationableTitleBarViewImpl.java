@@ -178,17 +178,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 						fileSize.setInnerText("(External Storage)");
 					}
 					else {
-						presenter.updateNodeStorageUsage(new AsyncCallback<Long>() {
-							@Override
-							public void onSuccess(Long result) {
-								fileSize.setInnerText("("+DisplayUtils.getFriendlySize(result.doubleValue(), true) + " - Synapse Storage)");
-							}
-							
-							@Override
-							public void onFailure(Throwable caught) {
-								//could not determine the size, leave it blank.
-							}
-						});
+						fileSize.setInnerText("");
 					}
 					md5Link.setVisible(!isExternal);
 					if (!isExternal) {
