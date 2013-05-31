@@ -54,6 +54,7 @@ public class WidgetConstants {
 	public static final String FLOAT_NONE = "None";
 	public static final String FLOAT_LEFT = "Left";
 	public static final String FLOAT_RIGHT = "Right";
+	public static final String FLOAT_CENTER = "Center";
 	
 	@Deprecated
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";

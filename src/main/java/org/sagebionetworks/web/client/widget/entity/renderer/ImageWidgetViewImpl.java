@@ -61,6 +61,8 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 			} else if (WidgetConstants.FLOAT_RIGHT.equalsIgnoreCase(trimmedAlignment)) {
 				image.addStyleName("floatright");
 				image.addStyleName("margin-left-10");
+			}else if (WidgetConstants.FLOAT_CENTER.equalsIgnoreCase(trimmedAlignment)) {
+				image.addStyleName("align-center");
 			} else if (!WidgetConstants.FLOAT_NONE.equalsIgnoreCase(trimmedAlignment)) {
 				showError("Alignment value not recognized: " + alignment);
 				return;
