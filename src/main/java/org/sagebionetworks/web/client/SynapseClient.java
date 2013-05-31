@@ -184,8 +184,6 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException;
 	
-	public Long getStorageUsage(String entityId) throws RestServiceException;
-
 	public String getActivityForEntity(String entityId) throws RestServiceException;
 	
 	public String getActivityForEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
