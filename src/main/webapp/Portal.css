@@ -917,3 +917,6 @@ ol.lowerroman {
     width: 270px;
     vertical-align: middle;
 }
+
+
+.align-center {display: block; margin-left: auto; margin-right: auto;}
