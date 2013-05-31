@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
-import org.sagebionetworks.web.client.presenter.EvaluationPresenter;
 import org.sagebionetworks.web.client.presenter.GovernancePresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -54,6 +53,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
@@ -107,8 +107,6 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public PresenterProxy<WikiPresenter, WikiPlace> getWikiPresenter();
 	
-	public EvaluationPresenter getEvaluationPresenter();
-	
 	public PresenterProxy<DownPresenter, Down> getDownPresenter();
 	
 	public EventBus getEventBus();
@@ -142,7 +140,8 @@ public interface PortalGinInjector extends Ginjector {
 	public TableOfContentsWidget getTableOfContentsRenderer();
 	public WikiFilesPreviewWidget getWikiFilesPreviewRenderer();
 	public EntityListWidget getEntityListRenderer();
-	public ShinySiteWidget getShinySiteRenderer(); 
+	public ShinySiteWidget getShinySiteRenderer();
+	public JoinWidget getJoinWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
