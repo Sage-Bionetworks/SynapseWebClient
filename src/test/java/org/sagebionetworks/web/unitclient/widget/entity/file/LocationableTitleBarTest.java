@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -25,9 +22,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarView;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class LocationableTitleBarTest {
 		
@@ -54,25 +48,6 @@ public class LocationableTitleBarTest {
 		locationableTitleBar.asWidget();
 	}
 	
-	@Test
-	public void testUpdateNodeStorageUsage() {
-		//updating node storage usage is wired to synapse client getStorageUsage (and result is completely based on the return of that call)
-		final Long testSize = 1234l;
-		locationableTitleBar.setEntityBundle(new EntityBundle(new Project(), null, null, null, null, null, null, null));
-		AsyncMockStubber.callSuccessWith(testSize).when(mockSynapseClient).getStorageUsage(anyString(), any(AsyncCallback.class));
-		locationableTitleBar.updateNodeStorageUsage(new AsyncCallback<Long>() {
-			@Override
-			public void onSuccess(Long result) {
-				Assert.assertEquals(testSize, result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				Assert.fail(caught.getMessage());
-			}
-		});
-		
-		verify(mockSynapseClient).getStorageUsage(anyString(), (AsyncCallback<Long>) any());
-	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testIsDataInLocationableFail() {
 		EntityBundle bundle = new EntityBundle(new Project(), null, null, null,null,null, null, null);

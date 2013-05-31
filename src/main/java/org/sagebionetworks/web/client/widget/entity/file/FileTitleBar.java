@@ -91,11 +91,6 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		
 	}
 	
-	@Override
-	public void updateNodeStorageUsage(final AsyncCallback<Long> callback) {
-		synapseClient.getStorageUsage(entityBundle.getEntity().getId(), callback);
-	}
-
 	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
 		String dataFileHandleId = fileEntity.getDataFileHandleId();
 		return (dataFileHandleId != null && dataFileHandleId.length() > 0);

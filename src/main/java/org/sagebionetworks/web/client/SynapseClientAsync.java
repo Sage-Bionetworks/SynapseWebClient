@@ -105,8 +105,6 @@ public interface SynapseClientAsync {
 
 	public void markdown2Html(String markdown, Boolean isPreview, AsyncCallback<String> callback);
 	
-	public void getStorageUsage(String entityId, AsyncCallback<Long> callback);
-
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 
 	void getActivityForEntity(String entityId, AsyncCallback<String> callback);
