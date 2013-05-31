@@ -53,6 +53,7 @@ public class ImageParamsPanel extends FormPanel{
 		alignmentCombo.add(WidgetConstants.FLOAT_NONE);
 		alignmentCombo.add(WidgetConstants.FLOAT_LEFT);
 		alignmentCombo.add(WidgetConstants.FLOAT_RIGHT);
+		alignmentCombo.add(WidgetConstants.FLOAT_CENTER);
 		alignmentCombo.setSimpleValue(WidgetConstants.FLOAT_NONE);
 		alignmentCombo.setTypeAhead(false);
 		alignmentCombo.setEditable(false);

@@ -4,8 +4,6 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
-import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -165,4 +163,12 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void createSubmission(String submissionJson, String etag, AsyncCallback<String> callback) throws RestServiceException;
+	
+	/**
+	 * Get all unique submission user aliases associated to the available evaluations (OPEN evaluations that the current user has joined).
+	 * The return list is sorted by Submission created date.
+	 * @param callback
+	 * @throws RestServiceException
+	 */
+	void getAvailableEvaluationsSubmitterAliases(AsyncCallback<String> callback) throws RestServiceException;
 }

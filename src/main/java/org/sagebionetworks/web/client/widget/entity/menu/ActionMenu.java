@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -13,6 +12,7 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -65,6 +65,22 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private CookieProvider cookieProvider;
 	private  NodeModelCreator nodeModelCreator;
 	
+	public interface EvaluationsCallback {
+		/**
+		 * When available evaluations are returned
+		 */
+		public void onSuccess(List<Evaluation> evaluations);		
+	}
+	
+	public interface SubmitterAliasesCallback {
+		/**
+		 * When available evaluations are returned
+		 */
+		public void onSuccess(List<String> evaluations);		
+	}
+
+
+	
 	@Inject
 	public ActionMenu(ActionMenuView view, NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
@@ -102,11 +118,12 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	}
 	
 	@Override
-	public void submitToEvaluations(List<String> evaluationIds) {
+	public void submitToEvaluations(List<String> evaluationIds, String submitterAlias) {
 		//set up shared values across all submissions
 		Entity entity = entityBundle.getEntity();
 		Submission newSubmission = new Submission();
 		newSubmission.setEntityId(entity.getId());
+		newSubmission.setSubmitterAlias(submitterAlias);
 		newSubmission.setUserId(authenticationController.getLoggedInUser().getProfile().getOwnerId());
 		if (entity instanceof Versionable) {
 			newSubmission.setVersionNumber(((Versionable)entity).getVersionNumber());
@@ -149,6 +166,20 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	
 	@Override
 	public void showAvailableEvaluations() {
+		getAvailableEvaluations(new EvaluationsCallback() {
+			@Override
+			public void onSuccess(final List<Evaluation> evaluations) {
+				getAvailableEvaluationsSubmitterAliases(new SubmitterAliasesCallback() {
+					@Override
+					public void onSuccess(List<String> submitterAliases) {
+						view.popupEvaluationSelector(evaluations, submitterAliases);		
+					}
+				});
+			}
+		});
+	}
+	
+	public void getAvailableEvaluations(final EvaluationsCallback callback) {
 		try {
 			synapseClient.getAvailableEvaluations(new AsyncCallback<String>() {
 				@Override
@@ -160,7 +191,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 							//no available evaluations, pop up an info dialog
 							view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
 						} else {
-							view.popupEvaluationSelector(results.getResults());	
+							callback.onSuccess(list);
 						}
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -175,7 +206,29 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		} catch (RestServiceException e) {
 			view.showErrorMessage(e.getMessage());
 		}
-		
+	}
+	
+	public void getAvailableEvaluationsSubmitterAliases(final SubmitterAliasesCallback callback) {
+		try {
+			synapseClient.getAvailableEvaluationsSubmitterAliases(new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String jsonString) {
+					try {
+						RestResourceList results = nodeModelCreator.createJSONEntity(jsonString, RestResourceList.class);
+						callback.onSuccess(results.getList());
+					} catch (JSONObjectAdapterException e) {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});
+		} catch (RestServiceException e) {
+			view.showErrorMessage(e.getMessage());
+		}
 	}
 	
 	public void clearState() {

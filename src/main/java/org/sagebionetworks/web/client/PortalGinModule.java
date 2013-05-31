@@ -28,8 +28,6 @@ import org.sagebionetworks.web.client.view.DownView;
 import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.view.EntityViewImpl;
-import org.sagebionetworks.web.client.view.EvaluationView;
-import org.sagebionetworks.web.client.view.EvaluationViewImpl;
 import org.sagebionetworks.web.client.view.GovernanceView;
 import org.sagebionetworks.web.client.view.GovernanceViewImpl;
 import org.sagebionetworks.web.client.view.HomeView;
@@ -74,6 +72,8 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
+import org.sagebionetworks.web.client.widget.entity.MyEvaluationsListView;
+import org.sagebionetworks.web.client.widget.entity.MyEvaluationsListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
@@ -137,6 +137,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetVie
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
@@ -327,9 +329,6 @@ public class PortalGinModule extends AbstractGinModule {
 		//Synapse Wiki Pages
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
 
-		//Evaluation
-		bind(EvaluationView.class).to(EvaluationViewImpl.class);
-
 		/*
 		 * Widgets
 		 */
@@ -427,6 +426,9 @@ public class PortalGinModule extends AbstractGinModule {
 		//Evaluation selector
 		bind(EvaluationListView.class).to(EvaluationListViewImpl.class);
 		
+		//My Evaluations
+		bind(MyEvaluationsListView.class).to(MyEvaluationsListViewImpl.class);
+		
 		// SnapshotWidget		
 		bind(SnapshotWidgetView.class).to(SnapshotWidgetViewImpl.class);
 
@@ -468,6 +470,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(APITableWidgetView.class).to(APITableWidgetViewImpl.class);
 		bind(TableOfContentsWidgetView.class).to(TableOfContentsWidgetViewImpl.class);
 		bind(WikiFilesPreviewWidgetView.class).to(WikiFilesPreviewWidgetViewImpl.class);
+		bind(JoinWidgetView.class).to(JoinWidgetViewImpl.class);
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);

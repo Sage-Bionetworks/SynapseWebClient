@@ -32,6 +32,9 @@ public class WidgetConstants {
 	public static final String USERBADGE_CONTENT_TYPE = "userbadge";
 	public static final String USERBADGE_FRIENDLY_NAME ="User Badge";
 	
+	public static final String JOIN_EVALUATION_CONTENT_TYPE = "joinevaluation";
+	public static final String JOIN_EVALUATION_FRIENDLY_NAME ="Join Evaluation";
+	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
@@ -47,9 +50,11 @@ public class WidgetConstants {
 	public static final String IMAGE_WIDGET_SCALE_KEY = "scale";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
 	public static final String IMAGE_WIDGET_SYNAPSE_ID_KEY = "synapseId";
+	public static final String JOIN_WIDGET_EVALUATION_ID_KEY = "evaluationId";
 	public static final String FLOAT_NONE = "None";
 	public static final String FLOAT_LEFT = "Left";
 	public static final String FLOAT_RIGHT = "Right";
+	public static final String FLOAT_CENTER = "Center";
 	
 	@Deprecated
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
