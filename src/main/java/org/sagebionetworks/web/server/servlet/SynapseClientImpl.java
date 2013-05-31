@@ -6,7 +6,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
@@ -38,6 +42,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.UserGroup;
@@ -1435,4 +1440,49 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
+	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException{
+		Synapse synapseClient = createSynapseClient();
+		try {
+			//query for all available evaluations.
+			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, 0, Integer.MAX_VALUE);
+			//gather all submissions
+			List<Submission> allSubmissions = new ArrayList<Submission>();
+			for (Evaluation evaluation : availableEvaluations.getResults()) {
+				//query for all submissions for each evaluation
+				PaginatedResults<Submission> submissions = synapseClient.getMySubmissions(evaluation.getId(), 0, Integer.MAX_VALUE);
+				allSubmissions.addAll(submissions.getResults());
+			}
+			
+			//sort by created on
+			Collections.sort(allSubmissions, new Comparator<Submission>() {
+				@Override
+				public int compare(Submission o1, Submission o2) {
+					return o2.getCreatedOn().compareTo(o1.getCreatedOn());
+				}
+			});
+			
+			//run through and only keep unique submitter alias values (first in the list was most recently used)
+			Set<String> uniqueSubmitterAliases = new HashSet<String>();
+			List<String> returnAliases = new ArrayList<String>();
+			for (Submission sub : allSubmissions) {
+				String submitterAlias = sub.getSubmitterAlias();
+				if (!uniqueSubmitterAliases.contains(submitterAlias)) {
+					uniqueSubmitterAliases.add(submitterAlias);
+					returnAliases.add(submitterAlias);
+				}
+			}
+			//if it contains null or empty string, remove
+			returnAliases.remove(null);
+			returnAliases.remove("");
+			RestResourceList returnList = new RestResourceList();
+			returnList.setList(returnAliases);
+			JSONObjectAdapter returnListJson = returnList.writeToJSONObject(adapterFactory.createNew());
+			return returnListJson.toJSONString();
+			
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 }
