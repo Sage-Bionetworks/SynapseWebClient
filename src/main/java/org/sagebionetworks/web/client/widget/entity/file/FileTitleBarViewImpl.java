@@ -165,18 +165,24 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				}
 				else if (fileHandle instanceof S3FileHandleInterface){
 					fileName.setInnerText(fileHandle.getFileName());
-					md5Link.setVisible(true);
+					
 					S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
 					
 					fileSize.setInnerText("("+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true) + " - Synapse Storage)");
 					final String md5 = s3FileHandle.getContentMd5();
-					md5Link.addClickHandler(new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							showMd5Dialog(md5);
-						}
-					});
-					DisplayUtils.addTooltip(synapseJSNIUtils, md5Link, md5, TOOLTIP_POSITION.BOTTOM);
+					if (md5 != null) {
+						md5Link.setVisible(true);
+						md5Link.addClickHandler(new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								showMd5Dialog(md5);
+							}
+						});
+						DisplayUtils.addTooltip(synapseJSNIUtils, md5Link, md5, TOOLTIP_POSITION.BOTTOM);
+					} 
+					else {
+						md5Link.setVisible(false);
+					}
 				}
 			}
 		}
