@@ -511,7 +511,7 @@ public class DisplayConstants {
 	
 	public static final String UNSUPPORTED_FOR_OWNER_TYPE = "This operation is not currently supported for the given owner type: ";
 	public static final String MY_PROJECTS = "My Projects";
-	public static final String MY_EVALUATIONS = "My Evaluations";
+	public static final String MY_EVALUATIONS = "My Challenges";
 	public static final String SUBMITTER_ALIAS = "your alias (or team name)";
 	public static final String FAVORITES = "Favorites";
 	public static final String ERROR_LOADING_FAVORITES = "Error loading Favorites.";
