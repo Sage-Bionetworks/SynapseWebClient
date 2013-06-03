@@ -145,6 +145,19 @@ public class ServerMarkdownUtilsTest {
 	}
 	
 	@Test
+	public void testResolveCodeWithLanguage(){
+		String standardCodeBlock = "\n```\nthis is a standard fenced code block\n```\n";
+		String testString = standardCodeBlock+"\n```` java \nthis should apply a \"java\" class to the code element\n````\n\n";
+		String result = ServerMarkdownUtils.resolveCodeWithLanguage(testString);
+		assertTrue(result.contains(ServerMarkdownUtils.START_PRE_CODE +" class=\"java\">"));
+		assertTrue(result.contains(ServerMarkdownUtils.END_PRE_CODE));
+		//and should not have touched the standard fenced code block
+		assertTrue(result.contains(standardCodeBlock));
+	}
+	
+	
+	
+	@Test
 	public void testAssignIdsToHeadings(){
 		//should assign h4 as toc-indent0 and id of synapseheading1
 		String testString = "<h6>smallest header</h6><h4 >top header</h4> <p><em>content</em><br></p> <h5>sub header 1</h5>";
