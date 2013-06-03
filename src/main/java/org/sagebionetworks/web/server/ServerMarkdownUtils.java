@@ -21,6 +21,8 @@ import eu.henkelmann.actuarius.ActuariusTransformer;
 
 public class ServerMarkdownUtils {
 	
+	public static final String START_PRE_CODE = "<pre><code";
+	public static final String END_PRE_CODE = "</code></pre>";
 	public static final String HTML_LINE_BREAK = "<br />\n";
 	private static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
 	private static final String TEMP_SPACE_DELIMITER = "%^&2_9d";
@@ -55,6 +57,7 @@ public class ServerMarkdownUtils {
 //		reportTime("suppress/escape html");
 		markdown = resolveHorizontalRules(markdown);
 		markdown = resolveTables(markdown);
+		markdown = resolveCodeWithLanguage(markdown);
 //		reportTime("resolved tables");
 		markdown = fixNewLines(markdown);
 		markdown = markdownProcessor.apply(markdown);
@@ -104,13 +107,13 @@ public class ServerMarkdownUtils {
 	 */
 	public static String fixNewLines(String markdown) {
 		if (markdown == null || markdown.length() == 0) return markdown;
-		//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by ` exactly 3 times (triple quote), then it's a match
+		//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by exactly 3 '`', then it's a match
 		String regEx = "^[> \t\n\f\r]*[`]{3}";
 		Pattern p = Pattern.compile(regEx);
 		StringBuilder sb = new StringBuilder();
 		boolean isSuspectedCode = false;
 		for (String line : markdown.split("\n")) {
-			boolean currentLineHasFence = p.matcher(line).matches();
+			boolean currentLineHasFence = line.contains(START_PRE_CODE) || line.contains(END_PRE_CODE) || p.matcher(line).matches();
 			if (currentLineHasFence) {
 				//flip
 				isSuspectedCode = !isSuspectedCode;
@@ -259,6 +262,36 @@ public class ServerMarkdownUtils {
 		
 		return sb.toString();
 	}
+	
+	public static String resolveCodeWithLanguage(String markdown) {
+		if (markdown == null || markdown.length() == 0) return markdown;
+		//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by ` exactly 4 times, then it's a match
+		//for starting code blocks, capture the language parameter by looking for word characters (or a hyphen) one or more times
+		String startCodeBlockRegex = "^[> \t\n\f\r]*[`]{4}\\s*([a-zA-Z_0-9-]+)\\s*$";
+		String endCodeBlockRegex = "^[> \t\n\f\r]*[`]{4}\\s*$";
+		Pattern p1 = Pattern.compile(startCodeBlockRegex);
+		Pattern p2 = Pattern.compile(endCodeBlockRegex);
+		StringBuilder sb = new StringBuilder();
+		for (String line : markdown.split("\n")) {
+			Matcher p1Matcher = p1.matcher(line);
+			Matcher p2Matcher = p2.matcher(line);
+			if (p1Matcher.matches() && p1Matcher.groupCount() == 1) {
+				//start pre code with the specified language
+				String language = p1Matcher.group(1);
+				sb.append(START_PRE_CODE + " class=\""+language.toLowerCase()+"\">");
+				
+			} else if (p2Matcher.matches()){
+				//end pre code
+				sb.append(END_PRE_CODE);
+			} else {
+				//else neither
+				sb.append(line);	
+			}
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+
 	
 	public static int appendNewTableHtml(StringBuilder builder, String regEx, String[] lines, int tableCount, int i) {
 		builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
