@@ -20,18 +20,16 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
+public class ChallengeOverviewViewImpl extends Composite implements ChallengeOverviewView {
 
-	public interface BCCOverviewViewImplUiBinder extends UiBinder<Widget, BCCOverviewViewImpl> {}
+	public interface ChallengeOverviewViewImplUiBinder extends UiBinder<Widget, ChallengeOverviewViewImpl> {}
 
 	@UiField
 	SimplePanel header;
 	@UiField
 	SimplePanel footer;
 	@UiField
-	SimplePanel applyForChallenge;
-	@UiField
-	SimplePanel bccContent;
+	SimplePanel content;
 	
 	private Presenter presenter;
 	private IconsImageBundle icons;
@@ -39,7 +37,7 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 	private Footer footerWidget;
 	
 	@Inject
-	public BCCOverviewViewImpl(BCCOverviewViewImplUiBinder binder,
+	public ChallengeOverviewViewImpl(ChallengeOverviewViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
 			SageImageBundle imageBundle) {		
 		initWidget(binder.createAndBindUi(this));
@@ -108,8 +106,8 @@ public class BCCOverviewViewImpl extends Composite implements BCCOverviewView {
 	public void showChallengeInfo(String html){
 		HTMLPanel panel = new HTMLPanel(html);
 		DisplayUtils.sendAllLinksToNewWindow(panel);
-		bccContent.clear();
-		bccContent.add(panel);
+		content.clear();
+		content.add(panel);
 	}
 
 	@Override

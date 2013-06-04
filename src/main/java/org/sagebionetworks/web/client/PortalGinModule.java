@@ -16,8 +16,8 @@ import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.JsoProviderImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.view.BCCOverviewView;
-import org.sagebionetworks.web.client.view.BCCOverviewViewImpl;
+import org.sagebionetworks.web.client.view.ChallengeOverviewView;
+import org.sagebionetworks.web.client.view.ChallengeOverviewViewImpl;
 import org.sagebionetworks.web.client.view.CellTableProvider;
 import org.sagebionetworks.web.client.view.CellTableProviderImpl;
 import org.sagebionetworks.web.client.view.ColumnsPopupView;
@@ -307,8 +307,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ComingSoonView.class).to(ComingSoonViewImpl.class);									
 		
 		// BCCOverviewView
-		bind(BCCOverviewViewImpl.class).in(Singleton.class);
-		bind(BCCOverviewView.class).to(BCCOverviewViewImpl.class);	
+		bind(ChallengeOverviewViewImpl.class).in(Singleton.class);
+		bind(ChallengeOverviewView.class).to(ChallengeOverviewViewImpl.class);	
 		
 		// CominSoonView
 		bind(GovernanceViewImpl.class).in(Singleton.class);

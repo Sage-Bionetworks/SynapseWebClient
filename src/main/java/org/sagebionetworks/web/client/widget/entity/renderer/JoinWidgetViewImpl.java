@@ -54,6 +54,10 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 				wrapper.add(megaButton);
 				add(wrapper);
 			}
+			else if (UserEvaluationState.EVAL_OPEN_USER_REGISTERED.equals(state)) {
+				//add info on how to get started!
+				add(new HTML(DisplayConstants.JOINED_EVALUATION_HTML));
+			}
 		}
 		
 		this.layout(true);
