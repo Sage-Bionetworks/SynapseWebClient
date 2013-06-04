@@ -3,7 +3,6 @@ package org.sagebionetworks.web.server.servlet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +51,7 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 	protected void registerKnownCacheProviders(){
 		//add all known cache providers to the list
 		if (registeredCacheProviders.isEmpty()) {
-			registeredCacheProviders.add(new BCCOverviewCacheProvider());
-			registeredCacheProviders.add(new BCCSummaryContentCacheProvider());
-			registeredCacheProviders.add(new SupportFeedCacheProvider());
+			registeredCacheProviders.add(new ChallengeOverviewCacheProvider());
 			registeredCacheProviders.add(new NewsFeedCacheProvider());
 			registeredCacheProviders.add(new DataAccessLevelsCacheProvider());
 		}

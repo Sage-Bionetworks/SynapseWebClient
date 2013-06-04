@@ -12,7 +12,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.BCCOverview;
+import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
@@ -27,7 +27,7 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
+import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
@@ -82,7 +82,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(ProjectsHome.class);
 		openAccessPlaces.add(ComingSoon.class);
 		openAccessPlaces.add(Governance.class);
-		openAccessPlaces.add(BCCOverview.class);
+		openAccessPlaces.add(Challenges.class);
 		openAccessPlaces.add(Search.class);
 		openAccessPlaces.add(WikiPlace.class);
 		openAccessPlaces.add(Down.class);
@@ -173,10 +173,10 @@ public class AppActivityMapper implements ActivityMapper {
 			PresenterProxy<GovernancePresenter, Governance> presenter = ginjector.getGovernancePresenter();
 			presenter.setPlace((Governance)place);
 			return presenter;
-		} else if (place instanceof BCCOverview) {
+		} else if (place instanceof Challenges) {
 			// user's profile page
-			PresenterProxy<BCCOverviewPresenter, BCCOverview> presenter = ginjector.getBCCOverviewPresenter();
-			presenter.setPlace((BCCOverview)place);
+			PresenterProxy<ChallengeOverviewPresenter, Challenges> presenter = ginjector.getChallengeOverviewPresenter();
+			presenter.setPlace((Challenges)place);
 			return presenter;
 		} else if (place instanceof Search) {
 			// search results page
