@@ -79,7 +79,7 @@
                     <div id="slider" class="nivoSlider">
                         <a href="#!Synapse:syn1720047"><img src="images/spotlight/HPN_Challenge.jpg" alt="" title="#hpnCaption" /></a>                        
                         <a href="#!Synapse:syn1761567"><img src="images/spotlight/Toxicogenetics_Challenge.jpg" alt="" title="#toxicoCaption" /></a>
-                        <a href="#!Synapse:syn1901639"><img src="images/spotlight/WholeCell_Challenge.jpg" alt="" title="#wholecellCaption" /></a>
+                        <a href="#!Synapse:syn1876068"><img src="images/spotlight/WholeCell_Challenge.jpg" alt="" title="#wholecellCaption" /></a>
 
                         <a href="#!Synapse:syn1710250"><img src="images/spotlight/attractorMetagene.jpg" alt="" title="#bccGatewayCaption" /></a>                        
                         <a href="#!Synapse:syn300013"><img src="images/spotlight/TcgaPancancer.jpg" alt="" title="#tcgaPancanCaption" /></a>
@@ -92,7 +92,7 @@
                         <a href="#!Synapse:syn1761567">Challenge Details</a>
                     </div>
                     <div id="wholecellCaption" class="nivo-html-caption" style="top: 120px !important;">
-                        <a href="#!Synapse:syn1901639">Challenge Details</a>
+                        <a href="#!Synapse:syn1876068">Challenge Details</a>
                     </div>
                     
                     <div id="bccGatewayCaption" class="nivo-html-caption" style="top: 120px !important;">
