@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.mvp;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.web.client.place.BCCOverview;
+import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
@@ -31,7 +31,7 @@ import com.google.gwt.place.shared.WithTokenizers;
 		ProjectsHome.Tokenizer.class, Profile.Tokenizer.class,
 		ComingSoon.Tokenizer.class, Synapse.Tokenizer.class, Wiki.Tokenizer.class,
 		Search.Tokenizer.class, Settings.Tokenizer.class,
-		BCCOverview.Tokenizer.class, Governance.Tokenizer.class,
+		Challenges.Tokenizer.class, Governance.Tokenizer.class,
 		WikiPlace.Tokenizer.class, Down.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

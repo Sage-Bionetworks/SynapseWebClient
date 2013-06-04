@@ -114,21 +114,19 @@ public class DisplayUtils {
 	public static final String HELP_EMAIL_ADDRESS = "synapseInfo@sagebase.org";
 	public static final String HELP_EMAIL_ADDRESS_LINK = "<a href=\""+ DisplayUtils.HELP_EMAIL_ADDRESS +"\" class=\"link\">contact us</a>";
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
-	public static final String SUPPORT_FEED_URL = "http://api.getsatisfaction.com/companies/sagebase/topics/";
 	public static final String SUPPORT_RECENT_ACTIVITY_URL = "http://support.sagebase.org/sagebase?view=recent";
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
 	public static final String USER_GUIDE_ID = "syn1669771";
 	
-	public static final String BCC_CONTENT_PAGE_ID = "24084517";
+	public static final String CHALLENGE_OVERVIEW_CONTENT_PAGE_ID = "38830113";
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
 	
-	public static final String BCC_OVERVIEW_CONTENT_PROVIDER_ID = "bccOverviewContent";
+	public static final String CHALLENGE_OVERVIEW_CONTENT_PROVIDER_ID = "challengeOverviewContent";
 	public static final String BCC_SUMMARY_PROVIDER_ID = "bccSummaryContent";
 	public static final String DATA_ACCESS_LEVELS_PROVIDER_ID = "dataAccessLevelsContent";
 	public static final String NEWS_FEED_PROVIDER_ID = "newsFeed";
-	public static final String SUPPORT_FEED_PROVIDER_ID = "supportFeed";
-
+	
 	
 	public static final String FASTPASS_LOGIN_COOKIE_VALUE = "fastpass-logging-in";
 	public static final String FASTPASS_SIGNOVER_URL = "http://support.sagebase.org/fastpass/finish_signover?company=sagebase&fastpass=";
