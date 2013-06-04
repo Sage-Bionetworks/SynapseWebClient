@@ -97,7 +97,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public PresenterProxy<ComingSoonPresenter, ComingSoon> getComingSoonPresenter();
 	
-	public PresenterProxy<ChallengeOverviewPresenter, Challenges> getBCCOverviewPresenter();
+	public PresenterProxy<ChallengeOverviewPresenter, Challenges> getChallengeOverviewPresenter();
 	
 	public PresenterProxy<GovernancePresenter, Governance> getGovernancePresenter();
 	

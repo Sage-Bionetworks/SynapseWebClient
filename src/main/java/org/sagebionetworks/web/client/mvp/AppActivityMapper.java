@@ -175,7 +175,7 @@ public class AppActivityMapper implements ActivityMapper {
 			return presenter;
 		} else if (place instanceof Challenges) {
 			// user's profile page
-			PresenterProxy<ChallengeOverviewPresenter, Challenges> presenter = ginjector.getBCCOverviewPresenter();
+			PresenterProxy<ChallengeOverviewPresenter, Challenges> presenter = ginjector.getChallengeOverviewPresenter();
 			presenter.setPlace((Challenges)place);
 			return presenter;
 		} else if (place instanceof Search) {
