@@ -511,7 +511,7 @@ public class DisplayConstants {
 	
 	public static final String UNSUPPORTED_FOR_OWNER_TYPE = "This operation is not currently supported for the given owner type: ";
 	public static final String MY_PROJECTS = "My Projects";
-	public static final String MY_EVALUATIONS = "My Evaluations";
+	public static final String MY_EVALUATIONS = "My Challenges";
 	public static final String SUBMITTER_ALIAS = "your alias (or team name)";
 	public static final String FAVORITES = "Favorites";
 	public static final String ERROR_LOADING_FAVORITES = "Error loading Favorites.";
@@ -541,6 +541,7 @@ public class DisplayConstants {
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
 	public static final String NOT_PARTICIPATING_IN_ANY_EVALUATIONS = "You are not currently participating in an Evaluation/Challenge. Please join one and try again.";
+	public static final String JOINED_EVALUATION_HTML = "<span class=\"mainPageHeader inline-block\"><h3>You are registered for this challenge!</h3><ul class=\"list arrow-list\"><li>Create a Project</li><li>Upload a file</li><li>Submit to the challenge</li></ul></span>";
 	public static final String READ_ONLY_MODE = "Read Only Mode";
 	public static final String SYNAPSE_IN_READ_ONLY_MODE = "Synapse is in READ_ONLY mode for maintenance. You can continue to browse, but can not modify during this period.";
 }
