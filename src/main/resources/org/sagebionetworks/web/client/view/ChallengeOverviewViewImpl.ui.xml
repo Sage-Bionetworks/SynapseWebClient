@@ -35,18 +35,7 @@
 
 				
 				<div>
-					<g:SimplePanel ui:field="bccContent" />
-					<g:SimplePanel ui:field="applyForChallenge" />
-					<br></br>
-					<br></br>
-					<center>
-						<h5>
-							<img alt="Google" src="http://www.google.com/favicon.ico" />
-							<span style="font-style: italic;">&nbsp;&nbsp;Contest
-								Computing Facilities Powered by Google&nbsp;&nbsp; </span>
-							<img alt="Google" src="http://www.google.com/favicon.ico" />
-						</h5>
-					</center>
+					<g:SimplePanel ui:field="content" />
 				</div>
 
 			</div>
