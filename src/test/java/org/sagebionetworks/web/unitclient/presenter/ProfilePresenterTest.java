@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.presenter.ProfileFormPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -41,6 +42,7 @@ public class ProfilePresenterTest {
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
+	ProfileFormPresenter mockProfileForm;
 	PlaceChanger mockPlaceChanger;	
 	CookieProvider mockCookieProvider;
 	GWTWrapper mockGWTWrapper;
@@ -64,7 +66,8 @@ public class ProfilePresenterTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockCookieProvider = mock(CookieProvider.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper, adapter);	
+		mockProfileForm = mock(ProfileFormPresenter.class);
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper, adapter, mockProfileForm);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(userProfile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -99,7 +102,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testStart() {
 		resetMocks();
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper,adapter);	
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper,adapter, mockProfileForm);	
 		profilePresenter.setPlace(place);
 
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
@@ -117,7 +120,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testUpdateProfile() {
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter);	
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter, mockProfileForm);	
 		profilePresenter.setPlace(place);
 
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
@@ -129,7 +132,7 @@ public class ProfilePresenterTest {
 				userProfile.getLocation(), 
 				userProfile.getIndustry(), 
 				userProfile.getCompany(), 
-				userProfile.getEmail(), userProfile.getPic());
+				userProfile.getEmail(), userProfile.getPic(), null, null);
 		
 		verify(mockView).showUserUpdateSuccess();
 		verify(mockPlaceChanger).goTo(any(Profile.class));//go to view profile
@@ -137,7 +140,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testUpdateProfileNotEmail() {
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter);	
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter, mockProfileForm);	
 		profilePresenter.setPlace(place);
 
 		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
@@ -151,7 +154,7 @@ public class ProfilePresenterTest {
 		//change email
 		String email = "johnsmith@sagebio.org";
 		AttachmentData pic = new AttachmentData();
-		profilePresenter.updateProfile(firstName, lastName, summary, position, location, industry, company, email, pic);
+		profilePresenter.updateProfile(firstName, lastName, summary, position, location, industry, company, email, pic, null, null);
 		verify(mockView).showUserUpdateSuccess();
 		verify(mockPlaceChanger).goTo(any(Profile.class));
 	}
@@ -160,7 +163,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testRedirectToLinkedIn() {
 		resetMocks();
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter);	
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter, mockProfileForm);	
 		profilePresenter.setPlace(place);
 	
 		profilePresenter.redirectToLinkedIn();
@@ -169,7 +172,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testUpdateProfileWithLinkedIn() {
 		resetMocks();
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter);	
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter, mockProfileForm);	
 		profilePresenter.setPlace(place);
 
 		when(mockCookieProvider.getCookie(CookieKeys.LINKEDIN)).thenReturn("secret");

@@ -18,6 +18,9 @@ public interface JoinWidgetView extends IsWidget {
 	
 	void showError(String message);
 	
+	void showAnonymousRegistrationMessage();
+	
+	
 	void showAccessRequirement(
 			String arText,
 			final Callback touAcceptanceCallback);
@@ -31,5 +34,7 @@ public interface JoinWidgetView extends IsWidget {
 		 * Called when Join button is clicked
 		 */
 		public void register();
+		
+		public void gotoLoginPage();
 	}
 }

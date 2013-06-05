@@ -106,7 +106,8 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 		try {
 			if (!authenticationController.isLoggedIn()) {
 				//go to login page
-				goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+				view.showAnonymousRegistrationMessage();
+				//directs to the login page
 			}
 			else {
 				registerStep2(0);
@@ -209,6 +210,11 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 		});
 	}
 
+	@Override
+	public void gotoLoginPage() {
+		goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+	}
+	
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
