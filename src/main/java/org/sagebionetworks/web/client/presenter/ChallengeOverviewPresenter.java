@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.web.client.BCCSignupAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
@@ -20,7 +19,6 @@ public class ChallengeOverviewPresenter extends AbstractActivity implements Chal
 	private Challenges place;
 	private ChallengeOverviewView view;
 	private AuthenticationController authenticationController;
-	private BCCSignupAsync bccSignup;
 	private NodeModelCreator nodeModelCreator;
 	private RssServiceAsync rssService;
 	private GlobalApplicationState globalApplicationState;
@@ -29,10 +27,8 @@ public class ChallengeOverviewPresenter extends AbstractActivity implements Chal
 	public ChallengeOverviewPresenter(ChallengeOverviewView view, 
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState, 
-			BCCSignupAsync bccSignup, 
 			NodeModelCreator nodeModelCreator, 
 			RssServiceAsync rssService){
-		this.bccSignup=bccSignup;
 		this.authenticationController = authenticationController;
 		this.view = view;
 		this.nodeModelCreator = nodeModelCreator;
