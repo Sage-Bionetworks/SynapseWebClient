@@ -1,10 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,7 +90,7 @@ public class JoinWidgetTest {
 	@Test
 	public void testRegisterStep1NotLoggedIn() throws Exception {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
-		AsyncMockStubber.callSuccessWith("my participant json").when(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("my participant json").when(mockSynapseClient).createParticipants(any(String[].class), any(AsyncCallback.class));
 		widget.configure(wikiKey, descriptor);
 		widget.registerStep1();
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
@@ -101,7 +98,7 @@ public class JoinWidgetTest {
 	
 	@Test
 	public void testRegisterStep1LoggedIn() throws Exception {
-		AsyncMockStubber.callSuccessWith("my participant json").when(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("my participant json").when(mockSynapseClient).createParticipants(any(String[].class), any(AsyncCallback.class));
 		widget.configure(wikiKey, descriptor);
 		widget.registerStep1();
 		verify(mockSynapseClient).getUnmetEvaluationAccessRequirements(anyString(), any(AsyncCallback.class));
@@ -111,16 +108,24 @@ public class JoinWidgetTest {
 	public void testRegisterStep2Failure() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getUnmetEvaluationAccessRequirements(anyString(), any(AsyncCallback.class));
 		widget.configure(wikiKey, descriptor);
-		widget.registerStep2();
+		widget.registerStep2(0);
 		verify(mockView).showError(anyString());
+	}
+	@Test 
+	public void testRegisterStep2MultipleSubchallenges() throws Exception {
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY);
+		descriptor.put(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY, "evalId1, evalId2");
+		widget.configure(wikiKey, descriptor);
+		widget.registerStep2(0);
+		verify(mockSynapseClient, times(2)).getUnmetEvaluationAccessRequirements(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testRegisterStep2() throws Exception {
 		widget.configure(wikiKey, descriptor);
-		widget.registerStep2();
+		widget.registerStep2(0);
 		//should go to step 3 (creating the participant)
-		verify(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).createParticipants(any(String[].class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -131,7 +136,7 @@ public class JoinWidgetTest {
 		requirement.setTermsOfUse("My test ToU");
 		requirements.getResults().add(requirement);
 		widget.configure(wikiKey, descriptor);
-		widget.registerStep2();
+		widget.registerStep2(0);
 
 		//should show terms of use
 		verify(mockView).showAccessRequirement(anyString(), any(Callback.class));
@@ -140,19 +145,19 @@ public class JoinWidgetTest {
 
 	@Test
 	public void testRegisterStep3() throws Exception {
-		AsyncMockStubber.callSuccessWith("my participant json").when(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createParticipants(any(String[].class), any(AsyncCallback.class));
 		widget.configure(wikiKey, descriptor);
 		widget.registerStep3();
-		verify(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).createParticipants(any(String[].class), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 	}
 	
 	@Test
 	public void testRegisterStep3Failure() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).createParticipants(any(String[].class), any(AsyncCallback.class));
 		widget.configure(wikiKey, descriptor);
 		widget.registerStep3();
-		verify(mockSynapseClient).createParticipant(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).createParticipants(any(String[].class), any(AsyncCallback.class));
 		verify(mockView).showError(anyString());
 	}
 }

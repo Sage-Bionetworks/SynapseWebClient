@@ -215,7 +215,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException;
 	
-	public String createParticipant(String evaluationId) throws RestServiceException;
+	public void createParticipants(String[] evaluationIds) throws RestServiceException;
 	
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	
