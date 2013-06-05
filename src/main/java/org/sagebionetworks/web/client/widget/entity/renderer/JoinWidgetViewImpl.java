@@ -7,9 +7,12 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -82,6 +85,16 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+	
+	@Override
+	public void showAnonymousRegistrationMessage() {
+		MessageBox.info("Not Logged In", DisplayConstants.ANONYMOUS_JOIN_EVALUATION, new Listener<MessageBoxEvent>() {
+			@Override
+			public void handleEvent(MessageBoxEvent be) {
+				presenter.gotoLoginPage();
+			}
+		});	
 	}
 	
 	@Override
