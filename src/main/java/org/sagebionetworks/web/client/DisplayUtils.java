@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.gwttime.time.DateTime;
 import org.gwttime.time.format.ISODateTimeFormat;
@@ -1020,7 +1019,7 @@ public class DisplayUtils {
 	 * @param pos where to position the tooltip relative to the widget
 	 */
 	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, String tooltipText, TOOLTIP_POSITION pos){
-		Map<String, String> optionsMap = new TreeMap<String, String>();
+		Map<String, String> optionsMap = new HashMap<String, String>();
 		optionsMap.put("title", tooltipText);
 		optionsMap.put("data-placement", pos.toString().toLowerCase());
 		optionsMap.put("data-animation", "false");
@@ -1055,7 +1054,7 @@ public class DisplayUtils {
 	}
 
 	public static void addClickPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new TreeMap<String, String>();
+		Map<String, String> optionsMap = new HashMap<String, String>();
 		optionsMap.put("data-html", "true");
 		optionsMap.put("data-animation", "true");
 		optionsMap.put("title", title);
@@ -1065,7 +1064,7 @@ public class DisplayUtils {
 	}
 
 	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new TreeMap<String, String>();
+		Map<String, String> optionsMap = new HashMap<String, String>();
 		optionsMap.put("data-html", "true");
 		optionsMap.put("data-animation", "true");
 		optionsMap.put("title", title);
