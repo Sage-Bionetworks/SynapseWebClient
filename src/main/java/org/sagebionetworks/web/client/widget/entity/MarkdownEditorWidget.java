@@ -381,7 +381,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			}));
 	    	menu.add(getNewCommand("Join Evaluation Button", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
-		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY+"=xxx" + WidgetConstants.WIDGET_END_MARKDOWN);
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY+"=evalId1,evalId2" + WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
 	    	
