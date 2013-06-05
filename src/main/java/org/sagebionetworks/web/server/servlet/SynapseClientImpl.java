@@ -1290,16 +1290,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String createParticipant(String evaluationId)
+	public void createParticipants(String[] evaluationIds)
 			throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			Participant participant = synapseClient.createParticipant(evaluationId);
-			return EntityFactory.createJSONStringForEntity(participant);
+			for (int i = 0; i < evaluationIds.length; i++) {
+				Participant participant = synapseClient.createParticipant(evaluationIds[i]);	
+			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 	
