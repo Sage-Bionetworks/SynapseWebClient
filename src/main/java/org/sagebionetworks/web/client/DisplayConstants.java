@@ -226,7 +226,7 @@ public class DisplayConstants {
 	public static final String LABEL_FINISHING = "Finishing...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
 	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit For Evaluation";
-	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login, or register for a free Synapse account, to participate in this challenge.";
+	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
 	
 	public static final String SUBMITTED_TITLE = "Submitted";
 	public static final String SUBMITTED_TO_EVALUATION = "Submitted to the selected evaluation(s)";

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.Date;
 
+import org.sagebionetworks.web.client.presenter.ProfileFormPresenter.ProfileUpdatedCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -44,6 +45,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private ProfileFormPresenter profileForm;
 	private GWTWrapper gwt;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private ProfileUpdatedCallback profileUpdatedCallback;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -176,7 +178,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
 						if (isOwner)
 							ownerProfile = profile;
-						profileForm.configure(profile);
+						profileForm.configure(profile, profileUpdatedCallback);
 						view.updateView(profile, editable, isOwner, profileForm.asWidget());
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -195,17 +197,29 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void setupProfileFormCallback() {
-		profileForm.setProfileUpdatedCallback(new AsyncCallback<Void>() {
+		profileUpdatedCallback = new ProfileUpdatedCallback() {
+			
 			@Override
-			public void onSuccess(Void result) {
+			public void profileUpdateSuccess() {
+				view.showInfo("Success", "Your profile has been updated.");
+				continueToViewProfile();
+			}
+			
+			@Override
+			public void profileUpdateCancelled() {
+				continueToViewProfile();
+			}
+			
+			public void continueToViewProfile() {
 				redirectToViewProfile();
 				view.refreshHeader();
 			}
+			
 			@Override
 			public void onFailure(Throwable caught) {
 				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
 			}
-		});
+		};
 	}
 	
 	private void showView(Profile place) {

@@ -137,7 +137,7 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	     left.add(teamName, formData);
 	     
 	     url = new TextField<String>();  
-	     url.setFieldLabel("URL");  
+	     url.setFieldLabel("Link To More Info");  
 	     url.setAllowBlank(true);
 	     url.setRegex(WebConstants.VALID_URL_REGEX);
 	     url.getMessages().setRegexText(DisplayConstants.INVALID_URL_MESSAGE);
@@ -232,6 +232,10 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 		 
 	 private void setUpdateUserInfoDefaultIcon() {
 		 updateUserInfoButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.arrowCurve16()));
+	 }
+	 @Override
+	 public void hideCancelButton(){
+		 cancelUpdateUserButton.setVisible(false);
 	 }
 
 	@Override

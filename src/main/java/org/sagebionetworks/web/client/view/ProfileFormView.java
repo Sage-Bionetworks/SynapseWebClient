@@ -13,19 +13,21 @@ public interface ProfileFormView extends IsWidget, SynapseView {
 	 * Set this view's presenter
 	 * @param presenter
 	 */
-	public void setPresenter(Presenter presenter);
+	void setPresenter(Presenter presenter);
 	
-	public void updateView(UserProfile profile);
+	void updateView(UserProfile profile);
 
 	/**
 	 * Show the user that the user's information has been updated.
 	 */
-	public void showUserUpdateSuccess();
+	void showUserUpdateSuccess();
+	
+	void hideCancelButton();
 	
 	/**
 	 * Alerts the view that updating the user's information failed.
 	 */
-	public void userUpdateFailed();
+	void userUpdateFailed();
 	
 	public interface Presenter extends SynapsePresenter {
 

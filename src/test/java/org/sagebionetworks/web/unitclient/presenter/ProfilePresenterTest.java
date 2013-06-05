@@ -117,49 +117,7 @@ public class ProfilePresenterTest {
 		Profile newPlace = Mockito.mock(Profile.class);
 		profilePresenter.setPlace(newPlace);
 	}
-	
-	@Test
-	public void testUpdateProfile() {
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter, mockProfileForm);	
-		profilePresenter.setPlace(place);
-
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
-		//modify the last name only
-		profilePresenter.updateProfile(userProfile.getFirstName(), 
-				userProfile.getLastName() + "_modifiedlastname", 
-				userProfile.getSummary(), 
-				userProfile.getPosition(), 
-				userProfile.getLocation(), 
-				userProfile.getIndustry(), 
-				userProfile.getCompany(), 
-				userProfile.getEmail(), userProfile.getPic(), null, null);
 		
-		verify(mockView).showUserUpdateSuccess();
-		verify(mockPlaceChanger).goTo(any(Profile.class));//go to view profile
-	}
-	
-	@Test
-	public void testUpdateProfileNotEmail() {
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter, mockProfileForm);	
-		profilePresenter.setPlace(place);
-
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
-		String firstName = "John";
-		String lastName = "Smith";
-		String summary = "A career summary";
-		String position = "Senior Director of writing code";
-		String location = "Seattle Area";
-		String industry = "Biotech";
-		String company = "Sage Bionetworks";
-		//change email
-		String email = "johnsmith@sagebio.org";
-		AttachmentData pic = new AttachmentData();
-		profilePresenter.updateProfile(firstName, lastName, summary, position, location, industry, company, email, pic, null, null);
-		verify(mockView).showUserUpdateSuccess();
-		verify(mockPlaceChanger).goTo(any(Profile.class));
-	}
-
-	
 	@Test
 	public void testRedirectToLinkedIn() {
 		resetMocks();

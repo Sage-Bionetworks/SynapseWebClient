@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -23,21 +22,18 @@ public class ProfileFormPresenter implements ProfileFormView.Presenter {
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
-	private GlobalApplicationState globalApplicationState;
 	private UserProfile ownerProfile;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private AsyncCallback<Void> profileUpdatedCallback;
+	private ProfileUpdatedCallback profileUpdatedCallback;
 	
 	@Inject
 	public ProfileFormPresenter(ProfileFormView view,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
@@ -47,16 +43,17 @@ public class ProfileFormPresenter implements ProfileFormView.Presenter {
 	public interface ProfileUpdatedCallback {
 		void profileUpdateCancelled();
 		void profileUpdateSuccess();
+		void onFailure(Throwable caught);
 	}
 
-	public void configure(UserProfile userProfile) {
+	public void configure(UserProfile userProfile, ProfileUpdatedCallback profileUpdatedCallback) {
 		ownerProfile = userProfile;
+		this.profileUpdatedCallback = profileUpdatedCallback;
 		view.updateView(userProfile);
 	}
 	
-	public void setProfileUpdatedCallback(
-			AsyncCallback<Void> profileUpdatedCallback) {
-		this.profileUpdatedCallback = profileUpdatedCallback;
+	public void hideCancelButton(){
+		view.hideCancelButton();
 	}
 	
 	public Widget asWidget() {
@@ -101,11 +98,6 @@ public class ProfileFormPresenter implements ProfileFormView.Presenter {
 								@Override
 								public void onSuccess(Void result) {
 									view.showUserUpdateSuccess();
-									if (isUpdatingEmail) {
-										view.showInfo("Success", "Please check your email to continue to change your email address.");
-									} else {
-										view.showInfo("Success", "Your profile has been updated.");
-									}
 									updateLoginInfo(currentUser);	
 								}
 								
@@ -129,19 +121,23 @@ public class ProfileFormPresenter implements ProfileFormView.Presenter {
 	
 	@Override
 	public void cancelClicked() {
-		profileUpdatedCallback.onSuccess(null);
+		profileUpdatedCallback.profileUpdateCancelled();
 	}
 	
 	private void updateLoginInfo(UserSessionData currentUser) {
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
-			public void onFailure(Throwable caught) { }
+			public void onFailure(Throwable caught) {
+				sendSuccessMessageBackToOwner();
+			}
 
 			@Override
 			public void onSuccess(String result) {
-				profileUpdatedCallback.onSuccess(null);
-				//redirectToViewProfile();
-				//view.refreshHeader();
+				sendSuccessMessageBackToOwner();
+			}
+			
+			public void sendSuccessMessageBackToOwner() {
+				profileUpdatedCallback.profileUpdateSuccess();
 			}
 		};
 

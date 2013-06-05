@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface JoinWidgetView extends IsWidget {
@@ -25,6 +27,8 @@ public interface JoinWidgetView extends IsWidget {
 			String arText,
 			final Callback touAcceptanceCallback);
 	void showInfo(String title, String message);
+	
+	public void showProfileForm(UserProfile profile, AsyncCallback<Void> callback);
 	
 	/**
 	 * Presenter interface
