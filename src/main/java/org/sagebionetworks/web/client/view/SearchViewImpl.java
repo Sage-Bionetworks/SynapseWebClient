@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.gwttime.time.DateTime;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.search.Facet;
@@ -47,6 +46,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -66,11 +66,17 @@ import com.google.inject.Inject;
 
 public class SearchViewImpl extends Composite implements SearchView {
 
-	private final int HIT_DESCRIPTION_LENGTH_CHAR = 270;
-	private final int FACET_NAME_LENGTH_CHAR = 21;
-	private final int MAX_PAGES_IN_PAGINATION = 10;
-	private final int MAX_RESULTS_PER_PAGE = 10;
-	private final int NUM_MILLI_SECONDS_PER_DAY = 86400 * 100;
+	private static final int HIT_DESCRIPTION_LENGTH_CHAR = 270;
+	private static final int FACET_NAME_LENGTH_CHAR = 21;
+	private static final int MAX_PAGES_IN_PAGINATION = 10;
+	private static final int MAX_RESULTS_PER_PAGE = 10;
+	private static final int MINUTE_MS = 1000*60;
+	private static final int HOUR_MS = MINUTE_MS * 60;
+	private static final int DAY_MS = HOUR_MS * 24;
+	private static final int WEEK_MS = DAY_MS * 7;
+	private static final int MONTH_MS = DAY_MS * 30;
+	private static final int YEAR_MS = DAY_MS * 365;
+  
 	
 	public interface SearchViewImplUiBinder extends
 			UiBinder<Widget, SearchViewImpl> {
@@ -467,13 +473,13 @@ public class SearchViewImpl extends Composite implements SearchView {
 		long max = facet.getMax() * 1000;
 		
 		// determine time diffs
-		DateTime now = presenter.getSearchStartTime();
+		Date now = presenter.getSearchStartTime();		
 		long beginingOfTime = 0;
-		long anHourAgo = now.minusHours(1).getMillis();
-		long aDayAgo = now.minusDays(1).getMillis();
-		long aWeekAgo = now.minusWeeks(1).getMillis();
-		long aMonthAgo = now.minusMonths(1).getMillis();
-		long aYearAgo = now.minusYears(1).getMillis();
+		long anHourAgo = now.getTime()-HOUR_MS;
+		long aDayAgo = now.getTime()-DAY_MS;
+		long aWeekAgo = now.getTime()-WEEK_MS;
+		long aMonthAgo = now.getTime()-MONTH_MS;
+		long aYearAgo = now.getTime()-YEAR_MS;
 		
 		int row = -1;
 		table.setWidget(++row, 0, createTimeFacet(facet, beginingOfTime, "Any Time"));
