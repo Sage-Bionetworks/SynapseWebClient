@@ -172,6 +172,11 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				getAvailableEvaluationsSubmitterAliases(new SubmitterAliasesCallback() {
 					@Override
 					public void onSuccess(List<String> submitterAliases) {
+						//add the default team name (if set in the profile and not already in the list)
+						String teamName = authenticationController.getLoggedInUser().getProfile().getTeamName();
+						if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
+							submitterAliases.add(teamName);
+						}
 						view.popupEvaluationSelector(evaluations, submitterAliases);		
 					}
 				});
