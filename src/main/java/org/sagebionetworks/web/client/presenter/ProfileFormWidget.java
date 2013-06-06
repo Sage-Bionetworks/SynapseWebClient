@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ProfileFormPresenter implements ProfileFormView.Presenter {
+public class ProfileFormWidget implements ProfileFormView.Presenter {
 		
 	private ProfileFormView view;
 	private SynapseClientAsync synapseClient;
@@ -27,7 +27,7 @@ public class ProfileFormPresenter implements ProfileFormView.Presenter {
 	private ProfileUpdatedCallback profileUpdatedCallback;
 	
 	@Inject
-	public ProfileFormPresenter(ProfileFormView view,
+	public ProfileFormWidget(ProfileFormView view,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,

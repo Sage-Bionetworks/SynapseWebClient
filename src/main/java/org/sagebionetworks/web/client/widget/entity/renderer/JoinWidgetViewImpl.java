@@ -4,10 +4,10 @@ import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.presenter.ProfileFormPresenter;
+import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.client.presenter.ProfileFormPresenter.ProfileUpdatedCallback;
+import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
@@ -31,10 +31,10 @@ import com.google.inject.Inject;
 public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetView {
 
 	private Presenter presenter;
-	private ProfileFormPresenter profileForm;
+	private ProfileFormWidget profileForm;
 	
 	@Inject
-	public JoinWidgetViewImpl(ProfileFormPresenter profileForm) {
+	public JoinWidgetViewImpl(ProfileFormWidget profileForm) {
 		this.profileForm = profileForm;
 	}
 	

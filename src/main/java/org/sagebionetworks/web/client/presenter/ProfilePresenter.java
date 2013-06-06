@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.Date;
 
-import org.sagebionetworks.web.client.presenter.ProfileFormPresenter.ProfileUpdatedCallback;
+import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -42,7 +42,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
 	private UserProfile ownerProfile;
-	private ProfileFormPresenter profileForm;
+	private ProfileFormWidget profileForm;
 	private GWTWrapper gwt;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private ProfileUpdatedCallback profileUpdatedCallback;
@@ -57,7 +57,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			NodeModelCreator nodeModelCreator,
 			CookieProvider cookieProvider,
 			GWTWrapper gwt, JSONObjectAdapter jsonObjectAdapter,
-			ProfileFormPresenter profileForm) {
+			ProfileFormWidget profileForm) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;

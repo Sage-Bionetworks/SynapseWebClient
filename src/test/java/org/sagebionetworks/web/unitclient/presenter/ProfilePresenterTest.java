@@ -21,7 +21,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.presenter.ProfileFormPresenter;
+import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -42,7 +42,7 @@ public class ProfilePresenterTest {
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
-	ProfileFormPresenter mockProfileForm;
+	ProfileFormWidget mockProfileForm;
 	PlaceChanger mockPlaceChanger;	
 	CookieProvider mockCookieProvider;
 	GWTWrapper mockGWTWrapper;
@@ -66,7 +66,7 @@ public class ProfilePresenterTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockCookieProvider = mock(CookieProvider.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
-		mockProfileForm = mock(ProfileFormPresenter.class);
+		mockProfileForm = mock(ProfileFormWidget.class);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper, adapter, mockProfileForm);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(userProfile);

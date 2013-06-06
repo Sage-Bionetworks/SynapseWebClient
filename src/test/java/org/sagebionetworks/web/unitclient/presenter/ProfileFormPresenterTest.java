@@ -19,8 +19,8 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.presenter.ProfileFormPresenter;
-import org.sagebionetworks.web.client.presenter.ProfileFormPresenter.ProfileUpdatedCallback;
+import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
+import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileFormView;
@@ -31,7 +31,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ProfileFormPresenterTest {
 	
-	ProfileFormPresenter profileForm;
+	ProfileFormWidget profileForm;
 	ProfileFormView mockView;
 	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
@@ -53,7 +53,7 @@ public class ProfileFormPresenterTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockProfileUpdatedCallback = mock(ProfileUpdatedCallback.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
-		profileForm = new ProfileFormPresenter(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, adapter);
+		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, adapter);
 		profileForm.configure(userProfile, mockProfileUpdatedCallback);
 		verify(mockView).setPresenter(profileForm);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(userProfile);
