@@ -103,17 +103,39 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	 * Check that the user is logged in
 	 */
 	public void registerStep1() {
-		try {
-			if (!authenticationController.isLoggedIn()) {
-				//go to login page
-				goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-			}
-			else {
-				registerStep2(0);
-			}
-		} catch (RestServiceException e) {
-			view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + e.getMessage());
+		if (!authenticationController.isLoggedIn()) {
+			//go to login page
+			view.showAnonymousRegistrationMessage();
+			//directs to the login page
 		}
+		else {
+			registerStep2();
+		}
+	}
+	
+	/**
+	 * Gather additional info about the logged in user
+	 */
+	public void registerStep2() {
+		//pop up profile form.  user does not have to fill in info
+		view.showProfileForm(authenticationController.getLoggedInUser().getProfile(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				continueToStep3();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				continueToStep3();
+			}
+			
+			public void continueToStep3(){
+				try{
+					registerStep3(0);	
+				} catch (RestServiceException e) {
+					view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + e.getMessage());
+				}			
+			}
+		});
 	}
 	
 	/**
@@ -121,7 +143,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	 * Will not proceed to step3 (joining the challenge) until all have been approved.
 	 * @throws RestServiceException
 	 */
-	public void registerStep2(final int evalIndex) throws RestServiceException {
+	public void registerStep3(final int evalIndex) throws RestServiceException {
 		synapseClient.getUnmetEvaluationAccessRequirements(evaluationIds[evalIndex], new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -144,9 +166,9 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 						view.showAccessRequirement(text, termsOfUseCallback);
 					} else {
 						if (evalIndex == evaluationIds.length - 1)
-							registerStep3();
+							registerStep4();
 						else
-							registerStep2(evalIndex+1);
+							registerStep3(evalIndex+1);
 					}
 						
 				} catch (Throwable e) {
@@ -174,7 +196,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 			public void invoke() {
 				//ToU signed, now try to register for the challenge (will check for other unmet access restrictions before join)
 				try {
-					registerStep2(evalIndex);
+					registerStep3(evalIndex);
 				} catch (RestServiceException e) {
 					onFailure.invoke(e);
 				}
@@ -194,7 +216,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	 * Join the evaluation
 	 * @throws RestServiceException
 	 */
-	public void registerStep3() throws RestServiceException {
+	public void registerStep4() throws RestServiceException {
 		//create participants
 		synapseClient.createParticipants(evaluationIds, new AsyncCallback<Void>() {
 			@Override
@@ -209,6 +231,11 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 		});
 	}
 
+	@Override
+	public void gotoLoginPage() {
+		goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+	}
+	
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
