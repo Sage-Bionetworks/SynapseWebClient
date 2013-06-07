@@ -92,11 +92,6 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		entityEditor.addNewEntity(type, parentId);
 		
 	}
-	
-	@Override
-	public void updateNodeStorageUsage(final AsyncCallback<Long> callback) {
-		synapseClient.getStorageUsage(entityBundle.getEntity().getId(), callback);
-	}
 
 	public static boolean isDataPossiblyWithinLocationable(EntityBundle bundle, boolean isLoggedIn) {
 		if (!(bundle.getEntity() instanceof Locationable))

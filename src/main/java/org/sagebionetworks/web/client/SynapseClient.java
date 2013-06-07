@@ -184,8 +184,6 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException;
 	
-	public Long getStorageUsage(String entityId) throws RestServiceException;
-
 	public String getActivityForEntity(String entityId) throws RestServiceException;
 	
 	public String getActivityForEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
@@ -217,7 +215,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException;
 	
-	public String createParticipant(String evaluationId) throws RestServiceException;
+	public void createParticipants(String[] evaluationIds) throws RestServiceException;
 	
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	

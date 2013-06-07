@@ -43,8 +43,6 @@ public interface LocationableTitleBarView extends IsWidget, SynapseWidgetView {
 		boolean isUserLoggedIn();
 		
 		public void addNewChild(EntityType type, String parentId);
-		
-		public void updateNodeStorageUsage(AsyncCallback<Long> callback);
 	}
 
 }

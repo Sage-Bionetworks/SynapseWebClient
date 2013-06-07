@@ -4,11 +4,11 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class BCCOverview extends Place{
+public class Challenges extends Place{
 	
 	private String token;
 
-	public BCCOverview(String token) {
+	public Challenges(String token) {
 		this.token = token;
 	}
 
@@ -16,16 +16,16 @@ public class BCCOverview extends Place{
 		return token;
 	}
 	
-	@Prefix("!BCCOverview")
-	public static class Tokenizer implements PlaceTokenizer<BCCOverview> {
+	@Prefix("!Challenges")
+	public static class Tokenizer implements PlaceTokenizer<Challenges> {
         @Override
-        public String getToken(BCCOverview place) {
+        public String getToken(Challenges place) {
             return place.toToken();
         }
 
         @Override
-        public BCCOverview getPlace(String token) {
-            return new BCCOverview(token);
+        public Challenges getPlace(String token) {
+            return new Challenges(token);
         }
     }
 }

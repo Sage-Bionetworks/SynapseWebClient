@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client;
 
-import org.sagebionetworks.web.client.place.BCCOverview;
+import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.client.presenter.BCCOverviewPresenter;
+import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
@@ -97,7 +97,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public PresenterProxy<ComingSoonPresenter, ComingSoon> getComingSoonPresenter();
 	
-	public PresenterProxy<BCCOverviewPresenter, BCCOverview> getBCCOverviewPresenter();
+	public PresenterProxy<ChallengeOverviewPresenter, Challenges> getChallengeOverviewPresenter();
 	
 	public PresenterProxy<GovernancePresenter, Governance> getGovernancePresenter();
 	
