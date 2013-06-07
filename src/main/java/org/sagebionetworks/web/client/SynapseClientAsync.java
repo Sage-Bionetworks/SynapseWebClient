@@ -142,7 +142,7 @@ public interface SynapseClientAsync {
 	 * @return
 	 * @throws RestServiceException
 	 */
-	void createParticipant(String evaluationId, AsyncCallback<String> callback) throws RestServiceException;
+	void createParticipants(String[] evaluationIds, AsyncCallback<Void> callback) throws RestServiceException;
 	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
 	void getChunkedFileToken(String fileName,  String contentType, AsyncCallback<String> callback) throws RestServiceException;
