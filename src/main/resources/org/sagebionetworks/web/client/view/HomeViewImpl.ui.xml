@@ -25,6 +25,7 @@
 					<div class="span-8 notopmargin">
 						<h3>What is Synapse?</h3>
 						<ul class="list check-list">
+						    
 							<li class="whatIsSynapseText">A <span style="font-weight: bold;">private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">public</span> <g:Image resource='{icons.globe16}' /> workspace that allows you to <span style="font-weight: bold;">aggregate</span>, <span style="font-weight: bold;">describe</span>, and <span style="font-weight: bold;">share</span> your research.</li>
 							<li class="whatIsSynapseText">A tool to improve reproducibility of data intensive science, <span style="font-weight: bold;">recording your progress as you work</span> with tools such as <span style="font-weight: bold;">R</span> and <span style="font-weight: bold;">Python</span>.</li>
 							<li class="whatIsSynapseText">A collection of <span style="font-weight: bold;">living research projects</span> enabling you to contribute to <span style="font-weight: bold;">large-scale collaborative solutions</span> to difficult scientific problems.</li>
@@ -77,23 +78,31 @@
             <div class="span-24 slider-area">
             	<div class="theme-default">
                     <div id="slider" class="nivoSlider">
+<!-- 
+                        <a class="link" href="#!Challenges:DREAM8"><img src="images/spotlight/Dream8Banner.jpg" alt="" title="#dream8BannerCaption" /></a>
                         <a href="#!Synapse:syn1720047"><img src="images/spotlight/HPN_Challenge.jpg" alt="" title="#hpnCaption" /></a>                        
                         <a href="#!Synapse:syn1761567"><img src="images/spotlight/Toxicogenetics_Challenge.jpg" alt="" title="#toxicoCaption" /></a>
                         <a href="#!Synapse:syn1876068"><img src="images/spotlight/WholeCell_Challenge.jpg" alt="" title="#wholecellCaption" /></a>
-
+ -->
                         <a href="#!Synapse:syn1710250"><img src="images/spotlight/attractorMetagene.jpg" alt="" title="#bccGatewayCaption" /></a>                        
                         <a href="#!Synapse:syn300013"><img src="images/spotlight/TcgaPancancer.jpg" alt="" title="#tcgaPancanCaption" /></a>
-                        <a class="link" href="#!Challenges:0"><img src="images/spotlight/CompetitionUpdates.jpg" alt="" title="#challengeInfoCaption" /></a>
+						<a class="link" target="_blank" href="http://eepurl.com/Af4wH"><img src="images/spotlight/CompetitionUpdates.jpg" alt="" title="#challengeInfoCaption" /></a>
                     </div>
+    
+<!-- 
+                    <div id="dream8BannerCaption" class="nivo-html-caption" style="top: 120px !important;">
+                    	<a class="link" href="#!Challenges:DREAM8">Learn More</a>                    
+                    </div>                    
                     <div id="hpnCaption" class="nivo-html-caption" style="top: 120px !important;">
-                        <a href="#!Synapse:syn1720047">Challenge Details</a>
+                        <a href="#!Synapse:syn1720047">Challenge Details &amp; Registration</a>
                     </div>
                     <div id="toxicoCaption" class="nivo-html-caption" style="top: 120px !important;">
-                        <a href="#!Synapse:syn1761567">Challenge Details</a>
+                        <a href="#!Synapse:syn1761567">Challenge Details &amp; Registration</a>
                     </div>
                     <div id="wholecellCaption" class="nivo-html-caption" style="top: 120px !important;">
-                        <a href="#!Synapse:syn1876068">Challenge Details</a>
+                        <a href="#!Synapse:syn1876068">Challenge Details &amp; Registration</a>
                     </div>
+ -->
                     
                     <div id="bccGatewayCaption" class="nivo-html-caption" style="top: 120px !important;">
                         <a href="#!Synapse:syn1710250">BCC Gateway Project</a>
@@ -102,9 +111,8 @@
                         <a href="#!Synapse:syn300013">TCGA Pancancer Project</a>
                     </div>
                     <div id="challengeInfoCaption" class="nivo-html-caption" style="top: 120px !important;">
-                    	<a class="link" href="#!Challenges:0">Learn More</a>                    
+                    	<a target="_blank" href="http://eepurl.com/Af4wH">Subscribe</a>                    
                     </div>
-
                 </div>
             </div>
             </div>
