@@ -78,18 +78,20 @@
             <div class="span-24 slider-area">
             	<div class="theme-default">
                     <div id="slider" class="nivoSlider">
-<!-- 
+                        
                         <a class="link" href="#!Challenges:DREAM8"><img src="images/spotlight/Dream8Banner.jpg" alt="" title="#dream8BannerCaption" /></a>
                         <a href="#!Synapse:syn1720047"><img src="images/spotlight/HPN_Challenge.jpg" alt="" title="#hpnCaption" /></a>                        
                         <a href="#!Synapse:syn1761567"><img src="images/spotlight/Toxicogenetics_Challenge.jpg" alt="" title="#toxicoCaption" /></a>
                         <a href="#!Synapse:syn1876068"><img src="images/spotlight/WholeCell_Challenge.jpg" alt="" title="#wholecellCaption" /></a>
- -->
+
                         <a href="#!Synapse:syn1710250"><img src="images/spotlight/attractorMetagene.jpg" alt="" title="#bccGatewayCaption" /></a>                        
                         <a href="#!Synapse:syn300013"><img src="images/spotlight/TcgaPancancer.jpg" alt="" title="#tcgaPancanCaption" /></a>
-						<a class="link" target="_blank" href="http://eepurl.com/Af4wH"><img src="images/spotlight/CompetitionUpdates.jpg" alt="" title="#challengeInfoCaption" /></a>
+
+                        <!-- Uncomment this once the DREAM8 competitions are out of the Carousel 
+                        <a class="link" target="_blank" href="http://eepurl.com/Af4wH"><img src="images/spotlight/CompetitionUpdates.jpg" alt="" title="#challengeInfoCaption" /></a>
+                        -->
                     </div>
     
-<!-- 
                     <div id="dream8BannerCaption" class="nivo-html-caption" style="top: 120px !important;">
                     	<a class="link" href="#!Challenges:DREAM8">Learn More</a>                    
                     </div>                    
@@ -102,7 +104,6 @@
                     <div id="wholecellCaption" class="nivo-html-caption" style="top: 120px !important;">
                         <a href="#!Synapse:syn1876068">Challenge Details &amp; Registration</a>
                     </div>
- -->
                     
                     <div id="bccGatewayCaption" class="nivo-html-caption" style="top: 120px !important;">
                         <a href="#!Synapse:syn1710250">BCC Gateway Project</a>
@@ -110,9 +111,12 @@
                     <div id="tcgaPancanCaption" class="nivo-html-caption" style="top: 120px !important;">
                         <a href="#!Synapse:syn300013">TCGA Pancancer Project</a>
                     </div>
+                    
+                    <!-- Uncomment this once the DREAM8 competitions are out of the Carousel
                     <div id="challengeInfoCaption" class="nivo-html-caption" style="top: 120px !important;">
                     	<a target="_blank" href="http://eepurl.com/Af4wH">Subscribe</a>                    
                     </div>
+                     -->
                 </div>
             </div>
             </div>
