@@ -308,14 +308,4 @@ public class UserAccountServiceImplTest {
 	}
 	
 	
-	@Ignore
-	@Test
-	public void testGetSynapseWebUrl() {
-		String synapseWebUrl = service.getSynapseWebUrl();
-		try {
-			URI testUri = new URI(synapseWebUrl);
-		} catch (URISyntaxException e) {
-			fail("The Synapse URL returned was not valid.");
-		}
-	}
 }
