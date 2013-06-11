@@ -118,7 +118,6 @@ public class DisplayUtils {
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
 	public static final String USER_GUIDE_ID = "syn1669771";
 	
-	public static final String CHALLENGE_OVERVIEW_CONTENT_PAGE_ID = "38830113";
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
 	
