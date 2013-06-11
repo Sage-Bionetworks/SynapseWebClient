@@ -37,15 +37,5 @@
 	<inherits name="org.sagebionetworks.repo.SharedSynpaseDTOs"/>
 	<inherits name="org.sagebionetworks.gwt.JSONAdapter"/>
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
-	
-	<!-- RPC Exclusions -->
-	<extend-configuration-property name="rpc.blacklist" value="-.*List"/>
-	<extend-configuration-property name="rpc.blacklist" value="-.*Map"/>
-	<extend-configuration-property name="rpc.blacklist" value="-.*Collection"/>
-	<extend-configuration-property name="rpc.blacklist" value="+java.util.ArrayList"/>
-	<extend-configuration-property name="rpc.blacklist" value="+java.util.LinkedList"/>		
-	<extend-configuration-property name="rpc.blacklist" value="+java.util.HashMap"/>
-	<extend-configuration-property name="rpc.blacklist" value="+java.util.LinkedHashMap"/>
-	<extend-configuration-property name="rpc.blacklist" value="+java.util.LinkedHashSet"/>	
-	
+		
 </module>
