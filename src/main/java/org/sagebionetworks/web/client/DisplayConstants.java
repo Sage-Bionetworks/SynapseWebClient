@@ -336,6 +336,7 @@ public class DisplayConstants {
 	 * Widget editors
 	 */
 	public static final String IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE = "A file must be uploaded to continue.";
+	public static final String IMAGE_CONFIG_FILE_TYPE_MESSAGE = "The uploaded image file type is not recognized on most browsers. Please convert to PNG or JPEG and try again.";
 	public static final String IMAGE_CONFIG_INVALID_URL_MESSAGE = "Please enter a valid URL";
 	public static final String IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE = "Please enter valid alternate text for the URL";
 	public static final String IMAGE_CONFIG_UPLOAD = "Upload";
