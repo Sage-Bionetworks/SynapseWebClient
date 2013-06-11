@@ -32,7 +32,6 @@ public interface UserAccountService extends RemoteService {
 	
 	public String getFastPassSupportUrl() throws RestServiceException;
 	public String getPublicAndAuthenticatedGroupPrincipalIds();
-	public String getSynapseWebUrl();
 
 	public String getTermsOfUse();
 	
