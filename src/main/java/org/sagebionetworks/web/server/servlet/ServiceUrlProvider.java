@@ -18,7 +18,6 @@ public class ServiceUrlProvider {
 	private String repositoryServiceUrl = StackConfiguration.getRepositoryServiceEndpoint();
 	private String authServicePrivateUrl = StackConfiguration.getAuthenticationServicePrivateEndpoint();
 	private String authServicePublicUrl = StackConfiguration.getAuthenticationServicePublicEndpoint();
-	private String portalBaseUrl = StackConfiguration.getPortalEndpoint();
 	private String linkedInUrl = "http://api.linkedin.com/v1/people/";
 	
 	/**
@@ -76,24 +75,6 @@ public class ServiceUrlProvider {
 	}
 
 	/**
-	 * The portal (this GWT project) endpoint
-	 * @return
-	 * @throws URISyntaxException 
-	 */
-	public String getPortalBaseUrl() {
-		if(portalBaseUrl == null){
-			logger.info("Portal Base URL: " + portalBaseUrl);
-			// Make sure it is a valid url
-			try {
-				new URI(portalBaseUrl);
-			} catch (URISyntaxException e) {
-				 throw new IllegalArgumentException(e);
-			}
-		}
-		return portalBaseUrl;
-	}
-
-	/**
 	 * LinkedIn API Url
 	 * @return
 	 * @throws URISyntaxException
@@ -124,14 +105,6 @@ public class ServiceUrlProvider {
 	 */
 	public void setAuthServicePublicUrl(String authServicePublicUrl) {
 		this.authServicePublicUrl = authServicePublicUrl;
-	}
-
-	/**
-	 * For testing purposes
-	 * @param portalBaseUrl
-	 */
-	public void setPortalBaseUrl(String portalBaseUrl) {
-		this.portalBaseUrl = portalBaseUrl;
 	}
 
 	/**
