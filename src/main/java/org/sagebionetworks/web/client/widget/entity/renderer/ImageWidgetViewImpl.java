@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
@@ -41,7 +42,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 		final String url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, null, false) :
 			DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false);
 
-		final Image image = new Image(url);
+		final Image image = new Image();
 		if (synapseId != null) {
 			image.addStyleName("imageButton");
 			image.addClickHandler(new ClickHandler() {
@@ -69,7 +70,6 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 			}
 		}
 		//don't show until we have the correct size (otherwise it's initially shown at 100%, then scaled down!).
-		image.setVisible(false);
 		image.addErrorHandler(new ErrorHandler() {
 			@Override
 		    public void onError(ErrorEvent event) {
@@ -92,7 +92,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 				try {
 					float imageHeight = image.getHeight();
 					float imageWidth = image.getWidth();
-					if (scale != null && !"100".equals(scale)) {
+					if (scale != null && !"100".equals(scale) && imageWidth > 0 && imageHeight > 0) {
 						//scale is specified
 						final float scaleFloat = Float.parseFloat(scale) * .01f;
 						if (scaleFloat < 0) {
@@ -114,8 +114,8 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 						//if scale is not specified (or if 100%), then only scale this image if it's too wide to fit in the screen
 						setImageToMaxSize(imageWidth, imageHeight);
 					}
-					image.setVisible(true);
-				} catch (Exception e) {
+					image.getElement().getStyle().setVisibility(Visibility.VISIBLE);
+				} catch (Throwable e) {
 					remove(image);
 					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + e.getMessage());
 				}
@@ -126,8 +126,9 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 				image.setHeight(imageHeight * MAX_IMAGE_WIDTH / imageWidth + "px");
 			}
 		});
-		
+		image.getElement().getStyle().setVisibility(Visibility.HIDDEN);
 		add(image);
+		image.setUrl(url);
 		this.layout(true);
 	}
 	
