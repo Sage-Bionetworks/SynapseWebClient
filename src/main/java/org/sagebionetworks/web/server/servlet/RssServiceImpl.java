@@ -51,7 +51,6 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 	protected void registerKnownCacheProviders(){
 		//add all known cache providers to the list
 		if (registeredCacheProviders.isEmpty()) {
-			registeredCacheProviders.add(new ChallengeOverviewCacheProvider());
 			registeredCacheProviders.add(new NewsFeedCacheProvider());
 			registeredCacheProviders.add(new DataAccessLevelsCacheProvider());
 		}
