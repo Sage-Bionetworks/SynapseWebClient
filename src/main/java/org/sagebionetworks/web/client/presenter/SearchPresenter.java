@@ -2,11 +2,11 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gwttime.time.DateTime;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SearchView;
@@ -34,7 +33,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.URL;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -58,7 +56,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private SearchResults currentResult;
 	private boolean newQuery = false;
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
-	private DateTime searchStartTime;
+	private Date searchStartTime;
 	
 	
 	@Inject
@@ -218,8 +216,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	}
 
 	@Override
-	public DateTime getSearchStartTime() {
-		if(searchStartTime == null) searchStartTime = new DateTime();
+	public Date getSearchStartTime() {
+		if(searchStartTime == null) searchStartTime = new Date();
 		return searchStartTime;		
 	}
 
@@ -281,7 +279,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private SearchQuery getBaseSearchQuery() {
 		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		timeValueToDisplay.clear();
-		searchStartTime = new DateTime();		
+		searchStartTime = new Date();		
 		newQuery = true;		
 		return query;
 	}

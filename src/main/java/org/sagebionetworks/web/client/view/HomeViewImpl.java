@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
-import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
@@ -74,8 +73,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private MyEvaluationsList myEvaluationsList;
 	
 	@Inject
-	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget,
-			Footer footerWidget, IconsImageBundle icons, QueryFilter filter,
+	public HomeViewImpl(HomeViewImplUiBinder binder, 
+			Header headerWidget,
+			Footer footerWidget, 
+			IconsImageBundle icons, 
 			SageImageBundle imageBundle,
 			final GlobalApplicationState globalApplicationState,
 			HomeSearchBox homeSearchBox, 
