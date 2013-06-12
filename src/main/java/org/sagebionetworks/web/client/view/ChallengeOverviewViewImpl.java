@@ -1,21 +1,18 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.shared.BCCSignupProfile;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,16 +32,18 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 	private IconsImageBundle icons;
 	private Header headerWidget;
 	private Footer footerWidget;
+	private WikiPageWidget wikiPage;
 	
 	@Inject
 	public ChallengeOverviewViewImpl(ChallengeOverviewViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle) {		
+			SageImageBundle imageBundle, WikiPageWidget wikiPage) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
+		this.wikiPage = wikiPage;
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -65,23 +64,6 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 
 	@Override
 	public void showOverView() {
-//		LayoutContainer megaButton = new LayoutContainer();
-//		megaButton.setStyleName("mega-button");
-//		megaButton.setStyleAttribute("margin-top", "10px;");
-//		megaButton.setStyleAttribute("float", "left;");
-//		Anchor applyForChallengeLink = new Anchor();
-//		applyForChallengeLink.setText("Join the Challenge");
-//		applyForChallengeLink.addClickHandler(new ClickHandler() {			
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				BCCSignupProfile profile = presenter.getBCCSignupProfile();
-//				final BCCCallback callback = presenter.getBCCSignupCallback();
-//				BCCSignupHelper.showDialog(profile, callback);				
-//			}
-//		});
-//		megaButton.add(applyForChallengeLink);
-//		applyForChallenge.clear();
-//		applyForChallenge.add(megaButton);
 	}
 
 	@Override
@@ -103,11 +85,15 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 	}
 
 	@Override
-	public void showChallengeInfo(String html){
-		HTMLPanel panel = new HTMLPanel(html);
-		DisplayUtils.sendAllLinksToNewWindow(panel);
+	public void showChallengeInfo(){
 		content.clear();
-		content.add(panel);
+		content.add(wikiPage.asWidget());
+		WikiPageKey wikiKey = new WikiPageKey("syn1929437", ObjectType.ENTITY.toString(), null);
+		wikiPage.configure(wikiKey, false, new WikiPageWidget.Callback() {
+			@Override
+			public void pageUpdated() {
+			}
+		}, true, 24);
 	}
 
 	@Override
