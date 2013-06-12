@@ -40,6 +40,7 @@ public class WidgetConstants {
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
 	
 	public static final String TOC_CONTENT_TYPE = "toc";
+	public static final String WIKI_SUBPAGES_CONTENT_TYPE = "wikipages";
 	
 	public static final String WIKI_FILES_PREVIEW_CONTENT_TYPE = "wikifilepreview";
 	

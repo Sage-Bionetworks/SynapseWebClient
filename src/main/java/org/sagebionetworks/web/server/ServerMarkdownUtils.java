@@ -14,6 +14,7 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -43,7 +44,7 @@ public class ServerMarkdownUtils {
 	 */
 	public static String markdown2Html(String markdown, Boolean isPreview, ActuariusTransformer markdownProcessor) throws IOException {
 		String originalMarkdown = markdown;
-		if (markdown == null) return "";
+		if (markdown == null) return DisplayUtils.getDefaultWikiMarkdown();
 		//trick to maintain newlines when suppressing all html
 		if (markdown != null) {
 			markdown = preserveWhitespace(markdown);
@@ -59,6 +60,7 @@ public class ServerMarkdownUtils {
 		markdown = resolveTables(markdown);
 		markdown = resolveCodeWithLanguage(markdown);
 //		reportTime("resolved tables");
+		markdown = addSubpagesIfNotPresent(markdown);
 		markdown = fixNewLines(markdown);
 		markdown = markdownProcessor.apply(markdown);
 //		reportTime("markdownToHtml");
@@ -99,6 +101,23 @@ public class ServerMarkdownUtils {
 		return markdown.replace(TEMP_NEWLINE_DELIMITER, "\n").replace(TEMP_SPACE_DELIMITER, " ");
 	}
 	
+
+	/**
+	 * adds a reference to the subpages wiki widget if it isn't already in the markdown
+	 * @param markdown
+	 * @return
+	 */
+	public static String addSubpagesIfNotPresent(String markdown) {
+		String subpagesWidgetMarkdown = DisplayUtils.getWikiSubpagesMarkdown();
+		String newMarkdown = markdown;
+		if (!markdown.contains(subpagesWidgetMarkdown)) {
+			//uncomment to include "Pages" header
+			//String subpagesMarkdown = "#####" + DisplayConstants.PAGES + "\n" + subpagesWidgetMarkdown;
+			String subpagesMarkdown = "\n" + subpagesWidgetMarkdown;
+			newMarkdown = markdown + subpagesMarkdown; 
+		}
+		return newMarkdown;
+	}
 	
 	/**
 	 * adds html line breaks to every line, unless it suspects that the line will be in a preformatted code block
@@ -346,7 +365,7 @@ public class ServerMarkdownUtils {
 					while (matcher.find()) {
 						if (matcher.groupCount() == 2) {
 							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
-							sb.append(ServerMarkdownUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
+							sb.append(DisplayUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
 							widgetsFound++;
 							previousFoundIndex = matcher.end(1);
 						}
@@ -373,18 +392,5 @@ public class ServerMarkdownUtils {
 	
 	public static String getUrlHtml(String url){
 		return "<a target=\"_blank\" class=\"link\" href=\"" + url.trim() + "\">" + url+ "</a>";
-	}
-	
-	public static String getWidgetHTML(int widgetIndex, String suffix, String widgetProperties){
-		StringBuilder sb = new StringBuilder();
-		sb.append("<div id=\"");
-		sb.append(WebConstants.DIV_ID_WIDGET_PREFIX);
-		sb.append(widgetIndex);
-		sb.append(suffix);
-		sb.append("\" class=\"widgetContainer\" widgetParams=\"");
-		sb.append(widgetProperties);
-		sb.append("\">");
-		sb.append("</div>");
-	    return sb.toString();
 	}
 }

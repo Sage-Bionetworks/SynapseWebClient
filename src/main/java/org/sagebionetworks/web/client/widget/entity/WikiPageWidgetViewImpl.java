@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHandler;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
-import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -60,7 +59,6 @@ import com.google.inject.Inject;
 public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageWidgetView {
 	
 	private MarkdownWidget markdownWidget;
-	private PagesBrowser pagesBrowser;
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
 	private Button editButton, addPageButton;
@@ -91,10 +89,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Inject
-	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, PagesBrowser pagesBrowser, MarkdownEditorWidget markdownEditorWidget, IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, WidgetRegistrar widgetRegistrar) {
+	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, WidgetRegistrar widgetRegistrar) {
 		super();
 		this.markdownWidget = markdownWidget;
-		this.pagesBrowser = pagesBrowser;
 		this.markdownEditorWidget = markdownEditorWidget;
 		this.iconsImageBundle = iconsImageBundle;
 		this.breadcrumb = breadcrumb;
@@ -138,7 +135,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
-		pagesBrowser.configure(wikiKey, ownerObjectName, ownerHistoryToken, DisplayConstants.PAGES, canEdit);
 		showDefaultViewWithWiki();
 	}
 	
@@ -161,7 +157,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		mainPanel.add(getBreadCrumbs(spanWidth));
 		mainPanel.add(getCommands(canEdit));
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "span-"+spanWidth + " margin-top-5"));
-		mainPanel.add(wrapWidget(pagesBrowser.asWidget(), "span-"+spanWidth+" notopmargin margin-bottom-10"));
 		add(mainPanel);
 		
 		layout(true);

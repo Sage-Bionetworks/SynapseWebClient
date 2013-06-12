@@ -52,14 +52,16 @@ public class MarkdownWidget extends LayoutContainer {
 			public void onSuccess(String result) {
 				try {
 					removeAll();
-					HTMLPanel panel;
-					if(result == null || "".equals(result)) {
-				    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%;margin-bottom:30px\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>"));
+					String content = "";
+					
+					if(result == null || DisplayUtils.getDefaultWikiMarkdown().equals(result)) {
+						content += SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%;margin-bottom:30px\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>").asString();
 					}
-					else{
-						panel = new HTMLPanel(result);
+					
+					if (result != null) {
+						content += result;
 					}
-
+					HTMLPanel panel = new HTMLPanel(content); 
 					add(panel);
 					layout();
 					synapseJSNIUtils.highlightCodeBlocks();

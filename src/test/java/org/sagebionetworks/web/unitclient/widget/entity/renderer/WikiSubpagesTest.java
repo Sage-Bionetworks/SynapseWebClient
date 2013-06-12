@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.unitclient.widget.entity.browse;
+package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -10,11 +10,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
@@ -26,8 +29,8 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowser;
-import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowserView;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -36,37 +39,43 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TreeItem;
 
-public class PagesBrowserTest {
+public class WikiSubpagesTest {
 
-	PagesBrowserView mockView;
+	WikiSubpagesView mockView;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
 	AutoGenFactory autoGenFactory;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
-	PagesBrowser pagesBrowser;
+	
+	WikiSubpagesWidget widget;
 	List<JSONEntity> wikiHeadersList;
 	WikiHeader testRootHeader;
 	String entityId = "syn123";
+	Map<String, String> descriptor = new HashMap<String, String>();
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		mockView = mock(PagesBrowserView.class);
+		mockView = mock(WikiSubpagesView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		adapterFactory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();		
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		pagesBrowser = new PagesBrowser(mockView, mockSynapseClient, mockNodeModelCreator);
-		verify(mockView).setPresenter(pagesBrowser);
-		ArrayList<String> results = new ArrayList<String>();
-		results.add("A Test Entity Header");
+		widget = new WikiSubpagesWidget(mockView, mockSynapseClient, mockNodeModelCreator, adapterFactory);
+		verify(mockView).setPresenter(widget);
+		ArrayList<JSONEntity> results = new ArrayList<JSONEntity>();
+		results.add(new EntityHeader());
 		
 		AsyncMockStubber.callSuccessWith("entity id 1").when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("entity id 1").when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
+		BatchResults<JSONEntity> batchResults = new BatchResults<JSONEntity>();
+		batchResults.setTotalNumberOfResults(1);
+		batchResults.setResults(results);
+		when(mockNodeModelCreator.createBatchResults(anyString(), eq(EntityHeader.class))).thenReturn(batchResults);
 		
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(EntityHeader.class))).thenReturn(new EntityHeader());
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		PaginatedResults<JSONEntity> wikiHeaders = new PaginatedResults<JSONEntity>();
 		wikiHeadersList = new ArrayList<JSONEntity>();
@@ -80,11 +89,20 @@ public class PagesBrowserTest {
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(WikiHeader.class))).thenReturn(wikiHeaders);
 		reset(mockView);
 	}
+
+	@Test
+	public void testConfigureEntityHeaderBatchFailure() throws Exception {
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor);
+		verify(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
 	
 	@Test
-	public void testConfigureProject() throws Exception {
+	public void testConfigureFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		pagesBrowser.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), "syn123", "#!Synapse:syn123", "Project A", true);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor);
 		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -92,14 +110,14 @@ public class PagesBrowserTest {
 	@Test
 	public void testConfigureProjectRootNotFound() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		pagesBrowser.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), "syn123", "#!Synapse:syn123", "Project A", true);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor);
 		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockView).configure(anyBoolean(), any(TreeItem.class));
+		verify(mockView).clear();
 	}
 
 	@Test
 	public void testAsWidget() {
-		pagesBrowser.asWidget();
+		widget.asWidget();
 		verify(mockView).asWidget();
 	}
 }
