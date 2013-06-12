@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -15,9 +13,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.BatchResults;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -34,8 +32,6 @@ import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.HomeView;
-import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -55,7 +51,7 @@ public class HomePresenterTest {
 	SynapseClientAsync mockSynapseClient; 
 	AutoGenFactory autoGenFactory;
 	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
-	List<Evaluation> testEvaluationResults;
+	List<EntityHeader> testEvaluationResults;
 	
 	RSSFeed testFeed = null;
 	
@@ -70,16 +66,16 @@ public class HomePresenterTest {
 		mockSearchService = mock(SearchServiceAsync.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		autoGenFactory = new AutoGenFactory();
-		PaginatedResults<Evaluation> testPaginatedResults = new PaginatedResults<Evaluation>();
-		testEvaluationResults = new ArrayList<Evaluation>();
-		Evaluation testEvaluation = new Evaluation();
-		testEvaluation.setId("eval id 1");
-		testEvaluation.setName("My Test Evaluation");
+		BatchResults<EntityHeader> testBatchResults = new BatchResults<EntityHeader>();
+		testEvaluationResults = new ArrayList<EntityHeader>();
+		EntityHeader testEvaluation = new EntityHeader();
+		testEvaluation.setId("eval project id 1");
+		testEvaluation.setName("My Test Evaluation Project");
 		testEvaluationResults.add(testEvaluation);
-		testPaginatedResults.setTotalNumberOfResults(1);
-		testPaginatedResults.setResults(testEvaluationResults);
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(testPaginatedResults);
-		AsyncMockStubber.callSuccessWith("fake paginated evaluation results json").when(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
+		testBatchResults.setTotalNumberOfResults(1);
+		testBatchResults.setResults(testEvaluationResults);
+		when(mockNodeModelCreator.createBatchResults(anyString(), any(Class.class))).thenReturn(testBatchResults);
+		AsyncMockStubber.callSuccessWith("fake paginated evaluation results json").when(mockSynapseClient).getAvailableEvaluationEntities(any(AsyncCallback.class));
 		testFeed = new RSSFeed();
 		RSSEntry entry = new RSSEntry();
 		entry.setTitle("A Title");
@@ -122,7 +118,7 @@ public class HomePresenterTest {
 	@Test
 	public void testLoadEvaluations() {
 		//happy case
-		AsyncCallback<List<Evaluation>> mockCallback = mock(AsyncCallback.class);
+		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		homePresenter.loadEvaluations(mockCallback);
 		verify(mockCallback).onSuccess(testEvaluationResults);
 	}
@@ -131,8 +127,8 @@ public class HomePresenterTest {
 	@Test
 	public void testLoadEvaluationsFailure() throws RestServiceException {
 		Exception simulatedException = new Exception("Simulated Error");
-		AsyncMockStubber.callFailureWith(simulatedException).when(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
-		AsyncCallback<List<Evaluation>> mockCallback = mock(AsyncCallback.class);
+		AsyncMockStubber.callFailureWith(simulatedException).when(mockSynapseClient).getAvailableEvaluationEntities(any(AsyncCallback.class));
+		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		homePresenter.loadEvaluations(mockCallback);
 		verify(mockCallback).onFailure(simulatedException);
 	}

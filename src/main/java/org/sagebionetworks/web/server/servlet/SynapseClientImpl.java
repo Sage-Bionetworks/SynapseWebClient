@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -1403,6 +1404,32 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
 			JSONObjectAdapter evaluationsJson = results.writeToJSONObject(adapterFactory.createNew());
 			return evaluationsJson.toJSONString();
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	public String getAvailableEvaluationEntities() throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			//look up the available evaluations
+			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			//collect contentSource entity IDs
+			Set<String> uniqueEntityIds = new HashSet<String>();
+			for (Evaluation eval : availableEvaluations.getResults()) {
+				uniqueEntityIds.add(eval.getContentSource());
+			}
+			//create reference for each contentSource entity ID
+			List<Reference> references = new ArrayList<Reference>();
+			for (String entityId : uniqueEntityIds) {
+				Reference ref = new Reference();
+				ref.setTargetId(entityId);
+				references.add(ref);
+			}
+			//query for the associated entities
+			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(references);
+			//and return them
+			return EntityFactory.createJSONStringForEntity(results);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
