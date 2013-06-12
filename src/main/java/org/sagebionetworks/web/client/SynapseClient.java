@@ -229,6 +229,8 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getAvailableEvaluations() throws RestServiceException;
 	
+	public String getAvailableEvaluationEntities() throws RestServiceException;
+	
 	public String createSubmission(String submissionJson, String etag) throws RestServiceException;
 	
 	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException;

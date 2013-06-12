@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
@@ -171,9 +172,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	private void loadProjectsAndFavorites() {
-		loadEvaluations(new AsyncCallback<List<Evaluation>>() {
+		loadEvaluations(new AsyncCallback<List<EntityHeader>>() {
 			@Override
-			public void onSuccess(List<Evaluation> result) {
+			public void onSuccess(List<EntityHeader> result) {
 				view.setMyEvaluationList(result);
 			}
 			@Override
@@ -205,17 +206,17 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 
-	public void loadEvaluations(final AsyncCallback<List<Evaluation>> callback){
+	public void loadEvaluations(final AsyncCallback<List<EntityHeader>> callback){
 		try {
-			synapseClient.getAvailableEvaluations(new AsyncCallback<String>() {
+			synapseClient.getAvailableEvaluationEntities(new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String jsonString) {
+					BatchResults<EntityHeader> headers;
 					try {
-						PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
-						List<Evaluation> list = results.getResults();
-						callback.onSuccess(list);
+						headers = nodeModelCreator.createBatchResults(jsonString, EntityHeader.class);
+						callback.onSuccess(headers.getResults());
 					} catch (JSONObjectAdapterException e) {
-						callback.onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
 				}
 				

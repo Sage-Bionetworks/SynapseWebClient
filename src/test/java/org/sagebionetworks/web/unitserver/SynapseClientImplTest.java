@@ -46,6 +46,7 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -56,6 +57,7 @@ import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -762,6 +764,45 @@ public class SynapseClientImplTest {
 		String expectedJson = EntityFactory.createJSONStringForEntity(testResults);
 		assertEquals(expectedJson, evaluationsJson);
 	}
+	
+	@Test
+	public void testGetAvailableEvaluationEntities() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		//when asking for available evaluations, return two (subchallenges) that share the same contentSource (sharedEntityId)
+		String sharedEntityId = "syn123455";
+		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
+		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
+		Evaluation e = new Evaluation();
+		e.setId("eval ID 1");
+		e.setContentSource(sharedEntityId);
+		evaluationList.add(e);
+		e = new Evaluation();
+		e.setId("eval ID 2");
+		e.setContentSource(sharedEntityId);
+		evaluationList.add(e);
+		testResults.setTotalNumberOfResults(2);
+		testResults.setResults(evaluationList);
+		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(testResults);
+		
+		//when asking for entity headers, return a single entity header
+		BatchResults<EntityHeader> batchResults = new BatchResults<EntityHeader>();
+		List<EntityHeader> entityHeaders = new ArrayList<EntityHeader>();
+		entityHeaders.add(new EntityHeader());
+		batchResults.setResults(entityHeaders);
+		batchResults.setTotalNumberOfResults(1);
+		when(mockSynapse.getEntityHeaderBatch(any(List.class))).thenReturn(batchResults);
+		
+		String entityHeadersJson = synapseClient.getAvailableEvaluationEntities();
+		verify(mockSynapse).getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt());
+		
+		//capture argument to verify that the reference passed to getEntityHeaderBatch points to a single entity (the sharedEntityId)
+		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+		verify(mockSynapse).getEntityHeaderBatch(captor.capture());
+		assertTrue(captor.getValue().size() == 1);
+		assertEquals(sharedEntityId, ((Reference)captor.getValue().get(0)).getTargetId());
+		String expectedJson = EntityFactory.createJSONStringForEntity(batchResults);
+		assertEquals(expectedJson, entityHeadersJson);
+	}
+
 	@Test
 	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
 		Submission inputSubmission = new Submission();

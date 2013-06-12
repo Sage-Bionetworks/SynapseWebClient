@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
-import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -18,7 +18,7 @@ public class MyEvaluationsList implements MyEvaluationsListView.Presenter, Synap
 		view.setPresenter(this);
 	}
 	
-	public void configure(List<Evaluation> evaluations) {
+	public void configure(List<EntityHeader> evaluations) {
 		view.configure(evaluations);
 	}
 	

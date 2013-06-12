@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
-import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.repo.model.EntityHeader;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -13,7 +13,7 @@ public interface MyEvaluationsListView extends IsWidget {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	public void configure(List<Evaluation> evaluations);
+	public void configure(List<EntityHeader> evaluations);
 	/**
 	 * Presenter interface
 	 */

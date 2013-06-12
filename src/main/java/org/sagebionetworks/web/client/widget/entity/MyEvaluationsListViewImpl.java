@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -26,18 +27,18 @@ public class MyEvaluationsListViewImpl extends LayoutContainer implements MyEval
 	}
 	
 	@Override
-	public void configure(List<Evaluation> evaluations) {
+	public void configure(List<EntityHeader> evaluations) {
 		this.removeAll();
 		StringBuilder htmlBuilder = new StringBuilder();
 		if (evaluations.size() > 0) {
 			htmlBuilder.append("<h3>"+ DisplayConstants.MY_EVALUATIONS +"</h3>");
 			htmlBuilder.append("<div class=\"myEvaluationListContainer\"\">");
 			String iconHtml = DisplayUtils.getIconHtml(imageBundle.synapseStep16());
-			for (Evaluation evaluation : evaluations) {
+			for (EntityHeader evaluation : evaluations) {
 				htmlBuilder.append("<div>");
 				htmlBuilder.append(iconHtml);
 				htmlBuilder.append("<a class=\"myEvaluationLink\" href=\"");
-				htmlBuilder.append(DisplayUtils.getSynapseHistoryToken(evaluation.getContentSource()));
+				htmlBuilder.append(DisplayUtils.getSynapseHistoryToken(evaluation.getId()));
 				htmlBuilder.append("\">");
 				htmlBuilder.append(evaluation.getName());
 				htmlBuilder.append("</a></div>");
