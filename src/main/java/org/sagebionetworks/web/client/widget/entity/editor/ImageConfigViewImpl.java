@@ -262,6 +262,13 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 			//must have been uploaded
 			if (uploadedFileHandleName == null)
 				throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE);
+			else {
+				//block if it looks like this is not a valid image type
+				String extension = uploadedFileHandleName.substring(uploadedFileHandleName.lastIndexOf(".")+1);
+				if (!DisplayUtils.isRecognizedImageContentType("image/"+extension)) {
+					throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_FILE_TYPE_MESSAGE);
+				}
+			}
 		}
 	}
 	
