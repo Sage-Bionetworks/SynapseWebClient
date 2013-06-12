@@ -86,10 +86,8 @@ public class HomePresenterTest {
 		testFeed.setEntries(entries);
 		
 		homePresenter = new HomePresenter(mockView, 
-				cookieProvider, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
-				mockStackConfigService,
 				mockRssService,
 				mockNodeModelCreator,
 				mockSearchService,

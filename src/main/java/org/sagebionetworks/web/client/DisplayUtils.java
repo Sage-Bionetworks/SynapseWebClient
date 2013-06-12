@@ -9,10 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
-import org.gwttime.time.DateTime;
-import org.gwttime.time.format.ISODateTimeFormat;
+import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
@@ -35,6 +33,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -578,13 +577,7 @@ public class DisplayUtils {
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}
-	
-	public static String convertDateToString(Date toFormat) {
-		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		DateTime dt = new DateTime(toFormat.getTime());
-		return ISODateTimeFormat.dateTime().print(dt);
-	}
-	
+		
 	/**
 	 * YYYY-MM-DD HH:mm:ss
 	 * @param toFormat
@@ -592,8 +585,7 @@ public class DisplayUtils {
 	 */
 	public static String converDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		DateTime dt = new DateTime(toFormat.getTime());
-		return ISODateTimeFormat.dateHourMinuteSecond().print(dt).replaceAll("T", " ");		
+		return DateUtils.convertDateToString(FORMAT.DATE_TIME, toFormat).replaceAll("T", " ");
 	}
 	
 	
@@ -604,16 +596,9 @@ public class DisplayUtils {
 	 */
 	public static String converDateaToSimpleString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		DateTime dt = new DateTime(toFormat.getTime());
-		return ISODateTimeFormat.date().print(dt);		
+		return DateUtils.convertDateToString(FORMAT.DATE, toFormat);
 	}
- 
-	public static Date convertStringToDate(String toFormat) {
-		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		DateTime dt = ISODateTimeFormat.dateTime().parseDateTime(toFormat);
-		return dt.toDate();
-	}
-	
+ 	
 	public static String getSynapseWikiHistoryToken(String ownerId, String objectType, String wikiPageId) {
 		Wiki place = new Wiki(ownerId, objectType, wikiPageId);
 		return "#!" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
@@ -1020,7 +1005,7 @@ public class DisplayUtils {
 	 * @param pos where to position the tooltip relative to the widget
 	 */
 	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, String tooltipText, TOOLTIP_POSITION pos){
-		Map<String, String> optionsMap = new TreeMap<String, String>();
+		Map<String, String> optionsMap = new HashMap<String, String>();
 		optionsMap.put("title", tooltipText);
 		optionsMap.put("data-placement", pos.toString().toLowerCase());
 		optionsMap.put("data-animation", "false");
@@ -1055,7 +1040,7 @@ public class DisplayUtils {
 	}
 
 	public static void addClickPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new TreeMap<String, String>();
+		Map<String, String> optionsMap = new HashMap<String, String>();
 		optionsMap.put("data-html", "true");
 		optionsMap.put("data-animation", "true");
 		optionsMap.put("title", title);
@@ -1065,7 +1050,7 @@ public class DisplayUtils {
 	}
 
 	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new TreeMap<String, String>();
+		Map<String, String> optionsMap = new HashMap<String, String>();
 		optionsMap.put("data-html", "true");
 		optionsMap.put("data-animation", "true");
 		optionsMap.put("title", title);

@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.Date;
 import java.util.List;
 
-import org.gwttime.time.DateTime;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -47,7 +47,7 @@ public interface SearchView extends IsWidget, SynapseView {
 
 		String getDisplayForTimeFacet(String facetName, String facetValue);
 		
-		DateTime getSearchStartTime();
+		Date getSearchStartTime();
 		
 		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
 

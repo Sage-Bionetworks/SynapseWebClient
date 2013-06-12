@@ -15,9 +15,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
-import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -31,7 +29,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -45,9 +42,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private Home place;
 	private HomeView view;
 	private GlobalApplicationState globalApplicationState;
-	private CookieProvider cookieProvider;
 	private AuthenticationController authenticationController;
-	private StackConfigServiceAsync stackConfigService;
 	private RssServiceAsync rssService;
 	private NodeModelCreator nodeModelCreator;
 	private SearchServiceAsync searchService;
@@ -56,11 +51,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
-	public HomePresenter(HomeView view, 
-			CookieProvider cookieProvider, 
+	public HomePresenter(HomeView view,  
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
-			StackConfigServiceAsync stackConfigService,
 			RssServiceAsync rssService,
 			NodeModelCreator nodeModelCreator,
 			SearchServiceAsync searchService, 
@@ -69,10 +62,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			JSONObjectAdapter jsonObjectAdapter){
 		this.view = view;
 		// Set the presenter on the view
-		this.cookieProvider = cookieProvider;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.stackConfigService = stackConfigService;
 		this.rssService = rssService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.searchService = searchService;

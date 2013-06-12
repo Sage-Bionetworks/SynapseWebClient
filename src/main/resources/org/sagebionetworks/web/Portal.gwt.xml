@@ -37,4 +37,5 @@
 	<inherits name="org.sagebionetworks.repo.SharedSynpaseDTOs"/>
 	<inherits name="org.sagebionetworks.gwt.JSONAdapter"/>
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
+		
 </module>
