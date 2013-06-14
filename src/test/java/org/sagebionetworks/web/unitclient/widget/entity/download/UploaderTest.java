@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -20,6 +21,8 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.State;
+import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -98,7 +101,14 @@ public class UploaderTest {
 		when(synapseJsniUtils.getContentType(anyString())).thenReturn("image/png");
 		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("syn12345").when(synapseClient).completeChunkedFileUpload(anyString(), any(List.class), anyString(), anyBoolean(), any(AsyncCallback.class));
+		UploadDaemonStatus status = new UploadDaemonStatus();
+		status.setState(State.COMPLETED);
+		status.setFileHandleId("fake handle");
+		String completedUploadDaemonStatusJson = status.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		AsyncMockStubber.callSuccessWith(completedUploadDaemonStatusJson).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith("entityID").when(synapseClient).completeUpload(anyString(),  anyString(),  anyString(),  anyBoolean(),  any(AsyncCallback.class));
+		
 		when(gwt.createXMLHttpRequest()).thenReturn(null);
 		cancelHandler = mock(CancelHandler.class);
 		
@@ -214,7 +224,8 @@ public class UploaderTest {
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyString(), anyInt(), anyInt(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//kick off what would happen after a successful upload
 		uploader.directUploadStep3(false, null);
-		verify(synapseClient).completeChunkedFileUpload(anyString(), any(List.class), anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
+		verify(synapseClient).completeUpload(anyString(),  anyString(),  anyString(),  anyBoolean(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
 	}
 	
@@ -242,12 +253,23 @@ public class UploaderTest {
 	@Test
 	public void testDirectUploadStep3Failure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).completeChunkedFileUpload(anyString(), any(List.class), anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		uploader.handleUpload("newFile.txt");
 		//kick off what would happen after a successful upload
 		uploader.directUploadStep3(false, null);
 		verifyUploadError();
 	}
+	
+	@Test
+	public void testDirectUploadStep3CompleteUploadFailure() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).completeUpload(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		uploader.handleUpload("newFile.txt");
+		//kick off what would happen after a successful upload
+		uploader.directUploadStep3(false, null);
+		verifyUploadError();
+	}
+
 	
 	@Test
 	public void testByteRange() {
@@ -275,7 +297,7 @@ public class UploaderTest {
 	
 	@Test
 	public void testChunkUploadSuccessWithMoreChunksToUpload() throws RestServiceException {
-		//verify that request json is added to the list, and it calls step 2 (upload the next chunk) if there are more chunks to upload.  otherwise it calls step 3 if the current chunk number is equal to the total chunk count
+		//verify that request json is added to the list, and it calls step 2 (upload the next chunk) since there are more chunks to upload.
 		List<String> requestList = new ArrayList<String>();
 		uploader.chunkUploadSuccess("new request json", "content type",1, 2, 1024, requestList);
 		assertTrue(requestList.size() == 1);
@@ -285,13 +307,12 @@ public class UploaderTest {
 	
 	@Test
 	public void testChunkUploadSuccessWithFinalChunk() throws RestServiceException {
-		//verify that request json is added to the list, and it calls step 2 (upload the next chunk) if there are more chunks to upload.  otherwise it calls step 3 if the current chunk number is equal to the total chunk count
+		//verify that request json is added to the list, and it calls step 3 since the current chunk number is equal to the total chunk count
 		List<String> requestList = new ArrayList<String>();
 		uploader.chunkUploadSuccess("new request json", "content type",2, 2, 1024, requestList);
 		assertTrue(requestList.size() == 1);
 		//and it should try to get the url for the next chunk
-		verify(view).showFinishingProgress();
-		verify(synapseClient).completeChunkedFileUpload(anyString(), any(List.class), anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 	}
 	
 	@Test

@@ -62,6 +62,7 @@ import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -1385,6 +1386,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try{
 			// Complete the upload
 			UploadDaemonStatus status = synapseClient.getCompleteUploadDaemonStatus(daemonId);
+			if (State.COMPLETED != status.getState()) {
+				throw new BadRequestException("Upload completion daemon must be in the completed state before making this call.");
+			}
 			String fileHandleId = status.getFileHandleId();
 			FileHandle newHandle = synapseClient.getRawFileHandle(fileHandleId);
 			//create entity if we have to
