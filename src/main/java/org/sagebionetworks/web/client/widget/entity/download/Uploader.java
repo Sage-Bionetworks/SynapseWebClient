@@ -12,6 +12,8 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.State;
+import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -41,6 +43,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
@@ -57,6 +60,9 @@ import com.google.inject.Inject;
  */
 public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable {
 	
+	//we are dedicating 90% of the progress bar to uploading the chunks, reserving 10% for the final combining (last) step
+	public static final double UPLOADING_TOTAL_PERCENT = .9d;
+	public static final double COMBINING_TOTAL_PERCENT = .1d;
 	public static final double OLD_BROWSER_MAX_SIZE = DisplayUtils.MB * 5; //5MB
 	public static final int BYTES_PER_CHUNK = (int)DisplayUtils.MB * 5; //5MB
 	public static final int MAX_RETRY = 3;
@@ -262,7 +268,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						public void updateProgress(double value) {
 							//Note:  0 <= value <= 1
 							//And we need to add this to the chunks that have already been uploaded.  And divide by the total chunk count
-							double currentProgress = (((double)(currentChunkNumber-1)) + value)/((double)totalChunkCount);
+							double currentProgress = (((double)(currentChunkNumber-1)) + value)/((double)totalChunkCount) * UPLOADING_TOTAL_PERCENT;
 							String progressText = percentFormat.format(currentProgress*100.0) + "%";
 							view.updateProgress(currentProgress, progressText);
 						}
@@ -340,9 +346,83 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void directUploadStep3(final boolean isNewlyRestricted, List<String> requestList){
 		//complete the file upload, and refresh
 		try {
-			view.showFinishingProgress();
-			String entityId = entity==null ? null : entity.getId();
-			synapseClient.completeChunkedFileUpload(entityId, requestList,parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
+			final String entityId = entity==null ? null : entity.getId();
+			
+			//start the daemon to complete the file upload, and continue to check back until it's complete
+			synapseClient.combineChunkedFileUpload(requestList, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					try {
+						UploadDaemonStatus status = nodeModelCreator.createJSONEntity(result, UploadDaemonStatus.class);
+						//if it's already done, then finish.  Otherwise keep checking back until it's complete.
+						processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+					} catch (JSONObjectAdapterException e) {
+						onFailure(e);
+					}
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					uploadError(caught.getMessage());
+				}
+			});
+		} catch (RestServiceException e) {
+			uploadError(e.getMessage());
+		}
+	}
+	
+	public void processDaemonStatus(UploadDaemonStatus status, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted){
+		State state = status.getState();
+		if (State.COMPLETED == state) {
+			view.updateProgress(.99d, "99%");
+			completeUpload(status.getFileHandleId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+		}
+		else if (State.PROCESSING == state){
+			//still processing.  update the progress bar and check again later
+			double currentProgress = ((status.getPercentComplete()*.01d) * COMBINING_TOTAL_PERCENT) + UPLOADING_TOTAL_PERCENT;
+			String progressText = percentFormat.format(currentProgress*100.0) + "%";
+			view.updateProgress(currentProgress, progressText);
+			checkStatusAgainLater(status.getDaemonId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+		}
+		else if (State.FAILED == state) {
+			uploadError(status.getErrorMessage());
+		}
+	}
+	
+	public void checkStatusAgainLater(final String daemonId, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted) {
+		//in one second, do a web service call to check the status again
+		Timer t = new Timer() {
+		      public void run() {
+		    	  try {
+					synapseClient.getUploadDaemonStatus(daemonId, new AsyncCallback<String>() {
+						@Override
+						public void onSuccess(String result) {
+							try {
+								UploadDaemonStatus status = nodeModelCreator.createJSONEntity(result, UploadDaemonStatus.class);
+								// if it's already done, then finish. Otherwise keep checking back until it's complete.
+								processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+							} catch (JSONObjectAdapterException e) {
+								onFailure(e);
+							}
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							uploadError(caught.getMessage());
+						}
+					});
+				} catch (RestServiceException e) {
+					uploadError(e.getMessage());
+				}       
+		      }
+		    };
+
+	    t.schedule(1000);
+		
+		
+	}
+	
+	public void completeUpload(String fileHandleId, final String entityId, String parentEntityId, boolean isUploadRestricted, final boolean isNewlyRestricted) {
+		try {
+			synapseClient.completeUpload(fileHandleId, entityId, parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String entityId) {
 					//to new file handle id, or create new file entity with this file handle id
