@@ -58,6 +58,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -138,6 +139,7 @@ public interface PortalGinInjector extends Ginjector {
 	public AttachmentPreviewWidget getAttachmentPreviewRenderer();
 	public APITableWidget getSynapseAPICallRenderer();
 	public TableOfContentsWidget getTableOfContentsRenderer();
+	public WikiSubpagesWidget getWikiSubpagesRenderer();
 	public WikiFilesPreviewWidget getWikiFilesPreviewRenderer();
 	public EntityListWidget getEntityListRenderer();
 	public ShinySiteWidget getShinySiteRenderer();
