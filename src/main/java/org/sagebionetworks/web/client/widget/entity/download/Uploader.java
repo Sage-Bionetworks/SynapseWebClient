@@ -374,7 +374,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		State state = status.getState();
 		if (State.COMPLETED == state) {
 			view.updateProgress(.99d, "99%");
-			completeUpload(status.getDaemonId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+			completeUpload(status.getFileHandleId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
 		}
 		else if (State.PROCESSING == state){
 			//still processing.  update the progress bar and check again later
@@ -420,9 +420,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		
 	}
 	
-	public void completeUpload(String daemonId, final String entityId, String parentEntityId, boolean isUploadRestricted, final boolean isNewlyRestricted) {
+	public void completeUpload(String fileHandleId, final String entityId, String parentEntityId, boolean isUploadRestricted, final boolean isNewlyRestricted) {
 		try {
-			synapseClient.completeUpload(daemonId, entityId, parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
+			synapseClient.completeUpload(fileHandleId, entityId, parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String entityId) {
 					//to new file handle id, or create new file entity with this file handle id

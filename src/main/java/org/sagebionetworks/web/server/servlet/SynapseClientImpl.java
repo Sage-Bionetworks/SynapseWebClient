@@ -1370,6 +1370,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		Synapse synapseClient = createSynapseClient();
 		try {
 			UploadDaemonStatus status = synapseClient.getCompleteUploadDaemonStatus(daemonId);
+			if (State.FAILED == status.getState()) {
+				logError(status.getErrorMessage());
+			}
 			JSONObjectAdapter requestJson = status.writeToJSONObject(adapterFactory.createNew());
 			return requestJson.toJSONString();
 		} catch (SynapseException e) {
@@ -1381,15 +1384,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String completeUpload(String daemonId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException {
+	public String completeUpload(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try{
-			// Complete the upload
-			UploadDaemonStatus status = synapseClient.getCompleteUploadDaemonStatus(daemonId);
-			if (State.COMPLETED != status.getState()) {
-				throw new BadRequestException("Upload completion daemon must be in the completed state before making this call.");
-			}
-			String fileHandleId = status.getFileHandleId();
 			FileHandle newHandle = synapseClient.getRawFileHandle(fileHandleId);
 			//create entity if we have to
 			FileEntity fileEntity = null;

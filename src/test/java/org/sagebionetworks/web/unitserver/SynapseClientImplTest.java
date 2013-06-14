@@ -737,14 +737,6 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).createAccessRequirement(any(AccessRequirement.class));
 	}
 	
-	@Test (expected=BadRequestException.class)
-	public void testIncompleteUpload() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		UploadDaemonStatus status = new UploadDaemonStatus();
-		status.setState(State.PROCESSING);
-		when(mockSynapse.getCompleteUploadDaemonStatus(anyString())).thenReturn(status);
-		synapseClient.completeUpload("daemonId","entityId", null, true);
-	}
-	
 	@Test
 	public void testCompleteChunkedFileUploadExistingEntity() throws JSONObjectAdapterException, SynapseException, RestServiceException {
 		List<String> chunkRequests = getTestChunkRequestJson();
