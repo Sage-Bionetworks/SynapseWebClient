@@ -51,6 +51,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	@Override
 	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		this.wikiKey = wikiKey;
+		view.clear();
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id

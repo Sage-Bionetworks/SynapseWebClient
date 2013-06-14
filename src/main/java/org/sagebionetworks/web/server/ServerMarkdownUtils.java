@@ -103,7 +103,7 @@ public class ServerMarkdownUtils {
 	
 
 	/**
-	 * adds a reference to the subpages wiki widget if it isn't already in the markdown
+	 * adds a reference to the subpages wiki widget at the top of the page if it isn't already in the markdown
 	 * @param markdown
 	 * @return
 	 */
@@ -111,10 +111,8 @@ public class ServerMarkdownUtils {
 		String subpagesWidgetMarkdown = DisplayUtils.getWikiSubpagesMarkdown();
 		String newMarkdown = markdown;
 		if (!markdown.contains(subpagesWidgetMarkdown)) {
-			//uncomment to include "Pages" header
-			//String subpagesMarkdown = "#####" + DisplayConstants.PAGES + "\n" + subpagesWidgetMarkdown;
-			String subpagesMarkdown = "\n" + subpagesWidgetMarkdown;
-			newMarkdown = markdown + subpagesMarkdown; 
+			String subpagesMarkdown = subpagesWidgetMarkdown + "\n";
+			newMarkdown = subpagesMarkdown + markdown; 
 		}
 		return newMarkdown;
 	}
