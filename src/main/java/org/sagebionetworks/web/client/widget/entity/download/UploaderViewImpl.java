@@ -349,12 +349,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		progressBar.setVisible(false);
 	}
 	
-	@Override
-	public void showFinishingProgress() {
-		showSpinningProgress();
-		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_FINISHING));
-	}
-	
 	private void addRadioButtonsToContainer(
 			LayoutContainer layoutContainer,
 			Radio openRadio,

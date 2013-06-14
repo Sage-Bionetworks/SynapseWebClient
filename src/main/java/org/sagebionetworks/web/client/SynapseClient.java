@@ -221,7 +221,10 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getChunkedFileToken(String fileName, String contentType) throws RestServiceException;
 	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException;
-	public String completeChunkedFileUpload(String entityId, List<String> requests, String parentEntityId, boolean isRestricted) throws RestServiceException;
+	public String combineChunkedFileUpload(List<String> requests) throws RestServiceException;
+	public String getUploadDaemonStatus(String daemonId) throws RestServiceException;
+	public String completeUpload(String daemonId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException;
+	
 	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;
 	

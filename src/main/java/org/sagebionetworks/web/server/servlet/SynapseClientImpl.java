@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -57,19 +56,18 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
-import org.sagebionetworks.repo.model.file.ChunkResult;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
-import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
+import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
 import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.repo.model.storage.StorageUsage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -81,7 +79,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -1337,29 +1334,59 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String completeChunkedFileUpload(String entityId, List<String> requests, String parentEntityId, boolean isRestricted) throws RestServiceException {
+	public String combineChunkedFileUpload(List<String> requests) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
-			List<ChunkResult> results = new ArrayList<ChunkResult>();
-			
 			//re-create each request
 			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			//reconstruct all part numbers, and token
 			ChunkedFileToken token=null;
+			List<Long> parts = new ArrayList<Long>();
+			
 			for (String requestJson : requests) {
 				ChunkRequest request = jsonEntityFactory.createEntity(requestJson, ChunkRequest.class);
 				token = request.getChunkedFileToken();
-				//create the chunkresult
-				ChunkResult result = synapseClient.addChunkToFile(request);
-				results.add(result);
+				parts.add(request.getChunkNumber());
 			}
+			
+			CompleteAllChunksRequest cacr = new CompleteAllChunksRequest();
+			cacr.setChunkedFileToken(token);
+			cacr.setChunkNumbers(parts);
 
-			// And complete the upload
-			CompleteChunkedFileRequest ccfr = new CompleteChunkedFileRequest();
-			ccfr.setChunkedFileToken(token);
-			ccfr.setChunkResults(results);
+			// Start the daemon
+			UploadDaemonStatus status = synapseClient.startUploadDeamon(cacr);
+			JSONObjectAdapter requestJson = status.writeToJSONObject(adapterFactory.createNew());
+			return requestJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public String getUploadDaemonStatus(String daemonId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			UploadDaemonStatus status = synapseClient.getCompleteUploadDaemonStatus(daemonId);
+			JSONObjectAdapter requestJson = status.writeToJSONObject(adapterFactory.createNew());
+			return requestJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+
+	}
+	
+	@Override
+	public String completeUpload(String daemonId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try{
 			// Complete the upload
-			S3FileHandle newHandle = synapseClient.completeChunkFileUpload(ccfr);
-			String fileHandleId = newHandle.getId();
+			UploadDaemonStatus status = synapseClient.getCompleteUploadDaemonStatus(daemonId);
+			String fileHandleId = status.getFileHandleId();
+			FileHandle newHandle = synapseClient.getRawFileHandle(fileHandleId);
 			//create entity if we have to
 			FileEntity fileEntity = null;
 			
@@ -1377,14 +1404,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			//fix name and lock down
 			FileHandleServlet.fixNameAndLockDown(fileEntity, newHandle, isRestricted, synapseClient);
 			return fileEntity.getId();
-						
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-
+	
 	@Override
 	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
