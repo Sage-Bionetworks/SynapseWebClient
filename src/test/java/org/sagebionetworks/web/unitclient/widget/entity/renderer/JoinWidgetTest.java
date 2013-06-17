@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,10 +22,11 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -50,7 +55,9 @@ public class JoinWidgetTest {
 	JSONObjectAdapter mockJSONObjectAdapter;
 	NodeModelCreator mockNodeModelCreator;
 	PaginatedResults<TermsOfUseAccessRequirement> requirements;
-	
+	SystemFactory mockSystemFactory;
+	CookieHelper mockCookieHelper;
+
 	@Before
 	public void setup() throws Exception{
 		mockView = mock(JoinWidgetView.class);
@@ -61,7 +68,10 @@ public class JoinWidgetTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		mockSystemFactory = mock(SystemFactory.class);
+		mockCookieHelper = mock(CookieHelper.class);
+		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
+		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
 		UserSessionData currentUser = mock(UserSessionData.class);
 		UserProfile currentUserProfile = mock(UserProfile.class);
 		when(mockAuthController.getLoggedInUser()).thenReturn(currentUser);
@@ -76,7 +86,9 @@ public class JoinWidgetTest {
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUnmetEvaluationAccessRequirements(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE).when(mockSynapseClient).getUserEvaluationState(anyString(), any(AsyncCallback.class));
 		
-		widget = new JoinWidget(mockView, mockSynapseClient, mockAuthController, mockGlobalApplicationState,mockNodeModelCreator, mockJSONObjectAdapter);
+		widget = new JoinWidget(mockView, mockSynapseClient,
+				mockAuthController, mockGlobalApplicationState,
+				mockNodeModelCreator, mockJSONObjectAdapter, mockSystemFactory);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY, "my eval id");
 	}	
@@ -91,7 +103,7 @@ public class JoinWidgetTest {
 	
 	@Test
 	public void testRegisterStep1NotLoggedIn() throws Exception {
-		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		when(mockCookieHelper.isLoggedIn()).thenReturn(false);
 		AsyncMockStubber.callSuccessWith("my participant json").when(mockSynapseClient).createParticipants(any(String[].class), any(AsyncCallback.class));
 		widget.configure(wikiKey, descriptor);
 		widget.registerStep1();

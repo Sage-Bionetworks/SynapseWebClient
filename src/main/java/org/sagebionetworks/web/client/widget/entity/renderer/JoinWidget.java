@@ -10,6 +10,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -38,9 +39,15 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private String[] evaluationIds;
+	SystemFactory systemFactory;
 	
 	@Inject
-	public JoinWidget(JoinWidgetView view, SynapseClientAsync synapseClient, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, JSONObjectAdapter jsonObjectAdapter) {
+	public JoinWidget(JoinWidgetView view, SynapseClientAsync synapseClient,
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState,
+			NodeModelCreator nodeModelCreator,
+			JSONObjectAdapter jsonObjectAdapter,
+			SystemFactory systemFactory) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -48,6 +55,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.systemFactory = systemFactory;
 	}
 	
 	@Override
@@ -103,7 +111,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	 * Check that the user is logged in
 	 */
 	public void registerStep1() {
-		if (!authenticationController.isLoggedIn()) {
+		if (!systemFactory.getCookieHelper().isLoggedIn()) {
 			//go to login page
 			view.showAnonymousRegistrationMessage();
 			//directs to the login page

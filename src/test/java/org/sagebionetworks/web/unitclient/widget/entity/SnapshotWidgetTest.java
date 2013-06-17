@@ -26,13 +26,14 @@ import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidget;
@@ -55,7 +56,6 @@ public class SnapshotWidgetTest {
 
 	AdapterFactory factory;
 	GlobalApplicationState mockGlobal;
-	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
 	PlaceChanger mockPlaceChanger;
 	SynapseClientAsync mockSynapseClient;
@@ -70,6 +70,9 @@ public class SnapshotWidgetTest {
 	final boolean CAN_EDIT = true;
 	final boolean READ_ONLY = false;
 	final boolean SHOW_EDIT = true;
+	SystemFactory mockSystemFactory;
+	CookieHelper mockCookieHelper;
+
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{		
@@ -77,14 +80,20 @@ public class SnapshotWidgetTest {
 		autoGenFactory = new AutoGenFactory();
 		mockPlaceChanger = Mockito.mock(PlaceChanger.class);
 		mockGlobal = Mockito.mock(GlobalApplicationState.class);
-		when(mockGlobal.getPlaceChanger()).thenReturn(mockPlaceChanger);		
-		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
+		when(mockGlobal.getPlaceChanger()).thenReturn(mockPlaceChanger);				
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockView = mock(SnapshotWidgetView.class);
 		mockCookies = mock(CookieProvider.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		snapshotWidget = new SnapshotWidget(factory, mockView, mockSynapseClient, mockNodeModelCreator, mockGlobal, mockAuthenticationController, mockSynapseJSNIUtils);
+		mockSystemFactory = Mockito.mock(SystemFactory.class);
+		mockCookieHelper = Mockito.mock(CookieHelper.class);
+		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
+
+		snapshotWidget = new SnapshotWidget(factory, mockView,
+				mockSynapseClient, mockNodeModelCreator, mockGlobal,
+				mockSynapseJSNIUtils,
+				mockSystemFactory);
 		snapshot = createDefaultSnapshot();
 	}
 	

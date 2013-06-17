@@ -5,13 +5,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface AuthenticationController {
-	
-	/**
-	 * Is the user logged in?
-	 * @return
-	 */
-	public boolean isLoggedIn();
-	
+		
 	/**
 	 * Login the user
 	 * @param username

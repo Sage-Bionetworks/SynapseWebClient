@@ -10,12 +10,13 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WhereCondition;
-import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -26,9 +27,10 @@ public class EntityBrowserUtils {
 			final NodeModelCreator nodeModelCreator,
 			final GlobalApplicationState globalApplicationState,
 			final AuthenticationController authenticationController,
+			SystemFactory systemFactory,
 			final AsyncCallback<List<EntityHeader>> callback) {
 		//first, load the projects that the user created
-		if(authenticationController.isLoggedIn()) {
+		if(systemFactory.getCookieHelper().isLoggedIn()) {
 			
 			List<WhereCondition> where = new ArrayList<WhereCondition>();
 			UserSessionData userSessionData = authenticationController.getLoggedInUser();

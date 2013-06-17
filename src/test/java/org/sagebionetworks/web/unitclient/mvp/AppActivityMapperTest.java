@@ -4,24 +4,27 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.place.shared.Place;
@@ -35,25 +38,31 @@ import com.google.gwt.place.shared.Place;
 public class AppActivityMapperTest {
 	
 	PortalGinInjector mockInjector;
-	AuthenticationController mockController;
+
 	PresenterProxy<HomePresenter, Home> mockAll;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	AppActivityMapper appActivityMapper;
 	String historyToken = "Home:0";
+	SystemFactory mockSystemFactory;
+	CookieHelper mockCookieHelper;
+	BulkPresenterProxy mockBulkPresenterProxy;
 	
 	@Before
 	public void before(){
 		// Mock the views
 		mockInjector = Mockito.mock(PortalGinInjector.class);
 		// Controller
-		mockController = Mockito.mock(AuthenticationController.class);		
+		mockBulkPresenterProxy = Mockito.mock(BulkPresenterProxy.class);
 		mockSynapseJSNIUtils = Mockito.mock(SynapseJSNIUtils.class);
-		
+		mockSystemFactory = Mockito.mock(SystemFactory.class);
+		mockCookieHelper = Mockito.mock(CookieHelper.class);
+		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
+		when(mockInjector.getSystemFactory()).thenReturn(mockSystemFactory);
+		when(mockInjector.getBulkPresenterProxy()).thenReturn(mockBulkPresenterProxy);
 		
 		// WHENs
-		when(mockController.isLoggedIn()).thenReturn(true);
-		when(mockInjector.getAuthenticationController()).thenReturn(mockController);
+		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
 		when(mockSynapseJSNIUtils.getCurrentHistoryToken()).thenReturn(historyToken);
 		
 		// Home
@@ -61,7 +70,7 @@ public class AppActivityMapperTest {
 		when(mockInjector.getHomePresenter()).thenReturn(mockAll);
 		// Global App State
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
-		when(mockInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+		when(mockInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);		
 		
 		appActivityMapper = new AppActivityMapper(mockInjector, mockSynapseJSNIUtils);
 	}
@@ -70,7 +79,7 @@ public class AppActivityMapperTest {
 	public void testUnknown(){
 
 		// This is the place we will pass in
-		Place unknownPlace = new Place(){}; 
+		Home unknownPlace = new Home(""); 
 
 		// Create the mapper
 		Activity object = appActivityMapper.getActivity(unknownPlace);
@@ -80,7 +89,7 @@ public class AppActivityMapperTest {
 		verify(mockAll).setPlace((Home) anyObject());
 		
 		// validate that the place change was recorded
-		verify(mockSynapseJSNIUtils, Mockito.times(2)).recordPageVisit(historyToken);
+		verify(mockSynapseJSNIUtils, Mockito.times(1)).recordPageVisit(historyToken);
 	}
 	
 	/*
@@ -97,8 +106,8 @@ public class AppActivityMapperTest {
 		Place entityPlace = new Synapse("token");
 		Place loginPlace1 = new LoginPlace("0");
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(entityPlace);		
-		PresenterProxy<LoginPresenter, LoginPlace> loginPresenterProxy = mock(PresenterProxy.class);		
-		when(mockInjector.getLoginPresenter()).thenReturn(loginPresenterProxy);
+		LoginPresenter mockLoginPresenter = mock(LoginPresenter.class);		
+		when(mockInjector.getLoginPresenter()).thenReturn(mockLoginPresenter);
 		
 		appActivityMapper.getActivity(loginPlace1);
 		verify(mockGlobalApplicationState).setLastPlace(entityPlace);

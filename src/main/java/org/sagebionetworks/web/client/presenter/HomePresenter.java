@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -48,6 +49,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private SynapseClientAsync synapseClient;
 	private AutoGenFactory autoGenFactory;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private SystemFactory systemFactory;
 	
 	@Inject
 	public HomePresenter(HomeView view,  
@@ -58,7 +60,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			SearchServiceAsync searchService, 
 			SynapseClientAsync synapseClient, 
 			AutoGenFactory autoGenFactory,
-			JSONObjectAdapter jsonObjectAdapter){
+			JSONObjectAdapter jsonObjectAdapter,
+			SystemFactory systemFactory){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -69,6 +72,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		this.synapseClient = synapseClient;
 		this.autoGenFactory = autoGenFactory;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.systemFactory = systemFactory;
 		this.view.setPresenter(this);
 	}
 
@@ -88,7 +92,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		loadNewsFeed();
 		
 		// Things to load for authenticated users
-		if(authenticationController.isLoggedIn()) {
+		if(systemFactory.getCookieHelper().isLoggedIn()) {
 			loadProjectsAndFavorites();
 		}
 	}
@@ -158,7 +162,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 
 	@Override
 	public boolean showLoggedInDetails() {
-		return authenticationController.isLoggedIn();
+		return systemFactory.getCookieHelper().isLoggedIn();
 	}
 	
 	private void loadProjectsAndFavorites() {
@@ -173,7 +177,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		});
 		
-		EntityBrowserUtils.loadUserUpdateable(searchService, nodeModelCreator, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadUserUpdateable(searchService, nodeModelCreator, globalApplicationState, authenticationController, systemFactory, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setMyProjects(result);

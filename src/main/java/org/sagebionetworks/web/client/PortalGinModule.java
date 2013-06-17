@@ -8,6 +8,14 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
+import org.sagebionetworks.web.client.factory.EditorFactory;
+import org.sagebionetworks.web.client.factory.EditorFactoryImpl;
+import org.sagebionetworks.web.client.factory.RendererFactory;
+import org.sagebionetworks.web.client.factory.RendererFactoryImpl;
+import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.factory.SystemFactoryImpl;
+import org.sagebionetworks.web.client.factory.TableColumnRendererFactory;
+import org.sagebionetworks.web.client.factory.TableColumnRendererFactoryImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -16,10 +24,10 @@ import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.JsoProviderImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.view.ChallengeOverviewView;
-import org.sagebionetworks.web.client.view.ChallengeOverviewViewImpl;
 import org.sagebionetworks.web.client.view.CellTableProvider;
 import org.sagebionetworks.web.client.view.CellTableProviderImpl;
+import org.sagebionetworks.web.client.view.ChallengeOverviewView;
+import org.sagebionetworks.web.client.view.ChallengeOverviewViewImpl;
 import org.sagebionetworks.web.client.view.ColumnsPopupView;
 import org.sagebionetworks.web.client.view.ColumnsPopupViewImpl;
 import org.sagebionetworks.web.client.view.ComingSoonView;
@@ -331,6 +339,27 @@ public class PortalGinModule extends AbstractGinModule {
 		//Synapse Wiki Pages
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
 
+		// CookieHelper
+		bind(CookieHelperImpl.class).in(Singleton.class);
+		bind(CookieHelper.class).to(CookieHelperImpl.class);
+
+		
+		/*
+		 * Factories
+		 */
+		// editor
+		bind(EditorFactoryImpl.class).in(Singleton.class);
+		bind(EditorFactory.class).to(EditorFactoryImpl.class);
+		// renderer
+		bind(RendererFactoryImpl.class).in(Singleton.class);
+		bind(RendererFactory.class).to(RendererFactoryImpl.class);
+		// table
+		bind(TableColumnRendererFactoryImpl.class).in(Singleton.class);
+		bind(TableColumnRendererFactory.class).to(TableColumnRendererFactoryImpl.class);
+		// System
+		bind(SystemFactoryImpl.class).in(Singleton.class);
+		bind(SystemFactory.class).to(SystemFactoryImpl.class);
+		
 		/*
 		 * Widgets
 		 */

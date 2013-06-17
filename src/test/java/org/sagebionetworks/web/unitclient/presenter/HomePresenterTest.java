@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -16,25 +14,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.HomeView;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -56,7 +54,9 @@ public class HomePresenterTest {
 	AutoGenFactory autoGenFactory;
 	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	List<Evaluation> testEvaluationResults;
-	
+	SystemFactory mockSystemFactory;
+	CookieHelper mockCookieHelper;
+
 	RSSFeed testFeed = null;
 	
 	@Before
@@ -89,6 +89,10 @@ public class HomePresenterTest {
 		entries.add(entry);
 		testFeed.setEntries(entries);
 		
+		mockSystemFactory = Mockito.mock(SystemFactory.class);
+		mockCookieHelper = Mockito.mock(CookieHelper.class);
+		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
+		
 		homePresenter = new HomePresenter(mockView, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
@@ -97,7 +101,8 @@ public class HomePresenterTest {
 				mockSearchService,
 				mockSynapseClient,
 				autoGenFactory,
-				jsonObjectAdapter);
+				jsonObjectAdapter, 
+				mockSystemFactory);
 		verify(mockView).setPresenter(homePresenter);
 	}	
 	

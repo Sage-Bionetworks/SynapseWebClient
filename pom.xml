@@ -265,12 +265,6 @@
 			<artifactId>synapseJavaClient</artifactId>
 			<version>${synapse.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.sagebionetworks</groupId>
-			<artifactId>bccSetup</artifactId>
-			<version>${synapse.version}</version>
-		</dependency>
-
 
 		<!-- Make sure all the Jackson libraries are of the same version -->
 		<dependency>

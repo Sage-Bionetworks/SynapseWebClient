@@ -32,22 +32,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	@Override
-	public boolean isLoggedIn() {
-		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
-		if(loginCookieString != null) {
-			try {
-				currentUser = nodeModelCreator.createJSONEntity(loginCookieString, UserSessionData.class);
-			} catch (Throwable e) {
-				//invalid user
-				e.printStackTrace();
-			}
-			if(currentUser != null)
-				return true;
-		} 
-		return false;
-	}
-
-	@Override
 	public void loginUser(final String username, String password, boolean explicitlyAcceptsTermsOfUse, final AsyncCallback<String> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));		
 		userAccountService.initiateSession(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<String>() {		
@@ -94,14 +78,22 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public UserSessionData getLoggedInUser() {
-		if (isLoggedIn()) {
-			return currentUser;
-		}
-		else return null;
+		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
+		if(loginCookieString != null) {
+			try {
+				currentUser = nodeModelCreator.createJSONEntity(loginCookieString, UserSessionData.class);
+				return currentUser;
+			} catch (Throwable e) {
+				//invalid user
+				e.printStackTrace();
+			}
+		} 
+		return null;
 	}
 
 	@Override
 	public void logoutUser() {
+		getLoggedInUser();
 		if(currentUser != null) {
 			// don't actually terminate session, just remove the cookies			
 			cookies.removeCookie(CookieKeys.USER_LOGIN_DATA);

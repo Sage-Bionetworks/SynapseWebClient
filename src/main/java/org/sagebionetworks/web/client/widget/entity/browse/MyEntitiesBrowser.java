@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -44,6 +45,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private SelectedHandler selectedHandler;
+	SystemFactory systemFactory;
 	
 	public interface SelectedHandler {
 		void onSelection(String selectedEntityId);
@@ -57,7 +59,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			final GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter, 
-			SearchServiceAsync searchService) {
+			SearchServiceAsync searchService,
+			SystemFactory systemFactory) {
 		this.view = view;
 		this.searchService = searchService;
 		this.nodeModelCreator = nodeModelCreator;
@@ -66,6 +69,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.systemFactory = systemFactory;
 		
 		// default selection behavior is to do nothing
 		this.selectedHandler = new SelectedHandler() {			
@@ -111,7 +115,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public void loadUserUpdateable() {
 		view.showLoading();
-		EntityBrowserUtils.loadUserUpdateable(searchService, nodeModelCreator, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadUserUpdateable(searchService, nodeModelCreator, globalApplicationState, authenticationController, systemFactory, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setUpdatableEntities(result);

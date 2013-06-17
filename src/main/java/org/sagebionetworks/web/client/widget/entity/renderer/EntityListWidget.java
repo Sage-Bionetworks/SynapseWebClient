@@ -6,7 +6,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
@@ -20,21 +20,22 @@ import com.google.inject.Inject;
 public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetRendererPresenter {
 	
 	private EntityListWidgetView view;
-	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private NodeModelCreator nodeModelCreator;
 	private Map<String, String> descriptor;
+	SystemFactory systemFactory;
 	
 	@Inject
 	public EntityListWidget(EntityListWidgetView view,
-			AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, SynapseJSNIUtils synapseJSNIUtils) {
-		this.view = view;
-		this.authenticationController = authenticationController;
+			SynapseClientAsync synapseClient,
+			NodeModelCreator nodeModelCreator, SynapseJSNIUtils synapseJSNIUtils,
+			SystemFactory systemFactory) {
+		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.nodeModelCreator = nodeModelCreator;
+		this.systemFactory = systemFactory;
 		view.setPresenter(this);
 	}
 	
@@ -43,7 +44,7 @@ public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetR
 		if (widgetDescriptor == null) throw new IllegalArgumentException("Descriptor can not be null");
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		final boolean isLoggedIn = authenticationController.isLoggedIn();
+		final boolean isLoggedIn = systemFactory.getCookieHelper().isLoggedIn();
 		
 		view.configure();
 

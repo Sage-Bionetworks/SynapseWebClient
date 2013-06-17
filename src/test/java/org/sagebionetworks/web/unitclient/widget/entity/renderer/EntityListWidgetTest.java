@@ -17,8 +17,10 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -36,11 +38,12 @@ public class EntityListWidgetTest {
 		
 	EntityListWidget widget;
 	EntityListWidgetView mockView;
-	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	
+	SystemFactory mockSystemFactory;
+	CookieHelper mockCookieHelper;
+
 	Map<String, String> descriptor;
 	Data syn456;
 	EntityGroupRecord record456; 
@@ -48,11 +51,13 @@ public class EntityListWidgetTest {
 	@Before
 	public void setup() throws Exception{		
 		mockView = mock(EntityListWidgetView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		mockSystemFactory = mock(SystemFactory.class);
+		mockCookieHelper = mock(CookieHelper.class);
+		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
+		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
 
 		// create gettable entity
 		syn456 = new Data();
@@ -74,7 +79,7 @@ public class EntityListWidgetTest {
 		// create empty descriptor
 		descriptor = new HashMap<String, String>();		
 				
-		widget = new EntityListWidget(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils);
+		widget = new EntityListWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils, mockSystemFactory);
 	}
 	
 	@Test

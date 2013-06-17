@@ -20,12 +20,11 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -51,9 +50,8 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	private Summary snapshot;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	SystemFactory systemFactory;
 	
 	private boolean canEdit = false;
 	private boolean readOnly = false;
@@ -70,16 +68,15 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			SnapshotWidgetView propertyView, SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils, 
+			SystemFactory systemFactory) {
 		super();
 		this.factory = factory;
 		this.view = propertyView;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.systemFactory = systemFactory;
 		view.setPresenter(this);
 	}
 	
@@ -89,7 +86,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		this.readOnly = readOnly;
 		
 		boolean showEdit = canEdit;
-		isLoggedIn = authenticationController.isLoggedIn();		
+		isLoggedIn = systemFactory.getCookieHelper().isLoggedIn();		
 		
 		// add a default group if there are none, but don't persist unless record is added
 		if(snapshot != null && (snapshot.getGroups() == null || snapshot.getGroups().size() == 0)) {

@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
@@ -35,7 +36,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -55,6 +55,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private Anchor md5Link;
 	private FavoriteWidget favoriteWidget;	
+	SystemFactory systemFactory;
 	
 	@UiField
 	HTMLPanel panel;
@@ -101,12 +102,14 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			LicensedDownloader licensedDownloader, 
 			EntityTypeProvider typeProvider,
 			SynapseJSNIUtils synapseJSNIUtils,
-			FavoriteWidget favoriteWidget) {
+			FavoriteWidget favoriteWidget,
+			SystemFactory systemFactory) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.locationableUploader = locationableUploader;
 		this.licensedDownloader = licensedDownloader;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
+		this.systemFactory = systemFactory;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 		downloadButtonContainer.addStyleName("inline-block margin-left-5");
@@ -154,7 +157,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		if (entity instanceof Locationable) {
 			//configure this view based on if this entity has locations to download
 			Locationable locationable = (Locationable)entity;
-			boolean isDataPossiblyWithinLocationable = LocationableTitleBar.isDataPossiblyWithinLocationable(entityBundle, authenticationController.isLoggedIn());
+			boolean isDataPossiblyWithinLocationable = LocationableTitleBar.isDataPossiblyWithinLocationable(entityBundle, systemFactory.getCookieHelper().isLoggedIn());
 			noFileFoundContainer.setVisible(!isDataPossiblyWithinLocationable);
 			fileFoundContainer.setVisible(isDataPossiblyWithinLocationable);
 			if (isDataPossiblyWithinLocationable) {

@@ -19,10 +19,11 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
@@ -38,11 +39,12 @@ public class EntityListConfigEditorTest {
 		
 	EntityListConfigEditor editor;
 	EntityListConfigView mockView;
-	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	
+	SystemFactory mockSystemFactory;
+	CookieHelper mockCookieHelper;
+
 	Map<String, String> descriptor;
 	Data syn456;
 	EntityGroupRecord record456; 
@@ -50,12 +52,14 @@ public class EntityListConfigEditorTest {
 	@Before
 	public void setup() throws Exception{
 		mockView = mock(EntityListConfigView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
+		mockSystemFactory = mock(SystemFactory.class);
+		mockCookieHelper = mock(CookieHelper.class);
+		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
 		
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
 
 		// create gettable entity
 		syn456 = new Data();
@@ -77,7 +81,8 @@ public class EntityListConfigEditorTest {
 		// create empty descriptor
 		descriptor = new HashMap<String, String>();		
 		
-		editor = new EntityListConfigEditor(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils);
+		editor = new EntityListConfigEditor(mockView, mockSynapseClient,
+				mockNodeModelCreator, mockSynapseJSNIUtils, mockSystemFactory);
 		
 		editor.configure(null, descriptor);
 	}

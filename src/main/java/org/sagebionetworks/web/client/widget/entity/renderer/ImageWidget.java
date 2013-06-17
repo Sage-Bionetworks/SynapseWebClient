@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -14,20 +14,25 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	
 	private ImageWidgetView view;
 	private Map<String,String> descriptor;
-	private AuthenticationController authenticationController;
+	SystemFactory systemFactory;
 	
 	@Inject
-	public ImageWidget(ImageWidgetView view, AuthenticationController authenticationController) {
+	public ImageWidget(ImageWidgetView view, 
+			SystemFactory systemFactory) {
 		this.view = view;
+		this.systemFactory = systemFactory;
 		view.setPresenter(this);
-		this.authenticationController = authenticationController;
 	}
 	
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor) {
 		this.descriptor = widgetDescriptor;
 		String synapseId = descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY);
-		view.configure(wikiKey, descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY), descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY), descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY), synapseId, authenticationController.isLoggedIn());
+		view.configure(wikiKey,
+				descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
+				descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
+				descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
+				synapseId, systemFactory.getCookieHelper().isLoggedIn());
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 	}
