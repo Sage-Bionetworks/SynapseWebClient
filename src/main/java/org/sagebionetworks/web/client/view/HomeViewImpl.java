@@ -297,8 +297,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	}
 	
 	@Override
-	public void setMyEvaluationList(List<Evaluation> myEvaluations) {
-		myEvaluationsList.configure(myEvaluations);
+	public void setMyEvaluationList(List<EntityHeader> myEvaluationEntities) {
+		myEvaluationsList.configure(myEvaluationEntities);
 	}
 	
 	@Override

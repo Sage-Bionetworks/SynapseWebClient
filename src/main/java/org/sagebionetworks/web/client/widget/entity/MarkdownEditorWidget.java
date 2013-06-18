@@ -353,11 +353,17 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TOC_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
 	    	};
 		}));
-	    menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
+    	menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	
 	    	};
 		}));
+    	menu.add(getNewCommand("Wiki Pages", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		insertMarkdown(DisplayUtils.getWikiSubpagesMarkdown());
+	    	};
+		}));
+	    
 	    
 	    /**
 	     * load alpha test site widgets

@@ -1,16 +1,24 @@
-package org.sagebionetworks.web.client.widget.entity.browse;
+package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.BatchResults;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -21,31 +29,65 @@ import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPresenter {
+public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRendererPresenter {
 	
-	private PagesBrowserView view;
+	private WikiSubpagesView view;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private boolean canEdit;
+	private AdapterFactory adapterFactory;
 	private WikiPageKey wikiKey; 
 	private String ownerObjectName, ownerObjectLink;
 	
 	@Inject
-	public PagesBrowser(PagesBrowserView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
+		this.adapterFactory = adapterFactory;
 		
 		view.setPresenter(this);
 	}	
 	
-	public void configure(final WikiPageKey wikiKey, final String ownerObjectName, final String ownerObjectLink, final String title, final boolean canEdit) {
-		this.canEdit = canEdit;
+	@Override
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		this.wikiKey = wikiKey;
-		this.ownerObjectName = ownerObjectName;
-		this.ownerObjectLink = ownerObjectLink;
-		//refresh the table of contents
-		refreshTableOfContents();
+		view.clear();
+		//figure out owner object name/link
+		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
+			//lookup the entity name based on the id
+			Reference ref = new Reference();
+			ref.setTargetId(wikiKey.getOwnerObjectId());
+			List<Reference> allRefs = new ArrayList<Reference>();
+			allRefs.add(ref);
+			ReferenceList list = new ReferenceList();
+			list.setReferences(allRefs);		
+			try {
+				synapseClient.getEntityHeaderBatch(list.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String result) {					
+						BatchResults<EntityHeader> headers;
+						try {
+							headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
+							if (headers.getTotalNumberOfResults() == 1) {
+								EntityHeader theHeader = headers.getResults().get(0);
+								ownerObjectName = theHeader.getName();
+								ownerObjectLink = DisplayUtils.getSynapseHistoryToken(theHeader.getId());
+								refreshTableOfContents();
+							}	
+						} catch (JSONObjectAdapterException e) {
+							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+						}
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {					
+						view.showErrorMessage(caught.getMessage());
+					}
+				});
+			} catch (JSONObjectAdapterException e) {
+				view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+			}
+		}
 	}
 	
 	public void clearState() {
@@ -103,7 +145,7 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 						}
 					}
 					
-					view.configure(canEdit, root);
+					view.configure(root);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -111,10 +153,10 @@ public class PagesBrowser implements PagesBrowserView.Presenter, SynapseWidgetPr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				//if this is because the wiki header root was not found, and the parent wiki id is null, and this user can edit the wiki then
-				if (caught instanceof NotFoundException && canEdit) {
-					//add the Create Wiki button
-					view.configure(canEdit, null);
+				//if this is because the wiki header root was not found, and the parent wiki id is null,
+				if (caught instanceof NotFoundException) {
+					//do nothing, show nothing
+					view.clear();
 				}
 				else
 					view.showErrorMessage(caught.getMessage());

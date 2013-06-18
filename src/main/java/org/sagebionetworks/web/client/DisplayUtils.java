@@ -117,7 +117,6 @@ public class DisplayUtils {
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
 	public static final String USER_GUIDE_ID = "syn1669771";
 	
-	public static final String CHALLENGE_OVERVIEW_CONTENT_PAGE_ID = "38830113";
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
 	
@@ -170,7 +169,7 @@ public class DisplayUtils {
 	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
 	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
 	
-	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/gif","image/png"};
+	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/jpg", "image/jpe","image/gif","image/png"};
 	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
 	
 	public static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
@@ -1518,6 +1517,27 @@ public class DisplayUtils {
 		lc.add(htmlPanel);
 
 		return lc;
+	}
+
+	public static String getWikiSubpagesMarkdown() {
+		return WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN;
+	}
+
+	public static String getDefaultWikiMarkdown() {
+		return DisplayUtils.getWidgetHTML(0, "", WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE);
+	}
+
+	public static String getWidgetHTML(int widgetIndex, String suffix, String widgetProperties){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<div id=\"");
+		sb.append(WebConstants.DIV_ID_WIDGET_PREFIX);
+		sb.append(widgetIndex);
+		sb.append(suffix);
+		sb.append("\" class=\"widgetContainer\" widgetParams=\"");
+		sb.append(widgetProperties);
+		sb.append("\">");
+		sb.append("</div>");
+	    return sb.toString();
 	}
 		
 }

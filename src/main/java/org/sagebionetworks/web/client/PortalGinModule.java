@@ -103,8 +103,6 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowserView;
-import org.sagebionetworks.web.client.widget.entity.browse.PagesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
@@ -157,6 +155,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidg
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
@@ -504,6 +504,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableOfContentsWidgetView.class).to(TableOfContentsWidgetViewImpl.class);
 		bind(WikiFilesPreviewWidgetView.class).to(WikiFilesPreviewWidgetViewImpl.class);
 		bind(JoinWidgetView.class).to(JoinWidgetViewImpl.class);
+		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
@@ -511,9 +512,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// FilesBrowser
 		bind(FilesBrowserView.class).to(FilesBrowserViewImpl.class);
 		
-		// PagesBrowser
-		bind(PagesBrowserView.class).to(PagesBrowserViewImpl.class);
-
 		// Entity Finder
 		bind(EntityFinderView.class).to(EntityFinderViewImpl.class);		
 

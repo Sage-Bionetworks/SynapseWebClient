@@ -46,6 +46,7 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -56,6 +57,7 @@ import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -72,11 +74,15 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
 import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
 import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.file.State;
+import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.storage.StorageUsage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
@@ -98,6 +104,7 @@ import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -248,6 +255,7 @@ public class SynapseClientImplTest {
 		page.setTitle("A Title");
 		S3FileHandle handle = new S3FileHandle();
 		handle.setId("4422");
+		when(mockSynapse.getRawFileHandle(anyString())).thenReturn(handle);
 		when(mockSynapse.completeChunkFileUpload(any(CompleteChunkedFileRequest.class))).thenReturn(handle);
 		VariableContentPaginatedResults<AccessRequirement> ars = new VariableContentPaginatedResults<AccessRequirement>();
 		ars.setTotalNumberOfResults(0);
@@ -265,6 +273,17 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(mockParticipant);
 		
 		when(mockSynapse.createParticipant(anyString())).thenReturn(mockParticipant);
+		
+		UploadDaemonStatus status = new UploadDaemonStatus();
+		String fileHandleId = "myFileHandleId";
+		status.setFileHandleId(fileHandleId);
+		status.setState(State.COMPLETED);
+		when(mockSynapse.getCompleteUploadDaemonStatus(anyString())).thenReturn(status);
+		
+		status = new UploadDaemonStatus();
+		status.setState(State.PROCESSING);
+		status.setPercentComplete(.05d);
+		when(mockSynapse.startUploadDeamon(any(CompleteAllChunksRequest.class))).thenReturn(status);
 	}
 	
 	@Test
@@ -682,23 +701,34 @@ public class SynapseClientImplTest {
 		return chunkRequests;
 	}
 	
+	@Test
+	public void testCombineChunkedFileUpload() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		List<String> chunkRequests = getTestChunkRequestJson();
+		synapseClient.combineChunkedFileUpload(chunkRequests);
+		verify(mockSynapse).startUploadDeamon(any(CompleteAllChunksRequest.class));
+	}
+	
+	@Test
+	public void testGetUploadDaemonStatus() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		synapseClient.getUploadDaemonStatus("daemonId");
+		verify(mockSynapse).getCompleteUploadDaemonStatus(anyString());
+	}
+	
 	/**
-	 * Direct upload tests.  Most of the methods are simple pass-throughs to the Java Synapse client, but completeChunkedFileUpload has
+	 * Direct upload tests.  Most of the methods are simple pass-throughs to the Java Synapse client, but completeUpload has
 	 * additional logic
 	 * @throws JSONObjectAdapterException 
 	 * @throws SynapseException 
 	 * @throws RestServiceException 
 	 */
 	@Test
-	public void testCompleteChunkedFileUpload() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		List<String> chunkRequests = getTestChunkRequestJson();
+	public void testCompleteUpload() throws JSONObjectAdapterException, SynapseException, RestServiceException {
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = true;
-		synapseClient.completeChunkedFileUpload(null, chunkRequests, "syn1", isRestricted);
+		synapseClient.completeUpload(null, null, "parentEntityId", isRestricted);
 		
-		verify(mockSynapse).completeChunkFileUpload(any(CompleteChunkedFileRequest.class));
 		//it should have tried to create a new entity (since entity id was null)
 		verify(mockSynapse).createEntity(any(FileEntity.class));
 		//and update the name
@@ -715,9 +745,8 @@ public class SynapseClientImplTest {
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = false;
-		synapseClient.completeChunkedFileUpload(entityId, chunkRequests, "syn1", isRestricted);
+		synapseClient.completeUpload(null, entityId, "parentEntityId", isRestricted);
 		
-		verify(mockSynapse).completeChunkFileUpload(any(CompleteChunkedFileRequest.class));
 		//it should have tried to find the entity
 		verify(mockSynapse).getEntityById(anyString());
 		//update the data file handle id, and update the name
@@ -762,6 +791,45 @@ public class SynapseClientImplTest {
 		String expectedJson = EntityFactory.createJSONStringForEntity(testResults);
 		assertEquals(expectedJson, evaluationsJson);
 	}
+	
+	@Test
+	public void testGetAvailableEvaluationEntities() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		//when asking for available evaluations, return two (subchallenges) that share the same contentSource (sharedEntityId)
+		String sharedEntityId = "syn123455";
+		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
+		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
+		Evaluation e = new Evaluation();
+		e.setId("eval ID 1");
+		e.setContentSource(sharedEntityId);
+		evaluationList.add(e);
+		e = new Evaluation();
+		e.setId("eval ID 2");
+		e.setContentSource(sharedEntityId);
+		evaluationList.add(e);
+		testResults.setTotalNumberOfResults(2);
+		testResults.setResults(evaluationList);
+		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(testResults);
+		
+		//when asking for entity headers, return a single entity header
+		BatchResults<EntityHeader> batchResults = new BatchResults<EntityHeader>();
+		List<EntityHeader> entityHeaders = new ArrayList<EntityHeader>();
+		entityHeaders.add(new EntityHeader());
+		batchResults.setResults(entityHeaders);
+		batchResults.setTotalNumberOfResults(1);
+		when(mockSynapse.getEntityHeaderBatch(any(List.class))).thenReturn(batchResults);
+		
+		String entityHeadersJson = synapseClient.getAvailableEvaluationEntities();
+		verify(mockSynapse).getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt());
+		
+		//capture argument to verify that the reference passed to getEntityHeaderBatch points to a single entity (the sharedEntityId)
+		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+		verify(mockSynapse).getEntityHeaderBatch(captor.capture());
+		assertTrue(captor.getValue().size() == 1);
+		assertEquals(sharedEntityId, ((Reference)captor.getValue().get(0)).getTargetId());
+		String expectedJson = EntityFactory.createJSONStringForEntity(batchResults);
+		assertEquals(expectedJson, entityHeadersJson);
+	}
+
 	@Test
 	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
 		Submission inputSubmission = new Submission();
