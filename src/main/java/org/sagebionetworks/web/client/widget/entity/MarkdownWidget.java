@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -32,14 +33,16 @@ public class MarkdownWidget extends LayoutContainer {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
 	private IconsImageBundle iconsImageBundle;
+	private CookieProvider cookies;
 	
 	@Inject
-	public MarkdownWidget(SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar, IconsImageBundle iconsImageBundle) {
+	public MarkdownWidget(SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar, IconsImageBundle iconsImageBundle, CookieProvider cookies) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.widgetRegistrar = widgetRegistrar;
 		this.iconsImageBundle = iconsImageBundle;
+		this.cookies = cookies;
 	}
 	
 	/**
@@ -47,7 +50,7 @@ public class MarkdownWidget extends LayoutContainer {
 	 * @param attachmentBaseUrl if null, will use file handles
 	 */
 	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isWiki, final boolean isPreview) {
-		synapseClient.markdown2Html(md, isPreview, new AsyncCallback<String>() {
+		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {

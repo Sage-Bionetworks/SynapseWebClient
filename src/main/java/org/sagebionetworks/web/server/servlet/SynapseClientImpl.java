@@ -84,6 +84,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
+import org.sagebionetworks.web.server.AlphaServerMarkdownProcessor;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -988,9 +989,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException{
+	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlphaMode) throws RestServiceException{
 		try {
-			return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+			if (isAlphaMode)
+				return AlphaServerMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview);
+			else
+				return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
 		} catch (IOException e) {
 			throw new RestServiceException(e.getMessage());
 		}
