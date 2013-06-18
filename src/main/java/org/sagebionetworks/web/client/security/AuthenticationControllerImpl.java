@@ -231,7 +231,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			throws JSONObjectAdapterException {
 		String sessionToken = null;
 		if(userSessionData.has(SESSION_TOKEN))
-			sessionToken = userSessionData.getString(sessionToken);
+			sessionToken = userSessionData.getString(SESSION_TOKEN);
 		return sessionToken;
 	}
 	
