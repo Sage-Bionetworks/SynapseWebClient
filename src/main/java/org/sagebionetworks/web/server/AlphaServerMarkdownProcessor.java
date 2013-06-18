@@ -9,8 +9,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.server.markdownparser.BoldParser;
 import org.sagebionetworks.web.server.markdownparser.CodeParser;
+import org.sagebionetworks.web.server.markdownparser.HeadingParser;
 import org.sagebionetworks.web.server.markdownparser.HorizontalLineParser;
+import org.sagebionetworks.web.server.markdownparser.ImageParser;
+import org.sagebionetworks.web.server.markdownparser.ItalicsParser;
+import org.sagebionetworks.web.server.markdownparser.LinkParser;
+import org.sagebionetworks.web.server.markdownparser.ListParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
 import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
@@ -35,6 +41,12 @@ public class AlphaServerMarkdownProcessor {
 		elementParsers.add(new HorizontalLineParser());
 		elementParsers.add(new TableParser());
 		elementParsers.add(new CodeParser());
+		elementParsers.add(new BoldParser());
+		elementParsers.add(new HeadingParser());
+		elementParsers.add(new ImageParser());
+		elementParsers.add(new ItalicsParser());
+		elementParsers.add(new LinkParser());
+		elementParsers.add(new ListParser());
 		elementParsers.add(new WikiSubpageParser());
 		
 		for (MarkdownElementParser parser : elementParsers) {
