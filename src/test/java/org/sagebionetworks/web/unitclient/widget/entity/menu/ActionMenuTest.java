@@ -50,7 +50,7 @@ public class ActionMenuTest {
 		
 	ActionMenu actionMenu;
 	ActionMenuView mockView;
-	AuthenticationController mockAuthController;
+	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
 	EntityTypeProvider mockEntityTypeProvider;
 	SynapseClientAsync mockSynapseClient;
@@ -72,16 +72,20 @@ public class ActionMenuTest {
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockAutoGenFactory = mock(AutoGenFactory.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		mockAuthController = mock(AuthenticationController.class);
+		mockAuthenticationController = mock(AuthenticationController.class);
 		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockEntityEditor = mock(EntityEditor.class);
-		actionMenu = new ActionMenu(mockView, mockNodeModelCreator, mockAuthController, mockEntityTypeProvider, mockGlobalApplicationState, mockSynapseClient, jSONObjectAdapter, mockEntityEditor, mockAutoGenFactory, mockSynapseJSNIUtils, mockCookieProvider);
-		UserSessionData mockUser = mock(UserSessionData.class);
-		UserProfile mockProfile = mock(UserProfile.class);
-		when(mockAuthController.getLoggedInUser()).thenReturn(mockUser);
-		when(mockUser.getProfile()).thenReturn(mockProfile);
-		when(mockProfile.getOwnerId()).thenReturn("test owner ID");
+		actionMenu = new ActionMenu(mockView, mockNodeModelCreator, mockAuthenticationController, mockEntityTypeProvider, mockGlobalApplicationState, mockSynapseClient, jSONObjectAdapter, mockEntityEditor, mockAutoGenFactory, mockSynapseJSNIUtils, mockCookieProvider);
+		UserSessionData usd = new UserSessionData();
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("test owner ID");
+		usd.setProfile(profile);
+		
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd.writeToJSONObject(jSONObjectAdapter.createNew()));
+		when(mockNodeModelCreator.createJSONEntity(usd.writeToJSONObject(jSONObjectAdapter.createNew()).toJSONString(), UserSessionData.class)).thenReturn(usd);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		
 		AsyncMockStubber.callSuccessWith("fake submission result json").when(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake submitter alias results json").when(mockSynapseClient).getAvailableEvaluationsSubmitterAliases(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake evaluation results json").when(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
@@ -105,7 +109,7 @@ public class ActionMenuTest {
 		List<String> submitterAliasList = new ArrayList<String>();
 		submitterAliasList.add("Mr. F");
 		submitterAliases.setList(submitterAliasList);
-		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(submitterAliases);
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(RestResourceList.class))).thenReturn(submitterAliases);
 		
 		entity = new FileEntity();
 		entity.setVersionNumber(5l);

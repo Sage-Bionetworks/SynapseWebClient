@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client.widget.header;
 
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -22,26 +21,23 @@ import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -53,7 +49,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
 
-	private UserSessionData cachedUserSessionData = null;
+	private static final String PROFILE_KEY = "profile";
+	private static final String DISPLAY_NAME_KEY = "displayName";
+	private static final String PIC_KEY = "pic";
+	private static final String PIC_PREVIEW_ID_KEY = "previewId";
+
+	private JSONObjectAdapter cachedUserSessionData = null;
 	@UiField
 	HorizontalPanel commandBar;
 	
@@ -148,7 +149,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@Override
 	public void refresh() {
 		refreshTestSiteHeader();
-		UserSessionData userSessionData = presenter.getUser();
+		JSONObjectAdapter userSessionData = presenter.getUser();
 		if (cachedUserSessionData == null || !cachedUserSessionData.equals(userSessionData)){
 			cachedUserSessionData = userSessionData;
 			setUser(cachedUserSessionData);
@@ -165,7 +166,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 * Private Methods
 	 */
 	
-	private void setUser(UserSessionData userData) {
+	private void setUser(JSONObjectAdapter userData) {
 		//initialize buttons
 		if(userAnchor == null) {
 			userAnchor = new Anchor();
@@ -266,24 +267,37 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		
 		if(userData != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
-			UserProfile profile = userData.getProfile();
-			userAnchor.setText(profile.getDisplayName());
-			commandBar.remove(loginButton);
-			commandBar.remove(registerButton);
-			userNameWrapper.clear();
-			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
-				Image profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
-				profilePicture.setWidth("20px");
-				profilePicture.setHeight("20px");
-				profilePicture.addStyleName("imageButton userProfileImage");
-				profilePicture.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						userAnchor.fireEvent(event);
-					}
-				});
-				userNameWrapper.add(profilePicture);
+			
+			try {
+				JSONObjectAdapter profile = userData.getJSONObject(PROFILE_KEY);
+				userAnchor.setText(profile.getString(DISPLAY_NAME_KEY));
+				commandBar.remove(loginButton);
+				commandBar.remove(registerButton);
+				userNameWrapper.clear();
+				JSONObjectAdapter pic = null;
+				if(profile.has(PIC_KEY))
+					pic = profile.getJSONObject(PIC_KEY);
+				if (pic != null && pic.has(PIC_PREVIEW_ID_KEY) && pic.getString(PIC_PREVIEW_ID_KEY).length() > 0) {
+					Image profilePicture = new Image();
+					profilePicture.setUrl(
+							DisplayUtils.createUserProfileAttachmentUrl(
+									synapseJSNIUtils.getBaseProfileAttachmentUrl(), 
+									authenticationController.getCurrentUserPrincipalId(), 
+									pic.getString(PIC_PREVIEW_ID_KEY), 
+									null));
+					profilePicture.setWidth("20px");
+					profilePicture.setHeight("20px");
+					profilePicture.addStyleName("imageButton userProfileImage");
+					profilePicture.addClickHandler(new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							userAnchor.fireEvent(event);
+						}
+					});
+					userNameWrapper.add(profilePicture);
+				}
+			} catch (JSONObjectAdapterException e) {
+				MessageBox.alert("Error", DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION, null);
 			}
 			userNameWrapper.add(userAnchor);
 			if (commandBar.getWidgetIndex(userNameContainer) == -1){

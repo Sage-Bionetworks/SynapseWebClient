@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -14,9 +15,9 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
@@ -55,7 +56,8 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private Anchor md5Link;
 	private FavoriteWidget favoriteWidget;	
-	SystemFactory systemFactory;
+	AuthenticationController authenticationController;
+	NodeModelCreator nodeModelCreator;
 	
 	@UiField
 	HTMLPanel panel;
@@ -103,13 +105,15 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			EntityTypeProvider typeProvider,
 			SynapseJSNIUtils synapseJSNIUtils,
 			FavoriteWidget favoriteWidget,
-			SystemFactory systemFactory) {
+			AuthenticationController authenticationController,
+			NodeModelCreator nodeModelCreator) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.locationableUploader = locationableUploader;
 		this.licensedDownloader = licensedDownloader;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
-		this.systemFactory = systemFactory;
+		this.authenticationController = authenticationController;
+		this.nodeModelCreator = nodeModelCreator;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 		downloadButtonContainer.addStyleName("inline-block margin-left-5");
@@ -142,7 +146,11 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 
 		favoriteWidget.configure(entity.getId());
 		
-		UserSessionData sessionData = authenticationController.getLoggedInUser();
+		UserSessionData sessionData = null;
+		try {
+			sessionData = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);
+		} catch (JSONObjectAdapterException e) {
+		}	
 		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
 		
 		downloadButton = licensedDownloader.asWidget(entityBundle, userProfile);
@@ -157,7 +165,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		if (entity instanceof Locationable) {
 			//configure this view based on if this entity has locations to download
 			Locationable locationable = (Locationable)entity;
-			boolean isDataPossiblyWithinLocationable = LocationableTitleBar.isDataPossiblyWithinLocationable(entityBundle, systemFactory.getCookieHelper().isLoggedIn());
+			boolean isDataPossiblyWithinLocationable = LocationableTitleBar.isDataPossiblyWithinLocationable(entityBundle, authenticationController.isLoggedIn());
 			noFileFoundContainer.setVisible(!isDataPossiblyWithinLocationable);
 			fileFoundContainer.setVisible(isDataPossiblyWithinLocationable);
 			if (isDataPossiblyWithinLocationable) {

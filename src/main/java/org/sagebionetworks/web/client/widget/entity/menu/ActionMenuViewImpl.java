@@ -119,9 +119,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		this.isInTestMode = isInTestMode;
 		Entity entity = entityBundle.getEntity();
 
-		UserSessionData sessionData = authenticationController.getLoggedInUser();
-		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
-
 		// edit button
 		if(editButton == null) {			
 			editButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));

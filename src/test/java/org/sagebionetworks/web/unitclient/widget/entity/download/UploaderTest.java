@@ -94,7 +94,9 @@ public class UploaderTest {
 		when(autogenFactory.newInstance(anyString())).thenReturn(testEntity);
 		UserSessionData sessionData = new UserSessionData();
 		sessionData.setProfile(new UserProfile());
-		when(authenticationController.getLoggedInUser()).thenReturn(sessionData);
+		when(authenticationController.isLoggedIn()).thenReturn(true);
+		when(authenticationController.getCurrentUserSessionData()).thenReturn(sessionData.writeToJSONObject(jsonObjectAdapter.createNew()));
+		
 		//direct upload
 		//by default, do not support direct upload (direct upload tests will turn on)
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(false);
@@ -117,7 +119,10 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createAccessRequirement(any(EntityWrapper.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), any(AsyncCallback.class));
-		uploader=new Uploader(view,nodeModelCreator,authenticationController, entityTypeProvider, synapseClient, jiraURLHelper, jsonObjectAdapter, synapseJsniUtils, adapterFactory, autogenFactory, gwt);
+		uploader = new Uploader(view, nodeModelCreator,
+				authenticationController, entityTypeProvider, synapseClient,
+				jiraURLHelper, jsonObjectAdapter, synapseJsniUtils,
+				adapterFactory, autogenFactory, gwt);
 		uploader.addCancelHandler(cancelHandler);
 	}
 	

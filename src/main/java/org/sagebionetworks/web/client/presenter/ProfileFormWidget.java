@@ -61,62 +61,68 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	}
 	
 	@Override
-	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final AttachmentData pic, final String teamName, final String url) {
-		final UserSessionData currentUser = authenticationController.getLoggedInUser();
-		if(currentUser != null) {
-				//get the owner profile (may or may not be currently set
-				synapseClient.getUserProfile(null, new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String userProfileJson) {
-						try {
-							final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
-							ownerProfile = profile;
-							ownerProfile.setFirstName(firstName);
-							ownerProfile.setLastName(lastName);
-							ownerProfile.setSummary(summary);
-							ownerProfile.setPosition(position);
-							ownerProfile.setLocation(location);
-							ownerProfile.setIndustry(industry);
-							ownerProfile.setCompany(company);
-							ownerProfile.setDisplayName(firstName + " " + lastName);
-							if (teamName != null)
-								ownerProfile.setTeamName(teamName);
-							if (url != null)
-								ownerProfile.setUrl(url);
-							final boolean isUpdatingEmail = email != null && !email.equals(profile.getEmail()); 
-							if (isUpdatingEmail) {
-								ownerProfile.setEmail(email);
-							}
-								
-							if (pic != null)
-								ownerProfile.setPic(pic);
-							
-							JSONObjectAdapter adapter = ownerProfile.writeToJSONObject(jsonObjectAdapter.createNew());
-							userProfileJson = adapter.toJSONString();
-
-							synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
-								@Override
-								public void onSuccess(Void result) {
-									view.showUserUpdateSuccess();
-									updateLoginInfo(currentUser);	
+	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final AttachmentData pic, final String teamName, final String url) {		
+		
+		try {
+			final UserSessionData currentUser = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);			
+			if(currentUser != null) {
+					//get the owner profile (may or may not be currently set
+					synapseClient.getUserProfile(null, new AsyncCallback<String>() {
+						@Override
+						public void onSuccess(String userProfileJson) {
+							try {
+								final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
+								ownerProfile = profile;
+								ownerProfile.setFirstName(firstName);
+								ownerProfile.setLastName(lastName);
+								ownerProfile.setSummary(summary);
+								ownerProfile.setPosition(position);
+								ownerProfile.setLocation(location);
+								ownerProfile.setIndustry(industry);
+								ownerProfile.setCompany(company);
+								ownerProfile.setDisplayName(firstName + " " + lastName);
+								if (teamName != null)
+									ownerProfile.setTeamName(teamName);
+								if (url != null)
+									ownerProfile.setUrl(url);
+								final boolean isUpdatingEmail = email != null && !email.equals(profile.getEmail()); 
+								if (isUpdatingEmail) {
+									ownerProfile.setEmail(email);
 								}
+									
+								if (pic != null)
+									ownerProfile.setPic(pic);
 								
-								@Override
-								public void onFailure(Throwable caught) {
-									view.userUpdateFailed();
-									profileUpdatedCallback.onFailure(caught);
-								}
-							});
-						} catch (JSONObjectAdapterException e) {
-							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-						}    				
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						profileUpdatedCallback.onFailure(caught);
-					}
-				});
+								JSONObjectAdapter adapter = ownerProfile.writeToJSONObject(jsonObjectAdapter.createNew());
+								userProfileJson = adapter.toJSONString();
+	
+								synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
+									@Override
+									public void onSuccess(Void result) {
+										view.showUserUpdateSuccess();
+										updateLoginInfo(currentUser);	
+									}
+									
+									@Override
+									public void onFailure(Throwable caught) {
+										view.userUpdateFailed();
+										profileUpdatedCallback.onFailure(caught);
+									}
+								});
+							} catch (JSONObjectAdapterException e) {
+								onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+							}    				
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							profileUpdatedCallback.onFailure(caught);
+						}
+					});
+			}
+		} catch (JSONObjectAdapterException e1) {
+			profileUpdatedCallback.onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 		}
+
 	}
 	
 	@Override

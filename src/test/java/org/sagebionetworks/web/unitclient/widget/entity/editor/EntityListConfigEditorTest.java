@@ -19,11 +19,10 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
@@ -42,8 +41,7 @@ public class EntityListConfigEditorTest {
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	SystemFactory mockSystemFactory;
-	CookieHelper mockCookieHelper;
+	AuthenticationController mockAuthenticationController;
 
 	Map<String, String> descriptor;
 	Data syn456;
@@ -55,11 +53,9 @@ public class EntityListConfigEditorTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		mockSystemFactory = mock(SystemFactory.class);
-		mockCookieHelper = mock(CookieHelper.class);
-		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
+		mockAuthenticationController = mock(AuthenticationController.class);		
 		
-		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 		// create gettable entity
 		syn456 = new Data();
@@ -82,7 +78,7 @@ public class EntityListConfigEditorTest {
 		descriptor = new HashMap<String, String>();		
 		
 		editor = new EntityListConfigEditor(mockView, mockSynapseClient,
-				mockNodeModelCreator, mockSynapseJSNIUtils, mockSystemFactory);
+				mockNodeModelCreator, mockSynapseJSNIUtils, mockAuthenticationController);
 		
 		editor.configure(null, descriptor);
 	}

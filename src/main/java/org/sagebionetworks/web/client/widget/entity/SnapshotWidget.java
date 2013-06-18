@@ -20,7 +20,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -51,7 +51,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	SystemFactory systemFactory;
+	AuthenticationController authenticationController;
 	
 	private boolean canEdit = false;
 	private boolean readOnly = false;
@@ -69,14 +69,14 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			NodeModelCreator nodeModelCreator,
 			GlobalApplicationState globalApplicationState,
 			SynapseJSNIUtils synapseJSNIUtils, 
-			SystemFactory systemFactory) {
+			AuthenticationController authenticationController) {
 		super();
 		this.factory = factory;
 		this.view = propertyView;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.systemFactory = systemFactory;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}
 	
@@ -86,7 +86,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		this.readOnly = readOnly;
 		
 		boolean showEdit = canEdit;
-		isLoggedIn = systemFactory.getCookieHelper().isLoggedIn();		
+		isLoggedIn = authenticationController.isLoggedIn();		
 		
 		// add a default group if there are none, but don't persist unless record is added
 		if(snapshot != null && (snapshot.getGroups() == null || snapshot.getGroups().size() == 0)) {

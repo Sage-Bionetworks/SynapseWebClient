@@ -82,7 +82,7 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 
 	@Override
 	public boolean isUserLoggedIn() {
-		return authenticationController.getLoggedInUser() != null;
+		return authenticationController.isLoggedIn();
 	}
 
 	@Override

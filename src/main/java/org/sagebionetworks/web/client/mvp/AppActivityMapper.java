@@ -10,7 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
@@ -83,7 +83,7 @@ public class AppActivityMapper implements ActivityMapper {
 		synapseJSNIUtils.setPageTitle(DisplayConstants.DEFAULT_PAGE_TITLE);
 		synapseJSNIUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
 	    
-	    SystemFactory systemFactory = this.ginjector.getSystemFactory();
+	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();		
 		
 		// set current and last places
@@ -98,7 +98,7 @@ public class AppActivityMapper implements ActivityMapper {
 		// If the user is not logged in then we redirect them to the login screen
 		// except for the fully public places
 		if(!openAccessPlaces.contains(place.getClass())) {
-			if(!systemFactory.getCookieHelper().isLoggedIn()){
+			if(!authenticationController.isLoggedIn()){
 				// Redirect them to the login screen
 				LoginPlace loginPlace = new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN);
 				return getActivity(loginPlace);

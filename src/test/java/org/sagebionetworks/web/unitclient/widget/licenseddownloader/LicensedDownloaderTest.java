@@ -36,13 +36,11 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -73,8 +71,6 @@ public class LicensedDownloaderTest {
 	SynapseClientAsync mockSynapseClient;
 	PlaceChanger mockPlaceChanger;
 	AsyncCallback<String> mockStringCallback;
-	SystemFactory mockSystemFactory;
-	CookieHelper mockCookieHelper;
 
 	JSONObjectAdapter jsonObjectAdapterProvider;
 	EntityTypeProvider entityTypeProvider;
@@ -100,9 +96,7 @@ public class LicensedDownloaderTest {
 		jsonObjectAdapterProvider = new JSONObjectAdapterImpl();
 		mockStringCallback = mock(AsyncCallback.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		mockSystemFactory = mock(SystemFactory.class);
-		mockCookieHelper = mock(CookieHelper.class);
-		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
+		mockAuthenticationController = mock(AuthenticationController.class);
 
 
 		// create entity type provider
@@ -117,7 +111,7 @@ public class LicensedDownloaderTest {
 		jiraURLHelper  = new JiraURLHelperImpl(gc);
 
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
-				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, nodeModelCreator, mockSystemFactory);
+				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, nodeModelCreator);
 		
 		verify(mockView).setPresenter(licensedDownloader);
 		
@@ -194,7 +188,7 @@ public class LicensedDownloaderTest {
 		
 		// Null locations
 		resetMocks();			
-		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		((Locationable)entity).setLocations(null);		
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();
@@ -202,7 +196,7 @@ public class LicensedDownloaderTest {
 
 		// Not Logged in Test: Download
 		resetMocks();
-		when(mockCookieHelper.isLoggedIn()).thenReturn(false); 
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false); 
 		entity.setLocations(locations);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
@@ -211,7 +205,7 @@ public class LicensedDownloaderTest {
 		// Success Test: Download
 		resetMocks();			
 		entity.setLocations(locations);
-		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setDownloadLocations(locations, entity.getMd5());
@@ -228,7 +222,7 @@ public class LicensedDownloaderTest {
 		
 		// Null locations
 		resetMocks();			
-		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		entityBundle.setFileHandles(null);		
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();
@@ -236,7 +230,7 @@ public class LicensedDownloaderTest {
 
 		// Not Logged in Test: Download
 		resetMocks();
-		when(mockCookieHelper.isLoggedIn()).thenReturn(false);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setNeedToLogIn();
@@ -252,7 +246,7 @@ public class LicensedDownloaderTest {
 		fileHandles.add(fileHandle);
 		((FileEntity)entityBundle.getEntity()).setDataFileHandleId(fileHandleId);
 		entityBundle.setFileHandles(fileHandles);
-		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setDownloadLocation(fileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), fileHandle.getContentMd5());
@@ -344,7 +338,7 @@ public class LicensedDownloaderTest {
 	}	
 
 	private void configureTestLoadMocks() throws Exception {
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(StudyEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
 		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
@@ -353,7 +347,7 @@ public class LicensedDownloaderTest {
 	
 
 	private void configureTestFindEulaIdMocks() throws Exception {
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(StudyEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
 		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));

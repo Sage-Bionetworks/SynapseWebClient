@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -20,7 +19,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -50,8 +48,6 @@ public class PasswordResetPresenterTest {
 	PlaceChanger mockPlaceChanger;
 	PasswordReset place = Mockito.mock(PasswordReset.class);
 	UserSessionData currentUserSessionData = new UserSessionData();
-	SystemFactory mockSystemFactory;
-	CookieHelper mockCookieHelper;
 
 	
 	@Before
@@ -65,14 +61,12 @@ public class PasswordResetPresenterTest {
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		mockSystemFactory = Mockito.mock(SystemFactory.class);
-		mockCookieHelper = Mockito.mock(CookieHelper.class);
-		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
+		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		
 		presenter = new PasswordResetPresenter(mockView, mockCookieProvider,
 				mockUserService, mockAuthenticationController,
 				mockSageImageBundle, mockIconsImageBundle,
-				mockGlobalApplicationState, mockNodeModelCreator, mockSystemFactory);			
+				mockGlobalApplicationState, mockNodeModelCreator);			
 		verify(mockView).setPresenter(presenter);
 		when(place.toToken()).thenReturn(DisplayUtils.DEFAULT_PLACE_TOKEN);
 		currentUserSessionData.setProfile(new UserProfile());
@@ -89,7 +83,7 @@ public class PasswordResetPresenterTest {
 		reset(mockNodeModelCreator);
 
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(currentUserSessionData);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 	}
 	
 	@Test
@@ -108,7 +102,7 @@ public class PasswordResetPresenterTest {
 	public void testChangeEmail() {
 		resetAll();
 		when(place.toToken()).thenReturn(PasswordResetPresenter.CHANGE_EMAIL_TOKEN_PREFIX + "a20session20token");
-		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		presenter.setPlace(place);
 		
 		verify(mockView).showResetForm();
@@ -119,7 +113,7 @@ public class PasswordResetPresenterTest {
 	public void testChangeEmailNotLoggedIn() {
 		resetAll();
 		when(place.toToken()).thenReturn(PasswordResetPresenter.CHANGE_EMAIL_TOKEN_PREFIX + "a20session20token");
-		when(mockCookieHelper.isLoggedIn()).thenReturn(false);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		presenter.setPlace(place);
 		
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
@@ -103,9 +102,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EventBus getEventBus();
 	
 	public JiraURLHelper getJiraURLHelper();
-	
-	public SystemFactory getSystemFactory();
-	
+		
 
 	/*
 	 *  Markdown Widgets

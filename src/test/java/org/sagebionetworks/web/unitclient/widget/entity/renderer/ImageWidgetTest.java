@@ -15,8 +15,7 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.CookieHelper;
-import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
@@ -29,19 +28,16 @@ public class ImageWidgetTest {
 	Page testPage;
 	Map<String, String> descriptor;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	SystemFactory mockSystemFactory;
-	CookieHelper mockCookieHelper;
+	AuthenticationController mockAuthenticationController;
 
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		mockView = mock(ImageWidgetView.class);
-		mockSystemFactory = mock(SystemFactory.class);
-		mockCookieHelper = mock(CookieHelper.class);
-		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
-		widget = new ImageWidget(mockView, mockSystemFactory);
+		mockAuthenticationController = mock(AuthenticationController.class);
+		widget = new ImageWidget(mockView, mockAuthenticationController);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
-		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 	}
 	
 	@Test

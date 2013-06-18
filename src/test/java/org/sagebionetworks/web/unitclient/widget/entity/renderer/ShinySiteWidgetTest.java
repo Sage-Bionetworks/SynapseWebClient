@@ -15,8 +15,6 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.message.ObjectType;
-import org.sagebionetworks.web.client.CookieHelper;
-import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
@@ -30,8 +28,6 @@ public class ShinySiteWidgetTest {
 	AuthenticationController mockAuthenticationController;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
-	SystemFactory mockSystemFactory;
-	CookieHelper mockCookieHelper;
 
 	String invalidSiteUrl = "http://google.com";
 	
@@ -39,11 +35,9 @@ public class ShinySiteWidgetTest {
 	public void setup(){
 		mockView = mock(ShinySiteWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		mockSystemFactory = mock(SystemFactory.class);
-		mockCookieHelper = mock(CookieHelper.class);
-		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
-		when(mockCookieHelper.isLoggedIn()).thenReturn(false);
-		widget = new ShinySiteWidget(mockView, mockAuthenticationController, mockSystemFactory);
+		mockAuthenticationController = mock(AuthenticationController.class);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		widget = new ShinySiteWidget(mockView, mockAuthenticationController);
 	}
 	
 	@Test

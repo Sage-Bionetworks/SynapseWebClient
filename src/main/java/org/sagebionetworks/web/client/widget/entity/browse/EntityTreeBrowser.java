@@ -104,7 +104,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn());
 			}
 		});
 	}
@@ -147,7 +147,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());				
+					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn());				
 					asyncCallback.onFailure(caught);
 				}
 			});					
@@ -199,7 +199,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
 				}
 			}
@@ -257,7 +257,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
 					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
 				}
 				globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));

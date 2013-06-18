@@ -10,7 +10,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -26,15 +26,13 @@ public class EntityBrowserUtils {
 	public static void loadUserUpdateable(SearchServiceAsync searchService,
 			final NodeModelCreator nodeModelCreator,
 			final GlobalApplicationState globalApplicationState,
-			final AuthenticationController authenticationController,
-			SystemFactory systemFactory,
+			final AuthenticationController authenticationController,			
 			final AsyncCallback<List<EntityHeader>> callback) {
 		//first, load the projects that the user created
-		if(systemFactory.getCookieHelper().isLoggedIn()) {
+		if(authenticationController.isLoggedIn()) {
 			
 			List<WhereCondition> where = new ArrayList<WhereCondition>();
-			UserSessionData userSessionData = authenticationController.getLoggedInUser();
-			where.add(new WhereCondition(WebConstants.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, userSessionData.getProfile().getOwnerId()));
+			where.add(new WhereCondition(WebConstants.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, authenticationController.getCurrentUserPrincipalId()));
 			searchService.searchEntities("project", where, 1, 1000, null, false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {

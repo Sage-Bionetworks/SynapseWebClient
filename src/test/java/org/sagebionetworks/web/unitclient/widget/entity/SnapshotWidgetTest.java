@@ -26,14 +26,13 @@ import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidget;
@@ -70,8 +69,7 @@ public class SnapshotWidgetTest {
 	final boolean CAN_EDIT = true;
 	final boolean READ_ONLY = false;
 	final boolean SHOW_EDIT = true;
-	SystemFactory mockSystemFactory;
-	CookieHelper mockCookieHelper;
+	AuthenticationController mockAuthenticationController;
 
 	
 	@Before
@@ -86,14 +84,11 @@ public class SnapshotWidgetTest {
 		mockView = mock(SnapshotWidgetView.class);
 		mockCookies = mock(CookieProvider.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockSystemFactory = Mockito.mock(SystemFactory.class);
-		mockCookieHelper = Mockito.mock(CookieHelper.class);
-		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
+		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 
 		snapshotWidget = new SnapshotWidget(factory, mockView,
 				mockSynapseClient, mockNodeModelCreator, mockGlobal,
-				mockSynapseJSNIUtils,
-				mockSystemFactory);
+				mockSynapseJSNIUtils, mockAuthenticationController);
 		snapshot = createDefaultSnapshot();
 	}
 	

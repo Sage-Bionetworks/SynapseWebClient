@@ -122,9 +122,12 @@ public class EntityMetadata implements Presenter {
 	}
 
 	private UserProfile getUserProfile() {
-		UserSessionData sessionData = authenticationController.getLoggedInUser();
-		return (sessionData==null ? null : sessionData.getProfile());
-		
+		UserSessionData sessionData = null;
+		try {
+			sessionData = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);
+		} catch (JSONObjectAdapterException e) {
+		}
+		return (sessionData==null ? null : sessionData.getProfile());				
 	}
 
 	@Override
@@ -302,7 +305,7 @@ public class EntityMetadata implements Presenter {
 							public void onFailure(Throwable caught) {
 								if (!DisplayUtils.handleServiceException(
 										caught, globalApplicationState.getPlaceChanger(),
-										authenticationController.getLoggedInUser())) {
+										authenticationController.isLoggedIn())) {
 									view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE
 											+ "\n" + caught.getMessage());
 								}
@@ -326,7 +329,7 @@ public class EntityMetadata implements Presenter {
 			public void onFailure(Throwable caught) {
 				if (!DisplayUtils.handleServiceException(caught,
 						globalApplicationState.getPlaceChanger(),
-						authenticationController.getLoggedInUser())) {
+						authenticationController.isLoggedIn())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + "\n" + caught.getMessage());
 				}
 			}

@@ -6,7 +6,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
@@ -24,18 +24,18 @@ public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetR
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private NodeModelCreator nodeModelCreator;
 	private Map<String, String> descriptor;
-	SystemFactory systemFactory;
+	AuthenticationController authenticationController;
 	
 	@Inject
 	public EntityListWidget(EntityListWidgetView view,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator, SynapseJSNIUtils synapseJSNIUtils,
-			SystemFactory systemFactory) {
+			AuthenticationController authenticationController) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.nodeModelCreator = nodeModelCreator;
-		this.systemFactory = systemFactory;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}
 	
@@ -44,7 +44,7 @@ public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetR
 		if (widgetDescriptor == null) throw new IllegalArgumentException("Descriptor can not be null");
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		final boolean isLoggedIn = systemFactory.getCookieHelper().isLoggedIn();
+		final boolean isLoggedIn = authenticationController.isLoggedIn();
 		
 		view.configure();
 

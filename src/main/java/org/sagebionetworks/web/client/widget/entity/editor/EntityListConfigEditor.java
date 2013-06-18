@@ -8,7 +8,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
@@ -29,18 +29,18 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	private NodeModelCreator nodeModelCreator;
 	private Map<String, String> descriptor;
 	List<EntityGroupRecord> records;
-	SystemFactory systemFactory;
+	AuthenticationController authenticationController;
 
 	@Inject
 	public EntityListConfigEditor(EntityListConfigView view,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator, SynapseJSNIUtils synapseJSNIUtils,
-			SystemFactory systemFactory) {
+			AuthenticationController authenticationController) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.nodeModelCreator = nodeModelCreator;
-		this.systemFactory = systemFactory;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 		view.initView();
 	}
@@ -49,7 +49,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		if (widgetDescriptor == null) throw new IllegalArgumentException("Descriptor can not be null");
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		final boolean isLoggedIn = systemFactory.getCookieHelper().isLoggedIn();
+		final boolean isLoggedIn = authenticationController.isLoggedIn();
 		
 		view.configure();
 
@@ -70,7 +70,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	
 	@Override
 	public void addRecord(final String entityId, Long versionNumber, String note) {
-		final boolean isLoggedIn = systemFactory.getCookieHelper().isLoggedIn();
+		final boolean isLoggedIn = authenticationController.isLoggedIn();
 
 		// add record to list of records
 		final int addedIndex = records.size();

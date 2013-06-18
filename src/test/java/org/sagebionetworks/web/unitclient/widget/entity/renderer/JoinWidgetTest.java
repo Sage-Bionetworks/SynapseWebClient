@@ -21,12 +21,12 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.web.client.CookieHelper;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -48,35 +48,31 @@ public class JoinWidgetTest {
 	Map<String, String> descriptor;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
-	SynapseClientAsync mockSynapseClient;
-	AuthenticationController mockAuthController;
+	SynapseClientAsync mockSynapseClient;	
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
 	JSONObjectAdapter mockJSONObjectAdapter;
 	NodeModelCreator mockNodeModelCreator;
 	PaginatedResults<TermsOfUseAccessRequirement> requirements;
-	SystemFactory mockSystemFactory;
-	CookieHelper mockCookieHelper;
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
 	@Before
 	public void setup() throws Exception{
 		mockView = mock(JoinWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockAuthController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		mockSystemFactory = mock(SystemFactory.class);
-		mockCookieHelper = mock(CookieHelper.class);
-		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
-		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
-		UserSessionData currentUser = mock(UserSessionData.class);
-		UserProfile currentUserProfile = mock(UserProfile.class);
-		when(mockAuthController.getLoggedInUser()).thenReturn(currentUser);
-		when(currentUser.getProfile()).thenReturn(currentUserProfile);
-		when(currentUserProfile.getOwnerId()).thenReturn("1");
+		mockAuthenticationController = mock(AuthenticationController.class);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		UserSessionData currentUser = new UserSessionData();		
+		UserProfile currentUserProfile = new UserProfile();
+		currentUserProfile.setOwnerId("1");
+		currentUser.setProfile(currentUserProfile);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUser.writeToJSONObject(adapterFactory.createNew()));
+		when(mockNodeModelCreator.createJSONEntity(currentUser.writeToJSONObject(adapterFactory.createNew()).toJSONString(), UserSessionData.class)).thenReturn(currentUser);
 		requirements = new PaginatedResults<TermsOfUseAccessRequirement>();
 		requirements.setTotalNumberOfResults(0);
 		List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
@@ -87,8 +83,8 @@ public class JoinWidgetTest {
 		AsyncMockStubber.callSuccessWith(UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE).when(mockSynapseClient).getUserEvaluationState(anyString(), any(AsyncCallback.class));
 		
 		widget = new JoinWidget(mockView, mockSynapseClient,
-				mockAuthController, mockGlobalApplicationState,
-				mockNodeModelCreator, mockJSONObjectAdapter, mockSystemFactory);
+				mockAuthenticationController, mockGlobalApplicationState,
+				mockNodeModelCreator, mockJSONObjectAdapter);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY, "my eval id");
 	}	
@@ -103,7 +99,7 @@ public class JoinWidgetTest {
 	
 	@Test
 	public void testRegisterStep1NotLoggedIn() throws Exception {
-		when(mockCookieHelper.isLoggedIn()).thenReturn(false);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		AsyncMockStubber.callSuccessWith("my participant json").when(mockSynapseClient).createParticipants(any(String[].class), any(AsyncCallback.class));
 		widget.configure(wikiKey, descriptor);
 		widget.registerStep1();

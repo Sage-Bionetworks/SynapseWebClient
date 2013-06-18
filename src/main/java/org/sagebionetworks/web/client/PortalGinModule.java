@@ -12,8 +12,6 @@ import org.sagebionetworks.web.client.factory.EditorFactory;
 import org.sagebionetworks.web.client.factory.EditorFactoryImpl;
 import org.sagebionetworks.web.client.factory.RendererFactory;
 import org.sagebionetworks.web.client.factory.RendererFactoryImpl;
-import org.sagebionetworks.web.client.factory.SystemFactory;
-import org.sagebionetworks.web.client.factory.SystemFactoryImpl;
 import org.sagebionetworks.web.client.factory.TableColumnRendererFactory;
 import org.sagebionetworks.web.client.factory.TableColumnRendererFactoryImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -338,11 +336,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		//Synapse Wiki Pages
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
-
-		// CookieHelper
-		bind(CookieHelperImpl.class).in(Singleton.class);
-		bind(CookieHelper.class).to(CookieHelperImpl.class);
-
+		
 		
 		/*
 		 * Factories
@@ -356,9 +350,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// table
 		bind(TableColumnRendererFactoryImpl.class).in(Singleton.class);
 		bind(TableColumnRendererFactory.class).to(TableColumnRendererFactoryImpl.class);
-		// System
-		bind(SystemFactoryImpl.class).in(Singleton.class);
-		bind(SystemFactory.class).to(SystemFactoryImpl.class);
 		
 		/*
 		 * Widgets

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -12,7 +11,6 @@ import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SettingsView;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -67,9 +65,8 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	}
 
 	@Override
-	public void resetPassword(final String username, final String existingPassword, final String newPassword) {
-		final UserSessionData currentUser = authenticationController.getLoggedInUser();
-		if(currentUser != null) {
+	public void resetPassword(final String username, final String existingPassword, final String newPassword) {		
+		if(authenticationController.isLoggedIn()) {
 			authenticationController.loginUser(username, existingPassword, false, new AsyncCallback<String>() {				
 				@Override
 				public void onSuccess(String result) {
@@ -103,8 +100,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 
 	@Override
 	public void createSynapsePassword() {
-		final UserSessionData currentUser = authenticationController.getLoggedInUser();
-		if(currentUser != null) {
+		if(authenticationController.isLoggedIn()) {
 			userService.sendSetApiPasswordEmail(new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {

@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -59,7 +58,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraUrlHelper;
 	private boolean isDirectDownloadSupported;
-	SystemFactory systemFactory;
+	AuthenticationController authenticationController;
 	
 	// for testing
 	public void setUserProfile(UserProfile userProfile) {this.userProfile=userProfile;}
@@ -71,15 +70,14 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseClientAsync synapseClient,
 			JiraURLHelper jiraUrlHelper,
-			NodeModelCreator nodeModelCreator,
-			SystemFactory systemFactory) {
+			NodeModelCreator nodeModelCreator) {
 		this.view = view;		
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.jiraUrlHelper=jiraUrlHelper;
-		this.systemFactory = systemFactory;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);		
 		clearHandlers();
 	}
@@ -163,7 +161,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			view.showDownloadsLoading();
 			if (entityBundle.getEntity() instanceof FileEntity) {
 				FileEntity fileEntity = (FileEntity)entityBundle.getEntity();
-				if (this.systemFactory.getCookieHelper().isLoggedIn()) {
+				if (this.authenticationController.isLoggedIn()) {
 					FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 					if (fileHandle != null) {
 						String md5 = null;
@@ -183,7 +181,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			else if(entityBundle.getEntity() instanceof Locationable) {
 				Locationable locationable = (Locationable)entityBundle.getEntity();
 				List<LocationData> locations = locationable.getLocations();				
-				if (this.systemFactory.getCookieHelper().isLoggedIn()) {
+				if (this.authenticationController.isLoggedIn()) {
 					if(locations != null && locations.size() > 0) {
 						this.view.setDownloadLocations(locations, locationable.getMd5());
 					} else {
@@ -199,7 +197,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	}		
 
 	public boolean isDownloadAllowed() {
-		if(systemFactory.getCookieHelper().isLoggedIn()) {
+		if(authenticationController.isLoggedIn()) {
 			return true;
 		}
 		view.showInfo("Login Required", "Please Login to download data.");

@@ -186,7 +186,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());    					    				
+					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn());    					    				
 				}
 			});
 	}
@@ -217,7 +217,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn());
 			}
 		};
 	}

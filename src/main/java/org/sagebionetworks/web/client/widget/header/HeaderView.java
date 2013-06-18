@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.header;
 
-import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,7 +31,7 @@ public interface HeaderView extends IsWidget {
 	 */
 	public interface Presenter {
 		
-		UserSessionData getUser();
+		JSONObjectAdapter getUser();
 
 		void getSupportHRef(AsyncCallback<String> callback);
 	}

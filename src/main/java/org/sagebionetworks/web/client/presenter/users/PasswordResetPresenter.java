@@ -8,7 +8,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -37,7 +37,6 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	private IconsImageBundle iconsImageBundle;
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
-	SystemFactory systemFactory;
 	
 	private String registrationToken, changeEmailToken = null;
 	
@@ -47,8 +46,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			AuthenticationController authenticationController,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
 			GlobalApplicationState globalApplicationState,
-			NodeModelCreator nodeModelCreator,
-			SystemFactory systemFactory) {
+			NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.userService = userService;
 		this.authenticationController = authenticationController;
@@ -58,7 +56,6 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		this.cookieProvider = cookieProvider;
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator=nodeModelCreator;
-		this.systemFactory = systemFactory;
 		
 		view.setPresenter(this);
 	}
@@ -88,7 +85,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		} else if (place.toToken().startsWith(CHANGE_EMAIL_TOKEN_PREFIX)) {
 			//this is a change email token.
 			//the user must be logged in for this to work.
-			if (!systemFactory.getCookieHelper().isLoggedIn()) {
+			if (!authenticationController.isLoggedIn()) {
 				view.showMessage("You must be logged in to change your email address.");
 				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			} else {
@@ -168,8 +165,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 						});
 			
 		} else {
-			UserSessionData currentUser = authenticationController.getLoggedInUser();
-			if (currentUser != null) {
+			if (authenticationController.isLoggedIn()) {
 				userService.setPassword(
 						newPassword, new AsyncCallback<Void>() {
 							@Override

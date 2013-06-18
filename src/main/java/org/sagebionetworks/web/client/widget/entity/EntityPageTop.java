@@ -119,7 +119,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	
 	@Override 
 	public boolean isLoggedIn() {
-		return authenticationController.getLoggedInUser() != null;
+		return authenticationController.isLoggedIn();
 	}
 
 	@Override
@@ -173,7 +173,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 	
 	private UserProfile getUserProfile() {
-		UserSessionData sessionData = authenticationController.getLoggedInUser();
+		UserSessionData sessionData = null;
+		try {
+			sessionData = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);
+		} catch (JSONObjectAdapterException e) {
+		}
 		return (sessionData==null ? null : sessionData.getProfile());		
 	}
 }

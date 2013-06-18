@@ -17,10 +17,8 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -41,8 +39,7 @@ public class EntityListWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	SystemFactory mockSystemFactory;
-	CookieHelper mockCookieHelper;
+	AuthenticationController mockAuthenticationController;
 
 	Map<String, String> descriptor;
 	Data syn456;
@@ -54,10 +51,8 @@ public class EntityListWidgetTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockSystemFactory = mock(SystemFactory.class);
-		mockCookieHelper = mock(CookieHelper.class);
-		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
-		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
+		mockAuthenticationController = mock(AuthenticationController.class);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 		// create gettable entity
 		syn456 = new Data();
@@ -79,7 +74,7 @@ public class EntityListWidgetTest {
 		// create empty descriptor
 		descriptor = new HashMap<String, String>();		
 				
-		widget = new EntityListWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils, mockSystemFactory);
+		widget = new EntityListWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils, mockAuthenticationController);
 	}
 	
 	@Test

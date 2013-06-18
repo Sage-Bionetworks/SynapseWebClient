@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -124,7 +125,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		Submission newSubmission = new Submission();
 		newSubmission.setEntityId(entity.getId());
 		newSubmission.setSubmitterAlias(submitterAlias);
-		newSubmission.setUserId(authenticationController.getLoggedInUser().getProfile().getOwnerId());
+		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
 		if (entity instanceof Versionable) {
 			newSubmission.setVersionNumber(((Versionable)entity).getVersionNumber());
 		}
@@ -173,11 +174,17 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 					@Override
 					public void onSuccess(List<String> submitterAliases) {
 						//add the default team name (if set in the profile and not already in the list)
-						String teamName = authenticationController.getLoggedInUser().getProfile().getTeamName();
-						if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
-							submitterAliases.add(teamName);
+						UserSessionData sessionData = null;
+						try {
+							sessionData = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);
+							String teamName = sessionData.getProfile().getTeamName();
+							if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
+								submitterAliases.add(teamName);
+							}
+							view.popupEvaluationSelector(evaluations, submitterAliases);		
+						} catch (JSONObjectAdapterException e) {
+							view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 						}
-						view.popupEvaluationSelector(evaluations, submitterAliases);		
 					}
 				});
 			}
@@ -302,7 +309,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				if (caught instanceof UnauthorizedException) {
 					view.showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
 				}
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_MOVE_FAILURE);			
 				}
 			}
@@ -336,7 +343,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
 				}
 			}
@@ -345,7 +352,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	
 	@Override
 	public boolean isUserLoggedIn() {
-		return authenticationController.getLoggedInUser() != null;
+		return authenticationController.isLoggedIn();
 	}
 
 	@Override
@@ -394,7 +401,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 					view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
 					return;
 				}
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 				}
 			}

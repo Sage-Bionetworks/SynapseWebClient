@@ -12,11 +12,9 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.web.client.CookieHelper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.factory.SystemFactory;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -25,6 +23,7 @@ import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.place.shared.Place;
@@ -44,8 +43,7 @@ public class AppActivityMapperTest {
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	AppActivityMapper appActivityMapper;
 	String historyToken = "Home:0";
-	SystemFactory mockSystemFactory;
-	CookieHelper mockCookieHelper;
+	AuthenticationController mockAuthenticationController;
 	BulkPresenterProxy mockBulkPresenterProxy;
 	
 	@Before
@@ -55,14 +53,11 @@ public class AppActivityMapperTest {
 		// Controller
 		mockBulkPresenterProxy = Mockito.mock(BulkPresenterProxy.class);
 		mockSynapseJSNIUtils = Mockito.mock(SynapseJSNIUtils.class);
-		mockSystemFactory = Mockito.mock(SystemFactory.class);
-		mockCookieHelper = Mockito.mock(CookieHelper.class);
-		when(mockSystemFactory.getCookieHelper()).thenReturn(mockCookieHelper);
-		when(mockInjector.getSystemFactory()).thenReturn(mockSystemFactory);
+		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		when(mockInjector.getBulkPresenterProxy()).thenReturn(mockBulkPresenterProxy);
 		
 		// WHENs
-		when(mockCookieHelper.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockSynapseJSNIUtils.getCurrentHistoryToken()).thenReturn(historyToken);
 		
 		// Home

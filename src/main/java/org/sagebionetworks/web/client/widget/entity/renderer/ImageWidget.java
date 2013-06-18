@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
-import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -14,13 +14,13 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	
 	private ImageWidgetView view;
 	private Map<String,String> descriptor;
-	SystemFactory systemFactory;
+	AuthenticationController authenticationController;
 	
 	@Inject
 	public ImageWidget(ImageWidgetView view, 
-			SystemFactory systemFactory) {
+			AuthenticationController authenticationController) {
 		this.view = view;
-		this.systemFactory = systemFactory;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}
 	
@@ -32,7 +32,7 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
-				synapseId, systemFactory.getCookieHelper().isLoggedIn());
+				synapseId, authenticationController.isLoggedIn());
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 	}

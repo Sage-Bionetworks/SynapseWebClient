@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
-import org.sagebionetworks.web.client.factory.SystemFactory;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -17,14 +17,11 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	private ShinySiteWidgetView view;
 	private Map<String, String> descriptor;
 	private AuthenticationController authenticationController;
-	SystemFactory systemFactory;
 	
 	@Inject
-	public ShinySiteWidget(ShinySiteWidgetView view, AuthenticationController authenticationController,
-			SystemFactory systemFactory) {
+	public ShinySiteWidget(ShinySiteWidgetView view, AuthenticationController authenticationController) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.systemFactory = systemFactory;
 		view.setPresenter(this);
 	}
 	
@@ -37,9 +34,9 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 		if(isValidShinySite(siteUrl)) {
 			boolean includePrincipleId = isIncludePrincipalId(descriptor);
 			//if we should include the current user's principal id, then append ?principal=<principal> to the siteUrl
-			if (includePrincipleId && systemFactory.getCookieHelper().isLoggedIn() && authenticationController.getLoggedInUser().getProfile() != null) {
+			if (includePrincipleId && authenticationController.isLoggedIn()) {
 				String delimiter = siteUrl.contains("?") ? "&" : "?";
-				siteUrl = siteUrl + delimiter + "principalId=" + authenticationController.getLoggedInUser().getProfile().getOwnerId();
+				siteUrl = siteUrl + delimiter + "principalId=" + authenticationController.getCurrentUserPrincipalId();
 			}
 			view.configure(siteUrl, height);
 		}

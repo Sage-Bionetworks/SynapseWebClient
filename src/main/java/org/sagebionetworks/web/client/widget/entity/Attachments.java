@@ -148,7 +148,7 @@ public class Attachments implements AttachmentsView.Presenter,
 
 					@Override
 					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
 							view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
 						}
 					}

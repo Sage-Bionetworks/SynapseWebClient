@@ -390,14 +390,14 @@ public class DisplayUtils {
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
-	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, UserSessionData currentUser) {
+	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, boolean isLoggedIn) {
 		if(ex instanceof UnauthorizedException) {
 			// send user to login page						
 			showInfo("Session Timeout", "Your session has timed out. Please login again.");
 			placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			return true;
 		} else if(ex instanceof ForbiddenException) {			
-			if(currentUser == null) {				
+			if(!isLoggedIn) {				
 				MessageBox.info(DisplayConstants.ERROR_LOGIN_REQUIRED, DisplayConstants.ERROR_LOGIN_REQUIRED, null);
 				placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			} else {

@@ -9,13 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -24,17 +23,15 @@ public class HeaderTest {
 	Header header;
 	HeaderView mockView;
 	AuthenticationController mockAuthenticationController;
-	GlobalApplicationState mockGlobalApplicationState;
-	NodeModelCreator mockNodeModelCreator;
 	UserAccountServiceAsync mockUserService;
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+	
 	@Before
 	public void setup(){		
 		mockView = Mockito.mock(HeaderView.class);		
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockUserService = mock(UserAccountServiceAsync.class);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator, mockUserService);
+		header = new Header(mockView, mockAuthenticationController, mockUserService);
 		
 		verify(mockView).setPresenter(header);
 	}
@@ -45,9 +42,9 @@ public class HeaderTest {
 	}
 	
 	@Test
-	public void testSupportLinkClicked() throws RestServiceException{
+	public void testSupportLinkClicked() throws Exception{
 		//getFastPassSupportUrl is called when opening the support site
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(new UserSessionData());
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData().writeToJSONObject(adapterFactory.createNew()));
 		
 		header.getSupportHRef(new AsyncCallback<String>() {
 			
