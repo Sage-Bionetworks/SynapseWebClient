@@ -163,7 +163,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		TabPanel tabPanel = new TabPanel();		
 		tabPanel.setPlain(true);
-		tabPanel.setHeight(130);		
+		tabPanel.setHeight(140);		
 		container.add(tabPanel, new MarginData(0, 10, 10, 10));
 		TabItem tab;
 		
@@ -472,7 +472,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		externalLinkFormPanel.setFrame(false);
 		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.LEFT);
 		externalLinkFormPanel.setLabelWidth(110);
-		externalLinkFormPanel.setFieldWidth(230);
+		externalLinkFormPanel.setFieldWidth(PANEL_WIDTH-150);
 		pathField.setFieldLabel("External Path or URL");
 		
 		externalLinkFormPanel.add(pathField);
