@@ -14,7 +14,7 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -44,7 +44,7 @@ public class ServerMarkdownUtils {
 	 */
 	public static String markdown2Html(String markdown, Boolean isPreview, ActuariusTransformer markdownProcessor) throws IOException {
 		String originalMarkdown = markdown;
-		if (markdown == null) return DisplayUtils.getDefaultWikiMarkdown();
+		if (markdown == null) return SharedMarkdownUtils.getDefaultWikiMarkdown();
 		//trick to maintain newlines when suppressing all html
 		if (markdown != null) {
 			markdown = preserveWhitespace(markdown);
@@ -108,7 +108,7 @@ public class ServerMarkdownUtils {
 	 * @return
 	 */
 	public static String addSubpagesIfNotPresent(String markdown) {
-		String subpagesWidgetMarkdown = DisplayUtils.getWikiSubpagesMarkdown();
+		String subpagesWidgetMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
 		String newMarkdown = markdown;
 		if (!markdown.contains(subpagesWidgetMarkdown)) {
 			String subpagesMarkdown = subpagesWidgetMarkdown + "\n";
@@ -363,7 +363,7 @@ public class ServerMarkdownUtils {
 					while (matcher.find()) {
 						if (matcher.groupCount() == 2) {
 							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
-							sb.append(DisplayUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
+							sb.append(SharedMarkdownUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
 							widgetsFound++;
 							previousFoundIndex = matcher.end(1);
 						}

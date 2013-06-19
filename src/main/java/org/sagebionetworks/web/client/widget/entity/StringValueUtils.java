@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.Date;
 import java.util.List;
 
+
 /**
  * Utilities for generating the display string for various object types.
  * 
