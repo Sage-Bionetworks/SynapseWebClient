@@ -633,11 +633,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public String getJiraRestrictionLink() {
-		UserSessionData sessionData = null;
-		try {
-			sessionData = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);
-		} catch (JSONObjectAdapterException e) {
-		}
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		
 		if (sessionData==null) throw new NullPointerException("User profile cannot be null.");
 		UserProfile userProfile = sessionData.getProfile();

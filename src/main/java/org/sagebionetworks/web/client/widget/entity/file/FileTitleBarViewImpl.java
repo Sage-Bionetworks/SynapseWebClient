@@ -135,11 +135,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 
 		favoriteWidget.configure(entity.getId());
 		
-		UserSessionData sessionData = null;
-		try {
-			sessionData = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);
-		} catch (JSONObjectAdapterException e) {
-		}
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
 		
 		downloadButton = licensedDownloader.asWidget(entityBundle, userProfile);

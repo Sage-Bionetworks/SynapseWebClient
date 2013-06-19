@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.security;
 
 import java.util.Date;
 
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -16,20 +18,15 @@ import com.google.inject.Inject;
 /**
  * A util class for authentication
  * 
- * **** DO NOT ADD NODE MODEL CREATOR OR ANY REPO MODEL OBJECTS TO THIS CLASS ****
- * (for code splitting purposes)
+ * CODE SPLITTING NOTE: this class should be kept small
  * 
  * @author dburdick
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
 	
-	private static final String SESSION_TOKEN = "sessionToken";
-	private static final String PROFILE_KEY = "profile";
-	private static final String OWNERID_KEY = "ownerId";
-	private static final String isSSO_KEY = "isSSO";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
-	private static JSONObjectAdapter currentUser;
+	private static UserSessionData currentUser;
 	
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
@@ -49,14 +46,13 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		userAccountService.initiateSession(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<String>() {		
 			@Override
 			public void onSuccess(String userSessionJson) {
-				JSONObjectAdapter userSessionData = null;
+				UserSessionData userSessionData = null;
 				try {
 					//automatically expire after a day
 					Date tomorrow = getDayFromNow();
 					setUserSessionDataCookie(userSessionJson, tomorrow);
-					userSessionData = adapterFactory.createNew(userSessionJson); 
-					String sessionToken = getSessionToken(userSessionData);
-					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken, tomorrow);
+					userSessionData = new UserSessionData(adapterFactory.createNew(userSessionJson)); 
+					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken(), tomorrow);
 				} catch (JSONObjectAdapterException e) {
 					//can't save the cookie
 					e.printStackTrace();
@@ -73,13 +69,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 		});
 	}
-	
-	private Date getDayFromNow() {
-		Date date = new Date();
-		CalendarUtil.addDaysToDate(date, 1);
-		return date;  
-	}
-	
+		
 	@Override
 	public void loginUser(final String token, final AsyncCallback<String> callback) {
 		setUser(token, callback, false);
@@ -111,18 +101,19 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			@Override
 			public void onSuccess(String userSessionJson) {
 				if (userSessionJson != null) {					
-					JSONObjectAdapter userSessionData = null;
+					UserSessionData userSessionData = null;
 					try {
-						userSessionData = adapterFactory.createNew(userSessionJson);
-						userSessionData.put(isSSO_KEY, isSSO);
+						JSONObjectAdapter usdAdapter = adapterFactory.createNew(userSessionJson);
+						userSessionData = new UserSessionData(usdAdapter);
+						userSessionData.setIsSSO(isSSO);
 						Date tomorrow = getDayFromNow();
-						cookies.setCookie(CookieKeys.USER_LOGIN_DATA, userSessionData.toJSONString(), tomorrow);
-						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, getSessionToken(userSessionData), tomorrow);
+						cookies.setCookie(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString(), tomorrow);
+						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken(), tomorrow);
+						currentUser = userSessionData;
+						callback.onSuccess(usdAdapter.toJSONString());
 					} catch (JSONObjectAdapterException e){
 						callback.onFailure(e);
 					}
-					AuthenticationControllerImpl.currentUser = userSessionData;
-					callback.onSuccess(userSessionData.toJSONString());
 				} else {
 					callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 				}
@@ -144,11 +135,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public boolean isLoggedIn() {
 		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
 		if(loginCookieString != null) {
-			// remo.model.UserSessionData object, without using it directly
 			try {
-				JSONObjectAdapter userSessionDataObject = adapterFactory.createNew(loginCookieString);
-				if(userSessionDataObject.has(SESSION_TOKEN)) {
-					String token = userSessionDataObject.getString(SESSION_TOKEN);
+				UserSessionData userSessionData = new UserSessionData(adapterFactory.createNew(loginCookieString));
+				if(userSessionData != null) {
+					String token = userSessionData.getSessionToken();
 					if(token != null && !token.isEmpty())
 						return true;
 				}
@@ -160,23 +150,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public String getCurrentUserPrincipalId() {
-		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
-		if(loginCookieString != null) {
-			// remo.model.UserSessionData object, without using it directly
-			try {
-				JSONObjectAdapter userSessionDataObject = adapterFactory.createNew(loginCookieString);
-				if(userSessionDataObject.has(PROFILE_KEY)) {
-					JSONObjectAdapter profileObj = userSessionDataObject.getJSONObject(PROFILE_KEY);
-					if(profileObj != null && profileObj.has(OWNERID_KEY)) {							
-						return profileObj.getString(OWNERID_KEY);						
-					}
-				}
-			} catch (JSONObjectAdapterException e) {
-			}			
+		if(currentUser != null) {		
+			UserProfile profileObj = currentUser.getProfile();
+			if(profileObj != null && profileObj.getOwnerId() != null) {							
+				return profileObj.getOwnerId();						
+			}
 		} 
 		return null;
 	}
-
 	
 	@Override
 	public void reloadUserSessionData() {
@@ -194,28 +175,20 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	@Override
-	public JSONObjectAdapter getCurrentUserSessionData() {
+	public UserSessionData getCurrentUserSessionData() {
 		return currentUser;
 	}
 
 	@Override
 	public String getCurrentUserSessionToken() {
-		try {
-			return getSessionToken(currentUser);
-		} catch (JSONObjectAdapterException e) {
-		}
-		return null;
+		if(currentUser != null) return currentUser.getSessionToken();
+		else return null;
 	}
 	
 	@Override
 	public boolean getCurrentUserIsSSO() {
-		if(currentUser != null) {
-			try {
-				return currentUser.getBoolean(isSSO_KEY);
-			} catch (JSONObjectAdapterException e) {
-			}
-		}
-		return false;
+		if(currentUser != null) return currentUser.getIsSSO();
+		else return false;
 	}
 
 	
@@ -227,12 +200,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		cookies.setCookie(CookieKeys.USER_LOGIN_DATA, userSessionJson, tomorrow);
 	}
 
-	private String getSessionToken(JSONObjectAdapter userSessionData)
-			throws JSONObjectAdapterException {
-		String sessionToken = null;
-		if(userSessionData.has(SESSION_TOKEN))
-			sessionToken = userSessionData.getString(SESSION_TOKEN);
-		return sessionToken;
+	private Date getDayFromNow() {
+		Date date = new Date();
+		CalendarUtil.addDaysToDate(date, 1);
+		return date;  
 	}
+
 	
 }

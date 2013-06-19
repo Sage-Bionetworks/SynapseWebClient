@@ -48,7 +48,6 @@ public class HomePresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	StackConfigServiceAsync mockStackConfigService;
 	RssServiceAsync mockRssService;
-	NodeModelCreator mockNodeModelCreator;
 	SearchServiceAsync mockSearchService; 
 	SynapseClientAsync mockSynapseClient; 
 	AutoGenFactory autoGenFactory;
@@ -64,7 +63,6 @@ public class HomePresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockRssService = mock(RssServiceAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSearchService = mock(SearchServiceAsync.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		autoGenFactory = new AutoGenFactory();
@@ -76,8 +74,7 @@ public class HomePresenterTest {
 		testEvaluationResults.add(testEvaluation);
 		testBatchResults.setTotalNumberOfResults(1);
 		testBatchResults.setResults(testEvaluationResults);
-		when(mockNodeModelCreator.createBatchResults(anyString(), any(Class.class))).thenReturn(testBatchResults);
-		AsyncMockStubber.callSuccessWith("fake paginated evaluation results json").when(mockSynapseClient).getAvailableEvaluationEntities(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testBatchResults.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockSynapseClient).getAvailableEvaluationEntities(any(AsyncCallback.class));
 		testFeed = new RSSFeed();
 		RSSEntry entry = new RSSEntry();
 		entry.setTitle("A Title");
@@ -110,7 +107,6 @@ public class HomePresenterTest {
 		//when news is loaded, the view should be updated with the service result
 		String exampleNewsFeedResult = "news feed";
 		AsyncMockStubber.callSuccessWith(exampleNewsFeedResult).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));		
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(RSSFeed.class))).thenReturn(testFeed);
 		homePresenter.loadNewsFeed();
 		verify(mockView).showNews(anyString());
 	}	

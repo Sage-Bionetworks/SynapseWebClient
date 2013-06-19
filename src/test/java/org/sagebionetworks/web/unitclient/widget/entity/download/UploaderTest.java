@@ -95,7 +95,7 @@ public class UploaderTest {
 		UserSessionData sessionData = new UserSessionData();
 		sessionData.setProfile(new UserProfile());
 		when(authenticationController.isLoggedIn()).thenReturn(true);
-		when(authenticationController.getCurrentUserSessionData()).thenReturn(sessionData.writeToJSONObject(jsonObjectAdapter.createNew()));
+		when(authenticationController.getCurrentUserSessionData()).thenReturn(sessionData);
 		
 		//direct upload
 		//by default, do not support direct upload (direct upload tests will turn on)

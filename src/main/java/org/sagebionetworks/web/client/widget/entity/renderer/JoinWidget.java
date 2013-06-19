@@ -125,14 +125,8 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	 */
 	public void registerStep2() {
 		//pop up profile form.  user does not have to fill in info
-		UserSessionData sessionData = null;
-		UserProfile profile = null;
-		try {
-			sessionData = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);
-			if(sessionData != null) 
-				profile = sessionData.getProfile();
-		} catch (JSONObjectAdapterException e) {
-		}
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
+		UserProfile profile = sessionData.getProfile();
 		view.showProfileForm(profile, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {

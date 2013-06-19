@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.header;
 
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -49,12 +51,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
 
-	private static final String PROFILE_KEY = "profile";
-	private static final String DISPLAY_NAME_KEY = "displayName";
-	private static final String PIC_KEY = "pic";
-	private static final String PIC_PREVIEW_ID_KEY = "previewId";
-
-	private JSONObjectAdapter cachedUserSessionData = null;
+	private UserSessionData cachedUserSessionData = null;
 	@UiField
 	HorizontalPanel commandBar;
 	
@@ -149,7 +146,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@Override
 	public void refresh() {
 		refreshTestSiteHeader();
-		JSONObjectAdapter userSessionData = presenter.getUser();
+		UserSessionData userSessionData = presenter.getUser();
 		if (cachedUserSessionData == null || !cachedUserSessionData.equals(userSessionData)){
 			cachedUserSessionData = userSessionData;
 			setUser(cachedUserSessionData);
@@ -166,7 +163,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 * Private Methods
 	 */
 	
-	private void setUser(JSONObjectAdapter userData) {
+	private void setUser(UserSessionData userData) {
 		//initialize buttons
 		if(userAnchor == null) {
 			userAnchor = new Anchor();
@@ -267,37 +264,24 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		
 		if(userData != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
-			
-			try {
-				JSONObjectAdapter profile = userData.getJSONObject(PROFILE_KEY);
-				userAnchor.setText(profile.getString(DISPLAY_NAME_KEY));
-				commandBar.remove(loginButton);
-				commandBar.remove(registerButton);
-				userNameWrapper.clear();
-				JSONObjectAdapter pic = null;
-				if(profile.has(PIC_KEY))
-					pic = profile.getJSONObject(PIC_KEY);
-				if (pic != null && pic.has(PIC_PREVIEW_ID_KEY) && pic.getString(PIC_PREVIEW_ID_KEY).length() > 0) {
-					Image profilePicture = new Image();
-					profilePicture.setUrl(
-							DisplayUtils.createUserProfileAttachmentUrl(
-									synapseJSNIUtils.getBaseProfileAttachmentUrl(), 
-									authenticationController.getCurrentUserPrincipalId(), 
-									pic.getString(PIC_PREVIEW_ID_KEY), 
-									null));
-					profilePicture.setWidth("20px");
-					profilePicture.setHeight("20px");
-					profilePicture.addStyleName("imageButton userProfileImage");
-					profilePicture.addClickHandler(new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							userAnchor.fireEvent(event);
-						}
-					});
-					userNameWrapper.add(profilePicture);
-				}
-			} catch (JSONObjectAdapterException e) {
-				MessageBox.alert("Error", DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION, null);
+			UserProfile profile = userData.getProfile();
+			userAnchor.setText(profile.getDisplayName());
+			commandBar.remove(loginButton);
+			commandBar.remove(registerButton);
+			userNameWrapper.clear();
+			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
+				Image profilePicture = new Image();
+				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
+				profilePicture.setWidth("20px");
+				profilePicture.setHeight("20px");
+				profilePicture.addStyleName("imageButton userProfileImage");
+				profilePicture.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						userAnchor.fireEvent(event);
+					}
+				});
+				userNameWrapper.add(profilePicture);
 			}
 			userNameWrapper.add(userAnchor);
 			if (commandBar.getWidgetIndex(userNameContainer) == -1){
@@ -316,5 +300,3 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 	}
 	}
-	
-	

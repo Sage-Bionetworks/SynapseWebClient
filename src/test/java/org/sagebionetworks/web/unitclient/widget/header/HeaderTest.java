@@ -44,7 +44,7 @@ public class HeaderTest {
 	@Test
 	public void testSupportLinkClicked() throws Exception{
 		//getFastPassSupportUrl is called when opening the support site
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData().writeToJSONObject(adapterFactory.createNew()));
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData());
 		
 		header.getSupportHRef(new AsyncCallback<String>() {
 			

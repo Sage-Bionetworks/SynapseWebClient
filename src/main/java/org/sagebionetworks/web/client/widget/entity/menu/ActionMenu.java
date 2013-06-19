@@ -174,17 +174,12 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 					@Override
 					public void onSuccess(List<String> submitterAliases) {
 						//add the default team name (if set in the profile and not already in the list)
-						UserSessionData sessionData = null;
-						try {
-							sessionData = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);
-							String teamName = sessionData.getProfile().getTeamName();
-							if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
-								submitterAliases.add(teamName);
-							}
-							view.popupEvaluationSelector(evaluations, submitterAliases);		
-						} catch (JSONObjectAdapterException e) {
-							view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+						UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
+						String teamName = sessionData.getProfile().getTeamName();
+						if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
+							submitterAliases.add(teamName);
 						}
+						view.popupEvaluationSelector(evaluations, submitterAliases);		
 					}
 				});
 			}

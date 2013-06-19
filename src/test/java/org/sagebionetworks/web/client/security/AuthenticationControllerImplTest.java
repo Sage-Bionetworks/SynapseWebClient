@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -16,8 +17,9 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
 /**
@@ -58,6 +60,7 @@ public class AuthenticationControllerImplTest {
 		
 	}
 
+	@SuppressWarnings({ "deprecation", "unchecked" })
 	@Test
 	public void testGetCurrentUserPrincipalId() throws Exception {
 		String principalId = "4321";
@@ -68,23 +71,24 @@ public class AuthenticationControllerImplTest {
 		sessionData.setProfile(profile);
 		sessionData.setSessionToken("1234");
 		
-		// logged in
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_DATA)).thenReturn(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString());
-		assertEquals(principalId, authenticationController.getCurrentUserPrincipalId());
+		AsyncCallback<String> callback = mock(AsyncCallback.class);
+		AsyncMockStubber.callSuccessWith(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockUserAccountService).getUser(anyString(), any(AsyncCallback.class));	
 		
 		// not logged in
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_DATA)).thenReturn(null);
 		assertNull(authenticationController.getCurrentUserPrincipalId());
-			
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_DATA)).thenReturn("");
-		assertNull(authenticationController.getCurrentUserPrincipalId());
+		
+		// logged in
+		authenticationController.loginUser("token", callback);
+		assertEquals(principalId, authenticationController.getCurrentUserPrincipalId());	
 		
 		// empty user profile
 		sessionData.setProfile(null);
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_DATA)).thenReturn(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		AsyncMockStubber.callSuccessWith(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockUserAccountService).getUser(anyString(), any(AsyncCallback.class));	
+		authenticationController.loginUser("token", callback);
 		assertNull(authenticationController.getCurrentUserPrincipalId());
 		
 		
 	}
 
+	
 }

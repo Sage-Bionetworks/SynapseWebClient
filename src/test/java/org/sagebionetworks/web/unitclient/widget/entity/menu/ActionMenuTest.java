@@ -82,8 +82,7 @@ public class ActionMenuTest {
 		profile.setOwnerId("test owner ID");
 		usd.setProfile(profile);
 		
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd.writeToJSONObject(jSONObjectAdapter.createNew()));
-		when(mockNodeModelCreator.createJSONEntity(usd.writeToJSONObject(jSONObjectAdapter.createNew()).toJSONString(), UserSessionData.class)).thenReturn(usd);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		
 		AsyncMockStubber.callSuccessWith("fake submission result json").when(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));

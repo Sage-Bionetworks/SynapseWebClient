@@ -122,11 +122,7 @@ public class EntityMetadata implements Presenter {
 	}
 
 	private UserProfile getUserProfile() {
-		UserSessionData sessionData = null;
-		try {
-			sessionData = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);
-		} catch (JSONObjectAdapterException e) {
-		}
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());				
 	}
 

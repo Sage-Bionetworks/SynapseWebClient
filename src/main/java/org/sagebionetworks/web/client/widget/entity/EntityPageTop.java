@@ -173,11 +173,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 	
 	private UserProfile getUserProfile() {
-		UserSessionData sessionData = null;
-		try {
-			sessionData = nodeModelCreator.createJSONEntity(authenticationController.getCurrentUserSessionData().toJSONString(), UserSessionData.class);
-		} catch (JSONObjectAdapterException e) {
-		}
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());		
 	}
 }

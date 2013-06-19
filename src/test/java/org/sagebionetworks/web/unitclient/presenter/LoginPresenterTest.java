@@ -84,9 +84,8 @@ public class LoginPresenterTest {
 	public void testFastpassInvalidSession() throws Exception {
 		LoginPlace loginPlace = new LoginPlace(LoginPlace.FASTPASS_TOKEN);
 		UserSessionData myTestUserSessionData = new UserSessionData();
-		//return the test user the first time (as if logged in), then null the second time (simulate logging out)
-		JSONObjectAdapter myTestUserSessionDataAdapter = myTestUserSessionData.writeToJSONObject(adapterFactory.createNew());
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(myTestUserSessionDataAdapter);
+		//return the test user the first time (as if logged in), then null the second time (simulate logging out)		
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(myTestUserSessionData);
 		when(mockNodeModelCreator.createJSONEntity(myTestUserSessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString(), UserSessionData.class)).thenReturn(myTestUserSessionData);
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));		
 		loginPresenter.showView(loginPlace);

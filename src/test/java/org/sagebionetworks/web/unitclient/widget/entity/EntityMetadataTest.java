@@ -87,8 +87,7 @@ public class EntityMetadataTest {
 		up.setOwnerId("101");
 		usd.setProfile(up);
 		
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd.writeToJSONObject(adapterFactory.createNew()));
-		when(mockNodeModelCreator.createJSONEntity(usd.writeToJSONObject(adapterFactory.createNew()).toJSONString(), UserSessionData.class)).thenReturn(usd);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 

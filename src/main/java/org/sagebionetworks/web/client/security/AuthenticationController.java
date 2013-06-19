@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.security;
 
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -58,10 +59,10 @@ public interface AuthenticationController {
 	public boolean getCurrentUserIsSSO();		
 	
 	/**
-	 * Get the UserSessionData object in JSON object form
+	 * Get the UserSessionData object 
 	 * @return
 	 */
-	public JSONObjectAdapter getCurrentUserSessionData();
+	public UserSessionData getCurrentUserSessionData();
 
 	
 	

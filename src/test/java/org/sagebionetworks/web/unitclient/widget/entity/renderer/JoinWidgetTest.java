@@ -71,8 +71,7 @@ public class JoinWidgetTest {
 		UserProfile currentUserProfile = new UserProfile();
 		currentUserProfile.setOwnerId("1");
 		currentUser.setProfile(currentUserProfile);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUser.writeToJSONObject(adapterFactory.createNew()));
-		when(mockNodeModelCreator.createJSONEntity(currentUser.writeToJSONObject(adapterFactory.createNew()).toJSONString(), UserSessionData.class)).thenReturn(currentUser);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUser);
 		requirements = new PaginatedResults<TermsOfUseAccessRequirement>();
 		requirements.setTotalNumberOfResults(0);
 		List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
