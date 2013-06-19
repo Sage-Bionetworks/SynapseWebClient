@@ -52,4 +52,9 @@ public class CodeParser implements MarkdownElementParser {
 	@Override
 	public void completeParse(StringBuilder html) {
 	}
+	
+	@Override
+	public boolean isInMarkdownElement() {
+		return isInCodeBlock;
+	}
 }

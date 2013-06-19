@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.server.markdownparser;
 
-import java.util.regex.Pattern;
-
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
 public class WikiSubpageParser implements MarkdownElementParser {
 	String subpagesWidgetMarkdown;
@@ -35,4 +32,8 @@ public class WikiSubpageParser implements MarkdownElementParser {
 		}
 	}
 
+	@Override
+	public boolean isInMarkdownElement() {
+		return false;
+	}
 }

@@ -27,5 +27,10 @@ public class ImageParser implements MarkdownElementParser {
 	@Override
 	public void completeParse(StringBuilder html) {
 	}
+	
+	@Override
+	public boolean isInMarkdownElement() {
+		return false;
+	}
 
 }

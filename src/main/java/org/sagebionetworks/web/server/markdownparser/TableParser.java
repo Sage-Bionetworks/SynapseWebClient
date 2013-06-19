@@ -74,4 +74,8 @@ public class TableParser implements MarkdownElementParser {
 	public void completeParse(StringBuilder html) {
 	}
 
+	@Override
+	public boolean isInMarkdownElement() {
+		return isInTable;
+	}
 }

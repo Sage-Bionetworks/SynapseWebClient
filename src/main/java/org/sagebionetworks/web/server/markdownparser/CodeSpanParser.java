@@ -1,16 +1,16 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
-public class HorizontalLineParser implements MarkdownElementParser {
-	Pattern p1, p2;
-	
+public class CodeSpanParser implements MarkdownElementParser {
+	Pattern p1;
+	public static final String CODE_SPAN_REGEX = "(?<!\\\\)(`+)(.+?)(?<!`)\\1(?!`)";
 	@Override
 	public void init() {
-		p1 = Pattern.compile(ServerMarkdownUtils.HR_REGEX1);
-		p2 = Pattern.compile(ServerMarkdownUtils.HR_REGEX2);
+		p1 = Pattern.compile(CODE_SPAN_REGEX);
 	}
 
 	@Override
@@ -20,21 +20,17 @@ public class HorizontalLineParser implements MarkdownElementParser {
 
 	@Override
 	public String processLine(String line) {
-		String testLine = line.replaceAll(" ", "");
-		boolean isHr = p1.matcher(testLine).matches() || p2.matcher(testLine).matches();
-		if (isHr) {
-			//output hr
-			return "<hr>";
-		}
-		return line;
+		Matcher m = p1.matcher(line);
+		return m.replaceAll("<code>$2</code>");
 	}
 	
 	@Override
 	public void completeParse(StringBuilder html) {
 	}
-
+	
 	@Override
 	public boolean isInMarkdownElement() {
 		return false;
 	}
+
 }

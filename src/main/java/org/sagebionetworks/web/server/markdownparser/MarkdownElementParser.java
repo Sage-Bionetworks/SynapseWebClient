@@ -28,4 +28,6 @@ public interface MarkdownElementParser {
 	 * @param html
 	 */
 	void completeParse(StringBuilder html);
+	
+	boolean isInMarkdownElement();
 }

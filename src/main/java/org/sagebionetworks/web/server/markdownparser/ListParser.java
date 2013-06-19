@@ -113,4 +113,8 @@ public class ListParser implements MarkdownElementParser {
 	public void completeParse(StringBuilder html) {
 	}
 
+	@Override
+	public boolean isInMarkdownElement() {
+		return isInList;
+	}
 }

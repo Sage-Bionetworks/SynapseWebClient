@@ -3,14 +3,17 @@ package org.sagebionetworks.web.server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.server.markdownparser.BlockQuoteParser;
 import org.sagebionetworks.web.server.markdownparser.BoldParser;
 import org.sagebionetworks.web.server.markdownparser.CodeParser;
+import org.sagebionetworks.web.server.markdownparser.CodeSpanParser;
 import org.sagebionetworks.web.server.markdownparser.HeadingParser;
 import org.sagebionetworks.web.server.markdownparser.HorizontalLineParser;
 import org.sagebionetworks.web.server.markdownparser.ImageParser;
@@ -21,16 +24,16 @@ import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
 import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 
-public class AlphaServerMarkdownProcessor {
-	private static AlphaServerMarkdownProcessor singleton = null;
-	private List<MarkdownElementParser> elementParsers = new ArrayList<MarkdownElementParser>();
+public class SynapseMarkdownProcessor {
+	private static SynapseMarkdownProcessor singleton = null;
+	private List<MarkdownElementParser> allElementParsers = new ArrayList<MarkdownElementParser>();
 	
-	private AlphaServerMarkdownProcessor() {
+	private SynapseMarkdownProcessor() {
 	}
 	
-	public static AlphaServerMarkdownProcessor getInstance() {
+	public static SynapseMarkdownProcessor getInstance() {
 		if (singleton == null) {
-			singleton = new AlphaServerMarkdownProcessor();
+			singleton = new SynapseMarkdownProcessor();
 			singleton.init();
 		}
 		return singleton;
@@ -38,18 +41,20 @@ public class AlphaServerMarkdownProcessor {
 	
 	public void init() {
 		//initialize all markdown element parsers
-		elementParsers.add(new HorizontalLineParser());
-		elementParsers.add(new TableParser());
-		elementParsers.add(new CodeParser());
-		elementParsers.add(new BoldParser());
-		elementParsers.add(new HeadingParser());
-		elementParsers.add(new ImageParser());
-		elementParsers.add(new ItalicsParser());
-		elementParsers.add(new LinkParser());
-		elementParsers.add(new ListParser());
-		elementParsers.add(new WikiSubpageParser());
+		allElementParsers.add(new HorizontalLineParser());
+		allElementParsers.add(new TableParser());
+		allElementParsers.add(new CodeParser());
+		allElementParsers.add(new CodeSpanParser());
+		allElementParsers.add(new BoldParser());
+		allElementParsers.add(new BlockQuoteParser());
+		allElementParsers.add(new HeadingParser());
+		allElementParsers.add(new ImageParser());
+		allElementParsers.add(new ItalicsParser());
+		allElementParsers.add(new LinkParser());
+		allElementParsers.add(new ListParser());
+		allElementParsers.add(new WikiSubpageParser());
 		
-		for (MarkdownElementParser parser : elementParsers) {
+		for (MarkdownElementParser parser : allElementParsers) {
 			parser.init();
 		}
 	}
@@ -96,18 +101,55 @@ public class AlphaServerMarkdownProcessor {
 	
 	public String processMarkdown(String markdown) {
 		//first, reset all of the parsers
-		for (MarkdownElementParser parser : elementParsers) {
+		for (MarkdownElementParser parser : allElementParsers) {
 			parser.reset();
 		}
 		//go through the document once, and apply all markdown parsers to it
 		StringBuilder output = new StringBuilder();
+		//these are the processors that report they are in the middle of the element
+		List<MarkdownElementParser> currentlyProcessingElementProcessors = new ArrayList<MarkdownElementParser>();
+		//other element processors
+		List<MarkdownElementParser> otherElementProcessors = new ArrayList<MarkdownElementParser>();
+		//initialize all processors in the "other" list
+		otherElementProcessors.addAll(allElementParsers);
+		
 		for (String line : markdown.split("\n")) {
-			for (MarkdownElementParser parser : elementParsers) {
+			//first do parsers we're currently "in"
+			
+			for (MarkdownElementParser parser : currentlyProcessingElementProcessors) {
 				line = parser.processLine(line);
 			}
+			
+			//then the rest
+			for (MarkdownElementParser parser : otherElementProcessors) {
+				line = parser.processLine(line);
+			}
+			
+			List<MarkdownElementParser> newCurrentlyProcessingElementProcessors = new ArrayList<MarkdownElementParser>();
+			List<MarkdownElementParser> newOtherElementProcessors = new ArrayList<MarkdownElementParser>();
+			//add all from the still processing list (maintain order)
+			for (MarkdownElementParser parser : currentlyProcessingElementProcessors) {
+				if (parser.isInMarkdownElement())
+					newCurrentlyProcessingElementProcessors.add(parser);
+				else
+					newOtherElementProcessors.add(parser);
+			}
+			
+			//process the rest
+			for (MarkdownElementParser parser : otherElementProcessors) {
+				if (parser.isInMarkdownElement()) //add to the front (reverse their order so that they can have the opportunity to be well formed)
+					newCurrentlyProcessingElementProcessors.add(0, parser);
+				else
+					newOtherElementProcessors.add(parser);
+			}
+			
+			currentlyProcessingElementProcessors = newCurrentlyProcessingElementProcessors;
+			otherElementProcessors = newOtherElementProcessors;
+			
 			output.append(line);
 		}
-		for (MarkdownElementParser parser : elementParsers) {
+		
+		for (MarkdownElementParser parser : allElementParsers) {
 			parser.completeParse(output);
 		}
 		return output.toString();

@@ -34,4 +34,8 @@ public class HeadingParser implements MarkdownElementParser {
 	public void completeParse(StringBuilder html) {
 	}
 
+	@Override
+	public boolean isInMarkdownElement() {
+		return false;
+	}
 }
