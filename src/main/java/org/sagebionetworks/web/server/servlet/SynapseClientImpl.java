@@ -1002,7 +1002,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				html = ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
 			long endTime = System.currentTimeMillis();
 			float elapsedTime = endTime-startTime;
-			logInfo("Markdown processing took " + (elapsedTime/1000f) + " seconds");
+			
+			logInfo("Markdown processing took " + (elapsedTime/1000f) + " seconds.  In alpha mode? " + isAlphaMode);
 			
 			return html;
 		} catch (IOException e) {

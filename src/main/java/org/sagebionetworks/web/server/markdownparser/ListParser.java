@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 public class ListParser extends BasicMarkdownElementParser  {
 	
 	Pattern p1, p2;
-	public static final String ORDERED_LIST_REGEX = "^(\\s*)((?:\\d+[.]))(.+)";
-	public static final String UNORDERED_LIST_REGEX = "^(\\s*)((?:[-+*]))(.+)";
+	public static final String ORDERED_LIST_REGEX = "^[>]*(\\s*)((?:\\d+[.]))(.+)";
+	public static final String UNORDERED_LIST_REGEX = "^[>]*(\\s*)((?:[-+*]))(.+)";
 	Stack<MarkdownList> stack;
 	
 	@Override
