@@ -54,7 +54,7 @@ public class MarkdownWidget extends LayoutContainer {
 					removeAll();
 					String content = "";
 					
-					if(result == null || DisplayUtils.getDefaultWikiMarkdown().equals(result)) {
+					if(result == null || SharedMarkdownUtils.getDefaultWikiMarkdown().equals(result)) {
 						content += SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%;margin-bottom:30px\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>").asString();
 					}
 					
