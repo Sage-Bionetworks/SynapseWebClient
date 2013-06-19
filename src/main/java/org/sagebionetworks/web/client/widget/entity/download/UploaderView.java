@@ -31,7 +31,7 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 		
 		String getDefaultUploadActionUrl(boolean isRestricted);
 
-		void setExternalFilePath(String path, boolean isNewlyRestricted);
+		void setExternalFilePath(String path, String name, boolean isNewlyRestricted);
 		
 		void handleUpload(String fileName);
 		

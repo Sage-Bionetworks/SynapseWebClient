@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityViewUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -49,7 +50,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	SynapseJSNIUtils synapseJSNIUtils;
 	private SageImageBundle sageImageBundle;
 	
-	TextField<String> pathField;
+	TextField<String> pathField, nameField;
 	
 	// initialized in constructor
 	private boolean isInitiallyRestricted;
@@ -130,6 +131,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 		// reset
 		pathField.clear();
+		nameField.clear();
 
 	}
 
@@ -162,7 +164,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		TabPanel tabPanel = new TabPanel();		
 		tabPanel.setPlain(true);
-		tabPanel.setHeight(130);		
+		tabPanel.setHeight(140);		
 		container.add(tabPanel, new MarginData(0, 10, 10, 10));
 		TabItem tab;
 		
@@ -471,10 +473,19 @@ public class UploaderViewImpl extends LayoutContainer implements
 		externalLinkFormPanel.setFrame(false);
 		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.LEFT);
 		externalLinkFormPanel.setLabelWidth(110);
-		externalLinkFormPanel.setFieldWidth(230);
+		externalLinkFormPanel.setFieldWidth(PANEL_WIDTH-150);
 		pathField.setFieldLabel("External Path or URL");
 		
 		externalLinkFormPanel.add(pathField);
+		
+		nameField = new TextField<String>();
+		nameField.setFieldLabel("Name (Optional)");
+		nameField.setAllowBlank(true);
+		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
+		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+		
+		externalLinkFormPanel.add(nameField);
+		
 		saveExternalLinkButton = new Button("Save");
 		saveExternalLinkButton.removeAllListeners();
 		saveExternalLinkButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
@@ -495,7 +506,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 				if (isNewlyRestricted()) {
 					window = DisplayUtils.newWindow("", "", "");
 				}
-				presenter.setExternalFilePath(pathField.getValue(), isNewlyRestricted());
+				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue(), isNewlyRestricted());
 			}
 		});
 		externalLinkFormPanel.addButton(saveExternalLinkButton);

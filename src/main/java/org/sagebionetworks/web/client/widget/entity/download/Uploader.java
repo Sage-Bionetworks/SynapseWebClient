@@ -442,21 +442,21 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	
 	@Override
-	public void setExternalFilePath(String path, final boolean isNewlyRestricted) {
+	public void setExternalFilePath(String path, String name, final boolean isNewlyRestricted) {
 		if (entity==null || entity instanceof FileEntity) {
 			//new data, use the appropriate synapse call
 			//if we haven't created the entity yet, do that first
 			if (entity == null) {
-				createNewExternalFileEntity(path, isNewlyRestricted);
+				createNewExternalFileEntity(path, name, isNewlyRestricted);
 			}
 			else {
-				updateExternalFileEntity(entity.getId(), path, isNewlyRestricted);
+				updateExternalFileEntity(entity.getId(), path, name, isNewlyRestricted);
 			}
 		}
 		else {
 			//old data
 			String entityId = entity.getId();
-			synapseClient.updateExternalLocationable(entityId, path, new AsyncCallback<EntityWrapper>() {
+			synapseClient.updateExternalLocationable(entityId, path, name, new AsyncCallback<EntityWrapper>() {
 				
 				public void onSuccess(EntityWrapper result) {
 					externalLinkUpdated(result, isNewlyRestricted, entity.getClass());
@@ -501,9 +501,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	public void updateExternalFileEntity(String entityId, String path, final boolean isNewlyRestricted) {
+	public void updateExternalFileEntity(String entityId, String path, String name, final boolean isNewlyRestricted) {
 		try {
-			synapseClient.updateExternalFile(entityId, path, new AsyncCallback<EntityWrapper>() {
+			synapseClient.updateExternalFile(entityId, path, name, new AsyncCallback<EntityWrapper>() {
 				@Override
 				public void onSuccess(EntityWrapper result) {
 					externalLinkUpdated(result, isNewlyRestricted, FileEntity.class);
@@ -517,9 +517,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
 		}
 	}
-	public void createNewExternalFileEntity(final String path, final boolean isNewlyRestricted) {
+	public void createNewExternalFileEntity(final String path, final String name, final boolean isNewlyRestricted) {
 		try {
-			synapseClient.createExternalFile(parentEntityId, path, new AsyncCallback<EntityWrapper>() {
+			synapseClient.createExternalFile(parentEntityId, path, name, new AsyncCallback<EntityWrapper>() {
 				@Override
 				public void onSuccess(EntityWrapper result) {
 					externalLinkUpdated(result, isNewlyRestricted, FileEntity.class);

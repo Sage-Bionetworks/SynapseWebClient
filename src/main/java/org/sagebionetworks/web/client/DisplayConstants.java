@@ -545,5 +545,6 @@ public class DisplayConstants {
 	public static final String JOINED_EVALUATION_HTML = "<span class=\"mainPageHeader inline-block\"><h3>You are registered for this challenge!</h3><ul class=\"list arrow-list\"><li>Download the file(s) by going to the bottom of this page...</li></ul></span>";
 	public static final String READ_ONLY_MODE = "Read Only Mode";
 	public static final String SYNAPSE_IN_READ_ONLY_MODE = "Synapse is in READ_ONLY mode for maintenance. You can continue to browse, but can not modify during this period.";
+	public static final String VIEW_EDIT_PROFILE = "View / Edit Profile";
 }
 

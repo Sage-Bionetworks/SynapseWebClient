@@ -912,13 +912,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	@Override
 	@Deprecated
-	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl) throws RestServiceException {
+	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl, String name) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
 			Entity locationable = synapseClient.getEntityById(entityId);
 			if(!(locationable instanceof Locationable)) {
 				throw new RuntimeException("Upload failed. Entity id: " + locationable.getId() + " is not Locationable.");
-			}						
+			}
+			if (isManuallySettingExternalName(name)) {
+				locationable.setName(name);
+			}
 			Locationable result = synapseClient.updateExternalLocationableToSynapse((Locationable)locationable, externalUrl);
 			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
@@ -930,9 +933,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public EntityWrapper updateExternalFile(String entityId, String externalUrl) throws RestServiceException {
+	public EntityWrapper updateExternalFile(String entityId, String externalUrl, String name) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
+			boolean isManuallySettingName = isManuallySettingExternalName(name);
 			Entity entity = synapseClient.getEntityById(entityId);
 			if(!(entity instanceof FileEntity)) {
 				throw new RuntimeException("Upload failed. Entity id: " + entity.getId() + " is not a File.");
@@ -942,8 +946,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			efh.setExternalURL(externalUrl);
 			ExternalFileHandle clone = synapseClient.createExternalFileHandle(efh);
 			((FileEntity)entity).setDataFileHandleId(clone.getId());
+			if (isManuallySettingName)
+				entity.setName(name);
 			Entity updatedEntity = synapseClient.putEntity(entity);
-			updatedEntity = updateExternalFileName(updatedEntity, externalUrl, synapseClient);
+			if (!isManuallySettingName)
+				updatedEntity = updateExternalFileName(updatedEntity, externalUrl, synapseClient);
 			JSONObjectAdapter aaJson = updatedEntity.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
 		} catch (SynapseException e) {
@@ -953,18 +960,26 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} 
 	}
 	
+	private boolean isManuallySettingExternalName(String name) {
+		return name != null && name.trim().length() > 0;
+	}
+	
 	@Override
-	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl) throws RestServiceException {
+	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl, String name) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
+			boolean isManuallySettingName = isManuallySettingExternalName(name);
 			FileEntity newEntity = new FileEntity();
 			ExternalFileHandle efh = new ExternalFileHandle();
 			efh.setExternalURL(externalUrl);
 			ExternalFileHandle clone = synapseClient.createExternalFileHandle(efh);
 			newEntity.setDataFileHandleId(clone.getId());
 			newEntity.setParentId(parentEntityId);
+			if (isManuallySettingName)
+				newEntity.setName(name);
 			Entity updatedEntity = synapseClient.createEntity(newEntity);
-			updatedEntity = updateExternalFileName(updatedEntity, externalUrl, synapseClient);
+			if (!isManuallySettingName)
+				updatedEntity = updateExternalFileName(updatedEntity, externalUrl, synapseClient);
 			JSONObjectAdapter aaJson = updatedEntity.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
 		} catch (SynapseException e) {

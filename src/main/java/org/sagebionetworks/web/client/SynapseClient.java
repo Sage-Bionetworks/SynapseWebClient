@@ -171,11 +171,11 @@ public interface SynapseClient extends RemoteService {
 	EntityWrapper createAccessApproval(EntityWrapper aaEW)
 			throws RestServiceException;
 	
-	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl) throws RestServiceException;
+	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl, String name) throws RestServiceException;
 	
-	public EntityWrapper updateExternalFile(String entityId, String externalUrl) throws RestServiceException;
+	public EntityWrapper updateExternalFile(String entityId, String externalUrl, String name) throws RestServiceException;
 	
-	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl) throws RestServiceException;
+	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl, String name) throws RestServiceException;
 	
 	/**
 	 * convenience method for converting markdown to html

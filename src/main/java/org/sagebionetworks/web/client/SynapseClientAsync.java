@@ -97,11 +97,11 @@ public interface SynapseClientAsync {
 
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
 
-	public void updateExternalLocationable(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback);
+	public void updateExternalLocationable(String entityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback);
 	
-	public void updateExternalFile(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	public void updateExternalFile(String entityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 	
-	public void createExternalFile(String parentEntityId, String externalUrl, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	public void createExternalFile(String parentEntityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 
 	public void markdown2Html(String markdown, Boolean isPreview, AsyncCallback<String> callback);
 	
