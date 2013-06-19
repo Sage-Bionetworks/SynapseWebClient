@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
-public class CodeSpanParser implements MarkdownElementParser {
+public class CodeSpanParser extends BasicMarkdownElementParser {
 	Pattern p1;
 	public static final String CODE_SPAN_REGEX = "(?<!\\\\)(`+)(.+?)(?<!`)\\1(?!`)";
 	@Override
@@ -14,23 +14,8 @@ public class CodeSpanParser implements MarkdownElementParser {
 	}
 
 	@Override
-	public void reset() {
-		//no state
-	}
-
-	@Override
 	public String processLine(String line) {
 		Matcher m = p1.matcher(line);
 		return m.replaceAll("<code>$2</code>");
 	}
-	
-	@Override
-	public void completeParse(StringBuilder html) {
-	}
-	
-	@Override
-	public boolean isInMarkdownElement() {
-		return false;
-	}
-
 }

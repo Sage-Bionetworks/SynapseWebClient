@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
-public class TableParser implements MarkdownElementParser {
+public class TableParser extends BasicMarkdownElementParser {
 	Pattern p;
 	boolean isInTable;
 	int tableCount;
@@ -71,11 +71,12 @@ public class TableParser implements MarkdownElementParser {
 	}
 	
 	@Override
-	public void completeParse(StringBuilder html) {
-	}
-
-	@Override
 	public boolean isInMarkdownElement() {
 		return isInTable;
+	}
+	
+	@Override
+	public boolean isBlockElement() {
+		return true;
 	}
 }

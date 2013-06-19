@@ -29,5 +29,15 @@ public interface MarkdownElementParser {
 	 */
 	void completeParse(StringBuilder html);
 	
+	/**
+	 * Return true if this parser is still open (has not yet received the signal to close)
+	 * @return
+	 */
 	boolean isInMarkdownElement();
+	
+	/**
+	 * True if the output of this parser is already a block element (signals processor not add a newline if we're inside of this type of element)
+	 * @return
+	 */
+	boolean isBlockElement();
 }

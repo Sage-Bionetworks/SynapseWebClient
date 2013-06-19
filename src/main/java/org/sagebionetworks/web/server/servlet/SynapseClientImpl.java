@@ -106,7 +106,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
-
+	static {//kick off initialization (like pattern compilation) by referencing it
+			SynapseMarkdownProcessor.getInstance();
+		}
+	
 	@SuppressWarnings("unused")
 	private static Logger logger = Logger.getLogger(SynapseClientImpl.class
 			.getName());
@@ -991,10 +994,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	@Override
 	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlphaMode) throws RestServiceException{
 		try {
+			long startTime = System.currentTimeMillis();
+			String html = null;
 			if (isAlphaMode)
-				return SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview);
+				html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview);
 			else
-				return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+				html = ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+			long endTime = System.currentTimeMillis();
+			float elapsedTime = endTime-startTime;
+			logInfo("Markdown processing took " + (elapsedTime/1000f) + " seconds");
+			
+			return html;
 		} catch (IOException e) {
 			throw new RestServiceException(e.getMessage());
 		}

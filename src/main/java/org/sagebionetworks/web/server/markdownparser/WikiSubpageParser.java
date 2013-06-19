@@ -2,7 +2,7 @@ package org.sagebionetworks.web.server.markdownparser;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 
-public class WikiSubpageParser implements MarkdownElementParser {
+public class WikiSubpageParser extends BasicMarkdownElementParser  {
 	String subpagesWidgetMarkdown;
 	boolean seenWikiSubpagesWidget;
 	
@@ -30,10 +30,5 @@ public class WikiSubpageParser implements MarkdownElementParser {
 		if (!seenWikiSubpagesWidget) {
 			html.insert(0,  subpagesWidgetMarkdown + "<br />");
 		}
-	}
-
-	@Override
-	public boolean isInMarkdownElement() {
-		return false;
 	}
 }

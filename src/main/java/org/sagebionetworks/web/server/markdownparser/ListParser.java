@@ -9,13 +9,13 @@ import java.util.regex.Pattern;
  * @author jayhodgson
  *
  */
-public class ListParser implements MarkdownElementParser {
+public class ListParser extends BasicMarkdownElementParser  {
 	
 	Pattern p1, p2;
 	public static final String ORDERED_LIST_REGEX = "^(\\s*)((?:\\d+[.]))(.+)";
 	public static final String UNORDERED_LIST_REGEX = "^(\\s*)((?:[-+*]))(.+)";
 	Stack<MarkdownList> stack;
-	boolean isInList;
+	
 	@Override
 	public void init() {
 		p1 = Pattern.compile(ORDERED_LIST_REGEX, Pattern.DOTALL);
@@ -25,7 +25,6 @@ public class ListParser implements MarkdownElementParser {
 	@Override
 	public void reset() {
 		stack = new Stack<MarkdownList>();
-		isInList = false;
 	}
 
 	@Override
@@ -37,13 +36,11 @@ public class ListParser implements MarkdownElementParser {
 		boolean isUnorderedList = m2.matches();
 		
 		if (isOrderedList) {
-			isInList = true;
 			return getListItem(line, m1, true);
 		}
 		else if (isUnorderedList) {
-			isInList = true;
 			return getListItem(line, m2, false);
-		} else if (isInList) {
+		} else if (isInMarkdownElement()) {
 			//this is not a list item line.  End all existing lists
 			StringBuilder sb = new StringBuilder();
 			while(!stack.isEmpty()){
@@ -94,7 +91,6 @@ public class ListParser implements MarkdownElementParser {
         	//create a new list
         	returnString.append(createNewList(depth, isOrderedList, value));
         }
-        isInList = !stack.isEmpty();
         return returnString.toString();
 	}
 	
@@ -110,11 +106,12 @@ public class ListParser implements MarkdownElementParser {
 	}
 	
 	@Override
-	public void completeParse(StringBuilder html) {
-	}
-
-	@Override
 	public boolean isInMarkdownElement() {
-		return isInList;
+		return !stack.isEmpty();
+	}
+	
+	@Override
+	public boolean isBlockElement() {
+		return true;
 	}
 }

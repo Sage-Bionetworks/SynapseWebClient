@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
-public class BoldParser implements MarkdownElementParser {
+public class BoldParser extends BasicMarkdownElementParser  {
 	Pattern p1;
 	public static final String BOLD_REGEX = "(\\*\\*|__)(?=\\S)(.+?[*_]*)(?<=\\S)\\1";
 	@Override
@@ -14,22 +14,8 @@ public class BoldParser implements MarkdownElementParser {
 	}
 
 	@Override
-	public void reset() {
-		//no state
-	}
-
-	@Override
 	public String processLine(String line) {
 		Matcher m = p1.matcher(line);
 		return m.replaceAll("<strong>$2</strong>");
-	}
-	
-	@Override
-	public void completeParse(StringBuilder html) {
-	}
-	
-	@Override
-	public boolean isInMarkdownElement() {
-		return false;
 	}
 }

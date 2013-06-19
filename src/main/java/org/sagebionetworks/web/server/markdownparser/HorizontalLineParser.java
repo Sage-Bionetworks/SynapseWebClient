@@ -4,18 +4,13 @@ import java.util.regex.Pattern;
 
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
-public class HorizontalLineParser implements MarkdownElementParser {
+public class HorizontalLineParser extends BasicMarkdownElementParser  {
 	Pattern p1, p2;
 	
 	@Override
 	public void init() {
 		p1 = Pattern.compile(ServerMarkdownUtils.HR_REGEX1);
 		p2 = Pattern.compile(ServerMarkdownUtils.HR_REGEX2);
-	}
-
-	@Override
-	public void reset() {
-		//no state
 	}
 
 	@Override
@@ -27,14 +22,5 @@ public class HorizontalLineParser implements MarkdownElementParser {
 			return "<hr>";
 		}
 		return line;
-	}
-	
-	@Override
-	public void completeParse(StringBuilder html) {
-	}
-
-	@Override
-	public boolean isInMarkdownElement() {
-		return false;
 	}
 }

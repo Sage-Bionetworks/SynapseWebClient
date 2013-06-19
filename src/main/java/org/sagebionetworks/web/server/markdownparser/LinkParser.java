@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
-public class LinkParser implements MarkdownElementParser {
+public class LinkParser extends BasicMarkdownElementParser  {
 	Pattern p1;
 	public static final String LINK_REGEX = 
 			"(" + //group 1 has everything
@@ -21,22 +21,8 @@ public class LinkParser implements MarkdownElementParser {
 	}
 
 	@Override
-	public void reset() {
-		//no state
-	}
-
-	@Override
 	public String processLine(String line) {
 		Matcher m = p1.matcher(line);
 		return m.replaceAll("<a href=\"$3\">$2</a>");
-	}
-	
-	@Override
-	public void completeParse(StringBuilder html) {
-	}
-
-	@Override
-	public boolean isInMarkdownElement() {
-		return false;
 	}
 }

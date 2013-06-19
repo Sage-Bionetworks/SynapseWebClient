@@ -3,7 +3,6 @@ package org.sagebionetworks.web.server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
@@ -147,6 +146,15 @@ public class SynapseMarkdownProcessor {
 			otherElementProcessors = newOtherElementProcessors;
 			
 			output.append(line);
+			//also tack on a <br />, unless we are preformatted
+			boolean isPreformatted = false;
+			for (MarkdownElementParser parser : allElementParsers) {
+				if (parser.isInMarkdownElement() && parser.isBlockElement()) {
+					isPreformatted = true;
+					break;
+				}
+			}
+			output.append(isPreformatted ? "\n" : ServerMarkdownUtils.HTML_LINE_BREAK);
 		}
 		
 		for (MarkdownElementParser parser : allElementParsers) {

@@ -3,17 +3,12 @@ package org.sagebionetworks.web.server.markdownparser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HeadingParser implements MarkdownElementParser {
+public class HeadingParser extends BasicMarkdownElementParser  {
 	Pattern p1;
 	public static final String HEADING_REGEX = "((#{1,6})\\s*(.*))";
 	@Override
 	public void init() {
 		p1 = Pattern.compile(HEADING_REGEX, Pattern.DOTALL);
-	}
-
-	@Override
-	public void reset() {
-		//no state
 	}
 
 	@Override
@@ -28,14 +23,5 @@ public class HeadingParser implements MarkdownElementParser {
             return "<" + tag + ">" + headingText + "</" + tag + ">";
 		}
 		return line;
-	}
-	
-	@Override
-	public void completeParse(StringBuilder html) {
-	}
-
-	@Override
-	public boolean isInMarkdownElement() {
-		return false;
 	}
 }

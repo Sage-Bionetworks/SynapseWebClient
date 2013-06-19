@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
-public class CodeParser implements MarkdownElementParser {
+public class CodeParser extends BasicMarkdownElementParser  {
 	Pattern p;
 	//exactly three '`', optionally followed by the language class to use
 	public static final String FENCE_CODE_BLOCK_REGEX = "^[> \t\n\f\r]*[`]{3}\\s*([a-zA-Z_0-9-]*)\\s*$";
@@ -41,8 +41,6 @@ public class CodeParser implements MarkdownElementParser {
 		}
 		else {
 			sb.append(line);
-			String newLine = isInCodeBlock ? "\n" : ServerMarkdownUtils.HTML_LINE_BREAK;
-			sb.append(newLine);
 		}
 			
 		
@@ -50,11 +48,12 @@ public class CodeParser implements MarkdownElementParser {
 	}
 
 	@Override
-	public void completeParse(StringBuilder html) {
+	public boolean isInMarkdownElement() {
+		return isInCodeBlock;
 	}
 	
 	@Override
-	public boolean isInMarkdownElement() {
-		return isInCodeBlock;
+	public boolean isBlockElement() {
+		return true;
 	}
 }

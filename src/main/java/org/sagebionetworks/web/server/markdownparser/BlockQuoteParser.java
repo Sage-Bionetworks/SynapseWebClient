@@ -3,9 +3,7 @@ package org.sagebionetworks.web.server.markdownparser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.sagebionetworks.web.server.ServerMarkdownUtils;
-
-public class BlockQuoteParser implements MarkdownElementParser {
+public class BlockQuoteParser extends BasicMarkdownElementParser {
 	Pattern p1;
 	boolean inBlockQuote;
 	public static final String BLOCK_QUOTE_REGEX = "(^\\s*>\\s?(.+))";
@@ -42,10 +40,6 @@ public class BlockQuoteParser implements MarkdownElementParser {
 		return output.toString();
 	}
 	
-	@Override
-	public void completeParse(StringBuilder html) {
-	}
-
 	@Override
 	public boolean isInMarkdownElement() {
 		return inBlockQuote;
