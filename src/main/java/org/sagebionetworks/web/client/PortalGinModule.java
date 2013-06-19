@@ -261,6 +261,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(JiraURLHelper.class).to(JiraURLHelperImpl.class);
 		
+		
 		/*
 		 * Vanilla Implementation binding
 		 */

@@ -33,8 +33,9 @@ import com.google.inject.Inject;
 
 /**
  * This class exists to isolate JSONObject creation from any classes that need JVM based tests
- * This class doesn't need to be tested as the business logic is located elsewhere.
- * (JSONObect creation and JSONParser should not be used in classes that need testing)
+ * 
+ * CODE SPLITTING NOTE: JSONEntityFactory brings in AutoGenFactory and thus all of the repo.model package
+ * 
  * @author dburdick
  *
  */

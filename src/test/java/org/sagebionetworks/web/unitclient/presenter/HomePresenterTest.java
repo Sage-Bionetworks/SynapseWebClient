@@ -18,8 +18,10 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
@@ -50,7 +52,7 @@ public class HomePresenterTest {
 	SearchServiceAsync mockSearchService; 
 	SynapseClientAsync mockSynapseClient; 
 	AutoGenFactory autoGenFactory;
-	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
 	List<EntityHeader> testEvaluationResults;
 	RSSFeed testFeed = null;
@@ -91,11 +93,9 @@ public class HomePresenterTest {
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
 				mockRssService,
-				mockNodeModelCreator,
 				mockSearchService,
 				mockSynapseClient,
-				autoGenFactory,
-				jsonObjectAdapter);
+				adapterFactory);
 		verify(mockView).setPresenter(homePresenter);
 	}	
 	

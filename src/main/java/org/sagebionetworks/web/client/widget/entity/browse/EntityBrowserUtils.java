@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -24,7 +22,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class EntityBrowserUtils {
 
 	public static void loadUserUpdateable(SearchServiceAsync searchService,
-			final NodeModelCreator nodeModelCreator,
+			final AdapterFactory adapterFactory,
 			final GlobalApplicationState globalApplicationState,
 			final AuthenticationController authenticationController,			
 			final AsyncCallback<List<EntityHeader>> callback) {
@@ -39,7 +37,7 @@ public class EntityBrowserUtils {
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
 					for(String entityHeaderJson : result) {
 						try {
-							headers.add(nodeModelCreator.createJSONEntity(entityHeaderJson, EntityHeader.class));
+							headers.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
 						} catch (JSONObjectAdapterException e) {
 							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 						}
@@ -58,14 +56,15 @@ public class EntityBrowserUtils {
 
 	
 	public static void loadFavorites(SynapseClientAsync synapseClient,
-			final NodeModelCreator nodeModelCreator,
+			final AdapterFactory adapterFactory,
 			final GlobalApplicationState globalApplicationState,
 			final AsyncCallback<List<EntityHeader>> callback) {
 		synapseClient.getFavorites(Integer.MAX_VALUE, 0, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
-					PaginatedResults<EntityHeader> favorites = nodeModelCreator.createPaginatedResults(result, EntityHeader.class);
+					PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
+					favorites.initializeFromJSONObject(adapterFactory.createNew(result));
 					globalApplicationState.setFavorites(favorites.getResults());
 					callback.onSuccess(favorites.getResults());
 				} catch (JSONObjectAdapterException e) {

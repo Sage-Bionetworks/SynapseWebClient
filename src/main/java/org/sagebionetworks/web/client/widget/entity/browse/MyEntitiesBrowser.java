@@ -1,32 +1,19 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
-import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WhereCondition;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -41,10 +28,9 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
-	private EntityTypeProvider entityTypeProvider;
 	private SynapseClientAsync synapseClient;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private SelectedHandler selectedHandler;
+	AdapterFactory adapterFactory;
 	
 	public interface SelectedHandler {
 		void onSelection(String selectedEntityId);
@@ -58,15 +44,15 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			final GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter, 
-			SearchServiceAsync searchService) {
+			SearchServiceAsync searchService,
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.searchService = searchService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
-		this.entityTypeProvider = entityTypeProvider;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.adapterFactory = adapterFactory;
 		
 		// default selection behavior is to do nothing
 		this.selectedHandler = new SelectedHandler() {			
@@ -112,7 +98,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public void loadUserUpdateable() {
 		view.showLoading();
-		EntityBrowserUtils.loadUserUpdateable(searchService, nodeModelCreator, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setUpdatableEntities(result);
@@ -134,7 +120,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 
 	@Override
 	public void loadFavorites() {
-		EntityBrowserUtils.loadFavorites(synapseClient, nodeModelCreator, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setFavoriteEntities(result);

@@ -2,12 +2,11 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.List;
 
-import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -16,14 +15,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -45,32 +41,26 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private RssServiceAsync rssService;
-	private NodeModelCreator nodeModelCreator;
 	private SearchServiceAsync searchService;
 	private SynapseClientAsync synapseClient;
-	private AutoGenFactory autoGenFactory;
-	private JSONObjectAdapter jsonObjectAdapter;
+	private AdapterFactory adapterFactory;
 	
 	@Inject
 	public HomePresenter(HomeView view,  
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
 			RssServiceAsync rssService,
-			NodeModelCreator nodeModelCreator,
 			SearchServiceAsync searchService, 
-			SynapseClientAsync synapseClient, 
-			AutoGenFactory autoGenFactory,
-			JSONObjectAdapter jsonObjectAdapter){
+			SynapseClientAsync synapseClient, 			
+			AdapterFactory adapterFactory){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.rssService = rssService;
-		this.nodeModelCreator = nodeModelCreator;
 		this.searchService = searchService;
 		this.synapseClient = synapseClient;
-		this.autoGenFactory = autoGenFactory;
-		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.adapterFactory = adapterFactory;
 		this.authenticationController = authenticationController;
 		this.view.setPresenter(this);
 	}
@@ -113,8 +103,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 		
-	public String getHtml(String rssFeedJson) throws JSONObjectAdapterException {
-		RSSFeed feed = nodeModelCreator.createJSONEntity(rssFeedJson, RSSFeed.class);
+	public String getHtml(String rssFeedJson) throws JSONObjectAdapterException {		
+		RSSFeed feed = new RSSFeed(adapterFactory.createNew(rssFeedJson));
 		StringBuilder htmlResponse = new StringBuilder();
 		int maxIdx = feed.getEntries().size() > MAX_NEWS_ITEMS ? MAX_NEWS_ITEMS : feed.getEntries().size();
 		for (int i = 0; i < maxIdx; i++) {
@@ -134,7 +124,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 
 	public String getSupportFeedHtml(String rssFeedJson) throws JSONObjectAdapterException {
-		RSSFeed feed = nodeModelCreator.createJSONEntity(rssFeedJson, RSSFeed.class);
+		RSSFeed feed = new RSSFeed(adapterFactory.createNew(rssFeedJson));
 		StringBuilder htmlResponse = new StringBuilder();
 		htmlResponse.append("<div class=\"span-12 last notopmargin\"> <ul class=\"list question-list\">");
 		for (int i = 0; i < feed.getEntries().size(); i++) {
@@ -176,7 +166,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		});
 		
-		EntityBrowserUtils.loadUserUpdateable(searchService, nodeModelCreator, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
+		
+		
+		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setMyProjects(result);
@@ -187,7 +179,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		});
 		
-		EntityBrowserUtils.loadFavorites(synapseClient, nodeModelCreator, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setFavorites(result);
@@ -204,9 +196,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			synapseClient.getAvailableEvaluationEntities(new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String jsonString) {
-					BatchResults<EntityHeader> headers;
-					try {
-						headers = nodeModelCreator.createBatchResults(jsonString, EntityHeader.class);
+					BatchResults<EntityHeader> headers = new BatchResults<EntityHeader>(EntityHeader.class);
+					try {						
+						headers.initializeFromJSONObject(adapterFactory.createNew(jsonString));
 						callback.onSuccess(headers.getResults());
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -226,7 +218,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	
 	@Override
 	public void createProject(final String name) {
-		ProjectsHomePresenter.createProject(name, autoGenFactory, synapseClient, jsonObjectAdapter, globalApplicationState, authenticationController, new AsyncCallback<String>() {
+		CreateEntityUtil.createProject(name, synapseClient, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newProjectId) {
 				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
