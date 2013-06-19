@@ -360,7 +360,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}));
     	menu.add(getNewCommand("Wiki Pages", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
-	    		insertMarkdown(DisplayUtils.getWikiSubpagesMarkdown());
+	    		insertMarkdown(SharedMarkdownUtils.getWikiSubpagesMarkdown());
 	    	};
 		}));
 	    
