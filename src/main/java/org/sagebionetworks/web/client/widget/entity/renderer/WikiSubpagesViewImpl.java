@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,24 +31,17 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 		//this widget shows nothing if it doesn't have any pages!
 		if (root == null)
 			return;
-		LayoutContainer lc = new LayoutContainer();
-		lc.addStyleName("span-24 notopmargin");
-		lc.setAutoWidth(true);
-		lc.setAutoHeight(true);
-		
+		SimplePanel p = new SimplePanel();
+		p.addStyleName("pagesTree");
 		//only show the tree if the root has children
 		if (root != null && root.getChildCount() > 0) {
-			LayoutContainer files = new LayoutContainer();
-			files.setStyleName("pagesTree span-24 notopmargin");
 			Tree t = new Tree();
 			t.addItem(root);
 			root.setState(true);
-			files.add(t);
-			lc.add(files);
+			p.setWidget(t);
 		}
 			
-		lc.layout(true);
-		this.add(lc);
+		this.add(p);
 		this.layout(true);
 	}	
 	
