@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityViewUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -479,6 +480,10 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		nameField = new TextField<String>();
 		nameField.setFieldLabel("Name (Optional)");
+		nameField.setAllowBlank(true);
+		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
+		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+		
 		externalLinkFormPanel.add(nameField);
 		
 		saveExternalLinkButton = new Button("Save");
