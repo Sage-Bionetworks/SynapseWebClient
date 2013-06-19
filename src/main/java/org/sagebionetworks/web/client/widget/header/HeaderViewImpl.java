@@ -170,6 +170,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		if(userAnchor == null) {
 			userAnchor = new Anchor();
 			userAnchor.addStyleName("headerUsernameLink");
+			DisplayUtils.addTooltip(synapseJSNIUtils, userAnchor, DisplayConstants.VIEW_EDIT_PROFILE, TOOLTIP_POSITION.BOTTOM);
 			userAnchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -283,6 +284,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 						userAnchor.fireEvent(event);
 					}
 				});
+				DisplayUtils.addTooltip(synapseJSNIUtils, profilePicture, DisplayConstants.VIEW_EDIT_PROFILE, TOOLTIP_POSITION.BOTTOM);
 				userNameWrapper.add(profilePicture);
 			}
 			userNameWrapper.add(userAnchor);
