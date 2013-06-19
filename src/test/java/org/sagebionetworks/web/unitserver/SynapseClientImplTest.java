@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -78,13 +78,11 @@ import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
 import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
 import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.message.ObjectType;
-import org.sagebionetworks.repo.model.storage.StorageUsage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -104,7 +102,6 @@ import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -501,6 +498,12 @@ public class SynapseClientImplTest {
 		assertEquals(presignedUrl, EntityFactory.createJSONStringForEntity(testPresignedUrl));
 	}
 	
+	private void resetUpdateLocationableMock(Data layer, String testUrl, String testId) throws SynapseException {
+		reset(mockSynapse);
+		when(mockSynapse.updateExternalLocationableToSynapse(layer, testUrl)).thenReturn(layer);
+		when(mockSynapse.getEntityById(testId)).thenReturn(layer);
+	}
+	
 	@Test
 	public void testUpdateLocationable() throws Exception {
 		//verify call is directly calling the synapse client provider
@@ -516,11 +519,23 @@ public class SynapseClientImplTest {
 		layer.setLocations(locations);
 
 		String testId = "myTestId";
-		when(mockSynapse.updateExternalLocationableToSynapse(layer, testUrl)).thenReturn(layer);
-		when(mockSynapse.getEntityById(testId)).thenReturn(layer);
-		EntityWrapper returnedLayer = synapseClient.updateExternalLocationable(testId, testUrl);
-		
+		resetUpdateLocationableMock(layer, testUrl, testId);
+		EntityWrapper returnedLayer = synapseClient.updateExternalLocationable(testId, testUrl, null);
+		//should have called with the layer
+		verify(mockSynapse).updateExternalLocationableToSynapse(eq(layer), eq(testUrl));
 		assertEquals(returnedLayer.getEntityJson(), EntityFactory.createJSONStringForEntity(layer));
+		
+		//test with empty string new name
+		resetUpdateLocationableMock(layer, testUrl, testId);
+		synapseClient.updateExternalLocationable(testId, testUrl, "");
+		verify(mockSynapse).updateExternalLocationableToSynapse(eq(layer), eq(testUrl));
+		
+		//and test with a rename
+		resetUpdateLocationableMock(layer, testUrl, testId);
+		String newName = "a new name";
+		synapseClient.updateExternalLocationable(testId, testUrl, newName);
+		layer.setName(newName);
+		verify(mockSynapse).updateExternalLocationableToSynapse(eq(layer), eq(testUrl));
 	}
 	
 	@Test
@@ -601,6 +616,12 @@ public class SynapseClientImplTest {
 	    verify(mockSynapse).getWikiAttachmenthHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
 	}
 
+	private void resetUpdateExternalFileHandleMocks(String testId, FileEntity file, ExternalFileHandle handle) throws SynapseException, JSONObjectAdapterException {
+		reset(mockSynapse);
+		when(mockSynapse.getEntityById(testId)).thenReturn(file);
+		when(mockSynapse.createExternalFileHandle(any(ExternalFileHandle.class))).thenReturn(handle);
+		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(file);
+	}
 	@Test
 	public void testUpdateExternalFileHandle() throws Exception {
 		//verify call is directly calling the synapse client provider, and it tries to rename the entity to the filename
@@ -615,13 +636,10 @@ public class SynapseClientImplTest {
 		ExternalFileHandle handle = new ExternalFileHandle();
 		handle.setExternalURL(testUrl);
 		
-		when(mockSynapse.getEntityById(testId)).thenReturn(file);
-		when(mockSynapse.createExternalFileHandle(any(ExternalFileHandle.class))).thenReturn(handle);
-		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(file);
-		
+		resetUpdateExternalFileHandleMocks(testId, file, handle);
 		ArgumentCaptor<FileEntity> arg = ArgumentCaptor.forClass(FileEntity.class);
 		
-		synapseClient.updateExternalFile(testId, testUrl);
+		synapseClient.updateExternalFile(testId, testUrl, null);
 		
 		verify(mockSynapse).getEntityById(testId);
 		verify(mockSynapse).createExternalFileHandle(any(ExternalFileHandle.class));
@@ -632,17 +650,25 @@ public class SynapseClientImplTest {
 		assertEquals(myFileName, fileEntityArg.getName());
 		
 		//and if rename fails, verify all is well (but the FileEntity name is not updated)
+		resetUpdateExternalFileHandleMocks(testId, file, handle);
 		file.setName(originalFileEntityName);
 		//first call should return file, second call to putEntity should throw an exception
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(file).thenThrow(new IllegalArgumentException("invalid name for some reason"));
-		synapseClient.updateExternalFile(testId, testUrl);
+		synapseClient.updateExternalFile(testId, testUrl, "");
 		
-		//second time calling createExternalFileHandle
-		verify(mockSynapse, Mockito.times(2)).createExternalFileHandle(any(ExternalFileHandle.class));
+		//called createExternalFileHandle
+		verify(mockSynapse).createExternalFileHandle(any(ExternalFileHandle.class));
 		//and it should have called putEntity 2 additional times
-		verify(mockSynapse, Mockito.times(4)).putEntity(arg.capture());
+		verify(mockSynapse, Mockito.times(2)).putEntity(arg.capture());
 		fileEntityArg = arg.getValue();	//last value captured
 		assertEquals(originalFileEntityName, fileEntityArg.getName());
+		
+		//and (finally) verify the correct name if it is explicitly set
+		resetUpdateExternalFileHandleMocks(testId, file, handle);
+		String newName = "a new name";
+		synapseClient.updateExternalFile(testId, testUrl, newName);
+		file.setName(newName);
+		verify(mockSynapse).putEntity(eq(file));  //should equal the previous file but with the new name
 	}
 	
 	@Test
