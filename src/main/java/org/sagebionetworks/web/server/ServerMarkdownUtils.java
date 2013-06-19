@@ -367,7 +367,9 @@ public class ServerMarkdownUtils {
 					Matcher matcher = pattern.matcher(oldText);
 					StringBuilder sb = new StringBuilder();
 					int previousFoundIndex = 0;
+					boolean childFound = false;
 					while (matcher.find()) {
+						childFound = true;
 						if (matcher.groupCount() == 2) {
 							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
 							sb.append(DisplayUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
@@ -375,12 +377,14 @@ public class ServerMarkdownUtils {
 							previousFoundIndex = matcher.end(1);
 						}
 					}
-					if (previousFoundIndex < oldText.length() - 1)
-						// substring, go from the previously found index to the end
-						sb.append(oldText.substring(previousFoundIndex));
-					Element newElement = doc.createElement("div"); //wrap new html in a div, since it needs a container!					
-					newElement.html(sb.toString());
-					childNode.replaceWith(newElement);
+					if (childFound) {
+						if (previousFoundIndex < oldText.length() - 1)
+							// substring, go from the previously found index to the end
+							sb.append(oldText.substring(previousFoundIndex));
+						Element newElement = doc.createElement("div"); //wrap new html in a div, since it needs a container!					
+						newElement.html(sb.toString());
+						childNode.replaceWith(newElement);
+					}
 				}
 			}
 		}

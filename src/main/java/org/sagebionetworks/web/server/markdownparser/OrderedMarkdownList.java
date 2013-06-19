@@ -8,6 +8,10 @@ public class OrderedMarkdownList extends MarkdownList {
 		this.orderValue = 1;
 	}
 	
+	/**
+	 * Currently not used, but could be used to restrict it to the correct order
+	 * @return
+	 */
 	public int getOrderValue() {
 		return orderValue;
 	}

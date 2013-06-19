@@ -27,6 +27,7 @@ public class TableParser implements MarkdownElementParser {
 		if (isTableMatch) {
 			//are we starting a table?
 			if (!isInTable) {
+				isInTable = true;
 				//start table
 				builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
 				//this line is the header

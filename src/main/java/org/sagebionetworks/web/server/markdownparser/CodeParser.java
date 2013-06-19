@@ -41,8 +41,8 @@ public class CodeParser implements MarkdownElementParser {
 		}
 		else {
 			sb.append(line);
-			if (!isInCodeBlock)
-				sb.append(ServerMarkdownUtils.HTML_LINE_BREAK);
+			String newLine = isInCodeBlock ? "\n" : ServerMarkdownUtils.HTML_LINE_BREAK;
+			sb.append(newLine);
 		}
 			
 		
