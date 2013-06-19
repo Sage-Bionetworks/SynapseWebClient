@@ -68,6 +68,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getEntityListConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.SHINYSITE_CONTENT_TYPE)) {
 			presenter = ginInjector.getShinySiteConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.BUTTON_LINK_CONTENT_TYPE)) {
+			presenter = ginInjector.getButtonLinkConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -116,6 +118,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getUserBadgeWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.JOIN_EVALUATION_CONTENT_TYPE)) {
 			presenter = ginInjector.getJoinWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.BUTTON_LINK_CONTENT_TYPE)) {
+			presenter = ginInjector.getButtonLinkWidget();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)

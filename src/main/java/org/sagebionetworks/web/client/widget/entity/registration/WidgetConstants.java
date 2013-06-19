@@ -35,6 +35,9 @@ public class WidgetConstants {
 	public static final String JOIN_EVALUATION_CONTENT_TYPE = "joinevaluation";
 	public static final String JOIN_EVALUATION_FRIENDLY_NAME ="Join Evaluation";
 	
+	public static final String BUTTON_LINK_CONTENT_TYPE = "buttonlink";
+	public static final String BUTTON_LINK_FRIENDLY_NAME ="Button Link";
+	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
@@ -86,6 +89,8 @@ public class WidgetConstants {
 	public static final String SHINYSITE_HEIGHT_KEY = "height";
 	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
+	public static final String BUTTON_LINK_URL_KEY = "url";
+	public static final String BUTTON_LINK_TEXT_KEY = "text";
 	/**
 	 * API Table Column Renderers
 	 */
