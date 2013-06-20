@@ -109,7 +109,7 @@ public class SynapseMarkdownProcessor {
 		//the rest of the multiline processors not currently in the middle of an element
 		List<MarkdownElementParser> inactiveComplexParsers = new ArrayList<MarkdownElementParser>();
 		
-		//initialize all processors in the "other" list
+		//initialize all processors either in the simple list, or in the inactive list
 		for (MarkdownElementParser parser : allElementParsers) {
 			if (parser.isInputSingleLine())
 				simpleParsers.add(parser);
@@ -123,17 +123,17 @@ public class SynapseMarkdownProcessor {
 		}
 		allLines.add("");
 		for (String line : allLines) {
-			//always process the simple processors first
+			//process the simple processors first
 			for (MarkdownElementParser parser : simpleParsers) {
 				line = parser.processLine(line);
 			}
 			
-			//then do parsers we're currently "in"
+			//then do parsers we're currently in the middle of
 			for (MarkdownElementParser parser : activeComplexParsers) {
 				line = parser.processLine(line);
 			}
 			
-			//then the rest
+			//then the inactive multiline parsers
 			for (MarkdownElementParser parser : inactiveComplexParsers) {
 				line = parser.processLine(line);
 			}
@@ -160,7 +160,7 @@ public class SynapseMarkdownProcessor {
 			inactiveComplexParsers = newInactiveComplexParsers;
 			
 			output.append(line);
-			//also tack on a <br />, unless we are preformatted
+			//also tack on a <br />, unless we are a block element (those parsers handle their own newlines
 			boolean isInMiddleOfBlockElement = false;
 			for (MarkdownElementParser parser : allElementParsers) {
 				if (parser.isInMarkdownElement() && parser.isBlockElement()) {
