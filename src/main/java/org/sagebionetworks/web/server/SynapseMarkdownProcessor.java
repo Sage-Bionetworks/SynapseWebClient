@@ -105,54 +105,54 @@ public class SynapseMarkdownProcessor {
 		List<MarkdownElementParser> simpleParsers = new ArrayList<MarkdownElementParser>();
 		
 		//these are the processors that report they are in the middle of a multiline element
-		List<MarkdownElementParser> currentlyProcessingElementProcessors = new ArrayList<MarkdownElementParser>();
+		List<MarkdownElementParser> activeComplexParsers = new ArrayList<MarkdownElementParser>();
 		//the rest of the multiline processors not currently in the middle of an element
-		List<MarkdownElementParser> otherElementProcessors = new ArrayList<MarkdownElementParser>();
+		List<MarkdownElementParser> inactiveComplexParsers = new ArrayList<MarkdownElementParser>();
 		
 		//initialize all processors in the "other" list
 		for (MarkdownElementParser parser : allElementParsers) {
 			if (parser.isInputSingleLine())
 				simpleParsers.add(parser);
 			else
-				otherElementProcessors.add(parser);
+				inactiveComplexParsers.add(parser);
 		}
 		
 		for (String line : markdown.split("\n")) {
-			//always process the easy processors first
+			//always process the simple processors first
 			for (MarkdownElementParser parser : simpleParsers) {
 				line = parser.processLine(line);
 			}
 			
 			//then do parsers we're currently "in"
-			for (MarkdownElementParser parser : currentlyProcessingElementProcessors) {
+			for (MarkdownElementParser parser : activeComplexParsers) {
 				line = parser.processLine(line);
 			}
 			
 			//then the rest
-			for (MarkdownElementParser parser : otherElementProcessors) {
+			for (MarkdownElementParser parser : inactiveComplexParsers) {
 				line = parser.processLine(line);
 			}
 			
-			List<MarkdownElementParser> newCurrentlyProcessingElementProcessors = new ArrayList<MarkdownElementParser>();
-			List<MarkdownElementParser> newOtherElementProcessors = new ArrayList<MarkdownElementParser>();
+			List<MarkdownElementParser> newActiveComplexParsers = new ArrayList<MarkdownElementParser>();
+			List<MarkdownElementParser> newInactiveComplexParsers = new ArrayList<MarkdownElementParser>();
 			//add all from the still processing list (maintain order)
-			for (MarkdownElementParser parser : currentlyProcessingElementProcessors) {
+			for (MarkdownElementParser parser : activeComplexParsers) {
 				if (parser.isInMarkdownElement())
-					newCurrentlyProcessingElementProcessors.add(parser);
+					newActiveComplexParsers.add(parser);
 				else
-					newOtherElementProcessors.add(parser);
+					newInactiveComplexParsers.add(parser);
 			}
 			
 			//sort the rest
-			for (MarkdownElementParser parser : otherElementProcessors) {
+			for (MarkdownElementParser parser : inactiveComplexParsers) {
 				if (parser.isInMarkdownElement()) //add to the front (reverse their order so that they can have the opportunity to be well formed)
-					newCurrentlyProcessingElementProcessors.add(0, parser);
+					newActiveComplexParsers.add(0, parser);
 				else
-					newOtherElementProcessors.add(parser);
+					newInactiveComplexParsers.add(parser);
 			}
 			
-			currentlyProcessingElementProcessors = newCurrentlyProcessingElementProcessors;
-			otherElementProcessors = newOtherElementProcessors;
+			activeComplexParsers = newActiveComplexParsers;
+			inactiveComplexParsers = newInactiveComplexParsers;
 			
 			output.append(line);
 			//also tack on a <br />, unless we are preformatted
@@ -181,20 +181,14 @@ public class SynapseMarkdownProcessor {
 	public String postProcessHtml(String html, boolean isPreview) {
 		//using jsoup, since it's already in this project!
 		Document doc = Jsoup.parse(html);
-	//				reportTime("Jsoup parse");
 		ServerMarkdownUtils.assignIdsToHeadings(doc);
-	//				reportTime("Assign IDs to Headings");
 		ServerMarkdownUtils.sendAllLinksToNewWindow(doc);
-	//				reportTime("sendAllLinksToNewWindow");
 		Elements anchors = doc.getElementsByTag("a");
 		anchors.addClass("link");
 		
 		Elements tables = doc.getElementsByTag("table");
 		tables.addClass("markdowntable");
-		
-	//				reportTime("add link class");
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
-	//				reportTime("addWidgets");
 		SynapseAutoLinkDetector.getInstance().createLinks(doc);
 		DoiAutoLinkDetector.getInstance().createLinks(doc);
 		UrlAutoLinkDetector.getInstance().createLinks(doc);

@@ -5,19 +5,16 @@ import java.util.regex.Pattern;
 
 public class HeadingParser extends BasicMarkdownElementParser  {
 	Pattern p1;
-	boolean isHeading;
 	
 	@Override
 	public void init() {
 		p1 = Pattern.compile(MarkdownRegExConstants.HEADING_REGEX, Pattern.DOTALL);
-		isHeading = false;
 	}
 
 	@Override
 	public String processLine(String line) {
 		Matcher m = p1.matcher(line);
-		isHeading = m.matches();
-		if (isHeading) {
+		if (m.matches()) {
 			//looks like a heading
 			String prefix = m.group(1);
 			String hashes = m.group(2);
@@ -27,11 +24,6 @@ public class HeadingParser extends BasicMarkdownElementParser  {
             return prefix + "<" + tag + ">" + headingText + "</" + tag + ">";
 		}
 		return line;
-	}
-	
-	@Override
-	public boolean isInMarkdownElement() {
-		return isHeading;
 	}
 	
 	@Override
