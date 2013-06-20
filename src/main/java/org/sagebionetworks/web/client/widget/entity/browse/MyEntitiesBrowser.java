@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -24,7 +23,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	
 	private MyEntitiesBrowserView view;	
 	private SearchServiceAsync searchService;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
@@ -38,7 +36,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	
 	@Inject
 	public MyEntitiesBrowser(MyEntitiesBrowserView view,
-			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			final GlobalApplicationState globalApplicationState,
@@ -48,7 +45,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.searchService = searchService;
-		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;

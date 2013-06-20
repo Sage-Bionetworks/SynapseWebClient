@@ -56,8 +56,6 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseWidgetView {
 
 		void deleteEntity(EntityTreeModel model);
 
-		void onEdit(String entityId);
-
 	}
 
 }

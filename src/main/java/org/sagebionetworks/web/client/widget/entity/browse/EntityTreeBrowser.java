@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,13 +19,8 @@ import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.EntityEditor;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
@@ -49,10 +41,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private HandlerManager handlerManager = new HandlerManager(this);
 	private SynapseClientAsync synapseClient;
 	private IconsImageBundle iconsImageBundle;
-	private EntityEditor entityEditor;
 	AdapterFactory adapterFactory;
 	EntityTypeProvider entityTypeProvider;
-	NodeModelCreator nodeModelCreator;
 	
 	private String currentSelection;
 	
@@ -61,24 +51,20 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	@Inject
 	public EntityTreeBrowser(EntityTreeBrowserView view,
 			SearchServiceAsync searchService,
-			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
 			IconsImageBundle iconsImageBundle,
-			EntityEditor entityEditor,
 			AdapterFactory adapterFactory) {
 		this.view = view;		
 		this.searchService = searchService;
-		this.nodeModelCreator = nodeModelCreator;
 		this.entityTypeProvider = entityTypeProvider;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.iconsImageBundle = iconsImageBundle;
-		this.entityEditor = entityEditor;
 		this.adapterFactory = adapterFactory;
 		
 		view.setPresenter(this);
@@ -237,31 +223,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		else entityType = entityTypeProvider.getEntityTypeForString(type);
 		if (entityType == null) return null;
 		return DisplayUtils.getSynapseIconForEntityClassName(entityType.getClassName(), DisplayUtils.IconSize.PX16, iconsImageBundle);
-	}
-
-	@Override
-	public void onEdit(String entityId) {
-		int mask = ENTITY | PERMISSIONS;
-		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundleTransport>() {
-			@Override
-			public void onSuccess(EntityBundleTransport transport) {				
-				EntityBundle bundle = null;
-				try {
-					bundle = nodeModelCreator.createEntityBundle(transport);										
-					entityEditor.editEntity(bundle, false);					
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}				
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
-					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
-				}
-				globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
-			}			
-		});		
 	}
 
 }

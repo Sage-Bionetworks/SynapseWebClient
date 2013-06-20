@@ -89,8 +89,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.homeSearchBox = homeSearchBox;
 		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
 		this.favoritesTreeBrowser = favoritesTreeBrowser;
-		this.iconsImageBundle = icons;
 		this.myEvaluationsList = myEvaluationsList;
+		this.iconsImageBundle = icons;
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
