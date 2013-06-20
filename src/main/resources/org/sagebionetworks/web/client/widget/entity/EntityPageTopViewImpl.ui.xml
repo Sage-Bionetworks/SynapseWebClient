@@ -8,10 +8,10 @@
 	<g:HTMLPanel>
 
 				<div class="span-24 notopmargin" style="margin-top: 5px !important">
-					<div class="span-18 notopmargin" style="white-space: normal;">
+					<div class="span-14 notopmargin" style="white-space: normal;">
 						<g:SimplePanel ui:field="breadcrumbsPanel"/>
 					</div>
-					<div class="span-5 last right notopmargin" style="margin-left:14px">
+					<div class="span-10 last right notopmargin">
 						<g:SimplePanel ui:field="actionMenuPanel" />
 					</div>
 				</div>

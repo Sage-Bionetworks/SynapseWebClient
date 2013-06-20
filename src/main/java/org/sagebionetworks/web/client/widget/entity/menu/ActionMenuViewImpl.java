@@ -43,7 +43,6 @@ import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -54,15 +53,15 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuView {
+public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -74,7 +73,9 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private EntityFinder entityFinder;
 	private EvaluationList evaluationList;
 	
-	private boolean readOnly;	
+	private boolean readOnly;
+	private Button submitButton;
+	private SimplePanel submitButtonPanel;
 	private Button editButton;
 	private Button shareButton;
 	private Button toolsButton;
@@ -101,8 +102,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.entityFinder = entityFinder;
 		this.evaluationList = evaluationList;
-		this.setHorizontalAlign(HorizontalAlignment.RIGHT);
-		this.setTableWidth("100%");
 	}
 
 	@Override
@@ -121,42 +120,73 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 
 		UserSessionData sessionData = authenticationController.getLoggedInUser();
 		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
-
-		// edit button
-		if(editButton == null) {			
-			editButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
-			editButton.setId(DisplayConstants.ID_BTN_EDIT);
-			editButton.setHeight(25);
-			this.add(editButton);
-			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
-		}				
-		if (canEdit && !readOnly) editButton.enable();
-		else editButton.disable();
-		configureEditButton(entity, entityType);	
+		
+		if(deleteButton == null) {
+			deleteButton = getDeleteButton(entityType);
+			this.add(deleteButton);
+		}
+		
+		if(toolsButton == null) {
+			toolsButton = new Button(DisplayConstants.BUTTON_TOOLS_MENU, AbstractImagePrototype.create(iconsImageBundle.adminToolsGrey16()));
+			toolsButton.setHeight(25);
+			toolsButton.addStyleName("floatright margin-left-5");
+			this.add(toolsButton);	
+			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
+		}
 		
 		// share button
 		if(shareButton == null) { 
 			shareButton = new Button(DisplayConstants.BUTTON_SHARE, AbstractImagePrototype.create(iconsImageBundle.mailGrey16()));
 			shareButton.setId(DisplayConstants.ID_BTN_SHARE);
 			shareButton.setHeight(25);
+			shareButton.addStyleName("floatright margin-left-5");
 			this.add(shareButton);
-			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
+			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
+
+		// edit button
+		if(editButton == null) {			
+			editButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
+			editButton.setId(DisplayConstants.ID_BTN_EDIT);
+			editButton.setHeight(25);
+			editButton.addStyleName("floatright margin-left-5");
+			this.add(editButton);
+			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
+		}	
+		
+		if(submitButton == null) {
+			submitButtonPanel = new SimplePanel();
+			submitButton = new Button(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION, AbstractImagePrototype.create(iconsImageBundle.synapseStep16()));
+			submitButton.setId(DisplayConstants.ID_BTN_SUBMIT_TO_EVALUATION);
+			submitButton.setHeight(25);
+			submitButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					//ask the presenter to query for all available evaluations, and it may call the view back for the user to select evaluation(s) to submit to
+					presenter.showAvailableEvaluations();
+				}
+			});
+			submitButtonPanel.addStyleName("floatright margin-left-5");
+			this.add(submitButtonPanel);
+			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
+		}
+		
+		submitButtonPanel.clear();
+		if (canEdit && entity instanceof Versionable) {
+			//kick off the query (asynchronously) to determine if the current user is signed up for any challenges
+			//will call back to the view to set submit button visibility
+			presenter.isSubmitButtonVisible();
+		}
+		
+		if (canEdit && !readOnly) editButton.enable();
+		else editButton.disable();
+		configureEditButton(entity, entityType);	
+		
 		if (isAdministrator && !readOnly) shareButton.enable();
 		else shareButton.disable();
 		configureShareButton(entity);		
 		
-		if(toolsButton == null) {
-			toolsButton = new Button(DisplayConstants.BUTTON_TOOLS_MENU, AbstractImagePrototype.create(iconsImageBundle.adminToolsGrey16()));
-			toolsButton.setHeight(25);
-			this.add(toolsButton);	
-			this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
-		}
-		
-		if(deleteButton == null) {
-			deleteButton = getDeleteButton(entityType);
-			this.add(deleteButton);
-		}
 		
 		if (isAdministrator)
 			deleteButton.enable();
@@ -164,6 +194,11 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 		configureDeleteButton(entityType);
 		
 		configureToolsMenu(entityBundle, entityType, isAdministrator, canEdit);
+	}
+	
+	@Override
+	public void showSubmitToChallengeButton() {
+		submitButtonPanel.add(submitButton);
 	}
 	
 	@Override
@@ -314,10 +349,6 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 			addUploadItem(menu, entityBundle, entityType);
 		}
 		
-		if (canEdit && entity instanceof Versionable) {
-			addSubmitToEvaluationItem(menu, entity, entityType);
-		}
-		
 		// create link
 		if(authenticated) {
 			addCreateShortcutItem(menu, entity, entityType);
@@ -344,6 +375,7 @@ public class ActionMenuViewImpl extends HorizontalPanel implements ActionMenuVie
 	private Button getDeleteButton(EntityType entityType) {
 		Button deleteButton = new Button("", AbstractImagePrototype.create(iconsImageBundle.trash16()));
 		deleteButton.setHeight(25);
+		deleteButton.addStyleName("floatright margin-left-5");
 		DisplayUtils.addTooltip(synapseJSNIUtils, deleteButton, DisplayConstants.LABEL_DELETE, TOOLTIP_POSITION.BOTTOM);
 		return deleteButton;
 	}
