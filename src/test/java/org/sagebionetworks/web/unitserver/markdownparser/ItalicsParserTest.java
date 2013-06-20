@@ -16,7 +16,7 @@ public class ItalicsParserTest {
 	}
 	
 	@Test
-	public void testBold(){
+	public void testItalics(){
 		String text = "*this* should be italicized, and so should _that_";
 		String result = parser.processLine(text);
 		assertTrue(result.contains("<em>this</em>"));

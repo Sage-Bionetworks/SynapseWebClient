@@ -117,7 +117,12 @@ public class SynapseMarkdownProcessor {
 				inactiveComplexParsers.add(parser);
 		}
 		
+		List<String> allLines = new ArrayList<String>();
 		for (String line : markdown.split("\n")) {
+			allLines.add(line);
+		}
+		allLines.add("");
+		for (String line : allLines) {
 			//always process the simple processors first
 			for (MarkdownElementParser parser : simpleParsers) {
 				line = parser.processLine(line);

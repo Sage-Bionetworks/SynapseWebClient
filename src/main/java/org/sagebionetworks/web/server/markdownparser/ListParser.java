@@ -18,6 +18,7 @@ public class ListParser extends BasicMarkdownElementParser  {
 	public void init() {
 		p1 = Pattern.compile(MarkdownRegExConstants.ORDERED_LIST_REGEX, Pattern.DOTALL);
 		p2 = Pattern.compile(MarkdownRegExConstants.UNORDERED_LIST_REGEX, Pattern.DOTALL);
+		stack = new Stack<MarkdownList>();
 	}
 
 	@Override
@@ -38,7 +39,8 @@ public class ListParser extends BasicMarkdownElementParser  {
 		}
 		else if (isUnorderedList) {
 			return getListItem(line, m2, false);
-		} else if (isInMarkdownElement()) {
+		} 
+		else if (isInMarkdownElement()) {
 			//this is not a list item line.  End all existing lists
 			StringBuilder sb = new StringBuilder();
 			while(!stack.isEmpty()){
