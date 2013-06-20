@@ -322,6 +322,13 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    	};
 			}));
 	    }
+
+	    menu.add(getNewCommand(WidgetConstants.BUTTON_LINK_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.BUTTON_LINK_CONTENT_TYPE, callback);
+	    	};
+		}));
+
 	    menu.add(getNewCommand(WidgetConstants.ENTITYLIST_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	@Override
 	    	public void componentSelected(ComponentEvent ce) {
