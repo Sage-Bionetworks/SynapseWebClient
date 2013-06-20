@@ -225,7 +225,7 @@ public class DisplayConstants {
 	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String LABEL_FINISHING = "Finishing...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
-	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit For Evaluation";
+	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit To Challenge";
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
 	
 	public static final String SUBMITTED_TITLE = "Submitted";
@@ -397,6 +397,7 @@ public class DisplayConstants {
 	public static final String ID_INP_NEWPASSWORD = "id_inp_new_password";
 	public static final String ID_INP_CONFIRMPASSWORD = "id_inp_confirm_password";
 	public static final String ID_BTN_SUBMIT = "id_btn_submit";
+	public static final String ID_BTN_SUBMIT_TO_EVALUATION = "id_btn_submit_to_evaluation";
 	public static final String ID_BTN_START_PROJECT = "id_btn_start_project";
 	public static final String ID_BTN_DOWNLOAD = "id_btn_download";
 	public static final String ID_BTN_EDIT = "id_btn_edit";
