@@ -74,7 +74,13 @@ public class HomePresenterTest {
 		testEvaluationResults.add(testEvaluation);
 		testBatchResults.setTotalNumberOfResults(1);
 		testBatchResults.setResults(testEvaluationResults);
-		AsyncMockStubber.callSuccessWith(testBatchResults.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockSynapseClient).getAvailableEvaluationEntities(any(AsyncCallback.class));
+		
+		ArrayList<String> testBatchResultsList = new ArrayList<String>();
+		for(EntityHeader eh : testBatchResults.getResults()) {
+			testBatchResultsList.add(eh.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		}
+		
+		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getAvailableEvaluationEntitiesList(any(AsyncCallback.class));
 		testFeed = new RSSFeed();
 		RSSEntry entry = new RSSEntry();
 		entry.setTitle("A Title");
@@ -123,7 +129,7 @@ public class HomePresenterTest {
 	@Test
 	public void testLoadEvaluationsFailure() throws RestServiceException {
 		Exception simulatedException = new Exception("Simulated Error");
-		AsyncMockStubber.callFailureWith(simulatedException).when(mockSynapseClient).getAvailableEvaluationEntities(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(simulatedException).when(mockSynapseClient).getAvailableEvaluationEntitiesList(any(AsyncCallback.class));
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		homePresenter.loadEvaluations(mockCallback);
 		verify(mockCallback).onFailure(simulatedException);

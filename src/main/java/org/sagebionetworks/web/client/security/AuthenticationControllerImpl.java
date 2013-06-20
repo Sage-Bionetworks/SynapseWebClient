@@ -136,13 +136,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
 		if(loginCookieString != null) {
 			try {
-				UserSessionData userSessionData = new UserSessionData(adapterFactory.createNew(loginCookieString));
-				if(userSessionData != null) {
-					String token = userSessionData.getSessionToken();
-					if(token != null && !token.isEmpty())
-						return true;
-				}
-			} catch (JSONObjectAdapterException e) {
+				currentUser = new UserSessionData(adapterFactory.createNew(loginCookieString));
+				if(currentUser != null) return true;				
+			} catch (JSONObjectAdapterException e) {				
 			}			
 		} 
 		return false;
@@ -176,7 +172,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public UserSessionData getCurrentUserSessionData() {
-		return currentUser;
+		if (isLoggedIn()) {
+			return currentUser;
+		} else
+			return null;
 	}
 
 	@Override

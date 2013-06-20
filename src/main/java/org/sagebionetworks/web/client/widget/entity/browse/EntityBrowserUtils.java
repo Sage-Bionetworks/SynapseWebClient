@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WhereCondition;
@@ -59,17 +58,20 @@ public class EntityBrowserUtils {
 			final AdapterFactory adapterFactory,
 			final GlobalApplicationState globalApplicationState,
 			final AsyncCallback<List<EntityHeader>> callback) {
-		synapseClient.getFavorites(Integer.MAX_VALUE, 0, new AsyncCallback<String>() {
+		synapseClient.getFavoritesList(Integer.MAX_VALUE, 0, new AsyncCallback<ArrayList<String>>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
-					favorites.initializeFromJSONObject(adapterFactory.createNew(result));
-					globalApplicationState.setFavorites(favorites.getResults());
-					callback.onSuccess(favorites.getResults());
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
+			public void onSuccess(ArrayList<String> results) {
+				List<EntityHeader> favorites = new ArrayList<EntityHeader>();
+				for(String entityHeaderJson : results) {
+					try {
+						favorites.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
+					} catch (JSONObjectAdapterException e) {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+					}
+				} 
+				//show whatever projects that we found (maybe zero)
+				globalApplicationState.setFavorites(favorites);
+				callback.onSuccess(favorites);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

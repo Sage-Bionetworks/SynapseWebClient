@@ -1,13 +1,12 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -193,13 +192,15 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 
 	public void loadEvaluations(final AsyncCallback<List<EntityHeader>> callback){
 		try {
-			synapseClient.getAvailableEvaluationEntities(new AsyncCallback<String>() {
+			synapseClient.getAvailableEvaluationEntitiesList(new AsyncCallback<ArrayList<String>>() {
 				@Override
-				public void onSuccess(String jsonString) {
-					BatchResults<EntityHeader> headers = new BatchResults<EntityHeader>(EntityHeader.class);
-					try {						
-						headers.initializeFromJSONObject(adapterFactory.createNew(jsonString));
-						callback.onSuccess(headers.getResults());
+				public void onSuccess(ArrayList<String> results) {					
+					try {	
+						List<EntityHeader> evals = new ArrayList<EntityHeader>();
+						for(String eh : results) {
+							evals.add(new EntityHeader(adapterFactory.createNew(eh)));
+						}
+						callback.onSuccess(evals);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
