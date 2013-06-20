@@ -187,12 +187,7 @@ public class SynapseMarkdownProcessor {
 		//using jsoup, since it's already in this project!
 		Document doc = Jsoup.parse(html);
 		ServerMarkdownUtils.assignIdsToHeadings(doc);
-		ServerMarkdownUtils.sendAllLinksToNewWindow(doc);
-		Elements anchors = doc.getElementsByTag("a");
-		anchors.addClass("link");
 		
-		Elements tables = doc.getElementsByTag("table");
-		tables.addClass("markdowntable");
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
 		SynapseAutoLinkDetector.getInstance().createLinks(doc);
 		DoiAutoLinkDetector.getInstance().createLinks(doc);

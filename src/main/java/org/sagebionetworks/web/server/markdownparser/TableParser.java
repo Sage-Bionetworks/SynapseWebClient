@@ -28,7 +28,7 @@ public class TableParser extends BasicMarkdownElementParser {
 			if (!isInTable) {
 				isInTable = true;
 				//start table
-				builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
+				builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable\">");
 				//this line is the header
 				builder.append("<thead>");
 				builder.append("<tr>");
