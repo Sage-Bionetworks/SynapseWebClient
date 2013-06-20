@@ -39,6 +39,8 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 	
 	void popupEvaluationSelector(List<Evaluation> list, List<String> submitterAliases);
 	
+	void showSubmitToChallengeButton();
+	
 	/**
 	 * Presenter interface
 	 */
@@ -69,6 +71,8 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 		void submitToEvaluations(List<String> evaluationIds, String submitterAlias);
 		
 		void showAvailableEvaluations();
+		
+		void isSubmitButtonVisible();
 	}
 
 }
