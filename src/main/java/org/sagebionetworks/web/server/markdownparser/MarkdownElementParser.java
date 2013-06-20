@@ -40,4 +40,10 @@ public interface MarkdownElementParser {
 	 * @return
 	 */
 	boolean isBlockElement();
+	
+	/**
+	 * True if element input is always represented on a single line
+	 * @return
+	 */
+	boolean isInputSingleLine();
 }

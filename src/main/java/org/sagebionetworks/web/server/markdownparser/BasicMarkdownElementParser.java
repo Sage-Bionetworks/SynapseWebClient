@@ -31,5 +31,10 @@ public abstract class BasicMarkdownElementParser implements MarkdownElementParse
 	public boolean isBlockElement() {
 		return false;
 	}
+	
+	@Override
+	public boolean isInputSingleLine() {
+		return true;
+	}
 
 }

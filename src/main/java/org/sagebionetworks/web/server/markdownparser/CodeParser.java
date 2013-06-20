@@ -7,12 +7,10 @@ import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
 public class CodeParser extends BasicMarkdownElementParser  {
 	Pattern p;
-	//exactly three '`', optionally followed by the language class to use
-	public static final String FENCE_CODE_BLOCK_REGEX = "^[> \t\n\f\r]*[`]{3}\\s*([a-zA-Z_0-9-]*)\\s*$";
 	boolean isInCodeBlock;
 	@Override
 	public void init() {
-		p = Pattern.compile(FENCE_CODE_BLOCK_REGEX);
+		p = Pattern.compile(MarkdownRegExConstants.FENCE_CODE_BLOCK_REGEX);
 	}
 
 	@Override
@@ -28,9 +26,10 @@ public class CodeParser extends BasicMarkdownElementParser  {
 			if (!isInCodeBlock) {
 				//starting code block
 				isInCodeBlock = true;
+				sb.append(m.group(1)); //prefix group
 				sb.append(ServerMarkdownUtils.START_PRE_CODE);
-				if (m.groupCount() == 1)
-					sb.append(" class=\""+m.group(1).toLowerCase()+"\"");
+				if (m.groupCount() == 2)
+					sb.append(" class=\""+m.group(2).toLowerCase()+"\"");
 				sb.append(">");
 			}
 			else {
@@ -41,6 +40,8 @@ public class CodeParser extends BasicMarkdownElementParser  {
 		}
 		else {
 			sb.append(line);
+			if (isInCodeBlock)
+				sb.append("\n");
 		}
 			
 		
@@ -56,4 +57,10 @@ public class CodeParser extends BasicMarkdownElementParser  {
 	public boolean isBlockElement() {
 		return true;
 	}
+	
+	@Override
+	public boolean isInputSingleLine() {
+		return false;
+	}
+
 }

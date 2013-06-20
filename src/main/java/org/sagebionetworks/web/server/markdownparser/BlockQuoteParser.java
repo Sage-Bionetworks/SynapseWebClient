@@ -6,10 +6,9 @@ import java.util.regex.Pattern;
 public class BlockQuoteParser extends BasicMarkdownElementParser {
 	Pattern p1;
 	boolean inBlockQuote;
-	public static final String BLOCK_QUOTE_REGEX = "(^\\s*>\\s?(.+))";
 	@Override
 	public void init() {
-		p1 = Pattern.compile(BLOCK_QUOTE_REGEX, Pattern.DOTALL);
+		p1 = Pattern.compile(MarkdownRegExConstants.BLOCK_QUOTE_REGEX, Pattern.DOTALL);
 	}
 
 	@Override
@@ -43,5 +42,10 @@ public class BlockQuoteParser extends BasicMarkdownElementParser {
 	@Override
 	public boolean isInMarkdownElement() {
 		return inBlockQuote;
+	}
+	
+	@Override
+	public boolean isInputSingleLine() {
+		return false;
 	}
 }

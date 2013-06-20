@@ -3,14 +3,11 @@ package org.sagebionetworks.web.server.markdownparser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.sagebionetworks.web.server.ServerMarkdownUtils;
-
 public class BoldParser extends BasicMarkdownElementParser  {
 	Pattern p1;
-	public static final String BOLD_REGEX = "(\\*\\*|__)(?=\\S)(.+?[*_]*)(?<=\\S)\\1";
 	@Override
 	public void init() {
-		p1 = Pattern.compile(BOLD_REGEX);
+		p1 = Pattern.compile(MarkdownRegExConstants.BOLD_REGEX);
 	}
 
 	@Override

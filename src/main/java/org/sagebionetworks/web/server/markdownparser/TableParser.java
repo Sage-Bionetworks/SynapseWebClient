@@ -3,7 +3,6 @@ package org.sagebionetworks.web.server.markdownparser;
 import java.util.regex.Pattern;
 
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
 public class TableParser extends BasicMarkdownElementParser {
 	Pattern p;
@@ -11,7 +10,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	int tableCount;
 	@Override
 	public void init() {
-		p = Pattern.compile(ServerMarkdownUtils.TABLE_REGEX);
+		p = Pattern.compile(MarkdownRegExConstants.TABLE_REGEX, Pattern.DOTALL);
 	}
 
 	@Override
@@ -54,7 +53,7 @@ public class TableParser extends BasicMarkdownElementParser {
 					builder.append(cells[j]);
 					builder.append("</td>");
 				}
-				builder.append("</tr>");
+				builder.append("</tr>\n");
 			}
 		}
 		else {
@@ -79,4 +78,10 @@ public class TableParser extends BasicMarkdownElementParser {
 	public boolean isBlockElement() {
 		return true;
 	}
+	
+	@Override
+	public boolean isInputSingleLine() {
+		return false;
+	}
+
 }

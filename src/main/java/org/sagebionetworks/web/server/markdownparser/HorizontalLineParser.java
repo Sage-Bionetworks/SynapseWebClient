@@ -2,15 +2,14 @@ package org.sagebionetworks.web.server.markdownparser;
 
 import java.util.regex.Pattern;
 
-import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
 public class HorizontalLineParser extends BasicMarkdownElementParser  {
 	Pattern p1, p2;
 	
 	@Override
 	public void init() {
-		p1 = Pattern.compile(ServerMarkdownUtils.HR_REGEX1);
-		p2 = Pattern.compile(ServerMarkdownUtils.HR_REGEX2);
+		p1 = Pattern.compile(MarkdownRegExConstants.HR_REGEX1);
+		p2 = Pattern.compile(MarkdownRegExConstants.HR_REGEX2);
 	}
 
 	@Override

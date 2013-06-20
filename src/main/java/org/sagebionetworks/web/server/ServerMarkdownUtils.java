@@ -16,15 +16,13 @@ import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.server.markdownparser.MarkdownRegExConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import eu.henkelmann.actuarius.ActuariusTransformer;
 
 public class ServerMarkdownUtils {
 	
-	public static final String TABLE_REGEX = ".*[|]{1}.+[|]{1}.*";
-	public static final String HR_REGEX2 = "^[*]{3,}$";
-	public static final String HR_REGEX1 = "^[-]{3,}$";
 	//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by exactly 3 '`', then it's a match
 	public static final String FENCE_CODE_BLOCK_REGEX = "^[> \t\n\f\r]*[`]{3}";
 	//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by ` exactly 4 times, then it's a match
@@ -246,8 +244,8 @@ public class ServerMarkdownUtils {
 	public static String resolveHorizontalRules(String rawMarkdown) {
 		//find all horizontal rules
 		//match if we have 3 or more '-' or '*', and it's the only thing on the line
-		String regEx1 = HR_REGEX1;
-		String regEx2 = HR_REGEX2;
+		String regEx1 = MarkdownRegExConstants.HR_REGEX1;
+		String regEx2 = MarkdownRegExConstants.HR_REGEX2;
 		String[] lines = rawMarkdown.split("\n");
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < lines.length; i++) {
@@ -268,7 +266,7 @@ public class ServerMarkdownUtils {
 	
 	public static String resolveTables(String rawMarkdown) {
 		//find all tables, and replace the raw text with html table
-		String regEx = TABLE_REGEX;
+		String regEx = MarkdownRegExConstants.TABLE_REGEX;
 		String[] lines = rawMarkdown.split("\n");
 		StringBuilder sb = new StringBuilder();
 		int tableCount = 0;

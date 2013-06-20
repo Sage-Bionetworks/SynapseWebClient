@@ -12,14 +12,12 @@ import java.util.regex.Pattern;
 public class ListParser extends BasicMarkdownElementParser  {
 	
 	Pattern p1, p2;
-	public static final String ORDERED_LIST_REGEX = "^[>]*(\\s*)((?:\\d+[.]))(.+)";
-	public static final String UNORDERED_LIST_REGEX = "^[>]*(\\s*)((?:[-+*]))(.+)";
 	Stack<MarkdownList> stack;
 	
 	@Override
 	public void init() {
-		p1 = Pattern.compile(ORDERED_LIST_REGEX, Pattern.DOTALL);
-		p2 = Pattern.compile(UNORDERED_LIST_REGEX, Pattern.DOTALL);
+		p1 = Pattern.compile(MarkdownRegExConstants.ORDERED_LIST_REGEX, Pattern.DOTALL);
+		p2 = Pattern.compile(MarkdownRegExConstants.UNORDERED_LIST_REGEX, Pattern.DOTALL);
 	}
 
 	@Override
@@ -56,11 +54,13 @@ public class ListParser extends BasicMarkdownElementParser  {
 	public String getListItem(String line, Matcher m, boolean isOrderedList) {
 		StringBuilder returnString = new StringBuilder();
 		//looks like a list item
-		String spaces = m.group(1);
+		String prefixGroup = m.group(1);
+		returnString.append(prefixGroup);
+		String spaces = m.group(2);
         int depth = spaces.length();
         //TODO: use listMarker to test order value (if ordered list)
-        String listMarker = m.group(2);
-        String value = m.group(3);
+        String listMarker = m.group(3);
+        String value = m.group(4);
         
         //end any list that is of greater depth on the stack
         boolean isGreaterDepth = true;
@@ -113,5 +113,10 @@ public class ListParser extends BasicMarkdownElementParser  {
 	@Override
 	public boolean isBlockElement() {
 		return true;
+	}
+	
+	@Override
+	public boolean isInputSingleLine() {
+		return false;
 	}
 }

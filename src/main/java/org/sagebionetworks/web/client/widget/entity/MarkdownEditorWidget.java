@@ -101,8 +101,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.markdownTextArea = markdownTextArea;
 		this.wikiKey = wikiKey;
 		this.isWikiEditor = isWikiEditor;
-		
-		descriptionFormatInfo = new HTML(WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
+		String formattingTipsHtml = DisplayUtils.isInTestWebsite(cookies) ? WebConstants.SYNAPSE_MARKDOWN_FORMATTING_TIPS_HTML : WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML;
+		descriptionFormatInfo = new HTML(formattingTipsHtml);
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
 		mdCommands.setVerticalAlign(VerticalAlignment.MIDDLE);

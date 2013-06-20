@@ -100,16 +100,30 @@ public class SynapseMarkdownProcessor {
 		}
 		//go through the document once, and apply all markdown parsers to it
 		StringBuilder output = new StringBuilder();
-		//these are the processors that report they are in the middle of the element
+		
+		//these are the parsers that only take a single line as input (element does not span across lines)
+		List<MarkdownElementParser> simpleParsers = new ArrayList<MarkdownElementParser>();
+		
+		//these are the processors that report they are in the middle of a multiline element
 		List<MarkdownElementParser> currentlyProcessingElementProcessors = new ArrayList<MarkdownElementParser>();
-		//other element processors
+		//the rest of the multiline processors not currently in the middle of an element
 		List<MarkdownElementParser> otherElementProcessors = new ArrayList<MarkdownElementParser>();
+		
 		//initialize all processors in the "other" list
-		otherElementProcessors.addAll(allElementParsers);
+		for (MarkdownElementParser parser : allElementParsers) {
+			if (parser.isInputSingleLine())
+				simpleParsers.add(parser);
+			else
+				otherElementProcessors.add(parser);
+		}
 		
 		for (String line : markdown.split("\n")) {
-			//first do parsers we're currently "in"
+			//always process the easy processors first
+			for (MarkdownElementParser parser : simpleParsers) {
+				line = parser.processLine(line);
+			}
 			
+			//then do parsers we're currently "in"
 			for (MarkdownElementParser parser : currentlyProcessingElementProcessors) {
 				line = parser.processLine(line);
 			}
@@ -129,7 +143,7 @@ public class SynapseMarkdownProcessor {
 					newOtherElementProcessors.add(parser);
 			}
 			
-			//process the rest
+			//sort the rest
 			for (MarkdownElementParser parser : otherElementProcessors) {
 				if (parser.isInMarkdownElement()) //add to the front (reverse their order so that they can have the opportunity to be well formed)
 					newCurrentlyProcessingElementProcessors.add(0, parser);
@@ -142,14 +156,15 @@ public class SynapseMarkdownProcessor {
 			
 			output.append(line);
 			//also tack on a <br />, unless we are preformatted
-			boolean isPreformatted = false;
+			boolean isInMiddleOfBlockElement = false;
 			for (MarkdownElementParser parser : allElementParsers) {
 				if (parser.isInMarkdownElement() && parser.isBlockElement()) {
-					isPreformatted = true;
+					isInMiddleOfBlockElement = true;
 					break;
 				}
 			}
-			output.append(isPreformatted ? "\n" : ServerMarkdownUtils.HTML_LINE_BREAK);
+			if (!isInMiddleOfBlockElement)
+				output.append(ServerMarkdownUtils.HTML_LINE_BREAK);
 		}
 		
 		for (MarkdownElementParser parser : allElementParsers) {
