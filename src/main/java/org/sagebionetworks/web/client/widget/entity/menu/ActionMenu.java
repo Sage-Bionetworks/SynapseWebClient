@@ -170,20 +170,38 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		getAvailableEvaluations(new EvaluationsCallback() {
 			@Override
 			public void onSuccess(final List<Evaluation> evaluations) {
-				getAvailableEvaluationsSubmitterAliases(new SubmitterAliasesCallback() {
-					@Override
-					public void onSuccess(List<String> submitterAliases) {
-						//add the default team name (if set in the profile and not already in the list)
-						UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-						String teamName = sessionData.getProfile().getTeamName();
-						if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
-							submitterAliases.add(teamName);
+				if (evaluations == null || evaluations.size() == 0) {
+					//no available evaluations, pop up an info dialog
+					view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
+				} 
+				else {
+					getAvailableEvaluationsSubmitterAliases(new SubmitterAliasesCallback() {
+						@Override
+						public void onSuccess(List<String> submitterAliases) {
+							//add the default team name (if set in the profile and not already in the list)
+							UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
+							String teamName = sessionData.getProfile().getTeamName();
+							if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
+								submitterAliases.add(teamName);
+							}
+							view.popupEvaluationSelector(evaluations, submitterAliases);		
 						}
-						view.popupEvaluationSelector(evaluations, submitterAliases);		
-					}
-				});
+					});
+				}
 			}
 		});
+	}
+	@Override
+	public void isSubmitButtonVisible() {
+		getAvailableEvaluations(new EvaluationsCallback() {
+			@Override
+			public void onSuccess(final List<Evaluation> evaluations) {
+				if (evaluations.size() > 0) {
+					view.showSubmitToChallengeButton();
+				}
+			}
+		});
+		
 	}
 	
 	public void getAvailableEvaluations(final EvaluationsCallback callback) {
@@ -194,12 +212,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 					try {
 						PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
 						List<Evaluation> list = results.getResults();
-						if (list == null || list.size() == 0) {
-							//no available evaluations, pop up an info dialog
-							view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
-						} else {
-							callback.onSuccess(list);
-						}
+						callback.onSuccess(list);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
