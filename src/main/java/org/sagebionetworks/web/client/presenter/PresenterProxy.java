@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -22,6 +23,8 @@ public class PresenterProxy<P extends Presenter<T>,T extends Place> extends Abst
 	
 	AsyncProvider<P> provider;
 	T place;
+	PortalGinInjector ginjector;
+	private static boolean prefetchedBulk = false;
 	
 	@Inject
 	public PresenterProxy(AsyncProvider<P> provider){
@@ -43,6 +46,15 @@ public class PresenterProxy<P extends Presenter<T>,T extends Place> extends Abst
 				// forward the place and start
 				result.setPlace(place);
 				result.start(panel, eventBus);
+				
+				// Prefetch the BulkPresenter code split
+				if(!prefetchedBulk) {
+					if(ginjector != null) {
+						BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();
+						bulkPresenterProxy.start(null, null);
+						prefetchedBulk = true;
+					}
+				}
 			}
 		});
 	}
@@ -50,6 +62,10 @@ public class PresenterProxy<P extends Presenter<T>,T extends Place> extends Abst
 	public void setPlace(T place) {
 		// This will get forwarded to the presenter when we get it in start()
 		this.place = place;
+	}
+
+	public void setGinInjector(PortalGinInjector ginjector) {
+		this.ginjector = ginjector;
 	}
 
 }

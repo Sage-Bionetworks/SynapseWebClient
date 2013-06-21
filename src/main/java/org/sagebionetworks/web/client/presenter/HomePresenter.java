@@ -82,7 +82,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		// Things to load for authenticated users
 		if(authenticationController.isLoggedIn()) {
 			loadProjectsAndFavorites();
-		}
+		}		
 	}
 		
 	public void loadNewsFeed(){

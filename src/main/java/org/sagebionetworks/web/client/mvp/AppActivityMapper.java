@@ -113,6 +113,7 @@ public class AppActivityMapper implements ActivityMapper {
 			// Split the code
 			PresenterProxy<HomePresenter, Home> presenter = ginjector.getHomePresenter();
 			presenter.setPlace((Home)place);
+			presenter.setGinInjector(ginjector);
 			return presenter;
 		} else {
 			BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();

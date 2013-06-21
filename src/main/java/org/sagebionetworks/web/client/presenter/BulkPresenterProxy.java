@@ -52,7 +52,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
 		GWT.runAsync(new RunAsyncCallback() {
 			@Override
-			public void onSuccess() {				
+			public void onSuccess() {
+				// detect prefetch
+				if(panel == null && eventBus == null) return; 
+				
 				 if(place instanceof Synapse){
 					EntityPresenter presenter = ginjector.getEntityPresenter();
 					presenter.setPlace((Synapse)place);
