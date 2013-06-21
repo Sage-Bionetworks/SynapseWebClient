@@ -37,6 +37,10 @@ public class FooterViewImpl extends Composite implements FooterView {
 	FlowPanel debugModePanel;	
 	@UiField
 	SpanElement copyrightYear;
+	@UiField
+	SpanElement portalVersionSpan;
+	@UiField
+	SpanElement repoVersionSpan;
 	
 	private Presenter presenter;
 	private CookieProvider cookies;
@@ -93,6 +97,14 @@ public class FooterViewImpl extends Composite implements FooterView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+	}
+
+	@Override
+	public void setVersion(String portalVersion, String repoVersion) {
+		if(portalVersion == null) portalVersion = "--";
+		if(repoVersion == null) repoVersion = "--";
+		portalVersionSpan.setInnerHTML(portalVersion);
+		repoVersionSpan.setInnerHTML(repoVersion);		
 	}
 
 }
