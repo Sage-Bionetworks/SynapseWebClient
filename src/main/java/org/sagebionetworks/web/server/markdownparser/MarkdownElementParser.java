@@ -9,8 +9,6 @@ package org.sagebionetworks.web.server.markdownparser;
  */
 public interface MarkdownElementParser {
 	
-	void init();
-	
 	/**
 	 * Called before document processing begins.  State should be cleared.
 	 */

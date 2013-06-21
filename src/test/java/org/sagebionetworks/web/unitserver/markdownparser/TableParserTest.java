@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.unitserver.markdownparser;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import org.junit.*;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
 
@@ -11,7 +12,6 @@ public class TableParserTest {
 	@Before
 	public void setup(){
 		parser = new TableParser();
-		parser.init();
 	}
 	
 	@Test

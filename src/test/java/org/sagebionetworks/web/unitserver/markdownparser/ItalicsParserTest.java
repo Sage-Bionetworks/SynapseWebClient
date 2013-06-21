@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitserver.markdownparser;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import org.junit.*;
-import org.sagebionetworks.web.server.markdownparser.BoldParser;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.sagebionetworks.web.server.markdownparser.ItalicsParser;
 
 public class ItalicsParserTest {
@@ -12,7 +12,6 @@ public class ItalicsParserTest {
 	@Before
 	public void setup(){
 		parser = new ItalicsParser();
-		parser.init();
 	}
 	
 	@Test

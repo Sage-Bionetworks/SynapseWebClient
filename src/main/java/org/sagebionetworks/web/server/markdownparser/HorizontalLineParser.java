@@ -4,13 +4,8 @@ import java.util.regex.Pattern;
 
 
 public class HorizontalLineParser extends BasicMarkdownElementParser  {
-	Pattern p1, p2;
-	
-	@Override
-	public void init() {
-		p1 = Pattern.compile(MarkdownRegExConstants.HR_REGEX1);
-		p2 = Pattern.compile(MarkdownRegExConstants.HR_REGEX2);
-	}
+	Pattern p1 = Pattern.compile(MarkdownRegExConstants.HR_REGEX1);
+	Pattern p2 = Pattern.compile(MarkdownRegExConstants.HR_REGEX2);
 
 	@Override
 	public String processLine(String line) {

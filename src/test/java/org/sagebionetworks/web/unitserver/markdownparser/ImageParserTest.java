@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.unitserver.markdownparser;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import org.junit.*;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.sagebionetworks.web.server.markdownparser.ImageParser;
 
 public class ImageParserTest {
@@ -11,7 +12,6 @@ public class ImageParserTest {
 	@Before
 	public void setup(){
 		parser = new ImageParser();
-		parser.init();
 	}
 	
 	@Test

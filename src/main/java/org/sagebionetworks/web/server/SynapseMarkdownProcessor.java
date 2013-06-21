@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.server.markdownparser.BlockQuoteParser;
 import org.sagebionetworks.web.server.markdownparser.BoldParser;
@@ -26,19 +25,20 @@ import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 public class SynapseMarkdownProcessor {
 	private static SynapseMarkdownProcessor singleton = null;
 	private List<MarkdownElementParser> allElementParsers = new ArrayList<MarkdownElementParser>();
-	
-	private SynapseMarkdownProcessor() {
-	}
-	
+
 	public static SynapseMarkdownProcessor getInstance() {
 		if (singleton == null) {
 			singleton = new SynapseMarkdownProcessor();
-			singleton.init();
 		}
 		return singleton;
 	}
+
 	
-	public void init() {
+	private SynapseMarkdownProcessor() {
+		init();
+	}
+	
+	private void init() {
 		//initialize all markdown element parsers
 		allElementParsers.add(new HorizontalLineParser());
 		allElementParsers.add(new TableParser());
@@ -52,10 +52,6 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new LinkParser());
 		allElementParsers.add(new ListParser());
 		allElementParsers.add(new WikiSubpageParser());
-		
-		for (MarkdownElementParser parser : allElementParsers) {
-			parser.init();
-		}
 	}
 	
 	/**

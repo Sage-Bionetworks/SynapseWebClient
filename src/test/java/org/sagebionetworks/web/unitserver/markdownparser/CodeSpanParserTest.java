@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitserver.markdownparser;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import org.junit.*;
-import org.sagebionetworks.web.server.markdownparser.BoldParser;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.sagebionetworks.web.server.markdownparser.CodeSpanParser;
 
 public class CodeSpanParserTest {
@@ -12,7 +12,6 @@ public class CodeSpanParserTest {
 	@Before
 	public void setup(){
 		parser = new CodeSpanParser();
-		parser.init();
 	}
 	
 	@Test

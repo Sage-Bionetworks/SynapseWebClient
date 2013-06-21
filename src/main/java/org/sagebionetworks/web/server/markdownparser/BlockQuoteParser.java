@@ -4,13 +4,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class BlockQuoteParser extends BasicMarkdownElementParser {
-	Pattern p1;
+	Pattern p1 = Pattern.compile(MarkdownRegExConstants.BLOCK_QUOTE_REGEX, Pattern.DOTALL);;
 	boolean inBlockQuote;
-	@Override
-	public void init() {
-		p1 = Pattern.compile(MarkdownRegExConstants.BLOCK_QUOTE_REGEX, Pattern.DOTALL);
-	}
-
+	
 	@Override
 	public void reset() {
 		inBlockQuote = false;

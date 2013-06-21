@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.unitserver.markdownparser;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import org.junit.*;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.sagebionetworks.web.server.markdownparser.HeadingParser;
 
 public class HeadingParserTest {
@@ -11,7 +12,6 @@ public class HeadingParserTest {
 	@Before
 	public void setup(){
 		parser = new HeadingParser();
-		parser.init();
 	}
 	
 	@Test

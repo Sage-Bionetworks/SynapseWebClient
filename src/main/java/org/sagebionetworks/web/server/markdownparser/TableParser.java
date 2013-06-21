@@ -5,14 +5,10 @@ import java.util.regex.Pattern;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 public class TableParser extends BasicMarkdownElementParser {
-	Pattern p;
+	Pattern p = Pattern.compile(MarkdownRegExConstants.TABLE_REGEX, Pattern.DOTALL);;
 	boolean isInTable;
 	int tableCount;
-	@Override
-	public void init() {
-		p = Pattern.compile(MarkdownRegExConstants.TABLE_REGEX, Pattern.DOTALL);
-	}
-
+	
 	@Override
 	public void reset() {
 		isInTable = false;

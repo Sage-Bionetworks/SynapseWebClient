@@ -6,13 +6,9 @@ import java.util.regex.Pattern;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
 public class CodeParser extends BasicMarkdownElementParser  {
-	Pattern p;
+	Pattern p = Pattern.compile(MarkdownRegExConstants.FENCE_CODE_BLOCK_REGEX);
 	boolean isInCodeBlock;
-	@Override
-	public void init() {
-		p = Pattern.compile(MarkdownRegExConstants.FENCE_CODE_BLOCK_REGEX);
-	}
-
+	
 	@Override
 	public void reset() {
 		isInCodeBlock = false;

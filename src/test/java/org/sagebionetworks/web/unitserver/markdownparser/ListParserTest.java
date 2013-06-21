@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.unitserver.markdownparser;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.sagebionetworks.web.server.markdownparser.ListParser;
 
 public class ListParserTest {
@@ -12,7 +13,6 @@ public class ListParserTest {
 	@Before
 	public void setup(){
 		parser = new ListParser();
-		parser.init();
 	}
 	
 	@Test

@@ -11,15 +11,9 @@ import java.util.regex.Pattern;
  */
 public class ListParser extends BasicMarkdownElementParser  {
 	
-	Pattern p1, p2;
+	Pattern p1= Pattern.compile(MarkdownRegExConstants.ORDERED_LIST_REGEX, Pattern.DOTALL);
+	Pattern p2 = Pattern.compile(MarkdownRegExConstants.UNORDERED_LIST_REGEX, Pattern.DOTALL);
 	Stack<MarkdownList> stack;
-	
-	@Override
-	public void init() {
-		p1 = Pattern.compile(MarkdownRegExConstants.ORDERED_LIST_REGEX, Pattern.DOTALL);
-		p2 = Pattern.compile(MarkdownRegExConstants.UNORDERED_LIST_REGEX, Pattern.DOTALL);
-		stack = new Stack<MarkdownList>();
-	}
 
 	@Override
 	public void reset() {
