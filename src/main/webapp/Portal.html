@@ -28,71 +28,55 @@ but I only want it to find the production (want it to ignore staging, which may 
 		<link rel="stylesheet" href="css/nivo-default.css" type="text/css" media="screen" />
 		<link rel="stylesheet" href="css/nivo-slider.css" type="text/css" media="screen" />
 		<link rel="stylesheet" href="css/prettyPhoto.css" type="text/css" media="screen" />
-		<link rel="stylesheet" href="css/code-highlighting.css" type="text/css">
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>		
-		<script type="text/javascript" src="js/custom.js"></script>		
-		<script type="text/javascript" src="js/tabs.js"></script>
-		<script type="text/javascript" src="js/slides.min.jquery.js"></script>
-		<script type="text/javascript" src="js/nivo-slider/jquery.nivo.slider.pack.js"></script>
-		<script type="text/javascript" src="js/superfish-menu/hoverIntent.js"></script>
-		<script type="text/javascript" src="js/superfish-menu/superfish.js"></script>
-		<script type="text/javascript" src="js/scrolltop/scrolltopcontrol.js"></script>
-		<script type="text/javascript" src="js/prettyPhoto/jquery.prettyPhoto.js"></script>
-		<script type="text/javascript" src="js/jquery.featureList-1.0.0.js"></script>
-		<script type="text/javascript" src="js/swfobject/swfobject.js"></script>
-		<script type="text/javascript" src="js/easing/jquery.easing.1.3.js"></script>
-		<script type="text/javascript" src="js/jquery.iconmenu.js"></script>
-		<script type="text/javascript" src="js/kwicks/jquery.kwicks-1.5.1.pack.js"></script>
-		<script type="text/javascript" src="js/mosaic/mosaic.1.0.1.js"></script>
-		<script type="text/javascript" src="js/jquery.tipsy.js"></script>
-		<script type="text/javascript" src="js/jquery.quicksand.js"></script>
-		<script type="text/javascript" src="js/jquery.tablesorter.js"></script>
-		<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
-		<script type="text/javascript" src="js/jquery.contentcarousel.js"></script>
-		<script type="text/javascript" src="js/jquery.vaccordion.js"></script>
-		<script type="text/javascript" src="js/highlight.pack.js"></script>
-
-		<!-- Google Closure -->
-		<script type="text/javascript" src="js/goog/base.js"></script>
-		
-		<!-- NChart  -->
-    	<script type="text/javascript" src="js/nchart.js"></script>
-		
-
-		<!-- jsPlumb Javascript -->
-		<script type="text/javascript" src="jsPlumb/lib/jquery.ui.touch-punch.min.js"></script>
-		<!-- support lib for bezier stuff -->		
-		<script type="text/javascript" src="jsPlumb/lib/jsBezier-0.4-min.js"></script>
-		<!-- jsplumb util -->
-		<script type="text/javascript" src="jsPlumb/jsPlumb-util-1.3.13-RC1.js"></script>
-		<!-- base DOM adapter -->
-		<script type="text/javascript" src="jsPlumb/jsPlumb-dom-adapter-1.3.13-RC1.js"></script>
-		<!-- main jsplumb engine -->
-		<script type="text/javascript" src="jsPlumb/jsPlumb-1.3.13-RC1.js"></script>
-		<!-- connectors, endpoint and overlays  -->
-		<script type="text/javascript" src="jsPlumb/jsPlumb-defaults-1.3.13-RC1.js"></script>
-		<!-- state machine connectors -->
-		<script type="text/javascript" src="jsPlumb/jsPlumb-connectors-statemachine-1.3.13-RC1.js"></script>
-		<!-- SVG renderer -->
-		<script type="text/javascript" src="jsPlumb/jsPlumb-renderers-svg-1.3.13-RC1.js"></script>
-		<!-- canvas renderer -->
-		<script type="text/javascript" src="jsPlumb/jsPlumb-renderers-canvas-1.3.13-RC1.js"></script>
-		<!-- vml renderer -->
-		<script type="text/javascript" src="jsPlumb/jsPlumb-renderers-vml-1.3.13-RC1.js"></script>
-		<!-- jquery jsPlumb adapter -->
-		<script type="text/javascript" src="jsPlumb/jquery.jsPlumb-1.3.13-RC1.js"></script>
-		<!-- /JS -->
-		
-
-		
+		<link rel="stylesheet" href="css/code-highlighting.css" type="text/css" />
 		<!--GOOGLE FONTS-->
 		<link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css' />
 		<link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css' />
 		<!--/GOOGLE FONTS-->
 		<!-- COLOR STYLE -->
 		<link href="style/color/SynapseColor.css" rel="stylesheet" type="text/css" />
-		<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+		
+		
+		<!-- head.js -->
+		<script src="js/head.load.min.js"></script>
+		<script>
+        var start = new Date();
+	        head.js("https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js")
+	        .js("https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js")		
+	        .js("js/custom.js")		
+	        .js("js/tabs.js")
+	        .js("js/slides.min.jquery.js")
+	        .js("js/nivo-slider/jquery.nivo.slider.pack.js")
+	        .js("js/superfish-menu/hoverIntent.js")
+	        .js("js/superfish-menu/superfish.js")
+	        .js("js/scrolltop/scrolltopcontrol.js")
+	        .js("js/prettyPhoto/jquery.prettyPhoto.js")
+	        .js("js/jquery.featureList-1.0.0.js")
+	        .js("js/swfobject/swfobject.js")
+	        .js("js/easing/jquery.easing.1.3.js")
+	        .js("js/jquery.iconmenu.js")
+	        .js("js/kwicks/jquery.kwicks-1.5.1.pack.js")
+	        .js("js/mosaic/mosaic.1.0.1.js")
+	        .js("js/jquery.tipsy.js")
+	        .js("js/jquery.quicksand.js")
+	        .js("js/jquery.tablesorter.js")
+	        .js("js/jquery.mousewheel.js")
+	        .js("js/jquery.contentcarousel.js")
+	        .js("js/jquery.vaccordion.js")
+	        .js("js/highlight.pack.js")
+            .js("jsPlumb/lib/jquery.ui.touch-punch.min.js")
+            .js("jsPlumb/lib/jsBezier-0.4-min.js")
+            .js("jsPlumb/jsPlumb-util-1.3.13-RC1.js")
+            .js("jsPlumb/jsPlumb-dom-adapter-1.3.13-RC1.js")
+            .js("jsPlumb/jsPlumb-1.3.13-RC1.js")
+            .js("jsPlumb/jsPlumb-defaults-1.3.13-RC1.js")
+            .js("jsPlumb/jsPlumb-connectors-statemachine-1.3.13-RC1.js")
+            .js("jsPlumb/jsPlumb-renderers-svg-1.3.13-RC1.js")
+            .js("jsPlumb/jsPlumb-renderers-canvas-1.3.13-RC1.js")
+            .js("jsPlumb/jsPlumb-renderers-vml-1.3.13-RC1.js")
+            .js("jsPlumb/jquery.jsPlumb-1.3.13-RC1.js")
+            .js("bootstrap/js/bootstrap.min.js");
+    	</script>    
 
 		<title>Sage Synapse : Contribute to the Cure</title>
 		
@@ -101,9 +85,12 @@ but I only want it to find the production (want it to ignore staging, which may 
 		<!-- If you add any GWT meta tags, they must   -->
 		<!-- be added before this line.                -->
 		<!--                                           -->
+
+		<script type="text/javascript" language="javascript" src="js/goog/base.js"></script>
+		<script type="text/javascript" language="javascript" src="js/nchart.js"></script>
 		<script type="text/javascript" language="javascript" src="Portal/Portal.nocache.js"></script>
 		<script language='javascript' src='resources/flash/swfobject.js'></script>
-				
+			
 		
 		<!-- Search autocomplete script. Temporary -->
 	

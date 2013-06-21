@@ -18,8 +18,10 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
@@ -46,13 +48,12 @@ public class HomePresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	StackConfigServiceAsync mockStackConfigService;
 	RssServiceAsync mockRssService;
-	NodeModelCreator mockNodeModelCreator;
 	SearchServiceAsync mockSearchService; 
 	SynapseClientAsync mockSynapseClient; 
 	AutoGenFactory autoGenFactory;
-	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+
 	List<EntityHeader> testEvaluationResults;
-	
 	RSSFeed testFeed = null;
 	
 	@Before
@@ -62,7 +63,6 @@ public class HomePresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockRssService = mock(RssServiceAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSearchService = mock(SearchServiceAsync.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		autoGenFactory = new AutoGenFactory();
@@ -74,8 +74,13 @@ public class HomePresenterTest {
 		testEvaluationResults.add(testEvaluation);
 		testBatchResults.setTotalNumberOfResults(1);
 		testBatchResults.setResults(testEvaluationResults);
-		when(mockNodeModelCreator.createBatchResults(anyString(), any(Class.class))).thenReturn(testBatchResults);
-		AsyncMockStubber.callSuccessWith("fake paginated evaluation results json").when(mockSynapseClient).getAvailableEvaluationEntities(any(AsyncCallback.class));
+		
+		ArrayList<String> testBatchResultsList = new ArrayList<String>();
+		for(EntityHeader eh : testBatchResults.getResults()) {
+			testBatchResultsList.add(eh.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		}
+		
+		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getAvailableEvaluationEntitiesList(any(AsyncCallback.class));
 		testFeed = new RSSFeed();
 		RSSEntry entry = new RSSEntry();
 		entry.setTitle("A Title");
@@ -85,15 +90,15 @@ public class HomePresenterTest {
 		entries.add(entry);
 		testFeed.setEntries(entries);
 		
+		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
+		
 		homePresenter = new HomePresenter(mockView, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
 				mockRssService,
-				mockNodeModelCreator,
 				mockSearchService,
 				mockSynapseClient,
-				autoGenFactory,
-				jsonObjectAdapter);
+				adapterFactory);
 		verify(mockView).setPresenter(homePresenter);
 	}	
 	
@@ -108,7 +113,6 @@ public class HomePresenterTest {
 		//when news is loaded, the view should be updated with the service result
 		String exampleNewsFeedResult = "news feed";
 		AsyncMockStubber.callSuccessWith(exampleNewsFeedResult).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));		
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(RSSFeed.class))).thenReturn(testFeed);
 		homePresenter.loadNewsFeed();
 		verify(mockView).showNews(anyString());
 	}	
@@ -125,7 +129,7 @@ public class HomePresenterTest {
 	@Test
 	public void testLoadEvaluationsFailure() throws RestServiceException {
 		Exception simulatedException = new Exception("Simulated Error");
-		AsyncMockStubber.callFailureWith(simulatedException).when(mockSynapseClient).getAvailableEvaluationEntities(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(simulatedException).when(mockSynapseClient).getAvailableEvaluationEntitiesList(any(AsyncCallback.class));
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		homePresenter.loadEvaluations(mockCallback);
 		verify(mockCallback).onFailure(simulatedException);

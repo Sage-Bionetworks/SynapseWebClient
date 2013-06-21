@@ -1257,6 +1257,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<EntityHeader> favorites = synapseClient.getFavorites(limit, offset);
+			ArrayList<String> results = new ArrayList<String>();
+			for(EntityHeader eh : favorites.getResults()) {
+				results.add(eh.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+			}
+			return results;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	
+	@Override
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException{
 		Synapse synapseClient = createSynapseClient();
 		try {
@@ -1470,6 +1488,37 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(references);
 			//and return them
 			return EntityFactory.createJSONStringForEntity(results);
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public ArrayList<String> getAvailableEvaluationEntitiesList() throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			//look up the available evaluations
+			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			//collect contentSource entity IDs
+			Set<String> uniqueEntityIds = new HashSet<String>();
+			for (Evaluation eval : availableEvaluations.getResults()) {
+				uniqueEntityIds.add(eval.getContentSource());
+			}
+			//create reference for each contentSource entity ID
+			List<Reference> references = new ArrayList<Reference>();
+			for (String entityId : uniqueEntityIds) {
+				Reference ref = new Reference();
+				ref.setTargetId(entityId);
+				references.add(ref);
+			}
+			//query for the associated entities
+			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(references);
+			//and return them
+			ArrayList<String> evaluations = new ArrayList<String>();
+			for(EntityHeader eh : results.getResults()) {
+				evaluations.add(eh.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+			}
+			return evaluations;
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}

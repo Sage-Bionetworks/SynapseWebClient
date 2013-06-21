@@ -38,11 +38,11 @@ public class EntityListConfigEditorTest {
 		
 	EntityListConfigEditor editor;
 	EntityListConfigView mockView;
-	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	
+	AuthenticationController mockAuthenticationController;
+
 	Map<String, String> descriptor;
 	Data syn456;
 	EntityGroupRecord record456; 
@@ -50,10 +50,10 @@ public class EntityListConfigEditorTest {
 	@Before
 	public void setup() throws Exception{
 		mockView = mock(EntityListConfigView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
+		mockAuthenticationController = mock(AuthenticationController.class);		
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
@@ -77,7 +77,8 @@ public class EntityListConfigEditorTest {
 		// create empty descriptor
 		descriptor = new HashMap<String, String>();		
 		
-		editor = new EntityListConfigEditor(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils);
+		editor = new EntityListConfigEditor(mockView, mockSynapseClient,
+				mockNodeModelCreator, mockSynapseJSNIUtils, mockAuthenticationController);
 		
 		editor.configure(null, descriptor);
 	}

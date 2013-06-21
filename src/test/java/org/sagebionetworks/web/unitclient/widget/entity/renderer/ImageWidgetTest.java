@@ -25,11 +25,11 @@ public class ImageWidgetTest {
 		
 	ImageWidget widget;
 	ImageWidgetView mockView;
-	AuthenticationController mockAuthenticationController;
 	Page testPage;
 	Map<String, String> descriptor;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	
+	AuthenticationController mockAuthenticationController;
+
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		mockView = mock(ImageWidgetView.class);

@@ -36,11 +36,11 @@ public class EntityListWidgetTest {
 		
 	EntityListWidget widget;
 	EntityListWidgetView mockView;
-	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	
+	AuthenticationController mockAuthenticationController;
+
 	Map<String, String> descriptor;
 	Data syn456;
 	EntityGroupRecord record456; 
@@ -48,10 +48,10 @@ public class EntityListWidgetTest {
 	@Before
 	public void setup() throws Exception{		
 		mockView = mock(EntityListWidgetView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
+		mockAuthenticationController = mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 		// create gettable entity
@@ -74,7 +74,7 @@ public class EntityListWidgetTest {
 		// create empty descriptor
 		descriptor = new HashMap<String, String>();		
 				
-		widget = new EntityListWidget(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils);
+		widget = new EntityListWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils, mockAuthenticationController);
 	}
 	
 	@Test

@@ -1,14 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -22,13 +19,8 @@ import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.EntityEditor;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
@@ -44,16 +36,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	
 	private EntityTreeBrowserView view;
 	private SearchServiceAsync searchService;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
-	private EntityTypeProvider entityTypeProvider;
 	private SynapseClientAsync synapseClient;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private IconsImageBundle iconsImageBundle;
-	private AutoGenFactory entityFactory;
-	private EntityEditor entityEditor;
+	AdapterFactory adapterFactory;
+	EntityTypeProvider entityTypeProvider;
 	
 	private String currentSelection;
 	
@@ -62,25 +51,21 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	@Inject
 	public EntityTreeBrowser(EntityTreeBrowserView view,
 			SearchServiceAsync searchService,
-			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
 			IconsImageBundle iconsImageBundle,
-			AutoGenFactory entityFactory, EntityEditor entityEditor) {
+			AdapterFactory adapterFactory) {
 		this.view = view;		
 		this.searchService = searchService;
-		this.nodeModelCreator = nodeModelCreator;
-		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
+		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.iconsImageBundle = iconsImageBundle;
-		this.entityFactory = entityFactory;
-		this.entityEditor = entityEditor;
+		this.adapterFactory = adapterFactory;
 		
 		view.setPresenter(this);
 	}	
@@ -104,7 +89,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn());
 			}
 		});
 	}
@@ -138,7 +123,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
 					for(String entityHeaderJson : result) {
 						try {
-							headers.add(nodeModelCreator.createJSONEntity(entityHeaderJson, EntityHeader.class));
+							headers.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
 						} catch (JSONObjectAdapterException e) {
 							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 						}
@@ -147,7 +132,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());				
+					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn());				
 					asyncCallback.onFailure(caught);
 				}
 			});					
@@ -199,7 +184,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
 				}
 			}
@@ -238,31 +223,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		else entityType = entityTypeProvider.getEntityTypeForString(type);
 		if (entityType == null) return null;
 		return DisplayUtils.getSynapseIconForEntityClassName(entityType.getClassName(), DisplayUtils.IconSize.PX16, iconsImageBundle);
-	}
-
-	@Override
-	public void onEdit(String entityId) {
-		int mask = ENTITY | PERMISSIONS;
-		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundleTransport>() {
-			@Override
-			public void onSuccess(EntityBundleTransport transport) {				
-				EntityBundle bundle = null;
-				try {
-					bundle = nodeModelCreator.createEntityBundle(transport);										
-					entityEditor.editEntity(bundle, false);					
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}				
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {
-					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
-				}
-				globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
-			}			
-		});		
 	}
 
 }

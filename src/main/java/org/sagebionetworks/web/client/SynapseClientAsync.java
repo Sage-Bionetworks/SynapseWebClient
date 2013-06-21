@@ -1,6 +1,7 @@
 
 package org.sagebionetworks.web.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
@@ -131,9 +132,10 @@ public interface SynapseClientAsync {
 
 	void removeFavorite(String entityId, AsyncCallback<Void> callback);
 
-	void getFavorites(Integer limit, Integer offset,
-			AsyncCallback<String> callback);
+	void getFavorites(Integer limit, Integer offset, AsyncCallback<String> callback);
 	
+	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
+
 	void getUserEvaluationState(String evaluationId, AsyncCallback<UserEvaluationState> callback) throws RestServiceException;
 
 	/**
@@ -158,6 +160,7 @@ public interface SynapseClientAsync {
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluationEntities(AsyncCallback<String> callback) throws RestServiceException;
+	void getAvailableEvaluationEntitiesList(AsyncCallback<ArrayList<String>> callback) throws RestServiceException;
 	
 	/**
 	 * Create a new Submission object.  Callback returning the updated version of the Submission object
@@ -174,4 +177,5 @@ public interface SynapseClientAsync {
 	 * @throws RestServiceException
 	 */
 	void getAvailableEvaluationsSubmitterAliases(AsyncCallback<String> callback) throws RestServiceException;
+
 }

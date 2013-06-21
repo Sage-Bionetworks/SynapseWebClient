@@ -55,7 +55,6 @@ public class SnapshotWidgetTest {
 
 	AdapterFactory factory;
 	GlobalApplicationState mockGlobal;
-	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
 	PlaceChanger mockPlaceChanger;
 	SynapseClientAsync mockSynapseClient;
@@ -70,6 +69,8 @@ public class SnapshotWidgetTest {
 	final boolean CAN_EDIT = true;
 	final boolean READ_ONLY = false;
 	final boolean SHOW_EDIT = true;
+	AuthenticationController mockAuthenticationController;
+
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{		
@@ -77,14 +78,17 @@ public class SnapshotWidgetTest {
 		autoGenFactory = new AutoGenFactory();
 		mockPlaceChanger = Mockito.mock(PlaceChanger.class);
 		mockGlobal = Mockito.mock(GlobalApplicationState.class);
-		when(mockGlobal.getPlaceChanger()).thenReturn(mockPlaceChanger);		
-		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
+		when(mockGlobal.getPlaceChanger()).thenReturn(mockPlaceChanger);				
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockView = mock(SnapshotWidgetView.class);
 		mockCookies = mock(CookieProvider.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		snapshotWidget = new SnapshotWidget(factory, mockView, mockSynapseClient, mockNodeModelCreator, mockGlobal, mockAuthenticationController, mockSynapseJSNIUtils);
+		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
+
+		snapshotWidget = new SnapshotWidget(factory, mockView,
+				mockSynapseClient, mockNodeModelCreator, mockGlobal,
+				mockSynapseJSNIUtils, mockAuthenticationController);
 		snapshot = createDefaultSnapshot();
 	}
 	

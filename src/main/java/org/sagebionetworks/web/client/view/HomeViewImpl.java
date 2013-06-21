@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
-import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -90,8 +89,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.homeSearchBox = homeSearchBox;
 		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
 		this.favoritesTreeBrowser = favoritesTreeBrowser;
-		this.iconsImageBundle = icons;
 		this.myEvaluationsList = myEvaluationsList;
+		this.iconsImageBundle = icons;
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());

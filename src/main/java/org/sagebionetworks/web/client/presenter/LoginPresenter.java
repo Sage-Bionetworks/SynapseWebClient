@@ -21,10 +21,8 @@ import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -81,16 +79,16 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		return openIdReturnUrl;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void showView(final LoginPlace place) {
 		String token = place.toToken();
 		if (LoginPlace.FASTPASS_TOKEN.equals(token)) {
 			//fastpass!
 			
-			//is the user already logged in?  
-			UserSessionData currentUser = authenticationController.getLoggedInUser();
-			if(currentUser != null){
+			//is the user already logged in?  			
+			if(authenticationController.isLoggedIn()){
 				//the user might be logged in.  verify the session token
-				authenticationController.loginUser(currentUser.getSessionToken(), new AsyncCallback<String>() {
+				authenticationController.loginUser(authenticationController.getCurrentUserSessionToken(), new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String result) {
 						//success, go to support the support site
@@ -113,11 +111,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			
 		}
 		
-		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {
-			UserSessionData currentUser = authenticationController.getLoggedInUser(); 
+		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {			
 			boolean isSso = false;
-			if(currentUser != null)
-				isSso = currentUser.getIsSSO();
+			if(authenticationController.isLoggedIn())
+				isSso = authenticationController.getCurrentUserIsSSO();
 			authenticationController.logoutUser();
 			view.showLogout(isSso);
 		} else if (token!=null && ServiceConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN.equals(token)) {

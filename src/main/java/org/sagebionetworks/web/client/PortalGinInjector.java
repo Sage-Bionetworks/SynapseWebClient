@@ -1,20 +1,7 @@
 package org.sagebionetworks.web.client;
 
-import org.sagebionetworks.web.client.place.Challenges;
-import org.sagebionetworks.web.client.place.ComingSoon;
-import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.ProjectsHome;
-import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.place.Settings;
-import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Wiki;
-import org.sagebionetworks.web.client.place.WikiPlace;
-import org.sagebionetworks.web.client.place.users.PasswordReset;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
@@ -78,44 +65,46 @@ import com.google.gwt.inject.client.Ginjector;
 @GinModules(PortalGinModule.class)
 public interface PortalGinInjector extends Ginjector {
 
+	public BulkPresenterProxy getBulkPresenterProxy();
+	
 	public GlobalApplicationState getGlobalApplicationState();
 	
 	public PresenterProxy<HomePresenter, Home> getHomePresenter();
 
-	public PresenterProxy<EntityPresenter, Synapse> getEntityPresenter();
+	public EntityPresenter getEntityPresenter();
 	
-	public PresenterProxy<ProjectsHomePresenter, ProjectsHome> getProjectsHomePresenter();
+	public ProjectsHomePresenter getProjectsHomePresenter();
 	
-	public PresenterProxy<LoginPresenter, LoginPlace> getLoginPresenter();
+	public LoginPresenter getLoginPresenter();
 	
 	public AuthenticationController getAuthenticationController();
 	
-	public PresenterProxy<PasswordResetPresenter, PasswordReset> getPasswordResetPresenter();
+	public PasswordResetPresenter getPasswordResetPresenter();
 	
-	public PresenterProxy<RegisterAccountPresenter, RegisterAccount> getRegisterAccountPresenter();
+	public RegisterAccountPresenter getRegisterAccountPresenter();
 
-	public PresenterProxy<ProfilePresenter, Profile> getProfilePresenter();
+	public ProfilePresenter getProfilePresenter();
 
-	public PresenterProxy<SettingsPresenter, Settings> getSettingsPresenter();
+	public SettingsPresenter getSettingsPresenter();
 	
-	public PresenterProxy<ComingSoonPresenter, ComingSoon> getComingSoonPresenter();
+	public ComingSoonPresenter getComingSoonPresenter();
 	
-	public PresenterProxy<ChallengeOverviewPresenter, Challenges> getChallengeOverviewPresenter();
+	public ChallengeOverviewPresenter getChallengeOverviewPresenter();
 	
-	public PresenterProxy<GovernancePresenter, Governance> getGovernancePresenter();
+	public GovernancePresenter getGovernancePresenter();
 	
-	public PresenterProxy<SearchPresenter, Search> getSearchPresenter();
+	public SearchPresenter getSearchPresenter();
 	
-	public PresenterProxy<SynapseWikiPresenter, Wiki> getSynapseWikiPresenter();
+	public SynapseWikiPresenter getSynapseWikiPresenter();
 	
-	public PresenterProxy<WikiPresenter, WikiPlace> getWikiPresenter();
+	public WikiPresenter getWikiPresenter();
 	
-	public PresenterProxy<DownPresenter, Down> getDownPresenter();
+	public DownPresenter getDownPresenter();
 	
 	public EventBus getEventBus();
 	
 	public JiraURLHelper getJiraURLHelper();
-
+		
 
 	/*
 	 *  Markdown Widgets

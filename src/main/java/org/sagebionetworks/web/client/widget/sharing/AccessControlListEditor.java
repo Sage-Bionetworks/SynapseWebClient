@@ -457,7 +457,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	private String getCurrentUserId() {
-		return authenticationController.getLoggedInUser().getProfile().getOwnerId();
+		return authenticationController.getCurrentUserPrincipalId();
 	}
 
 	/**

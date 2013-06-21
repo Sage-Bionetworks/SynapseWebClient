@@ -117,18 +117,6 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		if(tree == null) return;
 		if(showContextMenu) {
 			Menu contextMenu = new Menu();
-			MenuItem insert = new MenuItem();
-			insert.setText("Edit");
-			insert.setIcon(AbstractImagePrototype.create(iconsImageBundle.edit16()));
-			insert.addSelectionListener(new SelectionListener<MenuEvent>() {
-				public void componentSelected(MenuEvent ce) {
-					EntityTreeModel model = tree.getSelectionModel().getSelectedItem();
-					if (model != null) {
-						presenter.onEdit(model.getId());
-					}
-				}
-			});
-			contextMenu.add(insert);
 	
 			MenuItem remove = new MenuItem();
 			remove.setText("Delete");

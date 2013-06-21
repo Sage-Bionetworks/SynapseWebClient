@@ -26,8 +26,10 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -64,16 +66,11 @@ public class EntityMetadataTest {
 	Versionable vb;
 	String entityId = "syn123";
 	EntityBundle bundle;
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
-		UserSessionData usd = new UserSessionData();
-		UserProfile up = new UserProfile();
-		up.setOwnerId("101");
-		usd.setProfile(up);
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(usd);
-
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		
@@ -84,6 +81,15 @@ public class EntityMetadataTest {
 		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
+
+		UserSessionData usd = new UserSessionData();
+		UserProfile up = new UserProfile();
+		up.setOwnerId("101");
+		usd.setProfile(up);
+		
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+
 
 		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, jsonObjectAdapter, mockGlobalApplicationState, mockEntityTypeProvider, mockJiraURLHelper);
 

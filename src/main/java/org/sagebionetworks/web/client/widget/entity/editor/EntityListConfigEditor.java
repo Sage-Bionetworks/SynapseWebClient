@@ -24,22 +24,23 @@ import com.google.inject.Inject;
 public class EntityListConfigEditor implements EntityListConfigView.Presenter, WidgetEditorPresenter {
 	
 	private EntityListConfigView view;
-	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private NodeModelCreator nodeModelCreator;
 	private Map<String, String> descriptor;
 	List<EntityGroupRecord> records;
+	AuthenticationController authenticationController;
 
 	@Inject
 	public EntityListConfigEditor(EntityListConfigView view,
-			AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseClientAsync synapseClient,
+			NodeModelCreator nodeModelCreator, SynapseJSNIUtils synapseJSNIUtils,
+			AuthenticationController authenticationController) {
 		this.view = view;
-		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.nodeModelCreator = nodeModelCreator;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 		view.initView();
 	}

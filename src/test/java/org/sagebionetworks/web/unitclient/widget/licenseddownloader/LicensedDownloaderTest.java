@@ -55,7 +55,6 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.LicenseAgreement;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
@@ -72,7 +71,7 @@ public class LicensedDownloaderTest {
 	SynapseClientAsync mockSynapseClient;
 	PlaceChanger mockPlaceChanger;
 	AsyncCallback<String> mockStringCallback;
-	
+
 	JSONObjectAdapter jsonObjectAdapterProvider;
 	EntityTypeProvider entityTypeProvider;
 	Locationable entity;
@@ -97,6 +96,7 @@ public class LicensedDownloaderTest {
 		jsonObjectAdapterProvider = new JSONObjectAdapterImpl();
 		mockStringCallback = mock(AsyncCallback.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		mockAuthenticationController = mock(AuthenticationController.class);
 
 
 		// create entity type provider
@@ -196,7 +196,7 @@ public class LicensedDownloaderTest {
 
 		// Not Logged in Test: Download
 		resetMocks();
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false); // not logged in
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false); 
 		entity.setLocations(locations);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
@@ -230,7 +230,7 @@ public class LicensedDownloaderTest {
 
 		// Not Logged in Test: Download
 		resetMocks();
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false); // not logged in
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
 		verify(mockView).setNeedToLogIn();
@@ -338,7 +338,7 @@ public class LicensedDownloaderTest {
 	}	
 
 	private void configureTestLoadMocks() throws Exception {
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(StudyEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
 		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
@@ -347,7 +347,7 @@ public class LicensedDownloaderTest {
 	
 
 	private void configureTestFindEulaIdMocks() throws Exception {
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(user1);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(StudyEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
 		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));

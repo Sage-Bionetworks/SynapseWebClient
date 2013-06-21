@@ -5,7 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +34,7 @@ public class ShinySiteWidgetTest {
 	@Before
 	public void setup(){
 		mockView = mock(ShinySiteWidgetView.class);
+		mockAuthenticationController = mock(AuthenticationController.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		widget = new ShinySiteWidget(mockView, mockAuthenticationController);

@@ -99,7 +99,7 @@ public class AccessControlListEditorTest {
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
 		AsyncMockStubber.callSuccessWith(TEST_PUBLIC_PRINCIPAL_ID +","+ TEST_AUTHENTICATED_PRINCIPAL_ID).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 
-		when(mockAuthenticationController.getLoggedInUser().getProfile().getOwnerId()).thenReturn(new Long(ADMIN_ID).toString());
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
 		AsyncMockStubber.callSuccessWith(userGroupHeaderRPWrapper).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<List<String>>any(), any(AsyncCallback.class));
 
 		mockPushToSynapseCallback = mock(AsyncCallback.class);
