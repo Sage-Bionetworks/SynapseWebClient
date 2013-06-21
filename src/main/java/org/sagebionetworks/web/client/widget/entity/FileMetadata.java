@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -27,8 +26,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
-import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -39,9 +36,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityMetadata implements Presenter {
+public class FileMetadata implements FileMetadataView.Presenter {
 
-	private EntityMetadataView view;
+	private FileMetadataView view;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
@@ -53,7 +50,7 @@ public class EntityMetadata implements Presenter {
 	private EntityUpdatedHandler entityUpdatedHandler;
 	
 	@Inject
-	public EntityMetadata(EntityMetadataView view,
+	public FileMetadata(FileMetadataView view,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
@@ -102,22 +99,12 @@ public class EntityMetadata implements Presenter {
 
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		this.bundle = bundle;
-		boolean readOnly = versionNumber != null;
-		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit() && readOnly);
+		view.setEntityBundle(bundle, versionNumber);
 		boolean showDetailedMetadata = false;
 		boolean showEntityName = false;
-		if (bundle.getEntity() instanceof FileEntity) {
-			//it has data if there is a file handle associated with it
-			showDetailedMetadata = ((FileEntity)bundle.getEntity()).getDataFileHandleId() != null;
-			showEntityName = !showDetailedMetadata;
-		}
-		else {
-			//TODO: delete this after migration to FileHandle system.  This corresponds to the old logic
-			boolean isLocationable = bundle.getEntity() instanceof Locationable;
-			boolean isStudy = bundle.getEntity() instanceof Study; //if study, always show metadata and entity name
-			showDetailedMetadata = !isLocationable || isStudy || LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
-			showEntityName = !isLocationable || isStudy || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
-		}
+		//it has data if there is a file handle associated with it
+		showDetailedMetadata = ((FileEntity)bundle.getEntity()).getDataFileHandleId() != null;
+		showEntityName = !showDetailedMetadata;
 		view.setDetailedMetadataVisible(showDetailedMetadata);
 		view.setEntityNameVisible(showEntityName);
 	}

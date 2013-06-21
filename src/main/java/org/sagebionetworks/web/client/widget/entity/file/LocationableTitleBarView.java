@@ -30,8 +30,7 @@ public interface LocationableTitleBarView extends IsWidget, SynapseWidgetView {
 			EntityType entityType, 
 			AuthenticationController authenticationController,
 			boolean isAdministrator, 
-			boolean canEdit, 
-			boolean readOnly);
+			boolean canEdit);
 		
 	/**
 	 * Presenter interface

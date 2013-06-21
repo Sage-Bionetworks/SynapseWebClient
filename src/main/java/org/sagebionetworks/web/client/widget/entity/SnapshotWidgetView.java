@@ -35,7 +35,7 @@ public interface SnapshotWidgetView extends IsWidget, SynapseWidgetView {
 
 	void setPresenter(Presenter presenter);
 	
-	void setSnapshot(Summary entity, boolean canEdit, boolean readOnly, boolean showEdit);
+	void setSnapshot(Summary entity, boolean canEdit, boolean showEdit);
 
 	void setEntityGroupRecordDisplay(int groupIndex, int rowIndex, EntityGroupRecordDisplay display, boolean isLoggedIn);
 
