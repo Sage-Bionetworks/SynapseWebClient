@@ -8,6 +8,12 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
+import org.sagebionetworks.web.client.factory.EditorFactory;
+import org.sagebionetworks.web.client.factory.EditorFactoryImpl;
+import org.sagebionetworks.web.client.factory.RendererFactory;
+import org.sagebionetworks.web.client.factory.RendererFactoryImpl;
+import org.sagebionetworks.web.client.factory.TableColumnRendererFactory;
+import org.sagebionetworks.web.client.factory.TableColumnRendererFactoryImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -259,6 +265,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(JiraURLHelper.class).to(JiraURLHelperImpl.class);
 		
+		
 		/*
 		 * Vanilla Implementation binding
 		 */
@@ -334,7 +341,21 @@ public class PortalGinModule extends AbstractGinModule {
 
 		//Synapse Wiki Pages
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
-
+		
+		
+		/*
+		 * Factories
+		 */
+		// editor
+		bind(EditorFactoryImpl.class).in(Singleton.class);
+		bind(EditorFactory.class).to(EditorFactoryImpl.class);
+		// renderer
+		bind(RendererFactoryImpl.class).in(Singleton.class);
+		bind(RendererFactory.class).to(RendererFactoryImpl.class);
+		// table
+		bind(TableColumnRendererFactoryImpl.class).in(Singleton.class);
+		bind(TableColumnRendererFactory.class).to(TableColumnRendererFactoryImpl.class);
+		
 		/*
 		 * Widgets
 		 */

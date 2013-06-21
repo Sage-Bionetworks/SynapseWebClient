@@ -8,10 +8,10 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -41,7 +41,12 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	private String registrationToken, changeEmailToken = null;
 	
 	@Inject
-	public PasswordResetPresenter(PasswordResetView view, CookieProvider cookieProvider, UserAccountServiceAsync userService, AuthenticationController authenticationController, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator){
+	public PasswordResetPresenter(PasswordResetView view,
+			CookieProvider cookieProvider, UserAccountServiceAsync userService,
+			AuthenticationController authenticationController,
+			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
+			GlobalApplicationState globalApplicationState,
+			NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.userService = userService;
 		this.authenticationController = authenticationController;
@@ -160,8 +165,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 						});
 			
 		} else {
-			UserSessionData currentUser = authenticationController.getLoggedInUser();
-			if (currentUser != null) {
+			if (authenticationController.isLoggedIn()) {
 				userService.setPassword(
 						newPassword, new AsyncCallback<Void>() {
 							@Override

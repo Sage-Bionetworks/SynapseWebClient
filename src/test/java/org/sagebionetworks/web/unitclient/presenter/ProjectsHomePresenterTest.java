@@ -14,7 +14,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -42,7 +44,7 @@ public class ProjectsHomePresenterTest {
 	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	SynapseClientAsync mockSynapseClient;
 	PlaceChanger mockPlaceChanger;
-	AutoGenFactory autoGenFactory = new AutoGenFactory();	
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();	
 	
 	@Before
 	public void setup(){
@@ -53,7 +55,11 @@ public class ProjectsHomePresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);	
-		projectsHomePresenter = new ProjectsHomePresenter(mockView, mockGlobalApplicationState, jsonObjectAdapter, mockNodeModelCreator, mockAuthenticationController, mockSynapseClient, autoGenFactory);
+		projectsHomePresenter = new ProjectsHomePresenter(mockView,
+				mockGlobalApplicationState, 
+				mockAuthenticationController,
+				mockSynapseClient, 
+				adapterFactory);
 		verify(mockView).setPresenter(projectsHomePresenter);
 	}	
 	

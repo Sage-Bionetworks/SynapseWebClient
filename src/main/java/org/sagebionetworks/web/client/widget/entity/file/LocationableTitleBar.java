@@ -84,7 +84,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 
 	@Override
 	public boolean isUserLoggedIn() {
-		return authenticationController.getLoggedInUser() != null;
+		return authenticationController.isLoggedIn();
 	}
 
 	@Override

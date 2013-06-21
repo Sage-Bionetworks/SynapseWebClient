@@ -61,8 +61,8 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	}
 	
 	@Override
-	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final AttachmentData pic, final String teamName, final String url) {
-		final UserSessionData currentUser = authenticationController.getLoggedInUser();
+	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final AttachmentData pic, final String teamName, final String url) {				
+		final UserSessionData currentUser = authenticationController.getCurrentUserSessionData();			
 		if(currentUser != null) {
 				//get the owner profile (may or may not be currently set
 				synapseClient.getUserProfile(null, new AsyncCallback<String>() {

@@ -14,20 +14,25 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	
 	private ImageWidgetView view;
 	private Map<String,String> descriptor;
-	private AuthenticationController authenticationController;
+	AuthenticationController authenticationController;
 	
 	@Inject
-	public ImageWidget(ImageWidgetView view, AuthenticationController authenticationController) {
+	public ImageWidget(ImageWidgetView view, 
+			AuthenticationController authenticationController) {
 		this.view = view;
-		view.setPresenter(this);
 		this.authenticationController = authenticationController;
+		view.setPresenter(this);
 	}
 	
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor) {
 		this.descriptor = widgetDescriptor;
 		String synapseId = descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY);
-		view.configure(wikiKey, descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY), descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY), descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY), synapseId, authenticationController.isLoggedIn());
+		view.configure(wikiKey,
+				descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
+				descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
+				descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
+				synapseId, authenticationController.isLoggedIn());
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 	}

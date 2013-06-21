@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.widget.header;
 
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.http.client.URL;
@@ -22,16 +21,12 @@ public class Header implements HeaderView.Presenter {
 	
 	private HeaderView view;
 	private AuthenticationController authenticationController;
-	private GlobalApplicationState globalApplicationState;
-	private NodeModelCreator nodeModelCreator;
 	private UserAccountServiceAsync userAccountService;
 	
 	@Inject
-	public Header(HeaderView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, UserAccountServiceAsync userAccountService) {
+	public Header(HeaderView view, AuthenticationController authenticationController, UserAccountServiceAsync userAccountService) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
-		this.nodeModelCreator = nodeModelCreator;
 		this.userAccountService = userAccountService;
 		view.setPresenter(this);
 	}
@@ -60,7 +55,7 @@ public class Header implements HeaderView.Presenter {
 
 	@Override
 	public UserSessionData getUser() {
-		return authenticationController.getLoggedInUser(); 
+		return authenticationController.getCurrentUserSessionData(); 
 	}
 
 	@Override

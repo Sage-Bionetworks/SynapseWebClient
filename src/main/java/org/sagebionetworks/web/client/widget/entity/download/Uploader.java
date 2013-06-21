@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
@@ -632,7 +633,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public String getJiraRestrictionLink() {
-		UserProfile userProfile = authenticationController.getLoggedInUser().getProfile();
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
+		
+		if (sessionData==null) throw new NullPointerException("User profile cannot be null.");
+		UserProfile userProfile = sessionData.getProfile();
 		if (userProfile==null) throw new NullPointerException("User profile cannot be null.");
 		return jiraURLHelper.createAccessRestrictionIssue(
 				userProfile.getUserName(), userProfile.getDisplayName(), entity.getId());

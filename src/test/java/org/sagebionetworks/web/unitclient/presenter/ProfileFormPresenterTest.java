@@ -56,8 +56,8 @@ public class ProfileFormPresenterTest {
 		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, adapter);
 		profileForm.configure(userProfile, mockProfileUpdatedCallback);
 		verify(mockView).setPresenter(profileForm);
-		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(userProfile);
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
+		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(userProfile);		
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		userProfile.setDisplayName("tester");

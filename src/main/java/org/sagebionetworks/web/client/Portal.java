@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 
-import com.amazonaws.services.cloudformation.model.OnFailure;
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -57,7 +56,7 @@ public class Portal implements EntryPoint {
 						PlaceController placeController = new PlaceController(eventBus);
 						
 						// Start ActivityManager for the main widget with our ActivityMapper
-						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl());
+						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), loading);
 						ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
 						activityManager.setDisplay(appWidget);
 						

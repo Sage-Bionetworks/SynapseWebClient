@@ -6,7 +6,10 @@ import java.util.Map;
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -40,7 +43,11 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	private String[] evaluationIds;
 	
 	@Inject
-	public JoinWidget(JoinWidgetView view, SynapseClientAsync synapseClient, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, JSONObjectAdapter jsonObjectAdapter) {
+	public JoinWidget(JoinWidgetView view, SynapseClientAsync synapseClient,
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState,
+			NodeModelCreator nodeModelCreator,
+			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -118,7 +125,9 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	 */
 	public void registerStep2() {
 		//pop up profile form.  user does not have to fill in info
-		view.showProfileForm(authenticationController.getLoggedInUser().getProfile(), new AsyncCallback<Void>() {
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
+		UserProfile profile = sessionData.getProfile();
+		view.showProfileForm(profile, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				continueToStep3();
@@ -204,7 +213,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 		};
 		
 		GovernanceServiceHelper.signTermsOfUse(
-				authenticationController.getLoggedInUser().getProfile().getOwnerId(), 
+				authenticationController.getCurrentUserPrincipalId(), 
 				arId, 
 				onSuccess, 
 				onFailure, 

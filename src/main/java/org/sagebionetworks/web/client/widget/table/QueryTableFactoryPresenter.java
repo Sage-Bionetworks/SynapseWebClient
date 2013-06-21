@@ -67,7 +67,7 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn());
 				callback.onFailure(caught);			
 			}
 		});
@@ -91,7 +91,7 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.getLoggedInUser());
+				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.isLoggedIn());
 				callback.onFailure(caught);
 			}
 		});
