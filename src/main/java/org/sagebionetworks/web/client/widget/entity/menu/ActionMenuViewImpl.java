@@ -117,9 +117,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		this.entityBundle = entityBundle;
 		this.isInTestMode = isInTestMode;
 		Entity entity = entityBundle.getEntity();
-
-		UserSessionData sessionData = authenticationController.getLoggedInUser();
-		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
 		
 		if(deleteButton == null) {
 			deleteButton = getDeleteButton(entityType);
