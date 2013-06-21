@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.sagebionetworks.web.client.AppLoadingView;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Challenges;
@@ -43,6 +44,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 	private static Logger log = Logger.getLogger(BulkPresenterProxy.class.getName());
 	Place place;
 	PortalGinInjector ginjector;
+	AppLoadingView loading;
 	
 	@Inject
 	public BulkPresenterProxy(){
@@ -55,6 +57,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 			public void onSuccess() {
 				// detect prefetch
 				if(panel == null && eventBus == null) return; 
+				if(loading != null) loading.hide();
 				
 				 if(place instanceof Synapse){
 					EntityPresenter presenter = ginjector.getEntityPresenter();
@@ -160,6 +163,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 
 	public void setGinjector(PortalGinInjector ginjector) {
 		this.ginjector = ginjector;
+	}
+
+	public void setloader(AppLoadingView loading) {
+		this.loading = loading;		
 	}
 	
 	

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.sagebionetworks.web.client.AppLoadingView;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -30,17 +31,18 @@ import org.sagebionetworks.web.client.presenter.PresenterProxy;
 
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 
-public class AppActivityMapper implements ActivityMapper {
-	
+public class AppActivityMapper implements ActivityMapper {	
+
 	private static Logger log = Logger.getLogger(AppActivityMapper.class.getName());
 	private PortalGinInjector ginjector;
 	@SuppressWarnings("rawtypes")
 	private List<Class> openAccessPlaces; 
 	private List<Class> excludeFromLastPlace;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	
+	AppLoadingView loading;
 
 	/**
 	 * AppActivityMapper associates each Place with its corresponding
@@ -50,10 +52,11 @@ public class AppActivityMapper implements ActivityMapper {
 	 *            Factory to be passed to activities
 	 */
 	@SuppressWarnings("rawtypes")
-	public AppActivityMapper(PortalGinInjector ginjector, SynapseJSNIUtils synapseJSNIUtils) {
+	public AppActivityMapper(PortalGinInjector ginjector, SynapseJSNIUtils synapseJSNIUtils, AppLoadingView loading) {
 		super();
 		this.ginjector = ginjector;
 		this.synapseJSNIUtils = synapseJSNIUtils; 
+		this.loading = loading;
 		
 		openAccessPlaces = new ArrayList<Class>();
 		openAccessPlaces.add(Home.class);		
@@ -116,8 +119,10 @@ public class AppActivityMapper implements ActivityMapper {
 			presenter.setGinInjector(ginjector);
 			return presenter;
 		} else {
+			loading.showWidget();
 			BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();
 			bulkPresenterProxy.setGinjector(ginjector);
+			bulkPresenterProxy.setloader(loading);
 			bulkPresenterProxy.setPlace(place);
 			return bulkPresenterProxy;
 		}
