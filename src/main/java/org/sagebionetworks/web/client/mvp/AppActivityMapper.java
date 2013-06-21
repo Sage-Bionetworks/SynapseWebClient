@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
@@ -28,10 +27,10 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 
 public class AppActivityMapper implements ActivityMapper {	
@@ -119,7 +118,7 @@ public class AppActivityMapper implements ActivityMapper {
 			presenter.setGinInjector(ginjector);
 			return presenter;
 		} else {
-			loading.showWidget();
+			if(loading != null) loading.showWidget();
 			BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();
 			bulkPresenterProxy.setGinjector(ginjector);
 			bulkPresenterProxy.setloader(loading);
