@@ -67,7 +67,7 @@ public class AppActivityMapperTest {
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		when(mockInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);		
 		
-		appActivityMapper = new AppActivityMapper(mockInjector, mockSynapseJSNIUtils);
+		appActivityMapper = new AppActivityMapper(mockInjector, mockSynapseJSNIUtils, null);
 	}
 	
 	@Test

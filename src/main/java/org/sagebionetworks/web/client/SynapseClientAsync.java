@@ -180,4 +180,6 @@ public interface SynapseClientAsync {
 	 */
 	void getAvailableEvaluationsSubmitterAliases(AsyncCallback<String> callback) throws RestServiceException;
 
+	void getSynapseVersions(AsyncCallback<String> callback);
+
 }

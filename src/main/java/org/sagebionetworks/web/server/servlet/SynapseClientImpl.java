@@ -2,6 +2,7 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -10,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -69,6 +71,7 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -1595,5 +1598,38 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+
+	@Override
+	public String getSynapseVersions() throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {			
+			SynapseVersionInfo versionInfo = synapseClient.getVersionInfo();
+			new PortalVersionHolder();			
+			return PortalVersionHolder.getVersionInfo() +","+ versionInfo.getVersion();			
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	private static class PortalVersionHolder {
+		private static String versionInfo = "";
+		
+		static {
+			InputStream s = SynapseClientImpl.class.getResourceAsStream("/version-info.properties");
+			Properties prop = new Properties();
+			try {
+				prop.load(s);
+			} catch (IOException e) {
+				throw new RuntimeException("version-info.properties file not found", e);
+			}
+			versionInfo = prop.getProperty("org.sagebionetworks.portal.version");
+		}
+		
+		private static String getVersionInfo() {
+			return versionInfo;
+		}
+				
+	}
+
 	
 }
