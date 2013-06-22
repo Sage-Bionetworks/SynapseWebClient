@@ -16,7 +16,8 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
-		<synapse.version>2013-06-18-36515a0-525</synapse.version>
+		<!--synapse.version>2013-06-18-36515a0-525</synapse.version-->
+		<synapse.version>develop-SNAPSHOT</synapse.version>
 
 		<gwtVersion>2.4.0</gwtVersion>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
@@ -298,6 +299,7 @@
 			<version>${org.springframework.version}</version>
 		</dependency>
 		
+			<!-- note: OpenID4Java seems to require version 4.1.1 and to break with 4.1.2 -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>

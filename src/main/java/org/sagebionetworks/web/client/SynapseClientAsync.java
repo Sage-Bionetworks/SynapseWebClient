@@ -87,6 +87,8 @@ public interface SynapseClientAsync {
 	
 	public void createAccessRequirement(EntityWrapper arEW, AsyncCallback<EntityWrapper> callback);
 
+	public void createLockAccessRequirement(String entityId, AsyncCallback<EntityWrapper> callback);
+	
 	public void getUnmetAccessRequirements(String entityId, AsyncCallback<AccessRequirementsTransport> callback);
 	
 	/**
