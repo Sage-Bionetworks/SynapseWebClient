@@ -19,7 +19,7 @@ public interface MarkdownElementParser {
 	 * @param line
 	 * @return
 	 */
-	String processLine(String line);
+	void processLine(MarkdownElements line);
 	
 	/**
 	 * If there are any final modifications to the output html that the parser needs to make, it should perform it here (efficiently)

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import org.jsoup.Jsoup;
+
 public abstract class BasicMarkdownElementParser implements MarkdownElementParser {
 
 	/**
@@ -35,6 +37,10 @@ public abstract class BasicMarkdownElementParser implements MarkdownElementParse
 	@Override
 	public boolean isInputSingleLine() {
 		return true;
+	}
+	
+	protected String getLineWithoutHTML(String line) {
+		return Jsoup.parse(line).text();
 	}
 
 }

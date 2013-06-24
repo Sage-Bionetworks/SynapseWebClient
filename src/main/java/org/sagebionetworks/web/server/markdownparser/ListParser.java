@@ -21,37 +21,30 @@ public class ListParser extends BasicMarkdownElementParser  {
 	}
 
 	@Override
-	public String processLine(String line) {
-		Matcher m1 = p1.matcher(line);
-		Matcher m2 = p2.matcher(line);
+	public void processLine(MarkdownElements line) {
+		Matcher m1 = p1.matcher(line.getMarkdown());
+		Matcher m2 = p2.matcher(line.getMarkdown());
 		
 		boolean isOrderedList = m1.matches();
 		boolean isUnorderedList = m2.matches();
 		
 		if (isOrderedList) {
-			return getListItem(line, m1, true);
+			getListItem(line, m1, true);
 		}
 		else if (isUnorderedList) {
-			return getListItem(line, m2, false);
+			getListItem(line, m2, false);
 		} 
 		else if (isInMarkdownElement()) {
 			//this is not a list item line.  End all existing lists
-			StringBuilder sb = new StringBuilder();
 			while(!stack.isEmpty()){
-				sb.append(stack.pop().getEndListHtml());
+				line.prependElement(stack.pop().getEndListHtml());
 			}
-			sb.append(line);
-			return sb.toString();
 		}
-		
-		return line;
 	}
 	
-	public String getListItem(String line, Matcher m, boolean isOrderedList) {
-		StringBuilder returnString = new StringBuilder();
+	public void getListItem(MarkdownElements line, Matcher m, boolean isOrderedList) {
 		//looks like a list item
 		String prefixGroup = m.group(1);
-		returnString.append(prefixGroup);
 		String spaces = m.group(2);
         int depth = spaces.length();
         //TODO: use listMarker to test order value (if ordered list)
@@ -64,7 +57,7 @@ public class ListParser extends BasicMarkdownElementParser  {
         	MarkdownList list = stack.peek();
         	if (list.getDepth() > depth) {
         		stack.pop();
-        		returnString.append(list.getEndListHtml());
+        		line.prependElement(list.getEndListHtml());
         	} else {
         		isGreaterDepth = false;
         	}
@@ -75,19 +68,22 @@ public class ListParser extends BasicMarkdownElementParser  {
         	//this list is either the parent of the new list, or we should add this item to this list
         	if (list.getDepth() == depth) {
         		//add this to the current list
-        		returnString.append(list.getListItemHtml(value));
+        		list.addListItemHtml(line,  prefixGroup+value);
         	} else {
         		//list depth is less than the current depth
         		//create a new list
-        		returnString.append(createNewList(depth, isOrderedList, value));
+        		MarkdownList newList = getNewList(depth, isOrderedList);
+        		line.prependElement(newList.getStartListHtml());
+        		list.addListItemHtml(line, prefixGroup+value);
         	}
         }
         else {
         	//no list in the stack
         	//create a new list
-        	returnString.append(createNewList(depth, isOrderedList, value));
+        	MarkdownList newList = getNewList(depth, isOrderedList);
+    		line.prependElement(newList.getStartListHtml());
+    		newList.addListItemHtml(line, prefixGroup+value);
         }
-        return returnString.toString();
 	}
 	
 	/**
@@ -95,10 +91,10 @@ public class ListParser extends BasicMarkdownElementParser  {
 	 * the new list and include the item.
 	 * @return
 	 */
-	public String createNewList(int depth, boolean isOrderedList, String value) {
+	public MarkdownList getNewList(int depth, boolean isOrderedList) {
 		MarkdownList newList = isOrderedList ? new OrderedMarkdownList(depth) : new UnorderedMarkdownList(depth);
 		stack.push(newList);
-		return newList.getStartListHtml() + newList.getListItemHtml(value);
+		return newList;
 	}
 	
 	@Override

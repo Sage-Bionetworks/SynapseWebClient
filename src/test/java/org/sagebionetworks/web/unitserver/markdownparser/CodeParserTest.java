@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.server.markdownparser.CodeParser;
+import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 
 public class CodeParserTest {
 	CodeParser parser;
@@ -18,34 +19,47 @@ public class CodeParserTest {
 	public void testHappyCase(){
 		String language = "ruby";
 		String line = "``` " + language;
-		String result = parser.processLine(line);
-		assertTrue(result.toLowerCase().contains("<pre"));
-		assertTrue(result.toLowerCase().contains("<code"));
-		assertTrue(result.toLowerCase().contains("class=\"" + language));
-		assertFalse(result.toLowerCase().contains("</pre>"));
-		assertFalse(result.toLowerCase().contains("</code>"));
+		MarkdownElements elements = new MarkdownElements(line);
+		parser.processLine(elements);
+		String result = elements.getHtml().toLowerCase();
+		assertTrue(result.contains("<pre"));
+		assertTrue(result.contains("<code"));
+		assertTrue(result.contains("class=\"" + language));
+		assertFalse(result.contains("</pre>"));
+		assertFalse(result.contains("</code>"));
 		
 		assertTrue(parser.isInMarkdownElement());
 		
 		//second line
 		line = "some code";
-		result = parser.processLine(line);
-		assertFalse(result.toLowerCase().contains("<pre"));
-		assertFalse(result.toLowerCase().contains("<code"));
+		elements = new MarkdownElements(line);
+		parser.processLine(elements);
+		result = elements.getHtml().toLowerCase();
+		assertFalse(result.contains("<pre"));
+		assertFalse(result.contains("<code"));
 		assertTrue(result.contains(line));
-		assertTrue(result.endsWith("\n")); //should add it's own newline, since it's reporting to be a block element (therefore handling line breaks)
-		assertFalse(result.toLowerCase().contains("</pre>"));
+		assertFalse(result.startsWith("\n"));
+		assertFalse(result.contains("</pre>"));
 		assertFalse(result.toLowerCase().contains("</code>"));
 		
 		assertTrue(parser.isInMarkdownElement());
 		
 		//third line
+		line = "third line";
+		elements = new MarkdownElements(line);
+		parser.processLine(elements);
+		result = elements.getHtml().toLowerCase();
+		assertTrue(result.startsWith("\n"));
+		
+		//forth line
 		line =  "```";
-		result = parser.processLine(line);
-		assertFalse(result.toLowerCase().contains("<pre"));
-		assertFalse(result.toLowerCase().contains("<code"));
-		assertTrue(result.toLowerCase().contains("</pre>"));
-		assertTrue(result.toLowerCase().contains("</code>"));
+		elements = new MarkdownElements(line);
+		parser.processLine(elements);
+		result = elements.getHtml().toLowerCase();
+		assertFalse(result.contains("<pre"));
+		assertFalse(result.contains("<code"));
+		assertTrue(result.contains("</pre>"));
+		assertTrue(result.contains("</code>"));
 		
 		assertFalse(parser.isInMarkdownElement());
 	}

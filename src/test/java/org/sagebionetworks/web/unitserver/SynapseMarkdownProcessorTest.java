@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 
@@ -65,8 +65,10 @@ public class SynapseMarkdownProcessorTest {
 	
 	@Test
 	public void testListAndHeaderInBlockquote() throws IOException{
-		String testString = 
-				"> * Item 1\n> * Item 2\n>    1. Subitem";
-		
+		//complicated integration test of all parsers
+		String testString = "> * Item 1\n> * Item 2\n>   1. #### SubItem 2a\n>   2. SubItem 2b\n> ``` r\n> Then a code block!\n> ```";
+		String actualResult = processor.markdown2Html(testString, false);
+		String expectedResult = "<blockquote>\n   <ul>\n    <li> Item 1</li>\n    <ul>\n     <li>Item 2</li>\n     <ol>\n      <li><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li>\n      <li>SubItem 2b</li>\n     </ol>\n    </ul>\n   </ul>\n   <pre><code class=\"r\">Then a code block! </code></pre>\n   <br /> \n  </blockquote>";
+		assertTrue(actualResult.contains(expectedResult));
 	}
 }

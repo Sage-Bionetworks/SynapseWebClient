@@ -7,8 +7,8 @@ public class HeadingParser extends BasicMarkdownElementParser  {
 	Pattern p1 = Pattern.compile(MarkdownRegExConstants.HEADING_REGEX, Pattern.DOTALL);;
 	
 	@Override
-	public String processLine(String line) {
-		Matcher m = p1.matcher(line);
+	public void processLine(MarkdownElements line) {
+		Matcher m = p1.matcher(line.getMarkdown());
 		if (m.matches()) {
 			//looks like a heading
 			String prefix = m.group(1);
@@ -16,9 +16,8 @@ public class HeadingParser extends BasicMarkdownElementParser  {
             String headingText = m.group(3);
             int level = hashes.length();
             String tag = "h" + level;
-            return prefix + "<" + tag + ">" + headingText + "</" + tag + ">";
+            line.updateMarkdown(prefix + "<" + tag + ">" + headingText + "</" + tag + ">");
 		}
-		return line;
 	}
 	
 	@Override

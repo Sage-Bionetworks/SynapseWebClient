@@ -16,8 +16,9 @@ public class TableParser extends BasicMarkdownElementParser {
 	}
 
 	@Override
-	public String processLine(String line) {
-		boolean isTableMatch = p.matcher(line).matches();
+	public void processLine(MarkdownElements line) {
+		String markdown = line.getMarkdown();
+		boolean isTableMatch = p.matcher(markdown).matches();
 		StringBuilder builder = new StringBuilder();
 		if (isTableMatch) {
 			//are we starting a table?
@@ -28,7 +29,7 @@ public class TableParser extends BasicMarkdownElementParser {
 				//this line is the header
 				builder.append("<thead>");
 				builder.append("<tr>");
-				String[] cells = line.split("\\|");
+				String[] cells = markdown.split("\\|");
 				for (int j = 0; j < cells.length; j++) {
 					builder.append("<th>");
 					builder.append(cells[j]);
@@ -43,7 +44,7 @@ public class TableParser extends BasicMarkdownElementParser {
 			else {
 				//another row
 				builder.append("<tr>");
-				String[] cells = line.split("\\|");
+				String[] cells = markdown.split("\\|");
 				for (int j = 0; j < cells.length; j++) {
 					builder.append("<td>");
 					builder.append(cells[j]);
@@ -60,9 +61,9 @@ public class TableParser extends BasicMarkdownElementParser {
 				builder.append("</table>");
 				isInTable = false;
 			}
-			builder.append(line);
+			builder.append(line.getMarkdown());
 		}
-		return builder.toString();
+		line.updateMarkdown(builder.toString());
 	}
 	
 	@Override

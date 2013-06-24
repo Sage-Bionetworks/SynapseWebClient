@@ -7,8 +7,8 @@ public class BoldParser extends BasicMarkdownElementParser  {
 	Pattern p1 = Pattern.compile(MarkdownRegExConstants.BOLD_REGEX);
 	
 	@Override
-	public String processLine(String line) {
-		Matcher m = p1.matcher(line);
-		return m.replaceAll("<strong>$2</strong>");
+	public void processLine(MarkdownElements line) {
+		Matcher m = p1.matcher(line.getMarkdown());
+		line.updateMarkdown(m.replaceAll("<strong>$2</strong>"));
 	}
 }

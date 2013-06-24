@@ -12,12 +12,11 @@ public class WikiSubpageParser extends BasicMarkdownElementParser  {
 	}
 
 	@Override
-	public String processLine(String line) {
+	public void processLine(MarkdownElements line) {
 		if (!seenWikiSubpagesWidget) {
-			if (line.contains(subpagesWidgetMarkdown))
+			if (line.getMarkdown().contains(subpagesWidgetMarkdown))
 				seenWikiSubpagesWidget = true;
 		}
-		return line;
 	}
 	
 	@Override

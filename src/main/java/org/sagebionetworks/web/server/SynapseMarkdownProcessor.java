@@ -19,6 +19,7 @@ import org.sagebionetworks.web.server.markdownparser.ItalicsParser;
 import org.sagebionetworks.web.server.markdownparser.LinkParser;
 import org.sagebionetworks.web.server.markdownparser.ListParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
+import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
 import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 
@@ -40,17 +41,17 @@ public class SynapseMarkdownProcessor {
 	
 	private void init() {
 		//initialize all markdown element parsers
-		allElementParsers.add(new HorizontalLineParser());
-		allElementParsers.add(new TableParser());
+		allElementParsers.add(new BlockQuoteParser());
+		allElementParsers.add(new BoldParser());
 		allElementParsers.add(new CodeParser());
 		allElementParsers.add(new CodeSpanParser());
-		allElementParsers.add(new BoldParser());
-		allElementParsers.add(new BlockQuoteParser());
 		allElementParsers.add(new HeadingParser());
+		allElementParsers.add(new HorizontalLineParser());
 		allElementParsers.add(new ImageParser());
 		allElementParsers.add(new ItalicsParser());
 		allElementParsers.add(new LinkParser());
 		allElementParsers.add(new ListParser());
+		allElementParsers.add(new TableParser());
 		allElementParsers.add(new WikiSubpageParser());
 	}
 	
@@ -119,20 +120,23 @@ public class SynapseMarkdownProcessor {
 		}
 		allLines.add("");
 		for (String line : allLines) {
-			//process the simple processors first
-			for (MarkdownElementParser parser : simpleParsers) {
-				line = parser.processLine(line);
-			}
+			MarkdownElements elements = new MarkdownElements(line);
 			
-			//then do parsers we're currently in the middle of
+			//do parsers we're currently in the middle of
 			for (MarkdownElementParser parser : activeComplexParsers) {
-				line = parser.processLine(line);
+				parser.processLine(elements);
 			}
 			
 			//then the inactive multiline parsers
 			for (MarkdownElementParser parser : inactiveComplexParsers) {
-				line = parser.processLine(line);
+				parser.processLine(elements);
 			}
+			
+			//process the simple processors after complex parsers (the complex parsers clean up the markdown)
+			for (MarkdownElementParser parser : simpleParsers) {
+				parser.processLine(elements);
+			}
+
 			
 			List<MarkdownElementParser> newActiveComplexParsers = new ArrayList<MarkdownElementParser>();
 			List<MarkdownElementParser> newInactiveComplexParsers = new ArrayList<MarkdownElementParser>();
@@ -155,7 +159,7 @@ public class SynapseMarkdownProcessor {
 			activeComplexParsers = newActiveComplexParsers;
 			inactiveComplexParsers = newInactiveComplexParsers;
 			
-			output.append(line);
+			output.append(elements.getHtml());
 			//also tack on a <br />, unless we are a block element (those parsers handle their own newlines
 			boolean isInMiddleOfBlockElement = false;
 			for (MarkdownElementParser parser : allElementParsers) {

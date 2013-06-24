@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
 
 public class TableParserTest {
@@ -19,9 +20,17 @@ public class TableParserTest {
 		String exampleLine1 = "Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3";
 		String exampleLine2 = "Row 2 Content Cell 1  | Row 2 Content Cell 2  | Row 2 Content Cell 3";
 		StringBuilder tableOutput = new StringBuilder();
-		tableOutput.append(parser.processLine(exampleLine1));
-		tableOutput.append(parser.processLine(exampleLine2));
-		tableOutput.append(parser.processLine(""));
+		MarkdownElements elements = new MarkdownElements(exampleLine1);
+		parser.processLine(elements);
+		tableOutput.append(elements.getHtml());
+		
+		elements = new MarkdownElements(exampleLine2);
+		parser.processLine(elements);
+		tableOutput.append(elements.getHtml());
+		
+		elements = new MarkdownElements("");
+		parser.processLine(elements);
+		tableOutput.append(elements.getHtml());
 		//check for a few items
 		String html = tableOutput.toString();
 		assertTrue(html.contains("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+"0"));

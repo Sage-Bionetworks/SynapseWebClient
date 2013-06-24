@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.server.markdownparser.BlockQuoteParser;
+import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 
 public class BlockQuoteParserTest {
 	
@@ -24,30 +25,37 @@ public class BlockQuoteParserTest {
 	public void testHappyCase(){
 		String text = "first line text";
 		String line = "> " + text;
-		String result = parser.processLine(line);
-		assertTrue(result.toLowerCase().contains("<blockquote"));
+		MarkdownElements elements = new MarkdownElements(line);
+		parser.processLine(elements);
+		String result =elements.getHtml().toLowerCase();
+		assertTrue(result.contains("<blockquote"));
 		assertTrue(result.contains(text));
-		assertFalse(result.toLowerCase().contains("</blockquote>"));
+		assertFalse(result.contains("</blockquote>"));
 		
 		assertTrue(parser.isInMarkdownElement());
 		
 		//second line
 		text = "second line text";
 		line = " \t> " + text;
-		result = parser.processLine(line);
-		assertFalse(result.toLowerCase().contains("<blockquote"));
+		elements = new MarkdownElements(line);
+		parser.processLine(elements);
+		result =elements.getHtml().toLowerCase();
+		
+		assertFalse(result.contains("<blockquote"));
 		assertTrue(result.contains(text));
-		assertFalse(result.toLowerCase().contains("</blockquote>"));
+		assertFalse(result.contains("</blockquote>"));
 		
 		assertTrue(parser.isInMarkdownElement());
 		
 		//third line
 		text = "third line not in blockquote";
 		line =  text;
-		result = parser.processLine(line);
-		assertFalse(result.toLowerCase().contains("<blockquote"));
+		elements = new MarkdownElements(line);
+		parser.processLine(elements);
+		result = elements.getHtml().toLowerCase();
+		assertFalse(result.contains("<blockquote"));
 		assertTrue(result.contains(text));
-		assertTrue(result.toLowerCase().contains("</blockquote>"));
+		assertTrue(result.contains("</blockquote>"));
 		
 		assertFalse(parser.isInMarkdownElement());
 	}

@@ -7,8 +7,8 @@ public class ItalicsParser extends BasicMarkdownElementParser  {
 	Pattern p1 = Pattern.compile(MarkdownRegExConstants.ITALICS_REGEX);;
 	
 	@Override
-	public String processLine(String line) {
-		Matcher m = p1.matcher(line);
-		return m.replaceAll("<em>$2</em>");
+	public void processLine(MarkdownElements line) {
+		Matcher m = p1.matcher(line.getMarkdown());
+		line.updateMarkdown(m.replaceAll("<em>$2</em>"));
 	}
 }

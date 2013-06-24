@@ -12,8 +12,10 @@ public abstract class MarkdownList {
 	}
 	
 	public abstract String getStartListHtml();
-	public String getListItemHtml(String item) {
-		return "<li>"+item+"</li>";
+	public void addListItemHtml(MarkdownElements line, String item) {
+		line.prependElement("<li>");
+		line.updateMarkdown(item);
+		line.appendElement("</li>");
 	}
 	public abstract String getEndListHtml();
 }

@@ -13,26 +13,26 @@ public class BlockQuoteParser extends BasicMarkdownElementParser {
 	}
 
 	@Override
-	public String processLine(String line) {
-		Matcher m = p1.matcher(line);
-		StringBuilder output = new StringBuilder();
+	public void processLine(MarkdownElements line) {
+		Matcher m = p1.matcher(line.getMarkdown());
+		
 		if (m.matches()) {
 			if (!inBlockQuote) {
 				//starting block quote
 				inBlockQuote = true;
-				output.append("<blockquote>");
-			} 
-			output.append(m.group(2));
+				line.prependElement("<blockquote>");
+			}
+			//modify the markdown
+			line.updateMarkdown(m.group(2));
 		}
 		else {
 			if (inBlockQuote){
 				inBlockQuote = false;
 				//finish block quote
-				output.append("</blockquote>");
+				line.prependElement("</blockquote>");
 			}
-			output.append(line);
+			//no need to modify the markdown
 		}
-		return output.toString();
 	}
 	
 	@Override

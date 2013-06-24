@@ -7,41 +7,45 @@ import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
 public class CodeParser extends BasicMarkdownElementParser  {
 	Pattern p = Pattern.compile(MarkdownRegExConstants.FENCE_CODE_BLOCK_REGEX);
-	boolean isInCodeBlock;
+	boolean isInCodeBlock, isFirstCodeLine;
+	
 	
 	@Override
 	public void reset() {
 		isInCodeBlock = false;
+		isFirstCodeLine = false;
 	}
 
 	@Override
-	public String processLine(String line) {
-		StringBuilder sb = new StringBuilder();
-		Matcher m = p.matcher(line);
+	public void processLine(MarkdownElements line) {
+		Matcher m = p.matcher(line.getMarkdown());
 		if (m.matches()) {
 			if (!isInCodeBlock) {
 				//starting code block
 				isInCodeBlock = true;
-				sb.append(m.group(1)); //prefix group
+				isFirstCodeLine = true;
+				StringBuilder sb = new StringBuilder();
 				sb.append(ServerMarkdownUtils.START_PRE_CODE);
 				if (m.groupCount() == 2)
 					sb.append(" class=\""+m.group(2).toLowerCase()+"\"");
 				sb.append(">");
+				line.prependElement(sb.toString());
 			}
 			else {
 				//ending code block
-				sb.append(ServerMarkdownUtils.END_PRE_CODE);
+				line.appendElement(ServerMarkdownUtils.END_PRE_CODE);
 				isInCodeBlock = false;
 			}
+			//remove all fenced code blocks from the markdown, just set to the prefix group
+			line.updateMarkdown(m.group(1));
 		}
 		else {
-			sb.append(line);
-			if (isInCodeBlock)
-				sb.append("\n");
-		}
+			if (isInCodeBlock && !isFirstCodeLine)
+				line.prependElement("\n");
 			
-		
-		return sb.toString();
+			if (isFirstCodeLine)
+				isFirstCodeLine = false;
+		}
 	}
 
 	@Override

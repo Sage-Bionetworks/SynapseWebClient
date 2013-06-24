@@ -6,9 +6,10 @@ import java.util.regex.Pattern;
 public class CodeSpanParser extends BasicMarkdownElementParser {
 	Pattern p1 = Pattern.compile(MarkdownRegExConstants.CODE_SPAN_REGEX);;
 	
+	
 	@Override
-	public String processLine(String line) {
-		Matcher m = p1.matcher(line);
-		return m.replaceAll("<code>$2</code>");
+	public void processLine(MarkdownElements line) {
+		Matcher m = p1.matcher(line.getMarkdown());
+		line.updateMarkdown(m.replaceAll("<code>$2</code>"));
 	}
 }
