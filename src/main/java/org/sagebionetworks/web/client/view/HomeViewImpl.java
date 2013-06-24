@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -55,6 +56,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	SimplePanel loginBtnPanel;
 	@UiField
 	SimplePanel registerBtnPanel;		
+	@UiField
+	SimplePanel dream8BtnPanel;
 	@UiField
 	HTMLPanel whatIsSynapseContainer;
 	@UiField
@@ -120,6 +123,17 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 		registerBtnPanel.setWidget(registerBtn);
+		
+		Button dream8Btn = new Button(DisplayConstants.BUTTON_DREAM_8);
+		dream8Btn.removeStyleName("gwt-Button");
+		dream8Btn.addStyleName("btn btn-large btn-block");
+		dream8Btn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM8"));
+			}
+		});
+		dream8BtnPanel.setWidget(dream8Btn);
 		
 	}	
 
