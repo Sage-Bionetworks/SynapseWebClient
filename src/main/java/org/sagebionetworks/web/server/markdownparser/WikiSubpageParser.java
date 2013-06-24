@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.server.markdownparser;
 
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 
 public class WikiSubpageParser extends BasicMarkdownElementParser  {
-	String subpagesWidgetMarkdown = DisplayUtils.getWikiSubpagesMarkdown();
+	String subpagesWidgetMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
 	boolean seenWikiSubpagesWidget;
 	
 	@Override

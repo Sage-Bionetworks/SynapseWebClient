@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.server.markdownparser.BlockQuoteParser;
 import org.sagebionetworks.web.server.markdownparser.BoldParser;
 import org.sagebionetworks.web.server.markdownparser.CodeParser;
@@ -68,7 +69,7 @@ public class SynapseMarkdownProcessor {
 	 */
 	public String markdown2Html(String markdown, Boolean isPreview) throws IOException {
 		String originalMarkdown = markdown;
-		if (markdown == null) return DisplayUtils.getDefaultWikiMarkdown();
+		if (markdown == null) return SharedMarkdownUtils.getDefaultWikiMarkdown();
 		//trick to maintain newlines when suppressing all html
 		if (markdown != null) {
 			markdown = ServerMarkdownUtils.preserveWhitespace(markdown);
