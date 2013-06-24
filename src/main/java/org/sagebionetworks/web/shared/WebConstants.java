@@ -71,6 +71,20 @@ public class WebConstants {
 			"<h3>Symbols</h3><pre><code>&amp;copy; = copyright sign<br>&amp;mdash; = wide dash<br>&amp;amp; = ampersand<br>&amp;trade; = trademark TM<br>&amp;reg; = reserved mark R</code></pre><br>"+
 			"</div>";
 
+	public static final String SYNAPSE_MARKDOWN_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
+			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br></code></pre><br>" +
+			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>Custom Synapse ID link text:<br>[my text](#Synapse:syn12345)</code></pre><br>" +
+			"<h3>Tables</h3><pre><code>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>Row 2 Content Cell 1  | Row 2 Content Cell 2  | Row 2 Content Cell 3</code></pre><br>" +
+			"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
+			"<h3>Headers</h3><p><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre></p><p>Exclude a header from the table of contents:<pre><code>#! Header 1 <br>##! Header 2<br>######! Header 6</code></pre></p><br>" +
+			"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
+			"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
+			"<h3>Inline Code</h3><pre><code>Wrap inline snippets of `code` with backticks.<br>You can include literal backticks<br>like \\`this\\`.<br></code></pre><br>" +
+			"<h3>Fenced Code Blocks</h3><pre><code>Wrap your code blocks in ```<br><br>This is a normal paragraph.<br><br>```<br>This is a preformatted<br>code block.<br>```</code></pre><pre><code>To help syntax highlighting, you can add an optional language identifier<br><br>```r<br>library(synapseClient)<br>synapseLogin('usename','password')<br>syn1686521 <- getEntity('syn1686521')<br>```</code></pre><br>" +
+			"<h3>Symbols</h3><pre><code>&amp;copy; = copyright sign<br>&amp;mdash; = wide dash<br>&amp;amp; = ampersand<br>&amp;trade; = trademark TM<br>&amp;reg; = reserved mark R</code></pre><br>"+
+			"</div>";
+
+	
 	/*
 	 * Dimensions
 	 */
