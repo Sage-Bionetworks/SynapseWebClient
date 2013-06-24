@@ -250,8 +250,7 @@ public class EntityMetadata implements Presenter {
 					@Override
 					public void onSuccess(EntityWrapper result) {
 						fireEntityUpdatedEvent();
-						DisplayUtils.setWindowTarget(window, getJiraRestrictionUrl());
-				}
+					}
 					@Override
 					public void onFailure(Throwable caught) {
 						view.showInfo("Error", caught.getMessage());

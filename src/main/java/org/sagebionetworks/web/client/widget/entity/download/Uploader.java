@@ -476,8 +476,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					@Override
 					public void onSuccess(EntityWrapper result) {
 						view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
-						// open Jira issue
-						view.openNewBrowserTab(getJiraRestrictionLink());
 						entityUpdated();
 					}
 					@Override
@@ -613,9 +611,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	private void uploadSuccess(boolean isNewlyRestricted) {
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
-		if (isNewlyRestricted) {
-			view.openNewBrowserTab(getJiraRestrictionLink());
-		}
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 	
