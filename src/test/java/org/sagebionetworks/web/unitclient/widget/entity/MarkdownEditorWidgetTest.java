@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -50,10 +50,10 @@ public class MarkdownEditorWidgetTest {
 		AsyncMockStubber
 				.callFailureWith(new Exception())
 				.when(mockSynapseClient)
-				.markdown2Html(any(String.class), any(Boolean.class),
+				.markdown2Html(anyString(), anyBoolean(), anyBoolean(), 
 						any(AsyncCallback.class));
 		
 		presenter.showPreview(testMarkdown, true);
-		verify(mockSynapseClient).markdown2Html(any(String.class), any(Boolean.class), any(AsyncCallback.class));
+		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), any(AsyncCallback.class));
 	}
 }
