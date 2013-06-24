@@ -66,6 +66,8 @@
 						<g:SimplePanel ui:field="loginBtnPanel"/>
 						<br/>
 						<g:SimplePanel ui:field="registerBtnPanel"/>
+						<br/>
+						<g:SimplePanel ui:field="dream8BtnPanel"/>
 					</div>
 				</g:HTMLPanel>
 
