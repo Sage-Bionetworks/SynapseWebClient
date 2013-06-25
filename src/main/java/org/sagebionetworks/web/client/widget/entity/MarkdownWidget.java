@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -35,6 +36,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
 	private IconsImageBundle iconsImageBundle;
+	private CookieProvider cookies;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	
@@ -42,6 +44,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	public MarkdownWidget(SynapseClientAsync synapseClient,
 			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
 			IconsImageBundle iconsImageBundle,
+			CookieProvider cookies,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController) {
 		super();
@@ -49,6 +52,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.widgetRegistrar = widgetRegistrar;
 		this.iconsImageBundle = iconsImageBundle;
+		this.cookies = cookies;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 	}
@@ -59,7 +63,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	 */
 	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isWiki, final boolean isPreview) {
 		final SynapseView view = this;
-		synapseClient.markdown2Html(md, isPreview, new AsyncCallback<String>() {
+		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {

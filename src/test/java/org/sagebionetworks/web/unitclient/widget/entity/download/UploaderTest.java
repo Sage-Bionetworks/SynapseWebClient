@@ -116,7 +116,7 @@ public class UploaderTest {
 		
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createAccessRequirement(any(EntityWrapper.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		uploader = new Uploader(view, nodeModelCreator,
@@ -159,9 +159,8 @@ public class UploaderTest {
 		uploader.asWidget(parentEntityId, null);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", true);
 		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(synapseClient).createAccessRequirement(any(EntityWrapper.class), any(AsyncCallback.class));
+		verify(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
-		verify(view).openNewBrowserTab(anyString());
 	}
 	
 	@Test
@@ -188,7 +187,7 @@ public class UploaderTest {
 
 	@Test
 	public void testSetExternalPathFailedCreateAccessRequirement() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createAccessRequirement(any(EntityWrapper.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 
 		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId, null);
@@ -205,9 +204,8 @@ public class UploaderTest {
 		uploader.asWidget(data, null);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", true);
 		verify(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(synapseClient).createAccessRequirement(any(EntityWrapper.class), any(AsyncCallback.class));
+		verify(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
-		verify(view).openNewBrowserTab(anyString());
 	}
 	
 	@Test
@@ -215,9 +213,8 @@ public class UploaderTest {
 		uploader.asWidget(testEntity, null);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", true);
 		verify(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
-		verify(synapseClient).createAccessRequirement(any(EntityWrapper.class), any(AsyncCallback.class));
+		verify(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
-		verify(view).openNewBrowserTab(anyString());
 	}
 
 	@Test

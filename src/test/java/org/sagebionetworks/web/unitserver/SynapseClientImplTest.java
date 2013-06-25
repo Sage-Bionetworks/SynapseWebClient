@@ -107,6 +107,8 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 /**
  * Test for the SynapseClientImpl
  * @author John
@@ -760,7 +762,7 @@ public class SynapseClientImplTest {
 		//and update the name
 		verify(mockSynapse).putEntity(any(FileEntity.class));
 		//and lock down
-		verify(mockSynapse).createAccessRequirement(any(AccessRequirement.class));
+		verify(mockSynapse).createLockAccessRequirement(anyString());
 	}
 	
 	@Test
@@ -778,7 +780,7 @@ public class SynapseClientImplTest {
 		//update the data file handle id, and update the name
 		verify(mockSynapse, Mockito.times(2)).putEntity(any(FileEntity.class));
 		//do not lock down (restricted=false)
-		verify(mockSynapse, Mockito.times(0)).createAccessRequirement(any(AccessRequirement.class));
+		verify(mockSynapse, Mockito.times(0)).createLockAccessRequirement(anyString());
 	}
 
 	@Test

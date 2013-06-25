@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
-import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -245,21 +244,13 @@ public class EntityMetadata implements Presenter {
 		return new Callback() {
 			@Override
 			public void invoke() {
-				EntityWrapper ew = null;
-				try {
-					ew = EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(bundle.getEntity().getId(), jsonObjectAdapter);
-				} catch (JSONObjectAdapterException e) {
-					view.showInfo("Error", e.getMessage());
-					return;
-				}
 				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 				final JavaScriptObject window = DisplayUtils.newWindow("", "", "");
-				synapseClient.createAccessRequirement(ew, new AsyncCallback<EntityWrapper>(){
+				synapseClient.createLockAccessRequirement(bundle.getEntity().getId(), new AsyncCallback<EntityWrapper>(){
 					@Override
 					public void onSuccess(EntityWrapper result) {
 						fireEntityUpdatedEvent();
-						DisplayUtils.setWindowTarget(window, getJiraRestrictionUrl());
-				}
+					}
 					@Override
 					public void onFailure(Throwable caught) {
 						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))

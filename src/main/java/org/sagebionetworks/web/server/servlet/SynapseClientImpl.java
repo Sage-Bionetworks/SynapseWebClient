@@ -87,6 +87,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
+import org.sagebionetworks.web.server.SynapseMarkdownProcessor;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -108,7 +109,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
-
+	static {//kick off initialization (like pattern compilation) by referencing it
+			SynapseMarkdownProcessor.getInstance();
+		}
+	
 	@SuppressWarnings("unused")
 	private static Logger logger = Logger.getLogger(SynapseClientImpl.class
 			.getName());
@@ -851,6 +855,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public EntityWrapper createLockAccessRequirement(String entityId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			AccessRequirement result = synapseClient.createLockAccessRequirement(entityId);
+			JSONObjectAdapter arJson = result.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(arJson.toJSONString(), arJson.getClass().getName());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	
+	@Override
 	public AccessRequirementsTransport getUnmetAccessRequirements(String entityId) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
@@ -1006,9 +1025,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException{
+	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlphaMode) throws RestServiceException{
 		try {
-			return ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+			long startTime = System.currentTimeMillis();
+			String html = null;
+			if (isAlphaMode)
+				html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview);
+			else
+				html = ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
+			long endTime = System.currentTimeMillis();
+			float elapsedTime = endTime-startTime;
+			
+			logInfo("Markdown processing took " + (elapsedTime/1000f) + " seconds.  In alpha mode? " + isAlphaMode);
+			
+			return html;
 		} catch (IOException e) {
 			throw new RestServiceException(e.getMessage());
 		}
