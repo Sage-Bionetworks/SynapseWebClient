@@ -162,6 +162,8 @@ public interface SynapseClient extends RemoteService {
 
 	EntityWrapper createAccessRequirement(EntityWrapper arEW)
 			throws RestServiceException;
+	
+	EntityWrapper createLockAccessRequirement(String entityId) throws RestServiceException;
 
 	AccessRequirementsTransport getUnmetAccessRequirements(String entityId)
 			throws RestServiceException;
