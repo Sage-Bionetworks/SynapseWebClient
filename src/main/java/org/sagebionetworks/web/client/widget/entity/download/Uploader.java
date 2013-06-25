@@ -37,7 +37,6 @@ import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
-import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -473,18 +472,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		try {
 			entity = nodeModelCreator.createJSONEntity(result.getEntityJson(), entityClass);
 			if (isNewlyRestricted) {
-				EntityWrapper arEW = null;
-				try {
-					arEW=EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(entity.getId(), jsonObjectAdapter);
-				} catch (JSONObjectAdapterException caught) {
-					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);							
-				}
-				synapseClient.createAccessRequirement(arEW, new AsyncCallback<EntityWrapper>(){
+				synapseClient.createLockAccessRequirement(entity.getId(), new AsyncCallback<EntityWrapper>(){
 					@Override
 					public void onSuccess(EntityWrapper result) {
 						view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
-						// open Jira issue
-						view.openNewBrowserTab(getJiraRestrictionLink());
 						entityUpdated();
 					}
 					@Override
@@ -620,9 +611,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	private void uploadSuccess(boolean isNewlyRestricted) {
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
-		if (isNewlyRestricted) {
-			view.openNewBrowserTab(getJiraRestrictionLink());
-		}
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 	
