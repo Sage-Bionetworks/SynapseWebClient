@@ -5,7 +5,9 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
+import org.sagebionetworks.web.client.view.ProfilePanel;
 import org.sagebionetworks.web.client.widget.entity.EntityViewUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -16,7 +18,9 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FormEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
@@ -35,6 +39,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -237,6 +242,22 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setAction(presenter.getDefaultUploadActionUrl(/*isRestricted*/true));		
 	}
 	
+	/**
+	 * returns true if user selects "OK", false if user selects "CANCEL"
+	 * @return
+	 */
+	private void presentRestrictedWarningDialog(final Callback okCallback, final Callback cancelCallback) {
+		//return Window.confirm("By clicking 'OK' below, I request that the Synapse ACT contact me to assign the appropriate access restrictions for this dataset.");
+		DisplayUtils.showOkCancelMessage(
+				"Add Data Restriction", 
+				"By clicking 'OK' below, I request that the Synapse ACT contact me to assign the appropriate access restrictions for this dataset.", 
+				MessageBox.WARNING,
+				500,
+				okCallback, 
+				cancelCallback);
+
+	}
+	
 	// set the initial state of the controls when widget is made visible
 	private void initializeControls() {
 		isInitiallyRestricted = presenter.isRestricted();
@@ -246,16 +267,28 @@ public class UploaderViewImpl extends LayoutContainer implements
 			@Override
 			public void handleEvent(BaseEvent be) {
 				openSelected();
-				// select other open radio button
+				// select open radio button
 				linkExternalOpenRadio.setValue(true);
 			}
 		});
 		initializeRestrictedRadio(fileUploadRestrictedRadio, FILE_UPLOAD_RESTRICTED_PARAM_NAME, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {
-				restrictedSelected();
-				// select other restricted radio button
-				linkExternalRestrictedRadio.setValue(true);
+				presentRestrictedWarningDialog(
+						new Callback() {
+							@Override
+							public void invoke() {
+								restrictedSelected();
+								fileUploadRestrictedRadio.setValue(true);
+								linkExternalRestrictedRadio.setValue(true);
+							}},
+						new Callback() {
+							@Override
+							public void invoke() {
+								fileUploadRestrictedRadio.setValue(false);
+								linkExternalRestrictedRadio.setValue(false);
+							}}
+						);
 			}
 		});
 		initializeOpenRadio(linkExternalOpenRadio, LINK_EXTERNAL_RESTRICTED_PARAM_NAME, new Listener<BaseEvent>() {
@@ -269,9 +302,21 @@ public class UploaderViewImpl extends LayoutContainer implements
 		initializeRestrictedRadio(linkExternalRestrictedRadio, LINK_EXTERNAL_RESTRICTED_PARAM_NAME, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {
-				restrictedSelected();
-				// select other restricted radio button
-				fileUploadRestrictedRadio.setValue(true);
+				presentRestrictedWarningDialog(
+						new Callback() {
+							@Override
+							public void invoke() {
+								restrictedSelected();
+								fileUploadRestrictedRadio.setValue(true);
+								linkExternalRestrictedRadio.setValue(true);
+							}},
+						new Callback() {
+							@Override
+							public void invoke() {
+								fileUploadRestrictedRadio.setValue(false);
+								linkExternalRestrictedRadio.setValue(false);
+							}}
+						);
 			}
 		});
 		
