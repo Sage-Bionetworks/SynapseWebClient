@@ -142,8 +142,11 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				}
 			}			
 		};
-		//always ask for the current version.  if version is set, then highlight it in the version table
-		synapseClient.getEntityBundle(entityId, mask, callback);
+		if (versionNumber == null) {
+			synapseClient.getEntityBundle(entityId, mask, callback);
+		} else {
+			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+		}
 	}
 	
 }

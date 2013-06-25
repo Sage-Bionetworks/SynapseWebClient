@@ -14,7 +14,7 @@ public interface EntityMetadataView extends IsWidget {
 
 	public void setPresenter(Presenter p);
 
-	public void setEntityBundle(EntityBundle bundle, boolean readOnly);
+	public void setEntityBundle(EntityBundle bundle, boolean canEdit);
 
 	public void showInfo(String string, String message);
 	
@@ -23,6 +23,8 @@ public interface EntityMetadataView extends IsWidget {
 
 	public void showErrorMessage(String message);
 
+	void setFileHistoryVisible(boolean visible);
+	
 	public interface Presenter {
 
 		void loadVersions(String id, int offset, int limit,

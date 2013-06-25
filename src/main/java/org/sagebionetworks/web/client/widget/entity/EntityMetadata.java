@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -52,6 +54,9 @@ public class EntityMetadata implements Presenter {
 	private EntityBundle bundle;	
 	private EntityUpdatedHandler entityUpdatedHandler;
 	
+	//the version that we're currently looking at
+	private Long currentVersion;
+	
 	@Inject
 	public EntityMetadata(EntityMetadataView view,
 			SynapseClientAsync synapseClient,
@@ -72,7 +77,7 @@ public class EntityMetadata implements Presenter {
 	}
 
 	@Override
-	public void loadVersions(String id, int offset, int limit,
+	public void loadVersions(String id, final int offset, int limit,
 			final AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback) {
 		// TODO: If we ever change the offset api to actually take 0 as a valid
 		// offset, then we need to remove "+1"
@@ -83,6 +88,13 @@ public class EntityMetadata implements Presenter {
 						PaginatedResults<VersionInfo> paginatedResults;
 						try {
 							paginatedResults = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
+							List<VersionInfo> results = paginatedResults.getResults();
+							if (offset == 0 && results.size() > 0) {
+								if (currentVersion != null) {
+									//unhide file history to highlight the current version in the version list
+									view.setFileHistoryVisible(true);
+								}
+							}
 							asyncCallback.onSuccess(paginatedResults);
 						} catch (JSONObjectAdapterException e) {							
 							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -102,8 +114,8 @@ public class EntityMetadata implements Presenter {
 
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		this.bundle = bundle;
-		boolean readOnly = versionNumber != null;
-		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit() && readOnly);
+		this.currentVersion = versionNumber;
+		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit());
 		boolean showDetailedMetadata = false;
 		boolean showEntityName = false;
 		if (bundle.getEntity() instanceof FileEntity) {

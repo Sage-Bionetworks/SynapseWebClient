@@ -95,7 +95,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Long versionNumber;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
-	private FileMetadata fileMetadata;
 	private FilesBrowser filesBrowser;
 	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
@@ -111,9 +110,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			EntityTreeBrowser entityTreeBrowser, Breadcrumb breadcrumb,
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
-			EntityMetadata entityMetadata, 
-			FileMetadata fileMetadata,
-			SynapseJSNIUtils synapseJSNIUtils,
+			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
 			PortalGinInjector ginInjector, 
 			FilesBrowser filesBrowser, 
 			MarkdownWidget markdownWidget, 
@@ -128,7 +125,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.attachmentsPanel = attachmentsPanel;
 		this.snapshotWidget = snapshotWidget;
 		this.entityMetadata = entityMetadata;
-		this.fileMetadata = fileMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.locationableTitleBar = locationableTitleBar;
 		this.fileTitleBar = fileTitleBar;
@@ -170,12 +166,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			//render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
 			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, widgetMargin);
 		} else if (bundle.getEntity() instanceof Summary) {
-		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, widgetMargin);
-		} else if (bundle.getEntity() instanceof FileEntity) {
-			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, widgetMargin);
+		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, widgetMargin);
 		} else {
 			// default entity view
-			renderDefaultEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, widgetMargin);
+			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, widgetMargin);
 		}
 		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
@@ -204,7 +198,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		filesBrowser.setEntityUpdatedHandler(handler);
 		entityMetadata.setEntityUpdatedHandler(handler);
-		fileMetadata.setEntityUpdatedHandler(handler);
 	}
 
 	@Override
@@ -237,11 +230,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	/*
 	 * Private Methods
 	 */
-	// Render default entity	
-	private void renderDefaultEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, MarginData widgetMargin) {
+	// Render the File entity	
+	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber, MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
-		colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
+		if (bundle.getEntity() instanceof FileEntity)
+			colLeftContainer.add(fileTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
+		else
+			colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		
@@ -259,7 +255,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// ** RIGHT **
 		// Programmatic Clients
-		colRightContainer.add(createProgrammaticClientsWidget(bundle));
+		colRightContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
 		// Provenance Widget for anything other than projects of folders
 		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) 
 			colRightContainer.add(createProvenanceWidget(bundle), widgetMargin);
@@ -272,39 +268,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// ************************************************************************************************		
 	}
-	
-	// Render default entity	
-	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, MarginData widgetMargin) {
-		// ** LEFT **
-		// Entity Metadata
-		colLeftContainer.add(fileTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
-		fileMetadata.setEntityBundle(bundle, versionNumber);
-		colLeftContainer.add(fileMetadata.asWidget(), widgetMargin);
-		
-		//show preview
-		colLeftContainer.add(getFilePreview(bundle));
-		
-		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
-		
-		// show Wiki
-		addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
-
-		// ** RIGHT **
-		// Programmatic Clients
-		colRightContainer.add(createProgrammaticClientsWidget(bundle));
-		// Provenance Widget
-		colRightContainer.add(createProvenanceWidget(bundle), widgetMargin);
-		// Annotation Editor widget
-		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
-		// Attachments
-		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, false), widgetMargin);
-		
-		//these types should not have children to show (and don't show deprecated Preview child object)
-		
-		// ************************************************************************************************		
-	}
-
 	
 	private Widget getFilePreview(EntityBundle bundle) {
 		previewWidget.configure(bundle);
@@ -405,7 +368,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	// Render Snapshot Entity
 	// TODO: This rendering should be phased out in favor of a regular wiki page
 	private void renderSummaryEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, boolean canEdit,
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber,
 			MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
@@ -462,11 +425,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 
-	private Widget createProgrammaticClientsWidget(EntityBundle bundle) {		
+	private Widget createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {		
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("span-7 notopmargin");
 		lc.setAutoHeight(true);
-		LayoutContainer pcc = ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), synapseJSNIUtils, sageImageBundle);
+		LayoutContainer pcc = ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), versionNumber, synapseJSNIUtils, sageImageBundle);
 		pcc.addStyleName("right");
 		lc.add(pcc);
 		lc.layout();
