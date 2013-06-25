@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.List;
 
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.view.RowData;
 import org.sagebionetworks.web.shared.HeaderData;
 import org.sagebionetworks.web.shared.WhereCondition;
@@ -13,7 +14,7 @@ import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface QueryServiceTableView extends IsWidget {
+public interface QueryServiceTableView extends IsWidget, SynapseView {
 	
 
 	/**

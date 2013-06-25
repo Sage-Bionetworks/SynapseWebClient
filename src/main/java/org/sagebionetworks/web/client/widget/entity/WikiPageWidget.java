@@ -13,9 +13,11 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -49,6 +51,7 @@ SynapseWidgetPresenter {
 	private String ownerObjectName; //used for linking back to the owner object
 	private int spanWidth;
 	private WikiPageWidgetView view; 
+	AuthenticationController authenticationController;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -59,7 +62,12 @@ SynapseWidgetPresenter {
 	}
 	
 	@Inject
-	public WikiPageWidget(WikiPageWidgetView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, JSONObjectAdapter jsonObjectAdapter, AdapterFactory adapterFactory, GlobalApplicationState globalApplicationState) {
+	public WikiPageWidget(WikiPageWidgetView view,
+			SynapseClientAsync synapseClient,
+			NodeModelCreator nodeModelCreator,
+			JSONObjectAdapter jsonObjectAdapter, AdapterFactory adapterFactory,
+			GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -67,6 +75,7 @@ SynapseWidgetPresenter {
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.adapterFactory = adapterFactory;
 		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}
 	
@@ -121,7 +130,8 @@ SynapseWidgetPresenter {
 								view.show403();
 						}
 						else {
-							view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+								view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 						}
 					}
 				});				
@@ -150,7 +160,8 @@ SynapseWidgetPresenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 			}
 		});				
 	}
@@ -185,7 +196,8 @@ SynapseWidgetPresenter {
 					
 					@Override
 					public void onFailure(Throwable caught) {					
-						view.showErrorMessage(caught.getMessage());
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+							view.showErrorMessage(caught.getMessage());
 					}
 				});
 			} catch (JSONObjectAdapterException e) {
@@ -217,7 +229,8 @@ SynapseWidgetPresenter {
 						}
 						@Override
 						public void onFailure(Throwable caught) {
-							view.showErrorMessage(caught.getMessage());
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+								view.showErrorMessage(caught.getMessage());
 						}
 					});
 				} catch (JSONObjectAdapterException e) {
@@ -239,7 +252,8 @@ SynapseWidgetPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
 			}
 		});	
 	}
@@ -272,7 +286,8 @@ SynapseWidgetPresenter {
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
 				}
 			});
 		} catch (JSONObjectAdapterException e) {			

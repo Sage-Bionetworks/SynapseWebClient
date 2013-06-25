@@ -17,6 +17,8 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -61,6 +63,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private boolean hasLocalACL_inRepo;
 	private Long publicAclPrincipalId = null;
 	private Long authenticatedAclPrincipalId = null;
+	GlobalApplicationState globalApplicationState;
 	
 	// Entity components
 	private Entity entity;
@@ -74,13 +77,15 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			JSONObjectAdapter jsonObjectAdapter,
-			UserAccountServiceAsync userAccountService) {
+			UserAccountServiceAsync userAccountService,
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
 		this.userAccountService = userAccountService;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.authenticationController = authenticationController;
+		this.globalApplicationState = globalApplicationState;
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);		
 	}	
@@ -152,7 +157,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					showErrorMessage("Could not find the public group: " + caught.getMessage());
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						showErrorMessage("Could not find the public group: " + caught.getMessage());
 				}
 			});
 		}
@@ -372,7 +378,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				showErrorMessage("Unable to fetch benefactor permissions.");
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					showErrorMessage("Unable to fetch benefactor permissions.");
 			}
 		});
 	}
@@ -422,6 +429,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);
 				view.showInfoError("Error", "Permissions were not saved to Synapse");				
 				changesPushedCallback.onFailure(caught);
 			}

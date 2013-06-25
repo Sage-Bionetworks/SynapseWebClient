@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.filter;
 
 import java.util.List;
 
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.WhereCondition;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -84,6 +85,24 @@ public class QueryFilterViewImpl extends Composite implements QueryFilterView {
 			});
 			horizPanel.add(box);
 		}
+	}
+
+	@Override
+	public void showLoading() {
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+
+	@Override
+	public void clear() {
 	}
 	
 }

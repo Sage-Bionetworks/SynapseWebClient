@@ -25,6 +25,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
@@ -48,6 +49,7 @@ public class WikiPageWidgetTest {
 	AdapterFactory adapterFactory = new JSONObjectAdapterImpl();
 	WikiPageWidget presenter;
 	GlobalApplicationState mockGlobalApplicationState;
+	AuthenticationController mockAuthenticationController;
 	WikiPage testPage;
 	private static final String MY_TEST_ENTITY_OWNER_NAME = "My Test Entity Owner Name";
 	
@@ -58,7 +60,10 @@ public class WikiPageWidgetTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockJsonObjectAdapter = mock(JSONObjectAdapter.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockJsonObjectAdapter, adapterFactory, mockGlobalApplicationState);
+		mockAuthenticationController = mock(AuthenticationController.class);
+		presenter = new WikiPageWidget(mockView, mockSynapseClient,
+				mockNodeModelCreator, mockJsonObjectAdapter, adapterFactory,
+				mockGlobalApplicationState, mockAuthenticationController);
 		
 		BatchResults<EntityHeader> headers = new BatchResults<EntityHeader>();
 		headers.setTotalNumberOfResults(1);

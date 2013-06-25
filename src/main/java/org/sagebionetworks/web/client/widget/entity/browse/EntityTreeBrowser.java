@@ -89,7 +89,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn());
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);
 			}
 		});
 	}
@@ -132,7 +132,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn());				
+					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);				
 					asyncCallback.onFailure(caught);
 				}
 			});					
@@ -184,7 +184,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
 				}
 			}

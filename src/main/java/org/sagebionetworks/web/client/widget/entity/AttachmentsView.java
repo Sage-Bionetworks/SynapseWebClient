@@ -6,11 +6,11 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface AttachmentsView extends IsWidget, SynapseWidgetView {
+public interface AttachmentsView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.

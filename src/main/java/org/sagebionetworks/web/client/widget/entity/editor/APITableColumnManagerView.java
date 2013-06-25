@@ -2,11 +2,11 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
 
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface APITableColumnManagerView extends IsWidget, SynapseWidgetView {
+public interface APITableColumnManagerView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.

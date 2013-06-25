@@ -64,7 +64,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookieProvider;
-	private  NodeModelCreator nodeModelCreator;
+	private NodeModelCreator nodeModelCreator;
 	
 	public interface EvaluationsCallback {
 		/**
@@ -157,7 +157,8 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
@@ -220,7 +221,8 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
@@ -243,7 +245,8 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
@@ -317,7 +320,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				if (caught instanceof UnauthorizedException) {
 					view.showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
 				}
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_MOVE_FAILURE);			
 				}
 			}
@@ -351,7 +354,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
 				}
 			}
@@ -409,7 +412,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 					view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
 					return;
 				}
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 				}
 			}
@@ -447,7 +450,8 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 						}
 						@Override
 						public void onFailure(Throwable caught) {
-							view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+								view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 						}
 					});							
 				}

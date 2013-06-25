@@ -5,7 +5,10 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -27,14 +30,21 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 	private SynapseClientAsync synapseClient;
 	private boolean showVersions = true;
 	private Reference selectedEntity;
+	GlobalApplicationState globalApplicationState;
+	AuthenticationController authenticationController;
 		
 	@Inject
 	public EntityFinder(EntityFinderView view,
 			NodeModelCreator nodeModelCreator,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController) {
 		this.view = view;
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
+		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
+
 		view.setPresenter(this);
 	}	
 
@@ -83,7 +93,8 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 				} else if (caught instanceof ForbiddenException) {
 					view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
 				} else {
-					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 				}
 				callback.onFailure(caught);
 			}
@@ -105,7 +116,8 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 			}
 		});
 	}

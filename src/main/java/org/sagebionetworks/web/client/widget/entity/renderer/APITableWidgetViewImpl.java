@@ -163,6 +163,20 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 		while(this.getWidgetCount() > 0)
 			this.remove(0);
 	}
+
+	@Override
+	public void showLoading() {
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
 	
 	/*
 	 * Private Methods

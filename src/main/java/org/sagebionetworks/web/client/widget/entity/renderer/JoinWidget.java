@@ -9,8 +9,8 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -82,7 +82,8 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showError(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showError(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
@@ -187,7 +188,8 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
 			}
 		});
 	}
@@ -235,7 +237,8 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
 			}
 		});
 	}

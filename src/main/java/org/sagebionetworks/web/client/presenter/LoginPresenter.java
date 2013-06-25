@@ -96,6 +96,11 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					}
 					@Override
 					public void onFailure(Throwable caught) {
+						if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) {
+							//not really logged in. 
+							authenticationController.logoutUser();
+							return;
+						}
 						//not really logged in. 
 						authenticationController.logoutUser();
 						showView(place);
@@ -129,7 +134,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						});			
 				}
 				public void onFailure(Throwable throwable) {
-					view.showErrorMessage("An error occurred. Please try logging in again.");
+					if(!DisplayUtils.checkForRepoDown(throwable, globalApplicationState.getPlaceChanger(), view))
+						view.showErrorMessage("An error occurred. Please try logging in again.");
 					view.showLogin(openIdActionUrl, openIdReturnUrl);				}
 			});
 		} else if (!DisplayUtils.DEFAULT_PLACE_TOKEN.equals(token)				
@@ -148,7 +154,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					}
 					@Override
 					public void onFailure(Throwable caught) {
-
+						if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) {
+							view.showLogin(openIdActionUrl, openIdReturnUrl);
+							return;
+						}
 						if (caught instanceof TermsOfUseException) {
 							authenticationController.getTermsOfUse(new AsyncCallback<String>() {
 								public void onSuccess(String termsOfUseContents) {
@@ -158,7 +167,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 											});		
 								}
 								public void onFailure(Throwable t) {
-									view.showErrorMessage("An error occurred. Please try logging in again.");
+									if(!DisplayUtils.checkForRepoDown(t, globalApplicationState.getPlaceChanger(), view)) 
+										view.showErrorMessage("An error occurred. Please try logging in again.");
 									view.showLogin(openIdActionUrl, openIdReturnUrl);									
 								}
 							});
@@ -226,6 +236,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				
 				@Override
 				public void onFailure(Throwable caught) {
+					if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) return;
 					view.showErrorMessage(DisplayConstants.ERROR_NO_FASTPASS + caught.getMessage());
 				}
 			});
@@ -234,4 +245,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 
 		}
 	}
+
+
 }

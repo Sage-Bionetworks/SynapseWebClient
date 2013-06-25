@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.ImagePrototypeSingleton;
 import org.sagebionetworks.web.client.view.RowData;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
@@ -298,6 +299,24 @@ public class QueryServiceTableViewGxtImpl extends LayoutContainer implements Que
 	@Override
 	public void setTitle(String title) {
 		this.tableTitle = title;		
+	}
+
+	@Override
+	public void showLoading() {
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+
+	@Override
+	public void clear() {
 	}
 	
 }
