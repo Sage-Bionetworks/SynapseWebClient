@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.CookieUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.DisplayableValue;
 import org.sagebionetworks.web.shared.FilterEnumeration;
 import org.sagebionetworks.web.shared.WhereCondition;
@@ -35,18 +38,26 @@ public class QueryFilter implements QueryFilterView.Presenter, IsWidget{
 	private LinkedHashMap<String, WhereCondition> whereMap;
 	private List<SelectionListner> listeners;
 	private CookieProvider cookieProvider; 
+	GlobalApplicationState globalApplicationState;
+	AuthenticationController authenticationController;
 
 	/**
 	 * Injected via GIN
 	 * @param view
 	 */
 	@Inject
-	public QueryFilter(QueryFilterView view, SearchServiceAsync queryService, CookieProvider cookieProvider){
+	public QueryFilter(QueryFilterView view, SearchServiceAsync queryService,
+			CookieProvider cookieProvider,
+			GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController) {
 		this.view = view;
 		this.queryService = queryService;
 		this.view.setPresenter(this);
 		this.listeners = new ArrayList<SelectionListner>();
 		this.cookieProvider = cookieProvider;
+		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
+
 		// Get the data from the server
 		refreshFromServer();
 	}
@@ -61,7 +72,8 @@ public class QueryFilter implements QueryFilterView.Presenter, IsWidget{
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showError("An error occurred. Please try reloading the page.");
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showError("An error occurred. Please try reloading the page.");
 			}
 		});
 		

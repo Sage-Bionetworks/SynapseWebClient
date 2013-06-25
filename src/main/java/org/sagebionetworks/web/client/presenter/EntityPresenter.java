@@ -141,7 +141,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					view.show404();
 				} else if(caught instanceof ForbiddenException) {
 					view.show403();
-				} else if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
+				} else if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
 				}
 			}			

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,13 +24,13 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
@@ -56,6 +55,9 @@ public class EntityPropertyFormTest {
 	ExampleEntity entity;
 	EntityBundle entityBundle;
 	AttachmentData attachment1;
+	GlobalApplicationState mockGlobalApplicationState;
+	AuthenticationController mockAuthenticationController;
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
@@ -63,7 +65,12 @@ public class EntityPropertyFormTest {
 		mockView = mock(EntityPropertyFormView.class);
 		mockEventBus = mock(EventBus.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
-		presenter = new EntityPropertyForm(mockView, mockEventBus, mockNodeModelCreator, mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		mockAuthenticationController = mock(AuthenticationController.class);
+		presenter = new EntityPropertyForm(mockView, mockEventBus,
+				mockNodeModelCreator, mockSynapseClient, mockSynapseJSNIUtils,
+				mockWidgetRegistrar, mockGlobalApplicationState,
+				mockAuthenticationController);
 		EntityBundle bundle = new EntityBundle(new Project(), null, null, null,null,null, null, null);
 		
 		String entityId = "123";

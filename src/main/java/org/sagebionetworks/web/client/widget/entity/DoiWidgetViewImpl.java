@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -15,11 +18,17 @@ import com.google.inject.Inject;
 public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	
 	private Presenter presenter;
+	GlobalApplicationState globalApplicationState;
+	AuthenticationController authenticationController;
 	
 	FlowPanel container;
 	Button createDoiButton;
 	@Inject
-	public DoiWidgetViewImpl() {
+	public DoiWidgetViewImpl(GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController) {
+		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
+
 		container = new FlowPanel();
 		initWidget(container);
 		createDoiButton = new Button("Create DOI");
@@ -51,6 +60,7 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 		} else if (doi == DoiStatus.CREATED || doi == DoiStatus.READY) {
 			//ask for the doi prefix from the presenter, and show a link to that!
 			//first clear old handler, if there is one
+			final SynapseView view = this;
 			presenter.getDoiPrefix(new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String prefix) {
@@ -59,7 +69,8 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					showErrorMessage(caught.getMessage());
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						showErrorMessage(caught.getMessage());
 				}
 			});
 			

@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface WikiPageWidgetView extends IsWidget, SynapseWidgetView {
+public interface WikiPageWidgetView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.

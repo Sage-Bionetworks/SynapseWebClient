@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
@@ -123,7 +124,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		});
 	}

@@ -262,7 +262,8 @@ public class EntityMetadata implements Presenter {
 				}
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showInfo("Error", caught.getMessage());
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+							view.showInfo("Error", caught.getMessage());
 					}
 				});
 			}
@@ -301,7 +302,7 @@ public class EntityMetadata implements Presenter {
 							public void onFailure(Throwable caught) {
 								if (!DisplayUtils.handleServiceException(
 										caught, globalApplicationState.getPlaceChanger(),
-										authenticationController.isLoggedIn())) {
+										authenticationController.isLoggedIn(), view)) {
 									view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE
 											+ "\n" + caught.getMessage());
 								}
@@ -325,7 +326,7 @@ public class EntityMetadata implements Presenter {
 			public void onFailure(Throwable caught) {
 				if (!DisplayUtils.handleServiceException(caught,
 						globalApplicationState.getPlaceChanger(),
-						authenticationController.isLoggedIn())) {
+						authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + "\n" + caught.getMessage());
 				}
 			}

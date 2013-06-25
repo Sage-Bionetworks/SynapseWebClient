@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.TreeItem;
 
-public interface WikiSubpagesView extends IsWidget, SynapseWidgetView {
+public interface WikiSubpagesView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.

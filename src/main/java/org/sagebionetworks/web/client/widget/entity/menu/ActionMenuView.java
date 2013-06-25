@@ -5,12 +5,12 @@ import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface ActionMenuView extends IsWidget, SynapseWidgetView {
+public interface ActionMenuView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.
