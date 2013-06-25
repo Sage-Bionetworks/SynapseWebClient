@@ -48,6 +48,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
@@ -69,8 +70,11 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
@@ -528,7 +532,35 @@ public class DisplayUtils {
 	}
 	
 	public static void showErrorMessage(String message) {
-		MessageBox.info(DisplayConstants.TITLE_ERROR, message, null);
+		MessageBox.info(DisplayConstants.TITLE_ERROR, message, null);  
+	}
+	
+	public static void showOkCancelMessage(
+			String title, 
+			String message, 
+			String iconStyle,
+			int minWidth,
+			final Callback okCallback, 
+			final Callback cancelCallback) {
+		MessageBox box = new MessageBox();
+	    box.setButtons(MessageBox.OKCANCEL);
+	    box.setIcon(iconStyle);
+	    box.setTitle(title);
+	    box.addCallback(new Listener<MessageBoxEvent>() {					
+			@Override
+			public void handleEvent(MessageBoxEvent be) { 												
+				Button btn = be.getButtonClicked();
+				if(Dialog.OK.equals(btn.getItemId())) {
+					okCallback.invoke();
+				} else {
+					cancelCallback.invoke();
+				}
+			}
+		});
+	    box.setMessage(message);
+	    box.setMinWidth(minWidth);
+	    box.show();
+
 	}
 	
 	/**
