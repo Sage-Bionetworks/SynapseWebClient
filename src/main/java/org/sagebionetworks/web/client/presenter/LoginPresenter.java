@@ -96,7 +96,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					}
 					@Override
 					public void onFailure(Throwable caught) {
-						if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger())) {
+						if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) {
 							//not really logged in. 
 							authenticationController.logoutUser();
 							return;
@@ -134,7 +134,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						});			
 				}
 				public void onFailure(Throwable throwable) {
-					if(!DisplayUtils.checkForRepoDown(throwable, globalApplicationState.getPlaceChanger()))
+					if(!DisplayUtils.checkForRepoDown(throwable, globalApplicationState.getPlaceChanger(), view))
 						view.showErrorMessage("An error occurred. Please try logging in again.");
 					view.showLogin(openIdActionUrl, openIdReturnUrl);				}
 			});
@@ -154,7 +154,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					}
 					@Override
 					public void onFailure(Throwable caught) {
-						if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger())) {
+						if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) {
 							view.showLogin(openIdActionUrl, openIdReturnUrl);
 							return;
 						}
@@ -167,7 +167,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 											});		
 								}
 								public void onFailure(Throwable t) {
-									if(!DisplayUtils.checkForRepoDown(t, globalApplicationState.getPlaceChanger())) 
+									if(!DisplayUtils.checkForRepoDown(t, globalApplicationState.getPlaceChanger(), view)) 
 										view.showErrorMessage("An error occurred. Please try logging in again.");
 									view.showLogin(openIdActionUrl, openIdReturnUrl);									
 								}
@@ -236,7 +236,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger())) return;
+					if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) return;
 					view.showErrorMessage(DisplayConstants.ERROR_NO_FASTPASS + caught.getMessage());
 				}
 			});

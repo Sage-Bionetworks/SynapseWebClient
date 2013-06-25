@@ -397,7 +397,7 @@ public class DisplayUtils {
 	 */
 	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, boolean isLoggedIn, SynapseView view) {
 		if(ex instanceof ReadOnlyModeException) {
-			MessageBox.info(DisplayConstants.READ_ONLY_MODE, DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE, null);
+			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
 			return true;
 		} else if(ex instanceof SynapseDownException) {
 			placeChanger.goTo(new Down(DisplayUtils.DEFAULT_PLACE_TOKEN));
@@ -433,9 +433,9 @@ public class DisplayUtils {
 		return false;
 	}
 	
-	public static boolean checkForRepoDown(Throwable caught, PlaceChanger placeChanger) {
+	public static boolean checkForRepoDown(Throwable caught, PlaceChanger placeChanger, SynapseView view) {
 		if(caught instanceof ReadOnlyModeException) {
-			MessageBox.info(DisplayConstants.READ_ONLY_MODE, DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE, null);
+			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
 			return true;
 		} else if(caught instanceof SynapseDownException) {
 			placeChanger.goTo(new Down(DisplayUtils.DEFAULT_PLACE_TOKEN));
