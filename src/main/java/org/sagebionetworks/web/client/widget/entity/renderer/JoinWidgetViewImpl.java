@@ -183,6 +183,19 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 		dialog.show();
 	}
 
+	@Override
+	public void showLoading() {
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+
+	@Override
+	public void clear() {
+	}
+
 	/*
 	 * Private Methods
 	 */

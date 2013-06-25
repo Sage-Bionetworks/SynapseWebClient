@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.filter;
 
 import java.util.List;
 
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.WhereCondition;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -12,7 +13,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jmhill
  *
  */
-public interface QueryFilterView extends IsWidget{
+public interface QueryFilterView extends IsWidget, SynapseView {
 	
 	/**
 	 * 

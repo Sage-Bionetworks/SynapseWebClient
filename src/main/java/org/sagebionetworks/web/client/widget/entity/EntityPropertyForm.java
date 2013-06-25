@@ -13,11 +13,14 @@ import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
@@ -51,14 +54,24 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 	EntityPropertyFormView view;
 	WidgetRegistrar widgetRegistrar;
 	Callback callback;
+	GlobalApplicationState globalApplicationState;
+	AuthenticationController authenticationController;
 	
 	@Inject
-	public EntityPropertyForm(EntityPropertyFormView view, EventBus bus, NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar) {
+	public EntityPropertyForm(EntityPropertyFormView view, EventBus bus,
+			NodeModelCreator nodeModelCreator,
+			SynapseClientAsync synapseClient,
+			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
+			GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController) {
 		this.view = view;
 		this.bus = bus;
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
 		this.widgetRegistrar = widgetRegistrar;
+		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
+
 		init();
 	}
 	
@@ -167,7 +180,8 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
-				view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + caught.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + caught.getMessage());
 			}			
 		};
 		

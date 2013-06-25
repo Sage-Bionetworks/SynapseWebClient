@@ -246,7 +246,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
-		clear();
+		clearmeta();
 
 		Entity e = bundle.getEntity();
 
@@ -293,7 +293,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanEdit(), versionNumber);
 	}
 
-	private void clear() {
+	private void clearmeta() {
 		dataUseContainer.clear();
 		//reset versions ui
 		setVersionsVisible(false);
@@ -636,6 +636,15 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+
+	@Override
+	public void showLoading() {
+	}
+
+	@Override
+	public void clear() {
+		clearmeta();
 	}
 
 }

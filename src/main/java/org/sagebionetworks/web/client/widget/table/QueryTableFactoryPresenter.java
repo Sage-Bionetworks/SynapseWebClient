@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SearchServiceAsync;
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
 import org.sagebionetworks.web.shared.EntityType;
@@ -43,7 +42,28 @@ public class QueryTableFactoryPresenter {
 	private SearchServiceAsync searchService;	
 	private AuthenticationController authenticationController;
 	private ColumnFactory columnFactory;
+
+	private SynapseView fakeView = new SynapseView() {
+	
+		@Override
+		public void showLoading() {
+		}
 		
+		@Override
+		public void showInfo(String title, String message) {
+			DisplayUtils.showInfo(title, message);
+		}
+		
+		@Override
+		public void showErrorMessage(String message) {
+			DisplayUtils.showErrorMessage(message);
+		}
+		
+		@Override
+		public void clear() {
+		}
+	};
+	
 	public QueryTableFactoryPresenter(SearchServiceAsync searchService, AuthenticationController authenticationController, ColumnFactory columnFactory) {
 		this.searchService = searchService;
 		this.authenticationController = authenticationController;
@@ -67,7 +87,7 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn());
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), fakeView);
 				callback.onFailure(caught);			
 			}
 		});
@@ -91,7 +111,7 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.isLoggedIn());
+				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.isLoggedIn(), fakeView);
 				callback.onFailure(caught);
 			}
 		});
@@ -166,6 +186,5 @@ public class QueryTableFactoryPresenter {
 		}
 		throw new IllegalArgumentException("Cannot find HeaderData for column id: "+sortColumn);
 	}
-
-
+	
 }

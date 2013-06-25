@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.SaveCallback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.VoidCallback;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -10,7 +10,7 @@ import org.sagebionetworks.web.shared.users.PermissionLevel;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface AccessControlListEditorView extends IsWidget, SynapseWidgetView {
+public interface AccessControlListEditorView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.

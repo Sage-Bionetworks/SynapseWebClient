@@ -52,6 +52,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -394,18 +395,24 @@ public class DisplayUtils {
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
-	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, boolean isLoggedIn) {
-		if(ex instanceof UnauthorizedException) {
+	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, boolean isLoggedIn, SynapseView view) {
+		if(ex instanceof ReadOnlyModeException) {
+			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
+			return true;
+		} else if(ex instanceof SynapseDownException) {
+			placeChanger.goTo(new Down(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			return true;
+		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page						
 			showInfo("Session Timeout", "Your session has timed out. Please login again.");
 			placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			return true;
 		} else if(ex instanceof ForbiddenException) {			
 			if(!isLoggedIn) {				
-				MessageBox.info(DisplayConstants.ERROR_LOGIN_REQUIRED, DisplayConstants.ERROR_LOGIN_REQUIRED, null);
+				view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
 				placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			} else {
-				MessageBox.info(DisplayConstants.TITLE_UNAUTHORIZED, DisplayConstants.ERROR_FAILURE_PRIVLEDGES, null);
+				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
@@ -414,23 +421,29 @@ public class DisplayUtils {
 			if(reason.matches(".*entity with the name: .+ already exites.*")) {
 				message = DisplayConstants.ERROR_DUPLICATE_ENTITY_MESSAGE;
 			}			
-			MessageBox.info("Error", message, null);
+			view.showErrorMessage(message);
 			return true;
 		} else if(ex instanceof NotFoundException) {
-			MessageBox.info("Not Found", DisplayConstants.ERROR_NOT_FOUND, null);
+			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
 			placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
-			return true;
-		} else if(ex instanceof ReadOnlyModeException) {
-			MessageBox.info(DisplayConstants.READ_ONLY_MODE, DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE, null);
-			return true;
-		} else if(ex instanceof SynapseDownException) {
-			placeChanger.goTo(new Down(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			return true;
 		}
 		
 		// For other exceptions, allow the consumer to send a good message to the user
 		return false;
 	}
+	
+	public static boolean checkForRepoDown(Throwable caught, PlaceChanger placeChanger, SynapseView view) {
+		if(caught instanceof ReadOnlyModeException) {
+			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
+			return true;
+		} else if(caught instanceof SynapseDownException) {
+			placeChanger.goTo(new Down(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			return true;
+		}
+		return false;
+	}
+
 	
 	/**
 	 * Handle JSONObjectAdapterException.  This will occur when the client is pointing to an incompatible repo version. 

@@ -138,7 +138,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn())) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
 						view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
 					}
 				}

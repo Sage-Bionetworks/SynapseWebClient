@@ -6,13 +6,15 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,16 +28,24 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private AdapterFactory adapterFactory;
 	private AutoGenFactory autogenFactory;
 	private EntityUpdatedHandler entityUpdatedHandler;
+	GlobalApplicationState globalApplicationState;
+	AuthenticationController authenticationController;
 	boolean canEdit = false;
 	
 	@Inject
-	public FilesBrowser(FilesBrowserView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
-			AdapterFactory adapterFactory, AutoGenFactory autogenFactory) {
+	public FilesBrowser(FilesBrowserView view,
+			SynapseClientAsync synapseClient,
+			NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory,
+			AutoGenFactory autogenFactory,
+			GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
 		this.autogenFactory = autogenFactory;
+		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}	
 	
@@ -96,7 +106,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
 				}			
 			});
 		} catch (JSONObjectAdapterException e) {			

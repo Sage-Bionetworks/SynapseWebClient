@@ -5,9 +5,12 @@ import java.util.Map;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -27,22 +30,31 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class MarkdownWidget extends LayoutContainer {
+public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
 	private IconsImageBundle iconsImageBundle;
 	private CookieProvider cookies;
+	GlobalApplicationState globalApplicationState;
+	AuthenticationController authenticationController;
 	
 	@Inject
-	public MarkdownWidget(SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar, IconsImageBundle iconsImageBundle, CookieProvider cookies) {
+	public MarkdownWidget(SynapseClientAsync synapseClient,
+			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
+			IconsImageBundle iconsImageBundle,
+			CookieProvider cookies,
+			GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.widgetRegistrar = widgetRegistrar;
 		this.iconsImageBundle = iconsImageBundle;
 		this.cookies = cookies;
+		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
 	}
 	
 	/**
@@ -50,6 +62,7 @@ public class MarkdownWidget extends LayoutContainer {
 	 * @param attachmentBaseUrl if null, will use file handles
 	 */
 	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isWiki, final boolean isPreview) {
+		final SynapseView view = this;
 		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -78,7 +91,8 @@ public class MarkdownWidget extends LayoutContainer {
 			@Override
 			public void onFailure(Throwable caught) {
 				removeAll();
-				showErrorMessage(DisplayConstants.ERROR_LOADING_MARKDOWN_FAILED+caught.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					showErrorMessage(DisplayConstants.ERROR_LOADING_MARKDOWN_FAILED+caught.getMessage());
 			}
 		});
 	}
@@ -129,5 +143,18 @@ public class MarkdownWidget extends LayoutContainer {
 	
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+
+	@Override
+	public void showLoading() {
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void clear() {
 	}
 }

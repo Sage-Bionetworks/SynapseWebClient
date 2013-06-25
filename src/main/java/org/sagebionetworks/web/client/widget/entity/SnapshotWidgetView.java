@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityGroup;
 import org.sagebionetworks.repo.model.Summary;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -11,7 +11,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author dburdick
  *
  */
-public interface SnapshotWidgetView extends IsWidget, SynapseWidgetView {
+public interface SnapshotWidgetView extends IsWidget, SynapseView {
 	
 	public interface Presenter {		
 		

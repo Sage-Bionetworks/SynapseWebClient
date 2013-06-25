@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget;
 
-public interface WidgetEditorView extends SynapseWidgetView {
+import org.sagebionetworks.web.client.SynapseView;
+
+public interface WidgetEditorView extends SynapseView {
 	public void initView();
 	public int getDisplayHeight();
 	public int getAdditionalWidth();

@@ -4,9 +4,11 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView.Presenter;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -25,6 +27,8 @@ public class DoiWidget implements Presenter {
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private StackConfigServiceAsync stackConfigService;
+	GlobalApplicationState globalApplicationState;
+	AuthenticationController authenticationController;
 	
 	private Timer timer = null;
 	
@@ -38,12 +42,15 @@ public class DoiWidget implements Presenter {
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			GlobalApplicationState globalApplicationState, 
-			StackConfigServiceAsync stackConfigService) {
+			StackConfigServiceAsync stackConfigService,
+			AuthenticationController authenticationController) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.stackConfigService = stackConfigService;
+		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
 	}
 	
 	public void configure(String entityId, boolean canEdit, Long versionNumber) {
@@ -88,7 +95,8 @@ public class DoiWidget implements Presenter {
 					if (canEdit)
 						view.showCreateDoi();
 				} else {
-					view.showErrorMessage(caught.getMessage());
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(caught.getMessage());
 				}
 			}
 		});
@@ -104,7 +112,8 @@ public class DoiWidget implements Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}
