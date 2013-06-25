@@ -23,7 +23,6 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.common.io.Files;
@@ -166,8 +165,7 @@ public class FileUpload extends HttpServlet {
 
 				VariableContentPaginatedResults<AccessRequirement> currentARs = synapseClient.getAccessRequirements(subjectId);
 				if (currentARs.getTotalNumberOfResults()==0L) {
-					AccessRequirement ar = EntityUtil.createLockDownDataAccessRequirement(entityId);
-					synapseClient.createAccessRequirement(ar);
+					synapseClient.createLockAccessRequirement(entityId);
 				}
 			}
         } catch(Exception e){

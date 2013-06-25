@@ -442,6 +442,8 @@ public class DisplayConstants {
 	public static final String TOU_PROMPT = "Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:";
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
+	public static final String RESTRICTION_WARNING_TITLE = "Add Data Restriction";
+	public static final String RESTRICTION_WARNING = "By clicking 'OK' below, I request that the Synapse ACT contact me to assign the appropriate access restrictions for this dataset.";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
 	public static final String DATA_USE_BANNER = "Data Use Restrictions for Public Data";
 	public static final String DATA_USE_BANNER_SUB1 = "If you change Sharing to be ";

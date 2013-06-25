@@ -851,6 +851,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public EntityWrapper createLockAccessRequirement(String entityId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			AccessRequirement result = synapseClient.createLockAccessRequirement(entityId);
+			JSONObjectAdapter arJson = result.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(arJson.toJSONString(), arJson.getClass().getName());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+	
+	
+	@Override
 	public AccessRequirementsTransport getUnmetAccessRequirements(String entityId) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
