@@ -13,12 +13,17 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationsList;
+import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.layout.FitData;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -63,6 +68,15 @@ public class HomeViewImpl extends Composite implements HomeView {
 	HTMLPanel howToUseSynapseContainer;
 	@UiField
 	HTMLPanel getStartedContainer;
+	@UiField
+	SimplePanel rClientInstallPanel;
+	@UiField
+	SimplePanel pythonClientInstallPanel;
+	@UiField
+	SimplePanel javaClientInstallPanel;
+	@UiField
+	SimplePanel clClientInstallPanel;
+	
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -133,6 +147,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 		dream8BtnPanel.setWidget(dream8Btn);
+		
+		// Programmatic Clients
+		fillProgrammaticClientInstallCode();
 		
 	}	
 
@@ -317,4 +334,33 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void setMyEvaluationsError(String string) {
 	}
+	
+	private void fillProgrammaticClientInstallCode() {		
+		rClientInstallPanel.add(new HTML(ProgrammaticClientCode.getRClientInstallHTML()));
+		pythonClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
+		clClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
+
+		final Dialog javaWindow = new Dialog();
+		javaWindow.add(new HTML(ProgrammaticClientCode.getJavaClientInstallHTML()));
+		javaWindow.setSize(560, 287);
+		javaWindow.setPlain(true);
+		javaWindow.setModal(false);
+		javaWindow.setHeading(DisplayConstants.INSTALL_JAVA_MAVEN);
+		javaWindow.setLayout(new FitLayout());			    
+	    javaWindow.setButtons(Dialog.CLOSE);
+	    javaWindow.setButtonAlign(HorizontalAlignment.RIGHT);
+
+		Button showJava = new Button(DisplayConstants.SHOW);
+		showJava.removeStyleName("gwt-Button");
+		showJava.addStyleName("btn btn-large btn-block margin-top-5");
+		showJava.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				javaWindow.show();
+			}
+		});	
+		javaClientInstallPanel.add(showJava);
+	}
+
+	
 }

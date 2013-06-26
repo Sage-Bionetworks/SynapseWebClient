@@ -54,10 +54,14 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 		// add install code
 		load += "<br/>"
 		+ wrapCollapse(DisplayConstants.LABEL_R_CLIENT_INSTALL,
-					"<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
-					+ DisplayUtils.R_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
-					+ "</div>"); 
+					getRClientInstallHTML().asString()); 
 		return SafeHtmlUtils.fromSafeConstant(load);
+	}
+
+	public static SafeHtml getRClientInstallHTML() {
+		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
+		+ DisplayUtils.R_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
+		+ "</div>");
 	}	
 
 	public static SafeHtml getPythonClientEntityLoad(String id, Long versionNumber) {
@@ -76,11 +80,14 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 
 		// add install code
 		load += "<br/>"
-		+ wrapCollapse(DisplayConstants.LABEL_PYTHON_CLIENT_INSTALL,
-			"<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
-			+ DisplayUtils.PYTHON_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
-			+ "</div>"); 
+		+ wrapCollapse(DisplayConstants.LABEL_PYTHON_CLIENT_INSTALL, getPythonClientInstallHTML().asString()); 
 		return SafeHtmlUtils.fromSafeConstant(load);
+	}
+
+	public static SafeHtml getPythonClientInstallHTML() {
+		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
+		+ DisplayUtils.PYTHON_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
+		+ "</div>");
 	}	
 
 	public static SafeHtml getJavaClientEntityLoad(String id, Long versionNumber) {
@@ -97,25 +104,27 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 		+ "</div>";
 		
 		load += "<br/>"
-		+ wrapCollapse(DisplayConstants.INSTALL_JAVA_MAVEN,
-				"<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"	
-				+ ("# Using Maven, add to pom.xml:"
-					+ "&lt;distributionManagement&gt;<br/>"
-					+ "    &lt;repository&gt;<br/>"
-					+ "        &lt;id&gt;sagebionetworks&lt;/id&gt;<br/>"
-					+ "        &lt;name&gt;sagebionetworks-releases&lt;/name&gt;<br/>"
-					+ "        &lt;url&gt;http://sagebionetworks.artifactoryonline.com/sagebionetworks/ext-releases-local&lt;/url&gt;<br/>"
-					+ "    &lt;/repository&gt;<br/>"
-					+ "&lt;/distributionManagement&gt;<br/>"
-					+ "<br/>"
-					+ "&lt;dependency&gt;<br/>"
-					+ "    &lt;groupId&gt;org.sagebionetworks&lt;/groupId&gt;<br/>"
-					+ "    &lt;artifactId&gt;synapseJavaClient&lt;/artifactId&gt;<br/>"
-					+ "    &lt;version&gt;See Repository for newest Version&lt;/version&gt;<br/>"
-					+ "&lt;/dependency&gt;<br/>").replaceAll(" ", "&nbsp;")
-				+ "</div>"
-		);
+		+ wrapCollapse(DisplayConstants.INSTALL_JAVA_MAVEN,	getJavaClientInstallHTML().asString());
 		return SafeHtmlUtils.fromSafeConstant(load);
+	}
+
+	public static SafeHtml getJavaClientInstallHTML() {
+		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"	
+		+ ("# Using Maven, add to pom.xml:<br/>"
+			+ "&lt;distributionManagement&gt;<br/>"
+			+ "    &lt;repository&gt;<br/>"
+			+ "        &lt;id&gt;sagebionetworks&lt;/id&gt;<br/>"
+			+ "        &lt;name&gt;sagebionetworks-releases&lt;/name&gt;<br/>"
+			+ "        &lt;url&gt;http://sagebionetworks.artifactoryonline.com/sagebionetworks/ext-releases-local&lt;/url&gt;<br/>"
+			+ "    &lt;/repository&gt;<br/>"
+			+ "&lt;/distributionManagement&gt;<br/>"
+			+ "<br/>"
+			+ "&lt;dependency&gt;<br/>"
+			+ "    &lt;groupId&gt;org.sagebionetworks&lt;/groupId&gt;<br/>"
+			+ "    &lt;artifactId&gt;synapseJavaClient&lt;/artifactId&gt;<br/>"
+			+ "    &lt;version&gt;See Repository for newest Version&lt;/version&gt;<br/>"
+			+ "&lt;/dependency&gt;<br/>").replaceAll(" ", "&nbsp;")
+		+ "</div>");
 	}	
 
 	public static SafeHtml getCommandLineClientEntityLoad(String id, Long versionNumber) {
@@ -129,10 +138,7 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 
 		// add install code
 		load += "<br/>"
-		+ wrapCollapse(DisplayConstants.LABEL_CL_CLIENT_INSTALL,
-			"<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
-			+ DisplayUtils.PYTHON_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
-			+ "</div>"); 
+		+ wrapCollapse(DisplayConstants.LABEL_CL_CLIENT_INSTALL, getPythonClientInstallHTML().asString()); 
 		return SafeHtmlUtils.fromSafeConstant(load);
 	}
 	
