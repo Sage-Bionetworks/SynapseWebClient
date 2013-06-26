@@ -14,7 +14,7 @@ public interface EntityMetadataView extends IsWidget {
 
 	public void setPresenter(Presenter p);
 
-	public void setEntityBundle(EntityBundle bundle, boolean canEdit);
+	public void setEntityBundle(EntityBundle bundle, boolean canEdit, boolean autoShowFileHistory);
 
 	public void showInfo(String string, String message);
 	

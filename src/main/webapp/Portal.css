@@ -922,7 +922,6 @@ ol.lowerroman {
 .align-center {display: block; margin-left: auto; margin-right: auto;}
 
 .highlighted-version {
-    font-weight: bold !important;
     font-size: 11px !important;
     color: black !important;
 }

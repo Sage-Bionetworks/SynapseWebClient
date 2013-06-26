@@ -62,7 +62,7 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 
 	public static SafeHtml getPythonClientEntityLoad(String id, Long versionNumber) {
 		String safeId = SafeHtmlUtils.fromString(id).asString();
-		String idString = "id='" + safeId + "'";
+		String idString = "'" + safeId + "'";
 		String versionString = versionNumber == null ? "" : ", version="+versionNumber;
 		String load = "<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">" 
 			+ ("import synapseclient<br/><br/>"
@@ -70,8 +70,8 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 				+ "syn.login('synapse_username','password')<br/><br/>"
 				+ "# " + DisplayConstants.LABEL_CLIENT_GET_ENTITY + " <br/>"
 				+ safeId + " = syn.get(" + idString +versionString+")" 
-				+ "<br/><br/># " + DisplayConstants.LABEL_CLIENT_LOAD_ENTITY + " <br/>"
-				+ safeId + " = syn.get(" + idString + versionString+", load=True)").replaceAll(" ", "&nbsp;")
+				+ "<br/><br/># " + DisplayConstants.GET_PATH_CLIENT_ENTITY + " <br/>"
+				+ "filepath = "+safeId+".path").replaceAll(" ", "&nbsp;")
 			+ "</div>";
 
 		// add install code

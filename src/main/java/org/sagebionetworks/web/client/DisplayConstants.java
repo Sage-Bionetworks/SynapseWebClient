@@ -99,8 +99,9 @@ public class DisplayConstants {
 	public static final String LABEL_PYTHON_CLIENT_INSTALL = "Install Python Client";
 	public static final String INSTALL_JAVA_MAVEN = "Install Java Client";
 	public static final String LABEL_CL_CLIENT_INSTALL = "Install Command Line Client";
-	public static final String LABEL_CLIENT_GET_ENTITY = "Obtain a pointer";
+	public static final String LABEL_CLIENT_GET_ENTITY = "Obtain a pointer and download the data";
 	public static final String LABEL_CLIENT_LOAD_ENTITY = "Load the data";
+	public static final String GET_PATH_CLIENT_ENTITY = "Get the path to the local copy of the data file";
 	public static final String DOWNLOAD_FILE_LOCAL = "Download file";
 	public static final String LOGIN_USERNAME_LABEL = "Email Address";
 	

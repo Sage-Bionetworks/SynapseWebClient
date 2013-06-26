@@ -88,13 +88,6 @@ public class EntityMetadata implements Presenter {
 						PaginatedResults<VersionInfo> paginatedResults;
 						try {
 							paginatedResults = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
-							List<VersionInfo> results = paginatedResults.getResults();
-							if (offset == 0 && results.size() > 0) {
-								if (currentVersion != null) {
-									//unhide file history to highlight the current version in the version list
-									view.setFileHistoryVisible(true);
-								}
-							}
 							asyncCallback.onSuccess(paginatedResults);
 						} catch (JSONObjectAdapterException e) {							
 							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -115,7 +108,7 @@ public class EntityMetadata implements Presenter {
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		this.bundle = bundle;
 		this.currentVersion = versionNumber;
-		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit());
+		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit(), versionNumber != null);
 		boolean showDetailedMetadata = false;
 		boolean showEntityName = false;
 		if (bundle.getEntity() instanceof FileEntity) {

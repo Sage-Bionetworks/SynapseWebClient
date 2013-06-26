@@ -55,6 +55,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -87,6 +88,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private FavoriteWidget favoriteWidget;
 	private DoiWidget doiWidget;
 	private PortalGinInjector ginInjector;
+	//if true, will expand file history after it has completed loading
+	private boolean isShowingOlderVersion;
+	
+	private boolean canEdit;
 	
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
@@ -132,6 +137,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	InlineLabel allVersions;
 
+	@UiField
+	Hyperlink currentVersionLink;
+	
 	private Presenter presenter;
 
 	@UiField(provided = true)
@@ -152,7 +160,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	 * viewed model in the grid.
 	 */
 	private BaseModelData currentModel;
-
+	private Element scrollToElement;
+	
 	// Widget variables
 	private PagingToolBar vToolbar;
 	private Grid<BaseModelData> vGrid;
@@ -188,6 +197,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
 				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
+				if (scrollToElement != null)
+					scrollToElement.scrollIntoView();
 			}
 		});
 		versionAnimation.setShowConfig(showConfig);
@@ -241,9 +252,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, boolean canEdit) {
+	public void setEntityBundle(EntityBundle bundle, boolean canEdit, boolean isShowingOlderVersion) {
 		clear();
-
+		this.isShowingOlderVersion = isShowingOlderVersion;
+		this.canEdit = canEdit;
 		Entity e = bundle.getEntity();
 
 		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
@@ -251,6 +263,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		setEntityName(e.getName());
 		setEntityId(e.getId());
+		
+		currentVersionLink.setTargetHistoryToken(DisplayUtils.getSynapseHistoryTokenNoHash(e.getId()));
+		currentVersionLink.setVisible(isShowingOlderVersion);
 		
 		sharingContainer.clear();
 		sharingContainer.add(DisplayUtils.getShareSettingsDisplay("<span style=\"margin-right: 5px;\" class=\"boldText\">Sharing:</span>", bundle.getPermissions().getCanPublicRead(), synapseJSNIUtils));
@@ -338,6 +353,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setEntityVersions(final Versionable entity) {
 		// create bottom paging toolbar
 		currentModel = null;
+		scrollToElement = null;
 		RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
 
 			@Override
@@ -374,8 +390,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 											EntityMetadataViewImpl.VERSION_KEY_MOD_BY,
 											version.getModifiedByPrincipalId());
 
-									if (entity.getVersionNumber().equals(version.getVersionNumber()))
+									if (entity.getVersionNumber().equals(version.getVersionNumber())) {
 										currentModel = model;
+									}
+										
 									dataList.add(model);
 								}
 								if (currentModel == null) {
@@ -393,6 +411,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	
 									loadResultData.setOffset(offset);
 									callback.onSuccess(loadResultData);
+									if (isShowingOlderVersion)
+										setFileHistoryVisible(true);
+									scrollToElement = vGrid.getView().getRow(currentModel);
 								}
 							}
 
@@ -414,7 +435,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		ListStore<BaseModelData> store = new ListStore<BaseModelData>(loader);
 		vGrid.reconfigure(store, setupColumnModel(entity));
 		loader.load();
-
 		vGrid.addListener(Events.Attach, new Listener<GridEvent<ModelData>>() {
 			public void handleEvent(GridEvent<ModelData> be) {
 				BasePagingLoadConfig config = new BasePagingLoadConfig();
@@ -487,48 +507,49 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 			private Object setupIconMenu(final ModelData model, boolean currentVersion) {
 				IconMenu menu = new IconMenu();
-				final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
-				menu.addIcon(icons.deleteButtonGrey16(), "Delete Version",
-						new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								MessageBox.confirm(DisplayConstants.LABEL_DELETE + " " + versionLabel,
-										DisplayConstants.PROMPT_SURE_DELETE + " version?",
-										new Listener<MessageBoxEvent>() {
-									@Override
-									public void handleEvent(MessageBoxEvent be) {
-										Button btn = be.getButtonClicked();
-										if(Dialog.YES.equals(btn.getItemId())) {
-											presenter.deleteVersion(
-													(String) model.get(VERSION_KEY_ID),
-													(Long) model.get(VERSION_KEY_NUMBER));
-										}
-									}
-								});
-							}
-						});
-				if (currentVersion) {
-					menu.addIcon(icons.editGrey16(), "Edit Version Info",
+				if (canEdit) {
+					final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
+					menu.addIcon(icons.deleteButtonGrey16(), "Delete Version",
 							new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {
-									NameAndDescriptionEditorDialog.showNameAndDescriptionDialog(
-											(String) model.get(VERSION_KEY_LABEL),
-											(String) model.get(VERSION_KEY_COMMENT),
-											"Version",
-											"Comment",
-											new NameAndDescriptionEditorDialog.Callback() {
-												@Override
-												public void onSave(String version,
-														String comment) {
-													presenter.editCurrentVersionInfo(
-															(String) model.get(VERSION_KEY_ID), version, comment);
-												}
-											});
+									MessageBox.confirm(DisplayConstants.LABEL_DELETE + " " + versionLabel,
+											DisplayConstants.PROMPT_SURE_DELETE + " version?",
+											new Listener<MessageBoxEvent>() {
+										@Override
+										public void handleEvent(MessageBoxEvent be) {
+											Button btn = be.getButtonClicked();
+											if(Dialog.YES.equals(btn.getItemId())) {
+												presenter.deleteVersion(
+														(String) model.get(VERSION_KEY_ID),
+														(Long) model.get(VERSION_KEY_NUMBER));
+											}
+										}
+									});
 								}
 							});
-				}
-				
+					if (currentVersion) {
+						menu.addIcon(icons.editGrey16(), "Edit Version Info",
+								new ClickHandler() {
+									@Override
+									public void onClick(ClickEvent event) {
+										NameAndDescriptionEditorDialog.showNameAndDescriptionDialog(
+												(String) model.get(VERSION_KEY_LABEL),
+												(String) model.get(VERSION_KEY_COMMENT),
+												"Version",
+												"Comment",
+												new NameAndDescriptionEditorDialog.Callback() {
+													@Override
+													public void onSave(String version,
+															String comment) {
+														presenter.editCurrentVersionInfo(
+																(String) model.get(VERSION_KEY_ID), version, comment);
+													}
+												});
+									}
+								});
+					}
+				}	
 				return menu.asWidget();
 			}
 		};
@@ -538,9 +559,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@SuppressWarnings("deprecation")
 	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_MOD_BY , VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON,  VERSION_KEY_NUMBER};
-		String[] names = {"Version"        , "Modified By"      , "Comment"          , "Modified On"     ,  ""                };
-		int[] widths =	 {100               , 220                , 220                , 70                ,  50                };
+		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_MOD_BY, VERSION_KEY_MOD_ON , VERSION_KEY_COMMENT,  VERSION_KEY_NUMBER};
+		String[] names = {"Version"        , "Modified By"      , "Modified On"     , "Comment"          ,   ""                };
+		int[] widths =	 {100               , 220               , 70                , 200                ,   50                };
 		
 		if (keys.length != names.length || names.length != widths.length)
 			throw new IllegalArgumentException("All configuration arrays must be the same length.");
