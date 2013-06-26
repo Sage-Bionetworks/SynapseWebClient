@@ -85,7 +85,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static final String VERSION_KEY_MOD_BY = "modifiedBy";
 
 	private static final int VERSION_LIMIT = 100;
-	private static final int NAME_TIME_STUB_LENGTH = 7;
 	private FavoriteWidget favoriteWidget;
 	private DoiWidget doiWidget;
 	private PortalGinInjector ginInjector;
@@ -397,18 +396,22 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 										
 									dataList.add(model);
 								}
+								int totalResultCount = (int)result.getTotalNumberOfResults();
 								if (currentModel == null) {
 									//we have not found the current model.  keep paging until it's found
-									((PagingLoadConfig)loadConfig).setOffset(offset + VERSION_LIMIT);
-									load(loadConfig, callback);
+									//we should keep paging until it is found, or another page would be over the record count
+									int nextPageOffset = offset+VERSION_LIMIT;
+									boolean continueFetching = !(nextPageOffset > totalResultCount);
+									if (continueFetching) {
+										((PagingLoadConfig)loadConfig).setOffset(offset + VERSION_LIMIT);
+										load(loadConfig, callback);
+									}
 								}
 								else {
-									PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(
-											dataList);
-									loadResultData.setTotalLength((int) result
-											.getTotalNumberOfResults());
-									vToolbar.setVisible(loadResultData
-											.getTotalLength() > VERSION_LIMIT);
+									PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(dataList);
+									
+									loadResultData.setTotalLength(totalResultCount);
+									vToolbar.setVisible(loadResultData.getTotalLength() > VERSION_LIMIT);
 	
 									loadResultData.setOffset(offset);
 									callback.onSuccess(loadResultData);
