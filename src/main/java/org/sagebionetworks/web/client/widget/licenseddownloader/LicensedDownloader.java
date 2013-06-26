@@ -126,7 +126,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * @return
 	 */
 	public String getDirectDownloadURL() {
-		if (isDirectDownloadSupported)
+		if (isDirectDownloadSupported && authenticationController.isLoggedIn())
 			return view.getDirectDownloadURL();
 		else return null; 
 	}
