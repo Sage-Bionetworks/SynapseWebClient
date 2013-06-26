@@ -552,5 +552,10 @@ public class DisplayConstants {
 	public static final String SYNAPSE_IN_READ_ONLY_MODE = "Synapse is in READ_ONLY mode for maintenance. You can continue to browse, but can not modify during this period.";
 	public static final String VIEW_EDIT_PROFILE = "View / Edit Profile";
 	public static final String SHOW = "Show";
+	public static final String SEND_PASSWORD_CHANGE_REQUEST = "Send Password Change Request";
+	public static final String EMAIL_ADDRESS = "Email Address";
+	public static final String SET_PASSWORD = "Set Password";
+	public static final String SUCCESS = "Success";
+	public static final String REQUEST_SENT = "Request Sent";
 }
 
