@@ -355,7 +355,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			addMoveItem(menu, entity, entityType);
 		}
 
-		if(isInTestMode && (entity instanceof Locationable || entity instanceof FileEntity)) {
+		if(entity instanceof Locationable || entity instanceof FileEntity) {
 			addUploadToGenomeSpace(menu, entityBundle);
 		}
 		
