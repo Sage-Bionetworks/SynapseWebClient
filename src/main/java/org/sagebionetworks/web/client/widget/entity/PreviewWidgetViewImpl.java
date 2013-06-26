@@ -31,12 +31,14 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	public void setImagePreview(String fullFileUrl, String previewUrl) {
 		clear();
 		StringBuilder sb = new StringBuilder();
+		sb.append("<p  class=\"file-preview\">");
 		sb.append("<a href=\"");
 		sb.append(fullFileUrl);
 		sb.append("\"><img class=\"imageDescriptor\" ");
 		sb.append(" src=\"");
 		sb.append(previewUrl);
 		sb.append("\"></img></a>");
+		sb.append("</p>");
 		add(new HTMLPanel(sb.toString()));
 	}
 	
