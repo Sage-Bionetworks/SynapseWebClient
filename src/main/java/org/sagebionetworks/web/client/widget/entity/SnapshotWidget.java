@@ -50,11 +50,11 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	private Summary snapshot;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	AuthenticationController authenticationController;
 	
 	private boolean canEdit = false;
+	private boolean readOnly = false;
 	private boolean isLoggedIn = false;
 	
 	/**
@@ -68,22 +68,22 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			SnapshotWidgetView propertyView, SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils, 
+			AuthenticationController authenticationController) {
 		super();
 		this.factory = factory;
 		this.view = propertyView;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}
 	
-	public void setSnapshot(Summary snapshot, boolean canEdit) {		
+	public void setSnapshot(Summary snapshot, boolean canEdit, boolean readOnly) {		
 		this.snapshot = snapshot;
 		this.canEdit = canEdit;
+		this.readOnly = readOnly;
 		
 		boolean showEdit = canEdit;
 		isLoggedIn = authenticationController.isLoggedIn();		
@@ -97,7 +97,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			showEdit = false;
 		}
 		
-		view.setSnapshot(snapshot, canEdit, showEdit);		
+		view.setSnapshot(snapshot, canEdit, readOnly, showEdit);		
 	}	
 	
 	@Override
@@ -113,7 +113,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	@Override
 	public void setShowEditor(boolean show) {
 		if(snapshot != null) {
-			view.setSnapshot(snapshot, canEdit, show);
+			view.setSnapshot(snapshot, canEdit, readOnly, show);
 		}
 	}	
 
@@ -142,6 +142,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	@Override
 	public EntityGroup addGroup(final String name, final String description) {
 		// preconditions
+		if(readOnly) {
+			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
+			return null;
+		}		
 		if(!canEdit) {
 			view.showErrorMessage(DisplayConstants.ERROR_NO_EDIT_PERMISSION);
 			return null;
@@ -178,6 +182,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	@Override
 	public void updateGroup(int groupIndex, String name, String description) {
 		// preconditions
+		if(readOnly) {
+			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
+			return;
+		}
 		if(!canEdit) {
 			view.showErrorMessage(DisplayConstants.ERROR_NO_EDIT_PERMISSION);
 			return;
@@ -214,6 +222,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	@Override
 	public void removeGroup(int groupIndex) {
 		// preconditions
+		if(readOnly) {
+			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
+			return;
+		}
 		if(!canEdit) {
 			view.showErrorMessage(DisplayConstants.ERROR_NO_EDIT_PERMISSION);
 			return;
@@ -242,6 +254,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	@Override
 	public void addGroupRecord(final int groupIndex, final String entityId, String version, String note) {
 		// preconditions
+		if(readOnly) {
+			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
+			return;
+		}
 		if(!canEdit) {
 			view.showErrorMessage(DisplayConstants.ERROR_NO_EDIT_PERMISSION);
 			return;
@@ -285,6 +301,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	@Override
 	public void updateGroupRecord(int groupIndex, int rowIndex, String note) {
 		// preconditions
+		if(readOnly) {
+			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
+			return;
+		}
 		if(!canEdit) {
 			view.showErrorMessage(DisplayConstants.ERROR_NO_EDIT_PERMISSION);
 			return;
@@ -324,6 +344,10 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	@Override
 	public void removeGroupRecord(int groupIndex, int rowIndex) {
 		// preconditions
+		if(readOnly) {
+			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
+			return;
+		}
 		if(!canEdit) {
 			view.showErrorMessage(DisplayConstants.ERROR_NO_EDIT_PERMISSION);
 			return;
@@ -419,7 +443,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 				try {
 					// update current entity
 					snapshot = nodeModelCreator.createJSONEntity(result.getEntityJson(), Summary.class);
-					setSnapshot(snapshot, canEdit);
+					setSnapshot(snapshot, canEdit, readOnly);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -427,7 +451,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				setSnapshot(null, canEdit);
+				setSnapshot(null, canEdit, readOnly);
 				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		});

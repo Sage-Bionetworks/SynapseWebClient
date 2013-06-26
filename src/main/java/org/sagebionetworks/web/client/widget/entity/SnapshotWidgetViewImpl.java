@@ -66,6 +66,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private boolean canEdit = false;
+	private boolean readOnly = false;
 	private boolean showEdit = false;
 	private EntitySearchBox entitySearchBox;
 	private AddEntityToGroupWidget addEntityToGroupWidget; 
@@ -92,9 +93,9 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	}
 
 	@Override
-	public void setSnapshot(Summary entity, boolean canEdit, boolean showEdit) {
+	public void setSnapshot(Summary entity, boolean canEdit, boolean readOnly, boolean showEdit) {
 		this.canEdit = canEdit;
-		
+		this.readOnly = readOnly;
 		this.showEdit = showEdit;
 		this.removeAll();
 		
@@ -106,7 +107,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		}
 		
 		// add editor to self for rendering
-		if(canEdit) {
+		if(canEdit && !readOnly) {
 			// show edit button
 			this.add(getHideShowListEditorButton(!showEdit), new MarginData(0,0,10,0));
 			if(showEdit) {
@@ -149,7 +150,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 				SafeHtmlUtils.fromString(group.getDescription() == null ? "" : group.getDescription()),
 				iconsImageBundle, 
 				createEditMenu(groupDisplay, iconsImageBundle),
-				(canEdit));
+				(canEdit && !readOnly));
 		return groupDisplay;
 	}
 
@@ -268,7 +269,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 				display.getVersion(), description,
 				display.getModifienOn(), display.getContact(),
 				display.getNote());
-		if(canEdit && showEdit) {
+		if(canEdit && showEdit && !readOnly) {
 			ClickHandler editRow = new ClickHandler() {				
 				@Override
 				public void onClick(ClickEvent event) {
@@ -333,7 +334,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		} else {
 			addEditor.removeAll();
 		}
-		if(canEdit) {
+		if(canEdit && !readOnly) {
 			addEditor.setStyleName("span-24 slider-area-inner");
 			LayoutContainer left = new LayoutContainer();
 			left.setStyleName("span-4 notopmargin");			

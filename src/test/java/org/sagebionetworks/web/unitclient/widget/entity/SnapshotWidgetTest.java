@@ -84,7 +84,7 @@ public class SnapshotWidgetTest {
 		mockView = mock(SnapshotWidgetView.class);
 		mockCookies = mock(CookieProvider.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		snapshotWidget = new SnapshotWidget(factory, mockView, mockSynapseClient, mockNodeModelCreator, mockGlobal, mockAuthenticationController, mockSynapseJSNIUtils);
+		snapshotWidget = new SnapshotWidget(factory, mockView, mockSynapseClient, mockNodeModelCreator, mockGlobal, mockSynapseJSNIUtils, mockAuthenticationController);
 		snapshot = createDefaultSnapshot();
 	}
 	

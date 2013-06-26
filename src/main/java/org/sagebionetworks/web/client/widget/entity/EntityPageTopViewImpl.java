@@ -385,7 +385,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// ** FULL WIDTH **
 		// Snapshot entity
-		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit);
+		boolean readOnly = versionNumber != null;
+		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);
 		fullWidthContainer.add(snapshotWidget.asWidget());
 	}
 
