@@ -72,8 +72,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityFinder entityFinder;
 	private EvaluationList evaluationList;
-	
-	private boolean readOnly;
+	private Long versionNumber;
 	private Button submitButton;
 	private SimplePanel submitButtonPanel;
 	private Button editButton;
@@ -111,9 +110,9 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			AuthenticationController authenticationController,
 			boolean isAdministrator,
 			boolean canEdit, 
-			boolean readOnly,
+			Long versionNumber,
 			boolean isInTestMode) {
-		this.readOnly = readOnly;
+		this.versionNumber = versionNumber;
 		this.entityBundle = entityBundle;
 		this.isInTestMode = isInTestMode;
 		Entity entity = entityBundle.getEntity();
@@ -176,11 +175,11 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			presenter.isSubmitButtonVisible();
 		}
 		
-		if (canEdit && !readOnly) editButton.enable();
+		if (canEdit) editButton.enable();
 		else editButton.disable();
 		configureEditButton(entity, entityType);	
 		
-		if (isAdministrator && !readOnly) shareButton.enable();
+		if (isAdministrator) shareButton.enable();
 		else shareButton.disable();
 		configureShareButton(entity);		
 		
@@ -333,8 +332,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		
 		boolean authenticated = presenter.isUserLoggedIn();
 		// disable edit/admin items if in read-only mode
-		canEdit &= !readOnly;
-		isAdministrator &= !readOnly;
 		
 		// create drop down menu
 		Menu menu = new Menu();		

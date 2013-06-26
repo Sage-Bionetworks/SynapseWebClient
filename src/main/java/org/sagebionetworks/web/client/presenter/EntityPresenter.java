@@ -49,7 +49,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private NodeModelCreator nodeModelCreator;
 	private String entityId;
 	private Long versionNumber;
-	private boolean readOnly = false;
 	private AdapterFactory adapterFactory;
 	
 	@Inject
@@ -83,9 +82,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.entityId = place.getEntityId();
 		this.versionNumber = place.getVersionNumber();
 
-		// asking for a specific version puts you into read only mode
-		readOnly = versionNumber == null ? false : true;
-		
 		refresh();
 	}
 
@@ -129,7 +125,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						}
 					} 					
 					
-					view.setEntityBundle(bundle, readOnly);					
+					view.setEntityBundle(bundle, versionNumber);					
 				} catch (JSONObjectAdapterException ex) {					
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
 				}				
@@ -146,13 +142,11 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				}
 			}			
 		};
-		
-		if(versionNumber == null) {
+		if (versionNumber == null) {
 			synapseClient.getEntityBundle(entityId, mask, callback);
 		} else {
 			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
 		}
-
 	}
 	
 }

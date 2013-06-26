@@ -920,3 +920,12 @@ ol.lowerroman {
 
 
 .align-center {display: block; margin-left: auto; margin-right: auto;}
+
+.highlighted-version {
+    font-size: 11px !important;
+    color: black !important;
+}
+
+.not-highlighted-version {
+	color: #d3d3d3 !important;
+}

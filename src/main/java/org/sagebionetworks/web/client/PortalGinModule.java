@@ -465,7 +465,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// EntityMetadata
 		bind(EntityMetadataViewImpl.class).in(Singleton.class);
 		bind(EntityMetadataView.class).to(EntityMetadataViewImpl.class);
-
+		
 		// ProfileFormView
 		bind(ProfileFormView.class).to(ProfileFormViewImpl.class);		
 

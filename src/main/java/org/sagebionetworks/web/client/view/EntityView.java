@@ -24,11 +24,11 @@ public interface EntityView extends IsWidget, SynapseView {
 
 	/**
 	 * Set entity to display
-	 * @param readOnly 
+	 * @param versionNumber to highlight
 	 * @param entity
 	 * @param entityMetadata 
 	 */
-	public void setEntityBundle(EntityBundle bundle, boolean readOnly);
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber);
 
 	public void show404();
 	

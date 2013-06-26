@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -51,6 +53,9 @@ public class EntityMetadata implements Presenter {
 	private EntityBundle bundle;	
 	private EntityUpdatedHandler entityUpdatedHandler;
 	
+	//the version that we're currently looking at
+	private Long currentVersion;
+	
 	@Inject
 	public EntityMetadata(EntityMetadataView view,
 			SynapseClientAsync synapseClient,
@@ -71,7 +76,7 @@ public class EntityMetadata implements Presenter {
 	}
 
 	@Override
-	public void loadVersions(String id, int offset, int limit,
+	public void loadVersions(String id, final int offset, int limit,
 			final AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback) {
 		// TODO: If we ever change the offset api to actually take 0 as a valid
 		// offset, then we need to remove "+1"
@@ -99,9 +104,10 @@ public class EntityMetadata implements Presenter {
 		return view.asWidget();
 	}
 
-	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		this.bundle = bundle;
-		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit() && readOnly);
+		this.currentVersion = versionNumber;
+		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit(), versionNumber != null);
 		boolean showDetailedMetadata = false;
 		boolean showEntityName = false;
 		if (bundle.getEntity() instanceof FileEntity) {

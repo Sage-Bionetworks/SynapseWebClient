@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -9,6 +10,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
@@ -19,10 +21,10 @@ import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.IconMenu;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.BasePagingLoadConfig;
 import com.extjs.gxt.ui.client.data.BasePagingLoadResult;
@@ -53,6 +55,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -64,7 +67,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
@@ -83,13 +85,17 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static final String VERSION_KEY_MOD_BY = "modifiedBy";
 
 	private static final int VERSION_LIMIT = 100;
-	private static final int NAME_TIME_STUB_LENGTH = 7;
 	private FavoriteWidget favoriteWidget;
 	private DoiWidget doiWidget;
+	private PortalGinInjector ginInjector;
+	//if true, will expand file history after it has completed loading
+	private boolean isShowingOlderVersion;
+	
+	private boolean canEdit;
 	
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
-
+	
 	private static EntityMetadataViewImplUiBinder uiBinder = GWT
 			.create(EntityMetadataViewImplUiBinder.class);
 
@@ -103,8 +109,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@UiField
 	HTMLPanel versions;
-	@UiField
-	HTMLPanel readOnly;
 	@UiField
 	HTMLPanel entityNamePanel;
 	@UiField
@@ -122,12 +126,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SpanElement entityId;
 	@UiField
-	HTMLPanel addedBy;
-	@UiField
-	HTMLPanel modifiedBy;
-	@UiField
-	SpanElement label;
-	@UiField
 	SimplePanel favoritePanel;
 
 	@UiField
@@ -139,6 +137,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	InlineLabel allVersions;
 
+	@UiField
+	Hyperlink currentVersionLink;
+	
 	private Presenter presenter;
 
 	@UiField(provided = true)
@@ -159,19 +160,23 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	 * viewed model in the grid.
 	 */
 	private BaseModelData currentModel;
-
+	private Element scrollToElement;
+	
 	// Widget variables
 	private PagingToolBar vToolbar;
 	private Grid<BaseModelData> vGrid;
 	private AnimationProtector versionAnimation;
+	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
+	private static final int GRID_MARGIN = 0;
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget, DoiWidget doiWidget) {
+			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget, DoiWidget doiWidget, PortalGinInjector ginInjector) {
 		this.icons = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
 		this.doiWidget = doiWidget;
+		this.ginInjector = ginInjector;
 		initWidget(uiBinder.createAndBindUi(this));
 
 		versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(allVersions, previousVersions));
@@ -182,11 +187,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
 				allVersions.setText(DisplayConstants.SHOW_VERSIONS);
-				vGrid.getSelectionModel().select(currentModel, false);
 			}
 		});
 		versionAnimation.setHideConfig(hideConfig);
-
 		FxConfig showConfig = new FxConfig(400);
 		showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
 			@Override
@@ -194,7 +197,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
 				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
-				vGrid.getSelectionModel().select(currentModel, false);
+				if (scrollToElement != null)
+					scrollToElement.scrollIntoView();
 			}
 		});
 		versionAnimation.setShowConfig(showConfig);
@@ -212,9 +216,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		sm.setLocked(false);
 		sm.setUserLocked(true);
 		sm.setFiresEvents(false);
-		sm.setSelectionMode(SelectionMode.SINGLE);
-
-		vGrid.setSelectionModel(sm);
+		
 		vGrid.getView().setForceFit(true);
 		vGrid.getView().setEmptyText("Sorry, no versions were found.");
 		vGrid.setLayoutData(new FitLayout());
@@ -222,8 +224,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		vGrid.setLoadMask(true);
 		vGrid.setAutoWidth(true);
 		vGrid.setBorders(false);
-		vGrid.setStripeRows(true);
-
+		vGrid.setTrackMouseOver(false);
+		vGrid.setHideHeaders(true);
+		vGrid.setStripeRows(false);
+		//and disable row selection
+		vGrid.disableEvents(true);
+		vGrid.disableTextSelection(true);
+		
 		ContentPanel cp = new ContentPanel();
 		cp.setLayout(new FitLayout());
 		cp.setBodyBorder(true);
@@ -241,13 +248,14 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		doiPanel.addStyleName("inline-block");
 		doiPanel.setWidget(doiWidget.asWidget());
 		
-		previousVersions.setLayout(new FlowLayout(10));
+		previousVersions.setLayout(new FlowLayout(GRID_MARGIN));
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
+	public void setEntityBundle(EntityBundle bundle, boolean canEdit, boolean isShowingOlderVersion) {
 		clearmeta();
-
+		this.isShowingOlderVersion = isShowingOlderVersion;
+		this.canEdit = canEdit;
 		Entity e = bundle.getEntity();
 
 		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
@@ -256,13 +264,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setEntityName(e.getName());
 		setEntityId(e.getId());
 		
-		this.readOnly.setVisible(readOnly);
+		currentVersionLink.setTargetHistoryToken(DisplayUtils.getSynapseHistoryTokenNoHash(e.getId()));
+		currentVersionLink.setVisible(isShowingOlderVersion);
 		
 		sharingContainer.clear();
 		sharingContainer.add(DisplayUtils.getShareSettingsDisplay("<span style=\"margin-right: 5px;\" class=\"boldText\">Sharing:</span>", bundle.getPermissions().getCanPublicRead(), synapseJSNIUtils));
-
-		setCreatedBy(e.getCreatedBy(), DisplayUtils.converDataToPrettyString(e.getCreatedOn()));
-		setModified(e.getModifiedBy(), DisplayUtils.converDataToPrettyString(e.getModifiedOn()));
 			
 		dataUseContainer.clear();
 		if(bundle.getPermissions().getCanPublicRead()) {
@@ -282,10 +288,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		if (e instanceof Versionable) {
 			setVersionsVisible(true);
 			Versionable vb = (Versionable) e;
-			setVersionInfo(vb);
-			setEntityVersions(vb);
 			versionAnimation.hide();
 			versionNumber = vb.getVersionNumber();
+			setEntityVersions(vb);
 		}
 		favoriteWidget.configure(bundle.getEntity().getId());
 		
@@ -331,29 +336,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		entityId.setInnerText(text);
 	}
 
-	public void setCreatedBy(String who, String when) {
-		addedBy.clear();		
-		addedBy.add(new HTML("<span class=\"boldText\">" + DisplayConstants.CREATED + " by:</span> " + who + ", " + when));
-	}
-
-	public void setModified(String who, String when) {
-		modifiedBy.clear();
-		modifiedBy.add(new HTML("<span class=\"boldText\">" + DisplayConstants.MODIFIED + " by:</span> " + who + ", " + when));		
-	}
-
-	public void setVersionInfo(Versionable vb) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(vb.getVersionLabel());
-
-		// TODO : figure out a mobile-friendly way to display the version comment
-//		if (vb.getVersionComment() != null) {
-//			DisplayUtils.addTooltip(synapseJSNIUtils, versions, vb.getVersionComment(), TOOLTIP_POSITION.BOTTOM);
-//		} else {
-//			DisplayUtils.addTooltip(synapseJSNIUtils, versions, DisplayConstants.NO_VERSION_COMMENT, TOOLTIP_POSITION.BOTTOM);
-//		}
-		
-		label.setInnerText(sb.toString());
-	}
 
 	public void setPreviousVersions(ContentPanel versions) {
 		previousVersions.add(versions);
@@ -370,12 +352,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	public void setEntityVersions(final Versionable entity) {
 		// create bottom paging toolbar
-
+		currentModel = null;
+		scrollToElement = null;
 		RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
 
 			@Override
 			protected void load(
-					Object loadConfig,
+					final Object loadConfig,
 					final AsyncCallback<PagingLoadResult<BaseModelData>> callback) {
 				final int offset = ((PagingLoadConfig) loadConfig).getOffset();
 				int limit = ((PagingLoadConfig) loadConfig).getLimit();
@@ -405,21 +388,37 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 											version.getModifiedOn());
 									model.set(
 											EntityMetadataViewImpl.VERSION_KEY_MOD_BY,
-											version.getModifiedBy());
+											version.getModifiedByPrincipalId());
 
-									if (entity.getVersionNumber().equals(version.getVersionNumber()))
+									if (entity.getVersionNumber().equals(version.getVersionNumber())) {
 										currentModel = model;
+									}
+										
 									dataList.add(model);
 								}
-								PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(
-										dataList);
-								loadResultData.setTotalLength((int) result
-										.getTotalNumberOfResults());
-								vToolbar.setVisible(loadResultData
-										.getTotalLength() > VERSION_LIMIT);
-
-								loadResultData.setOffset(offset);
-								callback.onSuccess(loadResultData);
+								int totalResultCount = (int)result.getTotalNumberOfResults();
+								if (currentModel == null) {
+									//we have not found the current model.  keep paging until it's found
+									//we should keep paging until it is found, or another page would be over the record count
+									int nextPageOffset = offset+VERSION_LIMIT;
+									boolean continueFetching = !(nextPageOffset > totalResultCount);
+									if (continueFetching) {
+										((PagingLoadConfig)loadConfig).setOffset(offset + VERSION_LIMIT);
+										load(loadConfig, callback);
+									}
+								}
+								else {
+									PagingLoadResult<BaseModelData> loadResultData = new BasePagingLoadResult<BaseModelData>(dataList);
+									
+									loadResultData.setTotalLength(totalResultCount);
+									vToolbar.setVisible(loadResultData.getTotalLength() > VERSION_LIMIT);
+	
+									loadResultData.setOffset(offset);
+									callback.onSuccess(loadResultData);
+									scrollToElement = vGrid.getView().getRow(currentModel);
+									if (isShowingOlderVersion)
+										setFileHistoryVisible(true);
+								}
 							}
 
 							@Override
@@ -440,7 +439,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		ListStore<BaseModelData> store = new ListStore<BaseModelData>(loader);
 		vGrid.reconfigure(store, setupColumnModel(entity));
 		loader.load();
-
 		vGrid.addListener(Events.Attach, new Listener<GridEvent<ModelData>>() {
 			public void handleEvent(GridEvent<ModelData> be) {
 				BasePagingLoadConfig config = new BasePagingLoadConfig();
@@ -449,6 +447,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				loader.load(config);
 			}
 		});
+		
 	}
 
 	private GridCellRenderer<BaseModelData> configureVersionsGridCellRenderer(final Versionable vb) {
@@ -460,6 +459,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				boolean currentVersion = vb.getVersionNumber().equals(model.get(VERSION_KEY_NUMBER));
 				boolean topVersion = previousVersionsHasNotPaged && rowIndex == 0;
 
+				config.css = currentVersion ? "highlighted-version" :  "not-highlighted-version";
+				
 				if (property.equals(VERSION_KEY_LABEL)) {
 					if (currentVersion) {
 						InlineLabel label = new InlineLabel("Version "
@@ -494,7 +495,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 					return label;
 				} else if (property.equals(VERSION_KEY_NUMBER)) {
 					return setupIconMenu(model, topVersion);
-
+				} else if (property.equals(VERSION_KEY_MOD_BY)) {
+					UserBadge badge = ginInjector.getUserBadgeWidget();
+					badge.configure((String)model.get(VERSION_KEY_MOD_BY));
+					return badge.asWidget();
+				} else if (property.equals(VERSION_KEY_MOD_ON)) {
+					return EntityMetadataViewImpl.shortDateFormat.format((Date)model.get(property));
 				} else if (model.get(property) != null) {
 					return model.get(property).toString();
 
@@ -505,47 +511,49 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 			private Object setupIconMenu(final ModelData model, boolean currentVersion) {
 				IconMenu menu = new IconMenu();
-				final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
-				if (currentVersion) {
-					menu.addIcon(icons.editGrey16(), "Edit Version Info",
+				if (canEdit) {
+					final String versionLabel = (String) model.get(VERSION_KEY_LABEL);
+					menu.addIcon(icons.deleteButtonGrey16(), "Delete Version",
 							new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {
-									NameAndDescriptionEditorDialog.showNameAndDescriptionDialog(
-											(String) model.get(VERSION_KEY_LABEL),
-											(String) model.get(VERSION_KEY_COMMENT),
-											"Version",
-											"Comment",
-											new NameAndDescriptionEditorDialog.Callback() {
-												@Override
-												public void onSave(String version,
-														String comment) {
-													presenter.editCurrentVersionInfo(
-															(String) model.get(VERSION_KEY_ID), version, comment);
-												}
-											});
+									MessageBox.confirm(DisplayConstants.LABEL_DELETE + " " + versionLabel,
+											DisplayConstants.PROMPT_SURE_DELETE + " version?",
+											new Listener<MessageBoxEvent>() {
+										@Override
+										public void handleEvent(MessageBoxEvent be) {
+											Button btn = be.getButtonClicked();
+											if(Dialog.YES.equals(btn.getItemId())) {
+												presenter.deleteVersion(
+														(String) model.get(VERSION_KEY_ID),
+														(Long) model.get(VERSION_KEY_NUMBER));
+											}
+										}
+									});
 								}
 							});
-				}
-				menu.addIcon(icons.deleteButtonGrey16(), "Delete Version",
-						new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								MessageBox.confirm(DisplayConstants.LABEL_DELETE + " " + versionLabel,
-										DisplayConstants.PROMPT_SURE_DELETE + " version?",
-										new Listener<MessageBoxEvent>() {
+					if (currentVersion) {
+						menu.addIcon(icons.editGrey16(), "Edit Version Info",
+								new ClickHandler() {
 									@Override
-									public void handleEvent(MessageBoxEvent be) {
-										Button btn = be.getButtonClicked();
-										if(Dialog.YES.equals(btn.getItemId())) {
-											presenter.deleteVersion(
-													(String) model.get(VERSION_KEY_ID),
-													(Long) model.get(VERSION_KEY_NUMBER));
-										}
+									public void onClick(ClickEvent event) {
+										NameAndDescriptionEditorDialog.showNameAndDescriptionDialog(
+												(String) model.get(VERSION_KEY_LABEL),
+												(String) model.get(VERSION_KEY_COMMENT),
+												"Version",
+												"Comment",
+												new NameAndDescriptionEditorDialog.Callback() {
+													@Override
+													public void onSave(String version,
+															String comment) {
+														presenter.editCurrentVersionInfo(
+																(String) model.get(VERSION_KEY_ID), version, comment);
+													}
+												});
 									}
 								});
-							}
-						});
+					}
+				}	
 				return menu.asWidget();
 			}
 		};
@@ -554,20 +562,15 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON, VERSION_KEY_MOD_BY , VERSION_KEY_NUMBER};
-		String[] names = {"Version"        , "Comment"          , "Modified On"     , "Modified By"      , ""                };
-		int[] widths =	 {70               , 230                , 70                , 100                , 50                };
-		int MOD_ON_INDEX = -1;
-
+		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_MOD_BY, VERSION_KEY_MOD_ON , VERSION_KEY_COMMENT,  VERSION_KEY_NUMBER};
+		String[] names = {"Version"        , "Modified By"      , "Modified On"     , "Comment"          ,   ""                };
+		int[] widths =	 {100               , 220               , 70                , 200                ,   50                };
+		
 		if (keys.length != names.length || names.length != widths.length)
 			throw new IllegalArgumentException("All configuration arrays must be the same length.");
 
 		GridCellRenderer<BaseModelData> cellRenderer = configureVersionsGridCellRenderer(vb);
-
 		for (int i = 0; i < keys.length; i++) {
-			if (VERSION_KEY_MOD_ON.equals(keys[i]))
-				MOD_ON_INDEX = i;
-
 			ColumnConfig colConfig = new ColumnConfig(keys[i], names[i], widths[i]);
 			colConfig.setRenderer(cellRenderer);
 			colConfig.setSortable(false);
@@ -576,8 +579,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			columns.add(colConfig);
 		}
 
-		columns.get(MOD_ON_INDEX).setDateTimeFormat(DateTimeFormat.getShortDateFormat());
-		columns.get(MOD_ON_INDEX).setRenderer(null);
 		return new ColumnModel(columns);
 	}
 
@@ -634,13 +635,26 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	@Override
+	public void setFileHistoryVisible(boolean v) {
+		boolean isV = versionAnimation.isVisible();
+		//Only do the action if it's not already in that state.
+		//That is, if v=true and isV=true, then do nothing.  if v=false and isV=false, do nothing.  Only do something if they differ (v=T and isV=F, or v=F and isV=T).
+		if (isV ^ v) {
+			if (v) {
+				versionAnimation.show();
+			} else
+				versionAnimation.hide();
+		}
+	}
+	
+	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
 	public void showLoading() {
-	}
+}
 
 	@Override
 	public void clear() {

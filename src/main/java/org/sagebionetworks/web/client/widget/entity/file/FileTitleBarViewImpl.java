@@ -128,8 +128,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			EntityType entityType, 
 			AuthenticationController authenticationController,
 			boolean isAdministrator,
-			boolean canEdit, 
-			boolean readOnly) {
+			boolean canEdit) {
 		
 		Entity entity = entityBundle.getEntity();
 

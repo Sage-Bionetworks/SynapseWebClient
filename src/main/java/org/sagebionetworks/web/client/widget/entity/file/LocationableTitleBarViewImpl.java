@@ -139,8 +139,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			EntityType entityType, 
 			AuthenticationController authenticationController,
 			boolean isAdministrator,
-			boolean canEdit, 
-			boolean readOnly) {
+			boolean canEdit) {
 		
 		Entity entity = entityBundle.getEntity();
 
