@@ -242,28 +242,26 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, readOnly);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
-			//show preview
-			colLeftContainer.add(getFilePreview(bundle));
-		}
-		
-		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
-		
-		// show Wiki
-		addWikiPageWidget(colLeftContainer, bundle, canEdit, 17);
-				
-
 		// ** RIGHT **
 		// Programmatic Clients
 		colRightContainer.add(createProgrammaticClientsWidget(bundle));
+
+		// ** FULL WIDTH
+		// Description
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
+		// Wiki
+		addWikiPageWidget(fullWidthContainer, bundle, canEdit, 24);
+		// Preview
+		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+			fullWidthContainer.add(getFilePreview(bundle));
+		}
 		// Provenance Widget for anything other than projects of folders
 		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) 
-			colRightContainer.add(createProvenanceWidget(bundle), widgetMargin);
+			fullWidthContainer.add(createProvenanceWidget(bundle), widgetMargin);
 		// Annotation Editor widget
-		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
+		fullWidthContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
-		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly, false), widgetMargin);
+		fullWidthContainer.add(createAttachmentsWidget(bundle, canEdit, readOnly, false), widgetMargin);
 		
 		//these types should not have children to show (and don't show deprecated Preview child object)
 		
@@ -486,6 +484,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    // the headers for properties.
 	    propertyWidget.setEntityBundle(bundle);
 	    LayoutContainer lc = new LayoutContainer();
+	    lc.addStyleName("span-7");
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 		if (!propertyWidget.isEmpty()) {
