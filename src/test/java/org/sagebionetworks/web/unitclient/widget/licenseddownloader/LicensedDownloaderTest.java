@@ -307,6 +307,7 @@ public class LicensedDownloaderTest {
 	public void testGetDirectDownloadUrlAvailable(){
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
 		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		//direct download available if there are no access requirements
 		assertTrue(licensedDownloader.getDirectDownloadURL()!=null);
 	}
@@ -314,12 +315,17 @@ public class LicensedDownloaderTest {
 	@Test
 	public void testGetDirectDownloadUrlIsNull(){
 		String touText = "some agreement";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
 		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
 		accessRequirement.setTermsOfUse(touText);
 		accessRequirements.add(accessRequirement);
 		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);
 		//direct download unavailable if there are any access requirements
+		assertNull(licensedDownloader.getDirectDownloadURL());
+		
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		//if not logged in, then it should also return null
 		assertNull(licensedDownloader.getDirectDownloadURL());
 	}
 	
