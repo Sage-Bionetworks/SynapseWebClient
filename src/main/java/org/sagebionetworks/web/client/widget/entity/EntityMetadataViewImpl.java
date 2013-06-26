@@ -459,7 +459,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				
 				if (property.equals(VERSION_KEY_LABEL)) {
 					if (currentVersion) {
-						InlineLabel label = new InlineLabel("v."
+						InlineLabel label = new InlineLabel("Version "
 								+ model.get(VERSION_KEY_LABEL));
 						label.addStyleName(style.currentVersion());
 						return label;
@@ -474,7 +474,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 									.getSynapseHistoryTokenNoHash(vb.getId(),
 											(Long) model.get(VERSION_KEY_NUMBER)));
 						}
-						link.setText("Download v." + model.get(VERSION_KEY_LABEL));
+						link.setText("Version " + model.get(VERSION_KEY_LABEL));
 						link.setStyleName("link");
 						return link;
 					}

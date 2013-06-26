@@ -31,7 +31,7 @@
 			<div class="span-17 notopmargin">
 				<g:HTMLPanel ui:field="versions">
 					<span class="boldText">File History</span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
-					<g:Hyperlink ui:field="currentVersionLink" text="Download current version" styleName="link" visible="false" />			
+					<g:Hyperlink ui:field="currentVersionLink" text="Go to the current version" styleName="link" visible="false" />			
 				</g:HTMLPanel>			
 			</div>
 			<div class="span-17 notopmargin">
