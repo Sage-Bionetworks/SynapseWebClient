@@ -70,9 +70,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	private HTML spinningProgressContainer;
 	
-	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
-	private JavaScriptObject window;
-	
 	LayoutContainer container;
 	IconsImageBundle iconsImageBundle;
 	@Inject
@@ -204,15 +201,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.layout(true);
 	}
 	
-	@Override
-	public void openNewBrowserTab(String url) {
-		// open url using window previously created
-		if (window==null) return;
-		DisplayUtils.setWindowTarget(window, url);
-		// only use it once
-		window = null;
-	}
-	
 	private void initializeOpenRadio(Radio openRadio, String radioGroup, Listener<BaseEvent> listener) {
 		openRadio.removeAllListeners();
 		openRadio.addListener(Events.OnClick, listener);
@@ -324,12 +312,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 					return;
 				}
 				initializeProgress();
-				// this is used in the 'handleEvent' listener, but must
-				// be created in the original thread.  for more, see
-				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
-				if (isNewlyRestricted()) {
-					window = DisplayUtils.newWindow("", "", "");
-				}
 				presenter.handleUpload(fileName);
 			}
 		};
@@ -522,13 +504,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 				if(restrictedModeChosen() == RADIO_SELECTED.NO_RADIO_SELECTED) {
 					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
 					return;
-				}
-
-				// this is used in the 'handleEvent' listener, but must
-				// be created in the original thread.  for more, see
-				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
-				if (isNewlyRestricted()) {
-					window = DisplayUtils.newWindow("", "", "");
 				}
 				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue(), isNewlyRestricted());
 			}
