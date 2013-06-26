@@ -244,8 +244,6 @@ public class EntityMetadata implements Presenter {
 		return new Callback() {
 			@Override
 			public void invoke() {
-				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
-				final JavaScriptObject window = DisplayUtils.newWindow("", "", "");
 				synapseClient.createLockAccessRequirement(bundle.getEntity().getId(), new AsyncCallback<EntityWrapper>(){
 					@Override
 					public void onSuccess(EntityWrapper result) {

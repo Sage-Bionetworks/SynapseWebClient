@@ -14,7 +14,6 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 
 	public void createUploadForm(boolean isExternalSupported);
 	
-	public void openNewBrowserTab(String url);
 	public int getDisplayHeight();
 
 	public int getDisplayWidth();
@@ -46,8 +45,6 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 		 * @return
 		 */
 		boolean isRestricted();
-
-		String getJiraRestrictionLink();
 
 		void clearHandlers();
 	}
