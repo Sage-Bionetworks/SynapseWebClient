@@ -158,6 +158,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private Grid<BaseModelData> vGrid;
 	private AnimationProtector versionAnimation;
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
+	private static final int GRID_MARGIN = 0;
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
@@ -236,7 +237,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		doiPanel.addStyleName("inline-block");
 		doiPanel.setWidget(doiWidget.asWidget());
 		
-		previousVersions.setLayout(new FlowLayout(10));
+		previousVersions.setLayout(new FlowLayout(GRID_MARGIN));
 	}
 
 	@Override
@@ -539,7 +540,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
 		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_MOD_BY , VERSION_KEY_COMMENT, VERSION_KEY_MOD_ON,  VERSION_KEY_NUMBER};
 		String[] names = {"Version"        , "Modified By"      , "Comment"          , "Modified On"     ,  ""                };
-		int[] widths =	 {100               , 160                , 260                , 70                ,  50                };
+		int[] widths =	 {100               , 220                , 220                , 70                ,  50                };
 		
 		if (keys.length != names.length || names.length != widths.length)
 			throw new IllegalArgumentException("All configuration arrays must be the same length.");

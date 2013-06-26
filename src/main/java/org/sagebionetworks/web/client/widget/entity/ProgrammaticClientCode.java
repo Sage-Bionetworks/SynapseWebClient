@@ -41,7 +41,7 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 	public static SafeHtml getRClientEntityLoad(String id, Long versionNumber) {
 		String safeId = SafeHtmlUtils.fromString(id).asString();
 		String idString = "id='" + safeId + "'";
-		String versionString = versionNumber == null ? "" : ", '"+versionNumber+"'";
+		String versionString = versionNumber == null ? "" : ", version='"+versionNumber+"'";
 		String load = "<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">" 
 			+ ("library(synapseClient)<br/>" 
 				+ "synapseLogin('usename','password')<br/><br/>"

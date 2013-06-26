@@ -924,6 +924,7 @@ ol.lowerroman {
 .highlighted-version {
     font-weight: bold !important;
     font-size: 11px !important;
+    color: black !important;
 }
 
 .not-highlighted-version {
