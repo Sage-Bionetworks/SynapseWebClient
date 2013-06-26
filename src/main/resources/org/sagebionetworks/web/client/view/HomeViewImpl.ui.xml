@@ -4,7 +4,8 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
  	
  	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
- 
+ 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+ 	
 	<ui:style>		
 	</ui:style>
 	<g:HTMLPanel>
@@ -133,8 +134,66 @@
 			</div>
 			<!-- END SEARCH BOX -->
 
+
 			<div class="span-24 separator"></div>						
-						
+
+			<!-- PROGRAMMATIC CLIENTS -->
+			<div class="span-24">
+				<h3>Programmatic Clients</h3>
+				<p>Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
+				   interact with all of Synapse's functionality programmatically. Create projects, upload/download files, generate provenance, query, create wikis and more
+				   all from the comfort of your own code. Don't see your language of choice here? Check out our 
+				   full <a class="link" href="https://sagebionetworks.jira.com/wiki/display/PLFM/Synapse+REST+APIs">REST API documentation</a>.</p>
+				<div class="span-7 notopmargin">
+			    	<span style="position:relative; top:8px; padding-right: 5px;">
+			    	    <g:Image resource='{sageImageBundle.logoR45}' />
+			    	</span>
+			    	<h4 style="display:inline; ">R Client</h4>
+			    	<g:SimplePanel ui:field="rClientInstallPanel" />
+			    	<h5 style="display:inline"><a class="link" href="https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660" target="_blank">API Documentation</a></h5>
+			    	&nbsp;&amp;&nbsp; 
+			    	<h5 style="display:inline"><a class="link" href="https://sagebionetworks.jira.com/wiki/display/SYNR/Examples" target="_blank">Example Code</a></h5>
+				</div>
+				<div class="span-6 notopmargin">
+			    	<span style="position:relative; top:8px; padding-right: 5px;">
+			    	    <g:Image resource='{sageImageBundle.logoPython45}' />
+			    	</span>
+			    	<h4 style="display:inline; ">Python Client</h4>
+			    	<g:SimplePanel ui:field="pythonClientInstallPanel" />
+			    	<h5 style="display:inline"><a class="link" href="https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660" target="_blank">API Documentation</a></h5>
+			    	&nbsp;&amp;&nbsp; 
+			    	<h5 style="display:inline"><a class="link" href="https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660" target="_blank">Example Code</a></h5>
+				</div>
+				<div class="span-6 notopmargin">
+			    	<span style="position:relative; top:8px; padding-right: 5px;">
+			    	    <g:Image resource='{sageImageBundle.logoCommandLine45}' />
+			    	</span>
+			    	<h4 style="display:inline; ">Command Line Client</h4>
+			    	<g:SimplePanel ui:field="clClientInstallPanel" />
+			    	<h5 style="display:inline"><a class="link" href="https://github.com/Sage-Bionetworks/synapsePythonClient" target="_blank">API Documentation</a></h5>
+			    	&nbsp;&amp;&nbsp; 
+			    	<h5 style="display:inline"><a class="link" href="https://github.com/Sage-Bionetworks/synapsePythonClient/tree/master/examples/provenance" target="_blank">Example Code</a></h5>
+				</div>								
+				<div class="span-5 notopmargin last">
+			    	<span style="position:relative; top:8px; padding-right: 5px;">
+			    	    <g:Image resource='{sageImageBundle.logoJava45}' />
+			    	</span>
+			    	<h4 style="display:inline; ">Java Client</h4>
+			    	<g:SimplePanel ui:field="javaClientInstallPanel" />
+			    	<span class="padding-top-5">
+				    	<!-- 			    	
+				    	<h5 style="display:inline"><a class="link" href="#">API Documentation</a></h5>
+				    	&nbsp;&amp;&nbsp;
+				    	 --> 
+				    	<h5 style="display:inline"><a class="link" href="https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java" target="_blank">Example Code</a></h5>
+			    	</span>
+				</div>
+			</div>
+	
+			<div class="span-24 separator"></div>						
+			
+			
+			<!-- NEWS -->						
 			<div class="span-24 notopmargin main-service">
 				<div class="span-18">
 					<h3>News</h3>
@@ -168,6 +227,8 @@
 				</div>
 				<!-- END DATA USE -->				
 			</div>
+			
+								
 
 			<div class="clear"></div>
 		</div> <!-- close class="container" -->
