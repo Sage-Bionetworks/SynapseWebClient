@@ -306,7 +306,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 						new Double(com.google.gwt.user.client.Window.getClientWidth() * .97).intValue(),
 						new Double(com.google.gwt.user.client.Window.getClientHeight() * .97).intValue()); 
 				window.setPlain(true);
-				window.setModal(false);
+				window.setModal(true);
 				window.setHeaderVisible(true);
 				window.setHeading(DisplayConstants.PROVENANCE);
 				window.addListener(Events.OnClick, new Listener<BaseEvent>() {
