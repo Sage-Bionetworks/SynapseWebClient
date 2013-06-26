@@ -20,6 +20,8 @@ public class NChartUtil {
 	public static final int DEFULT_DURATION = 10;
 	public static final double SCALE_X = 1.7; // scale x by  
 	public static final double SCALE_Y = 0.9; // scale y by
+	public static final double LARGE_GRAPH_SCALE_Y = 1.2; // scale y by
+	private static final int LARGE_GRAPH_SIZE = 8;
 	
 	public static NChartLayersArray createLayers(JsoProvider jsoProvider, ProvGraph graph) {
 		Map<ProvGraphNode,Integer> nodeToLayer = new HashMap<ProvGraphNode, Integer>();	
@@ -187,6 +189,7 @@ public class NChartUtil {
 			}
 		}
 		int range = minY+maxY;
+		final double scaleY = graph.getNodes().size() >= LARGE_GRAPH_SIZE ? LARGE_GRAPH_SCALE_Y : SCALE_Y;
 		for(ProvGraphNode node : graph.getNodes()) {			
 			List<XYPoint> xyPoints = layoutResult.getPointsForId(node.getId());
 			if(xyPoints != null && xyPoints.size() > 0) {
@@ -194,7 +197,7 @@ public class NChartUtil {
 				XYPoint pt = xyPoints.get(0);
 				int x = (int) (pt.getY() * SCALE_X);
 				int y = (-1*pt.getX()) + range; // reflect y axis
-				y = new Long(Math.round(y * SCALE_Y)).intValue();
+				y = new Long(Math.round(y * scaleY)).intValue();
 				node.setxPos(x); 
 				node.setyPos(y);
 			}
