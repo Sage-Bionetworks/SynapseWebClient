@@ -618,19 +618,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public boolean isRestricted() {
 		return GovernanceServiceHelper.entityRestrictionLevel(accessRequirements)!=RESTRICTION_LEVEL.OPEN;
 	}
-	
-	@Override
-	public String getJiraRestrictionLink() {
-		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-		
-		if (sessionData==null) throw new NullPointerException("User profile cannot be null.");
-		UserProfile userProfile = sessionData.getProfile();
-		if (userProfile==null) throw new NullPointerException("User profile cannot be null.");
-		return jiraURLHelper.createAccessRestrictionIssue(
-				userProfile.getUserName(), userProfile.getDisplayName(), entity.getId());
-	}
-
-	public int getDisplayHeight() {
+		public int getDisplayHeight() {
 		return view.getDisplayHeight();
 	}
 	
