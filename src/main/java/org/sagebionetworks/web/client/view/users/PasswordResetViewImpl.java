@@ -45,6 +45,8 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	SimplePanel contentPanel;	
 	@UiField 
 	SpanElement contentHtml;
+	@UiField 
+	SpanElement pageTitle;
 
 	private Presenter presenter;
 	private FormPanel requestFormPanel;
@@ -78,28 +80,21 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	}
 
 
-	 private void createRequestForm() {  
+	 private void createRequestForm() {
 	     requestFormPanel = new FormPanel();  
 	     requestFormPanel.setFrame(true);
 	     requestFormPanel.setHeaderVisible(false);  
 	     requestFormPanel.setWidth(350);  
-	     requestFormPanel.setLayout(new FlowLayout());  
-	   
-	     FieldSet fieldSet = new FieldSet();  
-	     fieldSet.setHeading("Send Password Change Request&nbsp;");  
-	     fieldSet.setCheckboxToggle(false);  
-	   
+	   	   
 	     FormLayout layout = new FormLayout();  
 	     layout.setLabelWidth(100);  
-	     fieldSet.setLayout(layout);  
+	     requestFormPanel.setLayout(layout);  
 	   
 	     final TextField<String> emailAddress = new TextField<String>();  
-	     emailAddress.setFieldLabel("Email Address");  
+	     emailAddress.setFieldLabel(DisplayConstants.EMAIL_ADDRESS);  
 	     emailAddress.setAllowBlank(false);
 	     emailAddress.setId(DisplayConstants.ID_INP_EMAIL_ADDRESS2);
-	     fieldSet.add(emailAddress, formData);  
-	   
-	     requestFormPanel.add(fieldSet);  
+	     requestFormPanel.add(emailAddress, formData);    
 	   
 	     requestFormPanel.setButtonAlign(HorizontalAlignment.CENTER);  
 	     final Button sendChangeRequest = new Button("Send", new SelectionListener<ButtonEvent>() {				
@@ -123,36 +118,29 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 			};
 	   }  
 
-	 private void createResetForm() {  
+	 private void createResetForm() {
 	     resetFormPanel = new FormPanel();  
 	     resetFormPanel.setFrame(true);
 	     resetFormPanel.setHeaderVisible(false);  
-	     resetFormPanel.setWidth(350);  
-	     resetFormPanel.setLayout(new FlowLayout());  
-	   
-	     FieldSet fieldSet = new FieldSet();  
-	     fieldSet.setHeading("Enter a New Password&nbsp;");  
-	     fieldSet.setCheckboxToggle(false);  
+	     resetFormPanel.setWidth(350);    
 	   
 	     FormLayout layout = new FormLayout();  
 	     layout.setLabelWidth(100);  
-	     fieldSet.setLayout(layout);  
+	     resetFormPanel.setLayout(layout);  
 	   
 	     final TextField<String> newPassword = new TextField<String>();  
 	     newPassword.setFieldLabel("New Password");  
 	     newPassword.setAllowBlank(false);
 	     newPassword.setPassword(true);
 	     newPassword.setId(DisplayConstants.ID_INP_NEWPASSWORD);
-	     fieldSet.add(newPassword, formData);  
+	     resetFormPanel.add(newPassword, formData);  
 	   
 	     final TextField<String> newPasswordConfirm = new TextField<String>();  
 	     newPasswordConfirm.setFieldLabel("Confirm Password");  
 	     newPasswordConfirm.setAllowBlank(false);
 	     newPasswordConfirm.setPassword(true);
 	     newPasswordConfirm.setId(DisplayConstants.ID_INP_CONFIRMPASSWORD);
-	     fieldSet.add(newPasswordConfirm, formData);  
-	   
-	     resetFormPanel.add(fieldSet);  
+	     resetFormPanel.add(newPasswordConfirm, formData);    
 	   
 	     resetFormPanel.setButtonAlign(HorizontalAlignment.CENTER);  
 	     Button sendReset = new Button("Submit");
@@ -174,6 +162,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	@Override
 	public void showRequestForm() {
+		pageTitle.setInnerHTML(DisplayConstants.SEND_PASSWORD_CHANGE_REQUEST);
 		contentHtml.setInnerHTML("");		
 		contentPanel.clear();
 		contentPanel.add(requestFormPanel);
@@ -182,6 +171,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	@Override
 	public void showResetForm() {
+		pageTitle.setInnerHTML(DisplayConstants.SET_PASSWORD);
 		contentHtml.setInnerHTML("");
 		contentPanel.clear();
 		contentPanel.add(resetFormPanel);
@@ -196,19 +186,21 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	@Override
 	public void showPasswordResetSuccess() {
+		pageTitle.setInnerHTML(DisplayConstants.SUCCESS);
 		contentPanel.clear();		
 		contentHtml.setInnerHTML(AbstractImagePrototype.create(iconsImageBundle.informationBalloon16()).getHTML() + " Your password has been changed.");
 	}
 
 
 	@Override
-	public void showErrorMessage(String errorMessage) {
+	public void showErrorMessage(String errorMessage) {		
 		MessageBox.info("Error", errorMessage, null);
 	}
 
 
 	@Override
 	public void showRequestSentSuccess() {
+		pageTitle.setInnerHTML(DisplayConstants.REQUEST_SENT);
 		contentPanel.clear();		
 		contentHtml.setInnerHTML(AbstractImagePrototype.create(iconsImageBundle.informationBalloon16()).getHTML() + " Your password reset request has been sent. Please check your Email.");
 	}
