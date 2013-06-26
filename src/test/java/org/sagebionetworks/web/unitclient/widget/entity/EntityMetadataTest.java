@@ -110,7 +110,7 @@ public class EntityMetadataTest {
 		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
 		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
 				
-		entityMetadata.setEntityBundle(bundle, false);
+		entityMetadata.setEntityBundle(bundle, 1l);
 
 	}
 

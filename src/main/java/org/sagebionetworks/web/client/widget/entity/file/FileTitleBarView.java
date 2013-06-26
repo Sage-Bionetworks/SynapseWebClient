@@ -30,8 +30,7 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 			EntityType entityType, 
 			AuthenticationController authenticationController,
 			boolean isAdministrator, 
-			boolean canEdit, 
-			boolean readOnly);
+			boolean canEdit);
 		
 	/**
 	 * Presenter interface

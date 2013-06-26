@@ -99,8 +99,9 @@ public class DisplayConstants {
 	public static final String LABEL_PYTHON_CLIENT_INSTALL = "Install Python Client";
 	public static final String INSTALL_JAVA_MAVEN = "Install Java Client";
 	public static final String LABEL_CL_CLIENT_INSTALL = "Install Command Line Client";
-	public static final String LABEL_CLIENT_GET_ENTITY = "Obtain a pointer";
+	public static final String LABEL_CLIENT_GET_ENTITY = "Obtain a pointer and download the data";
 	public static final String LABEL_CLIENT_LOAD_ENTITY = "Load the data";
+	public static final String GET_PATH_CLIENT_ENTITY = "Get the path to the local copy of the data file";
 	public static final String DOWNLOAD_FILE_LOCAL = "Download file";
 	public static final String LOGIN_USERNAME_LABEL = "Email Address";
 	
@@ -308,8 +309,8 @@ public class DisplayConstants {
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
 	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
-	public static final String SHOW_VERSIONS = "show all versions";
-	public static final String HIDE_VERSIONS = "hide all versions";
+	public static final String SHOW_VERSIONS = "show";
+	public static final String HIDE_VERSIONS = "hide";
 	public static final String NOT_FOUND = "Not Found";
 	public static final String ERROR_LOADING = "Error Loading";
 	public static final String PREVIEW_FAILED_TEXT = "Preview failed: ";
@@ -463,7 +464,7 @@ public class DisplayConstants {
 	public static final String PAGE_NOT_FOUND = "Page not found";
 	public static final String PAGE_NOT_FOUND_DESC = "The page you requested was not found, that's all we know.";
 	public static final String ANNOTATIONS = "Annotations";
-	public static final String TO_LOAD_VERSION_1 = "To load version 1";
+	public static final String TO_LOAD_VERSION_1 = "To load this version";
 	public static final String TO_LOAD_AN_ENTITY = "To load an entity";
 	public static final String PROGRAMMATIC_ACCESS = "Programmatic Access";
 	public static final String PROVENANCE = "Provenance";

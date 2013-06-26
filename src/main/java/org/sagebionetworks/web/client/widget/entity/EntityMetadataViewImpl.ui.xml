@@ -26,15 +26,12 @@
 		</h2>
 		<g:HTMLPanel ui:field="detailedMetadata">
 			<div class="span-17 notopmargin">
-				<g:HTMLPanel tag="span" ui:field="addedBy"></g:HTMLPanel>
-				<g:HTMLPanel tag="span" ui:field="modifiedBy"></g:HTMLPanel>			
-			</div>
-			<div class="span-17 notopmargin">
 				<g:HTMLPanel ui:field="dataUseContainer" ></g:HTMLPanel>
 			</div>			
 			<div class="span-17 notopmargin">
 				<g:HTMLPanel ui:field="versions">
-					<span class="boldText">Version:</span> <span ui:field="label"></span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />			
+					<span class="boldText">File History</span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
+					<g:Hyperlink ui:field="currentVersionLink" text="Go to the current version" styleName="link" visible="false" />			
 				</g:HTMLPanel>			
 			</div>
 			<div class="span-17 notopmargin">
@@ -43,9 +40,6 @@
 			<div class="span-17 notopmargin">
 				<g:HTMLPanel ui:field="sharingContainer" ></g:HTMLPanel>
 			</div>
-			<g:HTMLPanel ui:field="readOnly">
-			  <h4 class="colored">READ ONLY <g:Image resource="{icons.help16}"/></h4>
-			</g:HTMLPanel>
 			<div class="span-17 notopmargin">
 				<g:SimplePanel ui:field="doiPanel"/>
 			</div>

@@ -95,7 +95,7 @@ public class EntityPageTopTest {
 		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean())).thenReturn(testWidgetRenderer);
 
 		EntityBundle bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
-		pageTop.setBundle(bundle, false);
+		pageTop.setBundle(bundle, 1l);
 	}
 
 }

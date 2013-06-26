@@ -34,7 +34,7 @@ public interface ActionMenuView extends IsWidget, SynapseView {
 			AuthenticationController authenticationController,
 			boolean isAdministrator, 
 			boolean canEdit, 
-			boolean readOnly, 
+			Long versionNumber, 
 			boolean isInTestMode);
 	
 	void popupEvaluationSelector(List<Evaluation> list, List<String> submitterAliases);
