@@ -78,9 +78,9 @@ public class EntityViewImpl extends Composite implements EntityView {
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		entityPageTop.clearState();
-		entityPageTop.setBundle(bundle, readOnly);
+		entityPageTop.setBundle(bundle, versionNumber);
 		entityPageTopPanel.setWidget(entityPageTop.asWidget());
 		entityPageTop.refresh();
 	}

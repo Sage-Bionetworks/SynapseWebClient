@@ -60,11 +60,11 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityEditor entityEditor;
 	private AutoGenFactory entityFactory;
-	private boolean readOnly = false;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookieProvider;
-	private NodeModelCreator nodeModelCreator;
+	private  NodeModelCreator nodeModelCreator;
+	private Long versionNumber;
 	
 	public interface EvaluationsCallback {
 		/**
@@ -106,15 +106,15 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit, boolean readOnly) {		
+	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit, Long versionNumber) {		
 		view.setPresenter(this);
 		this.entityBundle = bundle; 		
-		this.readOnly = readOnly;
+		this.versionNumber = versionNumber;
 
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
-		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, readOnly, DisplayUtils.isInTestWebsite(cookieProvider));
+		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, versionNumber, DisplayUtils.isInTestWebsite(cookieProvider));
 		return view.asWidget();
 	}
 	
@@ -158,7 +158,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				@Override
 				public void onFailure(Throwable caught) {
 					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(caught.getMessage());
+					view.showErrorMessage(caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
@@ -222,7 +222,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				@Override
 				public void onFailure(Throwable caught) {
 					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(caught.getMessage());
+					view.showErrorMessage(caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
@@ -246,7 +246,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				@Override
 				public void onFailure(Throwable caught) {
 					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(caught.getMessage());
+					view.showErrorMessage(caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
@@ -282,11 +282,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 
 	@Override
 	public void moveEntity(String newParentId) {
-		if(readOnly) {
-			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
-			return;
-		}
-		
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
 		
@@ -329,11 +324,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 
 	@Override
 	public void deleteEntity() {
-		if(readOnly) {
-			view.showErrorMessage(DisplayConstants.ERROR_IN_READ_ONLY_MODE);
-			return;
-		}
-		
 		final String parentId = entityBundle.getEntity().getParentId();
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
@@ -451,7 +441,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 						@Override
 						public void onFailure(Throwable caught) {
 							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-								view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+							view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 						}
 					});							
 				}

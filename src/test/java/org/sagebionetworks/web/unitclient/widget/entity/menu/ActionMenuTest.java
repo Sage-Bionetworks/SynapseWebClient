@@ -115,7 +115,7 @@ public class ActionMenuTest {
 		entity.setId("file entity test id");
 		bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		
-		actionMenu.asWidget(bundle, true, true, false);
+		actionMenu.asWidget(bundle, true, true, null);
 	}
 	
 	@Test

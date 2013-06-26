@@ -70,7 +70,7 @@ public class SnapshotWidgetTest {
 	final boolean READ_ONLY = false;
 	final boolean SHOW_EDIT = true;
 	AuthenticationController mockAuthenticationController;
-
+	
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{		
@@ -78,7 +78,7 @@ public class SnapshotWidgetTest {
 		autoGenFactory = new AutoGenFactory();
 		mockPlaceChanger = Mockito.mock(PlaceChanger.class);
 		mockGlobal = Mockito.mock(GlobalApplicationState.class);
-		when(mockGlobal.getPlaceChanger()).thenReturn(mockPlaceChanger);				
+		when(mockGlobal.getPlaceChanger()).thenReturn(mockPlaceChanger);		
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockView = mock(SnapshotWidgetView.class);

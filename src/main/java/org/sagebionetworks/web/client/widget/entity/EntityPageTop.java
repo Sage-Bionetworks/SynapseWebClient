@@ -42,10 +42,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private WidgetRegistrar widgetRegistrar;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private EntityBundle bundle;
-	private boolean readOnly;
 	private String entityTypeDisplay;
 	private EventBus bus;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private Long versionNumber;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -76,9 +76,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      *
      * @param bundle
      */
-    public void setBundle(EntityBundle bundle, boolean readOnly) {
+    public void setBundle(EntityBundle bundle, Long versionNumber) {
     	this.bundle = bundle;
-    	this.readOnly = readOnly;
+    	this.versionNumber = versionNumber;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -169,7 +169,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private void sendDetailsToView(boolean isAdmin, boolean canEdit) {
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, readOnly);
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber);
 	}
 	
 	private UserProfile getUserProfile() {
