@@ -246,8 +246,12 @@ SynapseWidgetPresenter {
 			
 			@Override
 			public void onSuccess(Void result) {
-				//go to the owner object
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(wikiKey.getOwnerObjectId()));
+				//clear the now invalid page id from the wiki key
+				wikiKey.setWikiPageId(null);
+				if (isEmbeddedInOwnerPage)
+					refresh();
+				else
+					globalApplicationState.getPlaceChanger().goTo(new Synapse(wikiKey.getOwnerObjectId()));
 			}
 			
 			@Override
