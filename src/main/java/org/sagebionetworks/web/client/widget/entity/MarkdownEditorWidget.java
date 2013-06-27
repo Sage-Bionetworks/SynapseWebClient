@@ -335,7 +335,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.ENTITYLIST_CONTENT_TYPE, callback);
 	    	}
 	    }));	    
-	    menu.add(getNewCommand("Image", new SelectionListener<ComponentEvent>() {
+	    menu.add(getNewCommand(WidgetConstants.IMAGE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
 	    	};
@@ -345,12 +345,19 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.LINK_CONTENT_TYPE, callback);
 	    	};
 		}));
-	    menu.add(getNewCommand("Provenance Graph", new SelectionListener<ComponentEvent>() {
+	    menu.add(getNewCommand(WidgetConstants.PROVENANCE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.PROVENANCE_CONTENT_TYPE, callback);
 	    	};
 		}));
-	    menu.add(getNewCommand("Table", new SelectionListener<ComponentEvent>() {
+
+	    menu.add(getNewCommand(WidgetConstants.QUERY_TABLE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.QUERY_TABLE_CONTENT_TYPE, callback);
+	    	};
+		}));
+
+	    menu.add(getNewCommand(WidgetConstants.TABBED_TABLE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, callback);
 	    	};
