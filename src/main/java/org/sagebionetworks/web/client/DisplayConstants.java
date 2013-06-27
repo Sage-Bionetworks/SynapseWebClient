@@ -557,5 +557,6 @@ public class DisplayConstants {
 	public static final String SET_PASSWORD = "Set Password";
 	public static final String SUCCESS = "Success";
 	public static final String REQUEST_SENT = "Request Sent";
+	public static final String PLEASE_ENTER_PROJECT_NAME = "Please enter a project name";
 }
 

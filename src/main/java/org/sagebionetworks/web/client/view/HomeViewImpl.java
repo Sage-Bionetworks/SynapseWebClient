@@ -264,6 +264,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 		createBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
+				String name = input.getValue();
+				if(name == null || name.isEmpty()) {
+					showErrorMessage(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
+					return;
+				}
 				presenter.createProject(input.getValue());
 			}
 		});
