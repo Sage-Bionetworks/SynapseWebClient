@@ -14,7 +14,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingU
  * Is initialized from a widget descriptor map.
  */
 public class APITableConfig {
-	private String uri, tableWidth, jsonResultsArrayKeyName, cssStyleName, rowNumberColName;
+	private String uri, jsonResultsArrayKeyName, cssStyleName, rowNumberColName;
 	private boolean isPaging, isShowRowNumber;
 	private int offset, pageSize;
 	private List<APITableColumnConfig> columnConfigs;
@@ -37,10 +37,6 @@ public class APITableConfig {
 					else
 						pageSize = 10;
 				}	
-			}
-			tableWidth = "";
-			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_WIDTH_KEY)){
-				tableWidth = descriptor.get(WidgetConstants.API_TABLE_WIDGET_WIDTH_KEY);
 			}
 			isShowRowNumber = false;
 			rowNumberColName = "";
@@ -98,14 +94,6 @@ public class APITableConfig {
 
 	public void setUri(String uri) {
 		this.uri = uri;
-	}
-
-	public String getTableWidth() {
-		return tableWidth;
-	}
-
-	public void setTableWidth(String tableWidth) {
-		this.tableWidth = tableWidth;
 	}
 
 	public String getJsonResultsArrayKeyName() {

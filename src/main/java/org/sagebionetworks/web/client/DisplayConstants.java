@@ -360,7 +360,6 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME = "Row Numbers Col Name:";
 	public static final String SYNAPSE_API_CALL_IS_PAGING = "Support Paging?";
 	public static final String SYNAPSE_API_CALL_PAGE_SIZE = "Page Size:";
-	public static final String SYNAPSE_API_CALL_WIDTH = "Width (% or pixels)";
 	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
 	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
 	public static final String SHINYSITE_SITE_LABEL = "Shiny Site URL";

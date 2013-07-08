@@ -21,7 +21,7 @@ import com.google.inject.Inject;
 public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTableConfigView {
 
 	private Presenter presenter;
-	private TextField<String> queryField, rowNumbersColumnNameField, widthField;
+	private TextField<String> queryField, rowNumbersColumnNameField;
 	private CheckBox isRowVisibleField;
 	private APITableColumnManager columnsManager;
 	
@@ -40,17 +40,12 @@ public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTa
 		isRowVisibleField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL);
 		isRowVisibleField.addStyleName("apitable");
 		rowNumbersColumnNameField = new TextField<String>();
-		widthField = new TextField<String>();
 		
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_QUERY_LABEL, queryField, flowpanel);
 		queryField.setAllowBlank(false);
 
 		flowpanel.add(isRowVisibleField);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME, rowNumbersColumnNameField, flowpanel);
-
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_WIDTH, widthField, flowpanel);
-		
-		
 		
 		flowpanel.add(columnsManager.asWidget());
 		
@@ -81,7 +76,6 @@ public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTa
 		queryField.setValue(tableConfig.getUri());
 		isRowVisibleField.setValue(tableConfig.isShowRowNumber());
 		rowNumbersColumnNameField.setValue(tableConfig.getRowNumberColName());
-		widthField.setValue(tableConfig.getTableWidth());
 	}
 	
 	@Override
@@ -116,11 +110,6 @@ public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTa
 	@Override
 	public String getRowNumberColumnName() {
 		return rowNumbersColumnNameField.getValue();
-	}
-	
-	@Override
-	public String getTableWidth() {
-		return widthField.getValue();
 	}
 	
 	@Override

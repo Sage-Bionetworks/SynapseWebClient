@@ -45,7 +45,6 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 		//update widget descriptor from the view
 		view.checkParams();
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, "/query?query=" + URL.encodeQueryString(view.getQueryString()));
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_WIDTH_KEY, view.getTableWidth());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, Boolean.FALSE.toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, view.isShowRowNumbers().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, view.getRowNumberColumnName());
