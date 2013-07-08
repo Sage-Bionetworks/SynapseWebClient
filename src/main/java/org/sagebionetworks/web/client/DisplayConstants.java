@@ -352,6 +352,7 @@ public class DisplayConstants {
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
 	public static final String SYNAPSE_API_CALL_URL_LABEL = "Synapse API URI:";
+	public static final String SYNAPSE_API_CALL_QUERY_LABEL = "Query:";
 	public static final String SYNAPSE_API_CALL_COLUMNS_LABEL = "Columns To Display:";
 	public static final String SYNAPSE_API_CALL_COLUMN_HEADERS_LABEL = "Column Headers:";
 	public static final String SYNAPSE_API_CALL_RENDERERS_LABEL = "Renderer Names:";
@@ -359,7 +360,6 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME = "Row Numbers Col Name:";
 	public static final String SYNAPSE_API_CALL_IS_PAGING = "Support Paging?";
 	public static final String SYNAPSE_API_CALL_PAGE_SIZE = "Page Size:";
-	public static final String SYNAPSE_API_CALL_WIDTH = "Width (% or pixels)";
 	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
 	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
 	public static final String SHINYSITE_SITE_LABEL = "Shiny Site URL";

@@ -177,7 +177,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID);
 		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE);
 		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS);
+		//combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS);	//don't want to expose
 		combo.setSimpleValue(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
 		combo.setTriggerAction(TriggerAction.ALL);
 		

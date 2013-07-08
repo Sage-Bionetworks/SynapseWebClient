@@ -18,15 +18,15 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class APITableConfigViewImpl extends LayoutContainer implements APITableConfigView {
+public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTableConfigView {
 
 	private Presenter presenter;
-	private TextField<String> urlField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField;
-	private CheckBox isPagingField, isRowVisibleField;
+	private TextField<String> queryField, rowNumbersColumnNameField;
+	private CheckBox isRowVisibleField;
 	private APITableColumnManager columnsManager;
 	
 	@Inject
-	public APITableConfigViewImpl(APITableColumnManager columnsManager) {
+	public QueryTableConfigViewImpl(APITableColumnManager columnsManager) {
 		this.columnsManager = columnsManager;
 	}
 	
@@ -36,28 +36,16 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		FlowPanel flowpanel = new FlowPanel();
 		flowpanel.addStyleName("margin-left-5");
 		flowpanel.addStyleName("margin-top-5");
-		urlField = new TextField<String>();
+		queryField = new TextField<String>();
 		isRowVisibleField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL);
 		isRowVisibleField.addStyleName("apitable");
 		rowNumbersColumnNameField = new TextField<String>();
-		isPagingField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_PAGING);
-		isPagingField.addStyleName("apitable");
-		pageSizeField = new TextField<String>();
-		jsonResultsKeyNameField = new TextField<String>();
-		cssStyleNameField = new TextField<String>();
 		
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_URL_LABEL, urlField, flowpanel);
-		urlField.setAllowBlank(false);
+		initNewField(DisplayConstants.SYNAPSE_API_CALL_QUERY_LABEL, queryField, flowpanel);
+		queryField.setAllowBlank(false);
 
 		flowpanel.add(isRowVisibleField);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME, rowNumbersColumnNameField, flowpanel);
-
-		flowpanel.add(isPagingField);
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_PAGE_SIZE, pageSizeField, flowpanel);
-		
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME, jsonResultsKeyNameField, flowpanel);
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_CSS_STYLE_NAME, cssStyleNameField, flowpanel);
-		
 		
 		flowpanel.add(columnsManager.asWidget());
 		
@@ -85,13 +73,9 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	@Override
 	public void configure(APITableConfig tableConfig) {
 		columnsManager.configure(tableConfig.getColumnConfigs());
-		urlField.setValue(tableConfig.getUri());
-		isPagingField.setValue(tableConfig.isPaging());
+		queryField.setValue(tableConfig.getUri());
 		isRowVisibleField.setValue(tableConfig.isShowRowNumber());
 		rowNumbersColumnNameField.setValue(tableConfig.getRowNumberColName());
-		pageSizeField.setValue(Integer.toString(tableConfig.getPageSize()));
-		jsonResultsKeyNameField.setValue(tableConfig.getJsonResultsArrayKeyName());
-		cssStyleNameField.setValue(tableConfig.getCssStyleName());
 	}
 	
 	@Override
@@ -115,17 +99,12 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!urlField.isValid())
-			throw new IllegalArgumentException(urlField.getErrorMessage());
+		if (!queryField.isValid())
+			throw new IllegalArgumentException(queryField.getErrorMessage());
 	}
 	@Override
-	public String getApiUrl() {
-		return urlField.getValue();
-	}
-	
-	@Override
-	public String getPageSize() {
-		return pageSizeField.getValue();
+	public String getQueryString() {
+		return queryField.getValue();
 	}
 	
 	@Override
@@ -134,23 +113,8 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	}
 	
 	@Override
-	public Boolean isPaging() {
-		return isPagingField.getValue();
-	}
-	
-	@Override
 	public Boolean isShowRowNumbers() {
 		return isRowVisibleField.getValue();
-	}
-	
-	@Override
-	public String getJsonResultsKeyName() {
-		return jsonResultsKeyNameField.getValue();
-	}
-	
-	@Override
-	public String getCssStyle() {
-		return cssStyleNameField.getValue();
 	}
 	
 	@Override

@@ -21,7 +21,6 @@ public class APITableConfigTest {
 	String path = "/evaluation";
 	String isPaging = Boolean.TRUE.toString();
 	String pageSize = new Integer(42).toString();
-	String width = "98%";
 	String showRowNumber = Boolean.TRUE.toString();
 	String rowColumnName="Rank";
 	String jsonResultsArrayKeyName = "myResultsField";
@@ -35,7 +34,6 @@ public class APITableConfigTest {
 		descriptor.put(API_TABLE_WIDGET_PATH_KEY, path);
 		descriptor.put(API_TABLE_WIDGET_PAGING_KEY, isPaging);
 		descriptor.put(API_TABLE_WIDGET_PAGESIZE_KEY, pageSize);
-		descriptor.put(API_TABLE_WIDGET_WIDTH_KEY, width);
 		descriptor.put(API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, showRowNumber);
 		descriptor.put(API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, rowColumnName);
 		descriptor.put(API_TABLE_WIDGET_RESULTS_KEY, jsonResultsArrayKeyName);
@@ -49,7 +47,6 @@ public class APITableConfigTest {
 		assertEquals(Boolean.parseBoolean(isPaging), tableconfig.isPaging());
 		
 		assertEquals(Integer.parseInt(pageSize), tableconfig.getPageSize());
-		assertEquals(width, tableconfig.getTableWidth());
 		assertEquals(Boolean.parseBoolean(showRowNumber), tableconfig.isShowRowNumber());
 		assertEquals(rowColumnName, tableconfig.getRowNumberColName());
 		assertEquals(jsonResultsArrayKeyName, tableconfig.getJsonResultsArrayKeyName());

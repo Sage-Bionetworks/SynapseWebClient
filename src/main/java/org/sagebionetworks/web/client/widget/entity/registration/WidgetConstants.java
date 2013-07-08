@@ -6,7 +6,7 @@ public class WidgetConstants {
 	public static final String YOUTUBE_FRIENDLY_NAME = "YouTube";
 	
 	public static final String PROVENANCE_CONTENT_TYPE = "provenance";
-	public static final String PROVENANCE_FRIENDLY_NAME = "ProvenanceGraph";
+	public static final String PROVENANCE_FRIENDLY_NAME = "Provenance Graph";
 	
 	public static final String IMAGE_CONTENT_TYPE = "image";
 	public static final String IMAGE_FRIENDLY_NAME ="Image";
@@ -19,6 +19,9 @@ public class WidgetConstants {
 
 	public static final String TABBED_TABLE_CONTENT_TYPE = "tabbedtable";
 	public static final String TABBED_TABLE_FRIENDLY_NAME ="Table";
+	
+	public static final String QUERY_TABLE_CONTENT_TYPE = "querytable";
+	public static final String QUERY_TABLE_FRIENDLY_NAME = "Query Table";
 	
 	public static final String API_TABLE_CONTENT_TYPE = "supertable";
 	public static final String API_TABLE_FRIENDLY_NAME = "Super Table (Synapse API Based)";
@@ -79,7 +82,6 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_CSS_STYLE = "cssStyle";
 	public static final String API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX = "columnConfig";
 	public static final String API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY = "rowNumberDisplayName";
-	public static final String API_TABLE_WIDGET_WIDTH_KEY = "width";
 	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
 	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	public static final String USERBADGE_WIDGET_ID_KEY = "id";
