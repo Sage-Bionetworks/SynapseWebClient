@@ -106,5 +106,5 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * * First Item
 	 */
-	public static final String UNORDERED_LIST_REGEX = "(^[>]*)(\\s+)((?:[-+*]))(.+)";
+	public static final String UNORDERED_LIST_REGEX = "(^[>]*)(\\s*)((?:[-+*]))(.+)";
 }

@@ -930,7 +930,3 @@ ol.lowerroman {
 .not-highlighted-version {
 	color: #d3d3d3 !important;
 }
-
-.strikeout {
-	text-decoration: line-through;	
-}
