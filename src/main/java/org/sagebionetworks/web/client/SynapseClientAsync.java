@@ -180,6 +180,14 @@ public interface SynapseClientAsync {
 	 */
 	void getAvailableEvaluationsSubmitterAliases(AsyncCallback<String> callback) throws RestServiceException;
 
+	/**
+	 * Return true if the current user has created at least one submission in the given evaluations
+	 * @param evaluationIds
+	 * @param callback
+	 * @throws RestServiceException
+	 */
+	void hasSubmitted(AsyncCallback<Boolean> callback)	throws RestServiceException;
+	
 	void getSynapseVersions(AsyncCallback<String> callback);
 
 }

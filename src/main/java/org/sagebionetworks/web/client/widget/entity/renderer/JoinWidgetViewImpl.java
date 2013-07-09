@@ -2,12 +2,16 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
+import org.sagebionetworks.web.shared.WikiPageKey;
+
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
@@ -16,11 +20,12 @@ import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -30,12 +35,23 @@ import com.google.inject.Inject;
 
 public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetView {
 
+//	public static final String SUBMISSION_GUIDE_STEP_3_PAGE_ID = "56913";
+//	public static final String SUBMISSION_GUIDE_STEP_2_PAGE_ID = "56912";
+//	public static final String SUBMISSION_GUIDE_STEP_1_PAGE_ID = "56911";
+//	public static final String SUBMISSION_GUIDE_ID = "syn1968135";
+	public static final String SUBMISSION_GUIDE_STEP_3_PAGE_ID = "19";
+	public static final String SUBMISSION_GUIDE_STEP_2_PAGE_ID = "18";
+	public static final String SUBMISSION_GUIDE_STEP_1_PAGE_ID = "17";
+	public static final String SUBMISSION_GUIDE_ID = "syn1681367";
 	private Presenter presenter;
 	private ProfileFormWidget profileForm;
-	
+	private MarkdownWidget step1, step2, step3;
 	@Inject
-	public JoinWidgetViewImpl(ProfileFormWidget profileForm) {
+	public JoinWidgetViewImpl(ProfileFormWidget profileForm, MarkdownWidget step1,  MarkdownWidget step2,  MarkdownWidget step3) {
 		this.profileForm = profileForm;
+		this.step1 = step1;
+		this.step2 = step2;
+		this.step3 = step3;
 	}
 	
 	@Override
@@ -65,7 +81,21 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 			}
 			else if (UserEvaluationState.EVAL_OPEN_USER_REGISTERED.equals(state)) {
 				//add info on how to get started!
-				add(new HTML(DisplayConstants.JOINED_EVALUATION_HTML));
+				FlowPanel p = new FlowPanel();
+				p.addStyleName("mainPageHeader inline-block");
+				p.add(new HTML(DisplayConstants.JOINED_EVALUATION_HTML));
+				
+				Button button = new Button("Submit To Challenge");
+				button.removeStyleName("gwt-Button");
+				button.addStyleName("btn btn-large");
+				button.addClickHandler(new ClickHandler() {			
+					@Override
+					public void onClick(ClickEvent event) {
+						presenter.submitToChallengeClicked();
+					}
+				});
+				p.add(button);
+				add(p);
 			}
 		}
 		
@@ -129,7 +159,7 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 		// agree to TOU, cancel
         dialog.okText = DisplayConstants.BUTTON_TEXT_ACCEPT_TERMS_OF_USE;
         dialog.setButtons(Dialog.OKCANCEL);
-        Button touButton = dialog.getButtonById(Dialog.OK);
+        com.extjs.gxt.ui.client.widget.button.Button touButton = dialog.getButtonById(Dialog.OK);
         touButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
 			@Override
 			public void componentSelected(ButtonEvent ce) {
@@ -196,6 +226,77 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 	public void clear() {
 	}
 
+	@Override
+	public void showSubmissionUserGuide() {
+		WikiPageKey wikiKey = new WikiPageKey(SUBMISSION_GUIDE_ID, ObjectType.ENTITY.toString(), SUBMISSION_GUIDE_STEP_1_PAGE_ID);
+		step1.loadMarkdownFromWikiPage(wikiKey, true);
+		
+		wikiKey = new WikiPageKey(SUBMISSION_GUIDE_ID, ObjectType.ENTITY.toString(), SUBMISSION_GUIDE_STEP_2_PAGE_ID);
+		step2.loadMarkdownFromWikiPage(wikiKey, true);
+		
+		wikiKey = new WikiPageKey(SUBMISSION_GUIDE_ID, ObjectType.ENTITY.toString(), SUBMISSION_GUIDE_STEP_3_PAGE_ID);
+		step3.loadMarkdownFromWikiPage(wikiKey, true);
+		
+		final Dialog dialog = new Dialog();
+       	dialog.setMaximizable(false);
+        dialog.setPlain(true); 
+        dialog.setModal(true);
+        dialog.setWidth(900);
+        //dialog.setAutoWidth(true);
+        dialog.setAutoHeight(true);
+        dialog.setResizable(false);
+        dialog.okText = "Next";
+        dialog.cancelText = "Skip Tutorial";
+        dialog.setButtons(Dialog.OKCANCEL);
+        dialog.add(wrap(step1.asWidget()));
+ 		dialog.setHeading("Step 1: Create a Project");
+ 		
+        final com.extjs.gxt.ui.client.widget.button.Button button = dialog.getButtonById(Dialog.OK);
+        final com.extjs.gxt.ui.client.widget.button.Button cancelButton = dialog.getButtonById(Dialog.CANCEL);
+        cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				//if the user cancels, then go straight to the submit entity dialog
+				dialog.hide();
+				presenter.submissionUserGuideSkipped();
+			}
+        });
+        button.addSelectionListener(new SelectionListener<ButtonEvent>(){
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				dialog.removeAll();
+				dialog.add(wrap(step2.asWidget()));
+				dialog.setHeading("Step 2: Upload Your Work");
+				dialog.layout(true);
+				button.removeAllListeners();
+				button.addSelectionListener(new SelectionListener<ButtonEvent>(){
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						dialog.removeAll();
+						dialog.add(wrap(step3.asWidget()));
+						dialog.setHeading("Step 3: Submit an Entry For Scoring");
+						button.removeAllListeners();
+						button.setText("OK");
+						dialog.layout(true);
+						button.addSelectionListener(new SelectionListener<ButtonEvent>(){
+							@Override
+							public void componentSelected(ButtonEvent ce) {
+								dialog.hide();
+							}
+				        });
+					}
+		        });
+		        
+			}
+        });
+		dialog.show();		
+	}
+	
+	public Widget wrap(Widget widget) {
+		widget.addStyleName("margin-10");
+		return widget;
+	}
+	
 	/*
 	 * Private Methods
 	 */

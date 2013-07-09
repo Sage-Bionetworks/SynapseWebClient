@@ -1615,6 +1615,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
+	public Boolean hasSubmitted() throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			//get all evaluations for which the user has joined as a participant
+			PaginatedResults<Evaluation> evaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			for (Evaluation evaluation : evaluations.getResults()) {
+				//return true if any of these have a submission
+				PaginatedResults<Submission> res = synapseClient.getMySubmissions(evaluation.getId(), 0, 0);
+				if (res.getTotalNumberOfResults() > 0) {
+					return true;
+				}
+			}
+			return false;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
 	public String getSynapseVersions() throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {			

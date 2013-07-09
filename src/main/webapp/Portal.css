@@ -463,6 +463,10 @@ a.shortBtn {
 	vertical-align: middle;
 }
 
+.margin-10 {
+	margin: 10px;
+}
+
 .margin-top-left-10 {
 	margin-top: 10px;
 	margin-left: 10px;
