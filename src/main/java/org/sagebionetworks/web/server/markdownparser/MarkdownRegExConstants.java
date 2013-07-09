@@ -86,6 +86,24 @@ public class MarkdownRegExConstants {
 	
 	/**
 	 * Recognized example input:
+	 * -striked out text-
+	 */
+	public static final String STRIKE_OUT_REGEX = "-(?=\\S)(.+?)(?<=\\S)-";
+	
+	/**
+	 * Recognized example input:
+	 * ~sub~ is a subscript
+	 */
+	public static final String SUBSCRIPT_REGEX = "~(?=\\S)(.+?)(?<=\\S)~";
+	
+	/**
+	 * Recognized example input:
+	 * ^sup^ is a superscript
+	 */
+	public static final String SUPERSCRIPT_REGEX = "(\\^)(?=\\S)(.+?)(?<=\\S)(\\^)";
+	
+	/**
+	 * Recognized example input:
 	 * * First Item
 	 */
 	public static final String UNORDERED_LIST_REGEX = "(^[>]*)(\\s*)((?:[-+*]))(.+)";
