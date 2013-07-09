@@ -548,6 +548,7 @@ a.shortBtn {
 	padding-left: 17px;
 }
 .markdown strong { font-weight: bold; }
+.markdown del { text-decoration: line-through; }
 .markdown em { font-style: italic; }
 .markdown a, a:hover, a:visited {}
 .markdown blockquote {
@@ -928,4 +929,8 @@ ol.lowerroman {
 
 .not-highlighted-version {
 	color: #d3d3d3 !important;
+}
+
+.strikeout {
+	text-decoration: line-through;	
 }
