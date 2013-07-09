@@ -192,18 +192,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			}
 		});
 	}
-	@Override
-	public void isSubmitButtonVisible() {
-		getAvailableEvaluations(new EvaluationsCallback() {
-			@Override
-			public void onSuccess(final List<Evaluation> evaluations) {
-				if (evaluations.size() > 0) {
-					view.showSubmitToChallengeButton();
-				}
-			}
-		});
-		
-	}
 	
 	public void getAvailableEvaluations(final EvaluationsCallback callback) {
 		try {

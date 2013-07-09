@@ -8,8 +8,6 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -57,7 +55,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -73,8 +70,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private EntityFinder entityFinder;
 	private EvaluationList evaluationList;
 	private Long versionNumber;
-	private Button submitButton;
-	private SimplePanel submitButtonPanel;
 	private Button editButton;
 	private Button shareButton;
 	private Button toolsButton;
@@ -150,31 +145,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
 		}	
 		
-		if(submitButton == null) {
-			submitButtonPanel = new SimplePanel();
-			submitButton = new Button(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION, AbstractImagePrototype.create(iconsImageBundle.synapseStep16()));
-			submitButton.setId(DisplayConstants.ID_BTN_SUBMIT_TO_EVALUATION);
-			submitButton.setHeight(25);
-			submitButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					//ask the presenter to query for all available evaluations, and it may call the view back for the user to select evaluation(s) to submit to
-					presenter.showAvailableEvaluations();
-				}
-			});
-			submitButtonPanel.addStyleName("floatright margin-left-5");
-			this.add(submitButtonPanel);
-			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
-		}
-		
-		submitButtonPanel.clear();
-		if (canEdit && entity instanceof Versionable) {
-			//kick off the query (asynchronously) to determine if the current user is signed up for any challenges
-			//will call back to the view to set submit button visibility
-			presenter.isSubmitButtonVisible();
-		}
-		
 		if (canEdit) editButton.enable();
 		else editButton.disable();
 		configureEditButton(entity, entityType);	
@@ -190,11 +160,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		configureDeleteButton(entityType);
 		
 		configureToolsMenu(entityBundle, entityType, isAdministrator, canEdit);
-	}
-	
-	@Override
-	public void showSubmitToChallengeButton() {
-		submitButtonPanel.add(submitButton);
 	}
 	
 	@Override
@@ -342,6 +307,10 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		if(canEdit) {
 			addUploadItem(menu, entityBundle, entityType);
 		}
+		
+		if (canEdit && entity instanceof Versionable) {
+			addSubmitToEvaluationItem(menu, entity, entityType);
+		} 
 		
 		// create link
 		if(authenticated) {
