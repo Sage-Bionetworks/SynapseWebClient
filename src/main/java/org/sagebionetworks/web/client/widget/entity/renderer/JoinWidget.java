@@ -288,7 +288,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 		showSubmissionDialog();
 	}
 	
-	private void showSubmissionDialog() {
+	public void showSubmissionDialog() {
 		List<String> evaluationIdsList = new ArrayList<String>();
 		for (int i = 0; i < evaluationIds.length; i++) {
 			evaluationIdsList.add(evaluationIds[i]);
