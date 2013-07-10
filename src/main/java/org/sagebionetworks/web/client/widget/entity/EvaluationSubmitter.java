@@ -149,7 +149,7 @@ public class EvaluationSubmitter implements Presenter {
 		final Long ver = version;
 		
 		//look up entity for the current etag
-		synapseClient.getEntity(selectedReference.getTargetId(), new AsyncCallback<EntityWrapper>() {
+		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
 			public void onSuccess(EntityWrapper result) {
 				Entity entity;
 				try {

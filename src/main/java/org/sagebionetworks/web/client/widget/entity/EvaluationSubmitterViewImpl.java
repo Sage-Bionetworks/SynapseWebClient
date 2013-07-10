@@ -13,7 +13,6 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
@@ -31,6 +30,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private ComboBox<ComboValue> submitterCombo;
 	private EntityFinder entityFinder;
 	private Dialog window;
+	private boolean showEntityFinder;
 	
 	@Inject
 	public EvaluationSubmitterViewImpl(EntityFinder entityFinder, EvaluationList evaluationList, SageImageBundle sageImageBundle) {
@@ -38,17 +38,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		this.evaluationList = evaluationList;
 		this.sageImageBundle = sageImageBundle;
 		
-		window = new Dialog();
-        window.setMaximizable(false);
-        
-        window.setPlain(true); 
-        window.setModal(true); 
-        
-        window.setHeading(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION); 
-        window.setButtons(Dialog.OKCANCEL);
-        window.setHideOnButtonClick(false);
-
-        window.setLayout(new FitLayout());
+		initializeWindow();
 	}
 	
 	@Override
@@ -59,9 +49,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void showLoading() {
 		window.removeAll();
+		window.setSize(200, 100);
 		window.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, "Loading Submission Options")));
 		window.layout(true);
-		window.setSize(200, 100);
 		window.show();
 	}
 	
@@ -80,43 +70,11 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	
 	@Override
-	public void popupSelector(final boolean showEntityFinder, List<Evaluation> evaluations, List<String> submitterAliases) {
+	public void popupSelector(boolean showEntityFinder, List<Evaluation> evaluations, List<String> submitterAliases) {
 		window.removeAll();
         evaluationList.configure(evaluations);
         submitterCombo = getSubmitterAliasComboBox(submitterAliases);
-        //ok button submits if valid
-        Button okButton = window.getButtonById(Dialog.OK);	    
-        okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				if (submitterCombo.isValid()) {
-					Reference selectedReference = null;
-					if (showEntityFinder) {
-						//validate that an entity was selected
-						selectedReference = entityFinder.getSelectedEntity();
-						if (selectedReference == null) {
-							//invalid, return.
-							showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
-							return;
-						}
-					}
-					window.hide();
-					presenter.submitToEvaluations(selectedReference, evaluationList.getSelectedEvaluationIds(), submitterCombo.getRawValue());
-				} else {
-					showErrorMessage(submitterCombo.getErrorMessage());
-				}
-					
-			}
-	    });
-        
-        //cancel button simply hides
-        Button cancelButton = window.getButtonById(Dialog.CANCEL);	    
-	    cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.hide();
-			}
-	    });
+        this.showEntityFinder = showEntityFinder;
 	    
         FlowPanel panel = new FlowPanel();
         if (showEntityFinder) {
@@ -139,6 +97,53 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         window.center();
 	}
 	
+	
+	public void initializeWindow() {
+		window = new Dialog();
+        window.setMaximizable(false);
+        
+        window.setPlain(true); 
+        window.setModal(true); 
+        
+        window.setHeading(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION); 
+        window.setButtons(Dialog.OKCANCEL);
+        window.setHideOnButtonClick(false);
+
+        window.setLayout(new FitLayout());
+        
+        //ok button submits if valid
+        Button okButton = window.getButtonById(Dialog.OK);  
+        okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				if (submitterCombo.isValid()) {
+					Reference selectedReference = null;
+					if (showEntityFinder) {
+						//validate that an entity was selected
+						selectedReference = entityFinder.getSelectedEntity();
+						if (selectedReference == null) {
+							//invalid, return.
+							showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
+							return;
+						}
+					}
+					window.hide();
+					presenter.submitToEvaluations(selectedReference, evaluationList.getSelectedEvaluationIds(), submitterCombo.getRawValue());
+				} else {
+					showErrorMessage(submitterCombo.getErrorMessage());
+				}
+			}
+	    });
+        
+        //cancel button simply hides
+        Button cancelButton = window.getButtonById(Dialog.CANCEL);	    
+	    cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+	    });
+	}
 	public ComboBox<ComboValue> getSubmitterAliasComboBox(List<String> submitterAliases) {
 		// build the list store from the enum
 		ListStore<ComboValue> store = new ListStore<ComboValue>();
