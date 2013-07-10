@@ -8,6 +8,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -267,6 +269,41 @@ public class ProvenanceWidgetTest {
 		verifySuccessGraphStructure(graph);
 	}
 		
+	@Test
+	public void testFindOldVersions() throws Exception {
+		// create graph
+		provenanceWidget.configure(null, descriptor);	
+		ProvGraph graph = verifyBuildGraphCalls();					
+		
+		reset(mockSynapseClient);
+		reset(mockNodeModelCreator);
+		
+		// current version of each reference
+		EntityHeader header123 = new EntityHeader();
+		header123.setId(outputEntity.getId());
+		header123.setVersionNumber(outputEntity.getVersionNumber());
+		EntityHeader header456 = new EntityHeader();
+		header456.setId(entity456Id);
+		header456.setVersionNumber(2L); // v2 is newer than in Before method
+		BatchResults<EntityHeader> currentVersionBatch = new BatchResults<EntityHeader>();
+		currentVersionBatch.setResults(new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header456, header123 })));		
+		String currentVersionsBatchJSON = referenceHeaders.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		
+		// new mocks for batch call
+		AsyncMockStubber.callSuccessWith(currentVersionsBatchJSON).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));		
+		Mockito.<BatchResults<?>>when(mockNodeModelCreator.createBatchResults(anyString(), eq(EntityHeader.class))).thenReturn((BatchResults<EntityHeader>)currentVersionBatch);
+
+		provenanceWidget.findOldVersions();
+		
+		@SuppressWarnings("rawtypes")
+		ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);		
+		verify(mockView).markOldVersions(argument.capture());		
+		@SuppressWarnings("unchecked")
+		List<String> oldVersions = (List<String>)argument.getValue();
+		
+		assertEquals(1, oldVersions.size());		
+	}
+
 
 	/*
 	 * Private Methods
