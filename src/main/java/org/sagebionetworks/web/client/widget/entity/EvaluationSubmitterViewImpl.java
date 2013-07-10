@@ -1,0 +1,166 @@
+package org.sagebionetworks.web.client.widget.entity;
+
+import java.util.List;
+
+import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.widget.Dialog;
+import com.extjs.gxt.ui.client.widget.Window;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.ComboBox;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.inject.Inject;
+
+public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
+	
+	private Presenter presenter;
+	private EvaluationList evaluationList;
+	private SageImageBundle sageImageBundle;
+	private ComboBox<ComboValue> submitterCombo;
+	private EntityFinder entityFinder;
+	private Dialog window;
+	
+	@Inject
+	public EvaluationSubmitterViewImpl(EntityFinder entityFinder, EvaluationList evaluationList, SageImageBundle sageImageBundle) {
+		this.entityFinder = entityFinder;
+		this.evaluationList = evaluationList;
+		this.sageImageBundle = sageImageBundle;
+		
+		window = new Dialog();
+        window.setMaximizable(false);
+        
+        window.setPlain(true); 
+        window.setModal(true); 
+        
+        window.setHeading(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION); 
+        window.setButtons(Dialog.OKCANCEL);
+        window.setHideOnButtonClick(false);
+
+        window.setLayout(new FitLayout());
+	}
+	
+	@Override
+	public void setPresenter(Presenter p) {
+		presenter = p;
+	}
+
+	@Override
+	public void showLoading() {
+		window.removeAll();
+		window.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, "Loading Submission Options")));
+		window.layout(true);
+		window.setSize(200, 100);
+		window.show();
+	}
+	
+	@Override
+	public void clear() {
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+	
+	@Override
+	public void popupSelector(final boolean showEntityFinder, List<Evaluation> evaluations, List<String> submitterAliases) {
+		window.removeAll();
+        evaluationList.configure(evaluations);
+        submitterCombo = getSubmitterAliasComboBox(submitterAliases);
+        //ok button submits if valid
+        Button okButton = window.getButtonById(Dialog.OK);	    
+        okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				if (submitterCombo.isValid()) {
+					Reference selectedReference = null;
+					if (showEntityFinder) {
+						//validate that an entity was selected
+						selectedReference = entityFinder.getSelectedEntity();
+						if (selectedReference == null) {
+							//invalid, return.
+							showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
+							return;
+						}
+					}
+					window.hide();
+					presenter.submitToEvaluations(selectedReference, evaluationList.getSelectedEvaluationIds(), submitterCombo.getRawValue());
+				} else {
+					showErrorMessage(submitterCombo.getErrorMessage());
+				}
+					
+			}
+	    });
+        
+        //cancel button simply hides
+        Button cancelButton = window.getButtonById(Dialog.CANCEL);	    
+	    cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+	    });
+	    
+        FlowPanel panel = new FlowPanel();
+        if (showEntityFinder) {
+        	panel.add(new HTML("<h6 class=\"margin-top-left-10\">Select the Entity that you would like to submit:</h6>"));
+        	entityFinder.configure(true);
+        	SimplePanel wrapper = new SimplePanel(entityFinder.asWidget());
+        	panel.add(wrapper);
+        	entityFinder.refresh();
+        	window.setSize(entityFinder.getViewWidth(),entityFinder.getViewHeight() + 200);
+        }
+        else {
+        	window.setSize(480,280);
+        }
+        panel.add(new HTML("<h6 class=\"margin-top-left-10\">Select the Evaluations below that you would like to submit to:</h6>"));
+        panel.add(evaluationList.asWidget());
+        panel.add(new HTML("<h6 class=\"margin-top-left-10\">Set "+DisplayConstants.SUBMITTER_ALIAS+" to be shown in the public leaderboard:</h6>"));
+        panel.add(submitterCombo);
+        window.add(panel);
+        window.layout(true);
+        window.center();
+	}
+	
+	public ComboBox<ComboValue> getSubmitterAliasComboBox(List<String> submitterAliases) {
+		// build the list store from the enum
+		ListStore<ComboValue> store = new ListStore<ComboValue>();
+		for (String value : submitterAliases) {
+			ComboValue comboValue = new ComboValue(value);
+			store.add(comboValue);
+		}
+		final ComboBox<ComboValue> combo = new ComboBox<ComboValue>();
+		combo.setDisplayField(ComboValue.VALUE_KEY);
+		combo.setWidth(400);
+		combo.addStyleName("margin-left-10");
+		combo.getMessages().setBlankText("Please set " + DisplayConstants.SUBMITTER_ALIAS);
+		combo.setStore(store);
+		combo.setEditable(true);
+		combo.setEmptyText("Set "+DisplayConstants.SUBMITTER_ALIAS+"...");
+		combo.setAllowBlank(false);
+		if(store.getCount() > 0)
+			combo.setValue(store.getAt(0));
+		combo.setTriggerAction(TriggerAction.ALL);
+		return combo;
+	}
+	
+		
+
+}

@@ -1477,6 +1477,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public String getEvaluations(List<String> evaluationIds) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			List<Evaluation> evalList = new ArrayList<Evaluation>();
+			for (String evalId : evaluationIds) {
+				evalList.add(synapseClient.getEvaluation(evalId));
+			}
+			PaginatedResults<Evaluation> results = new PaginatedResults<Evaluation>();
+			results.setResults(evalList);
+			results.setTotalNumberOfResults(evalList.size());
+			JSONObjectAdapter evaluationsJson = results.writeToJSONObject(adapterFactory.createNew());
+			return evaluationsJson.toJSONString();
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	
+	@Override
 	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {

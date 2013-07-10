@@ -120,10 +120,9 @@ public class ServerMarkdownUtils {
 		String newMarkdown = markdown;
 		if (!markdown.contains(subpagesMarkdown)) {
 			String noAutoWikiSubpages = SharedMarkdownUtils.getNoAutoWikiSubpagesMarkdown();
-			int indexOfFlag = markdown.indexOf(noAutoWikiSubpages);
-			if (indexOfFlag > -1) {
+			if (markdown.contains(noAutoWikiSubpages)) {
 				//found.  delete this string, and do not include subpages markdown
-				newMarkdown = markdown.substring(0, indexOfFlag) + markdown.substring(indexOfFlag + noAutoWikiSubpages.length());
+				newMarkdown = markdown.replace(noAutoWikiSubpages, "");
 			}
 			else {
 				newMarkdown = subpagesMarkdown + "\n"+ markdown;	

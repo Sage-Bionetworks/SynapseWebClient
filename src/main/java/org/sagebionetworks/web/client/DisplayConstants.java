@@ -239,6 +239,7 @@ public class DisplayConstants {
 	public static final String ERROR_ENTITY_CANT_LINKS = "Sorry, the requested entity can not contain links.";
 	public static final String ERROR_ENTITY_CREATION = "Sorry, creation failed. Please try again.";
 	public static final String ERROR_ENTITY_PROMOTE_FAILURE = "Sorry, promoting the entity failed.";
+	public static final String NO_ENTITY_SELECTED = "Please select an entity and try again.";
 	public static final String LABEL_SUCCESS = "Success";
 	public static final String LABEL_PROMOTED = " was promoted to top.";
 	public static final String TEXT_LINK_SAVED = "Link saved.";

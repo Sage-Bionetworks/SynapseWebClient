@@ -160,6 +160,7 @@ public interface SynapseClientAsync {
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
+	void getEvaluations(List<String> evaluationIds, AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluationEntities(AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluationEntitiesList(AsyncCallback<ArrayList<String>> callback) throws RestServiceException;

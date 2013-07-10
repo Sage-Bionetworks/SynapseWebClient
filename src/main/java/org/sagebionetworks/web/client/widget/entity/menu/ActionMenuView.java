@@ -37,8 +37,6 @@ public interface ActionMenuView extends IsWidget, SynapseView {
 			Long versionNumber, 
 			boolean isInTestMode);
 	
-	void popupEvaluationSelector(List<Evaluation> list, List<String> submitterAliases);
-	
 	/**
 	 * Presenter interface
 	 */
@@ -65,8 +63,6 @@ public interface ActionMenuView extends IsWidget, SynapseView {
 		void createLink(String selectedEntityId);
 
 		void uploadToGenomespace();
-		
-		void submitToEvaluations(List<String> evaluationIds, String submitterAlias);
 		
 		void showAvailableEvaluations();
 	}
