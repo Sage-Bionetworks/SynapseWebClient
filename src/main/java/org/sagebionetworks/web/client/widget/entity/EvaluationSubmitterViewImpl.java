@@ -120,7 +120,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         else {
         	window.setSize(DEFAULT_DIALOG_WIDTH,DEFAULT_DIALOG_HEIGHT);
         }
-        panel.add(new HTML("<h6 class=\"margin-top-10\">Select the evaluation(s) below that you would like to submit to:</h6>"));
+        panel.add(new HTML("<h6 class=\"margin-top-10\">Select the challenge(s) below that you would like to submit to:</h6>"));
         panel.add(evaluationList.asWidget());
         panel.add(new HTML("<h6 class=\"margin-top-10\">Set "+DisplayConstants.SUBMITTER_ALIAS+" to be shown in the public leaderboard:</h6>"));
         panel.add(submitterCombo);
