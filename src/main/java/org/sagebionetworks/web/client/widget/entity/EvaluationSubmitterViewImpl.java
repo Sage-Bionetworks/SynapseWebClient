@@ -6,17 +6,22 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Dialog;
+import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -29,17 +34,20 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private Presenter presenter;
 	private EvaluationList evaluationList;
 	private SageImageBundle sageImageBundle;
+	private  IconsImageBundle iconsImageBundle;
 	private ComboBox<ComboValue> submitterCombo;
 	private EntityFinder entityFinder;
 	private Dialog window;
 	private boolean showEntityFinder;
+	private Reference selectedReference;
+	private HTML selectedText;
 	
 	@Inject
-	public EvaluationSubmitterViewImpl(EntityFinder entityFinder, EvaluationList evaluationList, SageImageBundle sageImageBundle) {
+	public EvaluationSubmitterViewImpl(EntityFinder entityFinder, EvaluationList evaluationList, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
 		this.entityFinder = entityFinder;
 		this.evaluationList = evaluationList;
 		this.sageImageBundle = sageImageBundle;
-		
+		this.iconsImageBundle = iconsImageBundle;
 		initializeWindow();
 	}
 	
@@ -73,25 +81,48 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void popupSelector(boolean showEntityFinder, List<Evaluation> evaluations, List<String> submitterAliases) {
 		window.removeAll();
+		selectedReference = null;
         evaluationList.configure(evaluations);
         submitterCombo = getSubmitterAliasComboBox(submitterAliases);
         this.showEntityFinder = showEntityFinder;
 	    
         FlowPanel panel = new FlowPanel();
+        panel.addStyleName("margin-left-10");
         if (showEntityFinder) {
-        	panel.add(new HTML("<h6 class=\"margin-top-left-10\">Select the Entity that you would like to submit:</h6>"));
-        	entityFinder.configure(true);
-        	SimplePanel wrapper = new SimplePanel(entityFinder.asWidget());
-        	panel.add(wrapper);
-        	entityFinder.refresh();
-        	window.setSize(entityFinder.getViewWidth(),entityFinder.getViewHeight() + 200);
+        	panel.add(new HTML("<h6 class=\"margin-top-10\">Select the Entity that you would like to submit:</h6>"));
+        	Button findEntityButton = new Button(DisplayConstants.FIND_ENTITY, AbstractImagePrototype.create(iconsImageBundle.magnify16()));
+    		findEntityButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
+    			@Override
+    			public void componentSelected(ButtonEvent ce) {
+    				entityFinder.configure(true);				
+    				final Window window = new Window();
+    				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+    					@Override
+    					public void onSelected(Reference selected) {
+    						if(selected.getTargetId() != null) {					
+    							selectedReference = selected;
+    							selectedText.setHTML("&nbsp<h7>" + DisplayUtils.createEntityVersionString(selected) + "</h7>");
+    							window.hide();
+    						} else {
+    							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+    						}
+    					}
+    				});
+    			}
+    		});
+    		HorizontalPanel findEntityHorizintalPanel = new HorizontalPanel();
+    		findEntityHorizintalPanel.add(findEntityButton);
+        	selectedText = new HTML("");
+        	findEntityHorizintalPanel.add(selectedText);
+        	panel.add(findEntityHorizintalPanel);
+        	window.setSize(DEFAULT_DIALOG_WIDTH,DEFAULT_DIALOG_HEIGHT + 70);
         }
         else {
         	window.setSize(DEFAULT_DIALOG_WIDTH,DEFAULT_DIALOG_HEIGHT);
         }
-        panel.add(new HTML("<h6 class=\"margin-top-left-10\">Select the evaluation(s) below that you would like to submit to:</h6>"));
+        panel.add(new HTML("<h6 class=\"margin-top-10\">Select the evaluation(s) below that you would like to submit to:</h6>"));
         panel.add(evaluationList.asWidget());
-        panel.add(new HTML("<h6 class=\"margin-top-left-10\">Set "+DisplayConstants.SUBMITTER_ALIAS+" to be shown in the public leaderboard:</h6>"));
+        panel.add(new HTML("<h6 class=\"margin-top-10\">Set "+DisplayConstants.SUBMITTER_ALIAS+" to be shown in the public leaderboard:</h6>"));
         panel.add(submitterCombo);
         window.add(panel);
         window.layout(true);
@@ -120,10 +151,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 				List<String> evaluationIds = evaluationList.getSelectedEvaluationIds();
 				if (evaluationIds.size() > 0) {
 					if (submitterCombo.isValid()) {
-						Reference selectedReference = null;
 						if (showEntityFinder) {
-							//validate that an entity was selected
-							selectedReference = entityFinder.getSelectedEntity();
 							if (selectedReference == null || selectedReference.getTargetId() == null) {
 								//invalid, return.
 								showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
@@ -160,7 +188,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		final ComboBox<ComboValue> combo = new ComboBox<ComboValue>();
 		combo.setDisplayField(ComboValue.VALUE_KEY);
 		combo.setWidth(400);
-		combo.addStyleName("margin-left-10");
 		combo.getMessages().setBlankText("Please set " + DisplayConstants.SUBMITTER_ALIAS);
 		combo.setStore(store);
 		combo.setEditable(true);
