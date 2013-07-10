@@ -2,13 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -33,20 +32,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetView {
-
-	public static final String SUBMISSION_GUIDE_STEP_3_PAGE_ID = "56913";
-	public static final String SUBMISSION_GUIDE_STEP_2_PAGE_ID = "56912";
-	public static final String SUBMISSION_GUIDE_STEP_1_PAGE_ID = "56911";
 	public static final String SUBMISSION_GUIDE_ID = "syn1968135";
 	private Presenter presenter;
 	private ProfileFormWidget profileForm;
-	private MarkdownWidget step1, step2, step3;
+	private TutorialWizard tutorialWizard;
 	@Inject
-	public JoinWidgetViewImpl(ProfileFormWidget profileForm, MarkdownWidget step1,  MarkdownWidget step2,  MarkdownWidget step3) {
+	public JoinWidgetViewImpl(ProfileFormWidget profileForm, TutorialWizard tutorialWizard) {
 		this.profileForm = profileForm;
-		this.step1 = step1;
-		this.step2 = step2;
-		this.step3 = step3;
+		this.tutorialWizard = tutorialWizard;
 	}
 	
 	@Override
@@ -223,68 +216,18 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 
 	@Override
 	public void showSubmissionUserGuide() {
-		WikiPageKey wikiKey = new WikiPageKey(SUBMISSION_GUIDE_ID, ObjectType.ENTITY.toString(), SUBMISSION_GUIDE_STEP_1_PAGE_ID);
-		step1.loadMarkdownFromWikiPage(wikiKey, true);
-		
-		wikiKey = new WikiPageKey(SUBMISSION_GUIDE_ID, ObjectType.ENTITY.toString(), SUBMISSION_GUIDE_STEP_2_PAGE_ID);
-		step2.loadMarkdownFromWikiPage(wikiKey, true);
-		
-		wikiKey = new WikiPageKey(SUBMISSION_GUIDE_ID, ObjectType.ENTITY.toString(), SUBMISSION_GUIDE_STEP_3_PAGE_ID);
-		step3.loadMarkdownFromWikiPage(wikiKey, true);
-		
-		final Dialog dialog = new Dialog();
-       	dialog.setMaximizable(false);
-        dialog.setPlain(true); 
-        dialog.setModal(true);
-        dialog.setWidth(900);
-        //dialog.setAutoWidth(true);
-        dialog.setAutoHeight(true);
-        dialog.setResizable(false);
-        dialog.okText = "Next";
-        dialog.cancelText = "Skip Tutorial";
-        dialog.setButtons(Dialog.OKCANCEL);
-        dialog.add(wrap(step1.asWidget()));
- 		dialog.setHeading("Step 1: Create a Project");
- 		
-        final com.extjs.gxt.ui.client.widget.button.Button button = dialog.getButtonById(Dialog.OK);
-        final com.extjs.gxt.ui.client.widget.button.Button cancelButton = dialog.getButtonById(Dialog.CANCEL);
-        cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+		tutorialWizard.configure(SUBMISSION_GUIDE_ID, new TutorialWizard.Callback() {
+			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
-				//if the user cancels, then go straight to the submit entity dialog
-				dialog.hide();
+			public void tutorialSkipped() {
 				presenter.submissionUserGuideSkipped();
 			}
-        });
-        button.addSelectionListener(new SelectionListener<ButtonEvent>(){
+			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
-				dialog.removeAll();
-				dialog.add(wrap(step2.asWidget()));
-				dialog.setHeading("Step 2: Upload Your Work");
-				dialog.layout(true);
-				button.removeAllListeners();
-				button.addSelectionListener(new SelectionListener<ButtonEvent>(){
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						dialog.removeAll();
-						dialog.add(wrap(step3.asWidget()));
-						dialog.setHeading("Step 3: Submit an Entry For Scoring");
-						button.removeAllListeners();
-						button.setText("OK");
-						dialog.layout(true);
-						button.addSelectionListener(new SelectionListener<ButtonEvent>(){
-							@Override
-							public void componentSelected(ButtonEvent ce) {
-								dialog.hide();
-							}
-				        });
-					}
-		        });
-		        
+			public void tutorialFinished() {
+				//do nothing
 			}
-        });
-		dialog.show();		
+		});
 	}
 	
 	public Widget wrap(Widget widget) {

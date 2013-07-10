@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
@@ -106,7 +107,8 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public JiraURLHelper getJiraURLHelper();
 		
-
+	public MarkdownWidget getMarkdownWidget();
+	
 	/*
 	 *  Markdown Widgets
 	 */
