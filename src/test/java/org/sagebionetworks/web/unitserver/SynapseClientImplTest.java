@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -821,9 +818,42 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetAvailableEvaluationEntities() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		//when asking for available evaluations, return two (subchallenges) that share the same contentSource (sharedEntityId)
+	public void testGetEvaluations() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		when(mockSynapse.getEvaluation(anyString())).thenReturn(new Evaluation());
+		List<String> evaluationIds = new ArrayList<String>();
+		evaluationIds.add("1");
+		evaluationIds.add("2");
+		String evaluationsJson = synapseClient.getEvaluations(evaluationIds);
+		
+		verify(mockSynapse, Mockito.times(2)).getEvaluation(anyString());
+		
+		org.sagebionetworks.web.shared.PaginatedResults<Evaluation> evaluationObjectList = 
+				nodeModelCreator.createPaginatedResults(evaluationsJson, Evaluation.class);
+		assertEquals(2, evaluationObjectList.getTotalNumberOfResults());
+		assertEquals(2, evaluationObjectList.getResults().size());
+	}
+
+	
+	@Test
+	public void testHasSubmitted() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
 		String sharedEntityId = "syn123455";
+		setupGetAvailableEvaluations(sharedEntityId);
+		
+		PaginatedResults<Submission> submissions = new PaginatedResults<Submission>();
+		//verify when all empty, hasSubmitted returns false
+		when(mockSynapse.getMySubmissions(anyString(), anyLong(), anyLong())).thenReturn(submissions);
+		assertFalse(synapseClient.hasSubmitted());
+		
+		//verify when there is a submission, it returns true
+		submissions.setTotalNumberOfResults(1);
+		List<Submission> submissionList = new ArrayList<Submission>();
+		submissionList.add(new Submission());
+		submissions.setResults(submissionList);
+		assertTrue(synapseClient.hasSubmitted());
+	}
+	
+	public void setupGetAvailableEvaluations(String sharedEntityId) throws SynapseException {
+		
 		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		Evaluation e = new Evaluation();
@@ -837,6 +867,13 @@ public class SynapseClientImplTest {
 		testResults.setTotalNumberOfResults(2);
 		testResults.setResults(evaluationList);
 		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(testResults);
+	}
+	
+	@Test
+	public void testGetAvailableEvaluationEntities() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		//when asking for available evaluations, return two (subchallenges) that share the same contentSource (sharedEntityId)
+		String sharedEntityId = "syn123455";
+		setupGetAvailableEvaluations(sharedEntityId);
 		
 		//when asking for entity headers, return a single entity header
 		BatchResults<EntityHeader> batchResults = new BatchResults<EntityHeader>();
