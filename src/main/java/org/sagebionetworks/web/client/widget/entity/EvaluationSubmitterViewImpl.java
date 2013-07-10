@@ -24,6 +24,8 @@ import com.google.inject.Inject;
 
 public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
+	public static final int DEFAULT_DIALOG_HEIGHT = 280;
+	public static final int DEFAULT_DIALOG_WIDTH = 480;
 	private Presenter presenter;
 	private EvaluationList evaluationList;
 	private SageImageBundle sageImageBundle;
@@ -49,9 +51,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void showLoading() {
 		window.removeAll();
-		window.setSize(200, 100);
-		window.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, "Loading Submission Options")));
-		window.layout(true);
+		window.setSize(DEFAULT_DIALOG_WIDTH, DEFAULT_DIALOG_HEIGHT);
+		window.add(DisplayUtils.createFullWidthLoadingPanel(sageImageBundle, "Loading Submission Options..."));
 		window.show();
 	}
 	
@@ -86,9 +87,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         	window.setSize(entityFinder.getViewWidth(),entityFinder.getViewHeight() + 200);
         }
         else {
-        	window.setSize(480,280);
+        	window.setSize(DEFAULT_DIALOG_WIDTH,DEFAULT_DIALOG_HEIGHT);
         }
-        panel.add(new HTML("<h6 class=\"margin-top-left-10\">Select the Evaluations below that you would like to submit to:</h6>"));
+        panel.add(new HTML("<h6 class=\"margin-top-left-10\">Select the evaluation(s) below that you would like to submit to:</h6>"));
         panel.add(evaluationList.asWidget());
         panel.add(new HTML("<h6 class=\"margin-top-left-10\">Set "+DisplayConstants.SUBMITTER_ALIAS+" to be shown in the public leaderboard:</h6>"));
         panel.add(submitterCombo);
@@ -116,21 +117,26 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				if (submitterCombo.isValid()) {
-					Reference selectedReference = null;
-					if (showEntityFinder) {
-						//validate that an entity was selected
-						selectedReference = entityFinder.getSelectedEntity();
-						if (selectedReference == null) {
-							//invalid, return.
-							showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
-							return;
+				List<String> evaluationIds = evaluationList.getSelectedEvaluationIds();
+				if (evaluationIds.size() > 0) {
+					if (submitterCombo.isValid()) {
+						Reference selectedReference = null;
+						if (showEntityFinder) {
+							//validate that an entity was selected
+							selectedReference = entityFinder.getSelectedEntity();
+							if (selectedReference == null || selectedReference.getTargetId() == null) {
+								//invalid, return.
+								showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
+								return;
+							}
 						}
+						window.hide();
+						presenter.submitToEvaluations(selectedReference, evaluationIds, submitterCombo.getRawValue());
+					} else {
+						showErrorMessage(submitterCombo.getErrorMessage());
 					}
-					window.hide();
-					presenter.submitToEvaluations(selectedReference, evaluationList.getSelectedEvaluationIds(), submitterCombo.getRawValue());
 				} else {
-					showErrorMessage(submitterCombo.getErrorMessage());
+					showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
 				}
 			}
 	    });

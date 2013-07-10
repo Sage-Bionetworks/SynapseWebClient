@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -35,14 +34,10 @@ import com.google.inject.Inject;
 
 public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetView {
 
-//	public static final String SUBMISSION_GUIDE_STEP_3_PAGE_ID = "56913";
-//	public static final String SUBMISSION_GUIDE_STEP_2_PAGE_ID = "56912";
-//	public static final String SUBMISSION_GUIDE_STEP_1_PAGE_ID = "56911";
-//	public static final String SUBMISSION_GUIDE_ID = "syn1968135";
-	public static final String SUBMISSION_GUIDE_STEP_3_PAGE_ID = "19";
-	public static final String SUBMISSION_GUIDE_STEP_2_PAGE_ID = "18";
-	public static final String SUBMISSION_GUIDE_STEP_1_PAGE_ID = "17";
-	public static final String SUBMISSION_GUIDE_ID = "syn1681367";
+	public static final String SUBMISSION_GUIDE_STEP_3_PAGE_ID = "56913";
+	public static final String SUBMISSION_GUIDE_STEP_2_PAGE_ID = "56912";
+	public static final String SUBMISSION_GUIDE_STEP_1_PAGE_ID = "56911";
+	public static final String SUBMISSION_GUIDE_ID = "syn1968135";
 	private Presenter presenter;
 	private ProfileFormWidget profileForm;
 	private MarkdownWidget step1, step2, step3;

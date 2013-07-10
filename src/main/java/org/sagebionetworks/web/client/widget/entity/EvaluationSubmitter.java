@@ -154,7 +154,8 @@ public class EvaluationSubmitter implements Presenter {
 				Entity entity;
 				try {
 					entity = nodeModelCreator.createEntity(result);
-					submitToEvaluations(id, ver, entity.getEtag(), evaluationIds, submitterAlias);
+					Long v = ver != null ? ver : ((Versionable)entity).getVersionNumber();
+					submitToEvaluations(id, v, entity.getEtag(), evaluationIds, submitterAlias);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
