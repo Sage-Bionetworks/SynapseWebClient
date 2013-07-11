@@ -48,6 +48,8 @@ public class WidgetConstants {
 	public static final String TOC_CONTENT_TYPE = "toc";
 	public static final String WIKI_SUBPAGES_CONTENT_TYPE = "wikipages";
 	
+	public static final String NO_AUTO_WIKI_SUBPAGES = "nowikipages";
+	
 	public static final String WIKI_FILES_PREVIEW_CONTENT_TYPE = "wikifilepreview";
 	
 	/**
@@ -93,6 +95,7 @@ public class WidgetConstants {
 	
 	public static final String BUTTON_LINK_URL_KEY = "url";
 	public static final String BUTTON_LINK_TEXT_KEY = "text";
+	
 	/**
 	 * API Table Column Renderers
 	 */

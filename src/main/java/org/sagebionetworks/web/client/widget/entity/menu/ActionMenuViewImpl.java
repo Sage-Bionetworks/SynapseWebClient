@@ -1,15 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
-import java.util.List;
-
-import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -26,7 +21,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
-import org.sagebionetworks.web.client.widget.entity.ComboValue;
 import org.sagebionetworks.web.client.widget.entity.EvaluationList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
@@ -41,13 +35,10 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.ComboBox;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
@@ -56,8 +47,6 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -71,17 +60,14 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private EntityTypeProvider typeProvider;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityFinder entityFinder;
-	private EvaluationList evaluationList;
+	
 	private Long versionNumber;
-	private Button submitButton;
-	private SimplePanel submitButtonPanel;
 	private Button editButton;
 	private Button shareButton;
 	private Button toolsButton;
 	private Button deleteButton;
 	private boolean isInTestMode;
 	private EntityBundle entityBundle;
-	private ComboBox<ComboValue> submitterCombo;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
@@ -100,7 +86,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		this.typeProvider = typeProvider;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.entityFinder = entityFinder;
-		this.evaluationList = evaluationList;
 	}
 
 	@Override
@@ -150,31 +135,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
 		}	
 		
-		if(submitButton == null) {
-			submitButtonPanel = new SimplePanel();
-			submitButton = new Button(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION, AbstractImagePrototype.create(iconsImageBundle.synapseStep16()));
-			submitButton.setId(DisplayConstants.ID_BTN_SUBMIT_TO_EVALUATION);
-			submitButton.setHeight(25);
-			submitButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					//ask the presenter to query for all available evaluations, and it may call the view back for the user to select evaluation(s) to submit to
-					presenter.showAvailableEvaluations();
-				}
-			});
-			submitButtonPanel.addStyleName("floatright margin-left-5");
-			this.add(submitButtonPanel);
-			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
-		}
-		
-		submitButtonPanel.clear();
-		if (canEdit && entity instanceof Versionable) {
-			//kick off the query (asynchronously) to determine if the current user is signed up for any challenges
-			//will call back to the view to set submit button visibility
-			presenter.isSubmitButtonVisible();
-		}
-		
 		if (canEdit) editButton.enable();
 		else editButton.disable();
 		configureEditButton(entity, entityType);	
@@ -190,11 +150,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		configureDeleteButton(entityType);
 		
 		configureToolsMenu(entityBundle, entityType, isAdministrator, canEdit);
-	}
-	
-	@Override
-	public void showSubmitToChallengeButton() {
-		submitButtonPanel.add(submitButton);
 	}
 	
 	@Override
@@ -343,6 +298,10 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			addUploadItem(menu, entityBundle, entityType);
 		}
 		
+		if (canEdit && entity instanceof Versionable) {
+			addSubmitToEvaluationItem(menu, entity, entityType);
+		} 
+		
 		// create link
 		if(authenticated) {
 			addCreateShortcutItem(menu, entity, entityType);
@@ -478,77 +437,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			}
 		});
 		menu.add(item);
-	}
-	
-	@Override
-	public void popupEvaluationSelector(List<Evaluation> list, List<String> submitterAliases) {
-		final Dialog window = new Dialog();
-        window.setMaximizable(false);
-        window.setSize(450, 265);
-        window.setPlain(true); 
-        window.setModal(true); 
-        
-        window.setHeading("Evaluation Selection"); 
-        window.setButtons(Dialog.OKCANCEL);
-        window.setHideOnButtonClick(false);
-
-        window.setLayout(new FitLayout());
-        
-        evaluationList.configure(list);
-        submitterCombo = getSubmitterAliasComboBox(submitterAliases);
-        //ok button submits if valid
-        Button okButton = window.getButtonById(Dialog.OK);	    
-        okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				if (submitterCombo.isValid()) {
-					window.hide();
-					presenter.submitToEvaluations(evaluationList.getSelectedEvaluationIds(), submitterCombo.getRawValue());
-				} else {
-					showErrorMessage(submitterCombo.getErrorMessage());
-				}
-					
-			}
-	    });
-        
-        //cancel button simply hides
-        Button cancelButton = window.getButtonById(Dialog.CANCEL);	    
-	    cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.hide();
-			}
-	    });
-	    
-        FlowPanel panel = new FlowPanel();
-        panel.add(new HTML("<h6 class=\"margin-top-left-10\">Select the Evaluations below that you would like to submit to:</h6>"));
-        panel.add(evaluationList.asWidget());
-        panel.add(new HTML("<h6 class=\"margin-top-left-10\">Set "+DisplayConstants.SUBMITTER_ALIAS+" to be shown in the public leaderboard:</h6>"));
-        panel.add(submitterCombo);
-	    window.add(panel);
-	    window.show();
-	}
-	
-	public ComboBox<ComboValue> getSubmitterAliasComboBox(List<String> submitterAliases) {
-		// build the list store from the enum
-		ListStore<ComboValue> store = new ListStore<ComboValue>();
-		for (String value : submitterAliases) {
-			ComboValue comboValue = new ComboValue(value);
-			store.add(comboValue);
-		}
-		final ComboBox<ComboValue> combo = new ComboBox<ComboValue>();
-		combo.setDisplayField(ComboValue.VALUE_KEY);
-		combo.setWidth(400);
-		combo.addStyleName("margin-left-10");
-		combo.getMessages().setBlankText("Please set " + DisplayConstants.SUBMITTER_ALIAS);
-		combo.setStore(store);
-		combo.setEditable(true);
-		combo.setEmptyText("Set "+DisplayConstants.SUBMITTER_ALIAS+"...");
-		combo.setAllowBlank(false);
-		if(store.getCount() > 0)
-			combo.setValue(store.getAt(0));
-		combo.setTriggerAction(TriggerAction.ALL);
-		return combo;
 	}
 	
 	/**

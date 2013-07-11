@@ -229,6 +229,7 @@ public class DisplayConstants {
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
 	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit To Challenge";
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
+	public static final String SUBMIT_VERSIONABLE_ENTITY_MESSAGE = "Please select a versionable entity to submit for evaluation.";
 	
 	public static final String SUBMITTED_TITLE = "Submitted";
 	public static final String SUBMITTED_TO_EVALUATION = "Submitted to the selected evaluation(s)";
@@ -239,6 +240,8 @@ public class DisplayConstants {
 	public static final String ERROR_ENTITY_CANT_LINKS = "Sorry, the requested entity can not contain links.";
 	public static final String ERROR_ENTITY_CREATION = "Sorry, creation failed. Please try again.";
 	public static final String ERROR_ENTITY_PROMOTE_FAILURE = "Sorry, promoting the entity failed.";
+	public static final String NO_ENTITY_SELECTED = "Please select an entity and try again.";
+	public static final String NO_EVALUATION_SELECTED = "Please select an evaluation and try again.";
 	public static final String LABEL_SUCCESS = "Success";
 	public static final String LABEL_PROMOTED = " was promoted to top.";
 	public static final String TEXT_LINK_SAVED = "Link saved.";
@@ -505,6 +508,7 @@ public class DisplayConstants {
 	public static final String FIND_IMAGE_ENTITY = "Find Image File Entity";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
 	public static final String FIND_ENTITIES = "Find Entities";
+	public static final String FIND_ENTITY = "Find Entity";
 	
 	public static final String API_TABLE_COLUMN_COUNT_MISMATCH = "SuperTable: The number of columns must be the same as the number of renderers and column header titles.";
 	public static final String API_TABLE_MISSING_URI = "SuperTable: Endpoint path not specified.";
@@ -544,10 +548,12 @@ public class DisplayConstants {
 	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
 	
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
+	public static final String EVALUATION_SUBMISSION_ERROR = "Unable to submit to the evaluation: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
 	public static final String NOT_PARTICIPATING_IN_ANY_EVALUATIONS = "You are not currently participating in an Evaluation/Challenge. Please join one and try again.";
-	public static final String JOINED_EVALUATION_HTML = "<span class=\"mainPageHeader inline-block\"><h3>You are registered for this challenge!</h3><ul class=\"list arrow-list\"><li>Download the file(s) by going to the bottom of this page...</li></ul></span>";
+	public static final String JOINED_EVALUATION_HTML = "<h3>You are registered for this challenge!</h3><ul class=\"list arrow-list\"><li>Download the file(s) by going to the bottom of this page...</li></ul>";
+	public static final String PROPERTY_ERROR = "Unable to query for property: ";
 	public static final String READ_ONLY_MODE = "Read Only Mode";
 	public static final String SYNAPSE_IN_READ_ONLY_MODE = "Synapse is in READ_ONLY mode for maintenance. You can continue to browse, but can not modify during this period.";
 	public static final String VIEW_EDIT_PROFILE = "View / Edit Profile";

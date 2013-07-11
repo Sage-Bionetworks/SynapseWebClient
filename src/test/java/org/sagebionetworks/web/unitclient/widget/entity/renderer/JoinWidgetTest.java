@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -30,6 +32,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidgetView;
@@ -44,6 +47,7 @@ public class JoinWidgetTest {
 	JoinWidget widget;
 	JoinWidgetView mockView;
 	AuthenticationController mockAuthenticationController;
+	EvaluationSubmitter mockEvaluationSubmitter;
 	Page testPage;
 	Map<String, String> descriptor;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
@@ -64,6 +68,7 @@ public class JoinWidgetTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
+		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -83,7 +88,7 @@ public class JoinWidgetTest {
 		
 		widget = new JoinWidget(mockView, mockSynapseClient,
 				mockAuthenticationController, mockGlobalApplicationState,
-				mockNodeModelCreator, mockJSONObjectAdapter);
+				mockNodeModelCreator, mockJSONObjectAdapter, mockEvaluationSubmitter);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY, "my eval id");
 	}	
@@ -190,5 +195,11 @@ public class JoinWidgetTest {
 		widget.registerStep4();
 		verify(mockSynapseClient).createParticipants(any(String[].class), any(AsyncCallback.class));
 		verify(mockView).showError(anyString());
+	}
+	@Test
+	public void testShowEvaluationSubmitter() throws Exception {
+		widget.configure(wikiKey, descriptor);
+		widget.showSubmissionDialog();
+		verify(mockEvaluationSubmitter).configure(any(Entity.class), anyList());
 	}
 }

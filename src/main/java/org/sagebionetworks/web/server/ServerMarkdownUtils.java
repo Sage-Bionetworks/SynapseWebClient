@@ -116,11 +116,17 @@ public class ServerMarkdownUtils {
 	 * @return
 	 */
 	public static String addSubpagesIfNotPresent(String markdown) {
-		String subpagesWidgetMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
+		String subpagesMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
 		String newMarkdown = markdown;
-		if (!markdown.contains(subpagesWidgetMarkdown)) {
-			String subpagesMarkdown = subpagesWidgetMarkdown + "\n";
-			newMarkdown = subpagesMarkdown + markdown; 
+		if (!markdown.contains(subpagesMarkdown)) {
+			String noAutoWikiSubpages = SharedMarkdownUtils.getNoAutoWikiSubpagesMarkdown();
+			if (markdown.contains(noAutoWikiSubpages)) {
+				//found.  delete this string, and do not include subpages markdown
+				newMarkdown = markdown.replace(noAutoWikiSubpages, "");
+			}
+			else {
+				newMarkdown = subpagesMarkdown + "\n"+ markdown;	
+			}
 		}
 		return newMarkdown;
 	}

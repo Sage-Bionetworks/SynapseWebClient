@@ -37,10 +37,6 @@ public interface ActionMenuView extends IsWidget, SynapseView {
 			Long versionNumber, 
 			boolean isInTestMode);
 	
-	void popupEvaluationSelector(List<Evaluation> list, List<String> submitterAliases);
-	
-	void showSubmitToChallengeButton();
-	
 	/**
 	 * Presenter interface
 	 */
@@ -68,11 +64,7 @@ public interface ActionMenuView extends IsWidget, SynapseView {
 
 		void uploadToGenomespace();
 		
-		void submitToEvaluations(List<String> evaluationIds, String submitterAlias);
-		
 		void showAvailableEvaluations();
-		
-		void isSubmitButtonVisible();
 	}
 
 }
