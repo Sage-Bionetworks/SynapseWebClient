@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.resources.client.ImageResource;
 
 
 public class DisplayConstants {
@@ -564,5 +565,7 @@ public class DisplayConstants {
 	public static final String SUCCESS = "Success";
 	public static final String REQUEST_SENT = "Request Sent";
 	public static final String PLEASE_ENTER_PROJECT_NAME = "Please enter a project name";
+	public static final String OLD_VERSION = "old version";
+	public static final String THERE_IS_A_NEWER_VERSION = "A more recent version of this entity exists.";
 }
 

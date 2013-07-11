@@ -53,8 +53,8 @@ public class ProvViewUtil {
 	private static MarginData ACT_MARGIN_TIME = new MarginData(0, 0, 3, 10);
 	private static final MarginData ACT_MARGIN_NAME = new MarginData(5, 4, 8, 10);
 		
-	public static LayoutContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
-		LayoutContainer container = new LayoutContainer();
+	public static ProvNodeContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
+		ProvNodeContainer container = new ProvNodeContainer();
 		container.setAutoHeight(true);
 		container.setAutoWidth(true);
 		container.setId(node.getId());
@@ -78,18 +78,19 @@ public class ProvViewUtil {
 			HTML time = new HTML(DisplayUtils.converDataToPrettyString(node.getModifiedOn()));
 			time.addStyleName(PROV_ACTIVITY_TIME_STYLE);
 
-			
-			container.add(label, ACT_MARGIN_NAME);
-			container.add(badge.asWidget(), ACT_MARGIN_USER);
-			container.add(time, ACT_MARGIN_TIME);
+			LayoutContainer content = new LayoutContainer();
+			content.add(label, ACT_MARGIN_NAME);
+			content.add(badge.asWidget(), ACT_MARGIN_USER);
+			content.add(time, ACT_MARGIN_TIME);
+			container.addContent(content);
 		}
 		
 		setPosition(node, container);
 		return container;		
 	}
 	
-	public static LayoutContainer createEntityContainer(EntityGraphNode node, IconsImageBundle iconsImageBundle) {
-		LayoutContainer container = createEntityContainer(node.getId(), node.getEntityId(),
+	public static ProvNodeContainer createEntityContainer(EntityGraphNode node, IconsImageBundle iconsImageBundle) {
+		ProvNodeContainer container = createEntityContainer(node.getId(), node.getEntityId(),
 				node.getName(), node.getVersionLabel(),
 				node.getVersionNumber(), node.getEntityType(),
 				iconsImageBundle);		
@@ -97,7 +98,7 @@ public class ProvViewUtil {
 		return container;
 	}
 	
-	public static LayoutContainer createExpandContainer(final ExpandGraphNode node, final SageImageBundle sageImageBundle, final Presenter presenter, final ProvenanceWidgetView view) {
+	public static ProvNodeContainer createExpandContainer(final ExpandGraphNode node, final SageImageBundle sageImageBundle, final Presenter presenter, final ProvenanceWidgetView view) {
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();		
 		builder.appendHtmlConstant(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML());
 		
@@ -112,7 +113,7 @@ public class ProvViewUtil {
 			}
 		});
 		
-		LayoutContainer container = new LayoutContainer();
+		ProvNodeContainer container = new ProvNodeContainer();
 		container.setId(node.getId());
 		container.setStyleName(PROV_ENTTITY_NODE_STYLE + " " + PROV_EXPAND_NODE_STYLE);
 		container.add(link);
@@ -121,7 +122,7 @@ public class ProvViewUtil {
 		return container;
 	}	
 
-	public static LayoutContainer createExternalUrlContainer(ExternalGraphNode node, IconsImageBundle iconsImageBundle) {
+	public static ProvNodeContainer createExternalUrlContainer(ExternalGraphNode node, IconsImageBundle iconsImageBundle) {
 		if(node.getName() == null) node.setName("");
 		if(node.getUrl() == null) node.setUrl("");
 		
@@ -145,10 +146,10 @@ public class ProvViewUtil {
 				
 		link.setHTML(builder.toSafeHtml());
 
-		LayoutContainer container = new LayoutContainer();
+		ProvNodeContainer container = new ProvNodeContainer();
 		if(node.getId() != null) container.setId(node.getId());
 		container.setStyleName(PROV_ENTTITY_NODE_STYLE);
-		container.add(link);
+		container.addContent(link);
 		container.layout();
 		setPosition(node, container);
 		return container;
@@ -163,7 +164,7 @@ public class ProvViewUtil {
 		container.setStyleAttribute("left", node.getxPos() + "px");
 	}
 	
-	private static LayoutContainer createEntityContainer(String id, String entityId, String name, String versionLabel, Long versionNumber, String entityType, IconsImageBundle iconsImageBundle) {
+	private static ProvNodeContainer createEntityContainer(String id, String entityId, String name, String versionLabel, Long versionNumber, String entityType, IconsImageBundle iconsImageBundle) {
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		Anchor link = new Anchor();
 		if(versionNumber != null) {
@@ -201,41 +202,30 @@ public class ProvViewUtil {
 		
 		link.setHTML(builder.toSafeHtml());
 
-		LayoutContainer node = new LayoutContainer();
+		ProvNodeContainer node = new ProvNodeContainer();
 		if(id != null) node.setId(id);
 		node.setStyleName(PROV_ENTTITY_NODE_STYLE);
-		node.add(link);
+		node.addContent(link);
 		node.layout();
 		return node;
 	}
 
 	public static SafeHtml createEntityPopoverHtml(KeyValueDisplay<String> kvDisplay) {
-//		SafeHtmlBuilder sb = new SafeHtmlBuilder();
-//		if(kvDisplay != null) {
-//			Map<String,String> map = kvDisplay.getMap();
-//			for(String key : kvDisplay.getKeyDisplayOrder()) {
-//				String val = map.get(key);
-//				if(val == null) val = "";
-//				val = val.length() > MAX_TOOL_TIP_VALUE_CHAR ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR-3) + "..." : val;
-//				sb.appendHtmlConstant("<span class=\"boldText\">")
-//				.appendEscaped(key + ":")
-//				.appendHtmlConstant("</span> ")
-//				.appendEscaped(val)
-//				.appendHtmlConstant("<br/>");
-//			}
-//		}		
-//		return sb.toSafeHtml();
-		String str = "";
+		SafeHtmlBuilder sb = new SafeHtmlBuilder();
 		if(kvDisplay != null) {
 			Map<String,String> map = kvDisplay.getMap();
 			for(String key : kvDisplay.getKeyDisplayOrder()) {
 				String val = map.get(key);
 				if(val == null) val = "";
 				val = val.length() > MAX_TOOL_TIP_VALUE_CHAR ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR-3) + "..." : val;
-				str += key + ": " + val + "\n";
+				sb.appendHtmlConstant("<span class=\"boldText\">")
+				.appendEscaped(key + ":")
+				.appendHtmlConstant("</span> ")
+				.appendEscaped(val)
+				.appendHtmlConstant("<br/>");
 			}
 		}		
-		return SafeHtmlUtils.fromString(str);
+		return sb.toSafeHtml();
 	}
 
 	public static ToolTipConfig createTooltipConfig(String title, String text) {

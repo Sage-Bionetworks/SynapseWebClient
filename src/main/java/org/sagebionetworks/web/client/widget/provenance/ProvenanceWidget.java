@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.provenance;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -40,6 +41,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
@@ -79,6 +81,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	ProcessCallback doneCallback;
 	Set<Reference> noExpandNode;
 	Stack<String> lookupVersion;
+	ProvGraph currentGraph;
 	
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
@@ -417,6 +420,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		LayoutResult layoutResult = synapseJSNIUtils.nChartlayout(layerArray, characters);
 		NChartUtil.fillPositions(layoutResult, graph);
 		NChartUtil.repositionExpandNodes(graph);
+		currentGraph = graph;
 		view.setGraph(graph);
 	}
 	
@@ -485,6 +489,65 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		public void setActivity(Activity activity) {
 			this.activity = activity;
 		}		
+	}
+
+	@Override
+	public void findOldVersions() {
+		if(currentGraph == null) return;
+		
+		final Map<Reference,String> refToNodeId = new HashMap<Reference, String>();
+		Set<Reference> entityIds = new HashSet<Reference>();
+		
+		// create reverse lookup of reference to node id and save set of entity ids		
+		for(ProvGraphNode node : currentGraph.getNodes()) {
+			if(node instanceof EntityGraphNode) {
+				if(((EntityGraphNode)node).getVersionNumber() != null) {
+					Reference ref = new Reference();
+					ref.setTargetId(((EntityGraphNode)node).getEntityId());
+					ref.setTargetVersionNumber(((EntityGraphNode)node).getVersionNumber());
+					refToNodeId.put(ref, node.getId());
+
+					Reference currentVersionRef = new Reference();
+					currentVersionRef.setTargetId(ref.getTargetId());
+					entityIds.add(currentVersionRef);
+				}
+			}
+		}
+		
+		// batch request all entity ids to get current version. Notify view of non current versions
+		ReferenceList referenceList = new ReferenceList();
+		referenceList.setReferences(new ArrayList<Reference>(entityIds));		
+		try {
+			synapseClient.getEntityHeaderBatch(referenceList.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					try {
+						BatchResults<EntityHeader> currentVersions = nodeModelCreator.createBatchResults(result, EntityHeader.class);
+						Map<String,Long> entityToCurrentVersion = new HashMap<String, Long>();
+						for(EntityHeader header : currentVersions.getResults()) {
+							entityToCurrentVersion.put(header.getId(), header.getVersionNumber());
+						}
+						
+						// find graph nodes that should be marked as not current version
+						List<String> notCurrentNodeIds = new ArrayList<String>();
+						for(Reference ref : refToNodeId.keySet()) {
+							if(!entityToCurrentVersion.get(ref.getTargetId()).equals(ref.getTargetVersionNumber())) {
+								notCurrentNodeIds.add(refToNodeId.get(ref));
+							}
+						}
+						view.markOldVersions(notCurrentNodeIds);
+					} catch (JSONObjectAdapterException e) {
+						onFailure(e);
+					}
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		} 
 	}
 	
 }
