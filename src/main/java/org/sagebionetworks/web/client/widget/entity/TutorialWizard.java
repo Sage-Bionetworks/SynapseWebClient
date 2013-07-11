@@ -3,16 +3,13 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -20,7 +17,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.inject.Inject;
 
 public class TutorialWizard implements TutorialWizardView.Presenter {
@@ -66,11 +62,14 @@ public class TutorialWizard implements TutorialWizardView.Presenter {
 						if (header.getParentId() != null)
 							sortedHeaders.add(header);
 					}
-					
+					if (sortedHeaders.size() == 0) {
+						onFailure(new NotFoundException("Wiki subpages not found for tutorial: " + entityId));
+						return;
+					}
 					Collections.sort(sortedHeaders, new Comparator<WikiHeader>() {
 					    @Override
 				        public int compare(WikiHeader o1, WikiHeader o2) {
-				        	return o1.getId().compareTo(o2.getId());
+				        	return o1.getTitle().compareTo(o2.getTitle());
 				        }
 					});
 					view.showWizard(entityId, sortedHeaders);
@@ -81,13 +80,7 @@ public class TutorialWizard implements TutorialWizardView.Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				//if this is because the wiki header root was not found, and the parent wiki id is null,
-				if (caught instanceof NotFoundException) {
-					//do nothing, show nothing
-					view.clear();
-				}
-				else
-					view.showErrorMessage(caught.getMessage());
+				view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}
