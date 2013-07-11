@@ -192,7 +192,7 @@ public interface SynapseClientAsync {
 	void getSynapseVersions(AsyncCallback<String> callback);
 
 	/**
-	 * Return a property from portal.properties
+	 * Return a property from portal.properties.  Returns null if the property key is not defined
 	 * @param callback
 	 */
 	void getSynapseProperty(String key, AsyncCallback<String> callback);
