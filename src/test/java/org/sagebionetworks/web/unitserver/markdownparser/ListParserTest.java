@@ -40,6 +40,6 @@ public class ListParserTest {
 		MarkdownElements elements = new MarkdownElements("");
 		parser.processLine(elements);
 		result.append(elements.getHtml());
-		assertEquals("<ul><li>   Abacus</li><ul><li> answer</li></ul><li>   Bubbles</li><ol><li>  bunk</li><li>  bupkis</li><ul><li> BELITTLER</li></ul><li> burper</li></ol><li>   Cunning</li></ul>", result.toString());
+		assertEquals("<ul><li>Abacus</li><ul><li>answer</li></ul><li>Bubbles</li><ol><li>bunk</li><li>bupkis</li><ul><li>BELITTLER</li></ul><li>burper</li></ol><li>Cunning</li></ul>", result.toString());
 	}
 }

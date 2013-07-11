@@ -82,13 +82,13 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * 1. First Item
 	 */
-	public static final String ORDERED_LIST_REGEX = "(^[>]*)(\\s*)((?:\\d+[.]))(.+)";
+	public static final String ORDERED_LIST_REGEX = "(^[>]*)(\\s+)(?:\\d+[.])(\\s+)(.+)";
 	
 	/**
 	 * Recognized example input:
 	 * -striked out text-
 	 */
-	public static final String STRIKE_OUT_REGEX = "-(?=\\S)(.+?)(?<=\\S)-";
+	public static final String STRIKE_OUT_REGEX = "--(?=\\S)(.+?)(?<=\\S)--";
 	
 	/**
 	 * Recognized example input:
@@ -106,5 +106,5 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * * First Item
 	 */
-	public static final String UNORDERED_LIST_REGEX = "(^[>]*)(\\s*)((?:[-+*]))(.+)";
+	public static final String UNORDERED_LIST_REGEX = "(^[>]*)(\\s*)(?:[-+*])(\\s+)(.+)";
 }
