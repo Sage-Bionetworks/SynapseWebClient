@@ -1493,6 +1493,11 @@ public class DisplayUtils {
 	public static boolean isCSV(String contentType) {
 		return contentType.toLowerCase().startsWith("text/csv");
 	}
+	
+	public static boolean isTAB(String contentType) {
+		return contentType.toLowerCase().startsWith("text/tab-separated-values");
+	}
+	
 
 	/**
 	 * Return a preview filehandle associated with this bundle (or null if unavailable)

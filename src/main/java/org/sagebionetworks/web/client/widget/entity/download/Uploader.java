@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -201,7 +202,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		//get the chunked file request (includes token)
 		try {
 			//get the content type
-			final String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID);
+			String type = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID);
+			if (type == null || type.trim().length() == 0) {
+				if (ContentTypeUtils.isRecognizedCodeFileName(fileName)) {
+					type = ContentTypeUtils.PLAIN_TEXT;
+				}
+			}
+			final String contentType = type;
 			synapseClient.getChunkedFileToken(fileName, contentType, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
