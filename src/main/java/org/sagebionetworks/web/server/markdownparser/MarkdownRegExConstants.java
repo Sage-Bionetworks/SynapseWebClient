@@ -86,6 +86,12 @@ public class MarkdownRegExConstants {
 	
 	/**
 	 * Recognized example input:
+	 * ^[So H et al. Journal of Awesomeness. 2013 March 15]
+	 */
+	public static final String REFERENCE_REGEX = "\\^\\[(.*?)\\]";
+	
+	/**
+	 * Recognized example input:
 	 * -striked out text-
 	 */
 	public static final String STRIKE_OUT_REGEX = "-(?=\\S)(.+?)(?<=\\S)-";

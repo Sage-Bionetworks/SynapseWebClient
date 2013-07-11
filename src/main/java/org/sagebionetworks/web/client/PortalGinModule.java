@@ -125,6 +125,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView;
@@ -480,6 +482,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// UI Widget Descriptor editor
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
+		bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
 		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
 		bind(OldImageConfigView.class).to(OldImageConfigViewImpl.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);

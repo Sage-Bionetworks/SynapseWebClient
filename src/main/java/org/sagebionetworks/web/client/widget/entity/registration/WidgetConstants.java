@@ -16,6 +16,9 @@ public class WidgetConstants {
 	
 	public static final String LINK_CONTENT_TYPE = "link";
 	public static final String LINK_FRIENDLY_NAME ="Link";
+	
+	public static final String REFERENCE_CONTENT_TYPE = "reference";
+	public static final String REFERENCE_FRIENDLY_NAME = "Reference";
 
 	public static final String TABBED_TABLE_CONTENT_TYPE = "tabbedtable";
 	public static final String TABBED_TABLE_FRIENDLY_NAME ="Table";
@@ -65,7 +68,7 @@ public class WidgetConstants {
 	public static final String FLOAT_RIGHT = "Right";
 	public static final String FLOAT_CENTER = "Center";
 	
-	@Deprecated
+	//@Deprecated
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
 	public static final String PROV_WIDGET_ENTITY_LIST_KEY = "entityList";
 	public static final String PROV_WIDGET_ENTITY_LIST_DELIMETER = ",";

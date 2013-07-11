@@ -375,6 +375,11 @@ public class DisplayConstants {
 	public static final String SYNAPSE_ID_LABEL = "Synapse ID";
 	public static final String SAVE_BUTTON_LABEL = "Save";
 	public static final String INSERT_BUTTON_LABEL = "Insert";
+	
+	public static final String REFERENCE_AUTHOR_LABEL = "Author";
+	public static final String REFERENCE_TITLE_LABEL = "Title";
+	public static final String REFERENCE_DATE_LABEL = "Date";
+	public static final String REFERENCE_INVALID_DATE = "Please enter a valid date in the format: Year Month Day";
 
 	/*
 	 * Element ids for Selenium
