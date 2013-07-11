@@ -17,7 +17,7 @@ public class StrikeoutParserTest {
 	
 	@Test
 	public void testStrikeout(){
-		String text = "This is correct -not this part-.";
+		String text = "This is correct --not this part--.";
 		MarkdownElements elements = new MarkdownElements(text);
 		parser.processLine(elements);
 		assertTrue(elements.getHtml().contains("<del>not this part</del>"));
