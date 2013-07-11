@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -28,6 +30,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -42,6 +45,7 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -65,6 +69,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	private HTML loadingContainer;
 	private boolean blockCloseFullscreen = false;
 	private boolean inFullScreen = false;
+	private Map<String,ProvNodeContainer> nodeToContainer;
 	
 	@Inject
 	public ProvenanceWidgetViewImpl(SageImageBundle sageImageBundle,
@@ -139,6 +144,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	 * Private Methods
 	 */	
 	private void createGraph() {
+		nodeToContainer = new HashMap<String, ProvNodeContainer>();
 		this.filledPopoverIds = new HashMap<String,String>();
 		blockCloseFullscreen = false;
 		prov = new LayoutContainer();
@@ -150,8 +156,10 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			if(!inFullScreen) addFullScreenAnchor();			
 			// add nodes to graph
 			Set<ProvGraphNode> nodes = graph.getNodes();
-			for(ProvGraphNode node : nodes) {			
-				prov.add(getNodeContainer(node));
+			for(ProvGraphNode node : nodes) {							
+				ProvNodeContainer container = getNodeContainer(node); 
+				nodeToContainer.put(node.getId(), container);
+				prov.add(container);
 			}						
 		}
 		
@@ -159,14 +167,17 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		this.addStyleName("scroll-auto");
 		container.layout(true);
 		
-		// make connections (assure DOM elements are in before asking jsPlumb to connect them)
 		if(graph != null) {			
+			// make connections (assure DOM elements are in before asking jsPlumb to connect them)
 			Set<ProvGraphEdge> edges = graph.getEdges();
 			for(ProvGraphEdge edge : edges) {
 				connect(edge.getSink().getId(), edge.getSource().getId());
 			}
-		}
 
+			// look for old versions
+			presenter.findOldVersions();
+		}
+		
 	}
 	
 	/**
@@ -174,32 +185,32 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	 * @param node
 	 * @return
 	 */
-	private LayoutContainer getNodeContainer(final ProvGraphNode node) {
+	private ProvNodeContainer getNodeContainer(final ProvGraphNode node) {
 		if(node instanceof EntityGraphNode) {
-			LayoutContainer container = ProvViewUtil.createEntityContainer((EntityGraphNode)node, iconsImageBundle);
-			addToolTipToContainer(node, container, DisplayConstants.ENTITY);			
+			ProvNodeContainer container = ProvViewUtil.createEntityContainer((EntityGraphNode)node, iconsImageBundle);
+			addToolTipToContainer(node, container.getContent(), DisplayConstants.ENTITY);			
 			return container;
 		} else if(node instanceof ActivityGraphNode) {
-			LayoutContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle, ginInjector);
+			ProvNodeContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle, ginInjector);
 			// create tool tip for defined activities only
 			if(((ActivityGraphNode) node).getType() == ActivityType.UNDEFINED) {
 				addUndefinedToolTip(container);
 			} else {
-				addToolTipToContainer(node, container, DisplayConstants.ACTIVITY);				
+				addToolTipToContainer(node, container.getContent(), DisplayConstants.ACTIVITY);				
 			}
 			return container;
 		} else if(node instanceof ExpandGraphNode) {
 			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, sageImageBundle, presenter, this);
 		} else if(node instanceof ExternalGraphNode) {			
-			LayoutContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node, iconsImageBundle);
-			addToolTipToContainer(node, container, DisplayConstants.EXTERNAL_URL);
+			ProvNodeContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node, iconsImageBundle);
+			addToolTipToContainer(node, container.getContent(), DisplayConstants.EXTERNAL_URL);
 			return container;
 		}
 		return null;
 	}
 
-	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer container, final String title) {					
-		//container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayUtils.getLoadingHtml(sageImageBundle)));			
+	private void addToolTipToContainer(final ProvGraphNode node, final Component container, final String title) {					
+		final PopupPanel popup = DisplayUtils.addToolTip(container, DisplayUtils.getLoadingHtml(sageImageBundle));
 		container.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {	
@@ -216,7 +227,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 						filledPopoverIds.put(container.getId(), rendered);
 					    //container.setToolTip(ProvViewUtil.createTooltipConfig(title, rendered));
 						//DisplayUtils.addTooltipSpecial(synapseJSNIUtils, container, rendered, TOOLTIP_POSITION.RIGHT);
-						container.setTitle(rendered);
+						//container.setTitle(rendered);
+						popup.setWidget(new HTML(rendered));
 					}
 					
 					@Override
@@ -355,6 +367,16 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	@Override
 	public void setBlockCloseFullscreen(boolean blockClose) {
 		blockCloseFullscreen = blockClose;
+	}
+
+	@Override
+	public void markOldVersions(List<String> notCurrentNodeIds) {
+		for(String nodeId : notCurrentNodeIds) {
+			ProvNodeContainer container = nodeToContainer.get(nodeId);
+			if(container != null) {
+				container.showMessage("<span class=\"small moveup-5\">(" + DisplayConstants.OLD_VERSION + ")</span>", DisplayConstants.THERE_IS_A_NEWER_VERSION);				
+			}
+		}
 	}
 	
 	

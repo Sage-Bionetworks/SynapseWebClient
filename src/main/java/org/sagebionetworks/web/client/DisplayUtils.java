@@ -52,7 +52,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -70,10 +69,13 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
@@ -85,6 +87,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -109,6 +112,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
@@ -1023,6 +1027,31 @@ public class DisplayUtils {
 		return ordered;
 	}
 
+	
+	public static PopupPanel addToolTip(final Component widget, String message) {
+		final PopupPanel popup = new PopupPanel(true);
+		popup.setWidget(new HTML(message));
+		popup.setGlassEnabled(false);
+		popup.addStyleName("topLevelZIndex");
+		widget.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
+			          public void setPosition(int offsetWidth, int offsetHeight) {
+			        	  popup.showRelativeTo(widget);
+			          }
+			        });
+			}
+		});
+		widget.addListener(Events.OnMouseOut, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				popup.hide();
+			}
+		});
+		return popup;
+	}
+	
 	/**
 	 * A list of tags that core attributes like 'title' cannot be applied to.
 	 * This prevents them from having methods like addToolTip applied to them
