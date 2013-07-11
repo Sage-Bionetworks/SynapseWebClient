@@ -1683,6 +1683,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 				
 	}
+	
+	@Override
+	public String getSynapseProperty(String key) {
+		return PortalPropertiesHolder.getProperty(key);
+	}
+
+	private static class PortalPropertiesHolder {
+		private static Properties props;
+		
+		static {
+			InputStream s = SynapseClientImpl.class.getResourceAsStream("/portal.properties");
+			props = new Properties();
+			try {
+				props.load(s);
+			} catch (IOException e) {
+				throw new RuntimeException("portal.properties file not found", e);
+			}
+		}
+		
+		private static String getProperty(String key) {
+			return props.getProperty(key);
+		}
+				
+	}
 
 	
 }

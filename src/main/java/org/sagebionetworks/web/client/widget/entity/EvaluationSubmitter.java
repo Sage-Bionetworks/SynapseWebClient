@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
@@ -154,7 +155,17 @@ public class EvaluationSubmitter implements Presenter {
 				Entity entity;
 				try {
 					entity = nodeModelCreator.createEntity(result);
-					Long v = ver != null ? ver : ((Versionable)entity).getVersionNumber();
+					Long v = null;
+					if (ver != null)
+						v = ver;
+					else if (entity instanceof Versionable)
+						v = ((Versionable)entity).getVersionNumber();
+					else {
+						//not versionable, the service will not accept
+						onFailure(new IllegalArgumentException(DisplayConstants.SUBMIT_VERSIONABLE_ENTITY_MESSAGE));
+						return;
+					}
+					view.hideWindow();
 					submitToEvaluations(id, v, entity.getEtag(), evaluationIds, submitterAlias);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));

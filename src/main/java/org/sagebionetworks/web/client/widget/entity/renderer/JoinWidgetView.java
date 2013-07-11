@@ -29,7 +29,7 @@ public interface JoinWidgetView extends IsWidget, SynapseView {
 			final Callback touAcceptanceCallback);
 	void showInfo(String title, String message);
 	
-	void showSubmissionUserGuide();
+	void showSubmissionUserGuide(String tutorialEntityOwnerId);
 	
 	void showProfileForm(UserProfile profile, AsyncCallback<Void> callback);
 	

@@ -191,4 +191,9 @@ public interface SynapseClientAsync {
 	
 	void getSynapseVersions(AsyncCallback<String> callback);
 
+	/**
+	 * Return a property from portal.properties
+	 * @param callback
+	 */
+	void getSynapseProperty(String key, AsyncCallback<String> callback);
 }

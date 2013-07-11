@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -24,6 +25,7 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -268,7 +270,14 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 						showSubmissionDialog();
 					} else {
 						//no submissions found.  walk through the steps of uploading to Synapse
-						view.showSubmissionUserGuide();
+						getTutorialSynapseId(new AsyncCallback<String>() {
+							public void onFailure(Throwable caught) {
+								onFailure(new IllegalArgumentException(DisplayConstants.PROPERTY_ERROR + WebConstants.CHALLENGE_TUTORIAL_PROPERTY));
+							};
+							public void onSuccess(String tutorialEntityId) {
+								view.showSubmissionUserGuide(tutorialEntityId);
+							};
+						});
 					}
 				}
 				@Override
@@ -281,6 +290,10 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 			if(!DisplayUtils.handleServiceException(e, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
 				view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
 		}
+	}
+	
+	public void getTutorialSynapseId(AsyncCallback<String> callback) {
+		synapseClient.getSynapseProperty(WebConstants.CHALLENGE_TUTORIAL_PROPERTY, callback);
 	}
 	
 	@Override

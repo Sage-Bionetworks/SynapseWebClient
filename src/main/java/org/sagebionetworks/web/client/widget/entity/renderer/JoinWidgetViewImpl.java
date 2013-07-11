@@ -32,7 +32,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetView {
-	public static final String SUBMISSION_GUIDE_ID = "syn1968135";
 	private Presenter presenter;
 	private ProfileFormWidget profileForm;
 	private TutorialWizard tutorialWizard;
@@ -215,8 +214,9 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 	}
 
 	@Override
-	public void showSubmissionUserGuide() {
-		tutorialWizard.configure(SUBMISSION_GUIDE_ID, new TutorialWizard.Callback() {
+	public void showSubmissionUserGuide(String tutorialEntityOwnerId) {
+		
+		tutorialWizard.configure(tutorialEntityOwnerId, new TutorialWizard.Callback() {
 			
 			@Override
 			public void tutorialSkipped() {

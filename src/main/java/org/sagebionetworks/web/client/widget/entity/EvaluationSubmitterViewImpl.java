@@ -158,7 +158,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 								return;
 							}
 						}
-						window.hide();
 						presenter.submitToEvaluations(selectedReference, evaluationIds, submitterCombo.getRawValue());
 					} else {
 						showErrorMessage(submitterCombo.getErrorMessage());
@@ -199,6 +198,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		return combo;
 	}
 	
-		
-
+	@Override
+	public void hideWindow() {
+		window.hide();	
+	}
 }
