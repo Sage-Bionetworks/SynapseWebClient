@@ -12,14 +12,8 @@ public interface ReferenceConfigView extends IsWidget, WidgetEditorView {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void setAuthor(String author);
-	public String getAuthor();
-	
-	public void setTitle(String title);
-	public String getTitle();
-	
-	public void setDate(String date);
-	public String getDate();
+	public void setReference(String reference);
+	public String getReference();
 	
 	/**
 	 * Presenter interface

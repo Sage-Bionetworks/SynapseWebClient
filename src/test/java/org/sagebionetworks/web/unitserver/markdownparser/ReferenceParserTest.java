@@ -21,7 +21,7 @@ public class ReferenceParserTest {
 		MarkdownElements elements = new MarkdownElements(text);
 		parser.reset();
 		parser.processLine(elements);
-		assertTrue(elements.getHtml().contains("The statement was from here <a href=\"#footnote1\">[1]</a>."));
+		assertTrue(elements.getHtml().contains("The statement was from here <a href=\"#footnote-1\">[1]</a>."));
 		
 		StringBuilder html = new StringBuilder("This is the last sentence.");
 		parser.completeParse(html);

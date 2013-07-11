@@ -15,9 +15,7 @@ import com.google.inject.Inject;
 
 public class ReferenceConfigViewImpl extends LayoutContainer implements ReferenceConfigView {
 	private Presenter presenter;
-	private TextField<String> authorField;
-	private TextField<String> titleField;
-	private TextField<String> dateField;
+	private TextField<String> refField;
 	
 	@Inject
 	public ReferenceConfigViewImpl() {
@@ -28,43 +26,15 @@ public class ReferenceConfigViewImpl extends LayoutContainer implements Referenc
 		VerticalPanel vp = new VerticalPanel();
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		authorField = new TextField<String>();
-		authorField.setAllowBlank(false);
-		authorField.setRegex(WebConstants.VALID_WIDGET_NAME_REGEX);
-		authorField.getMessages().setRegexText(DisplayConstants.ERROR_WIDGET_NAME_PATTERN_MISMATCH);
-		Label authorLabel = new Label(DisplayConstants.REFERENCE_AUTHOR_LABEL);
-		authorLabel.setWidth(60);
-		authorField.setWidth(270);
-		hp.add(authorLabel);
-		hp.add(authorField);
-		hp.addStyleName("margin-top-left-10");
-		vp.add(hp);
-		
-		hp = new HorizontalPanel();
-		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		titleField = new TextField<String>();
-		titleField.setAllowBlank(false);
-		titleField.setRegex(WebConstants.VALID_WIDGET_NAME_REGEX);
-		titleField.getMessages().setRegexText(DisplayConstants.ERROR_WIDGET_NAME_PATTERN_MISMATCH);
-		Label titleLabel = new Label(DisplayConstants.REFERENCE_TITLE_LABEL);
-		titleLabel.setWidth(60);
-		titleField.setWidth(270);
-		hp.add(titleLabel);
-		hp.add(titleField);
-		hp.addStyleName("margin-top-left-10");
-		vp.add(hp);
-		
-		hp = new HorizontalPanel();
-		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		dateField = new TextField<String>();
-		dateField.setAllowBlank(false);
-		dateField.setRegex(WebConstants.VALID_REFERENCE_DATE_REGEX);
-		dateField.getMessages().setRegexText(DisplayConstants.REFERENCE_INVALID_DATE);
-		Label dateLabel = new Label(DisplayConstants.REFERENCE_DATE_LABEL);
-		dateLabel.setWidth(60);
-		dateField.setWidth(270);
-		hp.add(dateLabel);
-		hp.add(dateField);
+		refField = new TextField<String>();
+		refField.setAllowBlank(false);
+		refField.setRegex(WebConstants.VALID_REFERENCE_REGEX);
+		refField.getMessages().setRegexText(DisplayConstants.INVALID_REFERENCE);
+		Label refLabel = new Label(DisplayConstants.REFERENCE_LABEL);
+		refLabel.setWidth(60);
+		refField.setWidth(270);
+		hp.add(refLabel);
+		hp.add(refField);
 		hp.addStyleName("margin-top-left-10");
 		vp.add(hp);
 		
@@ -87,14 +57,8 @@ public class ReferenceConfigViewImpl extends LayoutContainer implements Referenc
 
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if(!authorField.isValid()) {
-			throw new IllegalArgumentException(authorField.getErrorMessage());
-		}
-		if(!titleField.isValid()) {
-			throw new IllegalArgumentException(titleField.getErrorMessage());
-		}
-		if(!dateField.isValid()) {
-			throw new IllegalArgumentException(dateField.getErrorMessage());
+		if(!refField.isValid()) {
+			throw new IllegalArgumentException(refField.getErrorMessage());
 		}
 	}
 
@@ -115,14 +79,8 @@ public class ReferenceConfigViewImpl extends LayoutContainer implements Referenc
 
 	@Override
 	public void clear() {
-		if(authorField != null) {
-			authorField.setValue("");
-		}
-		if(titleField != null) {
-			titleField.setValue("");
-		}
-		if(dateField != null) {
-			dateField.setValue("");
+		if(refField != null) {
+			refField.setValue("");
 		}
 	}
 
@@ -132,33 +90,13 @@ public class ReferenceConfigViewImpl extends LayoutContainer implements Referenc
 	}
 
 	@Override
-	public void setAuthor(String author) {
-		authorField.setValue(author);
+	public void setReference(String reference) {
+		refField.setValue(reference);
 	}
 
 	@Override
-	public String getAuthor() {
-		return authorField.getValue();
-	}
-
-	@Override
-	public void setTitle(String title) {
-		titleField.setValue(title);
-	}
-
-	@Override
-	public String getTitle() {
-		return titleField.getValue();
-	}
-
-	@Override
-	public void setDate(String date) {
-		dateField.setValue(date);
-	}
-
-	@Override
-	public String getDate() {
-		return dateField.getValue();
+	public String getReference() {
+		return refField.getValue();
 	}
 
 }

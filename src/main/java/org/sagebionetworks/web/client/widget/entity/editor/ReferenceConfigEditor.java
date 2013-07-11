@@ -3,12 +3,14 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, WidgetEditorPresenter {
+	private Map<String, String> descriptor;
 	private ReferenceConfigView view;
 	
 	@Inject
@@ -19,18 +21,19 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 	}
 	
 	@Override
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+		descriptor = widgetDescriptor;
+	}
+	
+	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
-		//no way to edit an existing link
-	}
-	
-	@Override
 	public void updateDescriptorFromView() {
 		view.checkParams();
+		descriptor.put(WidgetConstants.REFERENCE_TEXT_KEY, view.getReference());
 	}
 
 	@Override
@@ -45,6 +48,6 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 
 	@Override
 	public String getTextToInsert() {
-		return "^[" + view.getAuthor() + ". " + view.getTitle() + ". " + view.getDate()+ "]";
+		return null;
 	}
 }

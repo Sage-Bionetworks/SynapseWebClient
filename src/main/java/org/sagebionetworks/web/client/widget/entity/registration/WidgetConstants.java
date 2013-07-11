@@ -96,6 +96,9 @@ public class WidgetConstants {
 	
 	public static final String BUTTON_LINK_URL_KEY = "url";
 	public static final String BUTTON_LINK_TEXT_KEY = "text";
+	
+	public static final String REFERENCE_TEXT_KEY = BUTTON_LINK_TEXT_KEY;
+
 	/**
 	 * API Table Column Renderers
 	 */

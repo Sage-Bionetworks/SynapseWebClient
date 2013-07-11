@@ -23,7 +23,7 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 		while(m.find()) {
 			//store match and then replace
 			footnotes.add(input.substring(m.start() + 2, m.end() - 1));
-			m.appendReplacement(sb, "<a target=\"_self\" href=\"#footnote" + footnoteNumber + "\">[" + footnoteNumber + "]</a>");
+			m.appendReplacement(sb, "<a href=\"#!footnote-" + footnoteNumber + "\">[" + footnoteNumber + "]</a>");
 			footnoteNumber++;
 		}
 		m.appendTail(sb);
@@ -33,7 +33,7 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 	@Override
 	public void completeParse(StringBuilder html) {
 		for(int i = 0; i < footnotes.size(); i++) {
-			String footnote = "<a name=\"footnote" + (i + 1) + "\">[" + (i + 1) + "] " + footnotes.get(i) + "</a><br />";
+			String footnote = "<a name=\"!footnote-" + (i + 1) + "\">[" + (i + 1) + "] " + footnotes.get(i) + "</a><br />";
 			html.append(footnote);
 		}
 	}
