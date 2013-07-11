@@ -160,6 +160,7 @@ public interface SynapseClientAsync {
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
+	void getEvaluations(List<String> evaluationIds, AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluationEntities(AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluationEntitiesList(AsyncCallback<ArrayList<String>> callback) throws RestServiceException;
@@ -180,6 +181,19 @@ public interface SynapseClientAsync {
 	 */
 	void getAvailableEvaluationsSubmitterAliases(AsyncCallback<String> callback) throws RestServiceException;
 
+	/**
+	 * Return true if the current user has created at least one submission in the given evaluations
+	 * @param evaluationIds
+	 * @param callback
+	 * @throws RestServiceException
+	 */
+	void hasSubmitted(AsyncCallback<Boolean> callback)	throws RestServiceException;
+	
 	void getSynapseVersions(AsyncCallback<String> callback);
 
+	/**
+	 * Return a property from portal.properties.  Returns null if the property key is not defined
+	 * @param callback
+	 */
+	void getSynapseProperty(String key, AsyncCallback<String> callback);
 }

@@ -3,18 +3,13 @@ package org.sagebionetworks.web.client.widget.entity.menu;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.RestResourceList;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
@@ -36,13 +31,11 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
+import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.shared.EntityType;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -64,6 +57,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookieProvider;
 	private  NodeModelCreator nodeModelCreator;
+	private EvaluationSubmitter evaluationSubmitter;
 	private Long versionNumber;
 	
 	public interface EvaluationsCallback {
@@ -91,7 +85,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor,
 			AutoGenFactory entityFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
-			CookieProvider cookieProvider) {
+			CookieProvider cookieProvider, EvaluationSubmitter evaluationSubmitter) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
@@ -103,6 +97,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookieProvider = cookieProvider;
 		this.nodeModelCreator = nodeModelCreator;
+		this.evaluationSubmitter = evaluationSubmitter;
 		view.setPresenter(this);
 	}	
 	
@@ -117,143 +112,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, versionNumber, DisplayUtils.isInTestWebsite(cookieProvider));
 		return view.asWidget();
 	}
-	
-	@Override
-	public void submitToEvaluations(List<String> evaluationIds, String submitterAlias) {
-		//set up shared values across all submissions
-		Entity entity = entityBundle.getEntity();
-		Submission newSubmission = new Submission();
-		newSubmission.setEntityId(entity.getId());
-		newSubmission.setSubmitterAlias(submitterAlias);
-		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
-		if (entity instanceof Versionable) {
-			newSubmission.setVersionNumber(((Versionable)entity).getVersionNumber());
-		}
-		if (evaluationIds.size() > 0)
-			submitToEvaluations(newSubmission, entity.getEtag(), evaluationIds, 0);
-	}
-	
-	public void submitToEvaluations(final Submission newSubmission, final String etag, final List<String> evaluationIds, final int index) {
-		//and create a new submission for each evaluation
-		String evalId = evaluationIds.get(index);
-		newSubmission.setEvaluationId(evalId);
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		try {
-			newSubmission.writeToJSONObject(adapter);
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
-		}
-		try {
-			synapseClient.createSubmission(adapter.toJSONString(), etag, new AsyncCallback<String>() {			
-				@Override
-				public void onSuccess(String result) {
-					//result is the updated submission
-					if (index == evaluationIds.size()-1) {
-						view.showInfo(DisplayConstants.SUBMITTED_TITLE, DisplayConstants.SUBMITTED_TO_EVALUATION);				
-					} else {
-						submitToEvaluations(newSubmission, etag, evaluationIds, index+1);
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-				}
-			});
-		} catch (RestServiceException e) {
-			view.showErrorMessage(e.getMessage());
-		}
-	}
-	
-	@Override
-	public void showAvailableEvaluations() {
-		getAvailableEvaluations(new EvaluationsCallback() {
-			@Override
-			public void onSuccess(final List<Evaluation> evaluations) {
-				if (evaluations == null || evaluations.size() == 0) {
-					//no available evaluations, pop up an info dialog
-					view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
-				} 
-				else {
-					getAvailableEvaluationsSubmitterAliases(new SubmitterAliasesCallback() {
-						@Override
-						public void onSuccess(List<String> submitterAliases) {
-							//add the default team name (if set in the profile and not already in the list)
-							UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-							String teamName = sessionData.getProfile().getTeamName();
-							if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
-								submitterAliases.add(teamName);
-							}
-							view.popupEvaluationSelector(evaluations, submitterAliases);		
-						}
-					});
-				}
-			}
-		});
-	}
-	@Override
-	public void isSubmitButtonVisible() {
-		getAvailableEvaluations(new EvaluationsCallback() {
-			@Override
-			public void onSuccess(final List<Evaluation> evaluations) {
-				if (evaluations.size() > 0) {
-					view.showSubmitToChallengeButton();
-				}
-			}
-		});
 		
-	}
-	
-	public void getAvailableEvaluations(final EvaluationsCallback callback) {
-		try {
-			synapseClient.getAvailableEvaluations(new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String jsonString) {
-					try {
-						PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
-						List<Evaluation> list = results.getResults();
-						callback.onSuccess(list);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-				}
-			});
-		} catch (RestServiceException e) {
-			view.showErrorMessage(e.getMessage());
-		}
-	}
-	
-	public void getAvailableEvaluationsSubmitterAliases(final SubmitterAliasesCallback callback) {
-		try {
-			synapseClient.getAvailableEvaluationsSubmitterAliases(new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String jsonString) {
-					try {
-						RestResourceList results = nodeModelCreator.createJSONEntity(jsonString, RestResourceList.class);
-						callback.onSuccess(results.getList());
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-				}
-			});
-		} catch (RestServiceException e) {
-			view.showErrorMessage(e.getMessage());
-		}
-	}
-	
 	public void clearState() {
 		view.clear();
 		// remove handlers
@@ -462,6 +321,11 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			else
 				synapseJSNIUtils.uploadUrlToGenomeSpace(url);
 		}
+	}
+	
+	@Override
+	public void showAvailableEvaluations() {
+		evaluationSubmitter.configure(entityBundle.getEntity(), null);
 	}
 	
 }

@@ -8,7 +8,11 @@ public class SharedMarkdownUtils {
 	public static String getWikiSubpagesMarkdown() {
 		return WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN;
 	}
-
+	
+	public static String getNoAutoWikiSubpagesMarkdown() {
+		return WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.NO_AUTO_WIKI_SUBPAGES + WidgetConstants.WIDGET_END_MARKDOWN;
+	}
+	
 	public static String getWidgetHTML(int widgetIndex, String suffix, String widgetProperties){
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div id=\"");

@@ -1477,6 +1477,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public String getEvaluations(List<String> evaluationIds) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			List<Evaluation> evalList = new ArrayList<Evaluation>();
+			for (String evalId : evaluationIds) {
+				evalList.add(synapseClient.getEvaluation(evalId));
+			}
+			PaginatedResults<Evaluation> results = new PaginatedResults<Evaluation>();
+			results.setResults(evalList);
+			results.setTotalNumberOfResults(evalList.size());
+			JSONObjectAdapter evaluationsJson = results.writeToJSONObject(adapterFactory.createNew());
+			return evaluationsJson.toJSONString();
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	
+	@Override
 	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
@@ -1615,6 +1634,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
+	public Boolean hasSubmitted() throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			//get all evaluations for which the user has joined as a participant
+			PaginatedResults<Evaluation> evaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			for (Evaluation evaluation : evaluations.getResults()) {
+				//return true if any of these have a submission
+				PaginatedResults<Submission> res = synapseClient.getMySubmissions(evaluation.getId(), 0, 0);
+				if (res.getTotalNumberOfResults() > 0) {
+					return true;
+				}
+			}
+			return false;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
 	public String getSynapseVersions() throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {			
@@ -1642,6 +1680,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		
 		private static String getVersionInfo() {
 			return versionInfo;
+		}
+				
+	}
+	
+	@Override
+	public String getSynapseProperty(String key) {
+		return PortalPropertiesHolder.getProperty(key);
+	}
+
+	private static class PortalPropertiesHolder {
+		private static Properties props;
+		
+		static {
+			InputStream s = SynapseClientImpl.class.getResourceAsStream("/portal.properties");
+			props = new Properties();
+			try {
+				props.load(s);
+			} catch (IOException e) {
+				throw new RuntimeException("portal.properties file not found", e);
+			}
+		}
+		
+		private static String getProperty(String key) {
+			return props.getProperty(key);
 		}
 				
 	}

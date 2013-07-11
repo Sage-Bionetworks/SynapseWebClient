@@ -5,9 +5,11 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
+import org.sagebionetworks.web.shared.WikiPageKey;
+
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
@@ -16,11 +18,12 @@ import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -29,13 +32,13 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetView {
-
 	private Presenter presenter;
 	private ProfileFormWidget profileForm;
-	
+	private TutorialWizard tutorialWizard;
 	@Inject
-	public JoinWidgetViewImpl(ProfileFormWidget profileForm) {
+	public JoinWidgetViewImpl(ProfileFormWidget profileForm, TutorialWizard tutorialWizard) {
 		this.profileForm = profileForm;
+		this.tutorialWizard = tutorialWizard;
 	}
 	
 	@Override
@@ -65,7 +68,21 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 			}
 			else if (UserEvaluationState.EVAL_OPEN_USER_REGISTERED.equals(state)) {
 				//add info on how to get started!
-				add(new HTML(DisplayConstants.JOINED_EVALUATION_HTML));
+				FlowPanel p = new FlowPanel();
+				p.addStyleName("mainPageHeader inline-block");
+				p.add(new HTML(DisplayConstants.JOINED_EVALUATION_HTML));
+				
+				Button button = new Button("Submit To Challenge");
+				button.removeStyleName("gwt-Button");
+				button.addStyleName("btn btn-large");
+				button.addClickHandler(new ClickHandler() {			
+					@Override
+					public void onClick(ClickEvent event) {
+						presenter.submitToChallengeClicked();
+					}
+				});
+				p.add(button);
+				add(p);
 			}
 		}
 		
@@ -129,7 +146,7 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 		// agree to TOU, cancel
         dialog.okText = DisplayConstants.BUTTON_TEXT_ACCEPT_TERMS_OF_USE;
         dialog.setButtons(Dialog.OKCANCEL);
-        Button touButton = dialog.getButtonById(Dialog.OK);
+        com.extjs.gxt.ui.client.widget.button.Button touButton = dialog.getButtonById(Dialog.OK);
         touButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
 			@Override
 			public void componentSelected(ButtonEvent ce) {
@@ -196,6 +213,28 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 	public void clear() {
 	}
 
+	@Override
+	public void showSubmissionUserGuide(String tutorialEntityOwnerId) {
+		
+		tutorialWizard.configure(tutorialEntityOwnerId, new TutorialWizard.Callback() {
+			
+			@Override
+			public void tutorialSkipped() {
+				presenter.submissionUserGuideSkipped();
+			}
+			
+			@Override
+			public void tutorialFinished() {
+				//do nothing
+			}
+		});
+	}
+	
+	public Widget wrap(Widget widget) {
+		widget.addStyleName("margin-10");
+		return widget;
+	}
+	
 	/*
 	 * Private Methods
 	 */

@@ -29,7 +29,9 @@ public interface JoinWidgetView extends IsWidget, SynapseView {
 			final Callback touAcceptanceCallback);
 	void showInfo(String title, String message);
 	
-	public void showProfileForm(UserProfile profile, AsyncCallback<Void> callback);
+	void showSubmissionUserGuide(String tutorialEntityOwnerId);
+	
+	void showProfileForm(UserProfile profile, AsyncCallback<Void> callback);
 	
 	/**
 	 * Presenter interface
@@ -38,8 +40,12 @@ public interface JoinWidgetView extends IsWidget, SynapseView {
 		/**
 		 * Called when Join button is clicked
 		 */
-		public void register();
+		void register();
 		
-		public void gotoLoginPage();
+		void gotoLoginPage();
+		
+		void submitToChallengeClicked();
+		
+		void submissionUserGuideSkipped();
 	}
 }

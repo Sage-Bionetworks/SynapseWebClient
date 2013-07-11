@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 
 public class WikiSubpageParser extends BasicMarkdownElementParser  {
 	String subpagesWidgetMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
+	String noSubpagesMarkdown = SharedMarkdownUtils.getNoAutoWikiSubpagesMarkdown();
 	boolean seenWikiSubpagesWidget;
 	
 	@Override
@@ -16,6 +17,10 @@ public class WikiSubpageParser extends BasicMarkdownElementParser  {
 		if (!seenWikiSubpagesWidget) {
 			if (line.getMarkdown().contains(subpagesWidgetMarkdown))
 				seenWikiSubpagesWidget = true;
+			if (line.getMarkdown().contains(noSubpagesMarkdown)) {
+				seenWikiSubpagesWidget = true;
+				line.updateMarkdown(line.getMarkdown().replace(noSubpagesMarkdown, ""));
+			}
 		}
 	}
 	

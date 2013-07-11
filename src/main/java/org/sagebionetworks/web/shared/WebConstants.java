@@ -139,4 +139,10 @@ public class WebConstants {
 	public static final String ETAG_KEY = "etag";
 
 	public static final String ENTITY_VERSION_STRING = "/version/";
+	
+	
+	
+	//Synapse Properties
+	public static final String CHALLENGE_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_synapse_id";
+	
 }

@@ -235,6 +235,8 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException;
 	
+	public String getEvaluations(List<String> evaluationIds) throws RestServiceException;
+	
 	public String getAvailableEvaluations() throws RestServiceException;
 	
 	public String getAvailableEvaluationEntities() throws RestServiceException;
@@ -245,5 +247,9 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException;
 
+	public Boolean hasSubmitted()	throws RestServiceException;
+		
 	public String getSynapseVersions() throws RestServiceException;
+	
+	public String getSynapseProperty(String key);
 }
