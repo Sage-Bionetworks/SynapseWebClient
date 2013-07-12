@@ -20,6 +20,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Settings;
@@ -45,6 +46,7 @@ public class SettingsPresenterTest {
 	CookieProvider mockCookieProvider;
 	NodeModelCreator mockNodeModelCreator;
 	Settings place = Mockito.mock(Settings.class);
+	SynapseClientAsync mockSynapseClient;
 	
 	UserSessionData testUser = new UserSessionData();
 	UserProfile profile = new UserProfile();
@@ -59,7 +61,8 @@ public class SettingsPresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockCookieProvider = mock(CookieProvider.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		mockSynapseClient = mock(SynapseClientAsync.class);
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
@@ -73,7 +76,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testStart() {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		profilePresenter.setPlace(place);
 
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
@@ -91,7 +94,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testResetPassword() throws RestServiceException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		profilePresenter.setPlace(place);
 		
 		String newPassword = "otherpassword";
@@ -101,14 +104,14 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testCreateSynapsePassword() throws RestServiceException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		profilePresenter.setPlace(place);
 
 		profilePresenter.createSynapsePassword();
 	}
 	@Test
 	public void testUsage() throws RestServiceException, JSONObjectAdapterException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		
 		StorageUsageSummaryList usageSummary = new StorageUsageSummaryList();
 		Long totalSize = 12345l;
@@ -123,7 +126,7 @@ public class SettingsPresenterTest {
 	}
 	@Test
 	public void testUsageFailure() throws RestServiceException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserService).getStorageUsage(any(AsyncCallback.class));		
 		profilePresenter.setPlace(place);

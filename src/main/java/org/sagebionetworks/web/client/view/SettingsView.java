@@ -54,5 +54,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void goTo(Place place);
 	}
 
+	public void setApiKey(String apiKey);
+
 
 }

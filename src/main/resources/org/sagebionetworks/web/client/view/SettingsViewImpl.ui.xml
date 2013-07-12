@@ -38,22 +38,30 @@
 						<g:SimplePanel ui:field="storageUsagePanel" />
 					</div>					
 					
-					<p>&nbsp;</p>
-					<h3>Synapse R Client &amp; Synapse REST API</h3>
-					<p style="padding-bottom:5px">To login to this website without using a Google account or to use the Synapse R Client or REST API, 
-					you will need to have a Synapse specific password. To setup a Synapse password, click the button below. It will send you an email 
-					with instructions on how to complete the process.</p>
-					<g:SimplePanel ui:field="setupPasswordButtonPanel" />
-					
-					<div class="span-24 separator"></div>
-					<p>&nbsp;</p>					
-					<h3>Change Synapse Password</h3>
-					<g:SimplePanel ui:field="changePasswordPanel" />
-					<p><small></small></p>
-					
-					<p>&nbsp;</p>
-					<p>&nbsp;</p>					
 
+					<div class="span-24">
+						<h3>Synapse API Key</h3>
+						<p>Using an API key allows you to authenticate your scripts for an indefinite amount of time. It is important that you treat your API key with 
+						   the same security as your password.</p>
+						<div class="highlight-box highlight-line fixedWidthFont" title="API Key">
+						    <span class="strong" style="margin-left: 77px; font-size:13px;">
+						    	<span ui:field="apiKeyContainer"/>						    	
+						    </span>						    
+						</div>				
+					</div>						   
+					
+										
+					<div class="span-12">
+						<h3>Setup a Synapse Password</h3>
+						<p>To login to this website without using a Google account or to use the Synapse Programmatic Clients/REST API, 
+					you will need to either have a Synapse specific password or use your API key. To setup a Synapse password, click the button below. It will send you an email 
+						with instructions on how to complete the process.</p>
+						<g:SimplePanel ui:field="setupPasswordButtonPanel" />					    
+					</div>
+					<div class="span-12 last">
+						<h3>Change Synapse Password</h3>
+						<g:SimplePanel ui:field="changePasswordPanel" />					    					    
+					</div>										
 				</div>
 <!-- start footer -->
             <div class="clear"></div>

@@ -252,4 +252,6 @@ public interface SynapseClient extends RemoteService {
 	public String getSynapseVersions() throws RestServiceException;
 	
 	public String getSynapseProperty(String key);
+	
+	public String getAPIKey() throws RestServiceException;
 }
