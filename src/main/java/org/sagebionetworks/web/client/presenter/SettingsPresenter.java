@@ -3,7 +3,9 @@ package org.sagebionetworks.web.client.presenter;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -29,6 +31,9 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
 	private NodeModelCreator nodeModelCreator;
+	private SynapseClientAsync synapseClient;
+	
+	private String apiKey = null;
 	
 	@Inject
 	public SettingsPresenter(SettingsView view,
@@ -36,13 +41,15 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
 			CookieProvider cookieProvider,
-			NodeModelCreator nodeModelCreator) {
+			NodeModelCreator nodeModelCreator,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.cookieProvider = cookieProvider;
 		this.nodeModelCreator = nodeModelCreator;
+		this.synapseClient = synapseClient;
 		view.setPresenter(this);
 	}
 
@@ -62,6 +69,25 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.view.setPresenter(this);
 		this.view.clear();
 		showView(place);
+		
+		// lookup API key
+		if(apiKey == null) {			
+			synapseClient.getAPIKey(new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					apiKey = result;
+					view.setApiKey(apiKey);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
+						view.setApiKey(DisplayConstants.ERROR_LOADING);
+					}
+				}
+			});
+		} else {
+			view.setApiKey(apiKey);
+		}
 	}
 
 	@Override

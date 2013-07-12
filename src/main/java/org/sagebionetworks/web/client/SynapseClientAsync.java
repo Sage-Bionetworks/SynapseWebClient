@@ -196,4 +196,6 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void getSynapseProperty(String key, AsyncCallback<String> callback);
+
+	void getAPIKey(AsyncCallback<String> callback);
 }
