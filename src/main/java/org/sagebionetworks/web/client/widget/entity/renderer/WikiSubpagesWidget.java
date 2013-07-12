@@ -130,18 +130,11 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 						WikiHeader header = (WikiHeader) headerEntity;
 						if (header.getParentId() != null){
 							//add this as a child
-							wikiId2TreeItem.get(header.getParentId()).addItem(wikiId2TreeItem.get(header.getId()));
+							TreeItem item = wikiId2TreeItem.get(header.getParentId());
+							item.addItem(wikiId2TreeItem.get(header.getId()));
+							item.setState(true);
 						} else {
 							root = wikiId2TreeItem.get(header.getId());
-						}
-					}
-					
-					//finally, expand all nodes to the current wiki page.
-					if (root != null && wikiKey.getWikiPageId() != null) {
-						TreeItem currentItem =  wikiId2TreeItem.get(wikiKey.getWikiPageId());
-						while(currentItem != null) {
-							currentItem.setState(true);
-							currentItem = currentItem.getParentItem();
 						}
 					}
 					
