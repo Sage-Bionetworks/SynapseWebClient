@@ -961,5 +961,42 @@ ol.lowerroman {
 	top: -5px;
 }
 
+.highlight-box {
+    position: relative;
+    margin: 15px 0;
+    padding: 39px 19px 14px;
+    background-color: white;
+    border: 1px solid #DDD;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+}
 
+.highlight-box::after {
+    content: attr(title);
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    background-color: whiteSmoke;
+    border: 1px solid #DDD;
+    color: #9DA0A4;
+    -webkit-border-radius: 4px 0 4px 0;
+    -moz-border-radius: 4px 0 4px 0;
+    border-radius: 4px 0 4px 0;
+}
+
+.highlight-line {
+    padding: 3px;
+}
+
+.fixedWidthFont {
+    font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
+    font-family: Courier,monospace;
+    font-size: 11px;
+    line-height: 13px;
+}	
 

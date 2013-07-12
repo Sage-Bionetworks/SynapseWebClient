@@ -1708,5 +1708,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				
 	}
 
+	@Override
+	public String getAPIKey() throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			return synapseClient.retrieveApiKey();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}		
+	}
+
 	
 }
