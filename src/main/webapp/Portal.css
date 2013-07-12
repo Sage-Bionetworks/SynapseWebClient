@@ -657,6 +657,11 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 4px;
 }
 
+.previewtable tbody td {
+	border: 1px solid #EDEDED;
+	padding: 4px;
+}
+
 .markdowntable {
   border: 1px solid #dddddd;
   border-collapse: separate;

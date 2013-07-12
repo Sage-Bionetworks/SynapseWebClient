@@ -202,10 +202,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		//get the chunked file request (includes token)
 		try {
 			//get the content type
+			String lowercaseFilename = fileName.toLowerCase();
 			String type = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID);
 			if (type == null || type.trim().length() == 0) {
 				if (ContentTypeUtils.isRecognizedCodeFileName(fileName)) {
 					type = ContentTypeUtils.PLAIN_TEXT;
+				}
+				else if (lowercaseFilename.endsWith(".tsv") || lowercaseFilename.endsWith(".tab")) {
+					type = WebConstants.TEXT_TAB_SEPARATED_VALUES;
 				}
 			}
 			final String contentType = type;

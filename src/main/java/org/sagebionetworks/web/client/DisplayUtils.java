@@ -1495,7 +1495,7 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isTAB(String contentType) {
-		return contentType.toLowerCase().startsWith("text/tab-separated-values");
+		return contentType.toLowerCase().startsWith(WebConstants.TEXT_TAB_SEPARATED_VALUES);
 	}
 	
 

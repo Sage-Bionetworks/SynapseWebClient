@@ -72,9 +72,9 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 		String[] lines = text.split("[\r\n]");
 		for (int i = 0; i < lines.length; i++) {
 			sb.append("<tr>");
-			String[] cells = lines[i].split(delimiter + "(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+			String[] cells = lines[i].split(delimiter + "(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
 			for (int j = 0; j < cells.length; j++) {
-				sb.append("<td style=\"border-top:0px\">");
+				sb.append("<td>");
 				sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(cells[j]));
 				sb.append("</td>");
 			}

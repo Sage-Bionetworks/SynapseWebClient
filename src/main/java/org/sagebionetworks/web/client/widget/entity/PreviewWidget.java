@@ -61,7 +61,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 					else if (DisplayUtils.isCSV(originalFileHandle.getContentType())){
 						previewFileType = PreviewFileType.CSV;
 					}
-					else if (DisplayUtils.isTAB(contentType) || DisplayUtils.isCSV(originalFileHandle.getContentType())) {
+					else if (DisplayUtils.isTAB(contentType) || DisplayUtils.isTAB(originalFileHandle.getContentType())) {
 						previewFileType = PreviewFileType.TAB;
 					}
 					else {
