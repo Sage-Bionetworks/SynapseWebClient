@@ -28,10 +28,6 @@ public class ReferenceConfigEditorTest {
 	
 	@Test
 	public void testGetTextToInsert() {
-		when(mockView.getAuthor()).thenReturn("So H et al");
-		when(mockView.getTitle()).thenReturn("Book of Travels");
-		when(mockView.getDate()).thenReturn("2013 July 11");
-		String md = editor.getTextToInsert();
-		assertEquals("^[So H et al. Book of Travels. 2013 July 11]", md);
+		
 	}
 }
