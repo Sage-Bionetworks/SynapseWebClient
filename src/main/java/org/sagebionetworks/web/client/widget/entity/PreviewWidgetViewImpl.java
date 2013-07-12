@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -64,17 +65,17 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	}
 	
 	@Override
-	public void setTablePreview(String csv) {
+	public void setTablePreview(String text, String delimiter) {
 		clear();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<table class=\"file-preview\" style=\"overflow:auto;display:block;max-height:200px\">");
-		String[] lines = csv.split("\n");
+		sb.append("<table class=\"file-preview previewtable\" style=\"overflow:auto;display:block;max-height:200px\">");
+		String[] lines = text.split("[\r\n]");
 		for (int i = 0; i < lines.length; i++) {
 			sb.append("<tr>");
-			String[] cells = lines[i].split(",");
+			String[] cells = lines[i].split(delimiter + "(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
 			for (int j = 0; j < cells.length; j++) {
-				sb.append("<td style=\"border-top:0px\">");
-				sb.append(cells[j]);
+				sb.append("<td>");
+				sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(cells[j]));
 				sb.append("</td>");
 			}
 			sb.append("</tr>");

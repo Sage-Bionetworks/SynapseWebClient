@@ -145,5 +145,7 @@ public class WebConstants {
 	
 	//Synapse Properties
 	public static final String CHALLENGE_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_synapse_id";
+
+	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
 	
 }

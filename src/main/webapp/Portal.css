@@ -648,6 +648,20 @@ h1, h2, h3, h4, h5, h6 {
 	margin: 0px;
 }
 
+.previewtable {
+  border: 1px solid #dddddd;
+  border-collapse: separate;
+  *border-collapse: collapsed;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.previewtable tbody td {
+	border: 1px solid #EDEDED;
+	padding: 4px;
+}
+
 .markdowntable {
   border: 1px solid #dddddd;
   border-collapse: separate;
@@ -707,31 +721,6 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-border-bottom-right-radius: 4px;
   border-bottom-right-radius: 4px;
   -moz-border-radius-bottomright: 4px;
-}
-
-/** a minimalist table style **/
-.mintable table {
-    background: none repeat scroll 0 0 #FFFFFF;
-    border-collapse: collapse;
-    font-size: 12px;
-    text-align: left;
-    border: 0 none;
-    outline: 0 none;
-    vertical-align: baseline;
-}
-
-.mintable table th {
-    border-bottom: 2px solid #DDDDDD;
-    font-size: 14px;
-    font-weight: normal;
-    padding: 10px 8px;
-    border-left: 0 none;
-}
-
-.mintable table td {
-	border-left: 0 none;
-	border-top: 0 none;
-	padding: 9px 8px 0;	
 }
 
 .attachments-widget-row {

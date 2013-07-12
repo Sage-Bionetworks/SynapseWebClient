@@ -7,14 +7,13 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -196,12 +195,26 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
+	public String fixDefaultContentType(String type, String fileName) {
+		String contentType = type;
+		String lowercaseFilename = fileName.toLowerCase();
+		if (type == null || type.trim().length() == 0) {
+			if (ContentTypeUtils.isRecognizedCodeFileName(fileName)) {
+				contentType = ContentTypeUtils.PLAIN_TEXT;
+			}
+			else if (lowercaseFilename.endsWith(".tsv") || lowercaseFilename.endsWith(".tab")) {
+				contentType = WebConstants.TEXT_TAB_SEPARATED_VALUES;
+			}
+		}
+		return contentType;
+	}
+	
 	public void directUploadStep1(String fileName){
 		this.token = null;
 		//get the chunked file request (includes token)
 		try {
 			//get the content type
-			final String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID);
+			final String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID), fileName);
 			synapseClient.getChunkedFileToken(fileName, contentType, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {

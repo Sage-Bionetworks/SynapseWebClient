@@ -23,7 +23,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 	public static final String APPLICATION_ZIP = "application/zip";
 	
 	public enum PreviewFileType {
-		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE
+		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB
 	}
 
 	
@@ -57,6 +57,12 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 							previewFileType = PreviewFileType.ZIP;
 						else
 							previewFileType = PreviewFileType.CSV;
+					}
+					else if (DisplayUtils.isCSV(originalFileHandle.getContentType())){
+						previewFileType = PreviewFileType.CSV;
+					}
+					else if (DisplayUtils.isTAB(contentType) || DisplayUtils.isTAB(originalFileHandle.getContentType())) {
+						previewFileType = PreviewFileType.TAB;
 					}
 					else {
 						previewFileType = PreviewFileType.PLAINTEXT;
@@ -95,7 +101,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 							}
 							public void onResponseReceived(final Request request, final Response response) {
 								//add the response text
-								int statusCode = response.getStatusCode();
+							int statusCode = response.getStatusCode();
 								if (statusCode == Response.SC_OK) {
 									String responseText = response.getText();
 									if (responseText != null && responseText.length() > 0) {
@@ -103,7 +109,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 											view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
 										} 
 										else if (PreviewFileType.CSV == previewType)
-											view.setTablePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));	
+											view.setTablePreview(responseText, ",");
+										else if (PreviewFileType.TAB == previewType)
+											view.setTablePreview(responseText, "\\t");
 										else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
 											view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
 										}
