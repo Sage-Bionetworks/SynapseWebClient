@@ -86,9 +86,9 @@ public class MarkdownRegExConstants {
 	
 	/**
 	 * Recognized example input:
-	 * ^[So H et al. Journal of Awesomeness. 2013 March 15]
+	 * ${reference?text=So H et al. Journal of Awesomeness. 2013 March 15}
 	 */
-	public static final String REFERENCE_REGEX = "\\^\\[(.*?)\\]";
+	public static final String REFERENCE_REGEX = "\\$\\{reference\\?text=(.+?)\\}";
 	
 	/**
 	 * Recognized example input:

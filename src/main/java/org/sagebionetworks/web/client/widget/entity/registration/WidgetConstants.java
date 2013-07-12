@@ -98,6 +98,7 @@ public class WidgetConstants {
 	public static final String BUTTON_LINK_TEXT_KEY = "text";
 	
 	public static final String REFERENCE_TEXT_KEY = BUTTON_LINK_TEXT_KEY;
+	public static final String REFERENCE_FOOTNOTE_KEY = "footnoteId";
 
 	/**
 	 * API Table Column Renderers

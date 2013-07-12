@@ -15,7 +15,13 @@ public class SharedMarkdownUtils {
 		sb.append(WebConstants.DIV_ID_WIDGET_PREFIX);
 		sb.append(widgetIndex);
 		sb.append(suffix);
-		sb.append("\" class=\"widgetContainer\" widgetParams=\"");
+		
+		//Reference widgets will be inline
+		if(widgetProperties.contains(WidgetConstants.REFERENCE_FOOTNOTE_KEY)) {
+			sb.append("\" class=\"footnoteWidgetContainer\" widgetParams=\"");
+		} else {
+			sb.append("\" class=\"widgetContainer\" widgetParams=\"");
+		}
 		sb.append(widgetProperties);
 		sb.append("\">");
 		sb.append("</div>");
