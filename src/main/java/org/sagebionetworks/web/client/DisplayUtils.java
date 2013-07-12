@@ -1491,11 +1491,11 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isCSV(String contentType) {
-		return contentType.toLowerCase().startsWith("text/csv");
+		return contentType != null && contentType.toLowerCase().startsWith("text/csv");
 	}
 	
 	public static boolean isTAB(String contentType) {
-		return contentType.toLowerCase().startsWith(WebConstants.TEXT_TAB_SEPARATED_VALUES);
+		return contentType != null && contentType.toLowerCase().startsWith(WebConstants.TEXT_TAB_SEPARATED_VALUES);
 	}
 	
 

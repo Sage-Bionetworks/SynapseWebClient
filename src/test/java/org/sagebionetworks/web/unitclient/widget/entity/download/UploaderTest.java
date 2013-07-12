@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -43,6 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -332,5 +334,29 @@ public class UploaderTest {
 		int attempt = Uploader.MAX_RETRY;
 		uploader.chunkUploadFailure("content type",2, attempt, 2, 1024, requestList);
 		verifyUploadError();
+	}
+	
+	@Test
+	public void testFixingDefaultContentType() throws RestServiceException {
+		String inputFilename = "file.R";
+		String inputContentType = "foo/bar";
+		
+		//if the content type coming from the browser field is set, 
+		//then this method should never override it
+		assertEquals(inputContentType, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		
+		//but if the field reports a null or empty content type, then this method should fix it
+		inputContentType = "";
+		assertEquals(ContentTypeUtils.PLAIN_TEXT, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		
+		inputContentType = null;
+		assertEquals(ContentTypeUtils.PLAIN_TEXT, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		
+		//should fix tab delimited files too
+		inputFilename = "file.tab";
+		assertEquals(WebConstants.TEXT_TAB_SEPARATED_VALUES, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		
+		inputFilename = "file.tsv";
+		assertEquals(WebConstants.TEXT_TAB_SEPARATED_VALUES, uploader.fixDefaultContentType(inputContentType, inputFilename));
 	}
 }
