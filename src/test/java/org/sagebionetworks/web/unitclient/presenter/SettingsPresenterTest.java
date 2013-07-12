@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.storage.StorageUsageSummary;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -37,6 +38,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
 public class SettingsPresenterTest {
 	
+	private static final String APIKEY = "MYAPIKEY";
 	SettingsPresenter profilePresenter;
 	SettingsView mockView;
 	AuthenticationController mockAuthenticationController;
@@ -65,8 +67,10 @@ public class SettingsPresenterTest {
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-
-		profilePresenter.setPlace(place);
+		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
+		
+		
+//		profilePresenter.setPlace(place);
 		profile.setDisplayName("tester");
 		profile.setOwnerId("testuser@test.com");
 		testUser.setProfile(profile);
@@ -90,6 +94,18 @@ public class SettingsPresenterTest {
 	public void testSetPlace() {
 		Settings newPlace = Mockito.mock(Settings.class);
 		profilePresenter.setPlace(newPlace);
+		
+		verify(mockView).setApiKey(APIKEY);		
+	}
+	
+	@Test
+	public void testSetPlaceFailAPIKey() {
+		Settings newPlace = Mockito.mock(Settings.class);
+		AsyncMockStubber.callFailureWith(null).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
+		profilePresenter.setPlace(newPlace);
+				
+		verify(mockView).setApiKey(DisplayConstants.ERROR_LOADING);
+		
 	}
 	
 	@Test
