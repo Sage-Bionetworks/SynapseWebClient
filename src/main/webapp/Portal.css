@@ -894,6 +894,11 @@ ol.lowerroman {
 	display: inline;
 }
 
+.footnoteWidgetContainer {
+	overflow-x: auto;
+	display: inline-block;
+}
+
 .myEvaluationListContainer {
 	border:1px solid #D0D0D0; 
 	padding-left:7px;

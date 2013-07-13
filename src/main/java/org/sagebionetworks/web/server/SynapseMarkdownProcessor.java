@@ -21,6 +21,7 @@ import org.sagebionetworks.web.server.markdownparser.LinkParser;
 import org.sagebionetworks.web.server.markdownparser.ListParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
+import org.sagebionetworks.web.server.markdownparser.ReferenceParser;
 import org.sagebionetworks.web.server.markdownparser.StrikeoutParser;
 import org.sagebionetworks.web.server.markdownparser.SubscriptParser;
 import org.sagebionetworks.web.server.markdownparser.SuperscriptParser;
@@ -55,6 +56,7 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new ItalicsParser());
 		allElementParsers.add(new LinkParser());
 		allElementParsers.add(new ListParser());
+		allElementParsers.add(new ReferenceParser());
 		allElementParsers.add(new StrikeoutParser());
 		allElementParsers.add(new SubscriptParser());
 		allElementParsers.add(new SuperscriptParser());

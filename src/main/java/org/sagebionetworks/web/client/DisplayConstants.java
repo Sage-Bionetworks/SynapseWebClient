@@ -379,6 +379,9 @@ public class DisplayConstants {
 	public static final String SYNAPSE_ID_LABEL = "Synapse ID";
 	public static final String SAVE_BUTTON_LABEL = "Save";
 	public static final String INSERT_BUTTON_LABEL = "Insert";
+	
+	public static final String REFERENCE_LABEL = "Reference";
+	public static final String INVALID_REFERENCE = "Please enter a valid reference.";
 
 	/*
 	 * Element ids for Selenium
