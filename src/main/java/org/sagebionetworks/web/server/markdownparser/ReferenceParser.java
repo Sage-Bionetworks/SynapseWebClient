@@ -4,6 +4,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
 
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WebConstants;
+
 public class ReferenceParser extends BasicMarkdownElementParser {
 	Pattern p1= Pattern.compile(MarkdownRegExConstants.REFERENCE_REGEX);
 	ArrayList<String> footnotes;
@@ -22,9 +26,11 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
 			//Store reference text and insert extra parameter for the renderer to link to
-			footnotes.add(input.substring(m.start() + 17, m.end() - 1));
-			String updated = input.substring(m.start(), m.end() - 1) + "&footnoteId=" + footnoteNumber + "}";
-			updated = updated.replaceAll("\\$", "\\\\\\$");	//Escape for the appendReplacement method
+			int lenOfSyntax = "${reference?text=".length();
+			footnotes.add(input.substring(m.start() + lenOfSyntax, m.end() - 1));
+			String updated = input.substring(m.start(), m.end() - 1) + 
+				"&" + WidgetConstants.INLINE_WIDGET_KEY + "=true&" + WidgetConstants.REFERENCE_FOOTNOTE_KEY + "=" + footnoteNumber + "}";
+			updated = Matcher.quoteReplacement(updated);	//Escapes the replacement string for appendReplacement
 			m.appendReplacement(sb, updated);
 			footnoteNumber++;
 		}
@@ -35,8 +41,8 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 	@Override
 	public void completeParse(StringBuilder html) {
 		for(int i = 0; i < footnotes.size(); i++) {
-			String text = footnotes.get(i).replaceAll("%2E", ".");
-			String footnote = "<p id=\"footnote" + (i + 1) + "\">[" + (i + 1) + "] " + text + "</p>";
+			String text = WidgetEncodingUtil.decodeValue(footnotes.get(i));
+			String footnote = "<p id=\"" + WebConstants.FOOTNOTE_ID_WIDGET_PREFIX + (i + 1) + "\">[" + (i + 1) + "] " + text + "</p>";
 			html.append(footnote);
 		}
 	}

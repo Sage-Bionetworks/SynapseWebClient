@@ -33,7 +33,7 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 	@Override
 	public void updateDescriptorFromView() {
 		view.checkParams();
-		descriptor.put(WidgetConstants.REFERENCE_TEXT_KEY, view.getReference());
+		descriptor.put(WidgetConstants.BUTTON_LINK_TEXT_KEY, view.getReference());
 	}
 
 	@Override

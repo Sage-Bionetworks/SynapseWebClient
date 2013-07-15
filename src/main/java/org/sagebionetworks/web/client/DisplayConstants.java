@@ -377,7 +377,6 @@ public class DisplayConstants {
 	public static final String INSERT_BUTTON_LABEL = "Insert";
 	
 	public static final String REFERENCE_LABEL = "Reference";
-	public static final String INVALID_REFERENCE = "Please enter a valid reference.";
 
 	/*
 	 * Element ids for Selenium

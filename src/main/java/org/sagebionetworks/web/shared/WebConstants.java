@@ -40,7 +40,6 @@ public class WebConstants {
 	public static final String VALID_WIDGET_NAME_REGEX = "^"+WIDGET_NAME_REGEX+"+";
 	public static final String VALID_ENTITY_ID_REGEX = "^[Ss]{1}[Yy]{1}[Nn]{1}\\d+";
 	public static final String VALID_POSITIVE_NUMBER_REGEX = "^[0-9]+";
-	public static final String VALID_REFERENCE_REGEX = ".+\\.\\s.+\\.\\s.+\\."; 
 	
 	// OpenID related constants
 
@@ -98,6 +97,8 @@ public class WebConstants {
 	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
 
 	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
+	
+	public static final String FOOTNOTE_ID_WIDGET_PREFIX = "footnote_";
 
 	public static final String PROXY_PARAM_KEY = "proxy";
 

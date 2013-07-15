@@ -376,7 +376,7 @@ public class ServerMarkdownUtils {
 						}
 					}
 					if (childFound) {
-						if (previousFoundIndex < oldText.length() - 1)
+						if (previousFoundIndex <= oldText.length() - 1)
 							// substring, go from the previously found index to the end
 							sb.append(oldText.substring(previousFoundIndex));
 						Element newElement = doc.createElement("div"); //wrap new html in a div, since it needs a container!					
