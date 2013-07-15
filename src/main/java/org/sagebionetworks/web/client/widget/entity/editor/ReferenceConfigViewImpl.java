@@ -28,8 +28,6 @@ public class ReferenceConfigViewImpl extends LayoutContainer implements Referenc
 		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
 		refField = new TextField<String>();
 		refField.setAllowBlank(false);
-		refField.setRegex(WebConstants.VALID_REFERENCE_REGEX);
-		refField.getMessages().setRegexText(DisplayConstants.INVALID_REFERENCE);
 		Label refLabel = new Label(DisplayConstants.REFERENCE_LABEL);
 		refLabel.setWidth(60);
 		refField.setWidth(270);

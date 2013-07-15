@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.sagebionetworks.web.shared.WebConstants;
+
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -26,7 +28,7 @@ public class ReferenceWidgetViewImpl extends LayoutContainer implements Referenc
 		if(!hasLoaded) {
 			hasLoaded = true;
 			HTMLPanel parentPanel = (HTMLPanel)this.getParent();
-			Element heading = parentPanel.getElementById("footnote" + id);
+			Element heading = parentPanel.getElementById(WebConstants.FOOTNOTE_ID_WIDGET_PREFIX + id);
 			final Element scrollToElement = heading;
 			Anchor a = new Anchor();
 			a.setHTML("[" + id + "]");

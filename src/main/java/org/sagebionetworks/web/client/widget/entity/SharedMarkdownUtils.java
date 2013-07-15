@@ -20,9 +20,9 @@ public class SharedMarkdownUtils {
 		sb.append(widgetIndex);
 		sb.append(suffix);
 		
-		//Reference widgets will be inline
-		if(widgetProperties.contains(WidgetConstants.REFERENCE_FOOTNOTE_KEY)) {
-			sb.append("\" class=\"footnoteWidgetContainer\" widgetParams=\"");
+		//Some widgets will be inline
+		if(widgetProperties.contains(WidgetConstants.INLINE_WIDGET_KEY + "=true")) {
+			sb.append("\" class=\"inlineWidgetContainer\" widgetParams=\"");
 		} else {
 			sb.append("\" class=\"widgetContainer\" widgetParams=\"");
 		}
