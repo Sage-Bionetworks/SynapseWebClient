@@ -36,7 +36,7 @@ public class VersionTimer implements SynapseView {
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showError(DisplayConstants.NEW_VERSION_AVAILABLE, message);
+		DisplayUtils.showError(DisplayConstants.NEW_VERSION_AVAILABLE, message, CHECK_VERSIONS_INTERVAL_MS);
 	}
 
 	@Override

@@ -555,9 +555,12 @@ public class DisplayUtils {
 	 * @param title
 	 * @param message
 	 */
-	public static void showError(String title, String message) {
+	public static void showError(String title, String message, Integer timeout) {
 		Alert alert = new Alert(title, message, true);
 		alert.setAlertType(AlertType.Error);
+		if(timeout != null) {
+			alert.setTimeout(timeout);
+		}
 		displayGlobalAlert(alert);
 	}
 	
