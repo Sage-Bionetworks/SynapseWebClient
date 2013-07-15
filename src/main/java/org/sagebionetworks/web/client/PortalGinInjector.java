@@ -151,4 +151,5 @@ public interface PortalGinInjector extends Ginjector {
 	
 	// Other widgets
 	public UserBadge getUserBadgeWidget();
+	public VersionTimer getVersionTimer();
 }

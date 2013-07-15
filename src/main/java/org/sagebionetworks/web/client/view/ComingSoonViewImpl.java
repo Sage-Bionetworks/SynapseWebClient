@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -77,10 +78,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
-		Window.scrollTo(0, 0); // scroll user to top of page
-				
-		
-		
+		Window.scrollTo(0, 0); // scroll user to top of page				
 	}
 
 	@Override
