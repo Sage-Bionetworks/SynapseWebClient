@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.Label;
 
 public class Alert extends Composite {
 
@@ -26,7 +27,7 @@ public class Alert extends Composite {
 	private FlowPanel panel;
 	private Button closeButton;
 	private InlineHTML headingEl;
-	private InlineLabel bodyEl;
+	private Label bodyEl;
 
 	private String heading;
 
@@ -34,14 +35,14 @@ public class Alert extends Composite {
 	private boolean blockStyle = false;
 	
 	public Alert(String alert) {
-		init(null, alert);
+		init(null, alert, false);
 	}
 	
-	public Alert(String heading, String alert) {
-		init(heading, alert);
+	public Alert(String heading, String alert, boolean isBlock) {
+		init(heading, alert, isBlock);
 	}
 	
-	private void init(String heading, String body) {
+	private void init(String heading, String body, boolean isBlock) {
 		panel = new FlowPanel();
 
 		// The use of setStyleName throughout this class is INTENTIONAL
@@ -50,17 +51,23 @@ public class Alert extends Composite {
 		panel.setStyleName("alert");
 		panel.addStyleName("fade");
 		panel.addStyleName("in");
+		if(isBlock) panel.addStyleName("alert-block");
+
 		
 		this.closeButton = new Button("x");
 		closeButton.setStyleName("close");
 		closeButton.getElement().setAttribute("data-dismiss", "alert");
 		
 		this.heading = heading;
+		
 		this.headingEl = new InlineHTML();
 		this.headingEl.setStyleName("heading");
 		this.headingEl.setText(this.heading);
 		
-		this.bodyEl = new InlineLabel(body);
+		if(isBlock)
+			this.bodyEl = new Label(body);
+		else 
+			this.bodyEl = new InlineLabel(body);
 		this.bodyEl.setStyleName("");
 		
 		panel.add(closeButton);
@@ -68,10 +75,6 @@ public class Alert extends Composite {
 		panel.add(this.bodyEl);
 		
 		initWidget(panel);
-	}
-
-	public void setBlockStyle(boolean isBlock) {
-		panel.setStyleDependentName("block", isBlock);
 	}
 	
 	public void setAlertType(AlertType alertType) {
