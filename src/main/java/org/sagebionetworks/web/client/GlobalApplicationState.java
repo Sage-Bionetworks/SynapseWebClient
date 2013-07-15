@@ -72,5 +72,4 @@ public interface GlobalApplicationState {
 	
 	public void checkVersionCompatibility(SynapseClientAsync synapseClient, SynapseView view);
 	
-	public String getSynapseVersion();
 }

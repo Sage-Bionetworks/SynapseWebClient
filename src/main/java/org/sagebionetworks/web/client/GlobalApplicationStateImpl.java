@@ -135,10 +135,5 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			}
 		});
 	}
-
-	@Override
-	public String getSynapseVersion() {
-		return synapseVersion;		
-	}
 		
 }
