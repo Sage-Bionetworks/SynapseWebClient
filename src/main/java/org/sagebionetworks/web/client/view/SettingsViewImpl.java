@@ -25,6 +25,7 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -53,6 +54,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel breadcrumbsPanel;
 	@UiField
 	SimplePanel storageUsagePanel;
+	@UiField
+	SpanElement apiKeyContainer;
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -124,6 +127,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 		storageUsageWidget = new Html();
 		storageUsagePanel.add(storageUsageWidget);
+		
 	}
 
 	@Override
@@ -278,6 +282,12 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changePasswordPanel.clear();
 		setupPasswordButtonPanel.clear();
 		storageUsagePanel.clear();
+	}
+
+
+	@Override
+	public void setApiKey(String apiKey) {
+		apiKeyContainer.setInnerHTML(apiKey);
 	}
 
 }
