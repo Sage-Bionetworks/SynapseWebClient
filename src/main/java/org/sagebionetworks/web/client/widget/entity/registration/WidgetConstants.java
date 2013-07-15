@@ -70,7 +70,7 @@ public class WidgetConstants {
 	public static final String FLOAT_RIGHT = "Right";
 	public static final String FLOAT_CENTER = "Center";
 	
-	//@Deprecated
+	@Deprecated
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
 	public static final String PROV_WIDGET_ENTITY_LIST_KEY = "entityList";
 	public static final String PROV_WIDGET_ENTITY_LIST_DELIMETER = ",";
