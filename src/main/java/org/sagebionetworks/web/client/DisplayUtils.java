@@ -542,9 +542,22 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showInfo(String title, String message) {
-		Alert alert = new Alert(title, message);
+		Alert alert = new Alert(title, message, false);
 		alert.setAlertType(AlertType.Info);
 		alert.setTimeout(4000);
+		displayGlobalAlert(alert);
+	}
+
+	/**
+	 * Shows an warning message to the user in the "Global Alert area".
+	 * For more precise control over how the message appears,
+	 * use the {@link displayGlobalAlert(Alert)} method.
+	 * @param title
+	 * @param message
+	 */
+	public static void showError(String title, String message) {
+		Alert alert = new Alert(title, message, true);
+		alert.setAlertType(AlertType.Error);
 		displayGlobalAlert(alert);
 	}
 	

@@ -75,6 +75,9 @@ public class Portal implements EntryPoint {
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
 						globalApplicationState.setActivityMapper(activityMapper);
 
+						// start version timer
+						ginjector.getVersionTimer().start();
+						
 						// Goes to place represented on URL or default place
 						historyHandler.handleCurrentHistory();
 						loading.hide();

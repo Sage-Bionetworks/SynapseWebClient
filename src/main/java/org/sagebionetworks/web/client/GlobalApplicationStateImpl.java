@@ -11,9 +11,12 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
+
 
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
@@ -21,6 +24,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private ActivityMapper directMapper;
 	private PlaceChanger placeChanger;
 	private List<EntityHeader> favorites;
+	private String synapseVersion;
 	
 	@Inject
 	public GlobalApplicationStateImpl(CookieProvider cookieProvider) {
@@ -110,6 +114,31 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void setFavorites(List<EntityHeader> favorites) {
 		this.favorites = favorites;
+	}
+
+	@Override
+	public void checkVersionCompatibility(final SynapseClientAsync synapseClient, final SynapseView view) {
+		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
+			@Override
+			public void onSuccess(String versions) {
+				if(synapseVersion == null) {
+					synapseVersion = versions;
+				} else {
+					if(!synapseVersion.equals(versions)) {
+						view.showErrorMessage(DisplayConstants.NEW_VERSION_INSTRUCTIONS);
+					}
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+		});
+	}
+
+	@Override
+	public String getSynapseVersion() {
+		return synapseVersion;		
 	}
 		
 }

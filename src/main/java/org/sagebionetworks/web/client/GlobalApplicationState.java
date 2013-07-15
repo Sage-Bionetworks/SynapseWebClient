@@ -69,4 +69,8 @@ public interface GlobalApplicationState {
 	public List<EntityHeader> getFavorites();
 	
 	public void setFavorites(List<EntityHeader> favorites);
+	
+	public void checkVersionCompatibility(SynapseClientAsync synapseClient, SynapseView view);
+	
+	public String getSynapseVersion();
 }
