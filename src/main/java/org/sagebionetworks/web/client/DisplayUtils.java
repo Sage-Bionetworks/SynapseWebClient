@@ -1027,6 +1027,15 @@ public class DisplayUtils {
 		return ordered;
 	}
 	
+	public static PopupPanel addToolTip(final Widget widget, String message) {
+		final PopupPanel popup = new PopupPanel(true);
+		popup.setWidget(new HTML(message));
+		popup.setGlassEnabled(false);
+		popup.addStyleName("topLevelZIndex");
+		//widget.addDomHandler(, null);
+		return popup;
+	}
+	
 	public static PopupPanel addToolTip(final Component widget, String message) {
 		final PopupPanel popup = new PopupPanel(true);
 		popup.setWidget(new HTML(message));

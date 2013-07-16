@@ -88,7 +88,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * ${reference?text=So H et al. Journal of Awesomeness. 2013 March 15}
 	 */
-	public static final String REFERENCE_REGEX = "\\$\\{reference\\?text=(.+?)\\}";
+	public static final String REFERENCE_REGEX = "\\$\\{reference\\?text=(.+?)&inlineWidget=(.+?)\\}";
 	
 	/**
 	 * Recognized example input:

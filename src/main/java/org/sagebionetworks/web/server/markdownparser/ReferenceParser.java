@@ -26,8 +26,11 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
 			//Store reference text
+			
 			int lenOfSyntax = "${reference?text=".length();
-			footnotes.add(input.substring(m.start() + lenOfSyntax, m.end() - 1));
+			int lenOfInlineParam = "&inlineWidget=true}".length();
+			String text = input.substring(m.start(), m.end());
+			footnotes.add(text.substring(lenOfSyntax, text.length() - lenOfInlineParam));
 			
 			/*
 			 * Insert any extra parameters/values by appending to the widget's original expression/parameters
