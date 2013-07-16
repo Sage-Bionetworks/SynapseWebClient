@@ -569,5 +569,8 @@ public class DisplayConstants {
 	public static final String THERE_IS_A_NEWER_VERSION = "A more recent version of this entity exists.";
 	public static final String NEW_VERSION_AVAILABLE = "New Version of Synapse Available";
 	public static final String NEW_VERSION_INSTRUCTIONS = "A new version of Synapse is now available, please save your work and reload the page to ensure proper function.";
+	public static final String API_DOCUMENTATION = "API Documentation";
+	public static final String EXAMPLE_CODE = "Example Code";
+	
 }
 

@@ -5,7 +5,6 @@ import java.util.HashSet;
 
 public class ClientProperties {
 
-	
 	public static final String HELP_EMAIL_ADDRESS = "synapseInfo@sagebase.org";
 	public static final String HELP_EMAIL_ADDRESS_LINK = "<a href=\""+ HELP_EMAIL_ADDRESS +"\" class=\"link\">contact us</a>";
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
@@ -93,6 +92,17 @@ public class ClientProperties {
 	public static final String STYLE_DISPLAY_INLINE = "inline-block";
 	public static final String STYLE_BLACK_TEXT = "blackText";
 	
+	/*
+	 * Client Documentation
+	 */
+	public static final String REST_API_URL = "https://sagebionetworks.jira.com/wiki/display/PLFM/Synapse+REST+APIs";
+	public static final String CLIENT_R_API_URL = "https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660";
+	public static final String CLIENT_R_EXAMPLE_CODE_URL = "https://sagebionetworks.jira.com/wiki/display/SYNR/Examples";
+	public static final String CLIENT_PYTHON_API_URL = "https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660";
+	public static final String CLIENT_PYTHON_EXAMPLE_CODE_URL = "https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660";
+	public static final String CLIENT_CL_API_URL = "https://github.com/Sage-Bionetworks/synapsePythonClient";
+	public static final String CLIENT_CL_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/synapsePythonClient/tree/master/examples/provenance";
+	public static final String CLIENT_JAVA_API_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";
+	public static final String CLIENT_JAVA_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";
 	
-
 }

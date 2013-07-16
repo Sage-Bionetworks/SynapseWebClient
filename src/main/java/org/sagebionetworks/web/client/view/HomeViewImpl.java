@@ -76,7 +76,22 @@ public class HomeViewImpl extends Composite implements HomeView {
 	SimplePanel javaClientInstallPanel;
 	@UiField
 	SimplePanel clClientInstallPanel;
-	
+	@UiField
+	Anchor rAPILink;	
+	@UiField
+	Anchor rExampleCodeLink;	
+	@UiField
+	Anchor pythonAPILink;	
+	@UiField
+	Anchor pythonExampleCodeLink;	
+	@UiField
+	Anchor clAPILink;	
+	@UiField
+	Anchor clExampleCodeLink;	
+	@UiField
+	Anchor javaAPILink;	
+	@UiField
+	Anchor javaExampleCodeLink;	
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -340,7 +355,16 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void setMyEvaluationsError(String string) {
 	}
 	
-	private void fillProgrammaticClientInstallCode() {		
+	private void fillProgrammaticClientInstallCode() {
+		configureNewWindowLink(rAPILink, ClientProperties.CLIENT_R_API_URL, DisplayConstants.API_DOCUMENTATION);
+		configureNewWindowLink(rExampleCodeLink, ClientProperties.CLIENT_R_EXAMPLE_CODE_URL, DisplayConstants.EXAMPLE_CODE);
+		configureNewWindowLink(pythonAPILink, ClientProperties.CLIENT_PYTHON_API_URL, DisplayConstants.API_DOCUMENTATION);
+		configureNewWindowLink(pythonExampleCodeLink, ClientProperties.CLIENT_PYTHON_EXAMPLE_CODE_URL, DisplayConstants.EXAMPLE_CODE);
+		configureNewWindowLink(clAPILink, ClientProperties.CLIENT_CL_API_URL, DisplayConstants.API_DOCUMENTATION);
+		configureNewWindowLink(clExampleCodeLink, ClientProperties.CLIENT_CL_EXAMPLE_CODE_URL, DisplayConstants.EXAMPLE_CODE);
+		configureNewWindowLink(javaAPILink, ClientProperties.CLIENT_JAVA_API_URL, DisplayConstants.API_DOCUMENTATION);
+		configureNewWindowLink(javaExampleCodeLink, ClientProperties.CLIENT_JAVA_EXAMPLE_CODE_URL, DisplayConstants.EXAMPLE_CODE);
+		
 		rClientInstallPanel.add(new HTML(ProgrammaticClientCode.getRClientInstallHTML()));
 		pythonClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
 		clClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
@@ -365,6 +389,13 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});	
 		javaClientInstallPanel.add(showJava);
+	}
+
+	private void configureNewWindowLink(Anchor a, String href, String text) {
+		a.addStyleName("link");
+		a.setTarget("_blank");
+		a.setHref(href);
+		a.setText(text);
 	}
 
 	

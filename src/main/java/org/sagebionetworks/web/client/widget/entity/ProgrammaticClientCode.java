@@ -25,17 +25,17 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 		Anchor pythonLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoPython45())));
 		DisplayUtils.addClickPopover(synapseJSNIUtils, pythonLink, "Synapse Python Client", getPythonClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
 
-		Anchor javaLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoJava45())));
-		DisplayUtils.addClickPopover(synapseJSNIUtils, javaLink, "Synapse Java Client", getJavaClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
-
 		Anchor shellLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoCommandLine45())));
 		DisplayUtils.addClickPopover(synapseJSNIUtils, shellLink, "Synapse Command Line Client", getCommandLineClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
 
+		Anchor javaLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoJava45())));
+		DisplayUtils.addClickPopover(synapseJSNIUtils, javaLink, "Synapse Java Client", getJavaClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
+		
 		LayoutContainer lc = new LayoutContainer();
 		lc.add(rLink);
 		lc.add(pythonLink);
-		lc.add(javaLink);
 		lc.add(shellLink);
+		lc.add(javaLink);
 		return lc;
 	}
 	
@@ -50,7 +50,9 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 				+ safeId + " &lt;- synGet(" + idString +   versionString+")" 
 				+"<br/><br/># " + DisplayConstants.LABEL_CLIENT_LOAD_ENTITY + " <br/>"
 				+ safeId + " &lt;- synGet(" + idString + versionString+", load=T)").replaceAll(" ", "&nbsp;")
-			+ "</div>";
+			+ "</div>"
+			+ getAPIandExampleCodeLinks(ClientProperties.CLIENT_R_API_URL, ClientProperties.CLIENT_R_EXAMPLE_CODE_URL)
+			+ "<br/>";
 
 		// add install code
 		load += "<br/>"
@@ -77,7 +79,9 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 				+ safeId + " = syn.get(" + idString +versionString+")" 
 				+ "<br/><br/># " + DisplayConstants.GET_PATH_CLIENT_ENTITY + " <br/>"
 				+ "filepath = "+safeId+".path").replaceAll(" ", "&nbsp;")
-			+ "</div>";
+			+ "</div>"
+			+ getAPIandExampleCodeLinks(ClientProperties.CLIENT_PYTHON_API_URL, ClientProperties.CLIENT_PYTHON_EXAMPLE_CODE_URL)
+			+ "<br/>";
 
 		// add install code
 		load += "<br/>"
@@ -91,6 +95,23 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 		+ "</div>");
 	}	
 
+	public static SafeHtml getCommandLineClientEntityLoad(String id, Long versionNumber) {
+		String safeId = SafeHtmlUtils.fromString(id).asString();
+		String load = "<div class=\"" + ClientProperties.STYLE_CODE_CONTENT + "\">" 
+			+ ("# Login<br/>"	
+				+ "synapse -u synapse_username -p pw<br/><br/>" 
+				+ "# " + DisplayConstants.DOWNLOAD_FILE_LOCAL + "<br/>"
+				+ "synapse get " + safeId + "<br/>").replaceAll(" ", "&nbsp;")
+			+ "</div>"
+			+ getAPIandExampleCodeLinks(ClientProperties.CLIENT_CL_API_URL, ClientProperties.CLIENT_CL_EXAMPLE_CODE_URL)
+			+ "<br/>";
+
+		// add install code
+		load += "<br/>"
+		+ wrapCollapse(DisplayConstants.LABEL_CL_CLIENT_INSTALL, getPythonClientInstallHTML().asString()); 
+		return SafeHtmlUtils.fromSafeConstant(load);
+	}
+	
 	public static SafeHtml getJavaClientEntityLoad(String id, Long versionNumber) {
 		String safeId = SafeHtmlUtils.fromString(id).asString();
 		String entityString = versionNumber == null ?  
@@ -102,7 +123,9 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 			+ "Synapse synapseClient = new Synapse();<br/>"
 			+ "synapseClient.login('synapse_username', 'password');<br/><br/>"
 			+ entityString).replaceAll(" ", "&nbsp;")
-		+ "</div>";
+		+ "</div>"
+		+ getAPIandExampleCodeLinks(ClientProperties.CLIENT_JAVA_API_URL, ClientProperties.CLIENT_JAVA_EXAMPLE_CODE_URL)
+		+ "<br/>";
 		
 		load += "<br/>"
 		+ wrapCollapse(DisplayConstants.INSTALL_JAVA_MAVEN,	getJavaClientInstallHTML().asString());
@@ -128,21 +151,9 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 		+ "</div>");
 	}	
 
-	public static SafeHtml getCommandLineClientEntityLoad(String id, Long versionNumber) {
-		String safeId = SafeHtmlUtils.fromString(id).asString();
-		String load = "<div class=\"" + ClientProperties.STYLE_CODE_CONTENT + "\">" 
-			+ ("# Login<br/>"	
-				+ "synapse -u synapse_username -p pw<br/><br/>" 
-				+ "# " + DisplayConstants.DOWNLOAD_FILE_LOCAL + "<br/>"
-				+ "synapse get " + safeId + "<br/>").replaceAll(" ", "&nbsp;")
-			+ "</div>";
-
-		// add install code
-		load += "<br/>"
-		+ wrapCollapse(DisplayConstants.LABEL_CL_CLIENT_INSTALL, getPythonClientInstallHTML().asString()); 
-		return SafeHtmlUtils.fromSafeConstant(load);
-	}
-	
+	/*
+	 * Private Methods
+	 */
 	private static String wrapCollapse(String link, String content) {		
 		String collapseId = "collapse-" + numSeq++;
 		String wrap = "<button type=\"button\" class=\"btn btn-info\" data-toggle=\"collapse\" data-target=\"#" + collapseId + "\">" 
@@ -155,5 +166,9 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 		return wrap;			
 	}
 
+	private static String getAPIandExampleCodeLinks(String apiUrl, String exampleCodeUrl) {
+		return "<a href=\""+ apiUrl + "\" class=\"link\" target=\"_blank\">"+ DisplayConstants.API_DOCUMENTATION 
+				+"</a> &amp; <a href=\"" + exampleCodeUrl + "\" class=\"link\" target=\"_blank\">"+ DisplayConstants.EXAMPLE_CODE +"</a>";
+	}
 	
 }
