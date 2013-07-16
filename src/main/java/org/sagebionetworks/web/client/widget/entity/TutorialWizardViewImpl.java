@@ -17,6 +17,9 @@ import com.google.inject.Inject;
 
 public class TutorialWizardViewImpl  implements TutorialWizardView {
 	
+	public static final String SKIP_TUTORIAL = "Skip Tutorial";
+	public static final String BACK_TEXT = "< Back";
+	public static final String NEXT_TEXT = "Next >";
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
 	private List<MarkdownWidget> pageContents;
@@ -43,16 +46,19 @@ public class TutorialWizardViewImpl  implements TutorialWizardView {
         //dialog.setAutoWidth(true);
         dialog.setAutoHeight(true);
         dialog.setResizable(false);
-        dialog.okText = "Next";
-        dialog.cancelText = "Skip Tutorial";
-        dialog.setButtons(Dialog.OKCANCEL);
+        dialog.noText = NEXT_TEXT;
+        dialog.yesText = BACK_TEXT;
+        dialog.cancelText = SKIP_TUTORIAL;
+        dialog.setButtons(Dialog.YESNOCANCEL);
         pageContents = new ArrayList<MarkdownWidget>();
         loadAllPageContents(ownerObjectId, headers);
         currentPageIndex = 0;
         dialog.add(wrap(pageContents.get(currentPageIndex)));
  		dialog.setHeading(wikiHeaders.get(currentPageIndex).getTitle());
  		
-        final com.extjs.gxt.ui.client.widget.button.Button button = dialog.getButtonById(Dialog.OK);
+        final com.extjs.gxt.ui.client.widget.button.Button nextButton = dialog.getButtonById(Dialog.NO);
+        final com.extjs.gxt.ui.client.widget.button.Button prevButton = dialog.getButtonById(Dialog.YES);
+        prevButton.setEnabled(false);
         final com.extjs.gxt.ui.client.widget.button.Button cancelButton = dialog.getButtonById(Dialog.CANCEL);
         cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
 			@Override
@@ -62,7 +68,7 @@ public class TutorialWizardViewImpl  implements TutorialWizardView {
 				presenter.userSkippedTutorial();
 			}
         });
-        button.addSelectionListener(new SelectionListener<ButtonEvent>(){
+        nextButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				//hide if we're on the last page
@@ -71,18 +77,36 @@ public class TutorialWizardViewImpl  implements TutorialWizardView {
 					presenter.userFinishedTutorial();
 				} else {
 					//else go to the next page
-					dialog.removeAll();
 					currentPageIndex++;
-					dialog.add(wrap(pageContents.get(currentPageIndex)));
-			 		dialog.setHeading(wikiHeaders.get(currentPageIndex).getTitle());
-			 		dialog.layout(true);
+					updatePageContents(dialog, currentPageIndex);
+					prevButton.setEnabled(true);
 			 		if (currentPageIndex == pageContents.size()-1) {
-			 			button.setText("OK");
+			 			nextButton.setText("OK");
 			 		}
 				}
 			}
         });
+        prevButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+					//go to the prev page
+				currentPageIndex--;
+				nextButton.setText(NEXT_TEXT);
+				updatePageContents(dialog, currentPageIndex);
+				if (currentPageIndex == 0) {
+		 			prevButton.setEnabled(false);
+		 		}
+			}
+        });
+
 		dialog.show();	
+	}
+	
+	private void updatePageContents(Dialog dialog, int currentPageIndex) {
+		dialog.removeAll();
+		dialog.add(wrap(pageContents.get(currentPageIndex)));
+ 		dialog.setHeading(wikiHeaders.get(currentPageIndex).getTitle());
+ 		dialog.layout(true);
 	}
 	
 	public void loadAllPageContents(String ownerObjectId, List<WikiHeader> headers){
