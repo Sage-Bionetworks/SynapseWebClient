@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
+import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -269,7 +270,18 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 						//pop up the submission dialog that has an Entity Finder
 						showSubmissionDialog();
 					} else {
-						showSubmissionGuide();
+						showSubmissionGuide(new TutorialWizard.Callback() {
+							
+							@Override
+							public void tutorialSkipped() {
+								submissionUserGuideSkipped();
+							}
+							
+							@Override
+							public void tutorialFinished() {
+								//do nothing
+							}
+						});
 					}
 				}
 				@Override
@@ -294,14 +306,14 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	}
 	
 	@Override
-	public void showSubmissionGuide() {
+	public void showSubmissionGuide(final TutorialWizard.Callback callback) {
 		//no submissions found.  walk through the steps of uploading to Synapse
 		getTutorialSynapseId(new AsyncCallback<String>() {
 			public void onFailure(Throwable caught) {
 				onFailure(new IllegalArgumentException(DisplayConstants.PROPERTY_ERROR + WebConstants.CHALLENGE_TUTORIAL_PROPERTY));
 			};
 			public void onSuccess(String tutorialEntityId) {
-				view.showSubmissionUserGuide(tutorialEntityId);
+				view.showSubmissionUserGuide(tutorialEntityId, callback);
 			};
 		});
 	}

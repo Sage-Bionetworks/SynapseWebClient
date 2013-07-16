@@ -87,7 +87,7 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 				link.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
-						presenter.showSubmissionGuide();
+						presenter.showSubmissionGuide(null);
 					}
 				});
 				tutorialLinkPanel.add(link);
@@ -237,20 +237,9 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 	}
 
 	@Override
-	public void showSubmissionUserGuide(String tutorialEntityOwnerId) {
+	public void showSubmissionUserGuide(String tutorialEntityOwnerId, TutorialWizard.Callback callback) {
 		
-		tutorialWizard.configure(tutorialEntityOwnerId, new TutorialWizard.Callback() {
-			
-			@Override
-			public void tutorialSkipped() {
-				presenter.submissionUserGuideSkipped();
-			}
-			
-			@Override
-			public void tutorialFinished() {
-				//do nothing
-			}
-		});
+		tutorialWizard.configure(tutorialEntityOwnerId, callback);
 	}
 	
 	public Widget wrap(Widget widget) {

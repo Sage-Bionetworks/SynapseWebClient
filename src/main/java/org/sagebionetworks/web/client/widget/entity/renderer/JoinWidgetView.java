@@ -4,6 +4,7 @@ import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -29,7 +30,7 @@ public interface JoinWidgetView extends IsWidget, SynapseView {
 			final Callback touAcceptanceCallback);
 	void showInfo(String title, String message);
 	
-	void showSubmissionUserGuide(String tutorialEntityOwnerId);
+	void showSubmissionUserGuide(String tutorialEntityOwnerId, TutorialWizard.Callback callback);
 	
 	void showProfileForm(UserProfile profile, AsyncCallback<Void> callback);
 	
@@ -48,6 +49,6 @@ public interface JoinWidgetView extends IsWidget, SynapseView {
 		
 		void submissionUserGuideSkipped();
 		
-		void showSubmissionGuide();
+		void showSubmissionGuide(TutorialWizard.Callback callback);
 	}
 }
