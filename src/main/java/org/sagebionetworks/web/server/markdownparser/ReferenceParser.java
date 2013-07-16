@@ -25,9 +25,20 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 		Matcher m = p1.matcher(input);
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
-			//Store reference text and insert extra parameter for the renderer to link to
+			//Store reference text
 			int lenOfSyntax = "${reference?text=".length();
 			footnotes.add(input.substring(m.start() + lenOfSyntax, m.end() - 1));
+			
+			/*
+			 * Insert any extra parameters/values by appending to the widget's original expression/parameters
+			 * (Don't forget the closing "}") Use as a replacement string:
+			 * 
+			 * To make widgets inline add:
+			 * &inlineWidget=true (this will render the widget inline)
+			 * 
+			 * Other:
+			 * &footnoteId=# (this id tells the renderer which element to link to)
+			 */
 			String updated = input.substring(m.start(), m.end() - 1) + 
 				"&" + WidgetConstants.INLINE_WIDGET_KEY + "=true&" + WidgetConstants.REFERENCE_FOOTNOTE_KEY + "=" + footnoteNumber + "}";
 			updated = Matcher.quoteReplacement(updated);	//Escapes the replacement string for appendReplacement
