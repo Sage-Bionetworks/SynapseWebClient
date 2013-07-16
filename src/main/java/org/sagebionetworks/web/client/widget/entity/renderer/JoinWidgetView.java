@@ -47,5 +47,7 @@ public interface JoinWidgetView extends IsWidget, SynapseView {
 		void submitToChallengeClicked();
 		
 		void submissionUserGuideSkipped();
+		
+		void showSubmissionGuide();
 	}
 }

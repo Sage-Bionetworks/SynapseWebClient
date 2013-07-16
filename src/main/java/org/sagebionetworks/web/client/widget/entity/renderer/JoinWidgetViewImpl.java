@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -26,6 +27,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -35,6 +37,7 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 	private Presenter presenter;
 	private ProfileFormWidget profileForm;
 	private TutorialWizard tutorialWizard;
+	
 	@Inject
 	public JoinWidgetViewImpl(ProfileFormWidget profileForm, TutorialWizard tutorialWizard) {
 		this.profileForm = profileForm;
@@ -70,8 +73,28 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 				//add info on how to get started!
 				FlowPanel p = new FlowPanel();
 				p.addStyleName("mainPageHeader inline-block");
-				p.add(new HTML(DisplayConstants.JOINED_EVALUATION_HTML));
+				p.add(new HTML("<h3>You are registered for this challenge!</h3>"));
 				
+				UnorderedListPanel listPanel = new UnorderedListPanel();
+				listPanel.addStyleName("list arrow-list");
+				listPanel.add(new HTML("Download the file(s) by going to the bottom of this page."));
+				
+				//add link and text
+				FlowPanel tutorialLinkPanel = new FlowPanel();
+				tutorialLinkPanel.addStyleName("inline-block");
+				Anchor link = new Anchor("Click here");
+				link.addStyleName("link inline-block");
+				link.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						presenter.showSubmissionGuide();
+					}
+				});
+				tutorialLinkPanel.add(link);
+				tutorialLinkPanel.add(new InlineLabel(" to learn how to upload and submit a file."));
+				listPanel.add(tutorialLinkPanel);
+				
+				p.add(listPanel);
 				Button button = new Button("Submit To Challenge");
 				button.removeStyleName("gwt-Button");
 				button.addStyleName("btn btn-large");

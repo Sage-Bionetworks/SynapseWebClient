@@ -269,15 +269,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 						//pop up the submission dialog that has an Entity Finder
 						showSubmissionDialog();
 					} else {
-						//no submissions found.  walk through the steps of uploading to Synapse
-						getTutorialSynapseId(new AsyncCallback<String>() {
-							public void onFailure(Throwable caught) {
-								onFailure(new IllegalArgumentException(DisplayConstants.PROPERTY_ERROR + WebConstants.CHALLENGE_TUTORIAL_PROPERTY));
-							};
-							public void onSuccess(String tutorialEntityId) {
-								view.showSubmissionUserGuide(tutorialEntityId);
-							};
-						});
+						showSubmissionGuide();
 					}
 				}
 				@Override
@@ -299,6 +291,19 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	@Override
 	public void submissionUserGuideSkipped() {
 		showSubmissionDialog();
+	}
+	
+	@Override
+	public void showSubmissionGuide() {
+		//no submissions found.  walk through the steps of uploading to Synapse
+		getTutorialSynapseId(new AsyncCallback<String>() {
+			public void onFailure(Throwable caught) {
+				onFailure(new IllegalArgumentException(DisplayConstants.PROPERTY_ERROR + WebConstants.CHALLENGE_TUTORIAL_PROPERTY));
+			};
+			public void onSuccess(String tutorialEntityId) {
+				view.showSubmissionUserGuide(tutorialEntityId);
+			};
+		});
 	}
 	
 	public void showSubmissionDialog() {
