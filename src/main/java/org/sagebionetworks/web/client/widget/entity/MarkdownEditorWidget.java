@@ -384,6 +384,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	     */
 	    if (DisplayUtils.isInTestWebsite(cookies)) {
 	    	menu.add(new SeparatorMenuItem());
+	    	menu.add(getNewCommand(WidgetConstants.REFERENCE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		handleInsertWidgetCommand(WidgetConstants.REFERENCE_CONTENT_TYPE, callback);
+		    	};
+		    }));
+	    	
 	    	menu.add(getNewCommand(WidgetConstants.SHINYSITE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
 		    		handleInsertWidgetCommand(WidgetConstants.SHINYSITE_CONTENT_TYPE, callback);
