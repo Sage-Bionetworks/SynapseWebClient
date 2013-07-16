@@ -21,8 +21,10 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -45,6 +47,8 @@ public class APITableWidgetTest {
 	PortalGinInjector mockGinInjector;
 	APITableColumnRendererSynapseID synapseIDColumnRenderer;
 	APITableColumnRendererNone noneColumnRenderer;
+	GlobalApplicationState mockGlobalApplicationState;
+	AuthenticationController mockAuthenticationController;
 	
 	String testJSON = "{totalNumberOfResults=10,results={}}";
 	Map<String, String> descriptor;
@@ -57,6 +61,8 @@ public class APITableWidgetTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
 		mockGinInjector = mock(PortalGinInjector.class);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		mockAuthenticationController = mock(AuthenticationController.class);
 		noneColumnRenderer = new APITableColumnRendererNone();
 		synapseIDColumnRenderer = new APITableColumnRendererSynapseID();
 		
@@ -77,12 +83,11 @@ public class APITableWidgetTest {
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(synapseIDColumnRenderer);
 		
 		AsyncMockStubber.callSuccessWith(testJSON).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		widget = new APITableWidget(mockView, mockSynapseClient, mockJSONObjectAdapter, mockGinInjector);
+		widget = new APITableWidget(mockView, mockSynapseClient, mockJSONObjectAdapter, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, "/testservice");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "true");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, "10");
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_WIDTH_KEY, "80%");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, "true");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, "Row Number");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, "results");
@@ -115,7 +120,6 @@ public class APITableWidgetTest {
 		
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY);
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY);
-		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_WIDTH_KEY);
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY);
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY);
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY);

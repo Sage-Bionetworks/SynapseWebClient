@@ -3,12 +3,11 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface MyEntitiesBrowserView extends IsWidget, SynapseWidgetView {
+public interface MyEntitiesBrowserView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.

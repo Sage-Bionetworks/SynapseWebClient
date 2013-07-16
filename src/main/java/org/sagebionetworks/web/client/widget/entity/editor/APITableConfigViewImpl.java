@@ -21,7 +21,7 @@ import com.google.inject.Inject;
 public class APITableConfigViewImpl extends LayoutContainer implements APITableConfigView {
 
 	private Presenter presenter;
-	private TextField<String> urlField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField, widthField;
+	private TextField<String> urlField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField;
 	private CheckBox isPagingField, isRowVisibleField;
 	private APITableColumnManager columnsManager;
 	
@@ -43,7 +43,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		isPagingField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_PAGING);
 		isPagingField.addStyleName("apitable");
 		pageSizeField = new TextField<String>();
-		widthField = new TextField<String>();
 		jsonResultsKeyNameField = new TextField<String>();
 		cssStyleNameField = new TextField<String>();
 		
@@ -56,7 +55,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		flowpanel.add(isPagingField);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_PAGE_SIZE, pageSizeField, flowpanel);
 		
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_WIDTH, widthField, flowpanel);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME, jsonResultsKeyNameField, flowpanel);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_CSS_STYLE_NAME, cssStyleNameField, flowpanel);
 		
@@ -94,7 +92,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		pageSizeField.setValue(Integer.toString(tableConfig.getPageSize()));
 		jsonResultsKeyNameField.setValue(tableConfig.getJsonResultsArrayKeyName());
 		cssStyleNameField.setValue(tableConfig.getCssStyleName());
-		widthField.setValue(tableConfig.getTableWidth());
 	}
 	
 	@Override
@@ -134,11 +131,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	@Override
 	public String getRowNumberColumnName() {
 		return rowNumbersColumnNameField.getValue();
-	}
-	
-	@Override
-	public String getTableWidth() {
-		return widthField.getValue();
 	}
 	
 	@Override

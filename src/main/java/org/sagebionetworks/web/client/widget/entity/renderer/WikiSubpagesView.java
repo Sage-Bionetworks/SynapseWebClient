@@ -1,11 +1,11 @@
-package org.sagebionetworks.web.client.widget.entity.browse;
+package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.TreeItem;
 
-public interface PagesBrowserView extends IsWidget, SynapseWidgetView {
+public interface WikiSubpagesView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.
@@ -18,7 +18,7 @@ public interface PagesBrowserView extends IsWidget, SynapseWidgetView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(boolean canEdit, TreeItem root);
+	public void configure(TreeItem root);
 	
 	public String getHTML(String href, String title, boolean isCurrentPage);
 	

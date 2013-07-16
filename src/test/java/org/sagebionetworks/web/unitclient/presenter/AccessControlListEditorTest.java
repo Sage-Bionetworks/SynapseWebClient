@@ -25,6 +25,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -78,6 +79,7 @@ public class AccessControlListEditorTest {
 	private static Project project;
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
 	private static EntityWrapper userGroupHeaderRPWrapper;
+	GlobalApplicationState mockGlobalApplicationState;
 	
 	
 	@SuppressWarnings("unchecked")
@@ -98,8 +100,9 @@ public class AccessControlListEditorTest {
 		mockACLEView = mock(AccessControlListEditorView.class);
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
 		AsyncMockStubber.callSuccessWith(TEST_PUBLIC_PRINCIPAL_ID +","+ TEST_AUTHENTICATED_PRINCIPAL_ID).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
-
-		when(mockAuthenticationController.getLoggedInUser().getProfile().getOwnerId()).thenReturn(new Long(ADMIN_ID).toString());
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
 		AsyncMockStubber.callSuccessWith(userGroupHeaderRPWrapper).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<List<String>>any(), any(AsyncCallback.class));
 
 		mockPushToSynapseCallback = mock(AsyncCallback.class);
@@ -110,7 +113,8 @@ public class AccessControlListEditorTest {
 				nodeModelCreator,
 				mockAuthenticationController,
 				new JSONObjectAdapterImpl(),
-				mockUserAccountService
+				mockUserAccountService,
+				mockGlobalApplicationState
 		);
 		acle.setResource(project);
 	}

@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -14,15 +12,16 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummary;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Settings;
@@ -30,7 +29,6 @@ import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SettingsView;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -40,6 +38,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
 public class SettingsPresenterTest {
 	
+	private static final String APIKEY = "MYAPIKEY";
 	SettingsPresenter profilePresenter;
 	SettingsView mockView;
 	AuthenticationController mockAuthenticationController;
@@ -49,6 +48,7 @@ public class SettingsPresenterTest {
 	CookieProvider mockCookieProvider;
 	NodeModelCreator mockNodeModelCreator;
 	Settings place = Mockito.mock(Settings.class);
+	SynapseClientAsync mockSynapseClient;
 	
 	UserSessionData testUser = new UserSessionData();
 	UserProfile profile = new UserProfile();
@@ -63,10 +63,14 @@ public class SettingsPresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockCookieProvider = mock(CookieProvider.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		mockSynapseClient = mock(SynapseClientAsync.class);
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		verify(mockView).setPresenter(profilePresenter);
-
-		profilePresenter.setPlace(place);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
+		
+		
+//		profilePresenter.setPlace(place);
 		profile.setDisplayName("tester");
 		profile.setOwnerId("testuser@test.com");
 		testUser.setProfile(profile);
@@ -76,12 +80,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testStart() {
-		reset(mockView);
-		reset(mockAuthenticationController);
-		reset(mockUserService);
-		reset(mockPlaceChanger);
-		reset(mockNodeModelCreator);
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		profilePresenter.setPlace(place);
 
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
@@ -95,21 +94,25 @@ public class SettingsPresenterTest {
 	public void testSetPlace() {
 		Settings newPlace = Mockito.mock(Settings.class);
 		profilePresenter.setPlace(newPlace);
+		
+		verify(mockView).setApiKey(APIKEY);		
+	}
+	
+	@Test
+	public void testSetPlaceFailAPIKey() {
+		Settings newPlace = Mockito.mock(Settings.class);
+		AsyncMockStubber.callFailureWith(null).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
+		profilePresenter.setPlace(newPlace);
+				
+		verify(mockView).setApiKey(DisplayConstants.ERROR_LOADING);
+		
 	}
 	
 	@Test
 	public void testResetPassword() throws RestServiceException {
-		reset(mockView);
-		reset(mockAuthenticationController);
-		reset(mockUserService);
-		reset(mockPlaceChanger);
-		reset(mockGlobalApplicationState);
-		reset(mockCookieProvider);
-		reset(mockNodeModelCreator);
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		profilePresenter.setPlace(place);
 		
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
 		String newPassword = "otherpassword";
 		
 		profilePresenter.resetPassword("testuser@test.com", password, newPassword);
@@ -117,31 +120,15 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testCreateSynapsePassword() throws RestServiceException {
-		reset(mockView);
-		reset(mockAuthenticationController);
-		reset(mockUserService);
-		reset(mockPlaceChanger);
-		reset(mockGlobalApplicationState);
-		reset(mockCookieProvider);
-		reset(mockNodeModelCreator);
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		profilePresenter.setPlace(place);
 
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
 		profilePresenter.createSynapsePassword();
 	}
 	@Test
 	public void testUsage() throws RestServiceException, JSONObjectAdapterException {
-		reset(mockView);
-		reset(mockAuthenticationController);
-		reset(mockUserService);
-		reset(mockPlaceChanger);
-		reset(mockGlobalApplicationState);
-		reset(mockCookieProvider);
-		reset(mockNodeModelCreator);
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
 		StorageUsageSummaryList usageSummary = new StorageUsageSummaryList();
 		Long totalSize = 12345l;
 		usageSummary.setTotalSize(totalSize);
@@ -155,15 +142,8 @@ public class SettingsPresenterTest {
 	}
 	@Test
 	public void testUsageFailure() throws RestServiceException {
-		reset(mockView);
-		reset(mockAuthenticationController);
-		reset(mockUserService);
-		reset(mockPlaceChanger);
-		reset(mockGlobalApplicationState);
-		reset(mockCookieProvider);
-		reset(mockNodeModelCreator);
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator);	
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(testUser);
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
+		
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserService).getStorageUsage(any(AsyncCallback.class));		
 		profilePresenter.setPlace(place);
 		verify(mockView).clearStorageUsageUI();

@@ -13,7 +13,12 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
-
+/**
+ * Should be able to create wiki content within Synapse and use the SynapseWikiPresenter to display, rather than caching an external source.
+ * @author jayhodgson
+ *
+ */
+@Deprecated
 public class WikiPresenter extends AbstractActivity implements WikiView.Presenter, Presenter<WikiPlace> {
 		
 	private WikiPlace place;
@@ -62,7 +67,7 @@ public class WikiPresenter extends AbstractActivity implements WikiView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser());
+				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);
 			}
 		});
 		

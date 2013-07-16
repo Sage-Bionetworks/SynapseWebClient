@@ -12,6 +12,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.AtLeast;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -38,6 +42,7 @@ public class LoginPresenterTest {
 	CookieProvider mockCookieProvier;
 	GWTWrapper mockGwtWrapper;
 	SynapseJSNIUtils mockJSNIUtils;
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	@Before
 	public void setup(){
@@ -67,7 +72,7 @@ public class LoginPresenterTest {
 	public void testFastpassValidSession() throws Exception {
 		LoginPlace loginPlace = new LoginPlace(LoginPlace.FASTPASS_TOKEN);
 		UserSessionData myTestUserSessionData = new UserSessionData();
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(myTestUserSessionData);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith("my user").when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("myfastpassurl").when(mockUserAccountServiceAsync).getFastPassSupportUrl(any(AsyncCallback.class));	
 		loginPresenter.showView(loginPlace);
@@ -76,11 +81,12 @@ public class LoginPresenterTest {
 	}
 	
 	@Test
-	public void testFastpassInvalidSession() {
+	public void testFastpassInvalidSession() throws Exception {
 		LoginPlace loginPlace = new LoginPlace(LoginPlace.FASTPASS_TOKEN);
 		UserSessionData myTestUserSessionData = new UserSessionData();
-		//return the test user the first time (as if logged in), then null the second time (simulate logging out)
-		when(mockAuthenticationController.getLoggedInUser()).thenReturn(myTestUserSessionData, null);
+		//return the test user the first time (as if logged in), then null the second time (simulate logging out)		
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(myTestUserSessionData);
+		when(mockNodeModelCreator.createJSONEntity(myTestUserSessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString(), UserSessionData.class)).thenReturn(myTestUserSessionData);
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));		
 		loginPresenter.showView(loginPlace);
 		verify(mockAuthenticationController, new AtLeast(1)).logoutUser();

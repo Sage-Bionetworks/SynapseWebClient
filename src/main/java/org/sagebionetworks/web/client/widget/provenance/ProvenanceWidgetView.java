@@ -1,15 +1,16 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import java.util.List;
+
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
-import org.sagebionetworks.web.shared.provenance.ProvTreeNode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface ProvenanceWidgetView extends IsWidget, SynapseWidgetView {
+public interface ProvenanceWidgetView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.
@@ -34,6 +35,8 @@ public interface ProvenanceWidgetView extends IsWidget, SynapseWidgetView {
 		void getInfo(String nodeId, AsyncCallback<KeyValueDisplay<String>> callback);
 
 		void expand(ExpandGraphNode node);
+
+		void findOldVersions();
 		
 	}
 
@@ -42,5 +45,7 @@ public interface ProvenanceWidgetView extends IsWidget, SynapseWidgetView {
 	public void setHeight(int height);
 	
 	public void setBlockCloseFullscreen(boolean blockClose);
+
+	public void markOldVersions(List<String> notCurrentNodeIds);
 	
 }

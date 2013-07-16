@@ -101,8 +101,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.markdownTextArea = markdownTextArea;
 		this.wikiKey = wikiKey;
 		this.isWikiEditor = isWikiEditor;
-		
-		descriptionFormatInfo = new HTML(WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML);
+		String formattingTipsHtml = DisplayUtils.isInTestWebsite(cookies) ? WebConstants.SYNAPSE_MARKDOWN_FORMATTING_TIPS_HTML : WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML;
+		descriptionFormatInfo = new HTML(formattingTipsHtml);
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
 		mdCommands.setVerticalAlign(VerticalAlignment.MIDDLE);
@@ -249,7 +249,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	
 	public void showPreview(String descriptionMarkdown, final boolean isWiki) {
 	    //get the html for the markdown
-	    synapseClient.markdown2Html(descriptionMarkdown, true, new AsyncCallback<String>() {
+	    synapseClient.markdown2Html(descriptionMarkdown, true, DisplayUtils.isInTestWebsite(cookies), new AsyncCallback<String>() {
 	    	@Override
 			public void onSuccess(String result) {
 	    		try {
@@ -322,13 +322,20 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    	};
 			}));
 	    }
+
+	    menu.add(getNewCommand(WidgetConstants.BUTTON_LINK_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.BUTTON_LINK_CONTENT_TYPE, callback);
+	    	};
+		}));
+
 	    menu.add(getNewCommand(WidgetConstants.ENTITYLIST_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	@Override
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.ENTITYLIST_CONTENT_TYPE, callback);
 	    	}
 	    }));	    
-	    menu.add(getNewCommand("Image", new SelectionListener<ComponentEvent>() {
+	    menu.add(getNewCommand(WidgetConstants.IMAGE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
 	    	};
@@ -338,12 +345,19 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.LINK_CONTENT_TYPE, callback);
 	    	};
 		}));
-	    menu.add(getNewCommand("Provenance Graph", new SelectionListener<ComponentEvent>() {
+	    menu.add(getNewCommand(WidgetConstants.PROVENANCE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.PROVENANCE_CONTENT_TYPE, callback);
 	    	};
 		}));
-	    menu.add(getNewCommand("Table", new SelectionListener<ComponentEvent>() {
+
+	    menu.add(getNewCommand(WidgetConstants.QUERY_TABLE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.QUERY_TABLE_CONTENT_TYPE, callback);
+	    	};
+		}));
+
+	    menu.add(getNewCommand(WidgetConstants.TABBED_TABLE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, callback);
 	    	};
@@ -353,11 +367,17 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TOC_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
 	    	};
 		}));
-	    menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
+    	menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	
 	    	};
 		}));
+    	menu.add(getNewCommand("Wiki Pages", new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		insertMarkdown(SharedMarkdownUtils.getWikiSubpagesMarkdown());
+	    	};
+		}));
+	    
 	    
 	    /**
 	     * load alpha test site widgets

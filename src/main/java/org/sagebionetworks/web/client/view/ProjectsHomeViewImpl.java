@@ -86,7 +86,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					presenter.createProject(searchField.getValue());
+					createProject(searchField.getValue());
 	            }					
 			}
 		});			
@@ -96,7 +96,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 		anchor.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.createProject(searchField.getValue());
+				createProject(searchField.getValue());
 			}
 		});
 		searchButtonContainer.setStyleName("mega-button");
@@ -126,6 +126,17 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 
 	@Override
 	public void clear() {
+	}
+
+	/*
+	 * Private Methods
+	 */
+	private void createProject(String name) {
+		if(name == null || name.isEmpty()) {
+			showErrorMessage(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
+			return;
+		}
+		presenter.createProject(name);
 	}
 
 }

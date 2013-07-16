@@ -2,13 +2,10 @@ package org.sagebionetworks.web.client.widget.footer;
 
 import java.util.Date;
 
-import org.gwttime.time.DateTime;
-import org.gwttime.time.format.ISODateTimeFormat;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
@@ -19,13 +16,13 @@ import com.google.gwt.dom.client.ScriptElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -40,6 +37,10 @@ public class FooterViewImpl extends Composite implements FooterView {
 	FlowPanel debugModePanel;	
 	@UiField
 	SpanElement copyrightYear;
+	@UiField
+	SpanElement portalVersionSpan;
+	@UiField
+	SpanElement repoVersionSpan;
 	
 	private Presenter presenter;
 	private CookieProvider cookies;
@@ -52,7 +53,7 @@ public class FooterViewImpl extends Composite implements FooterView {
 		this.cookies = cookies;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		addDebugModeLink();		
-		copyrightYear.setInnerHTML(ISODateTimeFormat.year().print(new DateTime()));
+		copyrightYear.setInnerHTML(DateTimeFormat.getFormat("yyyy").format(new Date()));
 	}
 	
 	private void addDebugModeLink() {
@@ -96,6 +97,14 @@ public class FooterViewImpl extends Composite implements FooterView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+	}
+
+	@Override
+	public void setVersion(String portalVersion, String repoVersion) {
+		if(portalVersion == null) portalVersion = "--";
+		if(repoVersion == null) repoVersion = "--";
+		portalVersionSpan.setInnerHTML(portalVersion);
+		repoVersionSpan.setInnerHTML(repoVersion);		
 	}
 
 }

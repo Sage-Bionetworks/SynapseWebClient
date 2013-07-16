@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -11,9 +8,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -27,25 +22,21 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 	private ProjectsHome place;
 	private ProjectsHomeView view;
 	private GlobalApplicationState globalApplicationState;
-	private JSONObjectAdapter jsonObjectAdapter;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
-	private AutoGenFactory autoGenFactory;
+	AdapterFactory adapterFactory;
 	
 	@Inject
 	public ProjectsHomePresenter(ProjectsHomeView view,
-			GlobalApplicationState globalApplicationState,
-			JSONObjectAdapter jsonObjectAdapter,
-			NodeModelCreator nodeModelCreator, AuthenticationController authenticationController, 
-			SynapseClientAsync synapseClient, AutoGenFactory autoGenFactory) {
+			GlobalApplicationState globalApplicationState,		
+			AuthenticationController authenticationController, 
+			SynapseClientAsync synapseClient, 
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.autoGenFactory = autoGenFactory;
+		this.adapterFactory = adapterFactory;
 		
 		view.setPresenter(this);
 	}
@@ -70,7 +61,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 
 	@Override
 	public void createProject(final String name) {
-		createProject(name, autoGenFactory, synapseClient, jsonObjectAdapter, globalApplicationState, authenticationController, new AsyncCallback<String>() {
+		CreateEntityUtil.createProject(name, synapseClient, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newProjectId) {
 				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
@@ -82,40 +73,12 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
 						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 					} 
 				}
 			}
 		});
-	}
-
-	public static void createProject(final String name,
-			AutoGenFactory autoGenFactory, SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter,
-			final GlobalApplicationState globalApplicationState,
-			final AuthenticationController authenticationController,
-			final AsyncCallback<String> callback) {
-		Project proj = (Project) autoGenFactory.newInstance(Project.class.getName());
-		proj.setEntityType(Project.class.getName());
-		proj.setName(name);
-		JSONObjectAdapter json = jsonObjectAdapter.createNew();
-		try {
-			proj.writeToJSONObject(json);
-			synapseClient.createOrUpdateEntity(json.toJSONString(), null, true, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String newProjectId) {
-					callback.onSuccess(newProjectId);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}		
 	}
 	
 }

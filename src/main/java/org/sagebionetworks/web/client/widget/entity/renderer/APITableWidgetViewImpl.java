@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -20,7 +21,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetView {
+public class APITableWidgetViewImpl extends LayoutContainer implements APITableWidgetView {
 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -30,6 +31,11 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	public APITableWidgetViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+	}
+	
+	@Override
+	public void clear() {
+		removeAll(true);
 	}
 	
 	@Override
@@ -47,10 +53,8 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 			
 			//do not apply sorter if paging (service needs to be involved for a true column sort)
 			if (!tableConfig.isPaging()) {
-				builder.append(" class=\"tablesorter\"");
+				builder.append(" class=\"inline-block scroll-x tablesorter\"");
 			}
-			if (tableConfig.getTableWidth() != null)
-				builder.append(" style=\"width:"+tableConfig.getTableWidth()+"\"");
 			builder.append(">");
 				
 			//headers
@@ -97,6 +101,7 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 				builder.append("</span>");
 
 			add(new HTMLPanel(builder.toString()));
+			layout(true);
 			synapseJSNIUtils.tablesorter(elementId);
 		}
 	}	
@@ -158,10 +163,19 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-	
-	private void removeAll() {
-		while(this.getWidgetCount() > 0)
-			this.remove(0);
+
+	@Override
+	public void showLoading() {
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 	
 	/*

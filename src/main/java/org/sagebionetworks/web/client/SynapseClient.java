@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -161,6 +162,8 @@ public interface SynapseClient extends RemoteService {
 
 	EntityWrapper createAccessRequirement(EntityWrapper arEW)
 			throws RestServiceException;
+	
+	EntityWrapper createLockAccessRequirement(String entityId) throws RestServiceException;
 
 	AccessRequirementsTransport getUnmetAccessRequirements(String entityId)
 			throws RestServiceException;
@@ -171,18 +174,18 @@ public interface SynapseClient extends RemoteService {
 	EntityWrapper createAccessApproval(EntityWrapper aaEW)
 			throws RestServiceException;
 	
-	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl) throws RestServiceException;
+	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl, String name) throws RestServiceException;
 	
-	public EntityWrapper updateExternalFile(String entityId, String externalUrl) throws RestServiceException;
+	public EntityWrapper updateExternalFile(String entityId, String externalUrl, String name) throws RestServiceException;
 	
-	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl) throws RestServiceException;
+	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl, String name) throws RestServiceException;
 	
 	/**
 	 * convenience method for converting markdown to html
 	 * @param markdown
 	 * @return
 	 */
-	public String markdown2Html(String markdown, Boolean isPreview) throws RestServiceException;
+	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha) throws RestServiceException;
 	
 	public String getActivityForEntity(String entityId) throws RestServiceException;
 	
@@ -213,6 +216,8 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getFavorites(Integer limit, Integer offset) throws RestServiceException;
 	
+	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException;
+	
 	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException;
 	
 	public void createParticipants(String[] evaluationIds) throws RestServiceException;
@@ -221,15 +226,32 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getChunkedFileToken(String fileName, String contentType) throws RestServiceException;
 	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException;
-	public String completeChunkedFileUpload(String entityId, List<String> requests, String parentEntityId, boolean isRestricted) throws RestServiceException;
+	public String combineChunkedFileUpload(List<String> requests) throws RestServiceException;
+	public String getUploadDaemonStatus(String daemonId) throws RestServiceException;
+	public String completeUpload(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException;
+	
 	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;
 	
 	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException;
 	
+	public String getEvaluations(List<String> evaluationIds) throws RestServiceException;
+	
 	public String getAvailableEvaluations() throws RestServiceException;
+	
+	public String getAvailableEvaluationEntities() throws RestServiceException;
+	public ArrayList<String> getAvailableEvaluationEntitiesList() throws RestServiceException;
+
 	
 	public String createSubmission(String submissionJson, String etag) throws RestServiceException;
 	
 	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException;
+
+	public Boolean hasSubmitted()	throws RestServiceException;
+		
+	public String getSynapseVersions() throws RestServiceException;
+	
+	public String getSynapseProperty(String key);
+	
+	public String getAPIKey() throws RestServiceException;
 }

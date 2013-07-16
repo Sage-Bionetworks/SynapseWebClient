@@ -1,18 +1,14 @@
 package org.sagebionetworks.web.client.widget.search;
 
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,7 +16,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.TextBox;
@@ -32,20 +27,14 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 	private static final String ALL_TYPES = "All Types";
 	private static final String PROJECTS = "Projects";
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;	
 	private FlexTable horizontalTable;
 	private Button typeDropdown;
 	private TextBox searchField;
 	private LayoutContainer searchButtonContainer;
 	
 	@Inject
-	public HomeSearchBoxViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, 
-			AccessMenuButton accessMenuButton,
+	public HomeSearchBoxViewImpl(AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor) {
-		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
 		this.setLayout(new FitLayout());
 				
 		horizontalTable = new FlexTable();

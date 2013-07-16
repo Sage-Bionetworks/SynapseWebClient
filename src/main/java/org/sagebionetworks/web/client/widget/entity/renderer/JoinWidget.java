@@ -1,15 +1,20 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -17,8 +22,10 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -37,10 +44,15 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private EvaluationSubmitter evaluationSubmitter;
 	private String[] evaluationIds;
 	
 	@Inject
-	public JoinWidget(JoinWidgetView view, SynapseClientAsync synapseClient, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, JSONObjectAdapter jsonObjectAdapter) {
+	public JoinWidget(JoinWidgetView view, SynapseClientAsync synapseClient,
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState,
+			NodeModelCreator nodeModelCreator,
+			JSONObjectAdapter jsonObjectAdapter, EvaluationSubmitter evaluationSubmitter) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -48,6 +60,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.evaluationSubmitter = evaluationSubmitter;
 	}
 	
 	@Override
@@ -75,7 +88,8 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showError(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showError(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
@@ -118,7 +132,9 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	 */
 	public void registerStep2() {
 		//pop up profile form.  user does not have to fill in info
-		view.showProfileForm(authenticationController.getLoggedInUser().getProfile(), new AsyncCallback<Void>() {
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
+		UserProfile profile = sessionData.getProfile();
+		view.showProfileForm(profile, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				continueToStep3();
@@ -178,7 +194,8 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
 			}
 		});
 	}
@@ -204,7 +221,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 		};
 		
 		GovernanceServiceHelper.signTermsOfUse(
-				authenticationController.getLoggedInUser().getProfile().getOwnerId(), 
+				authenticationController.getCurrentUserPrincipalId(), 
 				arId, 
 				onSuccess, 
 				onFailure, 
@@ -226,7 +243,8 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
 			}
 		});
 	}
@@ -239,4 +257,56 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
+	
+	@Override
+	public void submitToChallengeClicked() {
+		//has this user ever submitted to a challenge before?
+		try {
+			synapseClient.hasSubmitted(new AsyncCallback<Boolean>() {
+				@Override
+				public void onSuccess(Boolean hasSubmitted) {
+					if(hasSubmitted) {
+						//pop up the submission dialog that has an Entity Finder
+						showSubmissionDialog();
+					} else {
+						//no submissions found.  walk through the steps of uploading to Synapse
+						getTutorialSynapseId(new AsyncCallback<String>() {
+							public void onFailure(Throwable caught) {
+								onFailure(new IllegalArgumentException(DisplayConstants.PROPERTY_ERROR + WebConstants.CHALLENGE_TUTORIAL_PROPERTY));
+							};
+							public void onSuccess(String tutorialEntityId) {
+								view.showSubmissionUserGuide(tutorialEntityId);
+							};
+						});
+					}
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
+				}
+			});
+		} catch (RestServiceException e) {
+			if(!DisplayUtils.handleServiceException(e, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
+		}
+	}
+	
+	public void getTutorialSynapseId(AsyncCallback<String> callback) {
+		synapseClient.getSynapseProperty(WebConstants.CHALLENGE_TUTORIAL_PROPERTY, callback);
+	}
+	
+	@Override
+	public void submissionUserGuideSkipped() {
+		showSubmissionDialog();
+	}
+	
+	public void showSubmissionDialog() {
+		List<String> evaluationIdsList = new ArrayList<String>();
+		for (int i = 0; i < evaluationIds.length; i++) {
+			evaluationIdsList.add(evaluationIds[i]);
+		}
+		evaluationSubmitter.configure(null, evaluationIdsList);
+	}
+	
 }

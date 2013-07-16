@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -29,7 +31,6 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
-import org.sagebionetworks.web.shared.EntityUtil;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -52,6 +53,9 @@ public class EntityMetadata implements Presenter {
 	private EntityBundle bundle;	
 	private EntityUpdatedHandler entityUpdatedHandler;
 	
+	//the version that we're currently looking at
+	private Long currentVersion;
+	
 	@Inject
 	public EntityMetadata(EntityMetadataView view,
 			SynapseClientAsync synapseClient,
@@ -72,7 +76,7 @@ public class EntityMetadata implements Presenter {
 	}
 
 	@Override
-	public void loadVersions(String id, int offset, int limit,
+	public void loadVersions(String id, final int offset, int limit,
 			final AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback) {
 		// TODO: If we ever change the offset api to actually take 0 as a valid
 		// offset, then we need to remove "+1"
@@ -100,9 +104,10 @@ public class EntityMetadata implements Presenter {
 		return view.asWidget();
 	}
 
-	public void setEntityBundle(EntityBundle bundle, boolean readOnly) {
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		this.bundle = bundle;
-		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit() && readOnly);
+		this.currentVersion = versionNumber;
+		view.setEntityBundle(bundle, bundle.getPermissions().getCanEdit(), versionNumber != null);
 		boolean showDetailedMetadata = false;
 		boolean showEntityName = false;
 		if (bundle.getEntity() instanceof FileEntity) {
@@ -122,9 +127,8 @@ public class EntityMetadata implements Presenter {
 	}
 
 	private UserProfile getUserProfile() {
-		UserSessionData sessionData = authenticationController.getLoggedInUser();
-		return (sessionData==null ? null : sessionData.getProfile());
-		
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
+		return (sessionData==null ? null : sessionData.getProfile());				
 	}
 
 	@Override
@@ -246,24 +250,15 @@ public class EntityMetadata implements Presenter {
 		return new Callback() {
 			@Override
 			public void invoke() {
-				EntityWrapper ew = null;
-				try {
-					ew = EntityUtil.createLockDownDataAccessRequirementAsEntityWrapper(bundle.getEntity().getId(), jsonObjectAdapter);
-				} catch (JSONObjectAdapterException e) {
-					view.showInfo("Error", e.getMessage());
-					return;
-				}
-				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
-				final JavaScriptObject window = DisplayUtils.newWindow("", "", "");
-				synapseClient.createAccessRequirement(ew, new AsyncCallback<EntityWrapper>(){
+				synapseClient.createLockAccessRequirement(bundle.getEntity().getId(), new AsyncCallback<EntityWrapper>(){
 					@Override
 					public void onSuccess(EntityWrapper result) {
 						fireEntityUpdatedEvent();
-						DisplayUtils.setWindowTarget(window, getJiraRestrictionUrl());
-				}
+					}
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showInfo("Error", caught.getMessage());
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+							view.showInfo("Error", caught.getMessage());
 					}
 				});
 			}
@@ -302,7 +297,7 @@ public class EntityMetadata implements Presenter {
 							public void onFailure(Throwable caught) {
 								if (!DisplayUtils.handleServiceException(
 										caught, globalApplicationState.getPlaceChanger(),
-										authenticationController.getLoggedInUser())) {
+										authenticationController.isLoggedIn(), view)) {
 									view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE
 											+ "\n" + caught.getMessage());
 								}
@@ -326,7 +321,7 @@ public class EntityMetadata implements Presenter {
 			public void onFailure(Throwable caught) {
 				if (!DisplayUtils.handleServiceException(caught,
 						globalApplicationState.getPlaceChanger(),
-						authenticationController.getLoggedInUser())) {
+						authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + "\n" + caught.getMessage());
 				}
 			}

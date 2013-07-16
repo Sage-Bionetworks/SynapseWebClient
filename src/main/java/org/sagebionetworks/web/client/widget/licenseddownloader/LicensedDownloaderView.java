@@ -8,11 +8,11 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface LicensedDownloaderView extends IsWidget, SynapseWidgetView {
+public interface LicensedDownloaderView extends IsWidget, SynapseView {
 	
 	/**
 	 * Set the presenter.

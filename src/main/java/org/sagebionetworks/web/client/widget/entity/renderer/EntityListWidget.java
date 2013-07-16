@@ -20,21 +20,22 @@ import com.google.inject.Inject;
 public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetRendererPresenter {
 	
 	private EntityListWidgetView view;
-	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private NodeModelCreator nodeModelCreator;
 	private Map<String, String> descriptor;
+	AuthenticationController authenticationController;
 	
 	@Inject
 	public EntityListWidget(EntityListWidgetView view,
-			AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, SynapseJSNIUtils synapseJSNIUtils) {
-		this.view = view;
-		this.authenticationController = authenticationController;
+			SynapseClientAsync synapseClient,
+			NodeModelCreator nodeModelCreator, SynapseJSNIUtils synapseJSNIUtils,
+			AuthenticationController authenticationController) {
+		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.nodeModelCreator = nodeModelCreator;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}
 	

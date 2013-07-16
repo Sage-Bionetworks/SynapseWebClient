@@ -12,7 +12,7 @@ public interface ChallengeOverviewView extends IsWidget, SynapseView {
 	
 	public void showSubmissionError();
 	
-	public void showChallengeInfo(String html);
+	public void showChallengeInfo();
 	
 	/**
 	 * Set this view's presenter

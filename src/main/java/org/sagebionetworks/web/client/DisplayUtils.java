@@ -9,10 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
-import org.gwttime.time.DateTime;
-import org.gwttime.time.format.ISODateTimeFormat;
+import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
@@ -35,6 +33,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -49,6 +48,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
@@ -69,9 +69,15 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
@@ -81,6 +87,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -105,6 +112,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
@@ -118,7 +126,6 @@ public class DisplayUtils {
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
 	public static final String USER_GUIDE_ID = "syn1669771";
 	
-	public static final String CHALLENGE_OVERVIEW_CONTENT_PAGE_ID = "38830113";
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
 	
@@ -171,7 +178,7 @@ public class DisplayUtils {
 	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
 	public static final HashSet<Character> ESCAPE_CHARACTERS_SET = new HashSet<Character>(Arrays.asList(ESCAPE_CHARACTERS));
 	
-	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/gif","image/png"};
+	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/jpg", "image/jpe","image/gif","image/png"};
 	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
 	
 	public static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
@@ -392,18 +399,24 @@ public class DisplayUtils {
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
-	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, UserSessionData currentUser) {
-		if(ex instanceof UnauthorizedException) {
+	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, boolean isLoggedIn, SynapseView view) {
+		if(ex instanceof ReadOnlyModeException) {
+			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
+			return true;
+		} else if(ex instanceof SynapseDownException) {
+			placeChanger.goTo(new Down(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			return true;
+		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page						
 			showInfo("Session Timeout", "Your session has timed out. Please login again.");
 			placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			return true;
 		} else if(ex instanceof ForbiddenException) {			
-			if(currentUser == null) {				
-				MessageBox.info(DisplayConstants.ERROR_LOGIN_REQUIRED, DisplayConstants.ERROR_LOGIN_REQUIRED, null);
+			if(!isLoggedIn) {				
+				view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
 				placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			} else {
-				MessageBox.info(DisplayConstants.TITLE_UNAUTHORIZED, DisplayConstants.ERROR_FAILURE_PRIVLEDGES, null);
+				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
@@ -412,23 +425,29 @@ public class DisplayUtils {
 			if(reason.matches(".*entity with the name: .+ already exites.*")) {
 				message = DisplayConstants.ERROR_DUPLICATE_ENTITY_MESSAGE;
 			}			
-			MessageBox.info("Error", message, null);
+			view.showErrorMessage(message);
 			return true;
 		} else if(ex instanceof NotFoundException) {
-			MessageBox.info("Not Found", DisplayConstants.ERROR_NOT_FOUND, null);
+			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
 			placeChanger.goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
-			return true;
-		} else if(ex instanceof ReadOnlyModeException) {
-			MessageBox.info(DisplayConstants.READ_ONLY_MODE, DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE, null);
-			return true;
-		} else if(ex instanceof SynapseDownException) {
-			placeChanger.goTo(new Down(DisplayUtils.DEFAULT_PLACE_TOKEN));
 			return true;
 		}
 		
 		// For other exceptions, allow the consumer to send a good message to the user
 		return false;
 	}
+	
+	public static boolean checkForRepoDown(Throwable caught, PlaceChanger placeChanger, SynapseView view) {
+		if(caught instanceof ReadOnlyModeException) {
+			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
+			return true;
+		} else if(caught instanceof SynapseDownException) {
+			placeChanger.goTo(new Down(DisplayUtils.DEFAULT_PLACE_TOKEN));
+			return true;
+		}
+		return false;
+	}
+
 	
 	/**
 	 * Handle JSONObjectAdapterException.  This will occur when the client is pointing to an incompatible repo version. 
@@ -523,14 +542,58 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showInfo(String title, String message) {
-		Alert alert = new Alert(title, message);
+		Alert alert = new Alert(title, message, false);
 		alert.setAlertType(AlertType.Info);
 		alert.setTimeout(4000);
 		displayGlobalAlert(alert);
 	}
+
+	/**
+	 * Shows an warning message to the user in the "Global Alert area".
+	 * For more precise control over how the message appears,
+	 * use the {@link displayGlobalAlert(Alert)} method.
+	 * @param title
+	 * @param message
+	 */
+	public static void showError(String title, String message, Integer timeout) {
+		Alert alert = new Alert(title, message, true);
+		alert.setAlertType(AlertType.Error);
+		if(timeout != null) {
+			alert.setTimeout(timeout);
+		}
+		displayGlobalAlert(alert);
+	}
 	
 	public static void showErrorMessage(String message) {
-		MessageBox.info(DisplayConstants.TITLE_ERROR, message, null);
+		MessageBox.info(DisplayConstants.TITLE_ERROR, message, null);  
+	}
+	
+	public static void showOkCancelMessage(
+			String title, 
+			String message, 
+			String iconStyle,
+			int minWidth,
+			final Callback okCallback, 
+			final Callback cancelCallback) {
+		MessageBox box = new MessageBox();
+	    box.setButtons(MessageBox.OKCANCEL);
+	    box.setIcon(iconStyle);
+	    box.setTitle(title);
+	    box.addCallback(new Listener<MessageBoxEvent>() {					
+			@Override
+			public void handleEvent(MessageBoxEvent be) { 												
+				Button btn = be.getButtonClicked();
+				if(Dialog.OK.equals(btn.getItemId())) {
+					okCallback.invoke();
+				} else {
+					cancelCallback.invoke();
+				}
+			}
+		});
+	    box.setMessage(message);
+	    box.setMinWidth(minWidth);
+	    box.show();
+
 	}
 	
 	/**
@@ -578,13 +641,7 @@ public class DisplayUtils {
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}
-	
-	public static String convertDateToString(Date toFormat) {
-		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		DateTime dt = new DateTime(toFormat.getTime());
-		return ISODateTimeFormat.dateTime().print(dt);
-	}
-	
+		
 	/**
 	 * YYYY-MM-DD HH:mm:ss
 	 * @param toFormat
@@ -592,8 +649,7 @@ public class DisplayUtils {
 	 */
 	public static String converDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		DateTime dt = new DateTime(toFormat.getTime());
-		return ISODateTimeFormat.dateHourMinuteSecond().print(dt).replaceAll("T", " ");		
+		return DateUtils.convertDateToString(FORMAT.DATE_TIME, toFormat).replaceAll("T", " ");
 	}
 	
 	
@@ -604,16 +660,9 @@ public class DisplayUtils {
 	 */
 	public static String converDateaToSimpleString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		DateTime dt = new DateTime(toFormat.getTime());
-		return ISODateTimeFormat.date().print(dt);		
+		return DateUtils.convertDateToString(FORMAT.DATE, toFormat);
 	}
- 
-	public static Date convertStringToDate(String toFormat) {
-		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		DateTime dt = ISODateTimeFormat.dateTime().parseDateTime(toFormat);
-		return dt.toDate();
-	}
-	
+ 	
 	public static String getSynapseWikiHistoryToken(String ownerId, String objectType, String wikiPageId) {
 		Wiki place = new Wiki(ownerId, objectType, wikiPageId);
 		return "#!" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
@@ -994,6 +1043,31 @@ public class DisplayUtils {
 		return ordered;
 	}
 
+	
+	public static PopupPanel addToolTip(final Component widget, String message) {
+		final PopupPanel popup = new PopupPanel(true);
+		popup.setWidget(new HTML(message));
+		popup.setGlassEnabled(false);
+		popup.addStyleName("topLevelZIndex");
+		widget.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
+			          public void setPosition(int offsetWidth, int offsetHeight) {
+			        	  popup.showRelativeTo(widget);
+			          }
+			        });
+			}
+		});
+		widget.addListener(Events.OnMouseOut, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				popup.hide();
+			}
+		});
+		return popup;
+	}
+	
 	/**
 	 * A list of tags that core attributes like 'title' cannot be applied to.
 	 * This prevents them from having methods like addToolTip applied to them
@@ -1020,7 +1094,7 @@ public class DisplayUtils {
 	 * @param pos where to position the tooltip relative to the widget
 	 */
 	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, String tooltipText, TOOLTIP_POSITION pos){
-		Map<String, String> optionsMap = new TreeMap<String, String>();
+		Map<String, String> optionsMap = new HashMap<String, String>();
 		optionsMap.put("title", tooltipText);
 		optionsMap.put("data-placement", pos.toString().toLowerCase());
 		optionsMap.put("data-animation", "false");
@@ -1055,7 +1129,7 @@ public class DisplayUtils {
 	}
 
 	public static void addClickPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new TreeMap<String, String>();
+		Map<String, String> optionsMap = new HashMap<String, String>();
 		optionsMap.put("data-html", "true");
 		optionsMap.put("data-animation", "true");
 		optionsMap.put("title", title);
@@ -1065,7 +1139,7 @@ public class DisplayUtils {
 	}
 
 	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new TreeMap<String, String>();
+		Map<String, String> optionsMap = new HashMap<String, String>();
 		optionsMap.put("data-html", "true");
 		optionsMap.put("data-animation", "true");
 		optionsMap.put("title", title);
@@ -1433,8 +1507,13 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isCSV(String contentType) {
-		return contentType.toLowerCase().startsWith("text/csv");
+		return contentType != null && contentType.toLowerCase().startsWith("text/csv");
 	}
+	
+	public static boolean isTAB(String contentType) {
+		return contentType != null && contentType.toLowerCase().startsWith(WebConstants.TEXT_TAB_SEPARATED_VALUES);
+	}
+	
 
 	/**
 	 * Return a preview filehandle associated with this bundle (or null if unavailable)

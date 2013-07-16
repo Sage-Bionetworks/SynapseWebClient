@@ -6,7 +6,7 @@ public class WidgetConstants {
 	public static final String YOUTUBE_FRIENDLY_NAME = "YouTube";
 	
 	public static final String PROVENANCE_CONTENT_TYPE = "provenance";
-	public static final String PROVENANCE_FRIENDLY_NAME = "ProvenanceGraph";
+	public static final String PROVENANCE_FRIENDLY_NAME = "Provenance Graph";
 	
 	public static final String IMAGE_CONTENT_TYPE = "image";
 	public static final String IMAGE_FRIENDLY_NAME ="Image";
@@ -19,6 +19,9 @@ public class WidgetConstants {
 
 	public static final String TABBED_TABLE_CONTENT_TYPE = "tabbedtable";
 	public static final String TABBED_TABLE_FRIENDLY_NAME ="Table";
+	
+	public static final String QUERY_TABLE_CONTENT_TYPE = "querytable";
+	public static final String QUERY_TABLE_FRIENDLY_NAME = "Query Table";
 	
 	public static final String API_TABLE_CONTENT_TYPE = "supertable";
 	public static final String API_TABLE_FRIENDLY_NAME = "Super Table (Synapse API Based)";
@@ -35,11 +38,17 @@ public class WidgetConstants {
 	public static final String JOIN_EVALUATION_CONTENT_TYPE = "joinevaluation";
 	public static final String JOIN_EVALUATION_FRIENDLY_NAME ="Join Evaluation";
 	
+	public static final String BUTTON_LINK_CONTENT_TYPE = "buttonlink";
+	public static final String BUTTON_LINK_FRIENDLY_NAME ="Button Link";
+	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
 	
 	public static final String TOC_CONTENT_TYPE = "toc";
+	public static final String WIKI_SUBPAGES_CONTENT_TYPE = "wikipages";
+	
+	public static final String NO_AUTO_WIKI_SUBPAGES = "nowikipages";
 	
 	public static final String WIKI_FILES_PREVIEW_CONTENT_TYPE = "wikifilepreview";
 	
@@ -75,7 +84,6 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_CSS_STYLE = "cssStyle";
 	public static final String API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX = "columnConfig";
 	public static final String API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY = "rowNumberDisplayName";
-	public static final String API_TABLE_WIDGET_WIDTH_KEY = "width";
 	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
 	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	public static final String USERBADGE_WIDGET_ID_KEY = "id";
@@ -84,6 +92,9 @@ public class WidgetConstants {
 	public static final String SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY = "includePrincipalId";
 	public static final String SHINYSITE_HEIGHT_KEY = "height";
 	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
+	
+	public static final String BUTTON_LINK_URL_KEY = "url";
+	public static final String BUTTON_LINK_TEXT_KEY = "text";
 	
 	/**
 	 * API Table Column Renderers

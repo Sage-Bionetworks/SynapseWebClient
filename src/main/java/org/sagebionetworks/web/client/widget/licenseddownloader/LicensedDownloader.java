@@ -43,7 +43,6 @@ import com.google.inject.Inject;
 public class LicensedDownloader implements LicensedDownloaderView.Presenter, SynapseWidgetPresenter {
 	
 	private LicensedDownloaderView view;
-	private AuthenticationController authenticationController;
 	private NodeModelCreator nodeModelCreator;
 
 	private GlobalApplicationState globalApplicationState;
@@ -58,7 +57,8 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraUrlHelper;
-	private boolean isDirectDownloadSupported; 
+	private boolean isDirectDownloadSupported;
+	AuthenticationController authenticationController;
 	
 	// for testing
 	public void setUserProfile(UserProfile userProfile) {this.userProfile=userProfile;}
@@ -71,13 +71,13 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			SynapseClientAsync synapseClient,
 			JiraURLHelper jiraUrlHelper,
 			NodeModelCreator nodeModelCreator) {
-		this.view = view;
-		this.authenticationController = authenticationController;
+		this.view = view;		
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.jiraUrlHelper=jiraUrlHelper;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);		
 		clearHandlers();
 	}
@@ -126,7 +126,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * @return
 	 */
 	public String getDirectDownloadURL() {
-		if (isDirectDownloadSupported)
+		if (isDirectDownloadSupported && authenticationController.isLoggedIn())
 			return view.getDirectDownloadURL();
 		else return null; 
 	}

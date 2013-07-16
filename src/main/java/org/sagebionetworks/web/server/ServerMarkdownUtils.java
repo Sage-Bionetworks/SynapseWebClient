@@ -14,20 +14,29 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.server.markdownparser.MarkdownRegExConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import eu.henkelmann.actuarius.ActuariusTransformer;
 
 public class ServerMarkdownUtils {
 	
+	//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by exactly 3 '`', then it's a match
+	public static final String FENCE_CODE_BLOCK_REGEX = "^[> \t\n\f\r]*[`]{3}";
+	//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by ` exactly 4 times, then it's a match
+	//for starting code blocks, capture the language parameter by looking for word characters (or a hyphen) one or more times
+	public static final String START_CODE_BLOCK_REGEX = "^[> \t\n\f\r]*[`]{4}\\s*([a-zA-Z_0-9-]+)\\s*$";
+	public static final String END_CODE_BLOCK_REGEX = "^[> \t\n\f\r]*[`]{4}\\s*$";
+	
 	public static final String START_PRE_CODE = "<pre><code";
 	public static final String END_PRE_CODE = "</code></pre>";
 	public static final String HTML_LINE_BREAK = "<br />\n";
-	private static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
-	private static final String TEMP_SPACE_DELIMITER = "%^&2_9d";
-	private static final String R_ASSIGNMENT = "<-";
-	private static final String R_MESSED_UP_ASSIGNMENT = "< -";
+	public static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
+	public static final String TEMP_SPACE_DELIMITER = "%^&2_9d";
+	public static final String R_ASSIGNMENT = "<-";
+	public static final String R_MESSED_UP_ASSIGNMENT = "< -";
 	
 	
 	/**
@@ -43,7 +52,7 @@ public class ServerMarkdownUtils {
 	 */
 	public static String markdown2Html(String markdown, Boolean isPreview, ActuariusTransformer markdownProcessor) throws IOException {
 		String originalMarkdown = markdown;
-		if (markdown == null) return "";
+		if (markdown == null) return SharedMarkdownUtils.getDefaultWikiMarkdown();
 		//trick to maintain newlines when suppressing all html
 		if (markdown != null) {
 			markdown = preserveWhitespace(markdown);
@@ -59,6 +68,7 @@ public class ServerMarkdownUtils {
 		markdown = resolveTables(markdown);
 		markdown = resolveCodeWithLanguage(markdown);
 //		reportTime("resolved tables");
+		markdown = addSubpagesIfNotPresent(markdown);
 		markdown = fixNewLines(markdown);
 		markdown = markdownProcessor.apply(markdown);
 //		reportTime("markdownToHtml");
@@ -99,6 +109,27 @@ public class ServerMarkdownUtils {
 		return markdown.replace(TEMP_NEWLINE_DELIMITER, "\n").replace(TEMP_SPACE_DELIMITER, " ");
 	}
 	
+
+	/**
+	 * adds a reference to the subpages wiki widget at the top of the page if it isn't already in the markdown
+	 * @param markdown
+	 * @return
+	 */
+	public static String addSubpagesIfNotPresent(String markdown) {
+		String subpagesMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
+		String newMarkdown = markdown;
+		if (!markdown.contains(subpagesMarkdown)) {
+			String noAutoWikiSubpages = SharedMarkdownUtils.getNoAutoWikiSubpagesMarkdown();
+			if (markdown.contains(noAutoWikiSubpages)) {
+				//found.  delete this string, and do not include subpages markdown
+				newMarkdown = markdown.replace(noAutoWikiSubpages, "");
+			}
+			else {
+				newMarkdown = subpagesMarkdown + "\n"+ markdown;	
+			}
+		}
+		return newMarkdown;
+	}
 	
 	/**
 	 * adds html line breaks to every line, unless it suspects that the line will be in a preformatted code block
@@ -107,8 +138,7 @@ public class ServerMarkdownUtils {
 	 */
 	public static String fixNewLines(String markdown) {
 		if (markdown == null || markdown.length() == 0) return markdown;
-		//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by exactly 3 '`', then it's a match
-		String regEx = "^[> \t\n\f\r]*[`]{3}";
+		String regEx = FENCE_CODE_BLOCK_REGEX;
 		Pattern p = Pattern.compile(regEx);
 		StringBuilder sb = new StringBuilder();
 		boolean isSuspectedCode = false;
@@ -220,8 +250,8 @@ public class ServerMarkdownUtils {
 	public static String resolveHorizontalRules(String rawMarkdown) {
 		//find all horizontal rules
 		//match if we have 3 or more '-' or '*', and it's the only thing on the line
-		String regEx1 = "^[-]{3,}$";
-		String regEx2 = "^[*]{3,}$";
+		String regEx1 = MarkdownRegExConstants.HR_REGEX1;
+		String regEx2 = MarkdownRegExConstants.HR_REGEX2;
 		String[] lines = rawMarkdown.split("\n");
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < lines.length; i++) {
@@ -242,7 +272,7 @@ public class ServerMarkdownUtils {
 	
 	public static String resolveTables(String rawMarkdown) {
 		//find all tables, and replace the raw text with html table
-		String regEx = ".*[|]{1}.+[|]{1}.*";
+		String regEx = MarkdownRegExConstants.TABLE_REGEX;
 		String[] lines = rawMarkdown.split("\n");
 		StringBuilder sb = new StringBuilder();
 		int tableCount = 0;
@@ -265,10 +295,8 @@ public class ServerMarkdownUtils {
 	
 	public static String resolveCodeWithLanguage(String markdown) {
 		if (markdown == null || markdown.length() == 0) return markdown;
-		//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by ` exactly 4 times, then it's a match
-		//for starting code blocks, capture the language parameter by looking for word characters (or a hyphen) one or more times
-		String startCodeBlockRegex = "^[> \t\n\f\r]*[`]{4}\\s*([a-zA-Z_0-9-]+)\\s*$";
-		String endCodeBlockRegex = "^[> \t\n\f\r]*[`]{4}\\s*$";
+		String startCodeBlockRegex = START_CODE_BLOCK_REGEX;
+		String endCodeBlockRegex = END_CODE_BLOCK_REGEX;
 		Pattern p1 = Pattern.compile(startCodeBlockRegex);
 		Pattern p2 = Pattern.compile(endCodeBlockRegex);
 		StringBuilder sb = new StringBuilder();
@@ -343,20 +371,24 @@ public class ServerMarkdownUtils {
 					Matcher matcher = pattern.matcher(oldText);
 					StringBuilder sb = new StringBuilder();
 					int previousFoundIndex = 0;
+					boolean childFound = false;
 					while (matcher.find()) {
+						childFound = true;
 						if (matcher.groupCount() == 2) {
 							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
-							sb.append(ServerMarkdownUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
+							sb.append(SharedMarkdownUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
 							widgetsFound++;
 							previousFoundIndex = matcher.end(1);
 						}
 					}
-					if (previousFoundIndex < oldText.length() - 1)
-						// substring, go from the previously found index to the end
-						sb.append(oldText.substring(previousFoundIndex));
-					Element newElement = doc.createElement("div"); //wrap new html in a div, since it needs a container!					
-					newElement.html(sb.toString());
-					childNode.replaceWith(newElement);
+					if (childFound) {
+						if (previousFoundIndex < oldText.length() - 1)
+							// substring, go from the previously found index to the end
+							sb.append(oldText.substring(previousFoundIndex));
+						Element newElement = doc.createElement("div"); //wrap new html in a div, since it needs a container!					
+						newElement.html(sb.toString());
+						childNode.replaceWith(newElement);
+					}
 				}
 			}
 		}
@@ -373,18 +405,5 @@ public class ServerMarkdownUtils {
 	
 	public static String getUrlHtml(String url){
 		return "<a target=\"_blank\" class=\"link\" href=\"" + url.trim() + "\">" + url+ "</a>";
-	}
-	
-	public static String getWidgetHTML(int widgetIndex, String suffix, String widgetProperties){
-		StringBuilder sb = new StringBuilder();
-		sb.append("<div id=\"");
-		sb.append(WebConstants.DIV_ID_WIDGET_PREFIX);
-		sb.append(widgetIndex);
-		sb.append(suffix);
-		sb.append("\" class=\"widgetContainer\" widgetParams=\"");
-		sb.append(widgetProperties);
-		sb.append("\">");
-		sb.append("</div>");
-	    return sb.toString();
 	}
 }

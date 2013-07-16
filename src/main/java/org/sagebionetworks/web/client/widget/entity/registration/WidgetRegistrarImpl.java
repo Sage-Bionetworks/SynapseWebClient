@@ -62,12 +62,16 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getTabbedTableConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseAPICallConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.QUERY_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseQueryConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getAttachmentConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.ENTITYLIST_CONTENT_TYPE)) {
 			presenter = ginInjector.getEntityListConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.SHINYSITE_CONTENT_TYPE)) {
 			presenter = ginInjector.getShinySiteConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.BUTTON_LINK_CONTENT_TYPE)) {
+			presenter = ginInjector.getButtonLinkConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -98,10 +102,12 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 				presenter = ginInjector.getImageRenderer();
 			else
 				presenter = ginInjector.getOldImageRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE) || contentTypeKey.equals(WidgetConstants.QUERY_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseAPICallRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.TOC_CONTENT_TYPE)) {
 			presenter = ginInjector.getTableOfContentsRenderer();
+		} else if (contentTypeKey.equals(WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE)) {
+			presenter = ginInjector.getWikiSubpagesRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getWikiFilesPreviewRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
@@ -114,6 +120,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getUserBadgeWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.JOIN_EVALUATION_CONTENT_TYPE)) {
 			presenter = ginInjector.getJoinWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.BUTTON_LINK_CONTENT_TYPE)) {
+			presenter = ginInjector.getButtonLinkWidget();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -188,6 +196,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.LINK_CONTENT_TYPE, WidgetConstants.LINK_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, WidgetConstants.TABBED_TABLE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.API_TABLE_CONTENT_TYPE, WidgetConstants.API_TABLE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.QUERY_TABLE_CONTENT_TYPE, WidgetConstants.QUERY_TABLE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.ENTITYLIST_CONTENT_TYPE, WidgetConstants.ENTITYLIST_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.SHINYSITE_CONTENT_TYPE, WidgetConstants.SHINYSITE_FRIENDLY_NAME);
 	}

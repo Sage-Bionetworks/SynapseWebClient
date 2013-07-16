@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.resources.client.ImageResource;
 
 
 public class DisplayConstants {
@@ -99,8 +100,9 @@ public class DisplayConstants {
 	public static final String LABEL_PYTHON_CLIENT_INSTALL = "Install Python Client";
 	public static final String INSTALL_JAVA_MAVEN = "Install Java Client";
 	public static final String LABEL_CL_CLIENT_INSTALL = "Install Command Line Client";
-	public static final String LABEL_CLIENT_GET_ENTITY = "Obtain a pointer";
+	public static final String LABEL_CLIENT_GET_ENTITY = "Obtain a pointer and download the data";
 	public static final String LABEL_CLIENT_LOAD_ENTITY = "Load the data";
+	public static final String GET_PATH_CLIENT_ENTITY = "Get the path to the local copy of the data file";
 	public static final String DOWNLOAD_FILE_LOCAL = "Download file";
 	public static final String LOGIN_USERNAME_LABEL = "Email Address";
 	
@@ -199,8 +201,9 @@ public class DisplayConstants {
 	public static final String LABEL_NO_PREVIEW_DATA = "A Preview has not been created.";
 	public static final String LABEL_CONTAINS_NO_CHILDREN = "This object contains no children.";
 	public static final String BUTTON_REGISTER = "Register";
-	public static final String LINK_COMMUNITY_FORUM = "Help";
+	public static final String LINK_COMMUNITY_FORUM = "Forum";
 	public static final String BUTTON_LOGIN = "Login";
+	public static final String BUTTON_DREAM_8 = "DREAM8 Challenges";
 	public static final String LABEL_WELCOME = "Welcome";
 	public static final String BUTTON_LOGOUT = "Logout";
 	public static final String BUTTON_MY_PROFILE = "My Profile";
@@ -225,8 +228,9 @@ public class DisplayConstants {
 	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String LABEL_FINISHING = "Finishing...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
-	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit For Evaluation";
+	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit To Challenge";
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
+	public static final String SUBMIT_VERSIONABLE_ENTITY_MESSAGE = "Please select a versionable entity to submit for evaluation.";
 	
 	public static final String SUBMITTED_TITLE = "Submitted";
 	public static final String SUBMITTED_TO_EVALUATION = "Submitted to the selected evaluation(s)";
@@ -237,6 +241,8 @@ public class DisplayConstants {
 	public static final String ERROR_ENTITY_CANT_LINKS = "Sorry, the requested entity can not contain links.";
 	public static final String ERROR_ENTITY_CREATION = "Sorry, creation failed. Please try again.";
 	public static final String ERROR_ENTITY_PROMOTE_FAILURE = "Sorry, promoting the entity failed.";
+	public static final String NO_ENTITY_SELECTED = "Please select an entity and try again.";
+	public static final String NO_EVALUATION_SELECTED = "Please select an evaluation and try again.";
 	public static final String LABEL_SUCCESS = "Success";
 	public static final String LABEL_PROMOTED = " was promoted to top.";
 	public static final String TEXT_LINK_SAVED = "Link saved.";
@@ -307,8 +313,8 @@ public class DisplayConstants {
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
 	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
-	public static final String SHOW_VERSIONS = "show all versions";
-	public static final String HIDE_VERSIONS = "hide all versions";
+	public static final String SHOW_VERSIONS = "show";
+	public static final String HIDE_VERSIONS = "hide";
 	public static final String NOT_FOUND = "Not Found";
 	public static final String ERROR_LOADING = "Error Loading";
 	public static final String PREVIEW_FAILED_TEXT = "Preview failed: ";
@@ -336,6 +342,7 @@ public class DisplayConstants {
 	 * Widget editors
 	 */
 	public static final String IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE = "A file must be uploaded to continue.";
+	public static final String IMAGE_CONFIG_FILE_TYPE_MESSAGE = "The uploaded image file type is not recognized on most browsers. Please convert to PNG or JPEG and try again.";
 	public static final String IMAGE_CONFIG_INVALID_URL_MESSAGE = "Please enter a valid URL";
 	public static final String IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE = "Please enter valid alternate text for the URL";
 	public static final String IMAGE_CONFIG_UPLOAD = "Upload";
@@ -349,6 +356,7 @@ public class DisplayConstants {
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
 	public static final String SYNAPSE_API_CALL_URL_LABEL = "Synapse API URI:";
+	public static final String SYNAPSE_API_CALL_QUERY_LABEL = "Query:";
 	public static final String SYNAPSE_API_CALL_COLUMNS_LABEL = "Columns To Display:";
 	public static final String SYNAPSE_API_CALL_COLUMN_HEADERS_LABEL = "Column Headers:";
 	public static final String SYNAPSE_API_CALL_RENDERERS_LABEL = "Renderer Names:";
@@ -356,7 +364,6 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME = "Row Numbers Col Name:";
 	public static final String SYNAPSE_API_CALL_IS_PAGING = "Support Paging?";
 	public static final String SYNAPSE_API_CALL_PAGE_SIZE = "Page Size:";
-	public static final String SYNAPSE_API_CALL_WIDTH = "Width (% or pixels)";
 	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
 	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
 	public static final String SHINYSITE_SITE_LABEL = "Shiny Site URL";
@@ -396,6 +403,7 @@ public class DisplayConstants {
 	public static final String ID_INP_NEWPASSWORD = "id_inp_new_password";
 	public static final String ID_INP_CONFIRMPASSWORD = "id_inp_confirm_password";
 	public static final String ID_BTN_SUBMIT = "id_btn_submit";
+	public static final String ID_BTN_SUBMIT_TO_EVALUATION = "id_btn_submit_to_evaluation";
 	public static final String ID_BTN_START_PROJECT = "id_btn_start_project";
 	public static final String ID_BTN_DOWNLOAD = "id_btn_download";
 	public static final String ID_BTN_EDIT = "id_btn_edit";
@@ -439,6 +447,8 @@ public class DisplayConstants {
 	public static final String TOU_PROMPT = "Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:";
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
+	public static final String RESTRICTION_WARNING_TITLE = "Add Data Restriction";
+	public static final String RESTRICTION_WARNING = "By clicking 'OK' below, I request that the Synapse ACT contact me to assign the appropriate access restrictions for this dataset.";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
 	public static final String DATA_USE_BANNER = "Data Use Restrictions for Public Data";
 	public static final String DATA_USE_BANNER_SUB1 = "If you change Sharing to be ";
@@ -458,7 +468,7 @@ public class DisplayConstants {
 	public static final String PAGE_NOT_FOUND = "Page not found";
 	public static final String PAGE_NOT_FOUND_DESC = "The page you requested was not found, that's all we know.";
 	public static final String ANNOTATIONS = "Annotations";
-	public static final String TO_LOAD_VERSION_1 = "To load version 1";
+	public static final String TO_LOAD_VERSION_1 = "To load this version";
 	public static final String TO_LOAD_AN_ENTITY = "To load an entity";
 	public static final String PROGRAMMATIC_ACCESS = "Programmatic Access";
 	public static final String PROVENANCE = "Provenance";
@@ -499,6 +509,7 @@ public class DisplayConstants {
 	public static final String FIND_IMAGE_ENTITY = "Find Image File Entity";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
 	public static final String FIND_ENTITIES = "Find Entities";
+	public static final String FIND_ENTITY = "Find Entity";
 	
 	public static final String API_TABLE_COLUMN_COUNT_MISMATCH = "SuperTable: The number of columns must be the same as the number of renderers and column header titles.";
 	public static final String API_TABLE_MISSING_URI = "SuperTable: Endpoint path not specified.";
@@ -538,11 +549,25 @@ public class DisplayConstants {
 	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
 	
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
+	public static final String EVALUATION_SUBMISSION_ERROR = "Unable to submit to the evaluation: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
 	public static final String NOT_PARTICIPATING_IN_ANY_EVALUATIONS = "You are not currently participating in an Evaluation/Challenge. Please join one and try again.";
-	public static final String JOINED_EVALUATION_HTML = "<span class=\"mainPageHeader inline-block\"><h3>You are registered for this challenge!</h3><ul class=\"list arrow-list\"><li>Download the file(s) by going to the bottom of this page...</li></ul></span>";
+	public static final String JOINED_EVALUATION_HTML = "<h3>You are registered for this challenge!</h3><ul class=\"list arrow-list\"><li>Download the file(s) by going to the bottom of this page...</li></ul>";
+	public static final String PROPERTY_ERROR = "Unable to query for property: ";
 	public static final String READ_ONLY_MODE = "Read Only Mode";
 	public static final String SYNAPSE_IN_READ_ONLY_MODE = "Synapse is in READ_ONLY mode for maintenance. You can continue to browse, but can not modify during this period.";
+	public static final String VIEW_EDIT_PROFILE = "View / Edit Profile";
+	public static final String SHOW = "Show";
+	public static final String SEND_PASSWORD_CHANGE_REQUEST = "Send Password Change Request";
+	public static final String EMAIL_ADDRESS = "Email Address";
+	public static final String SET_PASSWORD = "Set Password";
+	public static final String SUCCESS = "Success";
+	public static final String REQUEST_SENT = "Request Sent";
+	public static final String PLEASE_ENTER_PROJECT_NAME = "Please enter a project name";
+	public static final String OLD_VERSION = "old version";
+	public static final String THERE_IS_A_NEWER_VERSION = "A more recent version of this entity exists.";
+	public static final String NEW_VERSION_AVAILABLE = "New Version of Synapse Available";
+	public static final String NEW_VERSION_INSTRUCTIONS = "A new version of Synapse is now available, please save your work and reload the page to ensure proper function.";
 }
 

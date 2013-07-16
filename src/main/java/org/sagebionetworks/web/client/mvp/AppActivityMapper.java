@@ -3,10 +3,9 @@ package org.sagebionetworks.web.client.mvp;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.web.client.AppLoadingView;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -18,46 +17,31 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
-import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
-import org.sagebionetworks.web.client.presenter.DownPresenter;
-import org.sagebionetworks.web.client.presenter.EntityPresenter;
-import org.sagebionetworks.web.client.presenter.GovernancePresenter;
+import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
-import org.sagebionetworks.web.client.presenter.ProfilePresenter;
-import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
-import org.sagebionetworks.web.client.presenter.SearchPresenter;
-import org.sagebionetworks.web.client.presenter.SearchUtil;
-import org.sagebionetworks.web.client.presenter.SettingsPresenter;
-import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
-import org.sagebionetworks.web.client.presenter.WikiPresenter;
-import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
-import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 
-public class AppActivityMapper implements ActivityMapper {
-	
+public class AppActivityMapper implements ActivityMapper {	
+
 	private static Logger log = Logger.getLogger(AppActivityMapper.class.getName());
 	private PortalGinInjector ginjector;
 	@SuppressWarnings("rawtypes")
 	private List<Class> openAccessPlaces; 
 	private List<Class> excludeFromLastPlace;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	AppLoadingView loading;
 
 	/**
 	 * AppActivityMapper associates each Place with its corresponding
@@ -67,10 +51,11 @@ public class AppActivityMapper implements ActivityMapper {
 	 *            Factory to be passed to activities
 	 */
 	@SuppressWarnings("rawtypes")
-	public AppActivityMapper(PortalGinInjector ginjector, SynapseJSNIUtils synapseJSNIUtils) {
+	public AppActivityMapper(PortalGinInjector ginjector, SynapseJSNIUtils synapseJSNIUtils, AppLoadingView loading) {
 		super();
 		this.ginjector = ginjector;
-		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.synapseJSNIUtils = synapseJSNIUtils; 
+		this.loading = loading;
 		
 		openAccessPlaces = new ArrayList<Class>();
 		openAccessPlaces.add(Home.class);		
@@ -101,7 +86,7 @@ public class AppActivityMapper implements ActivityMapper {
 		synapseJSNIUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
 	    
 	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
-		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
+		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();		
 		
 		// set current and last places
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
@@ -119,7 +104,9 @@ public class AppActivityMapper implements ActivityMapper {
 				// Redirect them to the login screen
 				LoginPlace loginPlace = new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN);
 				return getActivity(loginPlace);
-			}			
+			} else {
+				
+			}
 		}
 		
 		// We use GIN to generate and inject all presenters with 
@@ -128,84 +115,15 @@ public class AppActivityMapper implements ActivityMapper {
 			// Split the code
 			PresenterProxy<HomePresenter, Home> presenter = ginjector.getHomePresenter();
 			presenter.setPlace((Home)place);
-			return presenter;
-		} else if(place instanceof Synapse){
-			PresenterProxy<EntityPresenter, Synapse> presenter = ginjector.getEntityPresenter();
-			presenter.setPlace((Synapse)place);
-			return presenter;
-		}else if (place instanceof ProjectsHome) {
-			// Projects Home 
-			PresenterProxy<ProjectsHomePresenter, ProjectsHome> presenter = ginjector.getProjectsHomePresenter();
-			presenter.setPlace((ProjectsHome)place);
-			return presenter;
-		}else if (place instanceof LoginPlace) {
-			// login view
-			PresenterProxy<LoginPresenter, LoginPlace> presenter = ginjector.getLoginPresenter();
-			presenter.setPlace((LoginPlace)place);
-			return presenter;
-		} else if (place instanceof PasswordReset) {
-			// reset passwords
-			PresenterProxy<PasswordResetPresenter, PasswordReset> presenter = ginjector.getPasswordResetPresenter();
-			presenter.setPlace((PasswordReset)place);
-			return presenter;
-		} else if (place instanceof RegisterAccount) {
-			// register for a new account
-			PresenterProxy<RegisterAccountPresenter, RegisterAccount> presenter = ginjector.getRegisterAccountPresenter();
-			presenter.setPlace((RegisterAccount)place);
-			return presenter;
-		} else if (place instanceof Profile) {
-			// user's profile page
-			PresenterProxy<ProfilePresenter, Profile> presenter = ginjector.getProfilePresenter();
-			presenter.setPlace((Profile)place);
-			return presenter;
-		} else if (place instanceof Settings) {
-			// user's profile page
-			PresenterProxy<SettingsPresenter, Settings> presenter = ginjector.getSettingsPresenter();
-			presenter.setPlace((Settings)place);
-			return presenter;
-		} else if (place instanceof ComingSoon) {
-			// user's profile page
-			PresenterProxy<ComingSoonPresenter, ComingSoon> presenter = ginjector.getComingSoonPresenter();
-			presenter.setPlace((ComingSoon)place);
-			return presenter;
-		} else if (place instanceof Governance) {
-			// user's profile page
-			PresenterProxy<GovernancePresenter, Governance> presenter = ginjector.getGovernancePresenter();
-			presenter.setPlace((Governance)place);
-			return presenter;
-		} else if (place instanceof Challenges) {
-			// user's profile page
-			PresenterProxy<ChallengeOverviewPresenter, Challenges> presenter = ginjector.getChallengeOverviewPresenter();
-			presenter.setPlace((Challenges)place);
-			return presenter;
-		} else if (place instanceof Search) {
-			// search results page
-			Search searchPlace = (Search) place;
-			Synapse redirect = SearchUtil.willRedirect(searchPlace);
-			if(redirect != null){
-				return getActivity(redirect);
-			}
-			PresenterProxy<SearchPresenter, Search> presenter = ginjector.getSearchPresenter();
-			presenter.setPlace((Search)place);
-			return presenter;
-		} else if (place instanceof WikiPlace) {
-			// wiki page
-			PresenterProxy<WikiPresenter, WikiPlace> presenter = ginjector.getWikiPresenter();
-			presenter.setPlace((WikiPlace)place);
-			return presenter;
-		} else if(place instanceof Wiki){
-			PresenterProxy<SynapseWikiPresenter, Wiki> presenter = ginjector.getSynapseWikiPresenter();
-			presenter.setPlace((Wiki)place);
-			return presenter;
-		} else if(place instanceof Down) {
-			PresenterProxy<DownPresenter, Down> presenter = ginjector.getDownPresenter();
-			presenter.setPlace((Down) place);
+			presenter.setGinInjector(ginjector);
 			return presenter;
 		} else {
-			// Log that we have an unknown place but send the user to the default
-			log.log(Level.WARNING, "Unknown Place: "+place.getClass().getName());
-			// Go to the default place
-			return getActivity(getDefaultPlace());
+			if(loading != null) loading.showWidget();
+			BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();
+			bulkPresenterProxy.setGinjector(ginjector);
+			bulkPresenterProxy.setloader(loading);
+			bulkPresenterProxy.setPlace(place);
+			return bulkPresenterProxy;
 		}
 	}
 

@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.search.SearchResults;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author dburdick
  *
  */
-public interface EntitySearchBoxView extends IsWidget, SynapseWidgetView {
+public interface EntitySearchBoxView extends IsWidget, SynapseView {
 	
 	public interface Presenter {				
 		void search(String search);

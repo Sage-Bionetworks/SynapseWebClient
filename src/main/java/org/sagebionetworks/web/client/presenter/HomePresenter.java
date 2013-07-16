@@ -1,36 +1,30 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
-import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -44,40 +38,29 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private Home place;
 	private HomeView view;
 	private GlobalApplicationState globalApplicationState;
-	private CookieProvider cookieProvider;
 	private AuthenticationController authenticationController;
-	private StackConfigServiceAsync stackConfigService;
 	private RssServiceAsync rssService;
-	private NodeModelCreator nodeModelCreator;
 	private SearchServiceAsync searchService;
 	private SynapseClientAsync synapseClient;
-	private AutoGenFactory autoGenFactory;
-	private JSONObjectAdapter jsonObjectAdapter;
+	private AdapterFactory adapterFactory;
 	
 	@Inject
-	public HomePresenter(HomeView view, 
-			CookieProvider cookieProvider, 
+	public HomePresenter(HomeView view,  
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
-			StackConfigServiceAsync stackConfigService,
 			RssServiceAsync rssService,
-			NodeModelCreator nodeModelCreator,
 			SearchServiceAsync searchService, 
-			SynapseClientAsync synapseClient, 
-			AutoGenFactory autoGenFactory,
-			JSONObjectAdapter jsonObjectAdapter){
+			SynapseClientAsync synapseClient, 			
+			AdapterFactory adapterFactory){
 		this.view = view;
 		// Set the presenter on the view
-		this.cookieProvider = cookieProvider;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.stackConfigService = stackConfigService;
 		this.rssService = rssService;
-		this.nodeModelCreator = nodeModelCreator;
 		this.searchService = searchService;
 		this.synapseClient = synapseClient;
-		this.autoGenFactory = autoGenFactory;
-		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.adapterFactory = adapterFactory;
+		this.authenticationController = authenticationController;
 		this.view.setPresenter(this);
 	}
 
@@ -99,7 +82,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		// Things to load for authenticated users
 		if(authenticationController.isLoggedIn()) {
 			loadProjectsAndFavorites();
-		}
+		}		
 	}
 		
 	public void loadNewsFeed(){
@@ -119,8 +102,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 		
-	public String getHtml(String rssFeedJson) throws JSONObjectAdapterException {
-		RSSFeed feed = nodeModelCreator.createJSONEntity(rssFeedJson, RSSFeed.class);
+	public String getHtml(String rssFeedJson) throws JSONObjectAdapterException {		
+		RSSFeed feed = new RSSFeed(adapterFactory.createNew(rssFeedJson));
 		StringBuilder htmlResponse = new StringBuilder();
 		int maxIdx = feed.getEntries().size() > MAX_NEWS_ITEMS ? MAX_NEWS_ITEMS : feed.getEntries().size();
 		for (int i = 0; i < maxIdx; i++) {
@@ -140,7 +123,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 
 	public String getSupportFeedHtml(String rssFeedJson) throws JSONObjectAdapterException {
-		RSSFeed feed = nodeModelCreator.createJSONEntity(rssFeedJson, RSSFeed.class);
+		RSSFeed feed = new RSSFeed(adapterFactory.createNew(rssFeedJson));
 		StringBuilder htmlResponse = new StringBuilder();
 		htmlResponse.append("<div class=\"span-12 last notopmargin\"> <ul class=\"list question-list\">");
 		for (int i = 0; i < feed.getEntries().size(); i++) {
@@ -171,9 +154,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	private void loadProjectsAndFavorites() {
-		loadEvaluations(new AsyncCallback<List<Evaluation>>() {
+		loadEvaluations(new AsyncCallback<List<EntityHeader>>() {
 			@Override
-			public void onSuccess(List<Evaluation> result) {
+			public void onSuccess(List<EntityHeader> result) {
 				view.setMyEvaluationList(result);
 			}
 			@Override
@@ -182,7 +165,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		});
 		
-		EntityBrowserUtils.loadUserUpdateable(searchService, nodeModelCreator, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
+		
+		
+		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setMyProjects(result);
@@ -193,7 +178,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		});
 		
-		EntityBrowserUtils.loadFavorites(synapseClient, nodeModelCreator, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setFavorites(result);
@@ -205,17 +190,19 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 
-	public void loadEvaluations(final AsyncCallback<List<Evaluation>> callback){
+	public void loadEvaluations(final AsyncCallback<List<EntityHeader>> callback){
 		try {
-			synapseClient.getAvailableEvaluations(new AsyncCallback<String>() {
+			synapseClient.getAvailableEvaluationEntitiesList(new AsyncCallback<ArrayList<String>>() {
 				@Override
-				public void onSuccess(String jsonString) {
-					try {
-						PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
-						List<Evaluation> list = results.getResults();
-						callback.onSuccess(list);
+				public void onSuccess(ArrayList<String> results) {					
+					try {	
+						List<EntityHeader> evals = new ArrayList<EntityHeader>();
+						for(String eh : results) {
+							evals.add(new EntityHeader(adapterFactory.createNew(eh)));
+						}
+						callback.onSuccess(evals);
 					} catch (JSONObjectAdapterException e) {
-						callback.onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
 				}
 				
@@ -232,7 +219,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	
 	@Override
 	public void createProject(final String name) {
-		ProjectsHomePresenter.createProject(name, autoGenFactory, synapseClient, jsonObjectAdapter, globalApplicationState, authenticationController, new AsyncCallback<String>() {
+		CreateEntityUtil.createProject(name, synapseClient, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newProjectId) {
 				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
@@ -244,7 +231,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.getLoggedInUser())) {					
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
 						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 					} 
 				}

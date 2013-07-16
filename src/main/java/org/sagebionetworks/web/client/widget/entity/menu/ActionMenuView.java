@@ -5,12 +5,12 @@ import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface ActionMenuView extends IsWidget, SynapseWidgetView {
+public interface ActionMenuView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.
@@ -34,10 +34,8 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 			AuthenticationController authenticationController,
 			boolean isAdministrator, 
 			boolean canEdit, 
-			boolean readOnly, 
+			Long versionNumber, 
 			boolean isInTestMode);
-	
-	void popupEvaluationSelector(List<Evaluation> list, List<String> submitterAliases);
 	
 	/**
 	 * Presenter interface
@@ -65,8 +63,6 @@ public interface ActionMenuView extends IsWidget, SynapseWidgetView {
 		void createLink(String selectedEntityId);
 
 		void uploadToGenomespace();
-		
-		void submitToEvaluations(List<String> evaluationIds, String submitterAlias);
 		
 		void showAvailableEvaluations();
 	}

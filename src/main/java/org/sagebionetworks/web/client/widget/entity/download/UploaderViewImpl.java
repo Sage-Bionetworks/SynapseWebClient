@@ -5,8 +5,10 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityViewUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -16,6 +18,7 @@ import com.extjs.gxt.ui.client.event.FormEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
@@ -49,7 +52,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	SynapseJSNIUtils synapseJSNIUtils;
 	private SageImageBundle sageImageBundle;
 	
-	TextField<String> pathField;
+	TextField<String> pathField, nameField;
 	
 	// initialized in constructor
 	private boolean isInitiallyRestricted;
@@ -66,9 +69,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private String fileName;
 	
 	private HTML spinningProgressContainer;
-	
-	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
-	private JavaScriptObject window;
 	
 	LayoutContainer container;
 	IconsImageBundle iconsImageBundle;
@@ -130,6 +130,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 		// reset
 		pathField.clear();
+		nameField.clear();
 
 	}
 
@@ -162,7 +163,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		TabPanel tabPanel = new TabPanel();		
 		tabPanel.setPlain(true);
-		tabPanel.setHeight(130);		
+		tabPanel.setHeight(140);		
 		container.add(tabPanel, new MarginData(0, 10, 10, 10));
 		TabItem tab;
 		
@@ -200,15 +201,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.layout(true);
 	}
 	
-	@Override
-	public void openNewBrowserTab(String url) {
-		// open url using window previously created
-		if (window==null) return;
-		DisplayUtils.setWindowTarget(window, url);
-		// only use it once
-		window = null;
-	}
-	
 	private void initializeOpenRadio(Radio openRadio, String radioGroup, Listener<BaseEvent> listener) {
 		openRadio.removeAllListeners();
 		openRadio.addListener(Events.OnClick, listener);
@@ -235,6 +227,32 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setAction(presenter.getDefaultUploadActionUrl(/*isRestricted*/true));		
 	}
 	
+	/**
+	 * returns true if user selects "OK", false if user selects "CANCEL"
+	 * @return
+	 */
+	private void presentRestrictedWarningDialog() {
+		DisplayUtils.showOkCancelMessage(
+				DisplayConstants.RESTRICTION_WARNING_TITLE, 
+				DisplayConstants.RESTRICTION_WARNING, 
+				MessageBox.WARNING,
+				500,
+				new Callback() {
+					@Override
+					public void invoke() {
+						restrictedSelected();
+						fileUploadRestrictedRadio.setValue(true);
+						linkExternalRestrictedRadio.setValue(true);
+					}},
+				new Callback() {
+					@Override
+					public void invoke() {
+						fileUploadRestrictedRadio.setValue(false);
+						linkExternalRestrictedRadio.setValue(false);
+					}}
+				);
+	}
+	
 	// set the initial state of the controls when widget is made visible
 	private void initializeControls() {
 		isInitiallyRestricted = presenter.isRestricted();
@@ -244,16 +262,14 @@ public class UploaderViewImpl extends LayoutContainer implements
 			@Override
 			public void handleEvent(BaseEvent be) {
 				openSelected();
-				// select other open radio button
+				// select open radio button
 				linkExternalOpenRadio.setValue(true);
 			}
 		});
 		initializeRestrictedRadio(fileUploadRestrictedRadio, FILE_UPLOAD_RESTRICTED_PARAM_NAME, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {
-				restrictedSelected();
-				// select other restricted radio button
-				linkExternalRestrictedRadio.setValue(true);
+				presentRestrictedWarningDialog();
 			}
 		});
 		initializeOpenRadio(linkExternalOpenRadio, LINK_EXTERNAL_RESTRICTED_PARAM_NAME, new Listener<BaseEvent>() {
@@ -267,9 +283,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		initializeRestrictedRadio(linkExternalRestrictedRadio, LINK_EXTERNAL_RESTRICTED_PARAM_NAME, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {
-				restrictedSelected();
-				// select other restricted radio button
-				fileUploadRestrictedRadio.setValue(true);
+				presentRestrictedWarningDialog();
 			}
 		});
 		
@@ -298,12 +312,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 					return;
 				}
 				initializeProgress();
-				// this is used in the 'handleEvent' listener, but must
-				// be created in the original thread.  for more, see
-				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
-				if (isNewlyRestricted()) {
-					window = DisplayUtils.newWindow("", "", "");
-				}
 				presenter.handleUpload(fileName);
 			}
 		};
@@ -347,12 +355,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		spinningProgressContainer.setVisible(true);
 		progressBar.reset();
 		progressBar.setVisible(false);
-	}
-	
-	@Override
-	public void showFinishingProgress() {
-		showSpinningProgress();
-		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_FINISHING));
 	}
 	
 	private void addRadioButtonsToContainer(
@@ -477,10 +479,19 @@ public class UploaderViewImpl extends LayoutContainer implements
 		externalLinkFormPanel.setFrame(false);
 		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.LEFT);
 		externalLinkFormPanel.setLabelWidth(110);
-		externalLinkFormPanel.setFieldWidth(230);
+		externalLinkFormPanel.setFieldWidth(PANEL_WIDTH-150);
 		pathField.setFieldLabel("External Path or URL");
 		
 		externalLinkFormPanel.add(pathField);
+		
+		nameField = new TextField<String>();
+		nameField.setFieldLabel("Name (Optional)");
+		nameField.setAllowBlank(true);
+		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
+		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+		
+		externalLinkFormPanel.add(nameField);
+		
 		saveExternalLinkButton = new Button("Save");
 		saveExternalLinkButton.removeAllListeners();
 		saveExternalLinkButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
@@ -494,14 +505,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
 					return;
 				}
-
-				// this is used in the 'handleEvent' listener, but must
-				// be created in the original thread.  for more, see
-				// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
-				if (isNewlyRestricted()) {
-					window = DisplayUtils.newWindow("", "", "");
-				}
-				presenter.setExternalFilePath(pathField.getValue(), isNewlyRestricted());
+				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue(), isNewlyRestricted());
 			}
 		});
 		externalLinkFormPanel.addButton(saveExternalLinkButton);

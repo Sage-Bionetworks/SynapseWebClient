@@ -532,11 +532,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		return urlProvider.getPublicAuthBaseUrl();
 	}
 
-	@Override
-	public String getSynapseWebUrl() {
-		return urlProvider.getPortalBaseUrl();
-	}
-
 	/**
 	 * Validate that the service is ready to go. If any of the injected data is
 	 * missing then it cannot run. Public for tests.

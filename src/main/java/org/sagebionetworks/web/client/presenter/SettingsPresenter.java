@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -12,7 +13,6 @@ import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SettingsView;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -31,6 +31,9 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
 	private NodeModelCreator nodeModelCreator;
+	private SynapseClientAsync synapseClient;
+	
+	private String apiKey = null;
 	
 	@Inject
 	public SettingsPresenter(SettingsView view,
@@ -38,13 +41,15 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
 			CookieProvider cookieProvider,
-			NodeModelCreator nodeModelCreator) {
+			NodeModelCreator nodeModelCreator,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.cookieProvider = cookieProvider;
 		this.nodeModelCreator = nodeModelCreator;
+		this.synapseClient = synapseClient;
 		view.setPresenter(this);
 	}
 
@@ -64,12 +69,30 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.view.setPresenter(this);
 		this.view.clear();
 		showView(place);
+		
+		// lookup API key
+		if(apiKey == null) {			
+			synapseClient.getAPIKey(new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					apiKey = result;
+					view.setApiKey(apiKey);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
+						view.setApiKey(DisplayConstants.ERROR_LOADING);
+					}
+				}
+			});
+		} else {
+			view.setApiKey(apiKey);
+		}
 	}
 
 	@Override
-	public void resetPassword(final String username, final String existingPassword, final String newPassword) {
-		final UserSessionData currentUser = authenticationController.getLoggedInUser();
-		if(currentUser != null) {
+	public void resetPassword(final String username, final String existingPassword, final String newPassword) {		
+		if(authenticationController.isLoggedIn()) {
 			authenticationController.loginUser(username, existingPassword, false, new AsyncCallback<String>() {				
 				@Override
 				public void onSuccess(String result) {
@@ -103,8 +126,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 
 	@Override
 	public void createSynapsePassword() {
-		final UserSessionData currentUser = authenticationController.getLoggedInUser();
-		if(currentUser != null) {
+		if(authenticationController.isLoggedIn()) {
 			userService.sendSetApiPasswordEmail(new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {

@@ -2,24 +2,28 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
-import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationsList;
+import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
-import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.layout.FitData;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -57,11 +61,22 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	SimplePanel registerBtnPanel;		
 	@UiField
+	SimplePanel dream8BtnPanel;
+	@UiField
 	HTMLPanel whatIsSynapseContainer;
 	@UiField
 	HTMLPanel howToUseSynapseContainer;
 	@UiField
 	HTMLPanel getStartedContainer;
+	@UiField
+	SimplePanel rClientInstallPanel;
+	@UiField
+	SimplePanel pythonClientInstallPanel;
+	@UiField
+	SimplePanel javaClientInstallPanel;
+	@UiField
+	SimplePanel clClientInstallPanel;
+	
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -74,8 +89,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private MyEvaluationsList myEvaluationsList;
 	
 	@Inject
-	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget,
-			Footer footerWidget, IconsImageBundle icons, QueryFilter filter,
+	public HomeViewImpl(HomeViewImplUiBinder binder, 
+			Header headerWidget,
+			Footer footerWidget, 
+			IconsImageBundle icons, 
 			SageImageBundle imageBundle,
 			final GlobalApplicationState globalApplicationState,
 			HomeSearchBox homeSearchBox, 
@@ -89,8 +106,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.homeSearchBox = homeSearchBox;
 		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
 		this.favoritesTreeBrowser = favoritesTreeBrowser;
-		this.iconsImageBundle = icons;
 		this.myEvaluationsList = myEvaluationsList;
+		this.iconsImageBundle = icons;
 		
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -119,6 +136,20 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 		registerBtnPanel.setWidget(registerBtn);
+		
+		Button dream8Btn = new Button(DisplayConstants.BUTTON_DREAM_8);
+		dream8Btn.removeStyleName("gwt-Button");
+		dream8Btn.addStyleName("btn btn-large btn-block");
+		dream8Btn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM8"));
+			}
+		});
+		dream8BtnPanel.setWidget(dream8Btn);
+		
+		// Programmatic Clients
+		fillProgrammaticClientInstallCode();
 		
 	}	
 
@@ -233,6 +264,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 		createBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
+				String name = input.getValue();
+				if(name == null || name.isEmpty()) {
+					showErrorMessage(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
+					return;
+				}
 				presenter.createProject(input.getValue());
 			}
 		});
@@ -296,11 +332,40 @@ public class HomeViewImpl extends Composite implements HomeView {
 	}
 	
 	@Override
-	public void setMyEvaluationList(List<Evaluation> myEvaluations) {
-		myEvaluationsList.configure(myEvaluations);
+	public void setMyEvaluationList(List<EntityHeader> myEvaluationEntities) {
+		myEvaluationsList.configure(myEvaluationEntities);
 	}
 	
 	@Override
 	public void setMyEvaluationsError(String string) {
 	}
+	
+	private void fillProgrammaticClientInstallCode() {		
+		rClientInstallPanel.add(new HTML(ProgrammaticClientCode.getRClientInstallHTML()));
+		pythonClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
+		clClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
+
+		final Dialog javaWindow = new Dialog();
+		javaWindow.add(new HTML(ProgrammaticClientCode.getJavaClientInstallHTML()));
+		javaWindow.setSize(560, 287);
+		javaWindow.setPlain(true);
+		javaWindow.setModal(false);
+		javaWindow.setHeading(DisplayConstants.INSTALL_JAVA_MAVEN);
+		javaWindow.setLayout(new FitLayout());			    
+	    javaWindow.setButtons(Dialog.CLOSE);
+	    javaWindow.setButtonAlign(HorizontalAlignment.RIGHT);
+
+		Button showJava = new Button(DisplayConstants.SHOW);
+		showJava.removeStyleName("gwt-Button");
+		showJava.addStyleName("btn btn-large btn-block margin-top-5");
+		showJava.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				javaWindow.show();
+			}
+		});	
+		javaClientInstallPanel.add(showJava);
+	}
+
+	
 }

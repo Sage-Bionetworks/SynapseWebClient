@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface UploaderView extends IsWidget, SynapseWidgetView {
+public interface UploaderView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.
@@ -14,7 +14,6 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 
 	public void createUploadForm(boolean isExternalSupported);
 	
-	public void openNewBrowserTab(String url);
 	public int getDisplayHeight();
 
 	public int getDisplayWidth();
@@ -23,7 +22,6 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 	public boolean isNewlyRestricted();
 	public void updateProgress(double value, String text);
 	public void showProgressBar();
-	public void showFinishingProgress();
 	
 	/**
 	 * Presenter interface
@@ -32,7 +30,7 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 		
 		String getDefaultUploadActionUrl(boolean isRestricted);
 
-		void setExternalFilePath(String path, boolean isNewlyRestricted);
+		void setExternalFilePath(String path, String name, boolean isNewlyRestricted);
 		
 		void handleUpload(String fileName);
 		
@@ -47,8 +45,6 @@ public interface UploaderView extends IsWidget, SynapseWidgetView {
 		 * @return
 		 */
 		boolean isRestricted();
-
-		String getJiraRestrictionLink();
 
 		void clearHandlers();
 	}

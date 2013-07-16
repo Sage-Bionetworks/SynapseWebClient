@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.header;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -22,26 +23,23 @@ import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -170,6 +168,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		if(userAnchor == null) {
 			userAnchor = new Anchor();
 			userAnchor.addStyleName("headerUsernameLink");
+			DisplayUtils.addTooltip(synapseJSNIUtils, userAnchor, DisplayConstants.VIEW_EDIT_PROFILE, TOOLTIP_POSITION.BOTTOM);
 			userAnchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -283,6 +282,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 						userAnchor.fireEvent(event);
 					}
 				});
+				DisplayUtils.addTooltip(synapseJSNIUtils, profilePicture, DisplayConstants.VIEW_EDIT_PROFILE, TOOLTIP_POSITION.BOTTOM);
 				userNameWrapper.add(profilePicture);
 			}
 			userNameWrapper.add(userAnchor);
@@ -302,5 +302,3 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 	}
 	}
-	
-	

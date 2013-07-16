@@ -1,6 +1,7 @@
 
 package org.sagebionetworks.web.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
@@ -86,6 +87,8 @@ public interface SynapseClientAsync {
 	
 	public void createAccessRequirement(EntityWrapper arEW, AsyncCallback<EntityWrapper> callback);
 
+	public void createLockAccessRequirement(String entityId, AsyncCallback<EntityWrapper> callback);
+	
 	public void getUnmetAccessRequirements(String entityId, AsyncCallback<AccessRequirementsTransport> callback);
 	
 	/**
@@ -97,13 +100,13 @@ public interface SynapseClientAsync {
 
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
 
-	public void updateExternalLocationable(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback);
+	public void updateExternalLocationable(String entityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback);
 	
-	public void updateExternalFile(String entityId, String externalUrl, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	public void updateExternalFile(String entityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 	
-	public void createExternalFile(String parentEntityId, String externalUrl, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	public void createExternalFile(String parentEntityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 
-	public void markdown2Html(String markdown, Boolean isPreview, AsyncCallback<String> callback);
+	public void markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, AsyncCallback<String> callback);
 	
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 
@@ -131,9 +134,10 @@ public interface SynapseClientAsync {
 
 	void removeFavorite(String entityId, AsyncCallback<Void> callback);
 
-	void getFavorites(Integer limit, Integer offset,
-			AsyncCallback<String> callback);
+	void getFavorites(Integer limit, Integer offset, AsyncCallback<String> callback);
 	
+	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
+
 	void getUserEvaluationState(String evaluationId, AsyncCallback<UserEvaluationState> callback) throws RestServiceException;
 
 	/**
@@ -147,12 +151,19 @@ public interface SynapseClientAsync {
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
 	void getChunkedFileToken(String fileName,  String contentType, AsyncCallback<String> callback) throws RestServiceException;
 	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
-	void completeChunkedFileUpload(String entityId, List<String> requests, String parentEntityId, boolean isRestricted, AsyncCallback<String> callback) throws RestServiceException;
+	void combineChunkedFileUpload(List<String> requests, AsyncCallback<String> callback) throws RestServiceException;
+	void getUploadDaemonStatus(String daemonId,AsyncCallback<String> callback) throws RestServiceException;
+	void completeUpload(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted,AsyncCallback<String> callback) throws RestServiceException;
+	
+	
 	void getEntityDoi(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
+	void getEvaluations(List<String> evaluationIds, AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
+	void getAvailableEvaluationEntities(AsyncCallback<String> callback) throws RestServiceException;
+	void getAvailableEvaluationEntitiesList(AsyncCallback<ArrayList<String>> callback) throws RestServiceException;
 	
 	/**
 	 * Create a new Submission object.  Callback returning the updated version of the Submission object
@@ -169,4 +180,22 @@ public interface SynapseClientAsync {
 	 * @throws RestServiceException
 	 */
 	void getAvailableEvaluationsSubmitterAliases(AsyncCallback<String> callback) throws RestServiceException;
+
+	/**
+	 * Return true if the current user has created at least one submission in the given evaluations
+	 * @param evaluationIds
+	 * @param callback
+	 * @throws RestServiceException
+	 */
+	void hasSubmitted(AsyncCallback<Boolean> callback)	throws RestServiceException;
+	
+	void getSynapseVersions(AsyncCallback<String> callback);
+
+	/**
+	 * Return a property from portal.properties.  Returns null if the property key is not defined
+	 * @param callback
+	 */
+	void getSynapseProperty(String key, AsyncCallback<String> callback);
+
+	void getAPIKey(AsyncCallback<String> callback);
 }

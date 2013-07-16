@@ -2,16 +2,15 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
+public interface EntityPageTopView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.
@@ -19,7 +18,7 @@ public interface EntityPageTopView extends IsWidget, SynapseWidgetView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdmin, boolean canEdit, boolean readOnly);
+	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber);
 
 	/**
 	 * Presenter interface

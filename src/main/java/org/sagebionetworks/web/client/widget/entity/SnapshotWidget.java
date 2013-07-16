@@ -25,7 +25,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -51,9 +50,8 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 	private Summary snapshot;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	AuthenticationController authenticationController;
 	
 	private boolean canEdit = false;
 	private boolean readOnly = false;
@@ -70,16 +68,15 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			SnapshotWidgetView propertyView, SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils, 
+			AuthenticationController authenticationController) {
 		super();
 		this.factory = factory;
 		this.view = propertyView;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}
 	

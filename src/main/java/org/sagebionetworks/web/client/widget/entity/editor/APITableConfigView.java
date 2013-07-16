@@ -15,7 +15,6 @@ public interface APITableConfigView extends IsWidget, WidgetEditorView {
 	public void setPresenter(Presenter presenter);
 	public String getApiUrl();
 	
-	public String getTableWidth();
 	public Boolean isPaging();
 	public String getPageSize();
 	public Boolean isShowRowNumbers();

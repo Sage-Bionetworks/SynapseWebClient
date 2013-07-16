@@ -3,11 +3,11 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface EvaluationListView extends IsWidget, SynapseWidgetView {
+public interface EvaluationListView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.

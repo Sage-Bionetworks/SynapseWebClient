@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
@@ -55,6 +57,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private Anchor md5Link;
 	private FavoriteWidget favoriteWidget;
+	NodeModelCreator nodeModelCreator;
 	
 	@UiField
 	HTMLPanel panel;
@@ -100,12 +103,14 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			LicensedDownloader licensedDownloader, 
 			EntityTypeProvider typeProvider,
 			SynapseJSNIUtils synapseJSNIUtils,
-			FavoriteWidget favoriteWidget) {
+			FavoriteWidget favoriteWidget,
+			NodeModelCreator nodeModelCreator) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.locationableUploader = locationableUploader;
 		this.licensedDownloader = licensedDownloader;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
+		this.nodeModelCreator = nodeModelCreator;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 		downloadButtonContainer.addStyleName("inline-block margin-left-5");
@@ -123,14 +128,13 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			EntityType entityType, 
 			AuthenticationController authenticationController,
 			boolean isAdministrator,
-			boolean canEdit, 
-			boolean readOnly) {
+			boolean canEdit) {
 		
 		Entity entity = entityBundle.getEntity();
 
 		favoriteWidget.configure(entity.getId());
 		
-		UserSessionData sessionData = authenticationController.getLoggedInUser();
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
 		
 		downloadButton = licensedDownloader.asWidget(entityBundle, userProfile);

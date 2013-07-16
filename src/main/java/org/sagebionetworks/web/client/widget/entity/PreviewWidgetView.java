@@ -12,7 +12,12 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setImagePreview(String fullFileUrl, String previewUrl);
 	public void setCodePreview(String text);
 	public void setTextPreview(String text);
-	public void setTablePreview(String csv);
+	/**
+	 * text must not be escaped (a regular expression will be used to split it into cells)
+	 * @param text
+	 * @param delimiter
+	 */
+	public void setTablePreview(String text, String delimiter);
 	
 	public void showErrorMessage(String message);
 	public void clear();

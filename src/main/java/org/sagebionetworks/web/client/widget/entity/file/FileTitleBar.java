@@ -35,14 +35,14 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit, boolean readOnly) {		
+	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit) {		
 		view.setPresenter(this);
 		this.entityBundle = bundle; 		
 		
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
-		view.createTitlebar(bundle, entityType, authenticationController, isAdministrator, canEdit, readOnly);
+		view.createTitlebar(bundle, entityType, authenticationController, isAdministrator, canEdit);
 		return view.asWidget();
 	}
 	
@@ -82,7 +82,7 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 
 	@Override
 	public boolean isUserLoggedIn() {
-		return authenticationController.getLoggedInUser() != null;
+		return authenticationController.isLoggedIn();
 	}
 
 	@Override

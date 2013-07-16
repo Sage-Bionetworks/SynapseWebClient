@@ -17,18 +17,18 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 
 	private static int numSeq = 0;
 	
-	public static LayoutContainer createLoadWidget(String entityId, SynapseJSNIUtils synapseJSNIUtils, SageImageBundle sageImageBundle) {
+	public static LayoutContainer createLoadWidget(String entityId, Long versionNumber, SynapseJSNIUtils synapseJSNIUtils, SageImageBundle sageImageBundle) {
 		Anchor rLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoR45())));
-		DisplayUtils.addClickPopover(synapseJSNIUtils, rLink, "Synapse R Client", getRClientEntityLoad(entityId).asString(), TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addClickPopover(synapseJSNIUtils, rLink, "Synapse R Client", getRClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
 
 		Anchor pythonLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoPython45())));
-		DisplayUtils.addClickPopover(synapseJSNIUtils, pythonLink, "Synapse Python Client", getPythonClientEntityLoad(entityId).asString(), TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addClickPopover(synapseJSNIUtils, pythonLink, "Synapse Python Client", getPythonClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
 
 		Anchor javaLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoJava45())));
-		DisplayUtils.addClickPopover(synapseJSNIUtils, javaLink, "Synapse Java Client", getJavaClientEntityLoad(entityId).asString(), TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addClickPopover(synapseJSNIUtils, javaLink, "Synapse Java Client", getJavaClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
 
 		Anchor shellLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoCommandLine45())));
-		DisplayUtils.addClickPopover(synapseJSNIUtils, shellLink, "Synapse Command Line Client", getCommandLineClientEntityLoad(entityId).asString(), TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addClickPopover(synapseJSNIUtils, shellLink, "Synapse Command Line Client", getCommandLineClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
 
 		LayoutContainer lc = new LayoutContainer();
 		lc.add(rLink);
@@ -38,83 +38,96 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 		return lc;
 	}
 	
-	public static SafeHtml getRClientEntityLoad(String id) {
+	public static SafeHtml getRClientEntityLoad(String id, Long versionNumber) {
 		String safeId = SafeHtmlUtils.fromString(id).asString();
+		String idString = "id='" + safeId + "'";
+		String versionString = versionNumber == null ? "" : ", version='"+versionNumber+"'";
 		String load = "<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">" 
 			+ ("library(synapseClient)<br/>" 
 				+ "synapseLogin('usename','password')<br/><br/>"
 				+"# " + DisplayConstants.LABEL_CLIENT_GET_ENTITY + " <br/>"
-				+ safeId + " &lt;- getEntity('" + safeId + "')" 
+				+ safeId + " &lt;- synGet(" + idString +   versionString+")" 
 				+"<br/><br/># " + DisplayConstants.LABEL_CLIENT_LOAD_ENTITY + " <br/>"
-				+ safeId + " &lt;- loadEntity('" + safeId + "')").replaceAll(" ", "&nbsp;")
+				+ safeId + " &lt;- synGet(" + idString + versionString+", load=T)").replaceAll(" ", "&nbsp;")
 			+ "</div>";
 
 		// add install code
 		load += "<br/>"
 		+ wrapCollapse(DisplayConstants.LABEL_R_CLIENT_INSTALL,
-					"<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
-					+ DisplayUtils.R_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
-					+ "</div>"); 
+					getRClientInstallHTML().asString()); 
 		return SafeHtmlUtils.fromSafeConstant(load);
+	}
+
+	public static SafeHtml getRClientInstallHTML() {
+		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
+		+ DisplayUtils.R_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
+		+ "</div>");
 	}	
 
-	public static SafeHtml getPythonClientEntityLoad(String id) {
+	public static SafeHtml getPythonClientEntityLoad(String id, Long versionNumber) {
 		String safeId = SafeHtmlUtils.fromString(id).asString();
+		String idString = "'" + safeId + "'";
+		String versionString = versionNumber == null ? "" : ", version="+versionNumber;
 		String load = "<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">" 
 			+ ("import synapseclient<br/><br/>"
 				+ "syn = synapseclient.Synapse()<br/>"
 				+ "syn.login('synapse_username','password')<br/><br/>"
 				+ "# " + DisplayConstants.LABEL_CLIENT_GET_ENTITY + " <br/>"
-				+ safeId + " = syn.getEntity('" + safeId + "')" 
-				+ "<br/><br/># " + DisplayConstants.LABEL_CLIENT_LOAD_ENTITY + " <br/>"
-				+ safeId + " = syn.downloadEntity('" + safeId + "')").replaceAll(" ", "&nbsp;")
+				+ safeId + " = syn.get(" + idString +versionString+")" 
+				+ "<br/><br/># " + DisplayConstants.GET_PATH_CLIENT_ENTITY + " <br/>"
+				+ "filepath = "+safeId+".path").replaceAll(" ", "&nbsp;")
 			+ "</div>";
 
 		// add install code
 		load += "<br/>"
-		+ wrapCollapse(DisplayConstants.LABEL_PYTHON_CLIENT_INSTALL,
-			"<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
-			+ DisplayUtils.PYTHON_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
-			+ "</div>"); 
+		+ wrapCollapse(DisplayConstants.LABEL_PYTHON_CLIENT_INSTALL, getPythonClientInstallHTML().asString()); 
 		return SafeHtmlUtils.fromSafeConstant(load);
+	}
+
+	public static SafeHtml getPythonClientInstallHTML() {
+		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
+		+ DisplayUtils.PYTHON_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
+		+ "</div>");
 	}	
 
-	public static SafeHtml getJavaClientEntityLoad(String id) {
+	public static SafeHtml getJavaClientEntityLoad(String id, Long versionNumber) {
 		String safeId = SafeHtmlUtils.fromString(id).asString();
+		String entityString = versionNumber == null ?  
+				"Entity "+ safeId +" = synapseClient.getEntityById(\""+ safeId +"\");" :
+				"Entity "+ safeId +" = synapseClient.getEntityByIdForVersion(\""+ safeId +"\", "+versionNumber+"L);";
+		
 		String load = "<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">" 
 		+ ("import org.sagebionetworks.client.Synapse;<br/><br/>"
 			+ "Synapse synapseClient = new Synapse();<br/>"
 			+ "synapseClient.login('synapse_username', 'password');<br/><br/>"
-			+ "// " + DisplayConstants.TO_LOAD_AN_ENTITY + "<br/>"  
-			+ "Entity "+ safeId +" = synapseClient.getEntityById(\""+ safeId +"\");"
-			+ "<br/><br/>"
-			+ "// " + DisplayConstants.TO_LOAD_VERSION_1 + "<br/>"
-			+ "Entity "+ safeId +" = synapseClient.getEntityByIdForVersion(\""+ safeId +"\", 1L);").replaceAll(" ", "&nbsp;")
+			+ entityString).replaceAll(" ", "&nbsp;")
 		+ "</div>";
 		
 		load += "<br/>"
-		+ wrapCollapse(DisplayConstants.INSTALL_JAVA_MAVEN,
-				"<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"	
-				+ ("# Using Maven, add to pom.xml:"
-					+ "&lt;distributionManagement&gt;<br/>"
-					+ "    &lt;repository&gt;<br/>"
-					+ "        &lt;id&gt;sagebionetworks&lt;/id&gt;<br/>"
-					+ "        &lt;name&gt;sagebionetworks-releases&lt;/name&gt;<br/>"
-					+ "        &lt;url&gt;http://sagebionetworks.artifactoryonline.com/sagebionetworks/ext-releases-local&lt;/url&gt;<br/>"
-					+ "    &lt;/repository&gt;<br/>"
-					+ "&lt;/distributionManagement&gt;<br/>"
-					+ "<br/>"
-					+ "&lt;dependency&gt;<br/>"
-					+ "    &lt;groupId&gt;org.sagebionetworks&lt;/groupId&gt;<br/>"
-					+ "    &lt;artifactId&gt;synapseJavaClient&lt;/artifactId&gt;<br/>"
-					+ "    &lt;version&gt;See Repository for newest Version&lt;/version&gt;<br/>"
-					+ "&lt;/dependency&gt;<br/>").replaceAll(" ", "&nbsp;")
-				+ "</div>"
-		);
+		+ wrapCollapse(DisplayConstants.INSTALL_JAVA_MAVEN,	getJavaClientInstallHTML().asString());
 		return SafeHtmlUtils.fromSafeConstant(load);
+	}
+
+	public static SafeHtml getJavaClientInstallHTML() {
+		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"	
+		+ ("# Using Maven, add to pom.xml:<br/>"
+			+ "&lt;distributionManagement&gt;<br/>"
+			+ "    &lt;repository&gt;<br/>"
+			+ "        &lt;id&gt;sagebionetworks&lt;/id&gt;<br/>"
+			+ "        &lt;name&gt;sagebionetworks-releases&lt;/name&gt;<br/>"
+			+ "        &lt;url&gt;http://sagebionetworks.artifactoryonline.com/sagebionetworks/ext-releases-local&lt;/url&gt;<br/>"
+			+ "    &lt;/repository&gt;<br/>"
+			+ "&lt;/distributionManagement&gt;<br/>"
+			+ "<br/>"
+			+ "&lt;dependency&gt;<br/>"
+			+ "    &lt;groupId&gt;org.sagebionetworks&lt;/groupId&gt;<br/>"
+			+ "    &lt;artifactId&gt;synapseJavaClient&lt;/artifactId&gt;<br/>"
+			+ "    &lt;version&gt;See Repository for newest Version&lt;/version&gt;<br/>"
+			+ "&lt;/dependency&gt;<br/>").replaceAll(" ", "&nbsp;")
+		+ "</div>");
 	}	
 
-	public static SafeHtml getCommandLineClientEntityLoad(String id) {
+	public static SafeHtml getCommandLineClientEntityLoad(String id, Long versionNumber) {
 		String safeId = SafeHtmlUtils.fromString(id).asString();
 		String load = "<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">" 
 			+ ("# Login<br/>"	
@@ -125,12 +138,9 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 
 		// add install code
 		load += "<br/>"
-		+ wrapCollapse(DisplayConstants.LABEL_CL_CLIENT_INSTALL,
-			"<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
-			+ DisplayUtils.PYTHON_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
-			+ "</div>"); 
+		+ wrapCollapse(DisplayConstants.LABEL_CL_CLIENT_INSTALL, getPythonClientInstallHTML().asString()); 
 		return SafeHtmlUtils.fromSafeConstant(load);
-	}	
+	}
 	
 	private static String wrapCollapse(String link, String content) {		
 		String collapseId = "collapse-" + numSeq++;

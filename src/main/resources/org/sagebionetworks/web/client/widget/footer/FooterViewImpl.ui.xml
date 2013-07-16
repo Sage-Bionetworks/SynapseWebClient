@@ -62,7 +62,8 @@
             <div class="footer-container">
             	<div class="span-24 notopmargin footer-line">
                     <div class="span-8 notopmargin">
-                        <p>Copyright <span ui:field="copyrightYear" /> <a href="http://www.sagebase.org">Sage Bionetworks</a></p>
+                        <p>Copyright <span ui:field="copyrightYear" /> <a href="http://www.sagebase.org">Sage Bionetworks</a><br/> 
+                        <span class="small">portal: <span ui:field="portalVersionSpan" />, repo: <span ui:field="repoVersionSpan" /></span></p>
                     </div>
                     <div class="span-16 notopmargin last">
                     	<p class="right">

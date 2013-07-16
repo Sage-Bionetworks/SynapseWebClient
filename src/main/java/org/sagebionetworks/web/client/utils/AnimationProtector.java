@@ -116,4 +116,10 @@ public class AnimationProtector {
 			}
 		}
 	}
+	
+	public boolean isVisible() {
+		if (view.isContainerRendered())
+			 return false;
+		else return view.isContainerVisible();
+	}
 }

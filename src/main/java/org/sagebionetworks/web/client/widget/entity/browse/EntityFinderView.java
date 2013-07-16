@@ -5,12 +5,12 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.web.client.widget.SynapseWidgetView;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface EntityFinderView extends IsWidget, SynapseWidgetView {
+public interface EntityFinderView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.

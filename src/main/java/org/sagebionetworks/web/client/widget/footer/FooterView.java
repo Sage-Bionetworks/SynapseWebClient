@@ -16,4 +16,11 @@ public interface FooterView extends IsWidget {
 	 */
 	public interface Presenter {
 	}
+
+	/**
+	 * 
+	 * @param portalVersion
+	 * @param repoVersion
+	 */
+	public void setVersion(String portalVersion, String repoVersion);
 }
