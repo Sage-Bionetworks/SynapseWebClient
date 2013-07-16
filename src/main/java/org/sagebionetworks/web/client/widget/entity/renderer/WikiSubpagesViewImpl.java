@@ -37,7 +37,6 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 		if (root != null && root.getChildCount() > 0) {
 			Tree t = new Tree();
 			t.addItem(root);
-			root.setState(true);
 			p.setWidget(t);
 		}
 			
