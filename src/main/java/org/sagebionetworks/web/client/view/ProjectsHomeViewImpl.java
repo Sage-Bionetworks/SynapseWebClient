@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -7,7 +8,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -80,7 +80,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 		horizontalTable.setWidget(0, 0, new HTML(SafeHtmlUtils.fromSafeConstant("<h1 class=\"left\">" + DisplayConstants.LABEL_PROJECT_NAME + "</h1>")));
 		
 		final TextBox searchField = new TextBox();
-	    searchField.setStyleName(DisplayUtils.HOMESEARCH_BOX_STYLE_NAME + " " + ADD_PROJECT_BOX_STYLE);
+	    searchField.setStyleName(ClientProperties.HOMESEARCH_BOX_STYLE_NAME + " " + ADD_PROJECT_BOX_STYLE);
 	    horizontalTable.setWidget(0, 1, searchField);
 		searchField.addKeyDownHandler(new KeyDownHandler() {				
 			@Override

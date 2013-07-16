@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.server.servlet.RssFeedUtils;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -42,7 +43,7 @@ public class RssFeedUtilTest {
 		try {
 			String feedDataJson = RssFeedUtils.getFeed(syndFeed, null, false);
 			if (feedDataJson == null || feedDataJson.length() == 0){
-				fail("Empty news feed." + DisplayUtils.NEWS_FEED_URL);
+				fail("Empty news feed." + ClientProperties.NEWS_FEED_URL);
 			}
 			RSSFeed theFeed = EntityFactory.createEntityFromJSONString(feedDataJson, RSSFeed.class);
 			Assert.assertTrue("News feed has no entries.", theFeed.getEntries() != null && theFeed.getEntries().size() > 0);
@@ -59,7 +60,7 @@ public class RssFeedUtilTest {
 			//ask for the latest entry, and only ask for the summary
 			String feedDataJson = RssFeedUtils.getFeed(syndFeed, 1, true);
 			if (feedDataJson == null || feedDataJson.length() == 0){
-				fail("Empty news feed." + DisplayUtils.NEWS_FEED_URL);
+				fail("Empty news feed." + ClientProperties.NEWS_FEED_URL);
 			}
 			RSSFeed theFeed = EntityFactory.createEntityFromJSONString(feedDataJson, RSSFeed.class);
 			Assert.assertTrue("Requested 1 entry failure.", theFeed.getEntries() != null && theFeed.getEntries().size() == 1);

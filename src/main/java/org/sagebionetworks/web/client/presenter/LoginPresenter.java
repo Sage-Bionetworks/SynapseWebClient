@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -110,8 +111,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			}
 			else { 
 				//not logged in. do normal login, but after all is done, redirect back to the support site
-				cookies.setCookie(DisplayUtils.FASTPASS_LOGIN_COOKIE_VALUE, Boolean.TRUE.toString());
-				token = DisplayUtils.DEFAULT_PLACE_TOKEN;
+				cookies.setCookie(ClientProperties.FASTPASS_LOGIN_COOKIE_VALUE, Boolean.TRUE.toString());
+				token = ClientProperties.DEFAULT_PLACE_TOKEN;
 			}
 			
 		}
@@ -129,7 +130,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						new AcceptTermsOfUseCallback() {
 							public void accepted() {
 								view.acceptTermsOfUse();
-								globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
+								globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 							} 
 						});			
 				}
@@ -138,7 +139,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						view.showErrorMessage("An error occurred. Please try logging in again.");
 					view.showLogin(openIdActionUrl, openIdReturnUrl);				}
 			});
-		} else if (!DisplayUtils.DEFAULT_PLACE_TOKEN.equals(token)				
+		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token)				
 				&& !"".equals(token) && token != null) {			
 			// Single Sign on token. try refreshing the token to see if it is valid. if so, log user in
 			// parse token
@@ -203,14 +204,14 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	 * Private Methods
 	 */
 	private void forwardToPlaceAfterLogin(Place forwardPlace) {
-		String isFastPassLogin = cookies.getCookie(DisplayUtils.FASTPASS_LOGIN_COOKIE_VALUE);
+		String isFastPassLogin = cookies.getCookie(ClientProperties.FASTPASS_LOGIN_COOKIE_VALUE);
 		if (isFastPassLogin != null && Boolean.valueOf(isFastPassLogin)){
-			cookies.removeCookie(DisplayUtils.FASTPASS_LOGIN_COOKIE_VALUE);
+			cookies.removeCookie(ClientProperties.FASTPASS_LOGIN_COOKIE_VALUE);
 			gotoSupport();
 		}
 		else {
 			if(forwardPlace == null) {
-				forwardPlace = new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
+				forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 			}
 			bus.fireEvent(new PlaceChangeEvent(forwardPlace));	
 		}
@@ -228,7 +229,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				public void onSuccess(String result) {
 					if (result != null && result.length()>0)
 						//send user to "http://support.sagebase.org/fastpass/finish_signover?company=sagebase&fastpass="+URL.encodeQueryString(result)
-						gwtWrapper.replaceThisWindowWith(DisplayUtils.FASTPASS_SIGNOVER_URL + gwtWrapper.encodeQueryString(result));
+						gwtWrapper.replaceThisWindowWith(ClientProperties.FASTPASS_SIGNOVER_URL + gwtWrapper.encodeQueryString(result));
 					else
 						//can't go on, just fail
 						view.showErrorMessage(DisplayConstants.ERROR_NO_FASTPASS);

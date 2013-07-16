@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -42,7 +43,7 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 		String safeId = SafeHtmlUtils.fromString(id).asString();
 		String idString = "id='" + safeId + "'";
 		String versionString = versionNumber == null ? "" : ", version='"+versionNumber+"'";
-		String load = "<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">" 
+		String load = "<div class=\"" + ClientProperties.STYLE_CODE_CONTENT + "\">" 
 			+ ("library(synapseClient)<br/>" 
 				+ "synapseLogin('usename','password')<br/><br/>"
 				+"# " + DisplayConstants.LABEL_CLIENT_GET_ENTITY + " <br/>"
@@ -59,8 +60,8 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 	}
 
 	public static SafeHtml getRClientInstallHTML() {
-		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
-		+ DisplayUtils.R_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
+		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + ClientProperties.STYLE_CODE_CONTENT + "\">"
+		+ ClientProperties.R_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
 		+ "</div>");
 	}	
 
@@ -68,7 +69,7 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 		String safeId = SafeHtmlUtils.fromString(id).asString();
 		String idString = "'" + safeId + "'";
 		String versionString = versionNumber == null ? "" : ", version="+versionNumber;
-		String load = "<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">" 
+		String load = "<div class=\"" + ClientProperties.STYLE_CODE_CONTENT + "\">" 
 			+ ("import synapseclient<br/><br/>"
 				+ "syn = synapseclient.Synapse()<br/>"
 				+ "syn.login('synapse_username','password')<br/><br/>"
@@ -85,8 +86,8 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 	}
 
 	public static SafeHtml getPythonClientInstallHTML() {
-		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"
-		+ DisplayUtils.PYTHON_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
+		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + ClientProperties.STYLE_CODE_CONTENT + "\">"
+		+ ClientProperties.PYTHON_CLIENT_DOWNLOAD_CODE.replaceAll(" ", "&nbsp;")
 		+ "</div>");
 	}	
 
@@ -96,7 +97,7 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 				"Entity "+ safeId +" = synapseClient.getEntityById(\""+ safeId +"\");" :
 				"Entity "+ safeId +" = synapseClient.getEntityByIdForVersion(\""+ safeId +"\", "+versionNumber+"L);";
 		
-		String load = "<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">" 
+		String load = "<div class=\"" + ClientProperties.STYLE_CODE_CONTENT + "\">" 
 		+ ("import org.sagebionetworks.client.Synapse;<br/><br/>"
 			+ "Synapse synapseClient = new Synapse();<br/>"
 			+ "synapseClient.login('synapse_username', 'password');<br/><br/>"
@@ -109,7 +110,7 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 	}
 
 	public static SafeHtml getJavaClientInstallHTML() {
-		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">"	
+		return SafeHtmlUtils.fromSafeConstant("<div class=\"" + ClientProperties.STYLE_CODE_CONTENT + "\">"	
 		+ ("# Using Maven, add to pom.xml:<br/>"
 			+ "&lt;distributionManagement&gt;<br/>"
 			+ "    &lt;repository&gt;<br/>"
@@ -129,7 +130,7 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 
 	public static SafeHtml getCommandLineClientEntityLoad(String id, Long versionNumber) {
 		String safeId = SafeHtmlUtils.fromString(id).asString();
-		String load = "<div class=\"" + DisplayUtils.STYLE_CODE_CONTENT + "\">" 
+		String load = "<div class=\"" + ClientProperties.STYLE_CODE_CONTENT + "\">" 
 			+ ("# Login<br/>"	
 				+ "synapse -u synapse_username -p pw<br/><br/>" 
 				+ "# " + DisplayConstants.DOWNLOAD_FILE_LOCAL + "<br/>"

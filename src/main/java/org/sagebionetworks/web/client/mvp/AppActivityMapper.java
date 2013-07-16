@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.sagebionetworks.web.client.AppLoadingView;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -102,7 +102,7 @@ public class AppActivityMapper implements ActivityMapper {
 		if(!openAccessPlaces.contains(place.getClass())) {
 			if(!authenticationController.isLoggedIn()){
 				// Redirect them to the login screen
-				LoginPlace loginPlace = new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN);
+				LoginPlace loginPlace = new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN);
 				return getActivity(loginPlace);
 			} else {
 				
@@ -132,7 +132,7 @@ public class AppActivityMapper implements ActivityMapper {
 	 * @return
 	 */
 	public Place getDefaultPlace() {
-		return new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
+		return new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 	}
 	
 }

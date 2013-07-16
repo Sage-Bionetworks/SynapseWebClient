@@ -13,10 +13,8 @@ import org.mockito.Mockito;
 import org.mockito.internal.verification.AtLeast;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -90,6 +88,6 @@ public class LoginPresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));		
 		loginPresenter.showView(loginPlace);
 		verify(mockAuthenticationController, new AtLeast(1)).logoutUser();
-		verify(mockCookieProvier).setCookie(DisplayUtils.FASTPASS_LOGIN_COOKIE_VALUE, Boolean.TRUE.toString());
+		verify(mockCookieProvier).setCookie(ClientProperties.FASTPASS_LOGIN_COOKIE_VALUE, Boolean.TRUE.toString());
 	}
 }

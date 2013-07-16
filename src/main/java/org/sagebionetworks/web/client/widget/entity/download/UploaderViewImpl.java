@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -35,7 +36,6 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -152,13 +152,13 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private void createUploadContents(boolean isExternalSupported) {
 		this.container = new LayoutContainer();
 		this.setLayout(new FitLayout());
-		this.addStyleName(DisplayUtils.STYLE_WHITE_BACKGROUND);
-		container.addStyleName(DisplayUtils.STYLE_WHITE_BACKGROUND);
+		this.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
+		container.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
 		container.setLayout(new FlowLayout());
 		this.add(container);
 				
-		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"><h4 class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\">" + DisplayConstants.ACCESS_WILL_BE + ":&nbsp;</h4>" 
-				+ "<div class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\" style=\"top:-3px; position: relative;\">" + DisplayUtils.getShareSettingsDisplay(null, false, synapseJSNIUtils) + "</div>"				
+		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"><h4 class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\">" + DisplayConstants.ACCESS_WILL_BE + ":&nbsp;</h4>" 
+				+ "<div class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\" style=\"top:-3px; position: relative;\">" + DisplayUtils.getShareSettingsDisplay(null, false, synapseJSNIUtils) + "</div>"				
 				+ "</div>"));
 		
 		TabPanel tabPanel = new TabPanel();		
@@ -186,7 +186,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// Data Use message 
 		
 		container.add(new HTML("<h3>"+ DisplayConstants.DATA_USE_BANNER +"</h3>"), new MarginData(25, 10, 5, 10));
-		container.add(new HTML("<div class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE + "\"> <span style=\"font-size: 12pt; display: inline; color: #000;\">"
+		container.add(new HTML("<div class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\"> <span style=\"font-size: 12pt; display: inline; color: #000;\">"
 				+ DisplayConstants.DATA_USE_BANNER_SUB1  + "</span>" 				
 				+ DisplayUtils.getShareSettingsDisplay(null, true, synapseJSNIUtils) 				
 				+ "<span style=\"font-size: 12pt; display: inline; color: #000;\">" + DisplayConstants.DATA_USE_BANNER_SUB2 + "</span>" 				
@@ -427,7 +427,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant("&nbsp;"
 				+ DisplayUtils.getIconHtml(EntityViewUtils.getShieldIcon(restrictionLevel, iconsImageBundle))
-				+ " <h5 class=\"" + DisplayUtils.STYLE_DISPLAY_INLINE +  "\">"
+				+ " <h5 class=\"" + ClientProperties.STYLE_DISPLAY_INLINE +  "\">"
 				+ EntityViewUtils.restrictionDescriptor(restrictionLevel)+"</h5>");
 		return new HTML(shb.toSafeHtml());
 	}

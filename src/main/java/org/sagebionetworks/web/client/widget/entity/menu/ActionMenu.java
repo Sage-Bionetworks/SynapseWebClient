@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -195,7 +196,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				if(parentId != null && !Project.class.getName().equals(entityBundle.getEntity().getEntityType())) {
 					gotoPlace = new Synapse(parentId);
 				} else {
-					gotoPlace = new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
+					gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 				}
 					
 				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
