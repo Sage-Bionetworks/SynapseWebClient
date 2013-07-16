@@ -129,6 +129,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView;
@@ -157,6 +159,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
@@ -484,6 +488,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// UI Widget Descriptor editor
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
+		bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
 		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
 		bind(OldImageConfigView.class).to(OldImageConfigViewImpl.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
@@ -498,6 +503,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ButtonLinkConfigView.class).to(ButtonLinkConfigViewImpl.class);
 		
 		// UI Widget Renderers
+		bind(ReferenceWidgetView.class).to(ReferenceWidgetViewImpl.class);
 		bind(YouTubeWidgetView.class).to(YouTubeWidgetViewImpl.class);
 		bind(OldImageWidgetView.class).to(OldImageWidgetViewImpl.class);
 		bind(EntityListWidgetView.class).to(EntityListWidgetViewImpl.class);
