@@ -17,15 +17,15 @@ public class ReferenceParserTest {
 	
 	@Test
 	public void testReference(){
-		String text = "The statement was from here ^[So H et al. Journal. 2013 March 15].";
+		String text = "The statement was from here ${reference?text=So H et al}.";
 		MarkdownElements elements = new MarkdownElements(text);
 		parser.reset();
 		parser.processLine(elements);
-		assertTrue(elements.getHtml().contains("The statement was from here <a href=\"#footnote-1\">[1]</a>."));
+		assertTrue(elements.getHtml().contains("The statement was from here ${reference?text=So H et al&footnoteId=1}."));
 		
 		StringBuilder html = new StringBuilder("This is the last sentence.");
 		parser.completeParse(html);
 		String result = html.toString();
-		assertTrue(result.contains("[1] So H et al. Journal. 2013 March 15"));
+		assertTrue(result.contains("[1] So H et al"));
 	}
 }
