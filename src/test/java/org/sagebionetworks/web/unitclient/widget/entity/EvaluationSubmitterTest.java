@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Before;
@@ -106,24 +107,24 @@ public class EvaluationSubmitterTest {
 	public void testSubmitToEvaluations() throws RestServiceException {
 		submitter.configure(entity, null);
 		
-		List<String> evalIds = new ArrayList<String>();
+		List<Evaluation> evals = new ArrayList<Evaluation>();
 		
-		submitter.submitToEvaluations(null, evalIds, submitterAlias);
+		submitter.submitToEvaluations(null, evals, submitterAlias);
 		verify(mockSynapseClient, times(0)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
-		evalIds.add("test evaluation id");
-		submitter.submitToEvaluations(null, evalIds, submitterAlias);
+		evals.add(new Evaluation());
+		submitter.submitToEvaluations(null, evals, submitterAlias);
 		verify(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 		//submitted status shown
-		verify(mockView).showSubmissionAcceptedDialog();
+		verify(mockView).showSubmissionAcceptedDialogs(any(HashSet.class));
 	}
 	
 	@Test
 	public void testSubmitToEvaluationsFailure() throws RestServiceException {
 		submitter.configure(entity, null);
-		List<String> evalIds = new ArrayList<String>();
+		List<Evaluation> evals = new ArrayList<Evaluation>();
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
-		evalIds.add("test evaluation id");
-		submitter.submitToEvaluations(null, evalIds, submitterAlias);
+		evals.add(new Evaluation());
+		submitter.submitToEvaluations(null, evals, submitterAlias);
 		verify(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 		//submitted status shown
 		verify(mockView).showErrorMessage(anyString());

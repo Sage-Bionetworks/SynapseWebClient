@@ -553,7 +553,7 @@ public class DisplayConstants {
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
 	public static final String THANK_YOU_FOR_SUBMISSION = "Thank you for your submission!";
-	public static final String SUBMISSION_RECEIVED_TEXT = "Your submission will be scored and results posted to the challenge leaderboard within 5 minutes.<br>You will be notified by email if we detect any errors in your submission.";
+	public static final String SUBMISSION_RECEIVED_TEXT = "Your submission will be scored and results posted to the challenge leaderboard.";
 	public static final String NOT_PARTICIPATING_IN_ANY_EVALUATIONS = "You are not currently participating in an Evaluation/Challenge. Please join one and try again.";
 	public static final String JOINED_EVALUATION_HTML = "<h3>You are registered for this challenge!</h3><ul class=\"list arrow-list\"><li>Download the file(s) by going to the bottom of this page...</li></ul>";
 	public static final String PROPERTY_ERROR = "Unable to query for property: ";
