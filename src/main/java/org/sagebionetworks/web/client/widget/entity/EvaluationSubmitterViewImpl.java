@@ -16,6 +16,7 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
@@ -67,7 +68,20 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void clear() {
 	}
-
+	
+	@Override
+	public void showSubmissionAcceptedDialog() {
+		Dialog d = new Dialog();
+		d.setHeading(DisplayConstants.THANK_YOU_FOR_SUBMISSION);
+		d.addText(DisplayConstants.SUBMISSION_RECEIVED_TEXT);
+		d.setBodyStyle("padding:5px;");
+		d.setWidth(370);
+		d.setAutoHeight(true);
+		d.setHideOnButtonClick(true);
+		d.setButtons(Dialog.OK);
+		d.show();
+	}
+	
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);

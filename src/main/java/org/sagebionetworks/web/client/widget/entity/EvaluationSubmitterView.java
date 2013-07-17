@@ -11,6 +11,7 @@ public interface EvaluationSubmitterView extends SynapseView {
 	void setPresenter(Presenter presenter);
 	void popupSelector(boolean showEntityFinder, List<Evaluation> evaluations, List<String> submitterAliases);
 	void hideWindow();
+	void showSubmissionAcceptedDialog();
 	
 	public interface Presenter {
 		//view sends back the selected entity, selected evaluation Ids (will not be empty), and selected submitter alias (will not be null)
