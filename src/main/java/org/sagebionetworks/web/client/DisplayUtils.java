@@ -955,7 +955,7 @@ public class DisplayUtils {
 		
 		return ordered;
 	}
-	
+
 	public static PopupPanel addToolTip(final Component widget, String message) {
 		final PopupPanel popup = new PopupPanel(true);
 		popup.setWidget(new HTML(message));
