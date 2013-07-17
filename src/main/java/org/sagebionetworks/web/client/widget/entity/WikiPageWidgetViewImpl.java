@@ -8,6 +8,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -176,7 +177,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			List<LinkData> links = new ArrayList<LinkData>();
 			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
 				//point to Home
-				links.add(new LinkData("Home", new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)));
+				links.add(new LinkData("Home", new Home(ClientProperties.DEFAULT_PLACE_TOKEN)));
 				breadcrumbsWrapper.add(breadcrumb.asWidget(links, null));
 			} else {
 				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());

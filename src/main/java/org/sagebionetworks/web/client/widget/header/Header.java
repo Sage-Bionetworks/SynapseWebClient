@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.header;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -62,7 +62,7 @@ public class Header implements HeaderView.Presenter {
 	public void getSupportHRef(final AsyncCallback<String> callback) {
 		try {
 			if (getUser() == null){
-				callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
+				callback.onSuccess("http://"+ClientProperties.SUPPORT_URL);
 			}
 			else {
 				userAccountService.getFastPassSupportUrl(new AsyncCallback<String>() {
@@ -71,19 +71,19 @@ public class Header implements HeaderView.Presenter {
 						if (result != null && result.length()>0)
 							callback.onSuccess("http://support.sagebase.org/sagebase?fastpass="+URL.encodeQueryString(result));
 						else
-							callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
+							callback.onSuccess("http://"+ClientProperties.SUPPORT_URL);
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
 						//failed, just go
-						callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
+						callback.onSuccess("http://"+ClientProperties.SUPPORT_URL);
 					}
 				});
 			}
 		} catch (RestServiceException e) {
 			//if it fails, go to the support site without the fastpass url?
-			callback.onSuccess("http://"+DisplayUtils.SUPPORT_URL);
+			callback.onSuccess("http://"+ClientProperties.SUPPORT_URL);
 		}
 	}
 }

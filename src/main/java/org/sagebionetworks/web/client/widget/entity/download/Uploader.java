@@ -17,8 +17,8 @@ import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
@@ -62,8 +62,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	//we are dedicating 90% of the progress bar to uploading the chunks, reserving 10% for the final combining (last) step
 	public static final double UPLOADING_TOTAL_PERCENT = .9d;
 	public static final double COMBINING_TOTAL_PERCENT = .1d;
-	public static final double OLD_BROWSER_MAX_SIZE = DisplayUtils.MB * 5; //5MB
-	public static final int BYTES_PER_CHUNK = (int)DisplayUtils.MB * 5; //5MB
+	public static final double OLD_BROWSER_MAX_SIZE = ClientProperties.MB * 5; //5MB
+	public static final int BYTES_PER_CHUNK = (int)ClientProperties.MB * 5; //5MB
 	public static final int MAX_RETRY = 3;
 	
 	private UploaderView view;
@@ -582,7 +582,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		} catch (Throwable th) {detailedErrorMessage = th.getMessage();};//wasn't an UplaodResult
 		
 		if (uploadResult == null) {
-			if(!resultHtml.contains(DisplayUtils.UPLOAD_SUCCESS)) {
+			if(!resultHtml.contains(DisplayConstants.UPLOAD_SUCCESS)) {
 				uploadError(detailedErrorMessage);
 			} else {
 				uploadSuccess(isNewlyRestricted);

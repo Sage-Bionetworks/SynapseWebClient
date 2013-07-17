@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -28,8 +29,8 @@ public class SearchUtil {
 	 * @return
 	 */
 	public static Synapse willRedirect(String queryTerm) {
-		if(queryTerm.startsWith(DisplayUtils.SYNAPSE_ID_PREFIX)) {
-			String remainder = queryTerm.replaceFirst(DisplayUtils.SYNAPSE_ID_PREFIX, "");
+		if(queryTerm.startsWith(ClientProperties.SYNAPSE_ID_PREFIX)) {
+			String remainder = queryTerm.replaceFirst(ClientProperties.SYNAPSE_ID_PREFIX, "");
 			if(remainder.matches("^[0-9]+$")) {
 				return new Synapse(queryTerm);
 			}

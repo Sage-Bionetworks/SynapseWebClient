@@ -5,10 +5,9 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -57,7 +56,7 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 		// exchange root for home
 		List<LinkData> links = new ArrayList<LinkData>();
 		links.add(new LinkData("Home", new Home(
-				DisplayUtils.DEFAULT_PLACE_TOKEN)));
+				ClientProperties.DEFAULT_PLACE_TOKEN)));
 		String current = null;
 		if (entityPath != null) {
 			List<EntityHeader> path = entityPath.getPath();
@@ -84,7 +83,7 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 	public Widget asWidget(String currentPageName){
 		List<LinkData> links = new ArrayList<LinkData>();
 		links.add(new LinkData("Home", new Home(
-				DisplayUtils.DEFAULT_PLACE_TOKEN)));
+				ClientProperties.DEFAULT_PLACE_TOKEN)));
 		return asWidget(links, currentPageName);
 	}
 	

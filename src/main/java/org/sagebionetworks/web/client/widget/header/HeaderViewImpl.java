@@ -4,8 +4,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -25,7 +24,6 @@ import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.dom.client.Element;
@@ -186,7 +184,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
         	userGuide.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(DisplayUtils.USER_GUIDE_ID));
+					globalApplicationState.getPlaceChanger().goTo(new Synapse(ClientProperties.USER_GUIDE_ID));
 				}
 			});   		 	
 	 		DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.USER_GUIDE, TOOLTIP_POSITION.BOTTOM);
@@ -197,7 +195,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
    		 	settings.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Settings(DisplayUtils.DEFAULT_PLACE_TOKEN));
+					globalApplicationState.getPlaceChanger().goTo(new Settings(ClientProperties.DEFAULT_PLACE_TOKEN));
 				}
 			});   		 	
 	 		DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, DisplayConstants.TEXT_USER_SETTINGS, TOOLTIP_POSITION.BOTTOM);
@@ -241,7 +239,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			registerButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(DisplayUtils.DEFAULT_PLACE_TOKEN));
+					globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
 				}
 			});
 		}

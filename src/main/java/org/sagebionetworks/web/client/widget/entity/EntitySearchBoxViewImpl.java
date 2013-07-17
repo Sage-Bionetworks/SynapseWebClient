@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
@@ -60,7 +61,7 @@ public class EntitySearchBoxViewImpl extends LayoutContainer implements EntitySe
 		this.removeAll();
 		HorizontalPanel searchPanel = new HorizontalPanel();
 		searchBox = createTypeaheadField();
-		searchBox.setHeight(DisplayUtils.BIG_BUTTON_HEIGHT_PX);
+		searchBox.setHeight(ClientProperties.BIG_BUTTON_HEIGHT_PX);
 		searchBox.setWidth(width);		
 		searchPanel.add(searchBox);
 		Html icon = new Html(AbstractImagePrototype.create(iconsImageBundle.magnify16()).getHTML());

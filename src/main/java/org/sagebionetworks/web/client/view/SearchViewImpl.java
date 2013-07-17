@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.search.FacetTypeNames;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -46,7 +47,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -454,7 +454,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			pathBuilder.appendHtmlConstant(safeLink);
 			
 			if(i<headers.size() - 1) {
-				pathBuilder.appendHtmlConstant(DisplayUtils.BREADCRUMB_SEP);
+				pathBuilder.appendHtmlConstant(ClientProperties.BREADCRUMB_SEP);
 			}
 		}
 		return pathBuilder.toSafeHtml();

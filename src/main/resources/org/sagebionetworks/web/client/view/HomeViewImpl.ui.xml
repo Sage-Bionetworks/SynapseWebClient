@@ -150,9 +150,7 @@
 			    	</span>
 			    	<h4 style="display:inline; ">R Client</h4>
 			    	<g:SimplePanel ui:field="rClientInstallPanel" />
-			    	<h5 style="display:inline"><a class="link" href="https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660" target="_blank">API Documentation</a></h5>
-			    	&nbsp;&amp;&nbsp; 
-			    	<h5 style="display:inline"><a class="link" href="https://sagebionetworks.jira.com/wiki/display/SYNR/Examples" target="_blank">Example Code</a></h5>
+			    	<h5 style="display:inline"><g:Anchor ui:field="rAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="rExampleCodeLink"/></h5>
 				</div>
 				<div class="span-6 notopmargin">
 			    	<span style="position:relative; top:8px; padding-right: 5px;">
@@ -160,9 +158,7 @@
 			    	</span>
 			    	<h4 style="display:inline; ">Python Client</h4>
 			    	<g:SimplePanel ui:field="pythonClientInstallPanel" />
-			    	<h5 style="display:inline"><a class="link" href="https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660" target="_blank">API Documentation</a></h5>
-			    	&nbsp;&amp;&nbsp; 
-			    	<h5 style="display:inline"><a class="link" href="https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660" target="_blank">Example Code</a></h5>
+					<h5 style="display:inline"><g:Anchor ui:field="pythonAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="pythonExampleCodeLink"/></h5>
 				</div>
 				<div class="span-6 notopmargin">
 			    	<span style="position:relative; top:8px; padding-right: 5px;">
@@ -170,10 +166,8 @@
 			    	</span>
 			    	<h4 style="display:inline; ">Command Line Client</h4>
 			    	<g:SimplePanel ui:field="clClientInstallPanel" />
-			    	<h5 style="display:inline"><a class="link" href="https://github.com/Sage-Bionetworks/synapsePythonClient" target="_blank">API Documentation</a></h5>
-			    	&nbsp;&amp;&nbsp; 
-			    	<h5 style="display:inline"><a class="link" href="https://github.com/Sage-Bionetworks/synapsePythonClient/tree/master/examples/provenance" target="_blank">Example Code</a></h5>
-				</div>								
+					<h5 style="display:inline"><g:Anchor ui:field="clAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="clExampleCodeLink"/></h5>
+				</div>												
 				<div class="span-5 notopmargin last">
 			    	<span style="position:relative; top:8px; padding-right: 5px;">
 			    	    <g:Image resource='{sageImageBundle.logoJava45}' />
@@ -181,11 +175,7 @@
 			    	<h4 style="display:inline; ">Java Client</h4>
 			    	<g:SimplePanel ui:field="javaClientInstallPanel" />
 			    	<span class="padding-top-5">
-				    	<!-- 			    	
-				    	<h5 style="display:inline"><a class="link" href="#">API Documentation</a></h5>
-				    	&nbsp;&amp;&nbsp;
-				    	 --> 
-				    	<h5 style="display:inline"><a class="link" href="https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java" target="_blank">Example Code</a></h5>
+						<h5 style="display:inline"><g:Anchor ui:field="javaAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="javaExampleCodeLink"/></h5>								
 			    	</span>
 				</div>
 			</div>

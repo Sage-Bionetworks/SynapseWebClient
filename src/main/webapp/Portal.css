@@ -1005,3 +1005,7 @@ ol.lowerroman {
     line-height: 13px;
 }	
 
+.padding-top-15 {
+	margin-top: 5px;
+    position: absolute;
+}

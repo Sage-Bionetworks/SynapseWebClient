@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -19,7 +19,7 @@ import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -115,7 +115,7 @@ public class SearchPresenterTest {
 	@Test 
 	public void testSetPlaceSynapseIdPrefixNotId() throws Exception {
 		// test for a word with the prefix but not a synapse ID
-		String term = DisplayUtils.SYNAPSE_ID_PREFIX + "apse"; // # 'synapse'
+		String term = ClientProperties.SYNAPSE_ID_PREFIX + "apse"; // # 'synapse'
 
 		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		query.setQueryTerm(Arrays.asList(new String[] {term}));
@@ -129,7 +129,7 @@ public class SearchPresenterTest {
 	@Test 
 	public void testSetPlaceSynapseIdPrefix() throws Exception {
 		// test for a word with the prefix and is a synapse ID
-		String term = DisplayUtils.SYNAPSE_ID_PREFIX + "1234567890"; // # 'syn1234567890'
+		String term = ClientProperties.SYNAPSE_ID_PREFIX + "1234567890"; // # 'syn1234567890'
 		assertEquals(new Synapse(term), SearchUtil.willRedirect(new Search(term))); 
 	}
 

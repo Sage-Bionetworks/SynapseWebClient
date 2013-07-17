@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -147,10 +148,10 @@ public class AttachmentsViewImpl extends LayoutContainer implements AttachmentsV
 			SafeHtml previewToolip;
 		    if(data.getPreviewId() != null){
 		    	previewToolip = SafeHtmlUtils.fromSafeConstant("<div class=\"preview-image-loading\" >"
-			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_START
+			    		+ ClientProperties.IMAGE_CENTERING_TABLE_START
 			    		+ "<img style=\"background: white; margin:auto; display:block;\" src=\"" 
 			    		+ DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getPreviewId(), null) + "\"/>"
-			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_END
+			    		+ ClientProperties.IMAGE_CENTERING_TABLE_END
 			    		+ "</div>");  
 		    }else{
 			    previewToolip = dataName;			    
