@@ -379,6 +379,8 @@ public class DisplayConstants {
 	public static final String SYNAPSE_ID_LABEL = "Synapse ID";
 	public static final String SAVE_BUTTON_LABEL = "Save";
 	public static final String INSERT_BUTTON_LABEL = "Insert";
+	
+	public static final String REFERENCE_LABEL = "Reference";
 
 	/*
 	 * Element ids for Selenium
@@ -567,5 +569,7 @@ public class DisplayConstants {
 	public static final String PLEASE_ENTER_PROJECT_NAME = "Please enter a project name";
 	public static final String OLD_VERSION = "old version";
 	public static final String THERE_IS_A_NEWER_VERSION = "A more recent version of this entity exists.";
+	public static final String NEW_VERSION_AVAILABLE = "New Version of Synapse Available";
+	public static final String NEW_VERSION_INSTRUCTIONS = "A new version of Synapse is now available, please save your work and reload the page to ensure proper function.";
 }
 
