@@ -114,7 +114,7 @@ public class EvaluationSubmitterTest {
 		submitter.submitToEvaluations(null, evalIds, submitterAlias);
 		verify(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 		//submitted status shown
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showSubmissionAcceptedDialog();
 	}
 	
 	@Test

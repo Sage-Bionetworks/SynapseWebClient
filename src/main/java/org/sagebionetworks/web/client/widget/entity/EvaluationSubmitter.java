@@ -207,7 +207,7 @@ public class EvaluationSubmitter implements Presenter {
 				public void onSuccess(String result) {
 					//result is the updated submission
 					if (index == evaluationIds.size()-1) {
-						view.showInfo(DisplayConstants.SUBMITTED_TITLE, DisplayConstants.SUBMITTED_TO_EVALUATION);				
+						view.showSubmissionAcceptedDialog();
 					} else {
 						submitToEvaluations(newSubmission, etag, evaluationIds, index+1);
 					}
