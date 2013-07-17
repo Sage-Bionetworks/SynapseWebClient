@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.search.SearchBox;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.dom.client.Element;
@@ -40,6 +41,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -168,13 +170,24 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		if(userAnchor == null) {
 			userAnchor = new Anchor();
 			userAnchor.addStyleName("headerUsernameLink");
-			DisplayUtils.addTooltip(synapseJSNIUtils, userAnchor, DisplayConstants.VIEW_EDIT_PROFILE, TOOLTIP_POSITION.BOTTOM);
+			//DisplayUtils.addTooltip(synapseJSNIUtils, userAnchor, DisplayConstants.VIEW_EDIT_PROFILE, TOOLTIP_POSITION.BOTTOM);
+			
+			//IMPORTED POPUP and VERTICALPANEL
+			PopupPanel popup = DisplayUtils.addToolTip(userAnchor, "", true);
+			VerticalPanel vp = new VerticalPanel();
+			HorizontalPanel hp1 = new HorizontalPanel();	
+			Button b1 = new Button("Guide");
+			hp1.add(b1);
+			vp.add(hp1);
+			popup.add(vp);
+			
 			userAnchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
 				}
 			});
+			
 		}
 		if (userCommands == null){
 			userCommands = new HorizontalPanel();

@@ -93,6 +93,10 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
@@ -104,6 +108,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -1025,6 +1030,34 @@ public class DisplayUtils {
 		}
 		
 		return ordered;
+	}
+
+	public static PopupPanel addToolTip(final Widget widget, String message, boolean complex) {
+		final PopupPanel popup = new PopupPanel(true);
+		popup.setGlassEnabled(false);
+		popup.addStyleName("topLevelZIndex");
+		widget.addDomHandler(new MouseOverHandler() {
+			@Override
+			public void onMouseOver(MouseOverEvent event) {
+				popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
+			          public void setPosition(int offsetWidth, int offsetHeight) {
+			        	  popup.showRelativeTo(widget);
+			          }
+			        });
+			}
+		}, MouseOverEvent.getType());
+		widget.addDomHandler(new MouseOutHandler() {
+			@Override
+			public void onMouseOut(MouseOutEvent event) {
+				popup.hide();
+			}
+		}, MouseOutEvent.getType());
+		if(complex) {
+			return popup;
+		} else {
+			popup.setWidget(new HTML(message));
+			return popup;
+		}
 	}
 	
 	public static PopupPanel addToolTip(final Component widget, String message) {
