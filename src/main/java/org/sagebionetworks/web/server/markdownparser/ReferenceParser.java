@@ -25,9 +25,13 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 		Matcher m = p1.matcher(input);
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
-			//Store reference text
-			int lenOfSyntax = "${reference?text=".length();
-			footnotes.add(input.substring(m.start() + lenOfSyntax, m.end() - 1));
+			//Store the reference text, specified by the text parameter
+			String firstParam = input.substring(m.start(1), m.end(1));
+			if(firstParam.contains("text=")) {
+				footnotes.add(input.substring(m.start(2), m.end(2)));
+			} else {
+				footnotes.add(input.substring(m.start(4), m.end(4)));
+			}
 			
 			/*
 			 * Insert any extra parameters/values by appending to the widget's original expression/parameters
