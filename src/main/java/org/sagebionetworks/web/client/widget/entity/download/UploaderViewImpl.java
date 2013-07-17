@@ -17,12 +17,14 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FormEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.TabPanelEvent;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FileUploadField;
@@ -35,7 +37,6 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,8 +45,11 @@ import com.google.inject.Inject;
 public class UploaderViewImpl extends LayoutContainer implements
 		UploaderView {
 
-	public static final String FILE_FIELD_ID = "fileToUpload";
+	private boolean showCancelButton = true;
 
+	public static final String FILE_FIELD_ID = "fileToUpload";
+	public static final int BUTTON_HEIGHT_PX = 25;
+	public static final int BUTTON_WIDTH_PX = 100;
 	private static final MarginData MARGIN = new MarginData(10);
 	
 	private Presenter presenter;
@@ -65,8 +69,9 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private Button uploadBtn;
 	private ProgressBar progressBar;
 	// external link panel
-	private Button saveExternalLinkButton;
 	private String fileName;
+	FormPanel externalLinkFormPanel;
+	FormPanel radioButtonPanel;
 	
 	private HTML spinningProgressContainer;
 	
@@ -83,10 +88,14 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.fileUploadRestrictedRadio = new Radio();	
 		this.linkExternalOpenRadio = new Radio();
 		this.linkExternalRestrictedRadio = new Radio();
-		this.uploadBtn = new Button("Upload");
+		this.uploadBtn = new Button();
+		uploadBtn.setHeight(BUTTON_HEIGHT_PX);
+		uploadBtn.setWidth(BUTTON_WIDTH_PX);
+		uploadBtn.setEnabled(false);
 		this.progressBar = new ProgressBar();
 		this.formPanel = new FormPanel();
 		this.fileUploadField = new FileUploadField();
+		fileUploadField.setHeight(BUTTON_HEIGHT_PX);
 		spinningProgressContainer = new HTML();
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
@@ -119,6 +128,11 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 	@Override
 	public void clear() {
+		uploadBtn.setEnabled(false);
+		fileUploadField.clear();
+		pathField.clear();
+		nameField.clear();
+		radioButtonPanel.clear();
 	}
 	
 	@Override
@@ -137,14 +151,40 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	@Override
 	public int getDisplayHeight() {
-		return 490;
+		return 455;
 	}
 
 	@Override
 	public int getDisplayWidth() {
 		return 650;
 	}
+	
+	@Override
+	public void updateProgress(double value, String text) {
+		progressBar.updateProgress(value, text);
+	}
+	
+	@Override
+	public void setShowCancelButton(boolean showCancel) {
+		this.showCancelButton = showCancel;
+	}
 
+	@Override
+	public void hideLoading() {
+		//try to hide the loading progress bar.  ignore any errors
+		progressBar.reset();
+		progressBar.setVisible(false);
+		spinningProgressContainer.setHTML("");
+		spinningProgressContainer.setVisible(false);
+	}
+	
+	@Override
+	public void submitForm() {
+		showSpinningProgress();
+		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));
+		formPanel.submit();	
+	}
+	
 
 	/*
 	 * Private Methods
@@ -163,7 +203,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		TabPanel tabPanel = new TabPanel();		
 		tabPanel.setPlain(true);
-		tabPanel.setHeight(140);		
+		tabPanel.setHeight(100);		
 		container.add(tabPanel, new MarginData(0, 10, 10, 10));
 		TabItem tab;
 		
@@ -171,6 +211,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 		tab = new TabItem(DisplayConstants.UPLOAD_FILE);
 		tab.addStyleName("pad-text");
 		tab.add(formPanel);
+		tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
+            public void handleEvent( TabPanelEvent be ) {
+            	configureUploadButton();
+            }
+        
+        });
 		tabPanel.add(tab);
 
 		// External URL
@@ -179,7 +225,15 @@ public class UploaderViewImpl extends LayoutContainer implements
 			tab.setEnabled(false);
 		tab.addStyleName("pad-text");		
 		tab.add(createExternalPanel());		
+		tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
+            public void handleEvent( TabPanelEvent be ) {
+            	configureUploadButtonForExternal();
+            }
+        
+        });
 		tabPanel.add(tab);
+		
+		
 		
 		tabPanel.recalculate();
 
@@ -195,6 +249,22 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		addRadioButtonsToContainer(container, linkExternalOpenRadio, linkExternalRestrictedRadio);
 		
+		ButtonBar bar = new ButtonBar();
+		bar.setAlignment(HorizontalAlignment.RIGHT);
+		bar.add(uploadBtn);
+		if(showCancelButton) {
+			Button cancelButton = new Button(DisplayConstants.BUTTON_CANCEL);
+			cancelButton.setHeight(BUTTON_HEIGHT_PX);
+			cancelButton.setWidth(BUTTON_WIDTH_PX);			
+			cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					presenter.cancelClicked();
+				}
+			});
+			bar.add(cancelButton);
+		}
+		container.add(bar);
 		
 		this.setSize(PANEL_WIDTH+200, PANEL_HEIGHT);
 		container.layout(true);
@@ -300,43 +370,11 @@ public class UploaderViewImpl extends LayoutContainer implements
 		fileUploadField.clearState(); // doesn't successfully clear previous selection
 		if(formPanel.isRendered()) formPanel.reset(); // clear file choice from fileUploadField
 
-		uploadBtn.removeAllListeners();
-		SelectionListener<ButtonEvent> uploadListener = new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				if (!formPanel.isValid()) {
-					return;
-				}
-				if(restrictedModeChosen() == RADIO_SELECTED.NO_RADIO_SELECTED) {
-					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
-					return;
-				}
-				initializeProgress();
-				presenter.handleUpload(fileName);
-			}
-		};
-		uploadBtn.addSelectionListener(uploadListener);
+		configureUploadButton();
 		progressBar.setVisible(false);
 		formPanel.add(spinningProgressContainer);
 		formPanel.add(progressBar);
-		formPanel.addButton(uploadBtn);
 		formPanel.layout(true);
-	}
-	
-	@Override
-	public void hideLoading() {
-		//try to hide the loading progress bar.  ignore any errors
-		progressBar.reset();
-		progressBar.setVisible(false);
-		spinningProgressContainer.setHTML("");
-		spinningProgressContainer.setVisible(false);
-	}
-	
-	@Override
-	public void submitForm() {
-		showSpinningProgress();
-		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));
-		formPanel.submit();	
 	}
 	
 	private void initializeProgress() {
@@ -361,7 +399,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 			LayoutContainer layoutContainer,
 			Radio openRadio,
 			Radio restrictedRadio) {
-		FormPanel radioButtonPanel = new FormPanel();
+		radioButtonPanel = new FormPanel();
 		radioButtonPanel.setHeaderVisible(false);
 		radioButtonPanel.setFrame(false);
 		radioButtonPanel.setButtonAlign(HorizontalAlignment.RIGHT);		
@@ -457,13 +495,16 @@ public class UploaderViewImpl extends LayoutContainer implements
 				fileName = fullPath.substring(lastIndex + 1);
 				fileUploadField.setValue(fileName);
 				fileUploadField.getFileInput().setId(FILE_FIELD_ID);
+				uploadBtn.setEnabled(true);
 			}
 		});
 		MultiField fileUploadMF = new MultiField();
 		fileUploadMF.add(fileUploadField);
 		fileUploadMF.setFieldLabel("File");
 		formPanel.add(fileUploadMF);
-		formPanel.layout(true);
+		formPanel.layout(true);		
+		
+		configureUploadButton(); // upload tab first by default
 		
 		progressBar.setWidth(PANEL_WIDTH - 30);
 								
@@ -473,14 +514,20 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 
 	private Widget createExternalPanel() {
-		final FormPanel externalLinkFormPanel = new FormPanel();
+		externalLinkFormPanel = new FormPanel();
 		pathField = new TextField<String>();
 		externalLinkFormPanel.setHeaderVisible(false);
 		externalLinkFormPanel.setFrame(false);
 		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.LEFT);
 		externalLinkFormPanel.setLabelWidth(110);
 		externalLinkFormPanel.setFieldWidth(PANEL_WIDTH-150);
-		pathField.setFieldLabel("External Path or URL");
+		pathField.setFieldLabel("URL");
+		pathField.addListener(Events.KeyPress, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				uploadBtn.setEnabled(true);
+			}			
+		});
 		
 		externalLinkFormPanel.add(pathField);
 		
@@ -490,11 +537,35 @@ public class UploaderViewImpl extends LayoutContainer implements
 		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
 		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 		
-		externalLinkFormPanel.add(nameField);
+		externalLinkFormPanel.add(nameField);			
 		
-		saveExternalLinkButton = new Button("Save");
-		saveExternalLinkButton.removeAllListeners();
-		saveExternalLinkButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		return externalLinkFormPanel;
+	}
+
+	private void configureUploadButton() {
+		uploadBtn.setText("Upload");
+		uploadBtn.removeAllListeners();
+		SelectionListener<ButtonEvent> uploadListener = new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				if (!formPanel.isValid()) {
+					return;
+				}
+				if(restrictedModeChosen() == RADIO_SELECTED.NO_RADIO_SELECTED) {
+					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
+					return;
+				}
+				initializeProgress();
+				presenter.handleUpload(fileName);
+			}
+		};
+		uploadBtn.addSelectionListener(uploadListener);
+	}
+
+	private void configureUploadButtonForExternal() {
+		uploadBtn.setText("Save");
+		uploadBtn.removeAllListeners();
+		uploadBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				if (!externalLinkFormPanel.isValid()) {
@@ -508,13 +579,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue(), isNewlyRestricted());
 			}
 		});
-		externalLinkFormPanel.addButton(saveExternalLinkButton);
-		
-		return externalLinkFormPanel;
 	}
-	
-	@Override
-	public void updateProgress(double value, String text) {
-		progressBar.updateProgress(value, text);
-	}
+
 }
