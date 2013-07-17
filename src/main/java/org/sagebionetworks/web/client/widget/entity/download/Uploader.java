@@ -590,6 +590,31 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
+	public void showCancelButton(boolean showCancel) {
+		view.setShowCancelButton(showCancel);
+	}
+		
+	@Override
+	public boolean isRestricted() {
+		return GovernanceServiceHelper.entityRestrictionLevel(accessRequirements)!=RESTRICTION_LEVEL.OPEN;
+	}
+		public int getDisplayHeight() {
+		return view.getDisplayHeight();
+	}
+	
+	public int getDisplayWidth() {
+		return view.getDisplayWidth();
+	}
+
+	@Override
+	public void cancelClicked() {
+		fireCancelEvent();
+	}
+
+
+	/*
+	 * Private Methods
+	 */
 	private void refreshAfterSuccessfulUpload(String entityId, final boolean isNewlyRestricted) {
 		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
 			@Override
@@ -619,23 +644,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		//Verified that when this method is called, the input field used for direct upload is no longer available, 
 		//so that this effectively cancels chunked upload too (after the current chunk upload completes)
 		view.hideLoading();
+		view.clear();
 		handlerManager.fireEvent(new CancelEvent());
 	}
 	
 	private void uploadSuccess(boolean isNewlyRestricted) {
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+		view.clear();
 		handlerManager.fireEvent(new EntityUpdatedEvent());
-	}
-	
-	@Override
-	public boolean isRestricted() {
-		return GovernanceServiceHelper.entityRestrictionLevel(accessRequirements)!=RESTRICTION_LEVEL.OPEN;
-	}
-		public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	
-	public int getDisplayWidth() {
-		return view.getDisplayWidth();
 	}
 }
