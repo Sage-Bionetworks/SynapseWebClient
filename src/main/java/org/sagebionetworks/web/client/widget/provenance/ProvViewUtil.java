@@ -46,7 +46,7 @@ public class ProvViewUtil {
 	private static final String PROV_ACTIVITY_UNDEFINED_STYLE = "provUndefinedChange";
 	
 	private static final int ENTITY_LINE_NUMBER_CHARS = 17;
-	private static final int MAX_TOOL_TIP_VALUE_CHAR = 43;	 	
+	private static final int MAX_TOOL_TIP_VALUE_CHAR = 300;	 	
 	private static final int MAX_ACT_CODE_NAME_CHAR = 30;
 	private static final int MAX_DISPLAY_NAME_CHAR = 13;
 	private static MarginData ACT_MARGIN_USER = new MarginData(0, 0, 1, 10);
