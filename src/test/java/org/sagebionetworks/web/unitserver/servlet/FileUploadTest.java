@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.server.servlet.FileUpload;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
@@ -149,8 +150,8 @@ public class FileUploadTest {
 		servlet.doPost(mockRequest, mockResponse);
 		
 		// verify success response
-		BaseMatcher matcher = TestUtils.createByteArrayPrefixMatcher(DisplayUtils.UPLOAD_SUCCESS.getBytes());
-		verify(responseOutputStream).write((byte[]) argThat(matcher), eq(0), eq(DisplayUtils.UPLOAD_SUCCESS.getBytes().length));		
+		BaseMatcher matcher = TestUtils.createByteArrayPrefixMatcher(DisplayConstants.UPLOAD_SUCCESS.getBytes());
+		verify(responseOutputStream).write((byte[]) argThat(matcher), eq(0), eq(DisplayConstants.UPLOAD_SUCCESS.getBytes().length));		
 	}
 	
 }

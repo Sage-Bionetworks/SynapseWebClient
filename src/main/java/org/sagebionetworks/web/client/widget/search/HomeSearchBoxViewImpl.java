@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.search;
 
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
@@ -82,7 +83,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 
 		if(searchField == null) {
 		    searchField = new TextBox();
-		    searchField.setStyleName(DisplayUtils.HOMESEARCH_BOX_STYLE_NAME);
+		    searchField.setStyleName(ClientProperties.HOMESEARCH_BOX_STYLE_NAME);
 		    horizontalTable.setWidget(0, 1, searchField);
 			searchField.addKeyDownHandler(new KeyDownHandler() {				
 				@Override

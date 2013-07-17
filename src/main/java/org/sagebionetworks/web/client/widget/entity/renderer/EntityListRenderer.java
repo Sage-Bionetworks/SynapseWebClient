@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -17,7 +18,6 @@ import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.Anchor;
@@ -84,7 +84,7 @@ public class EntityListRenderer extends LayoutContainer {
 			name = new HTML(display.getName());
 		}
 		name.setWidth("212px");
-		name.addStyleName(DisplayUtils.STYLE_BREAK_WORD);
+		name.addStyleName(ClientProperties.STYLE_BREAK_WORD);
 		
 		// create download link
 		Widget downloadLink;
@@ -113,7 +113,7 @@ public class EntityListRenderer extends LayoutContainer {
 		HTML description = new HTML(display.getDescription());
 		description.setWidth("375px");
 		//description.setHeight("63px");
-		description.addStyleName(DisplayUtils.STYLE_BREAK_WORD);		
+		description.addStyleName(ClientProperties.STYLE_BREAK_WORD);		
 		
 		// set row in table
 		setRow(rowIndex, name, downloadLink,
@@ -140,7 +140,7 @@ public class EntityListRenderer extends LayoutContainer {
 	public void updateRowNote(int rowIndex, SafeHtml note) {
 		HTML noteDiv = new HTML(note);
 		noteDiv.setWidth("100px");
-		noteDiv.addStyleName(DisplayUtils.STYLE_BREAK_WORD);			
+		noteDiv.addStyleName(ClientProperties.STYLE_BREAK_WORD);			
 		table.setWidget(rowIndex, HEADER_NOTE_IDX, noteDiv);
 	}
 	

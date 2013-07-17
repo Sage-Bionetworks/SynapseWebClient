@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sagebionetworks.web.client.AppLoadingView;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Challenges;
@@ -158,7 +159,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 	}
 
 	private Place getDefaultPlace() {
-		return new Home(DisplayUtils.DEFAULT_PLACE_TOKEN);
+		return new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 	}
 
 	public void setGinjector(PortalGinInjector ginjector) {

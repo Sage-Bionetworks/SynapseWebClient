@@ -26,7 +26,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -37,7 +37,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
-import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
@@ -129,7 +128,7 @@ public class BreadcrumbTest {
 		//verify that setting the breadcrumb sets the view's links
 		reset(mockView);
 		List<LinkData> links = new ArrayList<LinkData>();
-		LinkData homeLink = new LinkData("MyHomeLink", new Home(DisplayUtils.DEFAULT_PLACE_TOKEN));
+		LinkData homeLink = new LinkData("MyHomeLink", new Home(ClientProperties.DEFAULT_PLACE_TOKEN));
 		links.add(homeLink);
 		String currentPageName  = "CurrentPage";
 		breadcrumb.asWidget(links, currentPageName);

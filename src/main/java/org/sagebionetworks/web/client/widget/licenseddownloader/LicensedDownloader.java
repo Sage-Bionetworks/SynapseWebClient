@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
@@ -201,7 +202,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			return true;
 		}
 		view.showInfo("Login Required", "Please Login to download data.");
-		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
+		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 		return false;
 	}
 		

@@ -22,7 +22,7 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.common.io.Files;
@@ -143,7 +143,7 @@ public class FileUpload extends HttpServlet {
 						logger.info("Uploaded file " + item.getName() + " ("+ file.getName() +") to Synapse id: " + uploaded.getId());
 						OutputStream os = response.getOutputStream();						
 						PrintStream printStream = new PrintStream(os);
-						printStream.print(DisplayUtils.UPLOAD_SUCCESS);
+						printStream.print(DisplayConstants.UPLOAD_SUCCESS);
 						printStream.close();
 						uploadedAny = true; // uploaded at least one file
 					} else {

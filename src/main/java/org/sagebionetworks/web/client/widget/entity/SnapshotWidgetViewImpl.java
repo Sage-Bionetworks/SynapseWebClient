@@ -8,9 +8,9 @@ import org.sagebionetworks.repo.model.EntityGroup;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtilsGWT;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
@@ -233,7 +233,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			name = new HTML(display.getName());
 		}
 		name.setWidth("212px");
-		name.addStyleName(DisplayUtils.STYLE_BREAK_WORD);
+		name.addStyleName(ClientProperties.STYLE_BREAK_WORD);
 		
 		// create download link
 		Widget downloadLink;
@@ -262,7 +262,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		HTML description = new HTML(display.getDescription());
 		description.setWidth("375px");
 		//description.setHeight("63px");
-		description.addStyleName(DisplayUtils.STYLE_BREAK_WORD);		
+		description.addStyleName(ClientProperties.STYLE_BREAK_WORD);		
 		
 		// set row in table
 		groupDisplay.setRow(rowIndex, name, downloadLink,
@@ -578,7 +578,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		public void updateRowNote(int rowIndex, SafeHtml note) {
 			HTML noteDiv = new HTML(note);
 			noteDiv.setWidth("100px");
-			noteDiv.addStyleName(DisplayUtils.STYLE_BREAK_WORD);			
+			noteDiv.addStyleName(ClientProperties.STYLE_BREAK_WORD);			
 			table.setWidget(rowIndex, HEADER_NOTE_IDX, noteDiv);
 		}
 		
