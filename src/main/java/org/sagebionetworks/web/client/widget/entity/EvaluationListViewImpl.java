@@ -6,10 +6,13 @@ import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.IconsImageBundle;
 
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.grid.CheckBoxSelectionModel;
@@ -18,14 +21,21 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EvaluationListViewImpl extends LayoutContainer implements EvaluationListView {
 	
+	private static final String RULES_KEY = "rules";
+	private static final String RECEIPT_KEY = "receipt";
 	private static final String NAME_KEY = "name";
 	private static final String ID_KEY = "idKey";
 	
@@ -35,10 +45,12 @@ public class EvaluationListViewImpl extends LayoutContainer implements Evaluatio
 	ListStore<BaseModelData> gridStore;
 	ColumnModel columnModel;
 	private Presenter presenter;
+	private IconsImageBundle iconsImageBundle;
 	
 	@Inject
-	public EvaluationListViewImpl() {
+	public EvaluationListViewImpl(IconsImageBundle iconsImageBundle) {
 		gridStore = new ListStore<BaseModelData>();
+		this.iconsImageBundle = iconsImageBundle;
 	}
 	
 	@Override
@@ -55,6 +67,14 @@ public class EvaluationListViewImpl extends LayoutContainer implements Evaluatio
 	    ColumnConfig column = new ColumnConfig();  
 	    column.setId(NAME_KEY);  
 	    column.setHeader("Name");  	    	   
+	    column.setRowHeader(false);
+	    column.setRenderer(valueRenderer);
+	    configs.add(column);
+	    
+	    column = new ColumnConfig();  
+	    column.setId(RULES_KEY);  
+	    column.setHeader("Rules");
+	    column.setWidth(40);
 	    column.setRowHeader(false);
 	    column.setRenderer(valueRenderer);
 	    configs.add(column);
@@ -105,6 +125,8 @@ public class EvaluationListViewImpl extends LayoutContainer implements Evaluatio
 			BaseModelData model = new BaseModelData();
 			model.set(NAME_KEY, SafeHtmlUtils.fromString(data.getName()).asString());
 			model.set(ID_KEY, data.getId());
+			model.set(RULES_KEY, data.getSubmissionInstructionsMessage());
+			model.set(RECEIPT_KEY, data.getSubmissionReceiptMessage());
 			gridStore.add(model);
 		}
 	}
@@ -121,14 +143,49 @@ public class EvaluationListViewImpl extends LayoutContainer implements Evaluatio
 				String value = model.get(property);
 				if (value == null) {
 					value = "";
-				} 
-				SafeHtmlBuilder builder = new SafeHtmlBuilder();
-				builder.appendHtmlConstant("<div style='font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;'>");
-				builder.appendEscaped(value);
-				builder.appendHtmlConstant("</div>");
-				Html html = new Html(builder.toSafeHtml().asString());
-			    
-				return html;
+				}
+				
+				if (property.equals(RULES_KEY)) {
+					if (value != null && value.length() > 0) {
+						//show link that pops up challenge specific submission rules
+						final Dialog d = new Dialog();
+						d.setBodyStyle("padding:5px;");
+						//render like html coming from markdown
+						d.addStyleName("markdown");
+						d.add(new HTML(value));
+						d.setAutoHeight(true);
+						d.setWidth(500);
+						d.setPlain(true);
+						d.setModal(false);
+						d.setHeading("Submission Rules");
+						d.setLayout(new FitLayout());			    
+					    d.setButtons(Dialog.CLOSE);
+					    d.setButtonAlign(HorizontalAlignment.RIGHT);
+	
+					    
+					    Image rulesButton = new Image(iconsImageBundle.informationBalloon16());
+			        	rulesButton.addStyleName("imageButton");
+					 	
+			        	rulesButton.addClickHandler(new ClickHandler() {
+							@Override
+							public void onClick(ClickEvent event) {
+								d.show();
+							}
+						});
+			        	return rulesButton;
+					}
+					else {
+						return new HTML();
+					}
+				} else {
+					SafeHtmlBuilder builder = new SafeHtmlBuilder();
+					builder.appendHtmlConstant("<div style='font-weight: normal;color:black; overflow:hidden; text-overflow:ellipsis; width:auto;'>");
+					builder.appendEscaped(value);
+					builder.appendHtmlConstant("</div>");
+					Html html = new Html(builder.toSafeHtml().asString());
+				    
+					return html;
+				}
 			}
 
 		};
@@ -171,11 +228,11 @@ public class EvaluationListViewImpl extends LayoutContainer implements Evaluatio
 		DisplayUtils.showErrorMessage(message);
 	}
 
-	public List<String> getSelectedEvaluationIds() {
-		List<String> selectedIds = new ArrayList<String>();
+	public List<Evaluation> getSelectedEvaluations() {
+		List<Evaluation> selectedEvaluations = new ArrayList<Evaluation>();
 		for (BaseModelData model : sm.getSelectedItems()) {
-			selectedIds.add((String)model.get(ID_KEY));
+			selectedEvaluations.add(presenter.getEvaluation((String)model.get(ID_KEY)));
 		}
-		return selectedIds;
+		return selectedEvaluations;
 	}
 }
