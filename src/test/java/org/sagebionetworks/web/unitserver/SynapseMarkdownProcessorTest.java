@@ -71,4 +71,14 @@ public class SynapseMarkdownProcessorTest {
 		String expectedResult = "<blockquote>\n   <ul>\n    <li>Item 1</li>\n    <ul>\n     <li>Item 2</li>\n     <ol>\n      <li><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li>\n      <li>SubItem 2b</li>\n     </ol>\n    </ul>\n   </ul>\n   <pre><code class=\"r\">Then a code block! </code></pre>\n   <br /> \n  </blockquote>";
 		assertTrue(actualResult.contains(expectedResult));
 	}
+	
+	@Test
+	public void testTableThenHR() throws IOException{
+		//complicated integration test of all parsers
+		String testString = "Tau | MAPT | MCF7,BT20\nVASP | VASP | MCF7,BT20\nXIAP | XIAP | MCF7,BT20\n--------------------------------\n## Additional Data Details";
+		String actualResult = processor.markdown2Html(testString, false);
+		assertTrue(actualResult.contains("<hr"));
+		assertFalse(actualResult.contains("<del"));
+	}
+	
 }
