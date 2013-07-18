@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -70,16 +71,20 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	
 	@Override
-	public void showSubmissionAcceptedDialog() {
-		Dialog d = new Dialog();
-		d.setHeading(DisplayConstants.THANK_YOU_FOR_SUBMISSION);
-		d.addText(DisplayConstants.SUBMISSION_RECEIVED_TEXT);
-		d.setBodyStyle("padding:5px;");
-		d.setWidth(370);
-		d.setAutoHeight(true);
-		d.setHideOnButtonClick(true);
-		d.setButtons(Dialog.OK);
-		d.show();
+	public void showSubmissionAcceptedDialogs(HashSet<String> receiptMessages) {
+		for (String message : receiptMessages) {
+			Dialog d = new Dialog();
+			d.setHeading(DisplayConstants.THANK_YOU_FOR_SUBMISSION);
+			d.addText(message);
+			d.setBodyStyle("padding:5px;");
+			//render like html coming from markdown
+			d.addStyleName("markdown");
+			d.setWidth(370);
+			d.setAutoHeight(true);
+			d.setHideOnButtonClick(true);
+			d.setButtons(Dialog.OK);
+			d.show();	
+		}
 	}
 	
 	@Override
@@ -162,8 +167,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				List<String> evaluationIds = evaluationList.getSelectedEvaluationIds();
-				if (evaluationIds.size() > 0) {
+				List<Evaluation> evaluations = evaluationList.getSelectedEvaluations();
+				if (evaluations.size() > 0) {
 					if (submitterCombo.isValid()) {
 						if (showEntityFinder) {
 							if (selectedReference == null || selectedReference.getTargetId() == null) {
@@ -172,7 +177,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 								return;
 							}
 						}
-						presenter.submitToEvaluations(selectedReference, evaluationIds, submitterCombo.getRawValue());
+						presenter.submitToEvaluations(selectedReference, evaluations, submitterCombo.getRawValue());
 					} else {
 						showErrorMessage(submitterCombo.getErrorMessage());
 					}

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -132,7 +133,7 @@ public class EvaluationSubmitter implements Presenter {
 
 	
 	@Override
-	public void submitToEvaluations(Reference selectedReference, final List<String> evaluationIds, final String submitterAlias) {
+	public void submitToEvaluations(Reference selectedReference, final List<Evaluation> evaluations, final String submitterAlias) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag
 		String entityId;
 		Long version = null;
@@ -166,7 +167,7 @@ public class EvaluationSubmitter implements Presenter {
 						return;
 					}
 					view.hideWindow();
-					submitToEvaluations(id, v, entity.getEtag(), evaluationIds, submitterAlias);
+					submitToEvaluations(id, v, entity.getEtag(), evaluations, submitterAlias);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -180,21 +181,21 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void submitToEvaluations(String entityId, Long versionNumber, String etag, List<String> evaluationIds, String submitterAlias) {
+	public void submitToEvaluations(String entityId, Long versionNumber, String etag, List<Evaluation> evaluations, String submitterAlias) {
 		//set up shared values across all submissions
 		Submission newSubmission = new Submission();
 		newSubmission.setEntityId(entityId);
 		newSubmission.setSubmitterAlias(submitterAlias);
 		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
 		newSubmission.setVersionNumber(versionNumber);
-		if (evaluationIds.size() > 0)
-			submitToEvaluations(newSubmission, etag, evaluationIds, 0);
+		if (evaluations.size() > 0)
+			submitToEvaluations(newSubmission, etag, evaluations, 0);
 	}
 	
-	public void submitToEvaluations(final Submission newSubmission, final String etag, final List<String> evaluationIds, final int index) {
+	public void submitToEvaluations(final Submission newSubmission, final String etag, final List<Evaluation> evaluations, final int index) {
 		//and create a new submission for each evaluation
-		String evalId = evaluationIds.get(index);
-		newSubmission.setEvaluationId(evalId);
+		Evaluation evaluation = evaluations.get(index);
+		newSubmission.setEvaluationId(evaluation.getId());
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		try {
 			newSubmission.writeToJSONObject(adapter);
@@ -206,10 +207,18 @@ public class EvaluationSubmitter implements Presenter {
 				@Override
 				public void onSuccess(String result) {
 					//result is the updated submission
-					if (index == evaluationIds.size()-1) {
-						view.showSubmissionAcceptedDialog();
+					if (index == evaluations.size()-1) {
+						HashSet<String> replyMessages = new HashSet<String>();
+						for (Evaluation eval : evaluations) {
+							String message = eval.getSubmissionReceiptMessage();
+							if (message == null || message.length()==0)
+								message = DisplayConstants.SUBMISSION_RECEIVED_TEXT;
+							replyMessages.add(message);
+						}
+						
+						view.showSubmissionAcceptedDialogs(replyMessages);
 					} else {
-						submitToEvaluations(newSubmission, etag, evaluationIds, index+1);
+						submitToEvaluations(newSubmission, etag, evaluations, index+1);
 					}
 				}
 				
