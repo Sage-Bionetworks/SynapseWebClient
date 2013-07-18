@@ -108,7 +108,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -1031,8 +1030,15 @@ public class DisplayUtils {
 		
 		return ordered;
 	}
-
-	public static PopupPanel addToolTip(final Widget widget, String message, boolean complex) {
+	
+	/**
+	 * Creates and attaches a tooltip to a GWT widget
+	 * Customization of content and style are made by the caller method
+	 * 
+	 * @param widget: the widget to attach the popup/tooltip to
+	 * @return the new popup/tooltip that can be customized
+	 */
+	public static PopupPanel addToolTip(final Widget widget) {
 		final PopupPanel popup = new PopupPanel(true);
 		popup.setGlassEnabled(false);
 		popup.addStyleName("topLevelZIndex");
@@ -1052,12 +1058,7 @@ public class DisplayUtils {
 				popup.hide();
 			}
 		}, MouseOutEvent.getType());
-		if(complex) {
-			return popup;
-		} else {
-			popup.setWidget(new HTML(message));
-			return popup;
-		}
+		return popup;
 	}
 	
 	public static PopupPanel addToolTip(final Component widget, String message) {
