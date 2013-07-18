@@ -82,7 +82,10 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 				//add link and text
 				FlowPanel tutorialLinkPanel = new FlowPanel();
 				tutorialLinkPanel.addStyleName("inline-block");
-				Anchor link = new Anchor("Click here");
+				
+				tutorialLinkPanel.add(new InlineLabel("Read the "));
+				
+				Anchor link = new Anchor("Submission Tutorial");
 				link.addStyleName("link inline-block");
 				link.addClickHandler(new ClickHandler() {
 					@Override
