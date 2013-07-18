@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,6 +13,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.RestResourceList;
@@ -40,6 +40,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EvaluationSubmitterTest {
 		
+	private static final String EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE = "Evaluation 2 Submission Receipt Message";
+	private static final String EVALUATION_1_SUBMISSION_RECEIPT_MESSAGE = "Evaluation 1 Submission Receipt Message";
 	EvaluationSubmitter submitter;
 	EvaluationSubmitterView mockView;
 	AuthenticationController mockAuthenticationController;
@@ -51,6 +53,7 @@ public class EvaluationSubmitterTest {
 	FileEntity entity;
 	EntityBundle bundle;
 	String submitterAlias = "MyAlias";
+	List<Evaluation> evaluationList;
 	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{	
@@ -75,14 +78,16 @@ public class EvaluationSubmitterTest {
 		
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
 		availableEvaluations.setTotalNumberOfResults(2);
-		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
+		evaluationList = new ArrayList<Evaluation>();
 		Evaluation e1 = new Evaluation();
 		e1.setId("1");
 		e1.setName("Test Evaluation 1");
+		e1.setSubmissionReceiptMessage(EVALUATION_1_SUBMISSION_RECEIPT_MESSAGE);
 		evaluationList.add(e1);
 		Evaluation e2 = new Evaluation();
-		e1.setId("2");
-		e1.setName("Test Evaluation 2");
+		e2.setId("2");
+		e2.setName("Test Evaluation 2");
+		e2.setSubmissionReceiptMessage(EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE);
 		evaluationList.add(e2);
 		availableEvaluations.setResults(evaluationList);
 
@@ -107,15 +112,21 @@ public class EvaluationSubmitterTest {
 	public void testSubmitToEvaluations() throws RestServiceException {
 		submitter.configure(entity, null);
 		
-		List<Evaluation> evals = new ArrayList<Evaluation>();
 		
-		submitter.submitToEvaluations(null, evals, submitterAlias);
+		submitter.submitToEvaluations(null, new ArrayList<Evaluation>(), submitterAlias);
 		verify(mockSynapseClient, times(0)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
-		evals.add(new Evaluation());
-		submitter.submitToEvaluations(null, evals, submitterAlias);
-		verify(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
+		submitter.submitToEvaluations(null, evaluationList, submitterAlias);
+		
+		//should invoke twice (once per evaluation)
+		verify(mockSynapseClient, times(2)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
+		
+		ArgumentCaptor<HashSet> captor = ArgumentCaptor.forClass(HashSet.class);
 		//submitted status shown
-		verify(mockView).showSubmissionAcceptedDialogs(any(HashSet.class));
+		verify(mockView).showSubmissionAcceptedDialogs(captor.capture());
+		//verify both evaluation receipt messages are in the map to display
+		HashSet receiptMessage = captor.getValue();
+		assertTrue(receiptMessage.contains(EVALUATION_1_SUBMISSION_RECEIPT_MESSAGE));
+		assertTrue(receiptMessage.contains(EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE));
 	}
 	
 	@Test
