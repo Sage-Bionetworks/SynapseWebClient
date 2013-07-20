@@ -969,10 +969,7 @@ public class DisplayUtils {
 	 * @return the new popup/tooltip that can be customized
 	 */
 	public static PopupPanel addToolTip(final Widget widget) {
-		final PopupPanel popup = createToolTip(false);
-		setMouseOverBehavior(widget, popup);
-		setMouseOutBehavior(widget, popup);
-		return popup;
+		return addToolTip(widget, false, false);
 	}
 	
 	/**
@@ -991,37 +988,6 @@ public class DisplayUtils {
 	 */
 	public static PopupPanel addToolTip(final Widget widget, boolean keepToolTipOpen, boolean autoHide) {
 		final PopupPanel popup = createToolTip(autoHide);
-		setMouseOverBehavior(widget, popup);
-
-		//If the tooltip is to remain open, we do not "hide" it when the curser moves out of the widget
-		if(keepToolTipOpen) {
-			popup.addDomHandler(new MouseOverHandler() {
-				@Override
-				/*public void onMouseOver(MouseOverEvent event) {
-					popup.showRelativeTo(widget);
-				}*/
-				public void onMouseOver(MouseOverEvent event) {
-					popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-				          public void setPosition(int offsetWidth, int offsetHeight) {
-				        	  popup.showRelativeTo(widget);
-				          }
-				        });
-				}
-			}, MouseOverEvent.getType());
-		} else {
-			setMouseOutBehavior(widget, popup);
-		}
-		return popup;
-	}
-	
-	private static PopupPanel createToolTip(boolean autoHide) {
-		final PopupPanel popup = new PopupPanel(autoHide);
-		popup.setGlassEnabled(false);
-		popup.addStyleName("topLevelZIndex");
-		return popup;
-	}
-	
-	private static void setMouseOverBehavior(final Widget widget, final PopupPanel popup) {
 		widget.addDomHandler(new MouseOverHandler() {
 			@Override
 			public void onMouseOver(MouseOverEvent event) {
@@ -1032,15 +998,35 @@ public class DisplayUtils {
 			        });
 			}
 		}, MouseOverEvent.getType());
+
+		//If the tooltip is to remain open, we do not "hide" it when the curser moves out of the widget
+		if(keepToolTipOpen) {
+			popup.addDomHandler(new MouseOverHandler() {
+				@Override
+				public void onMouseOver(MouseOverEvent event) {
+					popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
+				          public void setPosition(int offsetWidth, int offsetHeight) {
+				        	  popup.showRelativeTo(widget);
+				          }
+				        });
+				}
+			}, MouseOverEvent.getType());	
+		} else {
+			widget.addDomHandler(new MouseOutHandler() {
+				@Override
+				public void onMouseOut(MouseOutEvent event) {
+					popup.hide();
+				}
+			}, MouseOutEvent.getType());
+		}
+		return popup;
 	}
 	
-	private static void setMouseOutBehavior(final Widget widget, final PopupPanel popup) {
-		widget.addDomHandler(new MouseOutHandler() {
-			@Override
-			public void onMouseOut(MouseOutEvent event) {
-				popup.hide();
-			}
-		}, MouseOutEvent.getType());
+	private static PopupPanel createToolTip(boolean autoHide) {
+		final PopupPanel popup = new PopupPanel(autoHide);
+		popup.setGlassEnabled(false);
+		popup.addStyleName("topLevelZIndex");
+		return popup;
 	}
 	
 	public static PopupPanel addToolTip(final Component widget, String message) {
