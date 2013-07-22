@@ -16,6 +16,9 @@ public class WidgetConstants {
 	
 	public static final String LINK_CONTENT_TYPE = "link";
 	public static final String LINK_FRIENDLY_NAME ="Link";
+	
+	public static final String REFERENCE_CONTENT_TYPE = "reference";
+	public static final String REFERENCE_FRIENDLY_NAME = "Reference";
 
 	public static final String TABBED_TABLE_CONTENT_TYPE = "tabbedtable";
 	public static final String TABBED_TABLE_FRIENDLY_NAME ="Table";
@@ -95,8 +98,8 @@ public class WidgetConstants {
 	
 	public static final String BUTTON_LINK_URL_KEY = "url";
 	public static final String BUTTON_LINK_TEXT_KEY = "text";
-	
-	/**
+		public static final String REFERENCE_FOOTNOTE_KEY = "footnoteId";
+	public static final String INLINE_WIDGET_KEY = "inlineWidget";	/**
 	 * API Table Column Renderers
 	 */
 	public static final String API_TABLE_COLUMN_RENDERER_NONE = "none";

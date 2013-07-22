@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.place;
 
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.ClientProperties;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
@@ -11,7 +11,7 @@ public class LoginPlace extends Place {
 	private String token;	
 	
 	public static final String LOGOUT_TOKEN = "logout";
-	public static final String LOGIN_TOKEN = DisplayUtils.DEFAULT_PLACE_TOKEN;
+	public static final String LOGIN_TOKEN = ClientProperties.DEFAULT_PLACE_TOKEN;
 	public static final String FASTPASS_TOKEN = "fastpassing";
 	
 	public LoginPlace(String token) {

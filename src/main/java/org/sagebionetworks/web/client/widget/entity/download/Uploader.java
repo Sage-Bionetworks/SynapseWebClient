@@ -17,8 +17,8 @@ import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
@@ -62,8 +62,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	//we are dedicating 90% of the progress bar to uploading the chunks, reserving 10% for the final combining (last) step
 	public static final double UPLOADING_TOTAL_PERCENT = .9d;
 	public static final double COMBINING_TOTAL_PERCENT = .1d;
-	public static final double OLD_BROWSER_MAX_SIZE = DisplayUtils.MB * 5; //5MB
-	public static final int BYTES_PER_CHUNK = (int)DisplayUtils.MB * 5; //5MB
+	public static final double OLD_BROWSER_MAX_SIZE = ClientProperties.MB * 5; //5MB
+	public static final int BYTES_PER_CHUNK = (int)ClientProperties.MB * 5; //5MB
 	public static final int MAX_RETRY = 3;
 	
 	private UploaderView view;
@@ -582,7 +582,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		} catch (Throwable th) {detailedErrorMessage = th.getMessage();};//wasn't an UplaodResult
 		
 		if (uploadResult == null) {
-			if(!resultHtml.contains(DisplayUtils.UPLOAD_SUCCESS)) {
+			if(!resultHtml.contains(DisplayConstants.UPLOAD_SUCCESS)) {
 				uploadError(detailedErrorMessage);
 			} else {
 				uploadSuccess(isNewlyRestricted);
@@ -590,6 +590,31 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
+	public void showCancelButton(boolean showCancel) {
+		view.setShowCancelButton(showCancel);
+	}
+		
+	@Override
+	public boolean isRestricted() {
+		return GovernanceServiceHelper.entityRestrictionLevel(accessRequirements)!=RESTRICTION_LEVEL.OPEN;
+	}
+		public int getDisplayHeight() {
+		return view.getDisplayHeight();
+	}
+	
+	public int getDisplayWidth() {
+		return view.getDisplayWidth();
+	}
+
+	@Override
+	public void cancelClicked() {
+		fireCancelEvent();
+	}
+
+
+	/*
+	 * Private Methods
+	 */
 	private void refreshAfterSuccessfulUpload(String entityId, final boolean isNewlyRestricted) {
 		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
 			@Override
@@ -619,23 +644,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		//Verified that when this method is called, the input field used for direct upload is no longer available, 
 		//so that this effectively cancels chunked upload too (after the current chunk upload completes)
 		view.hideLoading();
+		view.clear();
 		handlerManager.fireEvent(new CancelEvent());
 	}
 	
 	private void uploadSuccess(boolean isNewlyRestricted) {
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+		view.clear();
 		handlerManager.fireEvent(new EntityUpdatedEvent());
-	}
-	
-	@Override
-	public boolean isRestricted() {
-		return GovernanceServiceHelper.entityRestrictionLevel(accessRequirements)!=RESTRICTION_LEVEL.OPEN;
-	}
-		public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	
-	public int getDisplayWidth() {
-		return view.getDisplayWidth();
 	}
 }

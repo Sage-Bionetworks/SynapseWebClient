@@ -57,8 +57,7 @@ public class TableParser extends BasicMarkdownElementParser {
 			//not a table line.  are we ending a table?
 			if (isInTable) {
 				//add end table
-				builder.append("</tbody>");
-				builder.append("</table>");
+				line.prependElement("</tbody></table>");
 				isInTable = false;
 			}
 			builder.append(line.getMarkdown());

@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.web.client.ClientProperties;
 
 /**
  * 
@@ -24,7 +24,7 @@ public class ListUtilsTest {
 		
 		// Create a few datset
 		Study one = new Study();
-		one.setId(DisplayUtils.DEFAULT_PLACE_TOKEN);
+		one.setId(ClientProperties.DEFAULT_PLACE_TOKEN);
 		one.setName("beta");
 		one.setCreatedOn(new Date(99));
 		Study two = new Study();

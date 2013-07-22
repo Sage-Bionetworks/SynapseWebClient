@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -11,10 +12,9 @@ public interface EvaluationSubmitterView extends SynapseView {
 	void setPresenter(Presenter presenter);
 	void popupSelector(boolean showEntityFinder, List<Evaluation> evaluations, List<String> submitterAliases);
 	void hideWindow();
-	
+	void showSubmissionAcceptedDialogs(HashSet<String> receiptMessages);
 	public interface Presenter {
 		//view sends back the selected entity, selected evaluation Ids (will not be empty), and selected submitter alias (will not be null)
-		void submitToEvaluations(Reference selectedEntity, List<String> evaluationIds, String submitterAlias);
+		void submitToEvaluations(Reference selectedEntity, List<Evaluation> evaluationIds, String submitterAlias);
 	}
-
 }

@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.presenter.users;
 
-import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -75,7 +73,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		changeEmailToken = null;
 		
 		// show proper view if token is present
-		if(DisplayUtils.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
+		if(ClientProperties.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
 			view.showRequestForm();
 		} else if (place.toToken().startsWith(REGISTRATION_TOKEN_PREFIX)) {
 			// if this is a registration token, we don't have enough information
@@ -172,7 +170,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 							public void onSuccess(Void result) {
 								view.showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
 								view.showPasswordResetSuccess();
-								globalApplicationState.getPlaceChanger().goTo(new Home(DisplayUtils.DEFAULT_PLACE_TOKEN)); // redirect to home page
+								globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to home page
 							}
 
 							@Override

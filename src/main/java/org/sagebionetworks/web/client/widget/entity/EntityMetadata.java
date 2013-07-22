@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -13,6 +11,7 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -35,7 +34,6 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -269,7 +267,7 @@ public class EntityMetadata implements Presenter {
 	public Callback getLoginCallback() {
 		return new Callback() {
 			public void invoke() {		
-				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(DisplayUtils.DEFAULT_PLACE_TOKEN));
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 			}
 		};
 	}

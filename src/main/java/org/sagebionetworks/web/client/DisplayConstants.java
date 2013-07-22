@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.resources.client.ImageResource;
 
 
 public class DisplayConstants {
@@ -12,6 +11,7 @@ public class DisplayConstants {
 	/*
 	 * Text constants
 	 */
+	public static final String UPLOAD_SUCCESS = "Upload Success";
 	public static final String DEFAULT_PAGE_TITLE = "Sage Synapse: Contribute to the Cure";
 	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
 	
@@ -379,6 +379,8 @@ public class DisplayConstants {
 	public static final String SYNAPSE_ID_LABEL = "Synapse ID";
 	public static final String SAVE_BUTTON_LABEL = "Save";
 	public static final String INSERT_BUTTON_LABEL = "Insert";
+	
+	public static final String REFERENCE_LABEL = "Reference";
 
 	/*
 	 * Element ids for Selenium
@@ -529,7 +531,7 @@ public class DisplayConstants {
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
 	public static final String EXTERNAL_URL = "External URL";
 	public static final String ADD_ENTITY = "Add Entity";
-	public static final String INVALID_SHINY_SITE = " is not a valid Shiny Site URL. Please " + DisplayUtils.HELP_EMAIL_ADDRESS_LINK + " if you would like your Shiny Server added to our white list.";
+	public static final String INVALID_SHINY_SITE = " is not a valid Shiny Site URL. Please " + ClientProperties.HELP_EMAIL_ADDRESS_LINK + " if you would like your Shiny Server added to our white list.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
 	public static final String ACCESS_WILL_BE = "Access Will Be";
 	public static final String ANY_USE = "Any Use";
@@ -552,6 +554,8 @@ public class DisplayConstants {
 	public static final String EVALUATION_SUBMISSION_ERROR = "Unable to submit to the evaluation: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
+	public static final String THANK_YOU_FOR_SUBMISSION = "Thank you for your submission!";
+	public static final String SUBMISSION_RECEIVED_TEXT = "Your submission will be scored and results posted to the challenge leaderboard.";
 	public static final String NOT_PARTICIPATING_IN_ANY_EVALUATIONS = "You are not currently participating in an Evaluation/Challenge. Please join one and try again.";
 	public static final String JOINED_EVALUATION_HTML = "<h3>You are registered for this challenge!</h3><ul class=\"list arrow-list\"><li>Download the file(s) by going to the bottom of this page...</li></ul>";
 	public static final String PROPERTY_ERROR = "Unable to query for property: ";
@@ -569,5 +573,8 @@ public class DisplayConstants {
 	public static final String THERE_IS_A_NEWER_VERSION = "A more recent version of this entity exists.";
 	public static final String NEW_VERSION_AVAILABLE = "New Version of Synapse Available";
 	public static final String NEW_VERSION_INSTRUCTIONS = "A new version of Synapse is now available, please save your work and reload the page to ensure proper function.";
+	public static final String API_DOCUMENTATION = "API Documentation";
+	public static final String EXAMPLE_CODE = "Example Code";
+	
 }
 

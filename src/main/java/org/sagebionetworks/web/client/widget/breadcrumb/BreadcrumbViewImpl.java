@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.widget.breadcrumb;
 
 import java.util.List;
 
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -65,14 +65,14 @@ public class BreadcrumbViewImpl extends LayoutContainer implements BreadcrumbVie
 				}
 			});
 			if (i > 0) {
-				panel.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.BREADCRUMB_SEP)));
+				panel.add(new HTML(SafeHtmlUtils.fromSafeConstant(ClientProperties.BREADCRUMB_SEP)));
 			}
 			panel.add(anchor);
 		}
 		if (current != null) {
 			current = stubString(current);
 			SafeHtmlBuilder shb = new SafeHtmlBuilder();
-			shb.appendHtmlConstant(DisplayUtils.BREADCRUMB_SEP);
+			shb.appendHtmlConstant(ClientProperties.BREADCRUMB_SEP);
 			shb.appendEscaped(current);
 			panel.add(new HTML(shb.toSafeHtml()));
 		}

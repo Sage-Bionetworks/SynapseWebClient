@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -16,6 +17,7 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
@@ -67,7 +69,24 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void clear() {
 	}
-
+	
+	@Override
+	public void showSubmissionAcceptedDialogs(HashSet<String> receiptMessages) {
+		for (String message : receiptMessages) {
+			Dialog d = new Dialog();
+			d.setHeading(DisplayConstants.THANK_YOU_FOR_SUBMISSION);
+			d.addText(message);
+			d.setBodyStyle("padding:5px;");
+			//render like html coming from markdown
+			d.addStyleName("markdown");
+			d.setWidth(370);
+			d.setAutoHeight(true);
+			d.setHideOnButtonClick(true);
+			d.setButtons(Dialog.OK);
+			d.show();	
+		}
+	}
+	
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
@@ -148,8 +167,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				List<String> evaluationIds = evaluationList.getSelectedEvaluationIds();
-				if (evaluationIds.size() > 0) {
+				List<Evaluation> evaluations = evaluationList.getSelectedEvaluations();
+				if (evaluations.size() > 0) {
 					if (submitterCombo.isValid()) {
 						if (showEntityFinder) {
 							if (selectedReference == null || selectedReference.getTargetId() == null) {
@@ -158,7 +177,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 								return;
 							}
 						}
-						presenter.submitToEvaluations(selectedReference, evaluationIds, submitterCombo.getRawValue());
+						presenter.submitToEvaluations(selectedReference, evaluations, submitterCombo.getRawValue());
 					} else {
 						showErrorMessage(submitterCombo.getErrorMessage());
 					}

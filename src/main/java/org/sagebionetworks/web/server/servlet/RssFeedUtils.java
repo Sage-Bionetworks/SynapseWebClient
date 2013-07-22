@@ -20,7 +20,7 @@ import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.server.HttpUtils;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.w3c.dom.Document;
@@ -110,7 +110,7 @@ public class RssFeedUtils {
 	}
 	
 	public static String getWikiPageContent(String pageId){
-		String urlString = DisplayUtils.WIKI_CONTENT_URL + pageId;
+		String urlString = ClientProperties.WIKI_CONTENT_URL + pageId;
 		String xml = "";
 		try {
 			xml = HttpUtils.httpGet(urlString, new HashMap<String, String>());
@@ -125,9 +125,9 @@ public class RssFeedUtils {
 		try {
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("pageId", pageId);
-			sourceHtml = HttpUtils.httpGet(DisplayUtils.WIKI_PAGE_SOURCE_CONTENT_URL, params);
+			sourceHtml = HttpUtils.httpGet(ClientProperties.WIKI_PAGE_SOURCE_CONTENT_URL, params);
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Could not read from the source: " + DisplayUtils.WIKI_PAGE_SOURCE_CONTENT_URL + " for pageId " + pageId, e);
+			throw new IllegalArgumentException("Could not read from the source: " + ClientProperties.WIKI_PAGE_SOURCE_CONTENT_URL + " for pageId " + pageId, e);
 		}
 		
 		return trimWikiSourceHtml(sourceHtml);
@@ -136,8 +136,8 @@ public class RssFeedUtils {
 	public static String trimWikiSourceHtml(String sourceHtml) {
 		String returnHtml = "";
 		if (sourceHtml != null) {
-			int startIndex = sourceHtml.indexOf(DisplayUtils.WIKI_SOURCE_DELIMITER);
-			int endIndex = sourceHtml.lastIndexOf(DisplayUtils.WIKI_SOURCE_DELIMITER);
+			int startIndex = sourceHtml.indexOf(ClientProperties.WIKI_SOURCE_DELIMITER);
+			int endIndex = sourceHtml.lastIndexOf(ClientProperties.WIKI_SOURCE_DELIMITER);
 			if (startIndex > -1 && endIndex > -1)
 				returnHtml = sourceHtml.substring(startIndex, endIndex);
 		}

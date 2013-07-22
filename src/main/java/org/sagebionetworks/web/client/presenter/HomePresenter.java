@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -86,7 +87,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 		
 	public void loadNewsFeed(){
-		rssService.getCachedContent(DisplayUtils.NEWS_FEED_PROVIDER_ID, new AsyncCallback<String>() {
+		rssService.getCachedContent(ClientProperties.NEWS_FEED_PROVIDER_ID, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
@@ -131,7 +132,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			htmlResponse.append("<li style=\"padding-top: 0px; padding-bottom: 3px\"><h5 style=\"margin-bottom: 0px;\"><a href=\"");
             //all of the rss links are null from Get Satisfaction.  Just point each item to the main page, showing the recent activity
 			//htmlResponse.append(entry.getLink());
-			htmlResponse.append(DisplayUtils.SUPPORT_RECENT_ACTIVITY_URL);
+			htmlResponse.append(ClientProperties.SUPPORT_RECENT_ACTIVITY_URL);
             htmlResponse.append("\" class=\"service-tipsy north link\">");
             htmlResponse.append(entry.getTitle());
             htmlResponse.append("</a></h5><p class=\"clear small-italic\" style=\"margin-bottom: 0px;\">");

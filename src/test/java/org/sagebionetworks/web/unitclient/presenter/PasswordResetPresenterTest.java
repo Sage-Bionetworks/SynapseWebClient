@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -68,7 +68,7 @@ public class PasswordResetPresenterTest {
 				mockSageImageBundle, mockIconsImageBundle,
 				mockGlobalApplicationState, mockNodeModelCreator);			
 		verify(mockView).setPresenter(presenter);
-		when(place.toToken()).thenReturn(DisplayUtils.DEFAULT_PLACE_TOKEN);
+		when(place.toToken()).thenReturn(ClientProperties.DEFAULT_PLACE_TOKEN);
 		currentUserSessionData.setProfile(new UserProfile());
 	}
 	

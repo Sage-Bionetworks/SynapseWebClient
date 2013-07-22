@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 
@@ -62,10 +63,10 @@ public class AttachmentPanel extends ContentPanel {
 			    // If we have a preview then show it as a tooltip.
 			    if(data.getPreviewId() != null){
 			    	SafeHtml previewToolip = SafeHtmlUtils.fromSafeConstant("<div class=\"preview-image-loading\" >"
-			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_START
+			    		+ ClientProperties.IMAGE_CENTERING_TABLE_START
 			    		+ "<img style=\"margin:auto; display:block;\" src=\"" 
 			    		+ DisplayUtils.createAttachmentUrl(baseUrl, entityId, data.getPreviewId(), null) + "\"/>"
-			    		+ DisplayUtils.IMAGE_CENTERING_TABLE_END
+			    		+ ClientProperties.IMAGE_CENTERING_TABLE_END
 			    		+ "</div>");
 			    	config.setText(previewToolip.asString());  
 			    }else{

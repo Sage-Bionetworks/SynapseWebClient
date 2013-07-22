@@ -115,6 +115,10 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		}
 	}
 
+	
+	/*
+	 * Private Methods
+	 */
 	private Entity createNewEntity(String className, String parentId) {
 		Entity entity = (Entity) autogenFactory.newInstance(className);
 		entity.setParentId(parentId);

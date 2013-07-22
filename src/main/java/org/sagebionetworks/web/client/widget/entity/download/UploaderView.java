@@ -47,6 +47,13 @@ public interface UploaderView extends IsWidget, SynapseView {
 		boolean isRestricted();
 
 		void clearHandlers();
+		
+		/**
+		 * Called when cancel is clicked in the view
+		 */
+		void cancelClicked();
 	}
 
+	public void setShowCancelButton(boolean showCancel);
+	
 }

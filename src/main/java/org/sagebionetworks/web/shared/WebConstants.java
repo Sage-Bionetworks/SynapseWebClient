@@ -98,6 +98,8 @@ public class WebConstants {
 	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
 
 	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
+	
+	public static final String FOOTNOTE_ID_WIDGET_PREFIX = "footnote_";
 
 	public static final String PROXY_PARAM_KEY = "proxy";
 

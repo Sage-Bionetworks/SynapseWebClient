@@ -4,12 +4,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.ontology.EnumerationTerm;
 import org.sagebionetworks.web.client.ontology.NcboOntologyTerm;
 
-import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
@@ -71,7 +70,7 @@ public class EditorUtils {
 			case INTEGER:
 			case DECIMAL:
 			case BOOLEAN:			
-				if(key.equals(DisplayUtils.NODE_DESCRIPTION_KEY) || key.matches("^" + DisplayUtils.LAYER_COLUMN_DESCRIPTION_KEY_PREFIX + ".*")) {
+				if(key.equals(ClientProperties.NODE_DESCRIPTION_KEY) || key.matches("^" + ClientProperties.LAYER_COLUMN_DESCRIPTION_KEY_PREFIX + ".*")) {
 					model.setColumnEditType(ColumnEditType.TEXTAREA);
 					model.setValue(formField.getValue());
 				} else {
