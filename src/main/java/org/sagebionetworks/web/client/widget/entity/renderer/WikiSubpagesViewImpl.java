@@ -2,11 +2,16 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 
+import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.ModelStringProvider;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.TreePanelEvent;
+import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
+import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -26,21 +31,45 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 	};
 
 	@Override
-	public void configure(TreeItem root) {
+	public void configure(TocItem root) {
 		clear();
 		//this widget shows nothing if it doesn't have any pages!
-		if (root == null)
+		TocItem mainPage = (TocItem) root.getChild(0);
+		if (mainPage.getChildCount() == 0)
 			return;
-		SimplePanel p = new SimplePanel();
-		p.addStyleName("pagesTree");
+		
 		//only show the tree if the root has children
-		if (root != null && root.getChildCount() > 0) {
-			Tree t = new Tree();
-			t.addItem(root);
-			p.setWidget(t);
-		}
+		if (mainPage.getChildCount() > 0) {
+			TreeStore<ModelData> store = new TreeStore<ModelData>();
+			store.add(root.getChildren(), true);
+			final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
 			
-		this.add(p);
+			tree.setAutoExpand(true);
+			tree.addStyleName("pagesTree");
+			//Remove folder icons
+			tree.getStyle().setNodeCloseIcon(null);
+			tree.getStyle().setNodeOpenIcon(null);
+			
+			//Set the text for the tree
+			tree.setLabelProvider(new ModelStringProvider<ModelData>() {
+				@Override
+				public String getStringValue(ModelData model, String property) {
+					return model.toString();
+				}	
+			});
+			
+			//Adjust the height of the tree as items are expanded/collapsed
+			Listener<TreePanelEvent<ModelData>> expandCollapseListener = new Listener<TreePanelEvent<ModelData>>() {
+				public void handleEvent(TreePanelEvent<ModelData> be) {
+					Element child = tree.getElement().getFirstChildElement();
+					tree.setHeight(child.getClientHeight() + "px");
+				}			
+			};
+			
+			tree.addListener(Events.Expand, expandCollapseListener);
+			tree.addListener(Events.Collapse, expandCollapseListener);
+			this.add(tree);
+		}
 		this.layout(true);
 	}	
 	
