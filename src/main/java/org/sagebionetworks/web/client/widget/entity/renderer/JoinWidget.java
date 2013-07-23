@@ -89,8 +89,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						view.showError(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
+					view.showError(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
@@ -195,8 +194,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
+				view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
 			}
 		});
 	}
@@ -244,8 +242,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
+				view.showError(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
 			}
 		});
 	}
@@ -286,13 +283,11 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
+					view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
-			if(!DisplayUtils.handleServiceException(e, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-				view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
+			view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
 		}
 	}
 	
