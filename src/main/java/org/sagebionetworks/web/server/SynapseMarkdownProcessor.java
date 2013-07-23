@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.server.markdownparser.BlockQuoteParser;
 import org.sagebionetworks.web.server.markdownparser.BoldParser;
@@ -31,7 +30,7 @@ import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 public class SynapseMarkdownProcessor {
 	private static SynapseMarkdownProcessor singleton = null;
 	private List<MarkdownElementParser> allElementParsers = new ArrayList<MarkdownElementParser>();
-
+	private CodeParser codeParser;
 	public static SynapseMarkdownProcessor getInstance() {
 		if (singleton == null) {
 			singleton = new SynapseMarkdownProcessor();
@@ -48,7 +47,8 @@ public class SynapseMarkdownProcessor {
 		//initialize all markdown element parsers
 		allElementParsers.add(new BlockQuoteParser());
 		allElementParsers.add(new BoldParser());
-		allElementParsers.add(new CodeParser());
+		codeParser = new CodeParser();
+		allElementParsers.add(codeParser);
 		allElementParsers.add(new CodeSpanParser());
 		allElementParsers.add(new HeadingParser());
 		allElementParsers.add(new HorizontalLineParser());
@@ -130,21 +130,24 @@ public class SynapseMarkdownProcessor {
 		allLines.add("");
 		for (String line : allLines) {
 			MarkdownElements elements = new MarkdownElements(line);
-			
 			//do parsers we're currently in the middle of
 			for (MarkdownElementParser parser : activeComplexParsers) {
 				parser.processLine(elements);
 			}
 			
-			//then the inactive multiline parsers
-			for (MarkdownElementParser parser : inactiveComplexParsers) {
-				parser.processLine(elements);
+			//only give the option to start new multiline element (complex parser) or process simple elements if we're not in a code block
+			if (!codeParser.isInMarkdownElement()){
+				//then the inactive multiline parsers
+				for (MarkdownElementParser parser : inactiveComplexParsers) {
+					parser.processLine(elements);
+				}
+				
+				//process the simple processors after complex parsers (the complex parsers clean up the markdown)
+				for (MarkdownElementParser parser : simpleParsers) {
+					parser.processLine(elements);
+				}
 			}
-			
-			//process the simple processors after complex parsers (the complex parsers clean up the markdown)
-			for (MarkdownElementParser parser : simpleParsers) {
-				parser.processLine(elements);
-			}
+				
 
 			
 			List<MarkdownElementParser> newActiveComplexParsers = new ArrayList<MarkdownElementParser>();
