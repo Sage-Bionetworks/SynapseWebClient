@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +25,8 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -106,7 +107,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			public void onSuccess(String results) {
 				try {
 					PaginatedResults<JSONEntity> wikiHeaders = nodeModelCreator.createPaginatedResults(results, WikiHeader.class);
-					Map<String, TreeItem> wikiId2TreeItem = new HashMap<String, TreeItem>(); 
+					Map<String, TocItem> wikiId2TreeItem = new HashMap<String, TocItem>();
 					
 					//now grab all of the headers associated with this level
 					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
@@ -121,20 +122,22 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							href = DisplayUtils.getSynapseWikiHistoryToken(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), header.getId());
 							title = header.getTitle();
 						}
-						TreeItem item = new TreeItem(view.getHTML(href, title, isCurrentPage));
+						
+						TocItem item = new TocItem(view.getHTML(href, title, isCurrentPage));
 						wikiId2TreeItem.put(header.getId(), item);
 					}
 					//now set up the relationships
-					TreeItem root = null;
+					TocItem root = new TocItem();
+					
 					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
 						WikiHeader header = (WikiHeader) headerEntity;
 						if (header.getParentId() != null){
-							//add this as a child
-							TreeItem item = wikiId2TreeItem.get(header.getParentId());
-							item.addItem(wikiId2TreeItem.get(header.getId()));
-							item.setState(true);
+							//add this as a child							
+							TocItem parent = wikiId2TreeItem.get(header.getParentId());
+							TocItem child = wikiId2TreeItem.get(header.getId());
+							parent.add(child);
 						} else {
-							root = wikiId2TreeItem.get(header.getId());
+							root.add(wikiId2TreeItem.get(header.getId()));
 						}
 					}
 					
@@ -155,5 +158,41 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 					view.showErrorMessage(caught.getMessage());
 			}
 		});
+	}
+}
+
+class TocItem extends BaseTreeModel implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	private static int ID = 0;
+	private String html;
+	
+	public TocItem() {
+		set("id", ID++);
+	}
+	
+	public TocItem(String html) {
+		super();
+		set("id", ID++);
+		this.html = html;
+	}
+	
+	public Integer getId() {
+		return (Integer) get("id");
+	}
+	
+	public TocItem(String html, BaseTreeModel[] children) {
+		this(html);
+		for(int i = 0; i < children.length; i++) {
+			add(children[i]);
+		}
+	}
+	
+	public String getHtml() {
+		return html;
+	}
+	
+	public String toString() {
+		return getHtml();
 	}
 }
