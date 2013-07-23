@@ -238,6 +238,54 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 		return fileToUploadElement.files[0].size;
 	}-*/;
+	
+	/**
+	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.
+	 */
+	@Override
+	public void getFileMd5(String fileFieldId, MD5Callback md5Callback) {
+		_getFileMd5(fileFieldId, md5Callback);
+	}
+	private final static native void _getFileMd5(String fileFieldId, MD5Callback md5Callback) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		var file = fileToUploadElement.files[0];
+		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
+		chunkSize = 2097152; // read in chunks of 2MB
+        chunks = Math.ceil(file.size / chunkSize);
+        currentChunk = 0;
+        spark = new $wnd.SparkMD5.ArrayBuffer();
+        $wnd.frOnload = function(e) {
+            console.log("read chunk nr", currentChunk + 1, "of", chunks);
+            spark.append(e.target.result);                 // append array buffer
+            currentChunk++;
+
+            if (currentChunk < chunks) {
+                $wnd.loadNext();
+            }
+            else {
+               console.log("finished loading file (to calculate md5)");
+               // Call instance method setMD5() on md5Callback with the final md5
+    			md5Callback.@org.sagebionetworks.web.client.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
+            }
+        };
+        $wnd.frOnerror = function () {
+        	console.warn("unable to calculate md5");
+            md5Callback.@org.sagebionetworks.web.client.MD5Callback::setMD5(Ljava/lang/String;)(null);
+        };
+        
+        $wnd.loadNext = function() { 
+            var fileReader = new FileReader();
+	        fileReader.onload = $wnd.frOnload;
+	        fileReader.onerror = $wnd.frOnerror;
+	
+	        var start = currentChunk * chunkSize,
+	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+	
+	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+		};
+       $wnd.loadNext();
+	}-*/;
+
 
 	@Override
 	public void uploadUrlToGenomeSpace(String url) {

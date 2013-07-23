@@ -1368,12 +1368,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String getChunkedFileToken(String fileName, String contentType) throws RestServiceException {
+	public String getChunkedFileToken(String fileName, String contentType, String contentMD5) throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();
 		try {
 			CreateChunkedFileTokenRequest ccftr = new CreateChunkedFileTokenRequest();
 			ccftr.setFileName(fileName);
 			ccftr.setContentType(contentType);
+			ccftr.setContentMD5(contentMD5);
 			// Start the upload
 			ChunkedFileToken token = synapseClient.createChunkedFileUploadToken(ccftr);
 			

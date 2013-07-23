@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.MD5Callback;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -329,6 +330,12 @@ public class ProvUtilsTest {
 
 			@Override
 			public void uploadUrlToGenomeSpace(String url, String filename) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void getFileMd5(String fileFieldId, MD5Callback callback) {
 				// TODO Auto-generated method stub
 				
 			}

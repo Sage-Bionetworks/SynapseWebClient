@@ -30,6 +30,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.MD5Callback;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -103,7 +104,7 @@ public class UploaderTest {
 		//by default, do not support direct upload (direct upload tests will turn on)
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(false);
 		when(synapseJsniUtils.getContentType(anyString())).thenReturn("image/png");
-		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
 		UploadDaemonStatus status = new UploadDaemonStatus();
 		status.setState(State.COMPLETED);
@@ -223,7 +224,10 @@ public class UploaderTest {
 	public void testDirectUploadHappyCase() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		uploader.handleUpload("newFile.txt");
-		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), any(AsyncCallback.class));
+		verify(synapseJsniUtils).getFileMd5(anyString(), any(MD5Callback.class));
+		
+		uploader.directUploadStep1("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
+		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyString(), anyInt(), anyInt(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//kick off what would happen after a successful upload
@@ -241,8 +245,8 @@ public class UploaderTest {
 	@Test
 	public void testDirectUploadStep1Failure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedFileToken(anyString(), anyString(), any(AsyncCallback.class));
-		uploader.handleUpload("newFile.txt");
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		uploader.directUploadStep1("newFile.txt", "", "");
 		verifyUploadError();
 	}
 
@@ -250,7 +254,7 @@ public class UploaderTest {
 	public void testDirectUploadStep2Failure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
-		uploader.handleUpload("newFile.txt");
+		uploader.directUploadStep2("", 0, 0, 1, 12345, new ArrayList<String>());
 		verifyUploadError();
 	}
 
