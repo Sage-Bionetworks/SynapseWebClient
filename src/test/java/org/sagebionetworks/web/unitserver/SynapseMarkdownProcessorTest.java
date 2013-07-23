@@ -68,7 +68,7 @@ public class SynapseMarkdownProcessorTest {
 		//complicated integration test of all parsers
 		String testString = "> * Item 1\n> * Item 2\n>   1. #### SubItem 2a\n>   2. SubItem 2b\n> ``` r\n> Then a code block!\n> ```";
 		String actualResult = processor.markdown2Html(testString, false);
-		String expectedResult = "<blockquote>\n   <ul>\n    <li>Item 1</li>\n    <ul>\n     <li>Item 2</li>\n     <ol>\n      <li><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li>\n      <li>SubItem 2b</li>\n     </ol>\n    </ul>\n   </ul>\n   <pre><code class=\"r\">Then a code block! </code></pre>\n   <br /> \n  </blockquote>";
+		String expectedResult = "<blockquote>\n   <ul>\n    <li>Item 1</li>\n    <ul>\n     <li>Item 2</li>\n     <ol>\n      <li><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li>\n      <li>SubItem 2b</li>\n     </ol>\n    </ul>\n   </ul>\n   <pre><code class=\"r\">Then a code block!</code></pre>\n   <br /> \n  </blockquote>";
 		assertTrue(actualResult.contains(expectedResult));
 	}
 	
@@ -79,6 +79,17 @@ public class SynapseMarkdownProcessorTest {
 		String actualResult = processor.markdown2Html(testString, false);
 		assertTrue(actualResult.contains("<hr"));
 		assertFalse(actualResult.contains("<del"));
+	}
+	
+	@Test
+	public void testMarkdownInFencedCode() throws IOException{
+		String markdown1 = "**bold**";
+		String markdown2 = "_italicized_ ";
+		String testString = "```java\nString s = \"should not be "+markdown1+"\";\n```\n"+markdown2;
+		String actualResult = processor.markdown2Html(testString, false);
+		//verify that it still contains raw markdown in the code block, but not raw markdown from outside the code block
+		assertTrue(actualResult.contains(markdown1));
+		assertFalse(actualResult.contains(markdown2));
 	}
 	
 }

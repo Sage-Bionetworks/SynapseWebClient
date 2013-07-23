@@ -14,7 +14,7 @@ public class MarkdownRegExConstants {
 	 * 
 	 * Beginning of the line, optional whitespace, blockquote character '>', whitespace, then the text
 	 */
-	public static final String BLOCK_QUOTE_REGEX = "(^\\s*>\\s?(.+))";
+	public static final String BLOCK_QUOTE_REGEX = "(^\\s*>\\s?(.*))";
 	
 	/**
 	 * Recognizes example input:
