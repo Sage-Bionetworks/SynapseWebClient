@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.MD5Callback;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -209,13 +210,23 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return contentType;
 	}
 	
-	public void directUploadStep1(String fileName){
+	public void directUploadStep1(final String fileName){
 		this.token = null;
 		//get the chunked file request (includes token)
+		//get the content type
+		final String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID), fileName);
+		synapseJsniUtils.getFileMd5(UploaderViewImpl.FILE_FIELD_ID, new MD5Callback() {
+			
+			@Override
+			public void setMD5(String hexValue) {
+				getChunkedUploadToken(fileName, contentType, hexValue);
+			}
+		});
+	}
+	
+	public void getChunkedUploadToken(String fileName, final String contentType, String md5) {
 		try {
-			//get the content type
-			final String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID), fileName);
-			synapseClient.getChunkedFileToken(fileName, contentType, new AsyncCallback<String>() {
+			synapseClient.getChunkedFileToken(fileName, contentType, md5, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
 					try {

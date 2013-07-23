@@ -224,7 +224,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	
-	public String getChunkedFileToken(String fileName, String contentType) throws RestServiceException;
+	public String getChunkedFileToken(String fileName, String contentType, String contentMD5) throws RestServiceException;
 	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException;
 	public String combineChunkedFileUpload(List<String> requests) throws RestServiceException;
 	public String getUploadDaemonStatus(String daemonId) throws RestServiceException;
