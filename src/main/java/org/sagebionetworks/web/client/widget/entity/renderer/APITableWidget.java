@@ -156,8 +156,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showError(caught.getMessage());
+				view.showError(caught.getMessage());
 			}
 		});
 	}
