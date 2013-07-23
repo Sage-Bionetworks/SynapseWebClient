@@ -94,6 +94,10 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
@@ -454,7 +458,7 @@ public class DisplayUtils {
 	 * @param title
 	 * @param message
 	 */
-	public static void showInfo(String title, String message) {
+	public static void showInfo(String title, String message) {	
 		Alert alert = new Alert(title, message, false);
 		alert.setAlertType(AlertType.Info);
 		alert.setTimeout(4000);
@@ -956,6 +960,75 @@ public class DisplayUtils {
 		return ordered;
 	}
 
+	/**
+	 * Creates and attaches a simple tooltip to a GWT widget
+	 * 
+	 * Customization of content and style are made by the caller method
+	 * 
+	 * @param widget: the widget to attach the popup/tooltip to
+	 * @return the new popup/tooltip that can be customized
+	 */
+	public static PopupPanel addToolTip(final Widget widget) {
+		return addToolTip(widget, false, false);
+	}
+	
+	/**
+	 * Provides a more flexible configuration of a tooltip's behavior
+	 * 
+	 * Customization of content and style are made by the caller method
+	 * 
+	 * Note: if keepOpen is set to true and autoHide is set to false, the caller 
+	 * 		should provide an alternative way to closing/hiding the tooltip
+	 * 
+	 * @param widget: the widget to attach to
+	 * @param keepToolTipOpen: whether the tooltip should remain open when the curser leaves the widget but 
+	 * 					moves onto the tooltip
+	 * @param autoHide: whether the tooltip should close when the curser clicks outside of it
+	 * @return the new tooltip
+	 */
+	public static PopupPanel addToolTip(final Widget widget, boolean keepToolTipOpen, boolean autoHide) {
+		final PopupPanel popup = createToolTip(autoHide);
+		widget.addDomHandler(new MouseOverHandler() {
+			@Override
+			public void onMouseOver(MouseOverEvent event) {
+				popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
+			          public void setPosition(int offsetWidth, int offsetHeight) {
+			        	  popup.showRelativeTo(widget);
+			          }
+			        });
+			}
+		}, MouseOverEvent.getType());
+
+		//If the tooltip is to remain open, we do not "hide" it when the curser moves out of the widget
+		if(keepToolTipOpen) {
+			popup.addDomHandler(new MouseOverHandler() {
+				@Override
+				public void onMouseOver(MouseOverEvent event) {
+					popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
+				          public void setPosition(int offsetWidth, int offsetHeight) {
+				        	  popup.showRelativeTo(widget);
+				          }
+				        });
+				}
+			}, MouseOverEvent.getType());	
+		} else {
+			widget.addDomHandler(new MouseOutHandler() {
+				@Override
+				public void onMouseOut(MouseOutEvent event) {
+					popup.hide();
+				}
+			}, MouseOutEvent.getType());
+		}
+		return popup;
+	}
+	
+	private static PopupPanel createToolTip(boolean autoHide) {
+		final PopupPanel popup = new PopupPanel(autoHide);
+		popup.setGlassEnabled(false);
+		popup.addStyleName("topLevelZIndex");
+		return popup;
+	}
+	
 	public static PopupPanel addToolTip(final Component widget, String message) {
 		final PopupPanel popup = new PopupPanel(true);
 		popup.setWidget(new HTML(message));
