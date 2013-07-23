@@ -784,13 +784,15 @@ public class SynapseClientImplTest {
 	public void testGetChunkedFileToken() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String fileName = "test file.zip";
 		String contentType = "application/test";
+		String md5 = "0123456789abcdef";
 		ChunkedFileToken testToken = new ChunkedFileToken();
 		testToken.setFileName(fileName);
 		testToken.setKey("a key 42");
 		testToken.setUploadId("upload ID 123");
+		testToken.setContentMD5(md5);
 		when(mockSynapse.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class))).thenReturn(testToken);
 		
-		String chunkTokenJson = synapseClient.getChunkedFileToken(fileName, contentType);
+		String chunkTokenJson = synapseClient.getChunkedFileToken(fileName, contentType, md5);
 		ChunkedFileToken token = EntityFactory.createEntityFromJSONString(chunkTokenJson, ChunkedFileToken.class);
 		verify(mockSynapse).createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class));
 		assertEquals(testToken, token);

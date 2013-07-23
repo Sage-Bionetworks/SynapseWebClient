@@ -172,7 +172,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		isDirectUploading = isFileEntity && synapseJsniUtils.isDirectUploadSupported();
 		if (isDirectUploading) {
 			//use case C from above
-			directUploadStep1(fileName);
+			directUploadStep0(fileName);
 		}
 		else {
 			//use case A and B from above
@@ -209,8 +209,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 		return contentType;
 	}
-	
-	public void directUploadStep1(final String fileName){
+	/**
+	 * Get the md5
+	 * @param fileName
+	 */
+	public void directUploadStep0(final String fileName) {
 		this.token = null;
 		//get the chunked file request (includes token)
 		//get the content type
@@ -219,12 +222,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			
 			@Override
 			public void setMD5(String hexValue) {
-				getChunkedUploadToken(fileName, contentType, hexValue);
+				directUploadStep1(fileName, contentType, hexValue);
 			}
 		});
+		
 	}
-	
-	public void getChunkedUploadToken(String fileName, final String contentType, String md5) {
+	public void directUploadStep1(final String fileName, final String contentType, String md5){
 		try {
 			synapseClient.getChunkedFileToken(fileName, contentType, md5, new AsyncCallback<String>() {
 				@Override
