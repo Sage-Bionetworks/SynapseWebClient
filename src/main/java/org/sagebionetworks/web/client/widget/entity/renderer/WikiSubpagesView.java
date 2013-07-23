@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.TreeItem;
 
 public interface WikiSubpagesView extends IsWidget, SynapseView {
 
@@ -18,7 +17,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(TreeItem root);
+	public void configure(TocItem root);
 	
 	public String getHTML(String href, String title, boolean isCurrentPage);
 	
