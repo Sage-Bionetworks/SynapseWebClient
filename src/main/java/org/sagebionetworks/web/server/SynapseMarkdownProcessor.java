@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.server.markdownparser.BlockQuoteParser;
 import org.sagebionetworks.web.server.markdownparser.BoldParser;
@@ -50,6 +49,7 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new BoldParser());
 		codeParser = new CodeParser();
 		allElementParsers.add(codeParser);
+		allElementParsers.add(new CodeSpanParser());
 		allElementParsers.add(new HeadingParser());
 		allElementParsers.add(new HorizontalLineParser());
 		allElementParsers.add(new ImageParser());
