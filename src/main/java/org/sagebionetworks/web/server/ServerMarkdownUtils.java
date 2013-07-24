@@ -35,6 +35,8 @@ public class ServerMarkdownUtils {
 	public static final String HTML_LINE_BREAK = "<br />\n";
 	public static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
 	public static final String TEMP_SPACE_DELIMITER = "%^&2_9d";
+	public static final String TEMP_LESS_THAN_DELIMITER = "2%lt%9";
+	public static final String TEMP_GREATER_THAN_DELIMITER = "2%gt%9";
 	public static final String R_ASSIGNMENT = "<-";
 	public static final String R_MESSED_UP_ASSIGNMENT = "< -";
 	

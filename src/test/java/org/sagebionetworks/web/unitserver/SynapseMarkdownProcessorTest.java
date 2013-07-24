@@ -92,4 +92,12 @@ public class SynapseMarkdownProcessorTest {
 		assertFalse(actualResult.contains(markdown2));
 	}
 	
+	@Test
+	public void testHtmlStripping() throws IOException{
+		String testString = "Configure s3cmd by executing\n`python s3cmd --configure s3://&lt;your_bucket_name&gt;`";
+		String actualResult = processor.markdown2Html(testString, false);
+		assertTrue(actualResult.contains("&lt;"));
+		assertTrue(actualResult.contains("&gt;"));
+		
+	}
 }
