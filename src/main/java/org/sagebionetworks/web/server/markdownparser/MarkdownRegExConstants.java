@@ -113,4 +113,10 @@ public class MarkdownRegExConstants {
 	 * * First Item
 	 */
 	public static final String UNORDERED_LIST_REGEX = "(^[>]*)(\\s*)(?:[-+*])(\\s+)(.+)";
+	
+	
+	public static final String NEWLINE_REGEX = "([\n])";
+	public static final String SPACE_REGEX = "([ ])";
+	public static final String LT_REGEX = "(&lt;)";
+	public static final String GT_REGEX = "(&gt;)";
 }
