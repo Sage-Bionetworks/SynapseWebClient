@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
@@ -131,6 +132,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ButtonLinkConfigEditor getButtonLinkConfigEditor();
 	
 	////// Renderers
+	public BookmarkWidget getBookmarkRenderer();
 	public ReferenceWidget getReferenceRenderer();
 	public YouTubeWidget getYouTubeRenderer();
 	public ProvenanceWidget getProvenanceRenderer();

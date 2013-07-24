@@ -149,6 +149,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
@@ -503,6 +505,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ButtonLinkConfigView.class).to(ButtonLinkConfigViewImpl.class);
 		
 		// UI Widget Renderers
+		bind(BookmarkWidgetView.class).to(BookmarkWidgetViewImpl.class);
 		bind(ReferenceWidgetView.class).to(ReferenceWidgetViewImpl.class);
 		bind(YouTubeWidgetView.class).to(YouTubeWidgetViewImpl.class);
 		bind(OldImageWidgetView.class).to(OldImageWidgetViewImpl.class);

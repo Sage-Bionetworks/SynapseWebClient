@@ -16,7 +16,7 @@ public class LinkParserTest {
 	}
 	
 	@Test
-	public void testBold(){
+	public void testLink(){
 		String text = "This Is A Test";
 		String href = "http://example.com";
 		String line = "[" + text + "](" + href +")";
@@ -26,5 +26,15 @@ public class LinkParserTest {
 		assertTrue(result.contains("<a"));
 		assertTrue(result.contains("href=\"" + href));
 		assertTrue(result.contains(text));
+	}
+	
+	@Test
+	public void testBookmarkAndLink() {
+		String line = "I want to refer to [this](#Bookmark:subject1). To see official page, go [here](http://example.com).";
+		MarkdownElements elements = new MarkdownElements(line);
+		parser.processLine(elements);
+		String result = elements.getHtml();
+		assertTrue(result.contains("${bookmark?text=this&inlineWidget=true&bookmarkID=subject1}"));
+		assertTrue(result.contains("<a class=\"link\" target=\"_blank\" href=\"http://example.com\">here</a>"));
 	}
 }
