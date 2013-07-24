@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.server.markdownparser.BlockQuoteParser;
 import org.sagebionetworks.web.server.markdownparser.BoldParser;
+import org.sagebionetworks.web.server.markdownparser.BookmarkParser;
 import org.sagebionetworks.web.server.markdownparser.CodeParser;
 import org.sagebionetworks.web.server.markdownparser.CodeSpanParser;
 import org.sagebionetworks.web.server.markdownparser.HeadingParser;
@@ -48,6 +49,7 @@ public class SynapseMarkdownProcessor {
 		//initialize all markdown element parsers
 		allElementParsers.add(new BlockQuoteParser());
 		allElementParsers.add(new BoldParser());
+		allElementParsers.add(new BookmarkParser());
 		allElementParsers.add(new CodeParser());
 		allElementParsers.add(new CodeSpanParser());
 		allElementParsers.add(new HeadingParser());

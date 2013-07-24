@@ -372,11 +372,15 @@ public class ServerMarkdownUtils {
 					StringBuilder sb = new StringBuilder();
 					int previousFoundIndex = 0;
 					boolean childFound = false;
+					boolean inlineWidget = false;
 					while (matcher.find()) {
 						childFound = true;
 						if (matcher.groupCount() == 2) {
 							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
 							sb.append(SharedMarkdownUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
+							if(matcher.group(2).contains("inlineWidget")) {
+								inlineWidget = true;
+							}
 							widgetsFound++;
 							previousFoundIndex = matcher.end(1);
 						}
@@ -385,7 +389,13 @@ public class ServerMarkdownUtils {
 						if (previousFoundIndex <= oldText.length() - 1)
 							// substring, go from the previously found index to the end
 							sb.append(oldText.substring(previousFoundIndex));
-						Element newElement = doc.createElement("div"); //wrap new html in a div, since it needs a container!					
+						//wrap new html in an appropriate tag, since it needs a container!
+						Element newElement;
+						if(inlineWidget) {
+							newElement = doc.createElement("span");
+						} else {
+							newElement = doc.createElement("div"); 					
+						}
 						newElement.html(sb.toString());
 						childNode.replaceWith(newElement);
 					}
