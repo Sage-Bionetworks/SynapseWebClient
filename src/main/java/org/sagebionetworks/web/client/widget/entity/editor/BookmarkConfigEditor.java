@@ -9,34 +9,29 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, WidgetEditorPresenter {
-	private Map<String, String> descriptor;
-	private ReferenceConfigView view;
+public class BookmarkConfigEditor implements BookmarkConfigView.Presenter, WidgetEditorPresenter{
+	private BookmarkConfigView view;
 	
 	@Inject
-	public ReferenceConfigEditor(ReferenceConfigView view) {
+	public BookmarkConfigEditor(BookmarkConfigView view) {
 		this.view = view;
 		view.setPresenter(this);
 		view.initView();
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
-		descriptor = widgetDescriptor;
-	}
-	
-	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	@Override
-	public void updateDescriptorFromView() {
+	public void configure(WikiPageKey wikiKey,
+			Map<String, String> widgetDescriptor) {
+	}
+
+	@Override
+	public void updateDescriptorFromView() throws IllegalArgumentException {
 		view.checkParams();
-		
-		//Add the inline parameter to make the widget render inline
-		descriptor.put(WidgetConstants.INLINE_WIDGET_KEY, "true");
-		descriptor.put(WidgetConstants.TEXT_KEY, view.getReference());
 	}
 
 	@Override
@@ -51,6 +46,7 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 
 	@Override
 	public String getTextToInsert() {
-		return null;
+		return "[" + view.getLinkText() + "](" + WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":" + view.getTargetId() + ")\n${" + WidgetConstants.BOOKMARK_TARGET_CONTENT_TYPE + "?" + WidgetConstants.BOOKMARK_KEY + "=" + view.getTargetId() + "}";
 	}
+
 }

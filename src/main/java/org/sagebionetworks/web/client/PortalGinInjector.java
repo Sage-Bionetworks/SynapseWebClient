@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
@@ -116,6 +117,7 @@ public interface PortalGinInjector extends Ginjector {
 	 *  Markdown Widgets
 	 */
 	////// Editors
+	public BookmarkConfigEditor getBookmarkConfigEditor();
 	public ReferenceConfigEditor getReferenceConfigEditor();
 	public YouTubeConfigEditor getYouTubeConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();

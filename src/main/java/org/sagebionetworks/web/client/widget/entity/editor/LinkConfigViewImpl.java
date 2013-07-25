@@ -46,7 +46,7 @@ public class LinkConfigViewImpl extends LayoutContainer implements LinkConfigVie
 		nameField.setName("Text");
 		nameField.setRegex(WebConstants.VALID_WIDGET_NAME_REGEX);
 		nameField.getMessages().setRegexText(DisplayConstants.ERROR_WIDGET_NAME_PATTERN_MISMATCH);
-		Label nameLabel = new Label("Link Text:");
+		Label nameLabel = new Label(DisplayConstants.LINK_TEXT_LABEL);
 		nameLabel.setWidth(60);
 		nameField.setWidth(270);
 		hp.add(nameLabel);

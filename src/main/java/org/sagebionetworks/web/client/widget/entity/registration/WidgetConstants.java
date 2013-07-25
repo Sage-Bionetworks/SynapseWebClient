@@ -4,6 +4,8 @@ package org.sagebionetworks.web.client.widget.entity.registration;
 public class WidgetConstants {
 	public static final String BOOKMARK_CONTENT_TYPE = "bookmark";
 	public static final String BOOKMARK_FRIENDLY_NAME = "Bookmark";
+	public static final String BOOKMARK_TARGET_CONTENT_TYPE = "bookmarktarget";
+	public static final String BOOKMARK_LINK_IDENTIFIER = "#Bookmark";
 	
 	public static final String YOUTUBE_CONTENT_TYPE = "youtube";
 	public static final String YOUTUBE_FRIENDLY_NAME = "YouTube";
@@ -100,7 +102,7 @@ public class WidgetConstants {
 	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
 	public static final String BUTTON_LINK_URL_KEY = "url";
-	public static final String BUTTON_LINK_TEXT_KEY = "text";
+	public static final String TEXT_KEY = "text";
 	
 	public static final String BOOKMARK_KEY = "bookmarkID";
 	public static final String REFERENCE_FOOTNOTE_KEY = "footnoteId";

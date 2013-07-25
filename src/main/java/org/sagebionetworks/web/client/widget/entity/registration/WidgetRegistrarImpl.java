@@ -47,7 +47,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
-		if(contentTypeKey.equals(WidgetConstants.REFERENCE_CONTENT_TYPE)) {
+		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
+			presenter = ginInjector.getBookmarkConfigEditor();
+		} else if(contentTypeKey.equals(WidgetConstants.REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
 			presenter = ginInjector.getYouTubeConfigEditor();

@@ -63,7 +63,7 @@ public class ButtonLinkConfigViewImpl extends LayoutContainer implements ButtonL
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor) {
-		String text = descriptor.get(WidgetConstants.BUTTON_LINK_TEXT_KEY);
+		String text = descriptor.get(WidgetConstants.TEXT_KEY);
 		if (text != null)
 			nameField.setValue(text);
 		String url = descriptor.get(WidgetConstants.BUTTON_LINK_URL_KEY);

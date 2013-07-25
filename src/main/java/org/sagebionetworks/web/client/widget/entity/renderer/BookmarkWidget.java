@@ -27,7 +27,7 @@ public class BookmarkWidget implements BookmarkWidgetView.Presenter, WidgetRende
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
-		view.configure(descriptor.get(WidgetConstants.BOOKMARK_KEY), descriptor.get(WidgetConstants.BUTTON_LINK_TEXT_KEY));
+		view.configure(descriptor.get(WidgetConstants.BOOKMARK_KEY), descriptor.get(WidgetConstants.TEXT_KEY));
 	}
 	
 	@SuppressWarnings("unchecked")
