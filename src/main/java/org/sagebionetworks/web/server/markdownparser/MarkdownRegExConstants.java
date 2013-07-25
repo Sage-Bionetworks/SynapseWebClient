@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+/**
+ * (?=pattern) is a positive look-ahead assertion - the pattern must succeed
+ * (?<=pattern) is a positive look-behind assertion - the pattern must succeed
+ *
+ */
 public class MarkdownRegExConstants {
 
 	/**
@@ -20,7 +25,7 @@ public class MarkdownRegExConstants {
 	 * Recognizes example input:
 	 * __This__ and **that** are bold
 	 */
-	public static final String BOLD_REGEX = "(\\*\\*|__)(?=\\S)(.+?[*_]*)(?<=\\S)\\1";
+	public static final String BOLD_REGEX = "(\\*\\*|__)(?=\\S*)(.+?[*_]*)(?<=\\S*)\\1";
 	
 	/**
 	 * Recognizes example input:
@@ -76,7 +81,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * *This* and _that_ will be italicized
 	 */
-	public static final String ITALICS_REGEX = "(\\*|_)(?=\\S)(.+?)(?<=\\S)\\1";
+	public static final String ITALICS_REGEX = "(\\*|_)(?=\\S*)(.+?)(?<=\\S*)\\1";
 	
 	/**
 	 * Recognized example input:
@@ -100,19 +105,19 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * --striked out text--
 	 */
-	public static final String STRIKE_OUT_REGEX = "--(?=\\S)(.+?)(?<=\\S)--";
+	public static final String STRIKE_OUT_REGEX = "--(?=\\S*)(.+?)(?<=\\S*)--";
 	
 	/**
 	 * Recognized example input:
 	 * ~sub~ is a subscript
 	 */
-	public static final String SUBSCRIPT_REGEX = "~(?=\\S)(.+?)(?<=\\S)~";
+	public static final String SUBSCRIPT_REGEX = "~(?=\\S*)(.+?)(?<=\\S*)~";
 	
 	/**
 	 * Recognized example input:
 	 * ^sup^ is a superscript
 	 */
-	public static final String SUPERSCRIPT_REGEX = "(\\^)(?=\\S)(.+?)(?<=\\S)(\\^)";
+	public static final String SUPERSCRIPT_REGEX = "(\\^)(?=\\S*)(.+?)(?<=\\S*)(\\^)";
 	
 	/**
 	 * Recognized example input:
