@@ -53,7 +53,10 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 		if (text != null) {
 			linkTextField.setValue(text);
 		}
-		bookmarkId = widgetDescriptor.get(WidgetConstants.BOOKMARK_KEY);
+		String id = widgetDescriptor.get(WidgetConstants.BOOKMARK_KEY);
+		if(id != null) {
+			bookmarkId = id;
+		}
 	}
 	
 	@Override
