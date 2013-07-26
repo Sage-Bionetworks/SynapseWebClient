@@ -27,6 +27,7 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
@@ -1590,6 +1591,40 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	public String getUserEvaluationPermissions(String evalId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			UserEvaluationPermissions permissions = synapseClient.getUserEvaluationPermissions(evalId);
+			JSONObjectAdapter json = permissions.writeToJSONObject(adapterFactory.createNew());
+			return json.toJSONString();
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	public String getEvaluationAcl(String evalId) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			AccessControlList acl = synapseClient.getEvaluationAcl(evalId);
+			JSONObjectAdapter json = acl.writeToJSONObject(adapterFactory.createNew());
+			return json.toJSONString();
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	public String updateEvaluationAcl(String aclJson) throws RestServiceException {
+		Synapse synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			AccessControlList acl = jsonEntityFactory.createEntity(aclJson, AccessControlList.class);
+			AccessControlList updatedacl = synapseClient.updateEvaluationAcl(acl);
+			JSONObjectAdapter json = updatedacl.writeToJSONObject(adapterFactory.createNew());
+			return json.toJSONString();
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException{
 		Synapse synapseClient = createSynapseClient();
 		try {
@@ -1718,6 +1753,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}		
 	}
+	
+	
 
 	
 }

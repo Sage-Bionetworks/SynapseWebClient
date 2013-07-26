@@ -173,6 +173,12 @@ public interface SynapseClientAsync {
 	 */
 	void createSubmission(String submissionJson, String etag, AsyncCallback<String> callback) throws RestServiceException;
 	
+	
+	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
+	void getEvaluationAcl(String evalId, AsyncCallback<String> callback);
+	void updateEvaluationAcl(String aclJson, AsyncCallback<String> callback);
+	
+	
 	/**
 	 * Get all unique submission user aliases associated to the available evaluations (OPEN evaluations that the current user has joined).
 	 * The return list is sorted by Submission created date.

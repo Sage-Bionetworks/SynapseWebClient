@@ -14,12 +14,11 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.SaveCallback;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -68,7 +67,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class AccessControlListEditorViewImpl extends LayoutContainer implements AccessControlListEditorView {
+public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer implements EvaluationAccessControlListEditorView {
  
 	private static final int FIELD_WIDTH = 500;
 	private static final String STYLE_VERTICAL_ALIGN_MIDDLE = "vertical-align:middle !important;";
@@ -94,7 +93,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private ComboBox<ModelData> peopleCombo;
 	
 	@Inject
-	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
+	public EvaluationAccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
 			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
@@ -102,9 +101,9 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
-		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
-		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
-		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
+		permissionDisplay.put(PermissionLevel.CAN_SCORE_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_SCORE);
+		permissionDisplay.put(PermissionLevel.CAN_PARTICIPATE_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_PARTICIPATE);
+		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
 		permissionDisplay.put(PermissionLevel.OWNER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);
 	}
 	
@@ -169,7 +168,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 	
 	@Override
-	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges) {		
+	public void buildWindow(boolean unsavedChanges) {		
 		this.removeAll(true);
 		this.setLayout(new FlowLayout(10));
 
@@ -185,132 +184,93 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		TableData tdRight = new TableData();
 		tdRight.setPadding(BUTTON_PADDING);
 		
-		if(isInherited) { 
-			permissionsGrid.disable();
-			Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
-			readOnly.setWidth(450);
-			add(readOnly, new MarginData(15, 0, 0, 0));			
-			
-			// 'Create ACL' button
-			Button createAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, AbstractImagePrototype.create(iconsImageBundle.addSquare16()));
-			createAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT));
-			createAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					presenter.createAcl();
-				}
-			});
-			hPanel.setHorizontalAlign(HorizontalAlignment.LEFT);
-			hPanel.add(createAclButton, tdLeft);
-		} else {
-			// show add people view
-			FormPanel form2 = new FormPanel();  
-			form2.setFrame(false);  
-			form2.setHeaderVisible(false);  
-			form2.setAutoWidth(true);			
-			form2.setLayout(new FlowLayout());
-			
-			FormLayout layout = new FormLayout();  
-			layout.setLabelWidth(75);
-			layout.setDefaultWidth(DEFAULT_WIDTH);
-			  
-			FieldSet fieldSet = new FieldSet();  
-			fieldSet.setHeading(DisplayConstants.LABEL_PERMISSION_TEXT_ADD_PEOPLE);  
-			fieldSet.setCheckboxToggle(false);
-			fieldSet.setCollapsible(false);			
-			fieldSet.setLayout(layout);
-			fieldSet.setWidth(FIELD_WIDTH);
-			
-			// user/group combobox
-			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalId, authenticatedPrincipalId);
-			peopleCombo.setEmptyText("Enter a user or group name...");
-			peopleCombo.setFieldLabel("User/Group");
-			peopleCombo.setForceSelection(true);
-			peopleCombo.setTriggerAction(TriggerAction.ALL);
-			peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
-				@Override
-				public void selectionChanged(SelectionChangedEvent<ModelData> se) {
-					presenter.setUnsavedViewChanges(true);
-				}
-			});
-			fieldSet.add(peopleCombo);			
-
-			// permission level combobox
-			permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT), PermissionLevel.CAN_EDIT));
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE), PermissionLevel.CAN_EDIT_DELETE));
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER), PermissionLevel.CAN_ADMINISTER));			
-			permissionLevelCombo.setEmptyText("Select access level...");
-			permissionLevelCombo.setFieldLabel("Access Level");
-			permissionLevelCombo.setTypeAhead(false);
-			permissionLevelCombo.setEditable(false);
-			permissionLevelCombo.setForceSelection(true);
-			permissionLevelCombo.setTriggerAction(TriggerAction.ALL);
-			permissionLevelCombo.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<PermissionLevelSelect>>() {				
-				@Override
-				public void selectionChanged(SelectionChangedEvent<SimpleComboValue<PermissionLevelSelect>> se) {
-					presenter.setUnsavedViewChanges(true);
-				}
-			});
-			fieldSet.add(permissionLevelCombo);
-			
-			// share button and listener
-			Button shareButton = new Button("Add");
-			shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					addPersonToAcl();
-				}
-			});
-
-			fieldSet.add(shareButton);
-			form2.add(fieldSet);
-			
-
-			//Make Public button
-			publicButton = new Button();
-			publicButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					//add the ability for PUBLIC to see this entity
-					if (isPubliclyVisible) {
-						if (publicPrincipalId != null){
-							presenter.removeAccess(publicPrincipalId);
-						}
-					}
-					else {
-						if (publicPrincipalId != null) {
-							presenter.setAccess(publicPrincipalId, PermissionLevel.CAN_VIEW);
-						}
-					}
-					
-				}
-			});
-			form2.add(publicButton, tdLeft);
-			add(form2);
-			
-			// 'Delete ACL' button
-			Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
-			deleteAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT));
-			deleteAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					presenter.deleteAcl();					
-				}
-			});
-			
-			hPanel.setHorizontalAlign(HorizontalAlignment.LEFT);
-			//delete button takes up the rest of the line space
-			hPanel.add(deleteAclButton, tdLeft);
-			deleteAclButton.setEnabled(canEnableInheritance);
-		}
 		
-		// Unsaved changes label
-//		Label blank = new Label("");
-//		Label unsavedChangesLabel = new Label(DisplayUtils.getIconHtml(iconsImageBundle.warning16()) + " " + DisplayConstants.PERMISSIONS_UNSAVED_CHANGES);
-//	   	hPanel.setHorizontalAlign(HorizontalAlignment.RIGHT);
-//		hPanel.add(unsavedChanges ? unsavedChangesLabel : blank, tdRight);
+		// show add people view
+		FormPanel form2 = new FormPanel();  
+		form2.setFrame(false);  
+		form2.setHeaderVisible(false);  
+		form2.setAutoWidth(true);			
+		form2.setLayout(new FlowLayout());
+		
+		FormLayout layout = new FormLayout();  
+		layout.setLabelWidth(75);
+		layout.setDefaultWidth(DEFAULT_WIDTH);
+		  
+		FieldSet fieldSet = new FieldSet();  
+		fieldSet.setHeading(DisplayConstants.LABEL_PERMISSION_TEXT_ADD_PEOPLE);  
+		fieldSet.setCheckboxToggle(false);
+		fieldSet.setCollapsible(false);			
+		fieldSet.setLayout(layout);
+		fieldSet.setWidth(FIELD_WIDTH);
+		
+		// user/group combobox
+		peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalId, authenticatedPrincipalId);
+		peopleCombo.setEmptyText("Enter a user or group name...");
+		peopleCombo.setFieldLabel("User/Group");
+		peopleCombo.setForceSelection(true);
+		peopleCombo.setTriggerAction(TriggerAction.ALL);
+		peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
+			@Override
+			public void selectionChanged(SelectionChangedEvent<ModelData> se) {
+				presenter.setUnsavedViewChanges(true);
+			}
+		});
+		fieldSet.add(peopleCombo);			
+
+		// permission level combobox
+		permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
+		permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
+		permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_PARTICIPATE_EVALUATION), PermissionLevel.CAN_PARTICIPATE_EVALUATION));
+		permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_SCORE_EVALUATION), PermissionLevel.CAN_SCORE_EVALUATION));
+		permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER_EVALUATION), PermissionLevel.CAN_ADMINISTER_EVALUATION));			
+		permissionLevelCombo.setEmptyText("Select access level...");
+		permissionLevelCombo.setFieldLabel("Access Level");
+		permissionLevelCombo.setTypeAhead(false);
+		permissionLevelCombo.setEditable(false);
+		permissionLevelCombo.setForceSelection(true);
+		permissionLevelCombo.setTriggerAction(TriggerAction.ALL);
+		permissionLevelCombo.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<PermissionLevelSelect>>() {				
+			@Override
+			public void selectionChanged(SelectionChangedEvent<SimpleComboValue<PermissionLevelSelect>> se) {
+				presenter.setUnsavedViewChanges(true);
+			}
+		});
+		fieldSet.add(permissionLevelCombo);
+		
+		// share button and listener
+		Button shareButton = new Button("Add");
+		shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				addPersonToAcl();
+			}
+		});
+
+		fieldSet.add(shareButton);
+		form2.add(fieldSet);
+		
+
+		//Make Public button
+		publicButton = new Button();
+		publicButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				//add the ability for PUBLIC to see this entity
+				if (isPubliclyVisible) {
+					if (publicPrincipalId != null){
+						presenter.removeAccess(publicPrincipalId);
+					}
+				}
+				else {
+					if (publicPrincipalId != null) {
+						presenter.setAccess(publicPrincipalId, PermissionLevel.CAN_VIEW);
+					}
+				}
+				
+			}
+		});
+		form2.add(publicButton, tdLeft);
+		add(form2);
 		
 		this.add(hPanel, new MarginData(10, 0, 0, 0));
 		this.layout(true);
@@ -346,11 +306,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	@Override
 	public void showInfoSuccess(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-		//TODO: Move info messages on top of modal shade
-//		Alert alert = new Alert(title, message);
-//		alert.setTimeout(1000);
-//		alert.setAlertType(AlertType.Success);
-//		this.insert(alert, 0);
+		
 	}
 	
 	@Override
@@ -420,26 +376,26 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		});
 		menu.add(item);
 
-		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_EDIT));			
+		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_PARTICIPATE_EVALUATION));			
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			public void componentSelected(MenuEvent menuEvent) {
-				presenter.setAccess(principalId, PermissionLevel.CAN_EDIT);
+				presenter.setAccess(principalId, PermissionLevel.CAN_PARTICIPATE_EVALUATION);
 			}
 		});
 		menu.add(item);
 
-		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE));			
+		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_SCORE_EVALUATION));			
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			public void componentSelected(MenuEvent menuEvent) {
-				presenter.setAccess(principalId, PermissionLevel.CAN_EDIT_DELETE);
+				presenter.setAccess(principalId, PermissionLevel.CAN_SCORE_EVALUATION);
 			}
 		});
 		menu.add(item);
 
-		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER));			
+		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER_EVALUATION));			
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			public void componentSelected(MenuEvent menuEvent) {
-				presenter.setAccess(principalId, PermissionLevel.CAN_ADMINISTER);
+				presenter.setAccess(principalId, PermissionLevel.CAN_ADMINISTER_EVALUATION);
 			}
 		});
 		menu.add(item);
@@ -581,7 +537,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 
 	@Override
-	public void alertUnsavedViewChanges(final SaveCallback saveCallback) {
+	public void alertUnsavedViewChanges(final Callback saveCallback) {
 		MessageBox.confirm(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.ADD_ACL_UNSAVED_CHANGES, new Listener<MessageBoxEvent>() {					
 			@Override
 			public void handleEvent(MessageBoxEvent be) { 					
@@ -589,11 +545,10 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				if(Dialog.YES.equals(btn.getItemId())) {
 					addPersonToAcl();
 					presenter.setUnsavedViewChanges(false);
-					saveCallback.save();
+					saveCallback.invoke();
 				} 				
 			}
 		});
-
 	}
 
 	private void addPersonToAcl() {
