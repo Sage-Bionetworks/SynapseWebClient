@@ -36,7 +36,7 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 		
 		//Add the inline parameter to make the widget render inline
 		descriptor.put(WidgetConstants.INLINE_WIDGET_KEY, "true");
-		descriptor.put(WidgetConstants.BUTTON_LINK_TEXT_KEY, view.getReference());
+		descriptor.put(WidgetConstants.TEXT_KEY, view.getReference());
 	}
 
 	@Override

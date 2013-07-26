@@ -337,7 +337,8 @@ public class DisplayConstants {
 	public static final String ACTIVITY = "Activity";
 	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	public static final String ERROR_WIDGET_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, hypens, periods, plus signs, and parentheses.";
-
+	public static final String ERROR_BOOKMARK_ID = "ID names may only contain letters, numbers, hypens, underscores, colons, and periods.";
+	
 	/**
 	 * Widget editors
 	 */
@@ -352,6 +353,7 @@ public class DisplayConstants {
 	public static final String IMAGE_CONFIG_ALT_TEXT = "Alternate Text:";
 	public static final String IMAGE_FAILED_TO_LOAD = "Image failed to load: ";
 	public static final String URL_LABEL = "URL:";
+	public static final String LINK_TEXT_LABEL = "Link Text:";
 	public static final String TABLE_LABEL = "Tab Delimitted Table Contents:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";

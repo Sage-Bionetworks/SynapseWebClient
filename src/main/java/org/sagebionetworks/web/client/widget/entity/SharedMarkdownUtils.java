@@ -14,18 +14,24 @@ public class SharedMarkdownUtils {
 	}
 	
 	public static String getWidgetHTML(int widgetIndex, String suffix, String widgetProperties){
+		boolean inlineWidget = false;
 		StringBuilder sb = new StringBuilder();
+		if(widgetProperties.contains(WidgetConstants.INLINE_WIDGET_KEY + "=true")) {
+			inlineWidget = true;
+		}
+	
 		sb.append("<div id=\"");
 		sb.append(WebConstants.DIV_ID_WIDGET_PREFIX);
 		sb.append(widgetIndex);
 		sb.append(suffix);
 		
 		//Some widgets will be inline
-		if(widgetProperties.contains(WidgetConstants.INLINE_WIDGET_KEY + "=true")) {
+		if(inlineWidget) {
 			sb.append("\" class=\"inlineWidgetContainer\" widgetParams=\"");
 		} else {
 			sb.append("\" class=\"widgetContainer\" widgetParams=\"");
 		}
+		
 		sb.append(widgetProperties);
 		sb.append("\">");
 		sb.append("</div>");

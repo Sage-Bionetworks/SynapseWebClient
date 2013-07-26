@@ -28,6 +28,12 @@ public class MarkdownRegExConstants {
 	public static final String BOLD_REGEX = "(\\*\\*|__)(?=\\S*)(.+?[*_]*)(?<=\\S*)\\1";
 	
 	/**
+	 * Recognizes example input:
+	 * ${bookmarktarget?bookmarkID=subject1} Subject 1
+	 */
+	public static final String BOOKMARK_TARGET_REGEX = "\\$\\{bookmarktarget\\?bookmarkID=(.+?)\\}";
+	
+	/**
 	 * Recognized example input:
 	 * ``` <optional language>
 	 * This is a code block
@@ -97,7 +103,7 @@ public class MarkdownRegExConstants {
 	
 	/**
 	 * Recognized example input:
-	 * -striked out text-
+	 * --striked out text--
 	 */
 	public static final String STRIKE_OUT_REGEX = "--(?=\\S*)(.+?)(?<=\\S*)--";
 	
