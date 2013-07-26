@@ -25,7 +25,7 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor) {
 		this.descriptor = widgetDescriptor;
 		String url = descriptor.get(WidgetConstants.BUTTON_LINK_URL_KEY);
-		String buttonText = descriptor.get(WidgetConstants.BUTTON_LINK_TEXT_KEY);
+		String buttonText = descriptor.get(WidgetConstants.TEXT_KEY);
 		view.configure(wikiKey, buttonText, url);
 		descriptor = widgetDescriptor;
 	}
