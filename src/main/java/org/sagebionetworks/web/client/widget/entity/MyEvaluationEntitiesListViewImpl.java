@@ -12,13 +12,13 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class MyEvaluationsListViewImpl extends LayoutContainer implements MyEvaluationsListView {
+public class MyEvaluationEntitiesListViewImpl extends LayoutContainer implements MyEvaluationEntitiesListView {
 
 	private Presenter presenter;
 	private IconsImageBundle imageBundle;
 	
 	@Inject
-	public MyEvaluationsListViewImpl(IconsImageBundle imageBundle) {
+	public MyEvaluationEntitiesListViewImpl(IconsImageBundle imageBundle) {
 		this.imageBundle = imageBundle;
 	}
 	

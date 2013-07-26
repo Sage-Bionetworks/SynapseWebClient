@@ -1547,6 +1547,38 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	/**
+	 * Return all evaluations associated to a particular entity, for which the caller can change permissions
+	 */
+	@Override
+	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException {
+		if (entityId == null || entityId.trim().length()==0 ) {
+			throw new BadRequestException("Entity ID must be given");
+		}
+		String lowerEntityId = entityId.toLowerCase();
+		Synapse synapseClient = createSynapseClient();
+		try {
+			//look up the available evaluations
+			PaginatedResults<Evaluation> allEvaluations = synapseClient.getEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			
+			ArrayList<String> mySharableEvalauations = new ArrayList<String>();
+			for (Evaluation eval : allEvaluations.getResults()) {
+				String contentSource = eval.getContentSource();
+				
+				if (contentSource != null && lowerEntityId.equals(contentSource.toLowerCase())) {
+					//evaluation is associated to entity id.  can I change permissions?
+					UserEvaluationPermissions uep = synapseClient.getUserEvaluationPermissions(eval.getId());
+					if (uep.getCanChangePermissions()) {
+						mySharableEvalauations.add(eval.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+					}
+				}
+			}
+			return mySharableEvalauations;
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 	@Override
 	public ArrayList<String> getAvailableEvaluationEntitiesList() throws RestServiceException {
 		Synapse synapseClient = createSynapseClient();

@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.VoidCallback;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -161,8 +162,8 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 		final Callback aclSetCallback = new Callback(){
 			@Override
 			public void invoke() {
-				//once we have the acl and uep, update the view
-				setViewDetails();
+				//once we have the acl and uep, fetch the user group headers
+				fetchUserGroupHeaders();					
 			}
 		};
 		
@@ -245,10 +246,13 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 		}
 	}
 
-	private void fetchUserGroupHeaders(final VoidCallback callback) {
+	private void fetchUserGroupHeaders() {
 		List<String> ids = new ArrayList<String>();
 		for (ResourceAccess ra : acl.getResourceAccess())
 			ids.add(ra.getPrincipalId().toString());
+		if (ids.contains(uep.getOwnerPrincipalId().toString())) {
+			ids.add(uep.getOwnerPrincipalId().toString());
+		}
 		synapseClient.getUserGroupHeadersById(ids, new AsyncCallback<EntityWrapper>(){
 			@Override
 			public void onSuccess(EntityWrapper wrapper) {
@@ -256,16 +260,14 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 					UserGroupHeaderResponsePage response = nodeModelCreator.createJSONEntity(wrapper.getEntityJson(), UserGroupHeaderResponsePage.class);
 					for (UserGroupHeader ugh : response.getChildren())
 						userGroupHeaders.put(ugh.getOwnerId(), ugh);
-					if (callback != null)
-						callback.success();
+					setViewDetails();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if (callback != null)
-					callback.failure(caught);
+				setViewDetails();
 			}
 		});
 	}
@@ -292,19 +294,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 			toSet.setPrincipalId(principalId);
 			acl.getResourceAccess().add(toSet);
 			toSet.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
-			fetchUserGroupHeaders(new VoidCallback() {
-				// fetch UserGroup headers for members of ACL
-				@Override
-				public void success() {
-					// update the view
-					setViewDetails();
-				}
-				@Override
-				public void failure(Throwable t) {
-					// update the view anyway - will fetch individual Profiles					
-					setViewDetails();
-				}						
-			});
+			fetchUserGroupHeaders();
 		} else {
 			// Existing entry in the ACL
 			toSet.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
