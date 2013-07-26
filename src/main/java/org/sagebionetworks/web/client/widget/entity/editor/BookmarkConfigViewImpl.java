@@ -20,7 +20,7 @@ import com.google.inject.Inject;
 public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkConfigView {
 	private Presenter presenter;
 	private TextField<String> linkTextField;
-	private Date bookmarkId;
+	private String bookmarkId;
 	
 	@Inject
 	public BookmarkConfigViewImpl() {
@@ -42,7 +42,8 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 		vp.add(hp);
 		add(vp);
 		
-		bookmarkId = new Date();
+		Date time = new Date();
+		bookmarkId = String.valueOf(time.getTime());
 	}
 
 	@Override
@@ -52,6 +53,7 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 		if (text != null) {
 			linkTextField.setValue(text);
 		}
+		bookmarkId = widgetDescriptor.get(WidgetConstants.BOOKMARK_KEY);
 	}
 	
 	@Override
@@ -105,15 +107,12 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 
 	@Override
 	public void setBookmarkId(String targetId) {
-		try {
-			bookmarkId.setTime(Long.valueOf(targetId));
-		} catch(NumberFormatException e) {
-		}
+		bookmarkId = targetId;
 	}
 
 	@Override
 	public String getBookmarkId() {
-		return String.valueOf(bookmarkId.getTime());
+		return bookmarkId;
 	}
 
 	@Override
