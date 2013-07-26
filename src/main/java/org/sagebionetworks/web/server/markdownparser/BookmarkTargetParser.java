@@ -9,6 +9,6 @@ public class BookmarkTargetParser extends BasicMarkdownElementParser {
 	@Override
 	public void processLine(MarkdownElements line) {
 		Matcher m = p1.matcher(line.getMarkdown());
-		line.updateMarkdown(m.replaceAll("<a id=\"$1\"></a>"));
+		line.updateMarkdown(m.replaceAll("<p id=\"$1\"></p>"));
 	}
 }

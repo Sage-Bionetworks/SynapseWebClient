@@ -11,6 +11,7 @@ import com.google.inject.Inject;
 
 public class BookmarkConfigEditor implements BookmarkConfigView.Presenter, WidgetEditorPresenter{
 	private BookmarkConfigView view;
+	private Map<String, String> descriptor;
 	
 	@Inject
 	public BookmarkConfigEditor(BookmarkConfigView view) {
@@ -27,11 +28,15 @@ public class BookmarkConfigEditor implements BookmarkConfigView.Presenter, Widge
 	@Override
 	public void configure(WikiPageKey wikiKey,
 			Map<String, String> widgetDescriptor) {
+		descriptor = widgetDescriptor;
+		view.configure(wikiKey, descriptor);
 	}
 
 	@Override
 	public void updateDescriptorFromView() throws IllegalArgumentException {
 		view.checkParams();
+		descriptor.put(WidgetConstants.TEXT_KEY, view.getLinkText());
+		descriptor.put(WidgetConstants.BOOKMARK_KEY, view.getBookmarkId());
 	}
 
 	@Override
@@ -46,7 +51,7 @@ public class BookmarkConfigEditor implements BookmarkConfigView.Presenter, Widge
 
 	@Override
 	public String getTextToInsert() {
-		return "[" + view.getLinkText() + "](" + WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":" + view.getTargetId() + ")\n${" + WidgetConstants.BOOKMARK_TARGET_CONTENT_TYPE + "?" + WidgetConstants.BOOKMARK_KEY + "=" + view.getTargetId() + "}";
+		return "[" + view.getLinkText() + "](" + WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":" + view.getBookmarkId() + ")\n${" + WidgetConstants.BOOKMARK_TARGET_CONTENT_TYPE + "?" + WidgetConstants.BOOKMARK_KEY + "=" + view.getBookmarkId() + "}";
 	}
 
 }

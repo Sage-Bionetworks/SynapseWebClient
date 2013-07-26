@@ -1,8 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.Date;
+import java.util.Map;
+
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -15,7 +20,7 @@ import com.google.inject.Inject;
 public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkConfigView {
 	private Presenter presenter;
 	private TextField<String> linkTextField;
-	private TextField<String> bookmarkIdField;
+	private Date bookmarkId;
 	
 	@Inject
 	public BookmarkConfigViewImpl() {
@@ -35,24 +40,20 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 		hp.add(linkTextField);
 		hp.addStyleName("margin-top-left-10");
 		vp.add(hp);
-		
-		hp = new HorizontalPanel();
-		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		bookmarkIdField = new TextField<String>();
-		bookmarkIdField.setAllowBlank(false);
-		bookmarkIdField.setRegex(WebConstants.VALID_BOOKMARK_ID_REGEX);
-		bookmarkIdField.getMessages().setRegexText(DisplayConstants.ERROR_BOOKMARK_ID);
-		Label bookmarkIdLabel = new Label("Bookmark ID:");
-		bookmarkIdLabel.setWidth(70);
-		bookmarkIdField.setWidth(270);
-		hp.add(bookmarkIdLabel);
-		hp.add(bookmarkIdField);
-		hp.addStyleName("margin-top-left-10");
-		vp.add(hp);
-		
 		add(vp);
+		
+		bookmarkId = new Date();
 	}
 
+	@Override
+	public void configure(WikiPageKey wikiKey,
+			Map<String, String> widgetDescriptor) {
+		String text = widgetDescriptor.get(WidgetConstants.TEXT_KEY);
+		if (text != null) {
+			linkTextField.setValue(text);
+		}
+	}
+	
 	@Override
 	public int getDisplayHeight() {
 		return 60;
@@ -68,9 +69,6 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 		if (!linkTextField.isValid()) {
 			throw new IllegalArgumentException(linkTextField.getErrorMessage());
 		} 
-		if (!bookmarkIdField.isValid()) {
-			throw new IllegalArgumentException(bookmarkIdField.getErrorMessage());
-		}
 	}
 
 	@Override
@@ -87,9 +85,6 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 	public void clear() {
 		if (linkTextField != null) {
 			linkTextField.setValue("");
-		}
-		if (bookmarkIdField != null) {
-			bookmarkIdField.setValue("");
 		}
 	}
 
@@ -109,13 +104,16 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 	}
 
 	@Override
-	public void setTargetId(String targetId) {
-		bookmarkIdField.setValue(targetId);
+	public void setBookmarkId(String targetId) {
+		try {
+			bookmarkId.setTime(Long.valueOf(targetId));
+		} catch(NumberFormatException e) {
+		}
 	}
 
 	@Override
-	public String getTargetId() {
-		return bookmarkIdField.getValue();
+	public String getBookmarkId() {
+		return String.valueOf(bookmarkId.getTime());
 	}
 
 	@Override
