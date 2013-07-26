@@ -53,7 +53,7 @@ import com.google.inject.Inject;
 /**
  * This Uploader class supports 3 use cases:
  * A. Legacy data types (like the Data Entity): Uploads to the FileUpload servlet, using the Form submit (POST).  @see org.sagebionetworks.web.server.servlet.FileUpload
- * B. File Entity, older client browser: Uploads to the FileHandleServlet servlet, using the Form submit (POST).  @see org.sagebionetworks.web.server.servlet.FileHandleServlet
+ * B. File Entity, older client browser: Directs users to JavaWebStart the SynapseUploader (for direct S3 upload from Java)
  * C. File Entity, newer client browser: Direct multipart upload to S3, using a PUT to presigned URLs.
  * 
  * Case C will be the most common case.
@@ -78,7 +78,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private JSONObjectAdapter jsonObjectAdapter;
 	private AdapterFactory adapterFactory;
 	private AutoGenFactory autogenFactory;
-	private boolean isDirectUploading;
 
 	private SynapseClientAsync synapseClient;
 	private JiraURLHelper jiraURLHelper;
@@ -87,6 +86,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private ChunkedFileToken token;
 	private boolean isUploadRestricted;
 	NumberFormat percentFormat;
+	private boolean isDirectUploadSupported;
+	
+	
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -116,13 +118,15 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.setPresenter(this);
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
+		
+		isDirectUploadSupported = !synapseJsniUtils.isDirectUploadSupported();
 	}		
 		
 	public Widget asWidget(Entity entity, List<AccessRequirement> accessRequirements) {
 		this.view.setPresenter(this);
 		this.entity = entity;
 		this.accessRequirements = accessRequirements;
-		this.view.createUploadForm(true);
+		this.view.createUploadForm(isDirectUploadSupported);
 		return this.view.asWidget();
 	}
 
@@ -156,11 +160,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		String entityParentString = entity==null && parentEntityId != null ? WebConstants.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY + "=" + parentEntityId + "&": "";
 		String entityIdString = entity != null ? WebConstants.ENTITY_PARAM_KEY + "=" + entity.getId() + "&" : "";
 		String uploadUrl = isFileEntity ? 
-				//new way
-				synapseJsniUtils.getBaseFileHandleUrl() + "?" + WebConstants.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted + "&" +
+				//new way				
+				getBaseFileHandleUrl() + "?" + WebConstants.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted + "&" +
 						WebConstants.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY  + "=" + Boolean.toString(entity == null) + "&" + entityParentString + entityIdString: 
 				//old way
-				gwt.getModuleBaseURL() + "upload" + "?" + 
+				getOldUploadUrl() + "?" + 
 					entityIdString +
 					WebConstants.IS_RESTRICTED_PARAM_KEY + "=" +isRestricted;
 		return uploadUrl;
@@ -168,13 +172,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void handleUpload(String fileName) {
-		boolean isFileEntity = entity == null || entity instanceof FileEntity;
-		isDirectUploading = isFileEntity && synapseJsniUtils.isDirectUploadSupported();
-		if (isDirectUploading) {
+		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
+		if (isFileEntity && isDirectUploadSupported) {
 			//use case C from above
 			directUploadStep0(fileName);
-		}
-		else {
+		} else if(isDirectUploadSupported) {
+			// show old browser & JavaWebStart link
+			
+		} else {
 			//use case A and B from above
 			//uses the default action url
 			//if using this method, block if file size is > MAX_SIZE
@@ -625,6 +630,26 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		fireCancelEvent();
 	}
 
+	@Override
+	public String getFileUploaderUrl() {
+		String url = gwt.getModuleBaseURL() + ClientProperties.FILE_UPLOADER_SERVLET_PATH;
+		String id;
+		boolean isUpdate;
+		if(entity == null && parentEntityId != null) {
+			id = parentEntityId;
+			isUpdate = false;
+		} else if (entity != null && parentEntityId == null){
+			id = entity.getId();
+			isUpdate = true;
+		} else {
+			view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+			return null;
+		}
+		url += "?" + WebConstants.ENTITY_PARAM_KEY+"="+id +
+				"&" + WebConstants.FILE_UPLOADER_IS_UPDATE_PARAM+"="+isUpdate;
+		return url;
+	}
+
 
 	/*
 	 * Private Methods
@@ -667,4 +692,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.clear();
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
+
+	private String getBaseFileHandleUrl() {
+		return gwt.getModuleBaseURL() + "filehandle";
+	}
+
+	private String getOldUploadUrl() {
+		return gwt.getModuleBaseURL() + "upload";
+	}
+
 }

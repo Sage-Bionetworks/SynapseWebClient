@@ -38,7 +38,11 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -137,10 +141,10 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 	
 	@Override
-	public void createUploadForm(boolean isExternalSupported) {
+	public void createUploadForm(boolean isDirectUploadSupported) {
 		initializeControls();
 		if(container == null) {
-			createUploadContents(isExternalSupported);
+			createUploadContents(isDirectUploadSupported);
 		}
 
 		// reset
@@ -190,7 +194,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	/*
 	 * Private Methods
 	 */	
-	private void createUploadContents(boolean isExternalSupported) {
+	private void createUploadContents(boolean isDirectUploadSupported) {
 		this.container = new LayoutContainer();
 		this.setLayout(new FitLayout());
 		this.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
@@ -204,26 +208,36 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		TabPanel tabPanel = new TabPanel();		
 		tabPanel.setPlain(true);
-		tabPanel.setHeight(100);		
+		tabPanel.setHeight(105);		
 		container.add(tabPanel, new MarginData(0, 10, 10, 10));
 		TabItem tab;
 		
 		// Upload File
 		tab = new TabItem(DisplayConstants.UPLOAD_FILE);
 		tab.addStyleName("pad-text");
-		tab.add(formPanel);
-		tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
-            public void handleEvent( TabPanelEvent be ) {
-            	configureUploadButton();
-            }
-        
-        });
+		
+		if(isDirectUploadSupported) {
+			// show regular direct upload form
+			tab.add(formPanel);
+			tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
+	            public void handleEvent( TabPanelEvent be ) {
+	            	configureUploadButton();
+	            }	        
+	        });
+		} else {
+			// Show Synapse Uploader and Disable upload button						
+			tab.add(createSynapseFileUploaderContainer(), new MarginData(5));
+			tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
+	            public void handleEvent( TabPanelEvent be ) {
+	            	configureUploadButton();
+	            	uploadBtn.disable();
+	            }	     
+	        });
+		}
 		tabPanel.add(tab);
 
 		// External URL
 		tab = new TabItem(DisplayConstants.LINK_TO_URL);
-		if (!isExternalSupported)
-			tab.setEnabled(false);
 		tab.addStyleName("pad-text");		
 		tab.add(createExternalPanel());		
 		tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
@@ -563,7 +577,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		uploadBtn.addSelectionListener(uploadListener);
 	}
 
-	private void configureUploadButtonForExternal() {
+	private void configureUploadButtonForExternal() {		
 		uploadBtn.setText("Save");
 		uploadBtn.removeAllListeners();
 		uploadBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
@@ -580,6 +594,39 @@ public class UploaderViewImpl extends LayoutContainer implements
 				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue(), isNewlyRestricted());
 			}
 		});
+	}
+
+	private LayoutContainer createSynapseFileUploaderContainer() {
+		LayoutContainer container = new LayoutContainer();
+		
+		HTML oldBrowser = new HTML(
+				"<h4 class=\"display-inline\">You're using an old Browser</h4>" +
+				"<p class=\"display-inline\">Older browsers can use the Synapse File Uploader to upload to Synapse. " +
+				"<a class=\"link\" href=\"http://caniuse.com/cors\" target=\"_blank\">Why is my browser old?</a></p>"				
+				);
+		LayoutContainer left = new LayoutContainer();
+		left.addStyleName("span-8 notopmargin");
+		left.add(oldBrowser);
+		
+		LayoutContainer right = new LayoutContainer();
+		right.addStyleName("span-7 last notopmargin");
+		com.google.gwt.user.client.ui.Button launchBtn = new com.google.gwt.user.client.ui.Button(DisplayConstants.LAUCH_FILE_UPLOADER);		
+		launchBtn.removeStyleName("gwt-Button");
+		launchBtn.addStyleName("btn btn-large btn-block");
+		launchBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				String url = presenter.getFileUploaderUrl();
+				if(url != null) Window.open(url, "_blank	", "");
+			}
+		});
+		right.add(launchBtn);		
+		
+		container.add(left);
+		container.add(right);
+		
+		
+		return container;
 	}
 
 }

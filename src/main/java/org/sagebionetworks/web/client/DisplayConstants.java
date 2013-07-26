@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
 
 
 public class DisplayConstants {
@@ -575,6 +576,7 @@ public class DisplayConstants {
 	public static final String NEW_VERSION_INSTRUCTIONS = "A new version of Synapse is now available, please save your work and reload the page to ensure proper function.";
 	public static final String API_DOCUMENTATION = "API Documentation";
 	public static final String EXAMPLE_CODE = "Example Code";
+	public static final String LAUCH_FILE_UPLOADER = "Launch File Uploader";
 	
 }
 

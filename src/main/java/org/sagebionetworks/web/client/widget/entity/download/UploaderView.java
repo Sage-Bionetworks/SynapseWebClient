@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.download;
 
 import org.sagebionetworks.web.client.SynapseView;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface UploaderView extends IsWidget, SynapseView {
@@ -12,7 +13,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void createUploadForm(boolean isExternalSupported);
+	public void createUploadForm(boolean isDirectUploadSupported);
 	
 	public int getDisplayHeight();
 
@@ -52,6 +53,8 @@ public interface UploaderView extends IsWidget, SynapseView {
 		 * Called when cancel is clicked in the view
 		 */
 		void cancelClicked();
+
+		String getFileUploaderUrl();
 	}
 
 	public void setShowCancelButton(boolean showCancel);
