@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.SaveCallback;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 

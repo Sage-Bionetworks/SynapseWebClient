@@ -12,8 +12,8 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.SaveCallback;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -563,7 +563,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 	
 	@Override
-	public void alertUnsavedViewChanges(final SaveCallback saveCallback) {
+	public void alertUnsavedViewChanges(final Callback saveCallback) {
 		MessageBox.confirm(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.ADD_ACL_UNSAVED_CHANGES, new Listener<MessageBoxEvent>() {					
 			@Override
 			public void handleEvent(MessageBoxEvent be) { 					
@@ -571,7 +571,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				if(Dialog.YES.equals(btn.getItemId())) {
 					addPersonToAcl();
 					presenter.setUnsavedViewChanges(false);
-					saveCallback.save();
+					saveCallback.invoke();
 				} 				
 			}
 		});

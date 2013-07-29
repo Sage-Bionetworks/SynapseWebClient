@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.SaveCallback;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.VoidCallback;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -50,7 +49,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	 * Prompt about unsaved view changes
 	 * @param saveCallback 
 	 */
-	public void alertUnsavedViewChanges(SaveCallback saveCallback);
+	public void alertUnsavedViewChanges(Callback saveCallback);
 	
 	/**
 	 * Presenter interface

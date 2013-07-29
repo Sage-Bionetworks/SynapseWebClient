@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.VoidCallback;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -112,12 +111,13 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 	 * Generate the ACLEditor Widget
 	 */
 	public Widget asWidget() {
-		refresh(new VoidCallback(){
+		refresh(new AsyncCallback<Void>() {
 			@Override
-			public void success() {}
+			public void onSuccess(Void result) {
+			}
 			@Override
-			public void failure(Throwable throwable) {
-				throwable.printStackTrace();					
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();					
 				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
 			}
 		});
@@ -131,7 +131,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 	/**
 	 * Refresh the ACLEditor by fetching from Synapse
 	 */
-	private void refresh(final VoidCallback callback) {
+	private void refresh(final AsyncCallback<Void> callback) {
 		if (this.evaluation.getId() == null) throw new IllegalStateException(NULL_EVALUATION_MESSAGE);
 		view.showLoading();
 		if (publicAclPrincipalId == null){
@@ -410,20 +410,4 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 	private void showErrorMessage(String s) {
 		view.showErrorMessage(s);
 	}
-
-	interface VoidCallback {
-		void success();
-		void failure(Throwable t);
-	}
-	
-	class VoidCallbackAdapter implements VoidCallback {
-		@Override
-		public void success() {};
-		@Override
-		public void failure(Throwable t) {
-			if (t instanceof RuntimeException) 
-				throw (RuntimeException) t; 
-			else throw new RuntimeException(t);
-		}
-	}	
 }
