@@ -22,7 +22,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	private AdministerEvaluationsListView view;
 	
 	@Inject
-	public AdministerEvaluationsList(SynapseClientAsync synapseClient, AdapterFactory adapterFactory, AdministerEvaluationsListView view) {
+	public AdministerEvaluationsList(AdministerEvaluationsListView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory) {
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.view = view;
