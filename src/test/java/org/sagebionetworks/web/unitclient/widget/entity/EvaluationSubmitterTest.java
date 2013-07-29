@@ -17,7 +17,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -28,8 +30,10 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView;
+import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -54,6 +58,9 @@ public class EvaluationSubmitterTest {
 	EntityBundle bundle;
 	String submitterAlias = "MyAlias";
 	List<Evaluation> evaluationList;
+	PaginatedResults<TermsOfUseAccessRequirement> requirements;
+	Reference selectedReference;
+	AccessRequirementsTransport art;
 	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{	
@@ -142,6 +149,29 @@ public class EvaluationSubmitterTest {
 	}
 	
 	@Test
+	public void testSubmitToEvaluationsWithTermsOfUse() throws RestServiceException, JSONObjectAdapterException{
+		requirements = new PaginatedResults<TermsOfUseAccessRequirement>();		
+		requirements.setTotalNumberOfResults(1);
+		TermsOfUseAccessRequirement requirement = new TermsOfUseAccessRequirement();
+		requirement.setId(2l);
+		requirement.setTermsOfUse("My test ToU");
+		List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
+		ars.add(requirement);
+		requirements.setResults(ars);
+
+		selectedReference = new Reference();
+		art = new AccessRequirementsTransport();
+		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(AsyncCallback.class));
+		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
+		
+		submitter.configure(entity, null);
+		submitter.submitToEvaluations(selectedReference, evaluationList, submitterAlias);
+
+		//should show terms of use
+		verify(mockView).showAccessRequirement(anyString(), any(Callback.class));
+	}
+	
+	@Test
 	public void testShowAvailableEvaluations() throws RestServiceException {
 		submitter.configure(entity, null);
 		verify(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
@@ -180,4 +210,5 @@ public class EvaluationSubmitterTest {
 		//Failure when asking for submitter aliases
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
 }
