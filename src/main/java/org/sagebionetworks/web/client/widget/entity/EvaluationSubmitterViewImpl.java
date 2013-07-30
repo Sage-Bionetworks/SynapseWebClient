@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -26,6 +27,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 
@@ -85,6 +87,34 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			d.setButtons(Dialog.OK);
 			d.show();	
 		}
+	}
+	
+	@Override
+	public void showAccessRequirement(String arText, final Callback touAcceptanceCallback) {
+		final Dialog dialog = new Dialog();
+       	dialog.setMaximizable(false);
+        dialog.setSize(640, 480);
+        dialog.setPlain(true); 
+        dialog.setModal(true); 
+        dialog.setAutoHeight(true);
+        dialog.setResizable(false);
+        ScrollPanel panel = new ScrollPanel(new HTML(arText));
+        panel.addStyleName("margin-top-left-10");
+        panel.setSize("605px", "450px");
+        dialog.add(panel);
+ 		dialog.setHeading("Terms of Use");
+		// agree to TOU, cancel
+        dialog.okText = DisplayConstants.BUTTON_TEXT_ACCEPT_TERMS_OF_USE;
+        dialog.setButtons(Dialog.OKCANCEL);
+        com.extjs.gxt.ui.client.widget.button.Button touButton = dialog.getButtonById(Dialog.OK);
+        touButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				touAcceptanceCallback.invoke();
+			}
+        });
+        dialog.setHideOnButtonClick(true);		
+		dialog.show();		
 	}
 	
 	@Override
