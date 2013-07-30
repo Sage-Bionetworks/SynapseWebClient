@@ -75,8 +75,8 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	private ListStore<PermissionsTableEntry> permissionsStore;
 	private ColumnModel columnModel;
 	private Long publicPrincipalId, authenticatedPrincipalId;
-	private Boolean isPubliclyVisible;
-	private Button publicButton;
+	private Boolean isOpenParticipation;
+	private Button openParticipationButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
 	private ComboBox<ModelData> peopleCombo;
 	
@@ -135,19 +135,19 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 		authenticatedPrincipalId = id;
 	}
 	@Override
-	public void setIsPubliclyVisible(Boolean isPubliclyVisible) {
-		this.isPubliclyVisible = isPubliclyVisible;
-		if (publicButton != null) {
-			if (isPubliclyVisible) {
+	public void setIsPubliclyVisible(Boolean isOpenParticipation) {
+		this.isOpenParticipation = isOpenParticipation;
+		if (openParticipationButton != null) {
+			if (isOpenParticipation) {
 				//already publicly visible, button removes access to public
-				publicButton.setText(DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL);
-				publicButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.lockGrey16()));
-				DisplayUtils.addToolTip(publicButton, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP);
+				openParticipationButton.setText(DisplayConstants.BUTTON_REVOKE_OPEN_PARTICIPATION_ACL);
+				openParticipationButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.lockGrey16()));
+				DisplayUtils.addToolTip(openParticipationButton, DisplayConstants.BUTTON_REVOKE_OPEN_PARTICIPATION_TOOLTIP);
 			}
 			else {
-				publicButton.setText(DisplayConstants.BUTTON_MAKE_PUBLIC_ACL);
-				publicButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.globe16()));
-				DisplayUtils.addToolTip(publicButton, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL_TOOLTIP);
+				openParticipationButton.setText(DisplayConstants.BUTTON_OPEN_PARTICIPATION_ACL);
+				openParticipationButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.globe16()));
+				DisplayUtils.addToolTip(openParticipationButton, DisplayConstants.BUTTON_OPEN_PARTICIPATION_TOOLTIP);
 			}
 		}
 	}
@@ -248,25 +248,25 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 		
 
 		//Make Public button
-		publicButton = new Button();
-		publicButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		openParticipationButton = new Button();
+		openParticipationButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				//add the ability for PUBLIC to see this entity
-				if (isPubliclyVisible) {
-					if (publicPrincipalId != null){
-						presenter.removeAccess(publicPrincipalId);
+				//add the ability for authenticated users to participate
+				if (isOpenParticipation) {
+					if (authenticatedPrincipalId != null){
+						presenter.removeAccess(authenticatedPrincipalId);
 					}
 				}
 				else {
-					if (publicPrincipalId != null) {
-						presenter.setAccess(publicPrincipalId, PermissionLevel.CAN_VIEW);
+					if (authenticatedPrincipalId != null) {
+						presenter.setAccess(authenticatedPrincipalId, PermissionLevel.CAN_PARTICIPATE_EVALUATION);
 					}
 				}
 				
 			}
 		});
-		form2.add(publicButton, tdLeft);
+		form2.add(openParticipationButton, tdLeft);
 		add(form2);
 		
 		this.add(hPanel, new MarginData(10, 0, 0, 0));

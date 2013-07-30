@@ -75,6 +75,12 @@ public class DisplayConstants {
 	public static final String BUTTON_REVOKE_PUBLIC_ACL = "Make Private";
 	public static final String BUTTON_MAKE_PUBLIC_ACL_TOOLTIP = "Click to allow access to anyone on the internet";
 	public static final String BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP = "Click to restrict access to only those people you select above";
+	
+	public static final String BUTTON_OPEN_PARTICIPATION_ACL = "Open Public Participation";
+	public static final String BUTTON_REVOKE_OPEN_PARTICIPATION_ACL = "Close Public Participation";
+	public static final String BUTTON_OPEN_PARTICIPATION_TOOLTIP = "Click to open participation to anyone on the internet";
+	public static final String BUTTON_REVOKE_OPEN_PARTICIPATION_TOOLTIP = "Click to restrict participation to only those people you select above";
+	
 	public static final String PUBLIC_ACL_TITLE = "Public on the web";
 	public static final String PUBLIC_ACL_DESCRIPTION = "Anyone on the internet can access, no login required";
 	public static final String PUBLIC_ACL_ENTITY_PAGE = "Public";
