@@ -160,13 +160,13 @@ public class EvaluationSubmitter implements Presenter {
 			@Override
 			public void invoke() {
 				//Requirements checked; move onto submitting
-				submitToEvaluations(id, ver, evaluations, submitterAlias);
+				lookupEtag(id, ver, evaluations, submitterAlias);
 			}
 		};
 		
 		//Check access requirements with the entity id before moving on with submission
 		try {
-			submitToEvaluations(id, onCheckSuccess);
+			checkSubmissionRequirements(id, onCheckSuccess);
 		} catch(RestServiceException e) {
 			view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
 		}
@@ -176,7 +176,7 @@ public class EvaluationSubmitter implements Presenter {
 	 * Check for unmet access restrictions. As long as more exist, it will not move onto submissions.
 	 * @throws RestServiceException
 	 */
-	public void submitToEvaluations(final String entityId, final Callback onCheckSuccess) throws RestServiceException {
+	public void checkSubmissionRequirements(final String entityId, final Callback onCheckSuccess) throws RestServiceException {
 		//Check for unmet access restrictions
 		synapseClient.getUnmetAccessRequirements(entityId, new AsyncCallback<AccessRequirementsTransport>() {
 			@Override
@@ -225,7 +225,7 @@ public class EvaluationSubmitter implements Presenter {
 			public void invoke() {
 				//ToU signed, now try to submit (will check for other unmet access restrictions)
 				try {
-					submitToEvaluations(entityId, onCheckSuccess);
+					checkSubmissionRequirements(entityId, onCheckSuccess);
 				} catch(RestServiceException e) {
 					onFailure.invoke(e);
 				}
@@ -241,7 +241,7 @@ public class EvaluationSubmitter implements Presenter {
 				jsonObjectAdapter);
 	}
 	
-	public void submitToEvaluations(final String id, final Long ver, final List<Evaluation> evaluations, final String submitterAlias) {
+	public void lookupEtag(final String id, final Long ver, final List<Evaluation> evaluations, final String submitterAlias) {
 		//look up entity for the current etag
 		synapseClient.getEntity(id, new AsyncCallback<EntityWrapper>() {
 			public void onSuccess(EntityWrapper result) {

@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
@@ -59,7 +60,6 @@ public class EvaluationSubmitterTest {
 	String submitterAlias = "MyAlias";
 	List<Evaluation> evaluationList;
 	PaginatedResults<TermsOfUseAccessRequirement> requirements;
-	Reference selectedReference;
 	AccessRequirementsTransport art;
 	
 	@Before
@@ -113,19 +113,26 @@ public class EvaluationSubmitterTest {
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(entity);
+		
+		requirements = new PaginatedResults<TermsOfUseAccessRequirement>();		
+		requirements.setTotalNumberOfResults(0);
+		art = new AccessRequirementsTransport();
+		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
-	public void testSubmitToEvaluations() throws RestServiceException {
+	public void testSubmitToEvaluations() throws RestServiceException, JSONObjectAdapterException{
+		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
+		
 		submitter.configure(entity, null);
-		
-		
 		submitter.submitToEvaluations(null, new ArrayList<Evaluation>(), submitterAlias);
 		verify(mockSynapseClient, times(0)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
-		submitter.submitToEvaluations(null, evaluationList, submitterAlias);
 		
-		//should invoke twice (once per evaluation)
+		submitter.submitToEvaluations(null, evaluationList, submitterAlias);
+		//should invoke submission twice (once per evaluation), directly without terms of use
+		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
 		verify(mockSynapseClient, times(2)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
+
 		
 		ArgumentCaptor<HashSet> captor = ArgumentCaptor.forClass(HashSet.class);
 		//submitted status shown
@@ -137,20 +144,26 @@ public class EvaluationSubmitterTest {
 	}
 	
 	@Test
-	public void testSubmitToEvaluationsFailure() throws RestServiceException {
+	public void testSubmitToEvaluationsFailure() throws RestServiceException, JSONObjectAdapterException{
 		submitter.configure(entity, null);
-		List<Evaluation> evals = new ArrayList<Evaluation>();
+
+		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
+		
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(AsyncCallback.class));
+
+		List<Evaluation> evals = new ArrayList<Evaluation>();
 		evals.add(new Evaluation());
 		submitter.submitToEvaluations(null, evals, submitterAlias);
+		//Should invoke once directly without terms of use
 		verify(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
+		
 		//submitted status shown
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
-	public void testSubmitToEvaluationsWithTermsOfUse() throws RestServiceException, JSONObjectAdapterException{
-		requirements = new PaginatedResults<TermsOfUseAccessRequirement>();		
+	public void testSubmitToEvaluationsWithTermsOfUse() throws RestServiceException, JSONObjectAdapterException{	
 		requirements.setTotalNumberOfResults(1);
 		TermsOfUseAccessRequirement requirement = new TermsOfUseAccessRequirement();
 		requirement.setId(2l);
@@ -158,17 +171,15 @@ public class EvaluationSubmitterTest {
 		List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
 		ars.add(requirement);
 		requirements.setResults(ars);
-
-		selectedReference = new Reference();
-		art = new AccessRequirementsTransport();
-		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
+		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(AsyncCallback.class));
 		
 		submitter.configure(entity, null);
-		submitter.submitToEvaluations(selectedReference, evaluationList, submitterAlias);
-
-		//should show terms of use
+		submitter.submitToEvaluations(null, evaluationList, submitterAlias);
+		
+		//should show terms of use for the requirement
 		verify(mockView).showAccessRequirement(anyString(), any(Callback.class));
+		
 	}
 	
 	@Test
