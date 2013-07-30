@@ -149,7 +149,7 @@ public interface SynapseClientAsync {
 	void createParticipants(String[] evaluationIds, AsyncCallback<Void> callback) throws RestServiceException;
 	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
-	void getChunkedFileToken(String fileName,  String contentType, AsyncCallback<String> callback) throws RestServiceException;
+	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, AsyncCallback<String> callback) throws RestServiceException;
 	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
 	void combineChunkedFileUpload(List<String> requests, AsyncCallback<String> callback) throws RestServiceException;
 	void getUploadDaemonStatus(String daemonId,AsyncCallback<String> callback) throws RestServiceException;
@@ -162,6 +162,7 @@ public interface SynapseClientAsync {
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	void getEvaluations(List<String> evaluationIds, AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
+	void getSharableEvaluations(String entityId, AsyncCallback<ArrayList<String>> callback);
 	void getAvailableEvaluationEntities(AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluationEntitiesList(AsyncCallback<ArrayList<String>> callback) throws RestServiceException;
 	
@@ -172,6 +173,12 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void createSubmission(String submissionJson, String etag, AsyncCallback<String> callback) throws RestServiceException;
+	
+	
+	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
+	void getEvaluationAcl(String evalId, AsyncCallback<String> callback);
+	void updateEvaluationAcl(String aclJson, AsyncCallback<String> callback);
+	
 	
 	/**
 	 * Get all unique submission user aliases associated to the available evaluations (OPEN evaluations that the current user has joined).

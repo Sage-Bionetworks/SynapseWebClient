@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -46,10 +47,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private static final String NULL_UEP_MESSAGE = "User's entity permissions are missing.";
 	private static final String NULL_ACL_MESSAGE = "ACL is missing.";
 	private static final String NULL_ENTITY_MESSAGE = "Entity is missing.";
-	
-	public interface SaveCallback {
-		void save(); 
-	}
 	
 	// Editor components
 	private AccessControlListEditorView view;
@@ -120,12 +117,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	 * Generate the ACLEditor Widget
 	 */
 	public Widget asWidget() {
-		refresh(new VoidCallback(){
+		refresh(new AsyncCallback<Void>() {
 			@Override
-			public void success() {}
+			public void onSuccess(Void result) {
+			}
 			@Override
-			public void failure(Throwable throwable) {
-				throwable.printStackTrace();					
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();					
 				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
 			}
 		});
@@ -139,7 +137,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	/**
 	 * Refresh the ACLEditor by fetching from Synapse
 	 */
-	private void refresh(final VoidCallback callback) {
+	private void refresh(final AsyncCallback<Void> callback) {
 		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
 		view.showLoading();
 		if (publicAclPrincipalId == null){
@@ -174,28 +172,25 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 					// retrieve ACL and user entity permissions from bundle
 					acl = nodeModelCreator.createJSONEntity(bundle.getAclJson(), AccessControlList.class);
 					uep = nodeModelCreator.createJSONEntity(bundle.getPermissionsJson(), UserEntityPermissions.class);
-					fetchUserGroupHeaders(new VoidCallback() {
-						// fetch UserGroup headers for members of ACL
-						@Override
-						public void success() {
+					fetchUserGroupHeaders(new AsyncCallback<Void>() {
+						public void onSuccess(Void result) {
 							// update the view
 							setViewDetails();
 							unsavedChanges = false;
 							hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
-							callback.success();
-						}
-						@Override
-						public void failure(Throwable t) {
-							onFailure(t);							
-						}						
-					});					
+							callback.onSuccess(null);
+						};
+						public void onFailure(Throwable caught) {
+							onFailure(caught);
+						};
+					});				
 				} catch (Throwable e) {
 					onFailure(e);					
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.failure(caught);
+				callback.onFailure(caught);
 			}
 		});
 	}
@@ -230,7 +225,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		}
 	}
 
-	private void fetchUserGroupHeaders(final VoidCallback callback) {
+	private void fetchUserGroupHeaders(final AsyncCallback<Void> callback) {
 		List<String> ids = new ArrayList<String>();
 		for (ResourceAccess ra : acl.getResourceAccess())
 			ids.add(ra.getPrincipalId().toString());
@@ -242,7 +237,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 					for (UserGroupHeader ugh : response.getChildren())
 						userGroupHeaders.put(ugh.getOwnerId(), ugh);
 					if (callback != null)
-						callback.success();
+						callback.onSuccess(null);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -250,7 +245,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			@Override
 			public void onFailure(Throwable caught) {
 				if (callback != null)
-					callback.failure(caught);
+					callback.onFailure(caught);
 			}
 		});
 	}
@@ -277,19 +272,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			toSet.setPrincipalId(principalId);
 			acl.getResourceAccess().add(toSet);
 			toSet.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
-			fetchUserGroupHeaders(new VoidCallback() {
-				// fetch UserGroup headers for members of ACL
-				@Override
-				public void success() {
-					// update the view
-					setViewDetails();
-				}
-				@Override
-				public void failure(Throwable t) {
-					// update the view anyway - will fetch individual Profiles					
-					setViewDetails();
-				}						
-			});
+			fetchUserGroupHeaders(updateViewDetailsCallback());
 		} else {
 			// Existing entry in the ACL
 			toSet.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
@@ -299,6 +282,21 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		unsavedChanges = true;
 	}
 
+	private AsyncCallback<Void> updateViewDetailsCallback() {
+		return new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				// update the view
+				setViewDetails();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				// update the view anyway - will fetch individual Profiles					
+				setViewDetails();
+			}
+		};
+	}
+	
 	@Override
 	public void removeAccess(Long principalIdToRemove) {
 		validateEditorState();
@@ -359,19 +357,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				try {
 					acl = nodeModelCreator.createJSONEntity(wrapper.getEntityJson(), AccessControlList.class);
 					unsavedChanges = hasLocalACL_inRepo;
-					fetchUserGroupHeaders(new VoidCallback() {
-						// fetch UserGroup headers for members of ACL
-						@Override
-						public void success() {
-							// update the view
-							setViewDetails();
-						}
-						@Override
-						public void failure(Throwable t) {
-							// update the view anyway - will fetch individual Profiles					
-							setViewDetails();
-						}						
-					});					
+					fetchUserGroupHeaders(updateViewDetailsCallback());					
 				} catch (Throwable e) {
 					onFailure(e);
 				}
@@ -387,9 +373,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	@Override
 	public void pushChangesToSynapse(final boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback) {
 		if(unsavedViewChanges) {
-			view.alertUnsavedViewChanges(new SaveCallback() {				
+			view.alertUnsavedViewChanges(new Callback() {
+				
 				@Override
-				public void save() {
+				public void invoke() {
 					pushChangesToSynapse(recursive, changesPushedCallback);
 				}
 			});
@@ -480,25 +467,5 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private void showErrorMessage(String s) {
 		view.showErrorMessage(s);
 	}
-
-	interface Callback<T> {
-		void success(T data);
-		void failure(Throwable t);
-	}
 	
-	interface VoidCallback {
-		void success();
-		void failure(Throwable t);
-	}
-	
-	class VoidCallbackAdapter implements VoidCallback {
-		@Override
-		public void success() {};
-		@Override
-		public void failure(Throwable t) {
-			if (t instanceof RuntimeException) 
-				throw (RuntimeException) t; 
-			else throw new RuntimeException(t);
-		}
-	}	
 }

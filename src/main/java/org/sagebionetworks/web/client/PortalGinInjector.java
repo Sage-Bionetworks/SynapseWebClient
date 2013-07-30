@@ -19,11 +19,13 @@ import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
@@ -42,6 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
@@ -115,6 +118,7 @@ public interface PortalGinInjector extends Ginjector {
 	 *  Markdown Widgets
 	 */
 	////// Editors
+	public BookmarkConfigEditor getBookmarkConfigEditor();
 	public ReferenceConfigEditor getReferenceConfigEditor();
 	public YouTubeConfigEditor getYouTubeConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
@@ -131,9 +135,11 @@ public interface PortalGinInjector extends Ginjector {
 	public ButtonLinkConfigEditor getButtonLinkConfigEditor();
 	
 	////// Renderers
+	public BookmarkWidget getBookmarkRenderer();
 	public ReferenceWidget getReferenceRenderer();
 	public YouTubeWidget getYouTubeRenderer();
 	public ProvenanceWidget getProvenanceRenderer();
+	public AdministerEvaluationsList getAdministerEvaluationsList();
 	public OldImageWidget getOldImageRenderer();
 	public ImageWidget getImageRenderer();
 	public AttachmentPreviewWidget getAttachmentPreviewRenderer();

@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+/**
+ * (?=pattern) is a positive look-ahead assertion - the pattern must succeed
+ * (?<=pattern) is a positive look-behind assertion - the pattern must succeed
+ *
+ */
 public class MarkdownRegExConstants {
 
 	/**
@@ -14,13 +19,19 @@ public class MarkdownRegExConstants {
 	 * 
 	 * Beginning of the line, optional whitespace, blockquote character '>', whitespace, then the text
 	 */
-	public static final String BLOCK_QUOTE_REGEX = "(^\\s*>\\s?(.+))";
+	public static final String BLOCK_QUOTE_REGEX = "(^\\s*>\\s?(.*))";
 	
 	/**
 	 * Recognizes example input:
 	 * __This__ and **that** are bold
 	 */
-	public static final String BOLD_REGEX = "(\\*\\*|__)(?=\\S)(.+?[*_]*)(?<=\\S)\\1";
+	public static final String BOLD_REGEX = "(\\*\\*|__)(?=\\S*)(.+?[*_]*)(?<=\\S*)\\1";
+	
+	/**
+	 * Recognizes example input:
+	 * ${bookmarktarget?bookmarkID=subject1} Subject 1
+	 */
+	public static final String BOOKMARK_TARGET_REGEX = "\\$\\{bookmarktarget\\?bookmarkID=(.+?)\\}";
 	
 	/**
 	 * Recognized example input:
@@ -70,7 +81,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * *This* and _that_ will be italicized
 	 */
-	public static final String ITALICS_REGEX = "(\\*|_)(?=\\S)(.+?)(?<=\\S)\\1";
+	public static final String ITALICS_REGEX = "(\\*|_)(?=\\S*)(.+?)(?<=\\S*)\\1";
 	
 	/**
 	 * Recognized example input:
@@ -92,25 +103,31 @@ public class MarkdownRegExConstants {
 	
 	/**
 	 * Recognized example input:
-	 * -striked out text-
+	 * --striked out text--
 	 */
-	public static final String STRIKE_OUT_REGEX = "--(?=\\S)(.+?)(?<=\\S)--";
+	public static final String STRIKE_OUT_REGEX = "--(?=\\S*)(.+?)(?<=\\S*)--";
 	
 	/**
 	 * Recognized example input:
 	 * ~sub~ is a subscript
 	 */
-	public static final String SUBSCRIPT_REGEX = "~(?=\\S)(.+?)(?<=\\S)~";
+	public static final String SUBSCRIPT_REGEX = "~(?=\\S*)(.+?)(?<=\\S*)~";
 	
 	/**
 	 * Recognized example input:
 	 * ^sup^ is a superscript
 	 */
-	public static final String SUPERSCRIPT_REGEX = "(\\^)(?=\\S)(.+?)(?<=\\S)(\\^)";
+	public static final String SUPERSCRIPT_REGEX = "(\\^)(?=\\S*)(.+?)(?<=\\S*)(\\^)";
 	
 	/**
 	 * Recognized example input:
 	 * * First Item
 	 */
 	public static final String UNORDERED_LIST_REGEX = "(^[>]*)(\\s*)(?:[-+*])(\\s+)(.+)";
+	
+	
+	public static final String NEWLINE_REGEX = "([\n])";
+	public static final String SPACE_REGEX = "([ ])";
+	public static final String LT_REGEX = "(&lt;)";
+	public static final String GT_REGEX = "(&gt;)";
 }

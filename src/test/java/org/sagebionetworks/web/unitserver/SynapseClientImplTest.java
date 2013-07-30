@@ -39,6 +39,7 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -113,6 +114,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class SynapseClientImplTest {
 	
+	
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
 	ServiceUrlProvider mockUrlProvider;
@@ -124,6 +126,8 @@ public class SynapseClientImplTest {
 	AttachmentData attachment1, attachment2;
 	Annotations annos;
 	UserEntityPermissions eup;
+	UserEvaluationPermissions userEvaluationPermissions;
+	
 	EntityPath path;
 	org.sagebionetworks.repo.model.PaginatedResults<UserGroup> pgugs;
 	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
@@ -133,7 +137,8 @@ public class SynapseClientImplTest {
 	Participant mockParticipant;
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
-	
+	private static final String EVAL_ID_1 = "eval ID 1";
+	private static final String EVAL_ID_2 = "eval ID 2";
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
@@ -178,6 +183,16 @@ public class SynapseClientImplTest {
 		eup.setOwnerPrincipalId(999L);
 		// the mock synapse should return this object
 		when(mockSynapse.getUsersEntityPermissions(entityId)).thenReturn(eup);
+		
+		//user can change permissions on eval 2, but not on 1
+		userEvaluationPermissions = new UserEvaluationPermissions();
+		userEvaluationPermissions.setCanChangePermissions(false);
+		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_1)).thenReturn(userEvaluationPermissions);
+		
+		userEvaluationPermissions = new UserEvaluationPermissions();
+		userEvaluationPermissions.setCanChangePermissions(true);
+		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_2)).thenReturn(userEvaluationPermissions);
+		
 		// Setup the path
 		path = new EntityPath();
 		path.setPath(new ArrayList<EntityHeader>());
@@ -784,13 +799,15 @@ public class SynapseClientImplTest {
 	public void testGetChunkedFileToken() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String fileName = "test file.zip";
 		String contentType = "application/test";
+		String md5 = "0123456789abcdef";
 		ChunkedFileToken testToken = new ChunkedFileToken();
 		testToken.setFileName(fileName);
 		testToken.setKey("a key 42");
 		testToken.setUploadId("upload ID 123");
+		testToken.setContentMD5(md5);
 		when(mockSynapse.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class))).thenReturn(testToken);
 		
-		String chunkTokenJson = synapseClient.getChunkedFileToken(fileName, contentType);
+		String chunkTokenJson = synapseClient.getChunkedFileToken(fileName, contentType, md5);
 		ChunkedFileToken token = EntityFactory.createEntityFromJSONString(chunkTokenJson, ChunkedFileToken.class);
 		verify(mockSynapse).createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class));
 		assertEquals(testToken, token);
@@ -852,20 +869,29 @@ public class SynapseClientImplTest {
 		assertTrue(synapseClient.hasSubmitted());
 	}
 	
-	public void setupGetAvailableEvaluations(String sharedEntityId) throws SynapseException {
-		
+	public void setupGetAllEvaluations(String sharedEntityId) throws SynapseException {
+		PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
+		when(mockSynapse.getEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
+	}
+	
+	private PaginatedResults<Evaluation> getTestEvaluations(String sharedEntityId) {
 		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		Evaluation e = new Evaluation();
-		e.setId("eval ID 1");
+		e.setId(EVAL_ID_1);
 		e.setContentSource(sharedEntityId);
 		evaluationList.add(e);
 		e = new Evaluation();
-		e.setId("eval ID 2");
+		e.setId(EVAL_ID_2);
 		e.setContentSource(sharedEntityId);
 		evaluationList.add(e);
 		testResults.setTotalNumberOfResults(2);
 		testResults.setResults(evaluationList);
+		return testResults;
+	}
+	
+	public void setupGetAvailableEvaluations(String sharedEntityId) throws SynapseException {
+		PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
 		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(testResults);
 	}
 	
@@ -971,4 +997,23 @@ public class SynapseClientImplTest {
 			assertEquals("Alias " + i, submitterAliasList.get(i));
 		}
 	}
+	
+	@Test
+	public void testGetSharableEvaluations() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		String myEntityId = "syn123";
+		//set up 2 available evaluations associated to this entity id
+		setupGetAllEvaluations(myEntityId);
+		
+		//"Before" junit test setup configured so this user to have the ability to change permissions on eval 2, but not on eval 1
+		ArrayList<String> sharableEvaluations = synapseClient.getSharableEvaluations(myEntityId);
+		//verify this is eval 2
+		assertEquals(1, sharableEvaluations.size());
+		Evaluation e2 = nodeModelCreator.createJSONEntity(sharableEvaluations.get(0), Evaluation.class);
+		assertEquals(EVAL_ID_2, e2.getId());
+		
+		//and verify that no evaluations are returned for a different entity id
+		sharableEvaluations = synapseClient.getSharableEvaluations("syn456");
+		assertEquals(0, sharableEvaluations.size());
+	}
+	
 }

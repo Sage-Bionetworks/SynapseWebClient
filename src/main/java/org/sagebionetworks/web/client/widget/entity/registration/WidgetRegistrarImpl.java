@@ -47,7 +47,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
-		if(contentTypeKey.equals(WidgetConstants.REFERENCE_CONTENT_TYPE)) {
+		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
+			presenter = ginInjector.getBookmarkConfigEditor();
+		} else if(contentTypeKey.equals(WidgetConstants.REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
 			presenter = ginInjector.getYouTubeConfigEditor();
@@ -95,7 +97,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
-		if(contentTypeKey.equals(WidgetConstants.REFERENCE_CONTENT_TYPE)) {
+		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
+			presenter = ginInjector.getBookmarkRenderer();
+		} else if(contentTypeKey.equals(WidgetConstants.REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
 			presenter = ginInjector.getYouTubeRenderer();
@@ -193,6 +197,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	}
 	
 	private void initWithKnownWidgets() {
+		registerWidget(WidgetConstants.BOOKMARK_CONTENT_TYPE, WidgetConstants.BOOKMARK_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.REFERENCE_CONTENT_TYPE, WidgetConstants.REFERENCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.YOUTUBE_CONTENT_TYPE, WidgetConstants.YOUTUBE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME);

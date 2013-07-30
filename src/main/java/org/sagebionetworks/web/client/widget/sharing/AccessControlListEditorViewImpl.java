@@ -2,11 +2,9 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -14,13 +12,12 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.SaveCallback;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.users.AclEntry;
-import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
@@ -123,7 +120,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		if (permissionsStore == null || columnModel == null || permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
 		if (!aclEntry.getPrincipal().getIsIndividual())
-			permissionsStore.insert(new PermissionsTableEntry(aclEntry), 0); // insert groups first
+			permissionsStore.insert(new PermissionsTableEntry(permissionDisplay, aclEntry), 0); // insert groups first
 		else if (aclEntry.isOwner()) {
 			//owner should be the first (after groups, if present)
 			int insertIndex = 0;
@@ -132,10 +129,10 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				if (item.getIsIndividual())
 					break;
 			}
-			permissionsStore.insert(new PermissionsTableEntry(aclEntry), insertIndex); // insert owner
+			permissionsStore.insert(new PermissionsTableEntry(permissionDisplay, aclEntry), insertIndex); // insert owner
 		}
 		else
-			permissionsStore.add(new PermissionsTableEntry(aclEntry));
+			permissionsStore.add(new PermissionsTableEntry(permissionDisplay, aclEntry));
 		permissionsGrid.reconfigure(permissionsStore, columnModel);
 	}
 	
@@ -155,15 +152,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				//already publicly visible, button removes access to public
 				publicButton.setText(DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL);
 				publicButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.lockGrey16()));
-				//TODO: use bootstrap tooltip instead.  can't get it working with the Button (and all other tooltips on dialog are standard).
-				publicButton.setToolTip(new ToolTipConfig(DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP));
-//				DisplayUtils.addTooltip(this.synapseJSNIUtils, publicButtonWrapper, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP, TOOLTIP_POSITION.BOTTOM);
+				DisplayUtils.addToolTip(publicButton, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP);
 			}
 			else {
 				publicButton.setText(DisplayConstants.BUTTON_MAKE_PUBLIC_ACL);
 				publicButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.globe16()));
-				publicButton.setToolTip(new ToolTipConfig(DisplayConstants.BUTTON_MAKE_PUBLIC_ACL, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL_TOOLTIP));
-//				DisplayUtils.addTooltip(this.synapseJSNIUtils, publicButtonWrapper, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL_TOOLTIP, TOOLTIP_POSITION.BOTTOM);
+				DisplayUtils.addToolTip(publicButton, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL_TOOLTIP);
 			}
 		}
 	}
@@ -175,7 +169,19 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 
 		// show existing permissions
 		permissionsStore = new ListStore<PermissionsTableEntry>();
-		createPermissionsGrid(permissionsStore);
+		permissionsGrid = AccessControlListEditorViewImpl.createPermissionsGrid(
+				permissionsStore, 
+				AccessControlListEditorViewImpl.createPeopleRenderer(publicPrincipalId, authenticatedPrincipalId, synapseJSNIUtils, iconsImageBundle), 
+				createButtonRenderer(), 
+				AccessControlListEditorViewImpl.createRemoveRenderer(iconsImageBundle, new CallbackP<Long>() {
+					@Override
+					public void invoke(Long principalId) {
+						presenter.removeAccess(principalId);
+					}
+				}));
+
+		add(permissionsGrid, new MarginData(5, 0, 0, 0));
+		columnModel = permissionsGrid.getColumnModel();
 		
 		// create panel to hold ACL management buttons
 		HorizontalPanel hPanel = new HorizontalPanel();
@@ -346,11 +352,6 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	@Override
 	public void showInfoSuccess(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-		//TODO: Move info messages on top of modal shade
-//		Alert alert = new Alert(title, message);
-//		alert.setTimeout(1000);
-//		alert.setAlertType(AlertType.Success);
-//		this.insert(alert, 0);
 	}
 	
 	@Override
@@ -366,50 +367,49 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		showErrorMessage(message);
 	}
 
-	private void createPermissionsGrid(ListStore<PermissionsTableEntry> permissionsStore) {			
-		GridCellRenderer<PermissionsTableEntry> peopleRenderer = createPeopleRenderer();
-		GridCellRenderer<PermissionsTableEntry> buttonRenderer = createButtonRenderer();
-		GridCellRenderer<PermissionsTableEntry> removeRenderer = createRemoveRenderer();						   
-				   
-		List<ColumnConfig> configs = new ArrayList<ColumnConfig>();  
-				   
-		ColumnConfig column = new ColumnConfig();  
-		column.setId(PRINCIPAL_COLUMN_ID);  
+	public static Grid<PermissionsTableEntry> createPermissionsGrid(
+			ListStore<PermissionsTableEntry> permissionsStore,
+			GridCellRenderer<PermissionsTableEntry> peopleRenderer,
+			GridCellRenderer<PermissionsTableEntry> buttonRenderer,
+			GridCellRenderer<PermissionsTableEntry> removeRenderer) {
+		List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
+
+		ColumnConfig column = new ColumnConfig();
+		column.setId(PRINCIPAL_COLUMN_ID);
 		column.setHeader("People");
 		column.setWidth(200);
 		column.setRenderer(peopleRenderer);
-		configs.add(column);  
-				   
-		column = new ColumnConfig();  
-		column.setId(ACCESS_COLUMN_ID);  
-		column.setHeader("Access");  
-		column.setWidth(110);  
+		configs.add(column);
+
+		column = new ColumnConfig();
+		column.setId(ACCESS_COLUMN_ID);
+		column.setHeader("Access");
+		column.setWidth(110);
 		column.setRenderer(buttonRenderer);
 		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
-		configs.add(column);  
-				   
-		column = new ColumnConfig();  
-		column.setId(REMOVE_COLUMN_ID);  
+		configs.add(column);
+
+		column = new ColumnConfig();
+		column.setId(REMOVE_COLUMN_ID);
 		column.setHeader("");
-		column.setWidth(25);  
-		column.setRenderer(removeRenderer);  
+		column.setWidth(25);
+		column.setRenderer(removeRenderer);
 		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
-		configs.add(column);  
-				   				   			   
-		columnModel = new ColumnModel(configs);  				  				 
-		permissionsGrid = new Grid<PermissionsTableEntry>(permissionsStore, columnModel);
-		permissionsGrid.setAutoExpandColumn(PRINCIPAL_COLUMN_ID);  
-		permissionsGrid.setBorders(true);		
+		configs.add(column);
+
+		Grid<PermissionsTableEntry> permissionsGrid = new Grid<PermissionsTableEntry>(
+				permissionsStore, new ColumnModel(configs));
+		permissionsGrid.setAutoExpandColumn(PRINCIPAL_COLUMN_ID);
+		permissionsGrid.setBorders(true);
 		permissionsGrid.setWidth(520);
 		permissionsGrid.setHeight(180);
-		
-		add(permissionsGrid, new MarginData(5, 0, 0, 0));
-		
+		return permissionsGrid;
 	}
 	
 	private Menu createEditAccessMenu(final AclEntry aclEntry) {
 		final Long principalId = Long.parseLong(aclEntry.getPrincipal().getOwnerId());
 		Menu menu = new Menu();
+		menu.setEnableScrolling(false);
 		MenuItem item;
 		
 		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_VIEW));			
@@ -447,7 +447,11 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		return menu;
 	}
 
-	private GridCellRenderer<PermissionsTableEntry> createPeopleRenderer() {
+	public static GridCellRenderer<PermissionsTableEntry> createPeopleRenderer(
+			final Long publicPrincipalId, 
+			final Long authenticatedPrincipalId, 
+			final SynapseJSNIUtils synapseJSNIUtils,
+			final IconsImageBundle iconsImageBundle) {
 		GridCellRenderer<PermissionsTableEntry> personRenderer = new GridCellRenderer<PermissionsTableEntry>() {
 			@Override
 			public Object render(PermissionsTableEntry model, String property,
@@ -532,7 +536,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			return buttonRenderer;
 	}
 
-	private GridCellRenderer<PermissionsTableEntry> createRemoveRenderer() {
+	public static GridCellRenderer<PermissionsTableEntry> createRemoveRenderer(final IconsImageBundle iconsImageBundle, final CallbackP<Long> callback) {
 		GridCellRenderer<PermissionsTableEntry> removeButton = new GridCellRenderer<PermissionsTableEntry>() {  			   
 			@Override  
 			public Object render(final PermissionsTableEntry model, String property, ColumnData config, int rowIndex,  
@@ -547,7 +551,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 						@Override
 						public void onClick(ClickEvent event) {
 							Long principalId = (Long.parseLong(entry.getAclEntry().getPrincipal().getOwnerId()));
-							presenter.removeAccess(principalId);
+							callback.invoke(principalId);
 						}
 					});
 					return removeAnchor;
@@ -558,58 +562,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		return removeButton;
 	}
 	
-	/*
-	 * Private Classes
-	 */
-	private class PermissionsTableEntry extends BaseModelData {
-		private static final long serialVersionUID = -5153720887903543399L;
-		private AclEntry aclEntry;
-		public PermissionsTableEntry(AclEntry aclEntry) {			
-			super();			
-			this.aclEntry = aclEntry;
-			UserGroupHeader principal = aclEntry.getPrincipal();
-			this.set(PRINCIPAL_COLUMN_ID, principal);			
-			this.set(REMOVE_COLUMN_ID, principal);			
-			PermissionLevel level = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));			
-			if(level != null) {
-				this.set(ACCESS_COLUMN_ID, permissionDisplay.get(level)); 
-			}			
-		}
-		public AclEntry getAclEntry() {
-			return aclEntry;
-		}		
-	}
-
-	private class PermissionLevelSelect {
-		private String display;
-		private PermissionLevel level;
-		public PermissionLevelSelect(String display, PermissionLevel level) {
-			super();
-			this.display = display;
-			this.level = level;
-		}
-		public String getDisplay() {
-			return display;
-		}
-		public void setDisplay(String display) {
-			this.display = display;
-		}
-		public PermissionLevel getLevel() {
-			return level;
-		}
-		public void setLevel(PermissionLevel level) {
-			this.level = level;
-		}		
-		
-		public String toString() {
-			return display;
-		}
-	}
-
-	
-	
 	@Override
-	public void alertUnsavedViewChanges(final SaveCallback saveCallback) {
+	public void alertUnsavedViewChanges(final Callback saveCallback) {
 		MessageBox.confirm(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.ADD_ACL_UNSAVED_CHANGES, new Listener<MessageBoxEvent>() {					
 			@Override
 			public void handleEvent(MessageBoxEvent be) { 					
@@ -617,7 +571,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				if(Dialog.YES.equals(btn.getItemId())) {
 					addPersonToAcl();
 					presenter.setUnsavedViewChanges(false);
-					saveCallback.save();
+					saveCallback.invoke();
 				} 				
 			}
 		});

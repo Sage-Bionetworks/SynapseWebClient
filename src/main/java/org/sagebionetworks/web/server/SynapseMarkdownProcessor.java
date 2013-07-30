@@ -2,15 +2,19 @@ package org.sagebionetworks.web.server;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.server.markdownparser.BlockQuoteParser;
 import org.sagebionetworks.web.server.markdownparser.BoldParser;
+import org.sagebionetworks.web.server.markdownparser.BookmarkTargetParser;
 import org.sagebionetworks.web.server.markdownparser.CodeParser;
 import org.sagebionetworks.web.server.markdownparser.CodeSpanParser;
 import org.sagebionetworks.web.server.markdownparser.HeadingParser;
@@ -21,6 +25,7 @@ import org.sagebionetworks.web.server.markdownparser.LinkParser;
 import org.sagebionetworks.web.server.markdownparser.ListParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
+import org.sagebionetworks.web.server.markdownparser.MarkdownRegExConstants;
 import org.sagebionetworks.web.server.markdownparser.ReferenceParser;
 import org.sagebionetworks.web.server.markdownparser.StrikeoutParser;
 import org.sagebionetworks.web.server.markdownparser.SubscriptParser;
@@ -31,7 +36,12 @@ import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 public class SynapseMarkdownProcessor {
 	private static SynapseMarkdownProcessor singleton = null;
 	private List<MarkdownElementParser> allElementParsers = new ArrayList<MarkdownElementParser>();
-
+	
+	//efficient hack to preserve strings that the html stripping process ruins
+	private Map<Pattern, String> preservers = new HashMap<Pattern, String>();
+	private Map<Pattern, String> restorers = new HashMap<Pattern, String>();
+	
+	private CodeParser codeParser;
 	public static SynapseMarkdownProcessor getInstance() {
 		if (singleton == null) {
 			singleton = new SynapseMarkdownProcessor();
@@ -47,8 +57,10 @@ public class SynapseMarkdownProcessor {
 	private void init() {
 		//initialize all markdown element parsers
 		allElementParsers.add(new BlockQuoteParser());
-		allElementParsers.add(new BoldParser());
-		allElementParsers.add(new CodeParser());
+		allElementParsers.add(new BoldParser());	
+		allElementParsers.add(new BookmarkTargetParser());
+		codeParser = new CodeParser();
+		allElementParsers.add(codeParser);
 		allElementParsers.add(new CodeSpanParser());
 		allElementParsers.add(new HeadingParser());
 		allElementParsers.add(new HorizontalLineParser());
@@ -62,6 +74,27 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new SuperscriptParser());
 		allElementParsers.add(new TableParser());
 		allElementParsers.add(new WikiSubpageParser());
+		
+		//preservers
+		preservers.put(Pattern.compile(MarkdownRegExConstants.NEWLINE_REGEX), ServerMarkdownUtils.TEMP_NEWLINE_DELIMITER);
+		preservers.put(Pattern.compile(MarkdownRegExConstants.SPACE_REGEX), ServerMarkdownUtils.TEMP_SPACE_DELIMITER);
+		preservers.put(Pattern.compile(MarkdownRegExConstants.LT_REGEX), ServerMarkdownUtils.TEMP_LESS_THAN_DELIMITER);
+		preservers.put(Pattern.compile(MarkdownRegExConstants.GT_REGEX), ServerMarkdownUtils.TEMP_GREATER_THAN_DELIMITER);
+		
+		//restorers
+		restorers.put(Pattern.compile("("+Pattern.quote(ServerMarkdownUtils.TEMP_NEWLINE_DELIMITER)+")"), "\n");
+		restorers.put(Pattern.compile("("+Pattern.quote(ServerMarkdownUtils.TEMP_SPACE_DELIMITER)+")"), " ");
+		restorers.put(Pattern.compile("("+Pattern.quote(ServerMarkdownUtils.TEMP_LESS_THAN_DELIMITER)+")"), "&lt;");
+		restorers.put(Pattern.compile("("+Pattern.quote(ServerMarkdownUtils.TEMP_GREATER_THAN_DELIMITER)+")"), "&gt;");
+	}
+	
+	private String applyPatternReplacements(String markdown, Map<Pattern, String> pattern2Replacement) {
+		String returnMarkdown = markdown;
+		for (Pattern p : pattern2Replacement.keySet()) {
+			Matcher m = p.matcher(returnMarkdown);
+			returnMarkdown = m.replaceAll(pattern2Replacement.get(p));
+		}
+		return returnMarkdown;
 	}
 	
 	/**
@@ -78,14 +111,15 @@ public class SynapseMarkdownProcessor {
 	public String markdown2Html(String markdown, Boolean isPreview) throws IOException {
 		String originalMarkdown = markdown;
 		if (markdown == null) return SharedMarkdownUtils.getDefaultWikiMarkdown();
+		
 		//trick to maintain newlines when suppressing all html
 		if (markdown != null) {
-			markdown = ServerMarkdownUtils.preserveWhitespace(markdown);
+			markdown = applyPatternReplacements(markdown, preservers);
 		}
 		//played with other forms of html stripping, 
 		//and this method has been the least destructive (compared to clean() with various WhiteLists, or using java HTMLEditorKit to do it).
 		markdown = Jsoup.parse(markdown).text();
-		markdown = ServerMarkdownUtils.restoreWhitespace(markdown);
+		markdown = applyPatternReplacements(markdown, restorers);
 		
 		//now make the main single pass to identify markdown elements and create the output
 		markdown = StringUtils.replace(markdown, ServerMarkdownUtils.R_MESSED_UP_ASSIGNMENT, ServerMarkdownUtils.R_ASSIGNMENT);
@@ -130,21 +164,24 @@ public class SynapseMarkdownProcessor {
 		allLines.add("");
 		for (String line : allLines) {
 			MarkdownElements elements = new MarkdownElements(line);
-			
 			//do parsers we're currently in the middle of
 			for (MarkdownElementParser parser : activeComplexParsers) {
 				parser.processLine(elements);
 			}
 			
-			//then the inactive multiline parsers
-			for (MarkdownElementParser parser : inactiveComplexParsers) {
-				parser.processLine(elements);
+			//only give the option to start new multiline element (complex parser) or process simple elements if we're not in a code block
+			if (!codeParser.isInMarkdownElement()){
+				//then the inactive multiline parsers
+				for (MarkdownElementParser parser : inactiveComplexParsers) {
+					parser.processLine(elements);
+				}
+				
+				//process the simple processors after complex parsers (the complex parsers clean up the markdown)
+				for (MarkdownElementParser parser : simpleParsers) {
+					parser.processLine(elements);
+				}
 			}
-			
-			//process the simple processors after complex parsers (the complex parsers clean up the markdown)
-			for (MarkdownElementParser parser : simpleParsers) {
-				parser.processLine(elements);
-			}
+				
 
 			
 			List<MarkdownElementParser> newActiveComplexParsers = new ArrayList<MarkdownElementParser>();
