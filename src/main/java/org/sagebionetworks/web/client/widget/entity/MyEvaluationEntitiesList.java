@@ -8,18 +8,18 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class MyEvaluationsList implements MyEvaluationsListView.Presenter, SynapseWidgetPresenter {
+public class MyEvaluationEntitiesList implements MyEvaluationEntitiesListView.Presenter, SynapseWidgetPresenter {
 	
-	private MyEvaluationsListView view;
+	private MyEvaluationEntitiesListView view;
 	
 	@Inject
-	public MyEvaluationsList(MyEvaluationsListView view) {
+	public MyEvaluationEntitiesList(MyEvaluationEntitiesListView view) {
 		this.view = view;
 		view.setPresenter(this);
 	}
 	
-	public void configure(List<EntityHeader> evaluations) {
-		view.configure(evaluations);
+	public void configure(List<EntityHeader> entities) {
+		view.configure(entities);
 	}
 	
 	@SuppressWarnings("unchecked")

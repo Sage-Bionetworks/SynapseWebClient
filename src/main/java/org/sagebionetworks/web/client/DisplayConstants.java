@@ -75,6 +75,12 @@ public class DisplayConstants {
 	public static final String BUTTON_REVOKE_PUBLIC_ACL = "Make Private";
 	public static final String BUTTON_MAKE_PUBLIC_ACL_TOOLTIP = "Click to allow access to anyone on the internet";
 	public static final String BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP = "Click to restrict access to only those people you select above";
+	
+	public static final String BUTTON_OPEN_PARTICIPATION_ACL = "Open Public Participation";
+	public static final String BUTTON_REVOKE_OPEN_PARTICIPATION_ACL = "Close Public Participation";
+	public static final String BUTTON_OPEN_PARTICIPATION_TOOLTIP = "Click to open participation to anyone on the internet";
+	public static final String BUTTON_REVOKE_OPEN_PARTICIPATION_TOOLTIP = "Click to restrict participation to only those people you select above";
+	
 	public static final String PUBLIC_ACL_TITLE = "Public on the web";
 	public static final String PUBLIC_ACL_DESCRIPTION = "Anyone on the internet can access, no login required";
 	public static final String PUBLIC_ACL_ENTITY_PAGE = "Public";
@@ -94,6 +100,8 @@ public class DisplayConstants {
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT = "Can edit";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE = "Edit & Delete";
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
+	public static final String MENU_PERMISSION_LEVEL_CAN_PARTICIPATE = "Can participate";
+	public static final String MENU_PERMISSION_LEVEL_CAN_SCORE = "Can score";
 	public static final String LABEL_PERMISSION_TEXT_ADD_PEOPLE = "Add People";
 	public static final String BUTTON_SHOW_R_CLIENT_INSTALL = "Show R Client Installation Code";
 	public static final String LABEL_R_CLIENT_INSTALL = "Install R Client";
