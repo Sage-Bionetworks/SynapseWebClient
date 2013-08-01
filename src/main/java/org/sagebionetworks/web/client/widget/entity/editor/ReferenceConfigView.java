@@ -14,6 +14,8 @@ public interface ReferenceConfigView extends IsWidget, WidgetEditorView {
 	
 	public void setReference(String reference);
 	public String getReference();
+	public void setUrl(String url);
+	public String getUrl();
 	
 	/**
 	 * Presenter interface

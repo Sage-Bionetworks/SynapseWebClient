@@ -36,6 +36,7 @@ import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 public class SynapseMarkdownProcessor {
 	private static SynapseMarkdownProcessor singleton = null;
 	private List<MarkdownElementParser> allElementParsers = new ArrayList<MarkdownElementParser>();
+	private List<MarkdownElementParser> parsersOnCompletion = new ArrayList<MarkdownElementParser>();
 	
 	//efficient hack to preserve strings that the html stripping process ruins
 	private Map<Pattern, String> preservers = new HashMap<Pattern, String>();
@@ -74,6 +75,10 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new SuperscriptParser());
 		allElementParsers.add(new TableParser());
 		allElementParsers.add(new WikiSubpageParser());
+		
+		parsersOnCompletion.add(new BoldParser());
+		parsersOnCompletion.add(new ItalicsParser());
+		parsersOnCompletion.add(new LinkParser());
 		
 		//preservers
 		preservers.put(Pattern.compile(MarkdownRegExConstants.NEWLINE_REGEX), ServerMarkdownUtils.TEMP_NEWLINE_DELIMITER);
@@ -123,7 +128,8 @@ public class SynapseMarkdownProcessor {
 		
 		//now make the main single pass to identify markdown elements and create the output
 		markdown = StringUtils.replace(markdown, ServerMarkdownUtils.R_MESSED_UP_ASSIGNMENT, ServerMarkdownUtils.R_ASSIGNMENT);
-		String html = processMarkdown(markdown);
+		String html = processMarkdown(markdown, allElementParsers);
+		html = processMarkdown(html, parsersOnCompletion);
 		if (html == null) {
 			//if the markdown processor fails to convert the md to html (will return null in this case), return the raw markdown instead. (as ugly as it might be, it's better than no information).
 			return originalMarkdown; 
@@ -133,9 +139,9 @@ public class SynapseMarkdownProcessor {
 		return html;
 	}
 	
-	public String processMarkdown(String markdown) {
+	public String processMarkdown(String markdown, List<MarkdownElementParser> parsers) {
 		//first, reset all of the parsers
-		for (MarkdownElementParser parser : allElementParsers) {
+		for (MarkdownElementParser parser : parsers) {
 			parser.reset();
 		}
 		//go through the document once, and apply all markdown parsers to it
@@ -150,7 +156,7 @@ public class SynapseMarkdownProcessor {
 		List<MarkdownElementParser> inactiveComplexParsers = new ArrayList<MarkdownElementParser>();
 		
 		//initialize all processors either in the simple list, or in the inactive list
-		for (MarkdownElementParser parser : allElementParsers) {
+		for (MarkdownElementParser parser : parsers) {
 			if (parser.isInputSingleLine())
 				simpleParsers.add(parser);
 			else
@@ -208,7 +214,7 @@ public class SynapseMarkdownProcessor {
 			output.append(elements.getHtml());
 			//also tack on a <br />, unless we are a block element (those parsers handle their own newlines
 			boolean isInMiddleOfBlockElement = false;
-			for (MarkdownElementParser parser : allElementParsers) {
+			for (MarkdownElementParser parser : parsers) {
 				if (parser.isInMarkdownElement() && parser.isBlockElement()) {
 					isInMiddleOfBlockElement = true;
 					break;
@@ -218,7 +224,7 @@ public class SynapseMarkdownProcessor {
 				output.append(ServerMarkdownUtils.HTML_LINE_BREAK);
 		}
 		
-		for (MarkdownElementParser parser : allElementParsers) {
+		for (MarkdownElementParser parser : parsers) {
 			parser.completeParse(output);
 		}
 		return output.toString();

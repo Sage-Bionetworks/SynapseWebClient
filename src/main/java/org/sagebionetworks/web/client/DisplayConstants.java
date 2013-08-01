@@ -390,7 +390,8 @@ public class DisplayConstants {
 	public static final String SAVE_BUTTON_LABEL = "Save";
 	public static final String INSERT_BUTTON_LABEL = "Insert";
 	
-	public static final String REFERENCE_LABEL = "Reference";
+	public static final String REFERENCE_LABEL = "Reference:";
+	public static final String REFERENCE_URL_LABEL = "(Optional) URL:";
 
 	/*
 	 * Element ids for Selenium

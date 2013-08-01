@@ -101,7 +101,7 @@ public class WidgetConstants {
 	public static final String SHINYSITE_HEIGHT_KEY = "height";
 	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
-	public static final String BUTTON_LINK_URL_KEY = "url";
+	public static final String LINK_URL_KEY = "url";
 	public static final String TEXT_KEY = "text";
 	
 	public static final String BOOKMARK_KEY = "bookmarkID";
