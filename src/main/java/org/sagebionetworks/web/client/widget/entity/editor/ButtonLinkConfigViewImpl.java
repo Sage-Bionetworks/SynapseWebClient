@@ -66,7 +66,7 @@ public class ButtonLinkConfigViewImpl extends LayoutContainer implements ButtonL
 		String text = descriptor.get(WidgetConstants.TEXT_KEY);
 		if (text != null)
 			nameField.setValue(text);
-		String url = descriptor.get(WidgetConstants.BUTTON_LINK_URL_KEY);
+		String url = descriptor.get(WidgetConstants.LINK_URL_KEY);
 		if (url != null)
 			urlField.setValue(url);
 	}
