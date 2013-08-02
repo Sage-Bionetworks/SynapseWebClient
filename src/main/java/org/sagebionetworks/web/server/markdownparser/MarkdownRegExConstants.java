@@ -99,7 +99,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * ${reference?text=So H et al&inlineWidget=true}
 	 */
-	public static final String REFERENCE_REGEX = "\\$\\{reference\\?(text=|inlineWidget=|url=)(.+?)&(text=|inlineWidget=|url=)(.+?)&(text=|inlineWidget=|url=)(.+?)\\}";
+	public static final String REFERENCE_REGEX = "\\$\\{reference\\?(text=|inlineWidget=)(.+?)&(text=|inlineWidget=)(.+?)\\}";
 	
 	/**
 	 * Recognized example input:

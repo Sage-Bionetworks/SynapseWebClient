@@ -17,6 +17,7 @@ import org.sagebionetworks.web.server.markdownparser.BoldParser;
 import org.sagebionetworks.web.server.markdownparser.BookmarkTargetParser;
 import org.sagebionetworks.web.server.markdownparser.CodeParser;
 import org.sagebionetworks.web.server.markdownparser.CodeSpanParser;
+import org.sagebionetworks.web.server.markdownparser.DoiAutoLinkParser;
 import org.sagebionetworks.web.server.markdownparser.HeadingParser;
 import org.sagebionetworks.web.server.markdownparser.HorizontalLineParser;
 import org.sagebionetworks.web.server.markdownparser.ImageParser;
@@ -30,13 +31,14 @@ import org.sagebionetworks.web.server.markdownparser.ReferenceParser;
 import org.sagebionetworks.web.server.markdownparser.StrikeoutParser;
 import org.sagebionetworks.web.server.markdownparser.SubscriptParser;
 import org.sagebionetworks.web.server.markdownparser.SuperscriptParser;
+import org.sagebionetworks.web.server.markdownparser.SynapseAutoLinkParser;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
+import org.sagebionetworks.web.server.markdownparser.UrlAutoLinkParser;
 import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 
 public class SynapseMarkdownProcessor {
 	private static SynapseMarkdownProcessor singleton = null;
 	private List<MarkdownElementParser> allElementParsers = new ArrayList<MarkdownElementParser>();
-	private List<MarkdownElementParser> parsersOnCompletion = new ArrayList<MarkdownElementParser>();
 	
 	//efficient hack to preserve strings that the html stripping process ruins
 	private Map<Pattern, String> preservers = new HashMap<Pattern, String>();
@@ -63,6 +65,7 @@ public class SynapseMarkdownProcessor {
 		codeParser = new CodeParser();
 		allElementParsers.add(codeParser);
 		allElementParsers.add(new CodeSpanParser());
+		allElementParsers.add(new DoiAutoLinkParser());
 		allElementParsers.add(new HeadingParser());
 		allElementParsers.add(new HorizontalLineParser());
 		allElementParsers.add(new ImageParser());
@@ -73,12 +76,10 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new StrikeoutParser());
 		allElementParsers.add(new SubscriptParser());
 		allElementParsers.add(new SuperscriptParser());
+		allElementParsers.add(new SynapseAutoLinkParser());
 		allElementParsers.add(new TableParser());
+		allElementParsers.add(new UrlAutoLinkParser());
 		allElementParsers.add(new WikiSubpageParser());
-		
-		parsersOnCompletion.add(new BoldParser());
-		parsersOnCompletion.add(new ItalicsParser());
-		parsersOnCompletion.add(new LinkParser());
 		
 		//preservers
 		preservers.put(Pattern.compile(MarkdownRegExConstants.NEWLINE_REGEX), ServerMarkdownUtils.TEMP_NEWLINE_DELIMITER);
@@ -129,7 +130,6 @@ public class SynapseMarkdownProcessor {
 		//now make the main single pass to identify markdown elements and create the output
 		markdown = StringUtils.replace(markdown, ServerMarkdownUtils.R_MESSED_UP_ASSIGNMENT, ServerMarkdownUtils.R_ASSIGNMENT);
 		String html = processMarkdown(markdown, allElementParsers);
-		html = processMarkdown(html, parsersOnCompletion);
 		if (html == null) {
 			//if the markdown processor fails to convert the md to html (will return null in this case), return the raw markdown instead. (as ugly as it might be, it's better than no information).
 			return originalMarkdown; 
@@ -241,9 +241,6 @@ public class SynapseMarkdownProcessor {
 		ServerMarkdownUtils.assignIdsToHeadings(doc);
 		
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
-		SynapseAutoLinkDetector.getInstance().createLinks(doc);
-		DoiAutoLinkDetector.getInstance().createLinks(doc);
-		UrlAutoLinkDetector.getInstance().createLinks(doc);
 		return doc.html();
 	}
 }

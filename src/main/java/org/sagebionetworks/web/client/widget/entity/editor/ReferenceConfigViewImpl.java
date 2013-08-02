@@ -36,21 +36,6 @@ public class ReferenceConfigViewImpl extends LayoutContainer implements Referenc
 		hp.add(refField);
 		hp.addStyleName("margin-top-left-10");
 		vp.add(hp);
-		
-		hp = new HorizontalPanel();
-		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		linkField = new TextField<String>();
-		linkField.setAllowBlank(true);
-		linkField.setRegex(WebConstants.VALID_URL_REGEX);
-		linkField.getMessages().setRegexText(DisplayConstants.IMAGE_CONFIG_INVALID_URL_MESSAGE);
-		Label linkLabel = new Label(DisplayConstants.REFERENCE_URL_LABEL);
-		linkLabel.setWidth(60);
-		linkField.setWidth(270);
-		hp.add(linkLabel);
-		hp.add(linkField);
-		hp.addStyleName("margin-top-left-10");
-		vp.add(hp);
-		
 		add(vp);
 	}
 	
@@ -110,16 +95,6 @@ public class ReferenceConfigViewImpl extends LayoutContainer implements Referenc
 	@Override
 	public String getReference() {
 		return refField.getValue();
-	}
-	
-	@Override
-	public void setUrl(String url) {
-		linkField.setValue(url);
-	}
-	
-	@Override
-	public String getUrl() {
-		return linkField.getValue();
 	}
 
 }
