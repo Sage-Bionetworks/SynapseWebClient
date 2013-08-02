@@ -1,13 +1,14 @@
 package org.sagebionetworks.web.server.markdownparser;
 
-import org.jsoup.Jsoup;
-import org.sagebionetworks.web.server.UrlAutoLinkDetector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UrlAutoLinkParser extends BasicMarkdownElementParser {
-	UrlAutoLinkDetector detector = UrlAutoLinkDetector.getInstance();
-	
+	Pattern p = Pattern.compile(MarkdownRegExConstants.LINK_URL);
+
 	@Override
 	public void processLine(MarkdownElements line) {
-		detector.createLinks(Jsoup.parse(line.getHtml()));
+		Matcher m = p.matcher(line.getMarkdown());
+		line.updateMarkdown(m.replaceAll("<a target=\"_blank\" class=\"link\" href=\"" + m.group(1).trim() + "\">" + m.group(1) + "</a>"));
 	}
 }
