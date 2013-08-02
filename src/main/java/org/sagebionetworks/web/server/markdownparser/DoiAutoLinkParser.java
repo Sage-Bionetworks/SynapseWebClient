@@ -9,8 +9,13 @@ public class DoiAutoLinkParser extends BasicMarkdownElementParser {
 	@Override
 	public void processLine(MarkdownElements line) {
 		Matcher m = p.matcher(line.getMarkdown());
-		line.updateMarkdown(m.replaceAll("<a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/" + m.group(1) + "\">" + m.group(2) +"</a>"));
-		
+		StringBuffer sb = new StringBuffer();
+		while(m.find()) {
+			String updated = "<a target=\"_blank\" class=\"link\" href=\"http://dx.doi.org/" + m.group(1) + "\">" + m.group(2) +"</a>";
+			m.appendReplacement(sb, updated);
+		}
+		m.appendTail(sb);
+		line.updateMarkdown(sb.toString());
 	}
 
 }
