@@ -17,6 +17,7 @@ import org.sagebionetworks.web.server.markdownparser.BoldParser;
 import org.sagebionetworks.web.server.markdownparser.BookmarkTargetParser;
 import org.sagebionetworks.web.server.markdownparser.CodeParser;
 import org.sagebionetworks.web.server.markdownparser.CodeSpanParser;
+import org.sagebionetworks.web.server.markdownparser.DoiAutoLinkParser;
 import org.sagebionetworks.web.server.markdownparser.HeadingParser;
 import org.sagebionetworks.web.server.markdownparser.HorizontalLineParser;
 import org.sagebionetworks.web.server.markdownparser.ImageParser;
@@ -30,7 +31,9 @@ import org.sagebionetworks.web.server.markdownparser.ReferenceParser;
 import org.sagebionetworks.web.server.markdownparser.StrikeoutParser;
 import org.sagebionetworks.web.server.markdownparser.SubscriptParser;
 import org.sagebionetworks.web.server.markdownparser.SuperscriptParser;
+import org.sagebionetworks.web.server.markdownparser.SynapseAutoLinkParser;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
+import org.sagebionetworks.web.server.markdownparser.UrlAutoLinkParser;
 import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 
 public class SynapseMarkdownProcessor {
@@ -62,6 +65,7 @@ public class SynapseMarkdownProcessor {
 		codeParser = new CodeParser();
 		allElementParsers.add(codeParser);
 		allElementParsers.add(new CodeSpanParser());
+		allElementParsers.add(new DoiAutoLinkParser());
 		allElementParsers.add(new HeadingParser());
 		allElementParsers.add(new HorizontalLineParser());
 		allElementParsers.add(new ImageParser());
@@ -72,7 +76,9 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new StrikeoutParser());
 		allElementParsers.add(new SubscriptParser());
 		allElementParsers.add(new SuperscriptParser());
+		allElementParsers.add(new SynapseAutoLinkParser());
 		allElementParsers.add(new TableParser());
+		allElementParsers.add(new UrlAutoLinkParser());
 		allElementParsers.add(new WikiSubpageParser());
 		
 		//preservers
@@ -123,7 +129,7 @@ public class SynapseMarkdownProcessor {
 		
 		//now make the main single pass to identify markdown elements and create the output
 		markdown = StringUtils.replace(markdown, ServerMarkdownUtils.R_MESSED_UP_ASSIGNMENT, ServerMarkdownUtils.R_ASSIGNMENT);
-		String html = processMarkdown(markdown);
+		String html = processMarkdown(markdown, allElementParsers);
 		if (html == null) {
 			//if the markdown processor fails to convert the md to html (will return null in this case), return the raw markdown instead. (as ugly as it might be, it's better than no information).
 			return originalMarkdown; 
@@ -133,9 +139,9 @@ public class SynapseMarkdownProcessor {
 		return html;
 	}
 	
-	public String processMarkdown(String markdown) {
+	public String processMarkdown(String markdown, List<MarkdownElementParser> parsers) {
 		//first, reset all of the parsers
-		for (MarkdownElementParser parser : allElementParsers) {
+		for (MarkdownElementParser parser : parsers) {
 			parser.reset();
 		}
 		//go through the document once, and apply all markdown parsers to it
@@ -150,7 +156,7 @@ public class SynapseMarkdownProcessor {
 		List<MarkdownElementParser> inactiveComplexParsers = new ArrayList<MarkdownElementParser>();
 		
 		//initialize all processors either in the simple list, or in the inactive list
-		for (MarkdownElementParser parser : allElementParsers) {
+		for (MarkdownElementParser parser : parsers) {
 			if (parser.isInputSingleLine())
 				simpleParsers.add(parser);
 			else
@@ -208,7 +214,7 @@ public class SynapseMarkdownProcessor {
 			output.append(elements.getHtml());
 			//also tack on a <br />, unless we are a block element (those parsers handle their own newlines
 			boolean isInMiddleOfBlockElement = false;
-			for (MarkdownElementParser parser : allElementParsers) {
+			for (MarkdownElementParser parser : parsers) {
 				if (parser.isInMarkdownElement() && parser.isBlockElement()) {
 					isInMiddleOfBlockElement = true;
 					break;
@@ -218,7 +224,7 @@ public class SynapseMarkdownProcessor {
 				output.append(ServerMarkdownUtils.HTML_LINE_BREAK);
 		}
 		
-		for (MarkdownElementParser parser : allElementParsers) {
+		for (MarkdownElementParser parser : parsers) {
 			parser.completeParse(output);
 		}
 		return output.toString();
@@ -235,9 +241,6 @@ public class SynapseMarkdownProcessor {
 		ServerMarkdownUtils.assignIdsToHeadings(doc);
 		
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
-		SynapseAutoLinkDetector.getInstance().createLinks(doc);
-		DoiAutoLinkDetector.getInstance().createLinks(doc);
-		UrlAutoLinkDetector.getInstance().createLinks(doc);
 		return doc.html();
 	}
 }

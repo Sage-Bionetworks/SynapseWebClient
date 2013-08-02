@@ -9,6 +9,7 @@ public class BookmarkTargetParser extends BasicMarkdownElementParser {
 	@Override
 	public void processLine(MarkdownElements line) {
 		Matcher m = p1.matcher(line.getMarkdown());
-		line.updateMarkdown(m.replaceAll("<p id=\"$1\"></p>"));
+		//Assign the inline style so bookmarks can be placed generally anywhere
+		line.updateMarkdown(m.replaceAll("<p class=\"inlineWidgetContainer\" id=\"$1\"></p>"));
 	}
 }

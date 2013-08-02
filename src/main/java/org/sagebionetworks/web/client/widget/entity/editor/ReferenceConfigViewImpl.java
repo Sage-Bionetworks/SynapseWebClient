@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 public class ReferenceConfigViewImpl extends LayoutContainer implements ReferenceConfigView {
 	private Presenter presenter;
 	private TextField<String> refField;
+	private TextField<String> linkField;
 	
 	@Inject
 	public ReferenceConfigViewImpl() {
@@ -35,7 +36,6 @@ public class ReferenceConfigViewImpl extends LayoutContainer implements Referenc
 		hp.add(refField);
 		hp.addStyleName("margin-top-left-10");
 		vp.add(hp);
-		
 		add(vp);
 	}
 	
