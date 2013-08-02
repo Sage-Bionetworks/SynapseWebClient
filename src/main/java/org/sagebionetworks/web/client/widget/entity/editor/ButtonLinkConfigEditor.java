@@ -40,7 +40,7 @@ public class ButtonLinkConfigEditor implements ButtonLinkConfigView.Presenter, W
 		//update widget descriptor from the view
 		view.checkParams();
 		descriptor.put(WidgetConstants.TEXT_KEY, view.getName());
-		descriptor.put(WidgetConstants.BUTTON_LINK_URL_KEY, view.getLinkUrl());
+		descriptor.put(WidgetConstants.LINK_URL_KEY, view.getLinkUrl());
 	}
 	
 	@Override
