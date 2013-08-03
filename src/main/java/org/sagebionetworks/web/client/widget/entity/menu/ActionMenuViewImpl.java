@@ -267,20 +267,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			}
 		});		
 	}
-
-	private MenuItem createAddMenuItem(final EntityType childType, final Entity entity) {
-		String displayName = typeProvider.getEntityDispalyName(childType);			
-		MenuItem item = new MenuItem(displayName);				
-		item.setIcon(AbstractImagePrototype.create(DisplayUtils
-				.getSynapseIconForEntityType(childType, IconSize.PX16,
-						iconsImageBundle)));				
-		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-			public void componentSelected(MenuEvent menuEvent) {
-				presenter.addNewChild(childType, entity.getId());
-			}
-		});
-		return item;
-	}
 	
 	private void configureToolsMenu(EntityBundle entityBundle, EntityType entityType, boolean isAdministrator, boolean canEdit) {
 		toolsButton.enable();

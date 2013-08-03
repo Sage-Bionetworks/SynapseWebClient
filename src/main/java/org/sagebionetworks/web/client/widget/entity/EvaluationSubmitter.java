@@ -5,9 +5,11 @@ import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -19,7 +21,11 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
+import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -133,7 +139,7 @@ public class EvaluationSubmitter implements Presenter {
 
 	
 	@Override
-	public void submitToEvaluations(Reference selectedReference, final List<Evaluation> evaluations, final String submitterAlias) {
+	public void submitToEvaluations(final Reference selectedReference, final List<Evaluation> evaluations, final String submitterAlias) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag
 		String entityId;
 		Long version = null;
@@ -150,8 +156,94 @@ public class EvaluationSubmitter implements Presenter {
 		final String id = entityId;
 		final Long ver = version;
 		
+		Callback onCheckSuccess = new Callback() {
+			@Override
+			public void invoke() {
+				//Requirements checked; move onto submitting
+				lookupEtag(id, ver, evaluations, submitterAlias);
+			}
+		};
+		
+		//Check access requirements with the entity id before moving on with submission
+		try {
+			checkSubmissionRequirements(id, onCheckSuccess);
+		} catch(RestServiceException e) {
+			view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
+		}
+	}
+	
+	/**
+	 * Check for unmet access restrictions. As long as more exist, it will not move onto submissions.
+	 * @throws RestServiceException
+	 */
+	public void checkSubmissionRequirements(final String entityId, final Callback onCheckSuccess) throws RestServiceException {
+		//Check for unmet access restrictions
+		synapseClient.getUnmetAccessRequirements(entityId, new AsyncCallback<AccessRequirementsTransport>() {
+			@Override
+			public void onSuccess(AccessRequirementsTransport result) {
+				try {
+					PaginatedResults<TermsOfUseAccessRequirement> ar = nodeModelCreator.createPaginatedResults(result.toString(), TermsOfUseAccessRequirement.class);
+					if (ar.getTotalNumberOfResults() > 0) {
+						//there are unmet access requirements.  user must accept all before joining the challenge
+						List<TermsOfUseAccessRequirement> unmetRequirements = ar.getResults();
+						final AccessRequirement firstUnmetAccessRequirement = unmetRequirements.get(0);
+						String text = GovernanceServiceHelper.getAccessRequirementText(firstUnmetAccessRequirement);
+						Callback termsOfUseCallback = new Callback() {
+							@Override
+							public void invoke() {
+								//agreed to terms of use.
+								setLicenseAccepted(firstUnmetAccessRequirement.getId(), entityId, onCheckSuccess);
+							}
+						};
+						//pop up the requirement
+						view.showAccessRequirement(text, termsOfUseCallback);
+					} else {
+						onCheckSuccess.invoke();
+					}
+				} catch(Throwable e) {
+					onFailure(e);
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
+			}
+		});
+	}
+	
+	public void setLicenseAccepted(Long arId, final String entityId, final Callback onCheckSuccess) {	
+		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
+			@Override
+			public void invoke(Throwable t) {
+				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + t.getMessage());
+			}
+		};
+		
+		Callback onSuccess = new Callback() {
+			@Override
+			public void invoke() {
+				//ToU signed, now try to submit (will check for other unmet access restrictions)
+				try {
+					checkSubmissionRequirements(entityId, onCheckSuccess);
+				} catch(RestServiceException e) {
+					onFailure.invoke(e);
+				}
+			}
+		};
+		
+		GovernanceServiceHelper.signTermsOfUse(
+				authenticationController.getCurrentUserPrincipalId(), 
+				arId, 
+				onSuccess, 
+				onFailure, 
+				synapseClient, 
+				jsonObjectAdapter);
+	}
+	
+	public void lookupEtag(final String id, final Long ver, final List<Evaluation> evaluations, final String submitterAlias) {
 		//look up entity for the current etag
-		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+		synapseClient.getEntity(id, new AsyncCallback<EntityWrapper>() {
 			public void onSuccess(EntityWrapper result) {
 				Entity entity;
 				try {

@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.client.widget.entity.MyEvaluationsList;
+import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesList;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -101,7 +101,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private EntityTreeBrowser myProjectsTreeBrowser;
 	private EntityTreeBrowser favoritesTreeBrowser;
 	IconsImageBundle iconsImageBundle;
-	private MyEvaluationsList myEvaluationsList;
+	private MyEvaluationEntitiesList myEvaluationsList;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -113,7 +113,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 			HomeSearchBox homeSearchBox, 
 			EntityTreeBrowser myProjectsTreeBrowser,
 			EntityTreeBrowser favoritesTreeBrowser,
-			MyEvaluationsList myEvaluationsList) {
+			MyEvaluationEntitiesList myEvaluationsList) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;

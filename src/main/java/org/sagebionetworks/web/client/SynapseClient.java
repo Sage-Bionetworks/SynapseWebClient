@@ -12,6 +12,7 @@ import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -238,12 +239,16 @@ public interface SynapseClient extends RemoteService {
 	public String getEvaluations(List<String> evaluationIds) throws RestServiceException;
 	
 	public String getAvailableEvaluations() throws RestServiceException;
-	
+	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException;
 	public String getAvailableEvaluationEntities() throws RestServiceException;
 	public ArrayList<String> getAvailableEvaluationEntitiesList() throws RestServiceException;
 
 	
 	public String createSubmission(String submissionJson, String etag) throws RestServiceException;
+	
+	public String getUserEvaluationPermissions(String evalId) throws RestServiceException; 
+	public String getEvaluationAcl(String evalId) throws RestServiceException;
+	public String updateEvaluationAcl(String aclJson) throws RestServiceException;
 	
 	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException;
 

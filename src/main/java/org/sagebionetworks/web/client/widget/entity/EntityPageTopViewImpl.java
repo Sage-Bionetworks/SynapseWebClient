@@ -302,6 +302,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		annotContainer.addStyleName("span-7 notopmargin");
 		threeCol.add(annotContainer, widgetMargin);		
 		threeCol.add(createSpacer(), widgetMargin);
+
+		threeCol.add(createEvaluationAdminList(bundle), widgetMargin);		
+		threeCol.add(createSpacer(), widgetMargin);
+		
 		fullWidthContainer.add(threeCol, widgetMargin);
 	}
 
@@ -339,6 +343,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		attachContainer.addStyleName("span-7 notopmargin");
 		threeCol.add(attachContainer);
 		threeCol.add(createSpacer());
+		
+		//Associated evaluations that user can administer
+		threeCol.add(createEvaluationAdminList(bundle));
+		threeCol.add(createSpacer());
+		
 		// ************************************************************************************************
 		fullWidthContainer.add(threeCol, widgetMargin);
 	}
@@ -422,6 +431,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    lc.add(border);
 	    lc.layout();
 		return lc;
+	}
+	
+	private Widget createEvaluationAdminList(EntityBundle bundle) {
+		// Create the property body
+	    // the headers for properties.
+		AdministerEvaluationsList list = ginInjector.getAdministerEvaluationsList();						
+		list.configure(bundle.getEntity().getId());
+		 
+		return list.asWidget();
 	}
 
 	private Widget createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {		
