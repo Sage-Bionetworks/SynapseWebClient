@@ -30,6 +30,7 @@
 							<li class="whatIsSynapseText">A <span style="font-weight: bold;">private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">public</span> <g:Image resource='{icons.globe16}' /> workspace that allows you to <span style="font-weight: bold;">aggregate</span>, <span style="font-weight: bold;">describe</span>, and <span style="font-weight: bold;">share</span> your research.</li>
 							<li class="whatIsSynapseText">A tool to improve reproducibility of data intensive science, <span style="font-weight: bold;">recording your progress as you work</span> with tools such as <span style="font-weight: bold;">R</span> and <span style="font-weight: bold;">Python</span>.</li>
 							<li class="whatIsSynapseText">A collection of <span style="font-weight: bold;">living research projects</span> enabling you to contribute to <span style="font-weight: bold;">large-scale collaborative solutions</span> to difficult scientific problems.</li>
+							<li class="whatIsSynapseText"><g:Anchor ui:field="aboutSynapseLink"/></li>
 						</ul>
 					</div>
 				</g:HTMLPanel>
@@ -143,7 +144,7 @@
 				<p>Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
 				   interact with all of Synapse's functionality programmatically. Create projects, upload/download files, generate provenance, query, create wikis and more
 				   all from the comfort of your own code. Don't see your language of choice here? Check out our 
-				   full <a class="link" href="https://sagebionetworks.jira.com/wiki/display/PLFM/Synapse+REST+APIs">REST API documentation</a>.</p>
+				   full <g:Anchor ui:field="restApiLink"/>.</p>
 				<div class="span-7 notopmargin">
 			    	<span style="position:relative; top:8px; padding-right: 5px;">
 			    	    <g:Image resource='{sageImageBundle.logoR45}' />

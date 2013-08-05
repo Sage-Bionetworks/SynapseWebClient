@@ -586,6 +586,8 @@ public class DisplayConstants {
 	public static final String NEW_VERSION_INSTRUCTIONS = "A new version of Synapse is now available, please save your work and reload the page to ensure proper function.";
 	public static final String API_DOCUMENTATION = "API Documentation";
 	public static final String EXAMPLE_CODE = "Example Code";
+	public static final String MORE_DETAILS_SYNAPSE = "Read more about Synapse";
+	public static final String REST_API_DOCUMENTATION = "REST API documentation";
 	
 }
 
