@@ -127,10 +127,11 @@ public class FileUploaderJnlp extends HttpServlet {
 		"         main-class=\"org.sagebionetworks.client.fileuploader.App\"\n" +
 //		"         width=\"800\"\n" + "         height=\"600\"" +
 		">\n" +
-		"        <argument>"+ sessionToken +"</argument>\n" +
-		"        <argument>"+ entityId +"</argument>\n" +
-		"        <argument>"+ isUpdate +"</argument>\n" +
+		"        <argument>--sessionToken="+ sessionToken +"</argument>\n" +
+		"        <argument>--entityId="+ entityId +"</argument>\n" +
+		"        <argument>--isUpdate="+ isUpdate +"</argument>\n" +
 		"     </application-desc>\n" +
+		"     <security><all-permissions/></security>\n" +
 		"</jnlp>";
 		return jnlp;
 	}

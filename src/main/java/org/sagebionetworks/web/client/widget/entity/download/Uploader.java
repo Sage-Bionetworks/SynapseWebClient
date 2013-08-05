@@ -87,6 +87,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private boolean isUploadRestricted;
 	NumberFormat percentFormat;
 	private boolean isDirectUploadSupported;
+	private boolean isFileEntity;
 	
 	
 	@Inject
@@ -172,7 +173,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void handleUpload(String fileName) {
-		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
+		isFileEntity = entity == null || entity instanceof FileEntity;				 
 		if (isFileEntity && isDirectUploadSupported) {
 			//use case C from above
 			directUploadStep0(fileName);
@@ -626,8 +627,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 
 	@Override
-	public void cancelClicked() {
+	public void cancelClicked() {		
 		fireCancelEvent();
+		if(!isDirectUploadSupported && isFileEntity) {
+			// for close after FileUploader Webstart, refresh page 
+//			handlerManager.fireEvent(new EntityUpdatedEvent());
+		}
 	}
 
 	@Override

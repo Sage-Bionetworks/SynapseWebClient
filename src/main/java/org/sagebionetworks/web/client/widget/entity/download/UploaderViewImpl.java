@@ -72,6 +72,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private FormPanel formPanel;
 	private FileUploadField fileUploadField;
 	private Button uploadBtn;
+	private Button cancelBtn; 
 	private ProgressBar progressBar;
 	// external link panel
 	private String fileName;
@@ -268,16 +269,16 @@ public class UploaderViewImpl extends LayoutContainer implements
 		bar.setAlignment(HorizontalAlignment.RIGHT);
 		bar.add(uploadBtn);
 		if(showCancelButton) {
-			Button cancelButton = new Button(DisplayConstants.BUTTON_CANCEL);
-			cancelButton.setHeight(BUTTON_HEIGHT_PX);
-			cancelButton.setWidth(BUTTON_WIDTH_PX);			
-			cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			cancelBtn = new Button(DisplayConstants.CLOSE);
+			cancelBtn.setHeight(BUTTON_HEIGHT_PX);
+			cancelBtn.setWidth(BUTTON_WIDTH_PX);			
+			cancelBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
 					presenter.cancelClicked();
 				}
 			});
-			bar.add(cancelButton);
+			bar.add(cancelBtn);
 		}
 		container.add(bar);
 		
