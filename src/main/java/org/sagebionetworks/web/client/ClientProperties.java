@@ -11,6 +11,7 @@ public class ClientProperties {
 	public static final String SUPPORT_RECENT_ACTIVITY_URL = "http://support.sagebase.org/sagebase?view=recent";
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
 	public static final String USER_GUIDE_ID = "syn1669771";
+	public static final String ABOUT_SYNAPSE_URL = "https://s3.amazonaws.com/static.synapse.org/About_Synapse.pdf";
 	
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
@@ -95,7 +96,7 @@ public class ClientProperties {
 	/*
 	 * Client Documentation
 	 */
-	public static final String REST_API_URL = "https://sagebionetworks.jira.com/wiki/display/PLFM/Synapse+REST+APIs";
+	public static final String REST_API_URL = "http://rest.synapse.org";
 	public static final String CLIENT_R_API_URL = "https://www.synapse.org/#!Synapse:syn1834618";
 	public static final String CLIENT_R_EXAMPLE_CODE_URL = "https://www.synapse.org/#!Synapse:syn1834618";
 	public static final String CLIENT_PYTHON_API_URL = "https://www.synapse.org/#!Synapse:syn1768504";
@@ -103,6 +104,6 @@ public class ClientProperties {
 	public static final String CLIENT_CL_API_URL = "https://github.com/Sage-Bionetworks/synapsePythonClient";
 	public static final String CLIENT_CL_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/synapsePythonClient/tree/master/examples/provenance";
 	public static final String CLIENT_JAVA_API_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";
-	public static final String CLIENT_JAVA_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";
+	public static final String CLIENT_JAVA_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";	
 	
 }
