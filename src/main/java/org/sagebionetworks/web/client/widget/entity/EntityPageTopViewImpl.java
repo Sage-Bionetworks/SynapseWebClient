@@ -362,6 +362,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			MarginData widgetMargin) {
 		// Entity Metadata
 		navtabContainer.removeClassName("hide");
+		if (isAdmin)
+			adminListItem.removeClassName("hide");
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description
