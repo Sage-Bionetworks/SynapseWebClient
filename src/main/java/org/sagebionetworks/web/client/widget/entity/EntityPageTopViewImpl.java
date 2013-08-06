@@ -49,6 +49,8 @@ import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -77,6 +79,21 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel actionMenuPanel;
 
+	@UiField
+	Anchor wikiLink;
+	@UiField
+	Anchor fileLink;
+	@UiField
+	Anchor adminChallengesLink;
+	@UiField
+	DivElement navtabContainer;
+	@UiField
+	LIElement wikiListItem;
+	@UiField
+	LIElement filesListItem;
+	@UiField
+	LIElement adminChallengesListItem;
+	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
@@ -90,6 +107,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private LayoutContainer colLeftContainer;
 	private LayoutContainer colRightContainer;
 	private LayoutContainer fullWidthContainer;
+	private LayoutContainer projectDynamicContainer, projectWikiContainer, projectFilesContainer, projectAdminChallengesContainer;
 	private Attachments attachmentsPanel;
 	private SnapshotWidget snapshotWidget;
 	private Long versionNumber;
@@ -135,6 +153,24 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.wikiPageWidget = wikiPageWidget;
 		
 		initWidget(uiBinder.createAndBindUi(this));
+		initProjectLayout();
+	}
+	
+	private void initProjectLayout() {
+		projectWikiContainer = new LayoutContainer();
+		projectFilesContainer = new LayoutContainer();
+		projectAdminChallengesContainer = new LayoutContainer();; 
+		wikiLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+			}
+		});
+		fileLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				
+			}
+		});
 	}
 
 	@Override
@@ -147,6 +183,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colLeftContainer.removeAll();
 		colRightContainer.removeAll();
 		fullWidthContainer.removeAll();
+		navtabContainer.addClassName("hide");
+		adminChallengesListItem.addClassName("hide");
+		projectWikiContainer.removeAll();
+		projectFilesContainer.removeAll();
+		projectAdminChallengesContainer.removeAll();
 
 		// add breadcrumbs
 		breadcrumbsPanel.clear();
@@ -313,18 +354,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderProjectEntity(final EntityBundle bundle,
 			String entityTypeDisplay, boolean isAdmin, final boolean canEdit,
 			MarginData widgetMargin) {
-		// ** LEFT **
 		// Entity Metadata
+		navtabContainer.removeClassName("hide");
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
-
-		// ** RIGHT **
-		//none
-	
-		// ** FULL WIDTH **
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 
+		
 		addWikiPageWidget(fullWidthContainer, bundle, canEdit, 24);
 			
 		// Child File Browser

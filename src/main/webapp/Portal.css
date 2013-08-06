@@ -1010,3 +1010,7 @@ ol.lowerroman {
 	margin-top: 5px;
     position: absolute;
 }
+
+.hide {
+	display: none;
+}
