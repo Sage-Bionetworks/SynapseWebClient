@@ -684,6 +684,19 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
 }
 
+/* Markdown table styles */
+.markdowntable.text-align-center {
+	text-align: center;
+}
+
+.markdowntable.text-align-right {
+	text-align: right;
+}
+
+.markdowntable.border {
+    border: 2px solid #dddddd;
+}
+
 .markdowntable caption + thead tr:first-child th,
 .markdowntable caption + tbody tr:first-child th,
 .markdowntable caption + tbody tr:first-child td,
