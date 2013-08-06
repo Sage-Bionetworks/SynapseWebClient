@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -349,8 +350,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		threeCol.add(annotContainer, widgetMargin);		
 		threeCol.add(createSpacer(), widgetMargin);
 
-		threeCol.add(createEvaluationAdminList(bundle), widgetMargin);		
-		threeCol.add(createSpacer(), widgetMargin);
+		//main use case appear to be Project level challenges
+//		threeCol.add(createEvaluationAdminList(bundle, null), widgetMargin);		
+//		threeCol.add(createSpacer(), widgetMargin);
 		
 		fullWidthContainer.add(threeCol, widgetMargin);
 	}
@@ -361,8 +363,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			MarginData widgetMargin) {
 		// Entity Metadata
 		navtabContainer.removeClassName("hide");
-		if (isAdmin)
-			adminListItem.removeClassName("hide");
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description
@@ -389,8 +389,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// ************************************************************************************************
 		projectFilesContainer.add(threeCol, widgetMargin);
-		
-		projectAdminContainer.add(createEvaluationAdminList(bundle));
+		projectAdminContainer.add(createEvaluationAdminList(bundle, new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean isVisible) {
+				if (isVisible)
+					adminListItem.removeClassName("hide");
+			}
+		}));
 		fullWidthContainer.add(projectDynamicContainer);
 		
 		setTabSelected(Tabs.WIKI);
@@ -520,11 +525,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 	
-	private Widget createEvaluationAdminList(EntityBundle bundle) {
+	private Widget createEvaluationAdminList(EntityBundle bundle, CallbackP<Boolean> isChallengeCallback) {
 		// Create the property body
 	    // the headers for properties.
 		AdministerEvaluationsList list = ginInjector.getAdministerEvaluationsList();						
-		list.configure(bundle.getEntity().getId());
+		list.configure(bundle.getEntity().getId(), isChallengeCallback);
 		 
 		return list.asWidget();
 	}
