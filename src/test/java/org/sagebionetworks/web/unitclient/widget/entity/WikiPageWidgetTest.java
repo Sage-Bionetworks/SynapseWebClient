@@ -93,7 +93,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure(){
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), true, null, true, 17, false);
-		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), false);
+		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), anyBoolean());
 	}
 	
 	@Test
@@ -147,6 +147,9 @@ public class WikiPageWidgetTest {
 			@Override
 			public void pageUpdated() {
 			}
+			@Override
+			public void noWikiFound() {
+			}
 		});
 		verify(mockView).updateWikiPage(testPage);
 		assertEquals(newTitle, testPage.getTitle());
@@ -161,6 +164,9 @@ public class WikiPageWidgetTest {
 		presenter.refreshWikiAttachments(newTitle, newMarkdown, new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
+			}
+			@Override
+			public void noWikiFound() {
 			}
 		});
 		verify(mockView).showErrorMessage(anyString());

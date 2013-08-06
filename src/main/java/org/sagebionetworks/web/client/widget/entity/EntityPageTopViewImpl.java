@@ -394,8 +394,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.add(projectDynamicContainer);
 		
 		setTabSelected(Tabs.WIKI);
-		projectDynamicContainer.add(projectWikiContainer);
-		projectDynamicContainer.layout(true);
 	}
 
 	private void setTabSelected(Tabs targetTab) {

@@ -129,7 +129,8 @@ SynapseWidgetPresenter {
 							else if (!isEmbeddedInOwnerPage) //otherwise, if it's not embedded in the owner page, show a 404
 								view.show404();
 							
-							callback.noWikiFound();
+							if (callback != null)
+								callback.noWikiFound();
 						}
 						else if (caught instanceof ForbiddenException) {
 							if (!isEmbeddedInOwnerPage) //if it's not embedded in the owner page, show a 403
