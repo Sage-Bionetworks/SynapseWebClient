@@ -94,6 +94,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	LIElement adminListItem;
 	
+	public static enum Tabs { WIKI, FILES, ADMIN };
+	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
@@ -161,19 +163,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectWikiContainer = new LayoutContainer();
 		projectFilesContainer = new LayoutContainer();
 		projectAdminContainer = new LayoutContainer(); 
-		wikiLink.addClickHandler(getProjectTabClickHandler(wikiListItem, wikiLink, projectWikiContainer));
-		fileLink.addClickHandler(getProjectTabClickHandler(filesListItem, fileLink, projectFilesContainer));
-		adminLink.addClickHandler(getProjectTabClickHandler(adminListItem, adminLink, projectAdminContainer));
+		wikiLink.addClickHandler(getProjectTabClickHandler(Tabs.WIKI));
+		fileLink.addClickHandler(getProjectTabClickHandler(Tabs.FILES));
+		adminLink.addClickHandler(getProjectTabClickHandler(Tabs.ADMIN));
 	}
 	
-	private ClickHandler getProjectTabClickHandler(final LIElement tabElement, final Anchor link, final LayoutContainer container) {
+	private ClickHandler getProjectTabClickHandler(final Tabs targetTab) {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				setTabSelected(tabElement, link);
-				projectDynamicContainer.removeAll();
-				projectDynamicContainer.add(container);
-				projectDynamicContainer.layout(true);
+				setTabSelected(targetTab);
 			}
 		};
 	}
@@ -394,12 +393,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectAdminContainer.add(createEvaluationAdminList(bundle));
 		fullWidthContainer.add(projectDynamicContainer);
 		
-		setTabSelected(wikiListItem, wikiLink);
+		setTabSelected(Tabs.WIKI);
 		projectDynamicContainer.add(projectWikiContainer);
 		projectDynamicContainer.layout(true);
 	}
 
-	private void setTabSelected(LIElement tab, Anchor link) {
+	private void setTabSelected(Tabs targetTab) {
 		wikiListItem.removeClassName("active");
 		filesListItem.removeClassName("active");
 		adminListItem.removeClassName("active");
@@ -407,14 +406,36 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileLink.addStyleName("link");
 		adminLink.addStyleName("link");
 		
+		LIElement tab; 
+		Anchor link;
+		LayoutContainer targetContainer;
+		
+		if (targetTab == Tabs.WIKI) {
+			tab = wikiListItem;
+			link = wikiLink;
+			targetContainer = projectWikiContainer;
+		} else if (targetTab == Tabs.FILES) {
+			tab = filesListItem;
+			link = fileLink;
+			targetContainer = projectFilesContainer;
+		} else {
+			tab = adminListItem;
+			link = adminLink;
+			targetContainer = projectAdminContainer;
+		}
+		
 		link.removeStyleName("link");
 		tab.addClassName("active");
+		
+		projectDynamicContainer.removeAll();
+		projectDynamicContainer.add(targetContainer);
+		projectDynamicContainer.layout(true);
 	}
 	
 	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, int spanWidth) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
-			boolean showAddPageButton = bundle.getEntity() instanceof Project; 
+			final boolean isProject = bundle.getEntity() instanceof Project; 
 			// Child Page Browser
 			container.add(wikiPageWidget.asWidget());
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), null), canEdit, new WikiPageWidget.Callback() {
@@ -422,10 +443,18 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				public void pageUpdated() {
 					presenter.fireEntityUpdatedEvent();
 				}
-			}, true, spanWidth, showAddPageButton);
+				@Override
+				public void noWikiFound() {
+					if (isProject) {
+						//no wiki found for this project.  show Files instead
+						setTabSelected(Tabs.FILES);
+					}
+					
+				}
+			}, true, spanWidth, isProject);
 		}
 	}
-
+	
 	private LayoutContainer createSpacer() {
 		LayoutContainer onewide = new LayoutContainer();
 		onewide.setStyleName("span-1 notopmargin");		
