@@ -92,6 +92,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Anchor javaAPILink;	
 	@UiField
 	Anchor javaExampleCodeLink;	
+	@UiField
+	Anchor aboutSynapseLink;
+	@UiField
+	Anchor restApiLink;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -165,6 +169,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		// Programmatic Clients
 		fillProgrammaticClientInstallCode();
+		
+		// Other links
+		configureNewWindowLink(aboutSynapseLink, ClientProperties.ABOUT_SYNAPSE_URL, DisplayConstants.MORE_DETAILS_SYNAPSE);
+		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
 		
 	}	
 

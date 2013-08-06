@@ -51,10 +51,8 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			
 			builder.append("<table id=\""+elementId+"\"");
 			
-			//do not apply sorter if paging (service needs to be involved for a true column sort)
-			if (!tableConfig.isPaging()) {
-				builder.append(" class=\"inline-block scroll-x tablesorter\"");
-			}
+			//apply tablesorter style
+			builder.append(" class=\"inline-block scroll-x tablesorter\"");
 			builder.append(">");
 				
 			//headers
@@ -102,7 +100,10 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 
 			add(new HTMLPanel(builder.toString()));
 			layout(true);
-			synapseJSNIUtils.tablesorter(elementId);
+			//do not apply sorter if paging (service needs to be involved for a true column sort)
+			if(!tableConfig.isPaging()) {
+				synapseJSNIUtils.tablesorter(elementId);
+			}
 		}
 	}	
 	
@@ -146,6 +147,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 //		pageBack.setEnabled(start > 1);
 //		pageForward.setEnabled(end < total);
 		add(hp);
+		layout(true);
 	}
 	
 	@Override

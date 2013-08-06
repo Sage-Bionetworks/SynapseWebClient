@@ -91,6 +91,25 @@ public class MarkdownRegExConstants {
 	
 	/**
 	 * Recognized example input:
+	 * doi:10.1234
+	 */
+	public static final String LINK_DOI = "(?<=\\s|^)(doi:([a-zA-Z_0-9./]+))";
+	
+	/**
+	 * Recognized example input:
+	 * syn12345
+	 */
+	public static final String LINK_SYNAPSE = "(?<=\\s|^)(syn\\d+)";
+	
+	/**
+	 * Recognized example input:
+	 * http://www.example.com/
+	 */
+	//from http://stackoverflow.com/questions/163360/regular-expresion-to-match-urls-java 
+	public static final String LINK_URL = "(?<=\\s|^)((https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
+	
+	/**
+	 * Recognized example input:
 	 * 1. First Item
 	 */
 	public static final String ORDERED_LIST_REGEX = "(^[>]*)(\\s+)(?:\\d+[.])(\\s+)(.+)";
