@@ -920,6 +920,7 @@ ol.lowerroman {
 
 
 .align-center {display: block; margin-left: auto; margin-right: auto;}
+.text-align-center { text-align: center;}
 
 .highlighted-version {
     font-size: 11px !important;
@@ -1014,3 +1015,8 @@ ol.lowerroman {
 .hide {
 	display: none;
 }
+
+.no-background {
+  background-image: none !important;
+}
+

@@ -19,7 +19,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage, int spanWidth);
+		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage, int spanWidth, boolean showAddPage);
 		public void createPage(String name);
 		public void deleteButtonClicked();
 		public void refreshWikiAttachments(final String updatedTitle, final String updatedMarkdown, final Callback pageUpdatedCallback);
@@ -27,7 +27,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void cancelClicked();
 	}
 	
-	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth);
+	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean showAddPage);
 	public void showNoWikiAvailableUI();
 	public void show404();
 	public void show403();

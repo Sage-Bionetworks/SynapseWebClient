@@ -93,7 +93,7 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 			@Override
 			public void pageUpdated() {
 			}
-		}, true, 24);
+		}, true, 24, true);
 	}
 
 	@Override

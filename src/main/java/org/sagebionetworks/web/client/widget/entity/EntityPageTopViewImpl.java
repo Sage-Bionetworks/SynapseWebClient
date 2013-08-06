@@ -161,16 +161,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectWikiContainer = new LayoutContainer();
 		projectFilesContainer = new LayoutContainer();
 		projectAdminContainer = new LayoutContainer(); 
-		wikiLink.addClickHandler(getProjectTabClickHandler(wikiListItem, projectWikiContainer));
-		fileLink.addClickHandler(getProjectTabClickHandler(filesListItem, projectFilesContainer));
-		adminLink.addClickHandler(getProjectTabClickHandler(adminListItem, projectAdminContainer));
+		wikiLink.addClickHandler(getProjectTabClickHandler(wikiListItem, wikiLink, projectWikiContainer));
+		fileLink.addClickHandler(getProjectTabClickHandler(filesListItem, fileLink, projectFilesContainer));
+		adminLink.addClickHandler(getProjectTabClickHandler(adminListItem, adminLink, projectAdminContainer));
 	}
 	
-	private ClickHandler getProjectTabClickHandler(final LIElement tabElement, final LayoutContainer container) {
+	private ClickHandler getProjectTabClickHandler(final LIElement tabElement, final Anchor link, final LayoutContainer container) {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				setTabSelected(tabElement);
+				setTabSelected(tabElement, link);
 				projectDynamicContainer.removeAll();
 				projectDynamicContainer.add(container);
 				projectDynamicContainer.layout(true);
@@ -394,21 +394,27 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectAdminContainer.add(createEvaluationAdminList(bundle));
 		fullWidthContainer.add(projectDynamicContainer);
 		
-		setTabSelected(wikiListItem);
+		setTabSelected(wikiListItem, wikiLink);
 		projectDynamicContainer.add(projectWikiContainer);
 		projectDynamicContainer.layout(true);
 	}
 
-	private void setTabSelected(LIElement tab) {
+	private void setTabSelected(LIElement tab, Anchor link) {
 		wikiListItem.removeClassName("active");
 		filesListItem.removeClassName("active");
 		adminListItem.removeClassName("active");
+		wikiLink.addStyleName("link");
+		fileLink.addStyleName("link");
+		adminLink.addStyleName("link");
+		
+		link.removeStyleName("link");
 		tab.addClassName("active");
 	}
 	
 	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, int spanWidth) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
+			boolean showAddPageButton = bundle.getEntity() instanceof Project; 
 			// Child Page Browser
 			container.add(wikiPageWidget.asWidget());
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), null), canEdit, new WikiPageWidget.Callback() {
@@ -416,7 +422,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				public void pageUpdated() {
 					presenter.fireEntityUpdatedEvent();
 				}
-			}, true, spanWidth);
+			}, true, spanWidth, showAddPageButton);
 		}
 	}
 

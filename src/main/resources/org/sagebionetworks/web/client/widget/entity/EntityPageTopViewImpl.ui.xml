@@ -17,9 +17,10 @@
 
 				<div class="span-24" ui:field="navtabContainer">
 				    <ul class="nav nav-tabs">
-					    <li class="active" ui:field="wikiListItem"><g:Anchor ui:field="wikiLink" text="Wiki"/></li>
-					    <li ui:field="filesListItem"><g:Anchor ui:field="fileLink" text="Files"/></li>
-					    <li ui:field="adminListItem"><g:Anchor ui:field="adminLink" text="Admin"/></li>
+				        <!-- remove span-8 after upgrade to Bootstrap 3.0, use nav-justified on parent ul instead -->
+					    <li class="span-8 active" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink" text="Wiki"/></li>
+					    <li class="span-8" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink" text="Files"/></li>
+					    <li class="span-8" ui:field="adminListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink" text="Admin"/></li>
 				    </ul>
 				</div>
 				<div class="span-24" style="margin-top: 5px">
