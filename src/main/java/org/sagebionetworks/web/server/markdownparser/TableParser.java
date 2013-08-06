@@ -9,6 +9,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	Pattern start = Pattern.compile(MarkdownRegExConstants.TABLE_START_REGEX);
 	Pattern p = Pattern.compile(MarkdownRegExConstants.TABLE_REGEX, Pattern.DOTALL);;
 	Pattern end = Pattern.compile(MarkdownRegExConstants.TABLE_END_REGEX);
+	boolean hasTags;
 	boolean isInTable;
 	boolean isTableStart;
 	boolean isTableEnd;
@@ -16,6 +17,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	
 	@Override
 	public void reset() {
+		hasTags = false;
 		isInTable = false;
 		isTableStart = false;
 		isTableEnd = false;
@@ -35,6 +37,7 @@ public class TableParser extends BasicMarkdownElementParser {
 		
 		StringBuilder builder = new StringBuilder();
 		if(isTableStart) {
+			hasTags = true;
 			//get class styles and start table
 			String styles = startMatcher.group(2);
 			builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable");
@@ -49,6 +52,10 @@ public class TableParser extends BasicMarkdownElementParser {
 			//are we starting a table?
 			if (!isInTable) {
 				isInTable = true;
+				//create table if not already done by the css-applying tags
+				if(!hasTags) {
+					builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable\">");
+				}
 				//Create the header
 				builder.append("<thead>");
 				builder.append("<tr>");
@@ -73,11 +80,26 @@ public class TableParser extends BasicMarkdownElementParser {
 				}
 				builder.append("</tr>\n");
 			}
-		} 
+		} else {
+			//not a table line. if table does not have surrounding tags, must be ending table
+			if(isInTable && !hasTags) {
+				line.prependElement("</tbody></table>");
+				isInTable = false;
+				builder.append(line.getMarkdown());
+			}
+			
+			//if we are not in a table at all, just append original markdown
+			if(!isInTable && !hasTags) {
+				builder.append(line.getMarkdown());
+			}
+			
+		}
 		
-		//Is the end delimiter seen while we're in a table?
+		//if we see a tag in a tag-surrounded table, end the table
 		if(isTableEnd && isInTable){
 			isInTable = false;
+			//reset to false since following tables may not have tags
+			hasTags = false;
 			//add end table
 			builder.append("</tbody></table>");
 			
@@ -87,7 +109,7 @@ public class TableParser extends BasicMarkdownElementParser {
 
 	@Override
 	public boolean isInMarkdownElement() {
-		return isTableStart || isInTable;
+		return isInTable || hasTags;
 	}
 
 	@Override
