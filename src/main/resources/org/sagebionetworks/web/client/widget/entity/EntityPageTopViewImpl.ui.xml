@@ -6,7 +6,6 @@
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 
 	<g:HTMLPanel>
-
 				<div class="span-24 notopmargin" style="margin-top: 5px !important">
 					<div class="span-14 notopmargin" style="white-space: normal;">
 						<g:SimplePanel ui:field="breadcrumbsPanel"/>
@@ -20,7 +19,7 @@
 				    <ul class="nav nav-tabs">
 					    <li class="active" ui:field="wikiListItem"><g:Anchor ui:field="wikiLink" text="Wiki"/></li>
 					    <li ui:field="filesListItem"><g:Anchor ui:field="fileLink" text="Files"/></li>
-					    <li ui:field="adminChallengesListItem"><g:Anchor ui:field="adminChallengesLink" text="Administer Challenges"/></li>
+					    <li ui:field="adminListItem"><g:Anchor ui:field="adminLink" text="Admin"/></li>
 				    </ul>
 				</div>
 				<div class="span-24" style="margin-top: 5px">
