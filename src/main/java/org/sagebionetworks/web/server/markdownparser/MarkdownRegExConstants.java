@@ -81,7 +81,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * |}
 	 */
-	public static final String TABLE_END_REGEX = "\\|\\}\\s*";
+	public static final String TABLE_END_REGEX = "\\s*\\|\\}\\s*";
 	
 	/**
 	 * Recognized example input:
