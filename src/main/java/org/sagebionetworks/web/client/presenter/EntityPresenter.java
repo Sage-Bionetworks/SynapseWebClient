@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl.EntityArea;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -50,6 +51,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String entityId;
 	private Long versionNumber;
 	private AdapterFactory adapterFactory;
+	private EntityArea selectTab;
 	
 	@Inject
 	public EntityPresenter(EntityView view,
@@ -81,7 +83,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		// token maps directly to entity id
 		this.entityId = place.getEntityId();
 		this.versionNumber = place.getVersionNumber();
-
+		this.selectTab = place.getProjectTab();
 		refresh();
 	}
 
@@ -125,7 +127,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						}
 					} 					
 					
-					view.setEntityBundle(bundle, versionNumber);					
+					view.setEntityBundle(bundle, versionNumber, selectTab);					
 				} catch (JSONObjectAdapterException ex) {					
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
 				}				

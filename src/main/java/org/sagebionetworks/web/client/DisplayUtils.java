@@ -53,6 +53,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl.EntityArea;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -608,7 +609,14 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
-		Synapse place = new Synapse(entityId, versionNumber);
+		return getSynapseHistoryTokenNoHash(entityId, versionNumber, null);
+	}
+	
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, EntityArea area) {
+		return getSynapseHistoryTokenNoHash(entityId, versionNumber, area, null);
+	}
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, EntityArea area, String areaToken) {
+		Synapse place = new Synapse(entityId, versionNumber, area, areaToken);
 		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	

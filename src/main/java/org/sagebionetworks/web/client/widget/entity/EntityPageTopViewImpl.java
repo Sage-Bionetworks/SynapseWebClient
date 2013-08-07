@@ -76,6 +76,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel fullWidthPanel;
 	@UiField
+	SimplePanel topFullWidthPanel;
+	@UiField
 	SimplePanel breadcrumbsPanel;
 	@UiField
 	SimplePanel actionMenuPanel;
@@ -95,7 +97,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	LIElement adminListItem;
 	
-	public static enum Tabs { WIKI, FILES, ADMIN };
+	public static enum EntityArea { WIKI, FILES, ADMIN };
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -110,10 +112,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private LayoutContainer colLeftContainer;
 	private LayoutContainer colRightContainer;
 	private LayoutContainer fullWidthContainer;
-	private LayoutContainer projectDynamicContainer, projectWikiContainer, projectFilesContainer, projectAdminContainer;
+	private LayoutContainer topFullWidthContainer, projectDynamicContainer, projectWikiContainer, projectFilesContainer, projectAdminContainer;
 	private Attachments attachmentsPanel;
 	private SnapshotWidget snapshotWidget;
 	private Long versionNumber;
+	private boolean isProject;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
 	private FilesBrowser filesBrowser;
@@ -164,12 +167,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectWikiContainer = new LayoutContainer();
 		projectFilesContainer = new LayoutContainer();
 		projectAdminContainer = new LayoutContainer(); 
-		wikiLink.addClickHandler(getProjectTabClickHandler(Tabs.WIKI));
-		fileLink.addClickHandler(getProjectTabClickHandler(Tabs.FILES));
-		adminLink.addClickHandler(getProjectTabClickHandler(Tabs.ADMIN));
+		wikiLink.addClickHandler(getProjectTabClickHandler(EntityArea.WIKI));
+		fileLink.addClickHandler(getProjectTabClickHandler(EntityArea.FILES));
+		adminLink.addClickHandler(getProjectTabClickHandler(EntityArea.ADMIN));
 	}
 	
-	private ClickHandler getProjectTabClickHandler(final Tabs targetTab) {
+	private ClickHandler getProjectTabClickHandler(final EntityArea targetTab) {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -179,15 +182,17 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, Long versionNumber) {
+	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, Long versionNumber, EntityArea selectTab) {
 		this.versionNumber = versionNumber;
 		colLeftContainer = initContainerAndPanel(colLeftContainer, colLeftPanel);
 		colRightContainer = initContainerAndPanel(colRightContainer, colRightPanel);
 		fullWidthContainer = initContainerAndPanel(fullWidthContainer, fullWidthPanel);
+		topFullWidthContainer = initContainerAndPanel(topFullWidthContainer, topFullWidthPanel);
 
 		colLeftContainer.removeAll();
 		colRightContainer.removeAll();
 		fullWidthContainer.removeAll();
+		topFullWidthContainer.removeAll();
 		navtabContainer.addClassName("hide");
 		adminListItem.addClassName("hide");
 		projectDynamicContainer.removeAll();
@@ -207,8 +212,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		MarginData widgetMargin = new MarginData(0, 0, 20, 0);
 
 		// Custom layouts for certain entities
-		if (bundle.getEntity() instanceof Project) {
-			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, widgetMargin);
+		isProject = bundle.getEntity() instanceof Project;
+		if (isProject) {
+			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, selectTab, widgetMargin);
 		} else if (bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis) {
 			//render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
 			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, widgetMargin);
@@ -224,6 +230,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colLeftContainer.layout(true);
 		colRightContainer.layout(true);
 		fullWidthContainer.layout(true);
+		topFullWidthContainer.layout(true);
 	}
 	
 	@Override
@@ -243,7 +250,17 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu.setEntityUpdatedHandler(handler);
 		locationableTitleBar.setEntityUpdatedHandler(handler);
 		fileTitleBar.setEntityUpdatedHandler(handler);
-		filesBrowser.setEntityUpdatedHandler(handler);
+		EntityUpdatedHandler fileBrowserUpdateHandler = new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				if (isProject)
+					presenter.refreshProject(EntityArea.FILES);
+				else
+					presenter.fireEntityUpdatedEvent();
+			}
+		};
+		
+		filesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
 		entityMetadata.setEntityUpdatedHandler(handler);
 	}
 
@@ -359,19 +376,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	// Render the Project entity
 	private void renderProjectEntity(final EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, final boolean canEdit,
+			String entityTypeDisplay, boolean isAdmin, final boolean canEdit, EntityArea selectTab,
 			MarginData widgetMargin) {
 		// Entity Metadata
 		navtabContainer.removeClassName("hide");
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
+		topFullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description
-		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
+		topFullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 		
 		addWikiPageWidget(projectWikiContainer, bundle, canEdit, 24);
 		
 		// Child File Browser
-		projectFilesContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true, canEdit));
+		projectFilesContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
 
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -397,11 +414,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		}));
 		fullWidthContainer.add(projectDynamicContainer);
-		
-		setTabSelected(Tabs.WIKI);
+		EntityArea tab = selectTab;
+		if (tab == null) {
+			//default is the wiki tab
+			tab = EntityArea.WIKI;
+		}
+		setTabSelected(tab);
 	}
 
-	private void setTabSelected(Tabs targetTab) {
+	private void setTabSelected(EntityArea targetTab) {
 		wikiListItem.removeClassName("active");
 		filesListItem.removeClassName("active");
 		adminListItem.removeClassName("active");
@@ -413,11 +434,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		Anchor link;
 		LayoutContainer targetContainer;
 		
-		if (targetTab == Tabs.WIKI) {
+		if (targetTab == EntityArea.WIKI) {
 			tab = wikiListItem;
 			link = wikiLink;
 			targetContainer = projectWikiContainer;
-		} else if (targetTab == Tabs.FILES) {
+		} else if (targetTab == EntityArea.FILES) {
 			tab = filesListItem;
 			link = fileLink;
 			targetContainer = projectFilesContainer;
@@ -450,11 +471,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				public void noWikiFound() {
 					if (isProject) {
 						//no wiki found for this project.  show Files instead
-						setTabSelected(Tabs.FILES);
+						setTabSelected(EntityArea.FILES);
 					}
 					
 				}
-			}, true, spanWidth, isProject);
+			}, true, spanWidth);
 		}
 	}
 	

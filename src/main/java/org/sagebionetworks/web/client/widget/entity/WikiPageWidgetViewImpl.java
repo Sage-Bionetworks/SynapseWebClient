@@ -65,7 +65,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private Button editButton, addPageButton;
 	private HorizontalPanel commandBar;
 	private SimplePanel commandBarWrapper;
-	private Boolean canEdit, showAddPage;
+	private Boolean canEdit;
 	private WikiPage currentPage;
 	private Breadcrumb breadcrumb;
 	private boolean isEmbeddedInOwnerPage;
@@ -126,14 +126,13 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void configure(WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean showAddPage) {
+			String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.ownerObjectName = ownerObjectName;
 		this.currentPage = newPage;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.spanWidth = spanWidth;
-		this.showAddPage = showAddPage;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
 		showDefaultViewWithWiki();
@@ -214,8 +213,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			addPageButton = getInsertPageButton(false);
 			commandBar.add(addPageButton);
 		}
-		
-		addPageButton.setVisible(showAddPage);
 		
 		commandBarWrapper.setVisible(canEdit);
 		configureEditButton();

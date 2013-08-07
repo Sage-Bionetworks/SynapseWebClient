@@ -44,7 +44,7 @@ SynapseWidgetPresenter {
 	private Callback callback;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private WikiPageKey wikiKey;
-	private Boolean canEdit, showAddPage;
+	private Boolean canEdit;
 	private WikiPage currentPage;
 	private boolean isEmbeddedInOwnerPage;
 	private AdapterFactory adapterFactory;
@@ -85,12 +85,11 @@ SynapseWidgetPresenter {
 		return view.asWidget();
 	}
 	
-	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage, final int spanWidth, final boolean showAddPage) {
+	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage, final int spanWidth) {
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.spanWidth = spanWidth;
-		this.showAddPage = showAddPage;
 		//set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -114,7 +113,7 @@ SynapseWidgetPresenter {
 						try {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isEmbeddedInOwnerPage, spanWidth, showAddPage);
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isEmbeddedInOwnerPage, spanWidth);
 						} catch (JSONObjectAdapterException e) {
 							onFailure(e);
 						}
@@ -313,6 +312,6 @@ SynapseWidgetPresenter {
 		view.clear();
 	}
 	private void refresh() {
-		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage, spanWidth, showAddPage);
+		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage, spanWidth);
 	}
 }

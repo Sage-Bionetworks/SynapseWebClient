@@ -91,7 +91,7 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 			@Override
 			public void noWikiFound() {
 			}
-		}, false, 24, true);
+		}, false, 24);
 		fullWidthContainer.layout(true);
 	}
 

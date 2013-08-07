@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl.EntityArea;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -28,7 +29,7 @@ public interface EntityView extends IsWidget, SynapseView {
 	 * @param entity
 	 * @param entityMetadata 
 	 */
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber);
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber, EntityArea selectTab);
 
 	public void show404();
 	

@@ -15,6 +15,7 @@
 					</div>
 				</div>
 
+				<div class="span-24 margin-top-5 left last"><g:SimplePanel ui:field="topFullWidthPanel" /></div>
 				<div class="span-24 margin-top-5" ui:field="navtabContainer">
 				    <ul class="nav nav-tabs">
 				        <!-- remove span-8 after upgrade to Bootstrap 3.0, use nav-justified on parent ul instead -->
