@@ -74,6 +74,8 @@ public class MarkdownRegExConstants {
 	/**
 	 * Recognized example input:
 	 * {| class="border"
+	 * or
+	 * {|
 	 */
 	public static final String TABLE_START_REGEX = "(\\{\\|\\s*class=\"(.*?)\"\\s*)|(\\{\\|\\s*)";
 	
