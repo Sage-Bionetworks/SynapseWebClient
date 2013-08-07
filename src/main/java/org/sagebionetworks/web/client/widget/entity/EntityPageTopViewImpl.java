@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -97,8 +98,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	LIElement adminListItem;
 	
-	public static enum EntityArea { WIKI, FILES, ADMIN };
-	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
@@ -167,12 +166,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectWikiContainer = new LayoutContainer();
 		projectFilesContainer = new LayoutContainer();
 		projectAdminContainer = new LayoutContainer(); 
-		wikiLink.addClickHandler(getProjectTabClickHandler(EntityArea.WIKI));
-		fileLink.addClickHandler(getProjectTabClickHandler(EntityArea.FILES));
-		adminLink.addClickHandler(getProjectTabClickHandler(EntityArea.ADMIN));
+		wikiLink.addClickHandler(getProjectTabClickHandler(Synapse.EntityArea.WIKI));
+		fileLink.addClickHandler(getProjectTabClickHandler(Synapse.EntityArea.FILES));
+		adminLink.addClickHandler(getProjectTabClickHandler(Synapse.EntityArea.ADMIN));
 	}
 	
-	private ClickHandler getProjectTabClickHandler(final EntityArea targetTab) {
+	private ClickHandler getProjectTabClickHandler(final Synapse.EntityArea targetTab) {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -182,7 +181,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, Long versionNumber, EntityArea selectTab) {
+	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, Long versionNumber, Synapse.EntityArea area, String areaToken) {
 		this.versionNumber = versionNumber;
 		colLeftContainer = initContainerAndPanel(colLeftContainer, colLeftPanel);
 		colRightContainer = initContainerAndPanel(colRightContainer, colRightPanel);
@@ -213,16 +212,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// Custom layouts for certain entities
 		isProject = bundle.getEntity() instanceof Project;
+		String wikiPageId = null;
+		if (Synapse.EntityArea.WIKI == area)
+			wikiPageId = areaToken;
 		if (isProject) {
-			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, selectTab, widgetMargin);
+			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, area, areaToken, widgetMargin);
 		} else if (bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis) {
 			//render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
-			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, widgetMargin);
+			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, wikiPageId, widgetMargin);
 		} else if (bundle.getEntity() instanceof Summary) {
 		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, widgetMargin);
 		} else {
 			// default entity view
-			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, widgetMargin);
+			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, wikiPageId, widgetMargin);
 		}
 		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
@@ -254,7 +256,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				if (isProject)
-					presenter.refreshProject(EntityArea.FILES);
+					presenter.refreshProject(Synapse.EntityArea.FILES, null);
 				else
 					presenter.fireEntityUpdatedEvent();
 			}
@@ -295,7 +297,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * Private Methods
 	 */
 	// Render the File entity	
-	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber, MarginData widgetMargin) {
+	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber, String wikiPageId, MarginData widgetMargin) {
 		// ** LEFT **
 		// Entity Metadata
 		if (bundle.getEntity() instanceof FileEntity)
@@ -313,7 +315,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 		// Wiki
-		addWikiPageWidget(fullWidthContainer, bundle, canEdit, 24);
+		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 		// Preview
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			fullWidthContainer.add(getFilePreview(bundle));
@@ -340,7 +342,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 	// Render the Folder entity
 	private void renderFolderEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, boolean canEdit,
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit, String wikiPageId,
 			MarginData widgetMargin) {
 		// ** LEFT **
 		entityMetadata.setEntityBundle(bundle, versionNumber);
@@ -354,7 +356,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 
-		addWikiPageWidget(fullWidthContainer, bundle, canEdit, 24);
+		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 
 		// Child Browser
 		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
@@ -376,7 +378,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	// Render the Project entity
 	private void renderProjectEntity(final EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, final boolean canEdit, EntityArea selectTab,
+			String entityTypeDisplay, boolean isAdmin, final boolean canEdit, Synapse.EntityArea area, String wikiPageId,
 			MarginData widgetMargin) {
 		// Entity Metadata
 		navtabContainer.removeClassName("hide");
@@ -385,7 +387,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		topFullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 		
-		addWikiPageWidget(projectWikiContainer, bundle, canEdit, 24);
+		addWikiPageWidget(projectWikiContainer, bundle, canEdit, wikiPageId, 24);
 		
 		// Child File Browser
 		projectFilesContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
@@ -414,15 +416,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		}));
 		fullWidthContainer.add(projectDynamicContainer);
-		EntityArea tab = selectTab;
+		Synapse.EntityArea tab = area;
 		if (tab == null) {
 			//default is the wiki tab
-			tab = EntityArea.WIKI;
+			tab = Synapse.EntityArea.WIKI;
 		}
 		setTabSelected(tab);
 	}
 
-	private void setTabSelected(EntityArea targetTab) {
+	private void setTabSelected(Synapse.EntityArea targetTab) {
 		wikiListItem.removeClassName("active");
 		filesListItem.removeClassName("active");
 		adminListItem.removeClassName("active");
@@ -434,11 +436,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		Anchor link;
 		LayoutContainer targetContainer;
 		
-		if (targetTab == EntityArea.WIKI) {
+		if (targetTab == Synapse.EntityArea.WIKI) {
 			tab = wikiListItem;
 			link = wikiLink;
 			targetContainer = projectWikiContainer;
-		} else if (targetTab == EntityArea.FILES) {
+		} else if (targetTab == Synapse.EntityArea.FILES) {
 			tab = filesListItem;
 			link = fileLink;
 			targetContainer = projectFilesContainer;
@@ -456,13 +458,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectDynamicContainer.layout(true);
 	}
 	
-	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, int spanWidth) {
+	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, String wikiPageId, int spanWidth) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			final boolean isProject = bundle.getEntity() instanceof Project; 
 			// Child Page Browser
 			container.add(wikiPageWidget.asWidget());
-			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), null), canEdit, new WikiPageWidget.Callback() {
+			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, new WikiPageWidget.Callback() {
 				@Override
 				public void pageUpdated() {
 					presenter.fireEntityUpdatedEvent();
@@ -471,7 +473,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				public void noWikiFound() {
 					if (isProject) {
 						//no wiki found for this project.  show Files instead
-						setTabSelected(EntityArea.FILES);
+						setTabSelected(Synapse.EntityArea.FILES);
 					}
 					
 				}
@@ -596,7 +598,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    if(description != null && !("".equals(description))) {
 	    	if (!DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 				lc.add(markdownWidget);
-		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  ObjectType.ENTITY.toString(), null), false, false);
+		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  ObjectType.ENTITY.toString(), null, versionNumber), false, false);
 	    	}
 	    	else {
 	    		Label plainDescriptionText = new Label();

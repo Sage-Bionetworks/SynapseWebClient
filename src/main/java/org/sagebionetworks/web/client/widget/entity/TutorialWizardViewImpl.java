@@ -112,7 +112,7 @@ public class TutorialWizardViewImpl  implements TutorialWizardView {
 	public void loadAllPageContents(String ownerObjectId, List<WikiHeader> headers){
 		for (WikiHeader header : headers) {
 			MarkdownWidget step = ginInjector.getMarkdownWidget();
-			step.loadMarkdownFromWikiPage(new WikiPageKey(ownerObjectId, ObjectType.ENTITY.toString(), header.getId()), true);
+			step.loadMarkdownFromWikiPage(new WikiPageKey(ownerObjectId, ObjectType.ENTITY.toString(), header.getId(), null), true);
 			pageContents.add(step);
 		}
 	}

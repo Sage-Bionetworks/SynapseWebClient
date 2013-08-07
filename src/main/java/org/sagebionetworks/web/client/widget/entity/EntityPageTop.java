@@ -18,10 +18,10 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl.EntityArea;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -50,7 +50,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EventBus bus;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Long versionNumber;
-	private EntityArea selectTab;
+	private Synapse.EntityArea area;
+	private String areaToken;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -83,10 +84,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      *
      * @param bundle
      */
-    public void setBundle(EntityBundle bundle, Long versionNumber, EntityArea selectTab) {
+    public void setBundle(EntityBundle bundle, Long versionNumber, Synapse.EntityArea area, String areaToken) {
     	this.bundle = bundle;
     	this.versionNumber = versionNumber;
-    	this.selectTab = selectTab;
+    	this.area = area;
+    	this.areaToken = areaToken;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -111,12 +113,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void refresh() {
-		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit(), selectTab);
+		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit(), area, areaToken);
 	}
 	
 	@Override
-	public void refreshProject(EntityArea selectTab) {
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(bundle.getEntity().getId(), null, selectTab));
+	public void refreshProject(Synapse.EntityArea area, String areaToken) {
+		globalApplicationState.getPlaceChanger().goTo(new Synapse(bundle.getEntity().getId(), null, area, areaToken));
 	}
 	
 	@Override
@@ -179,10 +181,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	/*
 	 * Private Methods
 	 */
-	private void sendDetailsToView(boolean isAdmin, boolean canEdit, EntityArea selectTab) {
+	private void sendDetailsToView(boolean isAdmin, boolean canEdit, Synapse.EntityArea area, String areaToken) {
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber, selectTab);
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber, area, areaToken);
 	}
 	
 	private UserProfile getUserProfile() {

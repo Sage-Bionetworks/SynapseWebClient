@@ -5,18 +5,13 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_REFERENCEDBY;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -25,10 +20,10 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
-import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl.EntityArea;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -51,7 +46,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String entityId;
 	private Long versionNumber;
 	private AdapterFactory adapterFactory;
-	private EntityArea selectTab;
+	private Synapse.EntityArea area;
+	private String areaToken;
 	
 	@Inject
 	public EntityPresenter(EntityView view,
@@ -83,7 +79,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		// token maps directly to entity id
 		this.entityId = place.getEntityId();
 		this.versionNumber = place.getVersionNumber();
-		this.selectTab = place.getProjectTab();
+		this.area = place.getEntityArea();
+		this.areaToken = place.getAreaToken();
 		refresh();
 	}
 
@@ -127,7 +124,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						}
 					} 					
 					
-					view.setEntityBundle(bundle, versionNumber, selectTab);					
+					view.setEntityBundle(bundle, versionNumber, area, areaToken);					
 				} catch (JSONObjectAdapterException ex) {					
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
 				}				

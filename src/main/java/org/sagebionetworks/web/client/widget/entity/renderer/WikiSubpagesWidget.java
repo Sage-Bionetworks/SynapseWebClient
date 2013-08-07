@@ -18,6 +18,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -119,7 +121,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							title = ownerObjectName;
 						}
 						else {
-							href = DisplayUtils.getSynapseWikiHistoryToken(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), header.getId());
+							href = "#"+DisplayUtils.getSynapseHistoryTokenNoHash(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), Synapse.EntityArea.WIKI, header.getId());
 							title = header.getTitle();
 						}
 						

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.place;
 
-import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl.EntityArea;
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
@@ -9,63 +7,69 @@ import com.google.gwt.place.shared.Prefix;
 public class Synapse extends Place{
 	private static final String VERSION_DELIMITER = "/version/";
 	
-	private static final String ADMIN_DELIMITER = getDelimiter(EntityArea.ADMIN);
-	private static final String WIKI_DELIMITER = getDelimiter(EntityArea.WIKI);
-	private static final String FILES_DELIMITER = getDelimiter(EntityArea.FILES);
+	private static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityArea.ADMIN);
+	private static final String WIKI_DELIMITER = getDelimiter(Synapse.EntityArea.WIKI);
+	private static final String FILES_DELIMITER = getDelimiter(Synapse.EntityArea.FILES);
 	
 	private String token;
 	private String entityId, areaToken;
 	private Long versionNumber;
-	private EntityArea area;
+	private Synapse.EntityArea area;
 	
 	public Synapse(String token) {
 		this.token = token;
 		area = null;
 		areaToken = null;
-		String toProcess = token;
-		if(token.contains(VERSION_DELIMITER)) {
-			String[] parts = token.split(VERSION_DELIMITER);
-			if(parts.length == 2) {				
-				entityId = parts[0];
-				int slashIndex = parts[1].indexOf("/");
-				if (slashIndex > -1) {
-					//there's more information in this token
-					versionNumber = Long.parseLong(parts[1].substring(0, slashIndex));
-					toProcess = parts[1].substring(slashIndex);
-				} else {
-					versionNumber = Long.parseLong(parts[1]);
-					toProcess = "";
+		
+		//the first token is the entityId
+		int firstSlash = token.indexOf("/");
+		if (firstSlash > -1) {
+			entityId = token.substring(0, firstSlash);
+			
+			//there's more
+			String toProcess = token.substring(firstSlash);
+			//is there a version?
+			if (toProcess.contains(VERSION_DELIMITER)) {
+				String[] parts = token.split(VERSION_DELIMITER);
+				if(parts.length == 2) {
+					entityId = parts[0];
+					int slashIndex = parts[1].indexOf("/");
+					if (slashIndex > -1) {
+						//there's more information after the version
+						versionNumber = Long.parseLong(parts[1].substring(0, slashIndex));
+						toProcess = parts[1].substring(slashIndex);
+					} else {
+						versionNumber = Long.parseLong(parts[1]);
+						toProcess = "";
+					}
+				} 
+			}
+			
+			if(toProcess.contains(WIKI_DELIMITER)) {
+				String[] parts = toProcess.split(WIKI_DELIMITER);
+				area = Synapse.EntityArea.WIKI;
+				if (parts.length == 2) {
+					areaToken = parts[1];
 				}
 				return;
-			} 		
-		} 
-		if(toProcess.contains(WIKI_DELIMITER)) {
-			String[] parts = toProcess.split(WIKI_DELIMITER);
-			entityId = parts[0];
-			area = EntityArea.WIKI;
-			if (parts.length == 2) {
-				areaToken = parts[1];
+			} else if(toProcess.contains(ADMIN_DELIMITER)) {
+				area = Synapse.EntityArea.ADMIN;
+				return;
+			} else if(toProcess.contains(FILES_DELIMITER)) {
+				area = Synapse.EntityArea.FILES;
+				return;
 			}
-			return;
-		} else if(toProcess.contains(ADMIN_DELIMITER)) {
-			entityId = toProcess.substring(0, toProcess.indexOf(ADMIN_DELIMITER));
-			area = EntityArea.ADMIN;
-			return;
-		} else if(toProcess.contains(FILES_DELIMITER)) {
-			entityId = toProcess.substring(0, toProcess.indexOf(FILES_DELIMITER));
-			area = EntityArea.FILES;
-			return;
+		} else {
+			//no slash
+			entityId = token;
 		}
-		
-		// default
-		entityId = token;		
 	}
 	
-	public static String getDelimiter(EntityArea tab) {
+	public static String getDelimiter(Synapse.EntityArea tab) {
 		return "/"+tab+"/";
 	}
 
-	public Synapse(String entityId, Long versionNumber, EntityArea area, String areaToken) {		
+	public Synapse(String entityId, Long versionNumber, Synapse.EntityArea area, String areaToken) {		
 		this.token = entityId;
 		if(versionNumber != null) 
 			this.token += VERSION_DELIMITER + versionNumber;
@@ -94,7 +98,7 @@ public class Synapse extends Place{
 		return versionNumber;
 	}
 	
-	public EntityArea getProjectTab() {
+	public Synapse.EntityArea getEntityArea() {
 		return area;
 	}
 	
@@ -114,6 +118,8 @@ public class Synapse extends Place{
             return new Synapse(token);
         }
     }
+
+	public static enum EntityArea { WIKI, FILES, ADMIN }
 
 	@Override
 	public int hashCode() {

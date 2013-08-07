@@ -161,7 +161,7 @@ public class CrawlFilter implements Filter {
 		String markdown = null;
 		String createdBy = escapeHtml(entity.getCreatedBy());
 		try{
-			String wikiPageJson = synapseClient.getWikiPage(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
+			String wikiPageJson = synapseClient.getWikiPage(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null, null));
 			WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, WikiPage.class);
 			markdown = escapeHtml(rootPage.getMarkdown());
 		} catch (Exception e) {}

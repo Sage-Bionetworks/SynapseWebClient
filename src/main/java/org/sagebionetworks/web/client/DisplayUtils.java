@@ -48,12 +48,12 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
-import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl.EntityArea;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -612,10 +612,10 @@ public class DisplayUtils {
 		return getSynapseHistoryTokenNoHash(entityId, versionNumber, null);
 	}
 	
-	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, EntityArea area) {
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityArea area) {
 		return getSynapseHistoryTokenNoHash(entityId, versionNumber, area, null);
 	}
-	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, EntityArea area, String areaToken) {
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityArea area, String areaToken) {
 		Synapse place = new Synapse(entityId, versionNumber, area, areaToken);
 		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
@@ -1605,6 +1605,13 @@ public class DisplayUtils {
 		lc.add(htmlPanel);
 
 		return lc;
+	}
+	
+	public static Long getVersion(Entity entity) {
+		Long version = null;
+		if (entity != null && entity instanceof Versionable)
+			version = ((Versionable) entity).getVersionNumber();
+		return version;
 	}
 		
 }

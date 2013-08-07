@@ -3,7 +3,8 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl.EntityArea;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -19,7 +20,7 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber, EntityArea selectTab);
+	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber, Synapse.EntityArea area, String areaToken);
 
 	/**
 	 * Presenter interface
@@ -28,7 +29,7 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 
 		void refresh();
 
-		void refreshProject(EntityArea selectTab);
+		void refreshProject(Synapse.EntityArea area, String areaToken);
 		
 		void fireEntityUpdatedEvent();
 
