@@ -28,7 +28,7 @@ public interface EvaluationAccessControlListEditorView extends IsWidget, Synapse
 	 */
 	public void addAclEntry(AclEntry entry);
 	
-	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
+	public void setIsOpenParticipation(Boolean isOpenParticipation);
 	public void setPublicPrincipalId(Long id);
 	public void setAuthenticatedPrincipalId(Long id);
 	
