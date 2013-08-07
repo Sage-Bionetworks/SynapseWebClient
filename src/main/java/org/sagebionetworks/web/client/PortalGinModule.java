@@ -14,6 +14,8 @@ import org.sagebionetworks.web.client.factory.RendererFactory;
 import org.sagebionetworks.web.client.factory.RendererFactoryImpl;
 import org.sagebionetworks.web.client.factory.TableColumnRendererFactory;
 import org.sagebionetworks.web.client.factory.TableColumnRendererFactoryImpl;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
+import org.sagebionetworks.web.client.resources.ResourceLoaderImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -234,6 +236,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// GlobalApplicationState
 		bind(GlobalApplicationStateImpl.class).in(Singleton.class);
 		bind(GlobalApplicationState.class).to(GlobalApplicationStateImpl.class);
+		
+		bind(ResourceLoaderImpl.class).in(Singleton.class);
+		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
 		
 		// Header & Footer
 		bind(HeaderViewImpl.class).in(Singleton.class);

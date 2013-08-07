@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client;
 
 import java.util.Date;
+import java.util.List;
 
+import org.sagebionetworks.web.client.callback.CompletedCallback;
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
@@ -9,6 +12,7 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
@@ -265,12 +269,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
             else {
                console.log("finished loading file (to calculate md5)");
                // Call instance method setMD5() on md5Callback with the final md5
-    			md5Callback.@org.sagebionetworks.web.client.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
+    			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
             }
         };
         $wnd.frOnerror = function () {
         	console.warn("unable to calculate md5");
-            md5Callback.@org.sagebionetworks.web.client.MD5Callback::setMD5(Ljava/lang/String;)(null);
+            md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
         };
         
         $wnd.loadNext = function() { 
@@ -314,4 +318,14 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 
+	@Override
+	public void requireJs(String url, CompletedCallback callback) {
+		_requireJs(url, callback);
+	}
+
+	private final static native void _requireJs(String url, CompletedCallback callback) /*-{		
+		$wnd.head.js(url, function() {
+			callback.@org.sagebionetworks.web.client.callback.CompletedCallback::complete()();	
+		});
+	}-*/;
 }
