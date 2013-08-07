@@ -134,7 +134,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 		authenticatedPrincipalId = id;
 	}
 	@Override
-	public void setIsPubliclyVisible(Boolean isOpenParticipation) {
+	public void setIsOpenParticipation(Boolean isOpenParticipation) {
 		this.isOpenParticipation = isOpenParticipation;
 		if (openParticipationButton != null) {
 			if (isOpenParticipation) {
