@@ -226,20 +226,21 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 		view.showLoading();
 		view.buildWindow(unsavedChanges);
 		populateAclEntries();
-		updateIsPublicAccess();
-	}
-
-	private void updateIsPublicAccess(){
-		view.setIsPubliclyVisible(uep.getCanPublicRead());	
 	}
 	
 	private void populateAclEntries() {
+		view.setIsOpenParticipation(false);
 		for (final ResourceAccess ra : acl.getResourceAccess()) {
-			final String principalId = ra.getPrincipalId().toString();
+			Long pricipalIdLong = ra.getPrincipalId();
+			String principalId = ra.getPrincipalId().toString();
 			UserGroupHeader header = userGroupHeaders.get(principalId);
-			final boolean isOwner = (ra.getPrincipalId().equals(uep.getOwnerPrincipalId()));
+			boolean isOwner = (ra.getPrincipalId().equals(uep.getOwnerPrincipalId()));
 			if (header != null) {
 				view.addAclEntry(new AclEntry(header, ra.getAccessType(), isOwner));
+				if (pricipalIdLong.equals(authenticatedAclPrincipalId)) {
+					PermissionLevel level = AclUtils.getPermissionLevel(ra.getAccessType());
+					view.setIsOpenParticipation(PermissionLevel.CAN_PARTICIPATE_EVALUATION.equals(level));
+				}
 			} else {
 				showErrorMessage("Could not find user " + principalId);
 			}
