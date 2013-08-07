@@ -73,6 +73,20 @@ public class MarkdownRegExConstants {
 
 	/**
 	 * Recognized example input:
+	 * {| class="border"
+	 * or
+	 * {|
+	 */
+	public static final String TABLE_START_REGEX = "(\\{\\|\\s*class=\"(.*?)\"\\s*)|(\\{\\|\\s*)";
+	
+	/**
+	 * Recognized example input:
+	 * |}
+	 */
+	public static final String TABLE_END_REGEX = "\\s*\\|\\}\\s*";
+	
+	/**
+	 * Recognized example input:
 	 * ![An Example](http://www.example.com/a.png)
 	 */
 	public static final String IMAGE_REGEX = "!\\[(.*)\\]\\((.*)\\)";
