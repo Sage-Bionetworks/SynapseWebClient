@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -162,6 +163,7 @@ public class EvaluationSubmitterTest {
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
+	@Ignore
 	@Test
 	public void testSubmitToEvaluationsWithTermsOfUse() throws RestServiceException, JSONObjectAdapterException{	
 		requirements.setTotalNumberOfResults(1);
