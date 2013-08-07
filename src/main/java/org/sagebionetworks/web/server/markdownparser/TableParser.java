@@ -14,7 +14,6 @@ public class TableParser extends BasicMarkdownElementParser {
 	boolean isTableStart;	//Is this the opening fence of the table
 	boolean isTableEnd;		//Is this the closing end of the table
 	boolean headColMade;	//To determine what type of row to create
-	boolean isTableMatch;	//Is the line a part of a table
 	int tableCount;			//Table ID
 	
 	@Override
@@ -24,7 +23,6 @@ public class TableParser extends BasicMarkdownElementParser {
 		isTableStart = false;
 		isTableEnd = false;
 		headColMade = false;
-		isTableMatch = false;
 		tableCount = 0;
 	}
 
@@ -40,7 +38,6 @@ public class TableParser extends BasicMarkdownElementParser {
 		if(isTableStart) {
 			hasTags = true;
 			isInTable = true;
-			isTableMatch = true;
 			//get class styles and start table
 			String styles = startMatcher.group(2);
 			builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable");
@@ -53,22 +50,18 @@ public class TableParser extends BasicMarkdownElementParser {
 			//we've reached the end; reset to false
 			isInTable = false;
 			hasTags = false;
-			isTableMatch = false;
 			headColMade = false;
 			builder.append("</tbody></table>");
 		} else {
 			//If we are not in a fenced table, check if this is a normal table
 			if(!hasTags) { 
-				isTableMatch = p.matcher(markdown).matches();
-				if(isTableMatch) {
-					//We've begun to create a table
-					isInTable = true;
-				}
+				isInTable = p.matcher(markdown).matches();		
 			}
 		
-			if(isTableMatch) {
+			if(isInTable) {
 				//Create header if not already made
 				if(!headColMade) {
+					//Create table if not already done when tags were found
 					if(!hasTags) {
 						builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable\">");
 					}
@@ -96,17 +89,15 @@ public class TableParser extends BasicMarkdownElementParser {
 					builder.append("</tr>\n");
 				}
 			} else {
-				//Not a table line; if we're in a table without surrounding tags, we must have reached the end
-				if(!hasTags && isInTable) {
+				//Not a table line; if we're in the middle of creating a table, we have reached the end
+				if(headColMade) {
 					//we reached the end; reset to false;
 					isInTable = false;
 					headColMade = false;
 					line.prependElement("</tbody></table>");
 					builder.append(line.getMarkdown());
-				}
-				
-				//if we are not in a table at all, just append the original markdown
-				if(!isInTable && !hasTags) {
+				} else {
+					//if we are not in a table at all, just append the original markdown
 					builder.append(line.getMarkdown());
 				}
 			}
