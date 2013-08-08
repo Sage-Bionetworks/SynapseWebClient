@@ -5,11 +5,11 @@ import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
 public class Synapse extends Place{
-	private static final String VERSION_DELIMITER = "/version/";
+	public static final String VERSION_DELIMITER = "/version/";
 	
-	private static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityArea.ADMIN);
-	private static final String WIKI_DELIMITER = getDelimiter(Synapse.EntityArea.WIKI);
-	private static final String FILES_DELIMITER = getDelimiter(Synapse.EntityArea.FILES);
+	public static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityArea.ADMIN);
+	public static final String WIKI_DELIMITER = getDelimiter(Synapse.EntityArea.WIKI);
+	public static final String FILES_DELIMITER = getDelimiter(Synapse.EntityArea.FILES);
 	
 	private String token;
 	private String entityId, areaToken;

@@ -166,12 +166,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		wikiTabContainer = new LayoutContainer();
 		filesTabContainer = new LayoutContainer();
 		adminTabContainer = new LayoutContainer(); 
-		wikiLink.addClickHandler(getProjectTabClickHandler(Synapse.EntityArea.WIKI));
-		fileLink.addClickHandler(getProjectTabClickHandler(Synapse.EntityArea.FILES));
-		adminLink.addClickHandler(getProjectTabClickHandler(Synapse.EntityArea.ADMIN));
+		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.WIKI));
+		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.FILES));
+		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.ADMIN));
 	}
 	
-	private ClickHandler getProjectTabClickHandler(final Synapse.EntityArea targetTab) {
+	private ClickHandler getTabClickHandler(final Synapse.EntityArea targetTab) {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
