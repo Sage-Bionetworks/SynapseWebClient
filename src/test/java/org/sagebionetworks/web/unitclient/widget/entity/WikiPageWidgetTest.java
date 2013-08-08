@@ -92,14 +92,14 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testConfigure(){
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), true, null, true, 17, false);
-		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), anyBoolean());
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt());
 	}
 	
 	@Test
 	public void testConfigureNoWikiPage(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), true, null, true, 17, false);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
 		verify(mockView).showNoWikiAvailableUI();
 	}
 	
@@ -107,14 +107,14 @@ public class WikiPageWidgetTest {
 	public void testConfigureNoWikiPageNotEmbedded(){
 		//if page is not embedded in the owner page, and the user can't edit, then it should show a 404
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), false, null, false, 17, false);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, false, 17);
 		verify(mockView).show404();
 	}
 	
 	@Test
 	public void testConfigureWikiForbiddenNotEmbedded(){
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), false, null, false, 17, false);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, false, 17);
 		verify(mockView).show403();
 	}
 	
@@ -127,7 +127,7 @@ public class WikiPageWidgetTest {
 		testEntityHeader.setName(MY_TEST_ENTITY_OWNER_NAME);
 		headers.setResults(new ArrayList());
 		when(mockNodeModelCreator.createBatchResults(anyString(), any(Class.class))).thenReturn(headers);
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), false, null, true, 17, false);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true, 17);
 		
 		verify(mockView).show404();
 	}
@@ -135,7 +135,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigureOtherErrorGettingWikiPage(){
 		AsyncMockStubber.callFailureWith(new RuntimeException("another error")).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), true, null, true, 17, false);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
@@ -177,7 +177,7 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testCreatePage(){
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), true, null, true, 17, false);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
 		presenter.createPage("a new wiki page with this title");
 		verify(mockSynapseClient).createWikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
@@ -185,7 +185,7 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testCreatePageFailure(){
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null), true, null, true, 17, false);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
 		AsyncMockStubber.callFailureWith(new RuntimeException("creation failed")).when(mockSynapseClient).createWikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		presenter.createPage("a new wiki page with this title");
 		verify(mockView).showErrorMessage(anyString());

@@ -12,6 +12,9 @@ public class WikiPageKey implements IsSerializable {
 	public WikiPageKey(){
 		
 	}
+	public WikiPageKey(String ownerObjectId, String ownerObjectType, String wikiPageId) {
+		this(ownerObjectId, ownerObjectType, wikiPageId, null);
+	}
 	public WikiPageKey(String ownerObjectId, String ownerObjectType, String wikiPageId, Long version) {
 		super();
 		if(ownerObjectId == null) throw new IllegalArgumentException("owner object id cannot be null");
