@@ -74,7 +74,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							if (headers.getTotalNumberOfResults() == 1) {
 								EntityHeader theHeader = headers.getResults().get(0);
 								ownerObjectName = theHeader.getName();
-								ownerObjectLink = DisplayUtils.getSynapseHistoryToken(theHeader.getId());
+								ownerObjectLink = "#"+DisplayUtils.getSynapseHistoryTokenNoHash(theHeader.getId(), wikiKey.getVersion(), Synapse.EntityArea.WIKI, null);
 								refreshTableOfContents();
 							}	
 						} catch (JSONObjectAdapterException e) {

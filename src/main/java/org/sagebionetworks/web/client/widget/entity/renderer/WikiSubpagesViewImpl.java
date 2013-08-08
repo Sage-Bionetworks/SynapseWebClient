@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -33,6 +34,9 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 	@Override
 	public void configure(TocItem root) {
 		clear();
+		final SimplePanel treePanel = new SimplePanel();
+		treePanel.addStyleName("well well-small");
+		
 		//this widget shows nothing if it doesn't have any pages!
 		TocItem mainPage = (TocItem) root.getChild(0);
 		if (mainPage.getChildCount() == 0)
@@ -62,14 +66,17 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 			Listener<TreePanelEvent<ModelData>> expandCollapseListener = new Listener<TreePanelEvent<ModelData>>() {
 				public void handleEvent(TreePanelEvent<ModelData> be) {
 					Element child = tree.getElement().getFirstChildElement();
-					tree.setHeight(child.getClientHeight() + "px");
+					String newHeight = child.getClientHeight() + "px";
+					tree.setHeight(newHeight);
+					treePanel.setHeight(newHeight);
 				}			
 			};
 			
 			tree.addListener(Events.Expand, expandCollapseListener);
 			tree.addListener(Events.Collapse, expandCollapseListener);
-			this.add(tree);
+			treePanel.add(tree);
 		}
+		this.add(treePanel);
 		this.layout(true);
 	}	
 	
