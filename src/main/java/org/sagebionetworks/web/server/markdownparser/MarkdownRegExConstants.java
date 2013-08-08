@@ -13,6 +13,12 @@ public class MarkdownRegExConstants {
 	public static final String PREFIX_GROUP = "(^[> \t\n\f\r]*)";
 	
 	/**
+	 * Recognizes example input:
+	 * \`
+	 */
+	public static final String BACKTICK_ESCAPED_REGEX = "\\\\`";
+	
+	/**
 	 * Recognized example input:
 	 * > This is in
 	 * > a blockquote.
@@ -107,26 +113,26 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * doi:10.1234
 	 */
-	public static final String LINK_DOI = "(?<=\\s|^)(doi:([a-zA-Z_0-9./]+))";
+	public static final String LINK_DOI = "(?<=[\\W&&[^:]]|^)(doi:([a-zA-Z_0-9./]+))";
 	
 	/**
 	 * Recognized example input:
 	 * syn12345
 	 */
-	public static final String LINK_SYNAPSE = "(?<=\\s|^)(syn\\d+)";
+	public static final String LINK_SYNAPSE = "(?<=[\\W&&[^:]]|^)(syn\\d+)";
 	
 	/**
 	 * Recognized example input:
 	 * http://www.example.com/
 	 */
 	//from http://stackoverflow.com/questions/163360/regular-expresion-to-match-urls-java 
-	public static final String LINK_URL = "(?<=\\s|^)((https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
+	public static final String LINK_URL = "(?<=[\\W&&[^\"]]|^)((https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
 	
 	/**
 	 * Recognized example input:
 	 * 1. First Item
 	 */
-	public static final String ORDERED_LIST_REGEX = "(^[>]*)(\\s+)(?:\\d+[.])(\\s+)(.+)";
+	public static final String ORDERED_LIST_REGEX = "(\\s*)(?:\\d+[.])(\\s+)(.+)";
 	
 	/**
 	 * Recognized example input:
@@ -153,10 +159,16 @@ public class MarkdownRegExConstants {
 	public static final String SUPERSCRIPT_REGEX = "(\\^)(?=\\S*)(.+?)(?<=\\S*)(\\^)";
 	
 	/**
+	 * Recognizes example input:
+	 * \_
+	 */
+	public static final String UNDERSCORE_ESCAPED_REGEX = "\\\\_";
+	
+	/**
 	 * Recognized example input:
 	 * * First Item
 	 */
-	public static final String UNORDERED_LIST_REGEX = "(^[>]*)(\\s*)(?:[-+*])(\\s+)(.+)";
+	public static final String UNORDERED_LIST_REGEX = "(\\s*)(?:[-+*])(\\s+)(.+)";
 	
 	
 	public static final String NEWLINE_REGEX = "([\n])";
