@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.place.shared.Place;
@@ -89,7 +90,10 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showError(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
+					//if the user can't read the evaluation, then don't show the join button.  if there was some other error, then report it...
+					if (!(caught instanceof ForbiddenException)) {
+						view.showError(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
+					}
 				}
 			});
 		} catch (RestServiceException e) {
