@@ -36,7 +36,7 @@ public class SynapseWikiPresenter extends AbstractActivity implements SynapseWik
 		this.place = place;
 		this.view.setPresenter(this);
 		
-		configure(new WikiPageKey(place.getOwnerId(), place.getOwnerType(), place.getWikiId(), null));
+		configure(new WikiPageKey(place.getOwnerId(), place.getOwnerType(), place.getWikiId()));
 	}
 	
 	

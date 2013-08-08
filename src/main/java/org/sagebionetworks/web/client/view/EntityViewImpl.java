@@ -6,7 +6,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.place.Synapse.EntityTab;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -80,7 +80,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber, Synapse.EntityArea area, String areaToken) {
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber, Synapse.EntityTab area, String areaToken) {
 		entityPageTop.clearState();
 		entityPageTop.setBundle(bundle, versionNumber, area, areaToken);
 		entityPageTopPanel.setWidget(entityPageTop.asWidget());

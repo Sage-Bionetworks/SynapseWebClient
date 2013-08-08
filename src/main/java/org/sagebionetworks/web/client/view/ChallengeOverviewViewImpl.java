@@ -88,7 +88,7 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 	public void showChallengeInfo(){
 		content.clear();
 		content.add(wikiPage.asWidget());
-		WikiPageKey wikiKey = new WikiPageKey("syn1929437", ObjectType.ENTITY.toString(), null, null);
+		WikiPageKey wikiKey = new WikiPageKey("syn1929437", ObjectType.ENTITY.toString(), null);
 		wikiPage.configure(wikiKey, false, new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {

@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.place.Synapse.EntityTab;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -74,7 +74,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							if (headers.getTotalNumberOfResults() == 1) {
 								EntityHeader theHeader = headers.getResults().get(0);
 								ownerObjectName = theHeader.getName();
-								ownerObjectLink = "#"+DisplayUtils.getSynapseHistoryTokenNoHash(theHeader.getId(), wikiKey.getVersion(), Synapse.EntityArea.WIKI, null);
+								ownerObjectLink = "#"+DisplayUtils.getSynapseHistoryTokenNoHash(theHeader.getId(), wikiKey.getVersion(), Synapse.EntityTab.WIKI, null);
 								refreshTableOfContents();
 							}	
 						} catch (JSONObjectAdapterException e) {
@@ -121,7 +121,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							title = ownerObjectName;
 						}
 						else {
-							href = "#"+DisplayUtils.getSynapseHistoryTokenNoHash(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), Synapse.EntityArea.WIKI, header.getId());
+							href = "#"+DisplayUtils.getSynapseHistoryTokenNoHash(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), Synapse.EntityTab.WIKI, header.getId());
 							title = header.getTitle();
 						}
 						

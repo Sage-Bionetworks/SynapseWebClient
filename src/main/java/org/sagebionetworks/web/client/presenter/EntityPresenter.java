@@ -20,7 +20,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.place.Synapse.EntityTab;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
@@ -46,7 +46,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String entityId;
 	private Long versionNumber;
 	private AdapterFactory adapterFactory;
-	private Synapse.EntityArea area;
+	private Synapse.EntityTab area;
 	private String areaToken;
 	
 	@Inject

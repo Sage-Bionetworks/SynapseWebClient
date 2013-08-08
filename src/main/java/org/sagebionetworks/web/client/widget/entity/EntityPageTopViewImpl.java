@@ -166,12 +166,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		wikiTabContainer = new LayoutContainer();
 		filesTabContainer = new LayoutContainer();
 		adminTabContainer = new LayoutContainer(); 
-		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.WIKI));
-		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.FILES));
-		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.ADMIN));
+		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityTab.WIKI));
+		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityTab.FILES));
+		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityTab.ADMIN));
 	}
 	
-	private ClickHandler getTabClickHandler(final Synapse.EntityArea targetTab) {
+	private ClickHandler getTabClickHandler(final Synapse.EntityTab targetTab) {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -181,7 +181,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, Long versionNumber, Synapse.EntityArea area, String areaToken) {
+	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, Long versionNumber, Synapse.EntityTab area, String areaToken) {
 		this.versionNumber = versionNumber;
 		colLeftContainer = initContainerAndPanel(colLeftContainer, colLeftPanel);
 		colRightContainer = initContainerAndPanel(colRightContainer, colRightPanel);
@@ -215,7 +215,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		boolean isProject = bundle.getEntity() instanceof Project;
 		isTabShowing = isFolderLike || isProject;
 		String wikiPageId = null;
-		if (Synapse.EntityArea.WIKI == area)
+		if (Synapse.EntityTab.WIKI == area)
 			wikiPageId = areaToken;
 		if (isProject) {
 			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, area, wikiPageId, widgetMargin);
@@ -258,7 +258,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				if (isTabShowing)
-					presenter.refreshProject(Synapse.EntityArea.FILES, null);
+					presenter.refreshTab(Synapse.EntityTab.FILES, null);
 				else
 					presenter.fireEntityUpdatedEvent();
 			}
@@ -344,7 +344,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 	// Render the Folder entity
 	private void renderFolderEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, boolean canEdit, Synapse.EntityArea area, String wikiPageId,
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit, Synapse.EntityTab area, String wikiPageId,
 			MarginData widgetMargin) {
 		navtabContainer.removeClassName("hide");
 
@@ -379,17 +379,17 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(threeCol, widgetMargin);
 		
 		fullWidthContainer.add(currentTabContainer);
-		Synapse.EntityArea tab = area;
+		Synapse.EntityTab tab = area;
 		if (tab == null) {
 			//default is the wiki tab
-			tab = Synapse.EntityArea.FILES;
+			tab = Synapse.EntityTab.FILES;
 		}
 		setTabSelected(tab);
 	}
 
 	// Render the Project entity
 	private void renderProjectEntity(final EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, final boolean canEdit, Synapse.EntityArea area, String wikiPageId,
+			String entityTypeDisplay, boolean isAdmin, final boolean canEdit, Synapse.EntityTab area, String wikiPageId,
 			MarginData widgetMargin) {
 		// Entity Metadata
 		navtabContainer.removeClassName("hide");
@@ -427,15 +427,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		}));
 		fullWidthContainer.add(currentTabContainer);
-		Synapse.EntityArea tab = area;
+		Synapse.EntityTab tab = area;
 		if (tab == null) {
 			//default is the wiki tab
-			tab = Synapse.EntityArea.WIKI;
+			tab = Synapse.EntityTab.WIKI;
 		}
 		setTabSelected(tab);
 	}
 
-	private void setTabSelected(Synapse.EntityArea targetTab) {
+	private void setTabSelected(Synapse.EntityTab targetTab) {
 		wikiListItem.removeClassName("active");
 		filesListItem.removeClassName("active");
 		adminListItem.removeClassName("active");
@@ -447,11 +447,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		Anchor link;
 		LayoutContainer targetContainer;
 		
-		if (targetTab == Synapse.EntityArea.WIKI) {
+		if (targetTab == Synapse.EntityTab.WIKI) {
 			tab = wikiListItem;
 			link = wikiLink;
 			targetContainer = wikiTabContainer;
-		} else if (targetTab == Synapse.EntityArea.FILES) {
+		} else if (targetTab == Synapse.EntityTab.FILES) {
 			tab = filesListItem;
 			link = fileLink;
 			targetContainer = filesTabContainer;
@@ -484,7 +484,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				public void noWikiFound() {
 					if (isProject) {
 						//no wiki found for this project.  show Files instead
-						setTabSelected(Synapse.EntityArea.FILES);
+						setTabSelected(Synapse.EntityTab.FILES);
 					}
 					
 				}

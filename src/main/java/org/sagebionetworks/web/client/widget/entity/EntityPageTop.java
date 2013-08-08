@@ -18,7 +18,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.place.Synapse.EntityTab;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -50,7 +50,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EventBus bus;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Long versionNumber;
-	private Synapse.EntityArea area;
+	private Synapse.EntityTab area;
 	private String areaToken;
 	
 	@Inject
@@ -84,7 +84,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      *
      * @param bundle
      */
-    public void setBundle(EntityBundle bundle, Long versionNumber, Synapse.EntityArea area, String areaToken) {
+    public void setBundle(EntityBundle bundle, Long versionNumber, Synapse.EntityTab area, String areaToken) {
     	this.bundle = bundle;
     	this.versionNumber = versionNumber;
     	this.area = area;
@@ -117,7 +117,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 	
 	@Override
-	public void refreshProject(Synapse.EntityArea area, String areaToken) {
+	public void refreshTab(Synapse.EntityTab area, String areaToken) {
 		globalApplicationState.getPlaceChanger().goTo(new Synapse(bundle.getEntity().getId(), null, area, areaToken));
 	}
 	
@@ -181,7 +181,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	/*
 	 * Private Methods
 	 */
-	private void sendDetailsToView(boolean isAdmin, boolean canEdit, Synapse.EntityArea area, String areaToken) {
+	private void sendDetailsToView(boolean isAdmin, boolean canEdit, Synapse.EntityTab area, String areaToken) {
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
 		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber, area, areaToken);

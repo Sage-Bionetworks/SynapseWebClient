@@ -7,14 +7,14 @@ import com.google.gwt.place.shared.Prefix;
 public class Synapse extends Place{
 	public static final String VERSION_DELIMITER = "/version/";
 	
-	public static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityArea.ADMIN);
-	public static final String WIKI_DELIMITER = getDelimiter(Synapse.EntityArea.WIKI);
-	public static final String FILES_DELIMITER = getDelimiter(Synapse.EntityArea.FILES);
+	public static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityTab.ADMIN);
+	public static final String WIKI_DELIMITER = getDelimiter(Synapse.EntityTab.WIKI);
+	public static final String FILES_DELIMITER = getDelimiter(Synapse.EntityTab.FILES);
 	
 	private String token;
 	private String entityId, areaToken;
 	private Long versionNumber;
-	private Synapse.EntityArea area;
+	private Synapse.EntityTab area;
 	
 	public Synapse(String token) {
 		this.token = token;
@@ -47,16 +47,16 @@ public class Synapse extends Place{
 			
 			if(toProcess.contains(WIKI_DELIMITER)) {
 				String[] parts = toProcess.split(WIKI_DELIMITER);
-				area = Synapse.EntityArea.WIKI;
+				area = Synapse.EntityTab.WIKI;
 				if (parts.length == 2) {
 					areaToken = parts[1];
 				}
 				return;
 			} else if(toProcess.contains(ADMIN_DELIMITER)) {
-				area = Synapse.EntityArea.ADMIN;
+				area = Synapse.EntityTab.ADMIN;
 				return;
 			} else if(toProcess.contains(FILES_DELIMITER)) {
-				area = Synapse.EntityArea.FILES;
+				area = Synapse.EntityTab.FILES;
 				return;
 			}
 		} else {
@@ -65,11 +65,11 @@ public class Synapse extends Place{
 		}
 	}
 	
-	public static String getDelimiter(Synapse.EntityArea tab) {
+	public static String getDelimiter(Synapse.EntityTab tab) {
 		return "/"+tab+"/";
 	}
 
-	public Synapse(String entityId, Long versionNumber, Synapse.EntityArea area, String areaToken) {		
+	public Synapse(String entityId, Long versionNumber, Synapse.EntityTab area, String areaToken) {		
 		this.token = entityId;
 		if(versionNumber != null) 
 			this.token += VERSION_DELIMITER + versionNumber;
@@ -98,7 +98,7 @@ public class Synapse extends Place{
 		return versionNumber;
 	}
 	
-	public Synapse.EntityArea getEntityArea() {
+	public Synapse.EntityTab getEntityArea() {
 		return area;
 	}
 	
@@ -119,7 +119,7 @@ public class Synapse extends Place{
         }
     }
 
-	public static enum EntityArea { WIKI, FILES, ADMIN }
+	public static enum EntityTab { WIKI, FILES, ADMIN }
 
 	@Override
 	public int hashCode() {

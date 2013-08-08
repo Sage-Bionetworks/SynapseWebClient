@@ -22,7 +22,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.place.Synapse.EntityTab;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -96,7 +96,7 @@ public class EntityPageTopTest {
 		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean())).thenReturn(testWidgetRenderer);
 
 		EntityBundle bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
-		pageTop.setBundle(bundle, 1l, EntityArea.FILES, null);
+		pageTop.setBundle(bundle, 1l, EntityTab.FILES, null);
 	}
 
 }
