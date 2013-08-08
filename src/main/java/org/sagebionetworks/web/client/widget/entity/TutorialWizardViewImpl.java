@@ -12,6 +12,10 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -143,5 +147,20 @@ public class TutorialWizardViewImpl  implements TutorialWizardView {
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-
+	
+	@Override
+	public Widget getTutorialButton(String buttonText) {
+		SimplePanel panel = new SimplePanel();
+		Button button = new Button(buttonText);
+		button.removeStyleName("gwt-Button");
+		button.addStyleName("btn btn-large");
+		button.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.userClickedTutorialButton();
+			}
+		});
+		panel.add(button);
+		return panel;
+	}
 }

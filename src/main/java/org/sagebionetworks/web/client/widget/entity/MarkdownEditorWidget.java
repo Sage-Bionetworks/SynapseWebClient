@@ -415,6 +415,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY+"=evalId1,evalId2" + WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
+	    	menu.add(getNewCommand(WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE + "?"+WidgetConstants.WIDGET_ENTITY_ID_KEY+"=123&" +WidgetConstants.TEXT_KEY + "=Tutorial" + WidgetConstants.WIDGET_END_MARKDOWN);
+		    	};
+			}));
+
 	    	
 	    }
 

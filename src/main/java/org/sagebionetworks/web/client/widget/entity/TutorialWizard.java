@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
@@ -12,19 +13,25 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TutorialWizard implements TutorialWizardView.Presenter {
+public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRendererPresenter {
 
 	private TutorialWizardView view;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private Callback callback;
+	private String entityId, tutorialButtonText;
+	
 	/**
 	 * Callback called when the user skips the tutorial, or presses ok.
 	 *
@@ -40,6 +47,25 @@ public class TutorialWizard implements TutorialWizardView.Presenter {
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
+	}
+	
+	/**
+	 * Synapse Widget configuration entry point
+	 */
+	@Override
+	public void configure(WikiPageKey wikiKey,Map<String, String> widgetDescriptor) {
+		entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
+		tutorialButtonText = widgetDescriptor.get(WidgetConstants.TEXT_KEY);
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return view.getTutorialButton(tutorialButtonText);
+	}
+	
+	@Override
+	public void userClickedTutorialButton() {
+		configure(entityId, null);
 	}
 	
 	/**
