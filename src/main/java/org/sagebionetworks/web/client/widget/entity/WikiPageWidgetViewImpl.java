@@ -146,8 +146,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private void showDefaultViewWithWiki() {
 		removeAll(true);
 		SimplePanel topBarWrapper = new SimplePanel();
-		String hrString = isEmbeddedInOwnerPage ? "separator" : "";
-		topBarWrapper.addStyleName("span-"+spanWidth + " margin-top-5 " + hrString);
+		topBarWrapper.addStyleName("span-"+spanWidth + " margin-top-5");
 		String titleString = isEmbeddedInOwnerPage ? "" : currentPage.getTitle();
 		topBarWrapper.add(new HTMLPanel("<h2 class=\"span-"+(spanWidth-5)+"\" style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
 		add(topBarWrapper);
