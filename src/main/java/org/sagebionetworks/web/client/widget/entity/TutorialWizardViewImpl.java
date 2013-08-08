@@ -14,6 +14,7 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -149,18 +150,15 @@ public class TutorialWizardViewImpl  implements TutorialWizardView {
 	}
 	
 	@Override
-	public Widget getTutorialButton(String buttonText) {
-		SimplePanel panel = new SimplePanel();
-		Button button = new Button(buttonText);
-		button.removeStyleName("gwt-Button");
-		button.addStyleName("btn btn-large");
-		button.addClickHandler(new ClickHandler() {			
+	public Widget getTutorialLink(String buttonText) {
+		Anchor link = new Anchor(buttonText);
+		link.addStyleName("link inline-block");
+		link.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.userClickedTutorialButton();
 			}
 		});
-		panel.add(button);
-		return panel;
+		return link;
 	}
 }

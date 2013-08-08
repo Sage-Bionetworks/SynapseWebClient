@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.Widget;
 public interface TutorialWizardView extends SynapseView {
 
 	void showWizard(String ownerObjectId, List<WikiHeader> headers);
-	Widget getTutorialButton(String buttonText);
+	Widget getTutorialLink(String buttonText);
 	
 	/**
 	 * Set the presenter.

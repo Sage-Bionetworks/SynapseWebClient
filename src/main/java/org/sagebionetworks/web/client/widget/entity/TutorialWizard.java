@@ -60,7 +60,7 @@ public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRende
 	
 	@Override
 	public Widget asWidget() {
-		return view.getTutorialButton(tutorialButtonText);
+		return view.getTutorialLink(tutorialButtonText);
 	}
 	
 	@Override

@@ -50,5 +50,7 @@ public interface JoinWidgetView extends IsWidget, SynapseView {
 		void submissionUserGuideSkipped();
 		
 		void showSubmissionGuide(TutorialWizard.Callback callback);
+		
+		void showWriteupGuide();
 	}
 }

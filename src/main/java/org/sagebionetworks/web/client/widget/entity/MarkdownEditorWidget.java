@@ -417,7 +417,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			}));
 	    	menu.add(getNewCommand(WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
-		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE + "?"+WidgetConstants.WIDGET_ENTITY_ID_KEY+"=123&" +WidgetConstants.TEXT_KEY + "=Tutorial" + WidgetConstants.WIDGET_END_MARKDOWN);
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE + "?"+WidgetConstants.WIDGET_ENTITY_ID_KEY+"=syn123&" +WidgetConstants.TEXT_KEY + "=Tutorial"+ WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
 
