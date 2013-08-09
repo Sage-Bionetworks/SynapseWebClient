@@ -165,9 +165,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		currentTabContainer = new LayoutContainer();
 		wikiTabContainer = new LayoutContainer();
 		filesTabContainer = new LayoutContainer();
-		adminTabContainer = new LayoutContainer(); 
+		adminTabContainer = new LayoutContainer();
+		wikiLink.setText(DisplayConstants.WIKI);
 		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityTab.WIKI));
+		fileLink.setText(DisplayConstants.FILES);
 		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityTab.FILES));
+		adminLink.setText(DisplayConstants.CHALLENGE_ADMIN);
 		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityTab.ADMIN));
 	}
 	
@@ -213,7 +216,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Custom layouts for certain entities
 		boolean isFolderLike = bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis;
 		boolean isProject = bundle.getEntity() instanceof Project;
-		isTabShowing = isFolderLike || isProject;
+		isTabShowing = isProject;
 		String wikiPageId = null;
 		if (Synapse.EntityTab.WIKI == area)
 			wikiPageId = areaToken;
@@ -221,7 +224,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, area, wikiPageId, widgetMargin);
 		} else if (isFolderLike) {
 			//render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
-			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, area, wikiPageId, widgetMargin);
+			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, wikiPageId, widgetMargin);
 		} else if (bundle.getEntity() instanceof Summary) {
 		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, widgetMargin);
 		} else {
@@ -344,12 +347,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 	// Render the Folder entity
 	private void renderFolderEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, boolean canEdit, Synapse.EntityTab area, String wikiPageId,
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit, String wikiPageId,
 			MarginData widgetMargin) {
-		navtabContainer.removeClassName("hide");
-
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		topFullWidthContainer.add(entityMetadata.asWidget(), new MarginData(0));
+		fullWidthContainer.add(entityMetadata.asWidget(), new MarginData(0));
 		
 		// ** RIGHT **
 		// none
@@ -357,12 +358,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// ** FULL WIDTH **
 		//SWC-668: render (from top to bottom) description, wiki, then file browser, to make consistent with Project view.
 		// Description
-		topFullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 
-		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24);
+		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 
 		// Child Browser
-		filesTabContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
+		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
 
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
@@ -376,15 +377,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 //		threeCol.add(createEvaluationAdminList(bundle, null), widgetMargin);		
 //		threeCol.add(createSpacer(), widgetMargin);
 		
-		filesTabContainer.add(threeCol, widgetMargin);
-		
-		fullWidthContainer.add(currentTabContainer);
-		Synapse.EntityTab tab = area;
-		if (tab == null) {
-			//default is the wiki tab
-			tab = Synapse.EntityTab.FILES;
-		}
-		setTabSelected(tab);
+		fullWidthContainer.add(threeCol, widgetMargin);
 	}
 
 	// Render the Project entity

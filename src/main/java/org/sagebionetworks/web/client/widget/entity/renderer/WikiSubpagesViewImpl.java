@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelStringProvider;
@@ -19,10 +20,12 @@ import com.google.inject.Inject;
 public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpagesView {
 
 	private Presenter presenter;
-		
+	private GlobalApplicationState globalAppState;
+	
 	@Inject
-	public WikiSubpagesViewImpl() {
+	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState) {
 		this.setLayout(new FitLayout());
+		this.globalAppState = globalAppState;
 	}
 	
 	@Override
@@ -74,25 +77,19 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 			
 			tree.addListener(Events.Expand, expandCollapseListener);
 			tree.addListener(Events.Collapse, expandCollapseListener);
+			
+			tree.addListener(Events.OnClick, new Listener<TreePanelEvent<TocItem>>() {
+	            public void handleEvent(TreePanelEvent<TocItem> event) {
+	            	//go to the target place
+	            	globalAppState.getPlaceChanger().goTo(event.getItem().getTargetPlace());
+	            };
+	        });
 			treePanel.add(tree);
 		}
 		this.add(treePanel);
 		this.layout(true);
 	}	
 	
-	@Override
-	public String getHTML(String href, String title, boolean isCurrentPage) {
-		StringBuilder html = new StringBuilder();
-		html.append("<a class=\"link");
-		if (isCurrentPage)
-			html.append(" boldText");
-		html.append("\" href=\"");
-		html.append(href);
-		html.append("\">");
-		html.append(title);
-		html.append("</a>");
-		return html.toString();
-	}
 	@Override
 	public Widget asWidget() {
 		return this;

@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.message.ObjectType;
@@ -107,8 +108,10 @@ public class WikiPageWidgetTest {
 	public void testConfigureNoWikiPageNotEmbedded(){
 		//if page is not embedded in the owner page, and the user can't edit, then it should show a 404
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, false, 17);
+		WikiPageWidget.Callback mockCallback = Mockito.mock(WikiPageWidget.Callback.class);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, mockCallback, false, 17);
 		verify(mockView).show404();
+		verify(mockCallback).noWikiFound();
 	}
 	
 	@Test

@@ -5,7 +5,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class WikiPageKey implements IsSerializable {
 
 	private String ownerObjectId,ownerObjectType,wikiPageId;
-	private Long version;
+	private Long ownerObjectVersion;
 	/**
 	 * This should only be used for RPC
 	 */
@@ -15,7 +15,7 @@ public class WikiPageKey implements IsSerializable {
 	public WikiPageKey(String ownerObjectId, String ownerObjectType, String wikiPageId) {
 		this(ownerObjectId, ownerObjectType, wikiPageId, null);
 	}
-	public WikiPageKey(String ownerObjectId, String ownerObjectType, String wikiPageId, Long version) {
+	public WikiPageKey(String ownerObjectId, String ownerObjectType, String wikiPageId, Long ownerObjectVersion) {
 		super();
 		if(ownerObjectId == null) throw new IllegalArgumentException("owner object id cannot be null");
 		if(ownerObjectType == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
@@ -24,7 +24,7 @@ public class WikiPageKey implements IsSerializable {
 		this.ownerObjectId = ownerObjectId;
 		this.ownerObjectType = ownerObjectType;
 		this.wikiPageId = wikiPageId;
-		this.version = version;
+		this.ownerObjectVersion = ownerObjectVersion;
 	}
 	public String getOwnerObjectId() {
 		return ownerObjectId;
@@ -45,10 +45,10 @@ public class WikiPageKey implements IsSerializable {
 		this.wikiPageId = wikiPageId;
 	}
 	public Long getVersion() {
-		return version;
+		return ownerObjectVersion;
 	}
 	public void setVersion(Long version) {
-		this.version = version;
+		this.ownerObjectVersion = version;
 	}
 	@Override
 	public int hashCode() {
@@ -58,7 +58,7 @@ public class WikiPageKey implements IsSerializable {
 				+ ((ownerObjectId == null) ? 0 : ownerObjectId.hashCode());
 		result = prime * result
 				+ ((ownerObjectType == null) ? 0 : ownerObjectType.hashCode());
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
+		result = prime * result + ((ownerObjectVersion == null) ? 0 : ownerObjectVersion.hashCode());
 		result = prime * result
 				+ ((wikiPageId == null) ? 0 : wikiPageId.hashCode());
 		return result;
@@ -82,10 +82,10 @@ public class WikiPageKey implements IsSerializable {
 				return false;
 		} else if (!ownerObjectType.equals(other.ownerObjectType))
 			return false;
-		if (version == null) {
-			if (other.version != null)
+		if (ownerObjectVersion == null) {
+			if (other.ownerObjectVersion != null)
 				return false;
-		} else if (!version.equals(other.version))
+		} else if (!ownerObjectVersion.equals(other.ownerObjectVersion))
 			return false;
 		if (wikiPageId == null) {
 			if (other.wikiPageId != null)
@@ -98,7 +98,7 @@ public class WikiPageKey implements IsSerializable {
 	public String toString() {
 		return "WikiPageKey [ownerObjectId=" + ownerObjectId
 				+ ", ownerObjectType=" + ownerObjectType + ", wikiPageId="
-				+ wikiPageId + ", version=" + version + "]";
+				+ wikiPageId + ", version=" + ownerObjectVersion + "]";
 	}
 	
 	
