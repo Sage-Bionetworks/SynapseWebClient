@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.BacktickWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
@@ -53,6 +54,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.UnderscoreWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
@@ -135,6 +137,8 @@ public interface PortalGinInjector extends Ginjector {
 	public ButtonLinkConfigEditor getButtonLinkConfigEditor();
 	
 	////// Renderers
+	public UnderscoreWidget getUnderscoreRenderer();
+	public BacktickWidget getBacktickRenderer();
 	public BookmarkWidget getBookmarkRenderer();
 	public ReferenceWidget getReferenceRenderer();
 	public YouTubeWidget getYouTubeRenderer();

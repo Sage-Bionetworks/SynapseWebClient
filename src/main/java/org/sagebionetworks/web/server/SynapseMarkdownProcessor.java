@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
+import org.sagebionetworks.web.server.markdownparser.BacktickParser;
 import org.sagebionetworks.web.server.markdownparser.BlockQuoteParser;
 import org.sagebionetworks.web.server.markdownparser.BoldParser;
 import org.sagebionetworks.web.server.markdownparser.BookmarkTargetParser;
@@ -33,6 +34,7 @@ import org.sagebionetworks.web.server.markdownparser.SubscriptParser;
 import org.sagebionetworks.web.server.markdownparser.SuperscriptParser;
 import org.sagebionetworks.web.server.markdownparser.SynapseAutoLinkParser;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
+import org.sagebionetworks.web.server.markdownparser.UnderscoreParser;
 import org.sagebionetworks.web.server.markdownparser.UrlAutoLinkParser;
 import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 
@@ -58,6 +60,9 @@ public class SynapseMarkdownProcessor {
 	}
 	
 	private void init() {
+		//first initialize parsers that handle escaping
+		allElementParsers.add(new UnderscoreParser());
+		allElementParsers.add(new BacktickParser());
 		//initialize all markdown element parsers
 		allElementParsers.add(new BlockQuoteParser());
 		allElementParsers.add(new BoldParser());	

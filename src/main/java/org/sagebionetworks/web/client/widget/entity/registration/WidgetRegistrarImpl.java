@@ -97,7 +97,11 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
-		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
+		if(contentTypeKey.equals(WidgetConstants.UNDERSCORE_CONTENT_TYPE)) {
+			presenter = ginInjector.getUnderscoreRenderer();
+		} else if(contentTypeKey.equals(WidgetConstants.BACKTICK_CONTENT_TYPE)) {
+			presenter = ginInjector.getBacktickRenderer();
+		} else if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
 			presenter = ginInjector.getBookmarkRenderer();
 		} else if(contentTypeKey.equals(WidgetConstants.REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceRenderer();
@@ -197,6 +201,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	}
 	
 	private void initWithKnownWidgets() {
+		registerWidget(WidgetConstants.UNDERSCORE_CONTENT_TYPE, WidgetConstants.UNDERSCORE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.BACKTICK_CONTENT_TYPE, WidgetConstants.BACKTICK_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.BOOKMARK_CONTENT_TYPE, WidgetConstants.BOOKMARK_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.REFERENCE_CONTENT_TYPE, WidgetConstants.REFERENCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.YOUTUBE_CONTENT_TYPE, WidgetConstants.YOUTUBE_FRIENDLY_NAME);

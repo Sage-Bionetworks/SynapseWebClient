@@ -378,11 +378,11 @@ public class ServerMarkdownUtils {
 					while (matcher.find()) {
 						childFound = true;
 						if (matcher.groupCount() == 2) {
-							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
-							sb.append(SharedMarkdownUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
 							if(matcher.group(2).contains("inlineWidget")) {
 								inlineWidget = true;
 							}
+							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
+							sb.append(SharedMarkdownUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
 							widgetsFound++;
 							previousFoundIndex = matcher.end(1);
 						}
