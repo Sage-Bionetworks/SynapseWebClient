@@ -77,7 +77,7 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 				
 				UnorderedListPanel listPanel = new UnorderedListPanel();
 				listPanel.addStyleName("list arrow-list");
-				listPanel.add(new HTML("Download the file(s) by going to the bottom of this page."));
+				listPanel.add(new HTML("Download the file(s) by going to the Files section of this page."));
 				
 				//add link and text
 				FlowPanel tutorialLinkPanel = new FlowPanel();

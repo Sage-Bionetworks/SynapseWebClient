@@ -48,6 +48,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityTab;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
@@ -608,7 +609,14 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
-		Synapse place = new Synapse(entityId, versionNumber);
+		return getSynapseHistoryTokenNoHash(entityId, versionNumber, null);
+	}
+	
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityTab area) {
+		return getSynapseHistoryTokenNoHash(entityId, versionNumber, area, null);
+	}
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityTab area, String areaToken) {
+		Synapse place = new Synapse(entityId, versionNumber, area, areaToken);
 		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
@@ -1597,6 +1605,13 @@ public class DisplayUtils {
 		lc.add(htmlPanel);
 
 		return lc;
+	}
+	
+	public static Long getVersion(Entity entity) {
+		Long version = null;
+		if (entity != null && entity instanceof Versionable)
+			version = ((Versionable) entity).getVersionNumber();
+		return version;
 	}
 		
 }

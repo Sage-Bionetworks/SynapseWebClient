@@ -48,14 +48,14 @@ public class AdministerEvaluationsListTest {
 	
 	@Test
 	public void testConfigure() {
-		evalList.configure("syn100");
+		evalList.configure("syn100", null);
 		verify(mockView).configure(any(List.class));
 	}
 	
 	@Test
 	public void testConfigureFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		evalList.configure("syn100");
+		evalList.configure("syn100", null);
 		verify(mockView).showErrorMessage(anyString());
 	}
 

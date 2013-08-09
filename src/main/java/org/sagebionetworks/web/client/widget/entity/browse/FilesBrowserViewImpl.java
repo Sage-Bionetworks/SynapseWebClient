@@ -75,32 +75,33 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		right.setStyleName("right span-7 notopmargin");
 		topbar.add(left);
 		topbar.add(right);
-
-		if(title == null) title = "&nbsp;"; 
+		boolean isTitle = (title!=null);
+		if(!isTitle) title = "&nbsp;"; 
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant("<h3>" + title + "</h3>");
 		left.add(new HTML(shb.toSafeHtml()));
-
-		Button upload = getUploadButton(entityId); 
-		upload.addStyleName("right last");
-
-		Button addFolder = new Button(DisplayConstants.ADD_FOLDER, AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16()), new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
-					@Override
-					public void onSave(String name, String description) {
-						presenter.createFolder(name);
-					}
-				});
-			}
-		});
-		addFolder.setHeight(25);
-		//SWC-363: explicitly set the width, since the auto-width is not calculated correctly in Chrome (but it is in Firefox).
-		addFolder.setWidth(90);
-		addFolder.addStyleName("right");
-
+		
 		if(canEdit) {
+			Button upload = getUploadButton(entityId); 
+			upload.addStyleName("right last");
+	
+			Button addFolder = new Button(DisplayConstants.ADD_FOLDER, AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16()), new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
+						@Override
+						public void onSave(String name, String description) {
+							presenter.createFolder(name);
+						}
+					});
+				}
+			});
+			addFolder.setHeight(25);
+			//SWC-363: explicitly set the width, since the auto-width is not calculated correctly in Chrome (but it is in Firefox).
+			addFolder.setWidth(90);
+			addFolder.addStyleName("right");
+
+		
 			right.add(upload);
 			right.add(addFolder, new MarginData(0, 3, 0, 0));
 		}
@@ -109,7 +110,9 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		files.setStyleName("span-24 notopmargin");
 		entityTreeBrowser.configure(entityId, true);
 		files.add(entityTreeBrowser.asWidget());
-		lc.add(topbar);
+		//If we are showing the buttons or a title, then add the topbar.  Otherwise don't
+		if (canEdit || isTitle)
+			lc.add(topbar);
 		lc.add(files);
 		lc.layout();
 		this.add(lc);
