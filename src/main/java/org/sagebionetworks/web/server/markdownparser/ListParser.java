@@ -13,6 +13,7 @@ public class ListParser extends BasicMarkdownElementParser  {
 	
 	Pattern p1= Pattern.compile(MarkdownRegExConstants.ORDERED_LIST_REGEX, Pattern.DOTALL);
 	Pattern p2 = Pattern.compile(MarkdownRegExConstants.UNORDERED_LIST_REGEX, Pattern.DOTALL);
+	Pattern p3 = Pattern.compile(MarkdownRegExConstants.INDENTED_REGEX, Pattern.DOTALL);
 	Stack<MarkdownList> stack;
 
 	@Override
@@ -24,10 +25,11 @@ public class ListParser extends BasicMarkdownElementParser  {
 	public void processLine(MarkdownElements line) {
 		Matcher m1 = p1.matcher(line.getMarkdown());
 		Matcher m2 = p2.matcher(line.getMarkdown());
-		
+		Matcher m3 = p3.matcher(line.getMarkdown());
+
 		boolean isOrderedList = m1.matches();
 		boolean isUnorderedList = m2.matches();
-		
+
 		if (isOrderedList) {
 			getListItem(line, m1, true);
 		}
@@ -35,46 +37,51 @@ public class ListParser extends BasicMarkdownElementParser  {
 			getListItem(line, m2, false);
 		} 
 		else if (isInMarkdownElement()) {
-			//this is not a list item line.  End all existing lists
-			while(!stack.isEmpty()){
-				line.prependElement(stack.pop().getEndListHtml());
-			}
+			//this is not a list item
+			m3.matches();
+			String spaces = m3.group(1);
+			int depth = spaces.length();
+			String value = m3.group(2);
+			
+			checkForGreaterDepth(line, depth);
+	        if (!stack.isEmpty()) {
+	        	MarkdownList list = stack.peek();
+	        	if(depth != 0) {
+	        		//this is an element under a list item, add it as a child to the item
+	        		list.addExtraElementHtml(line,  value);
+	        	} else {
+	        		//this is not an element under any list item. End all existing lists
+	    	        while(!stack.isEmpty()){
+	    	        	list.closeOpenListItems(line);
+	    				line.prependElement(stack.pop().getEndListHtml());
+	    			}	    			
+	        	}	        	
+	        }        
 		}
 	}
 	
 	public void getListItem(MarkdownElements line, Matcher m, boolean isOrderedList) {
 		//looks like a list item
-		String prefixGroup = m.group(1);
-		String spaces = m.group(2);
+		//String prefixGroup = m.group(1);
+		String spaces = m.group(1);
         int depth = spaces.length();
         //TODO: use listMarker to test order value (if ordered list)
-        String listMarker = m.group(3);
-        String value = m.group(4);
+        String listMarker = m.group(2);
+        String value = m.group(3);
         
-        //end any list that is of greater depth on the stack
-        boolean isGreaterDepth = true;
-        while (isGreaterDepth && !stack.isEmpty()) {
-        	MarkdownList list = stack.peek();
-        	if (list.getDepth() > depth) {
-        		stack.pop();
-        		line.prependElement(list.getEndListHtml());
-        	} else {
-        		isGreaterDepth = false;
-        	}
-        }
-        
+        checkForGreaterDepth(line, depth);
         if (!stack.isEmpty()) {
         	MarkdownList list = stack.peek();
         	//this list is either the parent of the new list, or we should add this item to this list
         	if (list.getDepth() == depth) {
         		//add this to the current list
-        		list.addListItemHtml(line,  prefixGroup+value);
+        		list.addListItemHtml(line,  value);
         	} else {
         		//list depth is less than the current depth
         		//create a new list
         		MarkdownList newList = getNewList(depth, isOrderedList);
         		line.prependElement(newList.getStartListHtml());
-        		list.addListItemHtml(line, prefixGroup+value);
+        		newList.addListItemHtml(line, value);
         	}
         }
         else {
@@ -82,7 +89,22 @@ public class ListParser extends BasicMarkdownElementParser  {
         	//create a new list
         	MarkdownList newList = getNewList(depth, isOrderedList);
     		line.prependElement(newList.getStartListHtml());
-    		newList.addListItemHtml(line, prefixGroup+value);
+    		newList.addListItemHtml(line, value);
+        }
+	}
+	
+	public void checkForGreaterDepth(MarkdownElements line, int depth) {
+        //end any list that is of greater depth on the stack
+        boolean isGreaterDepth = true;
+        while (isGreaterDepth && !stack.isEmpty()) {
+        	MarkdownList list = stack.peek();
+        	if (list.getDepth() > depth) {
+        		stack.pop();
+        		list.closeOpenListItems(line);
+        		line.prependElement(list.getEndListHtml());
+        	} else {
+        		isGreaterDepth = false;
+        	}
         }
 	}
 	
