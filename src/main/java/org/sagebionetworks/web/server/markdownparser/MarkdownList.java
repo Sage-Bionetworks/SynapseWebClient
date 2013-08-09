@@ -1,14 +1,21 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public abstract class MarkdownList {
 	private int depth;
 	private boolean firstItemCreated;
 	private boolean inCodeBlock;
+	private Pattern p;
+	
 	public MarkdownList(int depth) {
 		super();
 		this.depth = depth;
 		this.firstItemCreated = false;
 		this.inCodeBlock = false;
+		this.p = Pattern.compile(MarkdownRegExConstants.HTML_FENCE_CODE_BLOCK_REGEX, Pattern.DOTALL);
+		
 	}
 	
 	public int getDepth() {
@@ -27,13 +34,12 @@ public abstract class MarkdownList {
 	}
 	
 	public void addExtraElementHtml(MarkdownElements line, String item) {
+		Matcher m = p.matcher(line.getHtml());
 		//Add other elements under a list item
-		if(line.getHtml().contains("<pre>") || line.getHtml().contains("```")) {
-			//If this is a code block, do not modify and set flag
+		if(m.find()) {
+			//If this is a code block, do not modify and update flag
 			line.updateMarkdown(item);
-			inCodeBlock = true;
-		} else if(line.getHtml().contains("</pre>")) {
-			inCodeBlock = false;
+			inCodeBlock = !inCodeBlock;
 		} else {
 			if(!inCodeBlock) {
 				line.prependElement("<p>");

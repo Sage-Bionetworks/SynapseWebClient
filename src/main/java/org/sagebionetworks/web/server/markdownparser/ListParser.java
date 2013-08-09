@@ -13,7 +13,7 @@ public class ListParser extends BasicMarkdownElementParser  {
 	
 	Pattern p1= Pattern.compile(MarkdownRegExConstants.ORDERED_LIST_REGEX, Pattern.DOTALL);
 	Pattern p2 = Pattern.compile(MarkdownRegExConstants.UNORDERED_LIST_REGEX, Pattern.DOTALL);
-	Pattern p3 = Pattern.compile("(\\s*)(.*)", Pattern.DOTALL);
+	Pattern p3 = Pattern.compile(MarkdownRegExConstants.INDENTED_REGEX, Pattern.DOTALL);
 	Stack<MarkdownList> stack;
 
 	@Override

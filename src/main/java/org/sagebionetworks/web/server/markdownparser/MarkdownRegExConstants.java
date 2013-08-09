@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import org.sagebionetworks.web.server.ServerMarkdownUtils;
+
 /**
  * (?=pattern) is a positive look-ahead assertion - the pattern must succeed
  * (?<=pattern) is a positive look-behind assertion - the pattern must succeed
@@ -11,12 +13,6 @@ public class MarkdownRegExConstants {
 	 * Beginning of the line, and the blockquote or whitespace characters zero or more times
 	 */
 	public static final String PREFIX_GROUP = "(^[> \t\n\f\r]*)";
-	
-	/**
-	 * Recognizes example input:
-	 * \`
-	 */
-	public static final String BACKTICK_ESCAPED_REGEX = "\\\\`";
 	
 	/**
 	 * Recognized example input:
@@ -49,6 +45,12 @@ public class MarkdownRegExConstants {
 
 	/**
 	 * Recognized example input:
+	 * ``` or <pre><code or </code></pre>
+	 */
+	public static final String HTML_FENCE_CODE_BLOCK_REGEX = FENCE_CODE_BLOCK_REGEX + "|" + ServerMarkdownUtils.START_PRE_CODE + "|" + ServerMarkdownUtils.END_PRE_CODE;
+	
+	/**
+	 * Recognized example input:
 	 * A code span look like `this`
 	 */
 	public static final String CODE_SPAN_REGEX = "(?<!\\\\)(`+)(.+?)(?<!`)\\1(?!`)";
@@ -70,6 +72,7 @@ public class MarkdownRegExConstants {
 	 * *****
 	 */
 	public static final String HR_REGEX2 = "^[*]{3,}$";
+	
 	
 	/**
 	 * Recognized example input:
@@ -96,6 +99,13 @@ public class MarkdownRegExConstants {
 	 * ![An Example](http://www.example.com/a.png)
 	 */
 	public static final String IMAGE_REGEX = "!\\[(.*)\\]\\((.*)\\)";
+	
+	/**
+	 * Recognized example input:
+	 * No starting whitespace or
+	 * 		Starting whitespace
+	 */
+	public static final String INDENTED_REGEX = PREFIX_GROUP + "(.*)";
 	
 	/**
 	 * Recognized example input:
@@ -157,12 +167,6 @@ public class MarkdownRegExConstants {
 	 * ^sup^ is a superscript
 	 */
 	public static final String SUPERSCRIPT_REGEX = "(\\^)(?=\\S*)(.+?)(?<=\\S*)(\\^)";
-	
-	/**
-	 * Recognizes example input:
-	 * \_
-	 */
-	public static final String UNDERSCORE_ESCAPED_REGEX = "\\\\_";
 	
 	/**
 	 * Recognized example input:
