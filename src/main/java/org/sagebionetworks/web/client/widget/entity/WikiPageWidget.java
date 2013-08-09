@@ -55,6 +55,7 @@ SynapseWidgetPresenter {
 	
 	public interface Callback{
 		public void pageUpdated();
+		public void noWikiFound();
 	}
 	
 	public interface OwnerObjectNameCallback{
@@ -84,12 +85,11 @@ SynapseWidgetPresenter {
 		return view.asWidget();
 	}
 	
-	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, Callback callback, final boolean isEmbeddedInOwnerPage, final int spanWidth) {
+	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage, final int spanWidth) {
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.spanWidth = spanWidth;
-		
 		//set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -97,6 +97,9 @@ SynapseWidgetPresenter {
 			this.callback = new Callback() {
 				@Override
 				public void pageUpdated() {
+				}
+				@Override
+				public void noWikiFound() {
 				}
 			};
 		
@@ -124,6 +127,9 @@ SynapseWidgetPresenter {
 								view.showNoWikiAvailableUI();
 							else if (!isEmbeddedInOwnerPage) //otherwise, if it's not embedded in the owner page, show a 404
 								view.show404();
+							
+							if (callback != null)
+								callback.noWikiFound();
 						}
 						else if (caught instanceof ForbiddenException) {
 							if (!isEmbeddedInOwnerPage) //if it's not embedded in the owner page, show a 403
@@ -236,6 +242,9 @@ SynapseWidgetPresenter {
 				} catch (JSONObjectAdapterException e) {
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 				}
+			}
+			@Override
+			public void noWikiFound() {
 			}
 		});
 	}
