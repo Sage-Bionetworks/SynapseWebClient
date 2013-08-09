@@ -82,10 +82,8 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 				//add link and text
 				FlowPanel tutorialLinkPanel = new FlowPanel();
 				tutorialLinkPanel.addStyleName("inline-block");
-				
 				tutorialLinkPanel.add(new InlineLabel("Read the "));
-				
-				Anchor link = new Anchor("Submission Tutorial");
+				Anchor link = new Anchor("Submission Guide");
 				link.addStyleName("link inline-block");
 				link.addClickHandler(new ClickHandler() {
 					@Override
@@ -95,6 +93,21 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 				});
 				tutorialLinkPanel.add(link);
 				tutorialLinkPanel.add(new InlineLabel(" to learn how to upload and submit a file."));
+				listPanel.add(tutorialLinkPanel);
+				//add link and text
+				tutorialLinkPanel = new FlowPanel();
+				tutorialLinkPanel.addStyleName("inline-block");
+				tutorialLinkPanel.add(new InlineLabel("Read the "));
+				link = new Anchor("Write-Up Guide");
+				link.addStyleName("link inline-block");
+				link.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						presenter.showWriteupGuide();
+					}
+				});
+				tutorialLinkPanel.add(link);
+				tutorialLinkPanel.add(new InlineLabel(" to describe your work and provide source code."));
 				listPanel.add(tutorialLinkPanel);
 				
 				p.add(listPanel);
@@ -241,7 +254,6 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 
 	@Override
 	public void showSubmissionUserGuide(String tutorialEntityOwnerId, TutorialWizard.Callback callback) {
-		
 		tutorialWizard.configure(tutorialEntityOwnerId, callback);
 	}
 	

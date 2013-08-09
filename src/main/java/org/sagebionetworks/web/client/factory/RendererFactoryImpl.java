@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.factory;
 
+import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
@@ -25,6 +26,8 @@ public class RendererFactoryImpl implements RendererFactory {
 
 	@Inject
 	private Provider<YouTubeWidget> youTubeWidgetProvider;
+	@Inject
+	private Provider<TutorialWizard> tutorialWizardWidgetProvider;
 	@Inject
 	private Provider<ProvenanceWidget> provenanceWidgetProvider;
 	@Inject
@@ -96,10 +99,14 @@ public class RendererFactoryImpl implements RendererFactory {
 		return shinySiteWidgetProvider.get();
 	}
 
-
 	@Override
 	public UserBadge getUserBadgeWidget() {
 		return userBadgeProvider.get();
+	}
+	
+	@Override
+	public TutorialWizard getTutorialWidgetRenderer() {
+		return tutorialWizardWidgetProvider.get();
 	}
 
 }

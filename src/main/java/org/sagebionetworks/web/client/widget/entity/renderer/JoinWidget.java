@@ -299,6 +299,11 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 		synapseClient.getSynapseProperty(WebConstants.CHALLENGE_TUTORIAL_PROPERTY, callback);
 	}
 	
+	public void getWriteUpGuideSynapseId(AsyncCallback<String> callback) {
+		synapseClient.getSynapseProperty(WebConstants.CHALLENGE_WRITE_UP_TUTORIAL_PROPERTY, callback);
+	}
+
+	
 	@Override
 	public void submissionUserGuideSkipped() {
 		showSubmissionDialog();
@@ -313,6 +318,19 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 			};
 			public void onSuccess(String tutorialEntityId) {
 				view.showSubmissionUserGuide(tutorialEntityId, callback);
+			};
+		});
+	}
+	
+	@Override
+	public void showWriteupGuide() {
+		//no submissions found.  walk through the steps of uploading to Synapse
+		getWriteUpGuideSynapseId(new AsyncCallback<String>() {
+			public void onFailure(Throwable caught) {
+				onFailure(new IllegalArgumentException(DisplayConstants.PROPERTY_ERROR + WebConstants.CHALLENGE_WRITE_UP_TUTORIAL_PROPERTY));
+			};
+			public void onSuccess(String tutorialEntityId) {
+				view.showSubmissionUserGuide(tutorialEntityId, null);
 			};
 		});
 	}
