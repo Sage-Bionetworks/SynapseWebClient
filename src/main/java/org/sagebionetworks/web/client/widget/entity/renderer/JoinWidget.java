@@ -258,37 +258,7 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	
 	@Override
 	public void submitToChallengeClicked() {
-		//has this user ever submitted to a challenge before?
-		try {
-			synapseClient.hasSubmitted(new AsyncCallback<Boolean>() {
-				@Override
-				public void onSuccess(Boolean hasSubmitted) {
-					if(hasSubmitted) {
-						//pop up the submission dialog that has an Entity Finder
-						showSubmissionDialog();
-					} else {
-						showSubmissionGuide(new TutorialWizard.Callback() {
-							
-							@Override
-							public void tutorialSkipped() {
-								submissionUserGuideSkipped();
-							}
-							
-							@Override
-							public void tutorialFinished() {
-								//do nothing
-							}
-						});
-					}
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
-				}
-			});
-		} catch (RestServiceException e) {
-			view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
-		}
+		showSubmissionDialog();
 	}
 	
 	public void getTutorialSynapseId(AsyncCallback<String> callback) {
