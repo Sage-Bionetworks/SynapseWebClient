@@ -28,7 +28,7 @@ public class AclUtils {
 		permToACCESS_TYPE.put(PermissionLevel.CAN_SCORE_EVALUATION, addTypes(accessList, ACCESS_TYPE.READ_PRIVATE_SUBMISSION, ACCESS_TYPE.UPDATE_SUBMISSION));
 				
 		//Participate in Evaluation (must clean up new access_type, does not modify existing permission levels)
-		permToACCESS_TYPE.put(PermissionLevel.CAN_PARTICIPATE_EVALUATION, addTypes(accessList, ACCESS_TYPE.PARTICIPATE));
+		permToACCESS_TYPE.put(PermissionLevel.CAN_PARTICIPATE_EVALUATION, addTypes(accessList, ACCESS_TYPE.PARTICIPATE, ACCESS_TYPE.SUBMIT));
 		
 		accessList.add(ACCESS_TYPE.UPDATE);
 		
@@ -42,7 +42,7 @@ public class AclUtils {
 		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, new TreeSet<ACCESS_TYPE>(accessList));
 		
 		//Administer an Evaluation (must clean up new access_types, does not modify existing permission levels)
-		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, addTypes(accessList, ACCESS_TYPE.PARTICIPATE, ACCESS_TYPE.READ_PRIVATE_SUBMISSION, ACCESS_TYPE.UPDATE_SUBMISSION, ACCESS_TYPE.DELETE_SUBMISSION));
+		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, addTypes(accessList, ACCESS_TYPE.PARTICIPATE, ACCESS_TYPE.SUBMIT, ACCESS_TYPE.READ_PRIVATE_SUBMISSION, ACCESS_TYPE.UPDATE_SUBMISSION, ACCESS_TYPE.DELETE_SUBMISSION));
 		
 		accessList.add(ACCESS_TYPE.DOWNLOAD);
 		permToACCESS_TYPE.put(PermissionLevel.OWNER, new TreeSet<ACCESS_TYPE>(accessList));

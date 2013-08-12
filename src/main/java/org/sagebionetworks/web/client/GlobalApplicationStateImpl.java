@@ -9,9 +9,10 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 
 import com.google.gwt.activity.shared.ActivityMapper;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -23,12 +24,15 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
 	private ActivityMapper directMapper;
 	private PlaceChanger placeChanger;
+	private EventBus eventBus;
 	private List<EntityHeader> favorites;
 	private String synapseVersion;
 	
+	
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider) {
+	public GlobalApplicationStateImpl(CookieProvider cookieProvider, EventBus eventBus) {
 		this.cookieProvider = cookieProvider;
+		this.eventBus = eventBus;
 	}
 
 	@Override
@@ -42,9 +46,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 						placeController.goTo(place);
 					}else{
 						// We are already on this page but we want to force it to reload.
-						directMapper.getActivity(place);
+						eventBus.fireEvent(new PlaceChangeEvent(place));
 					}
-
 				}
 			};
 		}

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelStringProvider;
@@ -12,16 +13,19 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpagesView {
 
 	private Presenter presenter;
-		
+	private GlobalApplicationState globalAppState;
+	
 	@Inject
-	public WikiSubpagesViewImpl() {
+	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState) {
 		this.setLayout(new FitLayout());
+		this.globalAppState = globalAppState;
 	}
 	
 	@Override
@@ -33,6 +37,9 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 	@Override
 	public void configure(TocItem root) {
 		clear();
+		final SimplePanel treePanel = new SimplePanel();
+		treePanel.addStyleName("well well-small");
+		
 		//this widget shows nothing if it doesn't have any pages!
 		TocItem mainPage = (TocItem) root.getChild(0);
 		if (mainPage.getChildCount() == 0)
@@ -62,30 +69,27 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 			Listener<TreePanelEvent<ModelData>> expandCollapseListener = new Listener<TreePanelEvent<ModelData>>() {
 				public void handleEvent(TreePanelEvent<ModelData> be) {
 					Element child = tree.getElement().getFirstChildElement();
-					tree.setHeight(child.getClientHeight() + "px");
+					String newHeight = child.getClientHeight() + "px";
+					tree.setHeight(newHeight);
+					treePanel.setHeight(newHeight);
 				}			
 			};
 			
 			tree.addListener(Events.Expand, expandCollapseListener);
 			tree.addListener(Events.Collapse, expandCollapseListener);
-			this.add(tree);
+			
+			tree.addListener(Events.OnClick, new Listener<TreePanelEvent<TocItem>>() {
+	            public void handleEvent(TreePanelEvent<TocItem> event) {
+	            	//go to the target place
+	            	globalAppState.getPlaceChanger().goTo(event.getItem().getTargetPlace());
+	            };
+	        });
+			treePanel.add(tree);
 		}
+		this.add(treePanel);
 		this.layout(true);
 	}	
 	
-	@Override
-	public String getHTML(String href, String title, boolean isCurrentPage) {
-		StringBuilder html = new StringBuilder();
-		html.append("<a class=\"link");
-		if (isCurrentPage)
-			html.append(" boldText");
-		html.append("\" href=\"");
-		html.append(href);
-		html.append("\">");
-		html.append(title);
-		html.append("</a>");
-		return html.toString();
-	}
 	@Override
 	public Widget asWidget() {
 		return this;

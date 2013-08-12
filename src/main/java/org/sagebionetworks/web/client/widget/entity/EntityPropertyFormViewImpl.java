@@ -195,7 +195,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		}
 		else {
 			if (presenter.getEntity().getId() != null) {
-				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  ObjectType.ENTITY.toString(), null), markdownDescriptionField, formPanel, true, false, new WidgetDescriptorUpdatedHandler() {
+				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  ObjectType.ENTITY.toString(), null, DisplayUtils.getVersion(presenter.getEntity())), markdownDescriptionField, formPanel, true, false, new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						presenter.refreshEntityAttachments();

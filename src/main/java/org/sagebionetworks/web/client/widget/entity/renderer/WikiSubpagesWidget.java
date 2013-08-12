@@ -18,6 +18,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityTab;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -37,7 +39,8 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	private NodeModelCreator nodeModelCreator;
 	private AdapterFactory adapterFactory;
 	private WikiPageKey wikiKey; 
-	private String ownerObjectName, ownerObjectLink;
+	private String ownerObjectName;
+	private Synapse ownerObjectLink;
 	
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory) {
@@ -72,7 +75,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							if (headers.getTotalNumberOfResults() == 1) {
 								EntityHeader theHeader = headers.getResults().get(0);
 								ownerObjectName = theHeader.getName();
-								ownerObjectLink = DisplayUtils.getSynapseHistoryToken(theHeader.getId());
+								ownerObjectLink = new Synapse(theHeader.getId(), wikiKey.getVersion(), Synapse.EntityTab.WIKI, null);
 								refreshTableOfContents();
 							}	
 						} catch (JSONObjectAdapterException e) {
@@ -113,17 +116,20 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
 						WikiHeader header = (WikiHeader) headerEntity;
 						boolean isCurrentPage = header.getId().equals(wikiKey.getWikiPageId());
-						String href, title;
+						Synapse targetPlace;
+						String title;
 						if (header.getParentId() == null) {
-							href = ownerObjectLink;
+							targetPlace = ownerObjectLink;
 							title = ownerObjectName;
 						}
 						else {
-							href = DisplayUtils.getSynapseWikiHistoryToken(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), header.getId());
+							targetPlace = new Synapse(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), Synapse.EntityTab.WIKI, header.getId());
 							title = header.getTitle();
 						}
 						
-						TocItem item = new TocItem(view.getHTML(href, title, isCurrentPage));
+						if (isCurrentPage)
+							title += " (Current Page)";
+						TocItem item = new TocItem(title, targetPlace);
 						wikiId2TreeItem.put(header.getId(), item);
 					}
 					//now set up the relationships
@@ -165,34 +171,41 @@ class TocItem extends BaseTreeModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private static int ID = 0;
-	private String html;
+	private String text;
+	private Synapse targetPlace;
 	
 	public TocItem() {
 		set("id", ID++);
 	}
 	
-	public TocItem(String html) {
+	public TocItem(String text, Synapse targetPlace) {
 		super();
 		set("id", ID++);
-		this.html = html;
+		this.text = text;
+		this.targetPlace = targetPlace;
 	}
 	
 	public Integer getId() {
 		return (Integer) get("id");
 	}
 	
-	public TocItem(String html, BaseTreeModel[] children) {
-		this(html);
+	public TocItem(String text, Synapse targetPlace, BaseTreeModel[] children) {
+		this(text, targetPlace);
 		for(int i = 0; i < children.length; i++) {
 			add(children[i]);
 		}
 	}
 	
-	public String getHtml() {
-		return html;
+	public Synapse getTargetPlace() {
+		return targetPlace;
 	}
 	
+	public String getText() {
+		return text;
+	}
+	
+	@Override
 	public String toString() {
-		return getHtml();
+		return "<a href=\"\"> " + getText() + "</a>";
 	}
 }

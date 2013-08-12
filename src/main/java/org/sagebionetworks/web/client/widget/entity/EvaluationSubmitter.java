@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -90,7 +91,14 @@ public class EvaluationSubmitter implements Presenter {
 						view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
 					} 
 					else {
-						getAvailableEvaluationsSubmitterAliases(evaluations);
+						List<String> submitterAliases = new ArrayList<String>();
+						//add the default team name (if set in the profile and not already in the list)
+						UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
+						String teamName = sessionData.getProfile().getTeamName();
+						if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
+							submitterAliases.add(teamName);
+						}
+						view.popupSelector(submissionEntity == null, evaluations, submitterAliases);
 					}
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -105,39 +113,7 @@ public class EvaluationSubmitter implements Presenter {
 		};
 	}
 	
-	
-	public void getAvailableEvaluationsSubmitterAliases(final List<Evaluation> evaluations) {
-		try {
-			synapseClient.getAvailableEvaluationsSubmitterAliases(new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String jsonString) {
-					try {
-						RestResourceList results = nodeModelCreator.createJSONEntity(jsonString, RestResourceList.class);
-						List<String> submitterAliases = results.getList();
-						//add the default team name (if set in the profile and not already in the list)
-						UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-						String teamName = sessionData.getProfile().getTeamName();
-						if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
-							submitterAliases.add(teamName);
-						}
-						view.popupSelector(submissionEntity == null, evaluations, submitterAliases);	
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-				}
-			});
-		} catch (RestServiceException e) {
-			view.showErrorMessage(e.getMessage());
-		}
-	}
-
-	
+		
 	@Override
 	public void submitToEvaluations(final Reference selectedReference, final List<Evaluation> evaluations, final String submitterAlias) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag

@@ -134,6 +134,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getJoinWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.BUTTON_LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getButtonLinkWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE)) {
+			presenter = ginInjector.getTutorialWidgetRenderer();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -215,6 +217,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.QUERY_TABLE_CONTENT_TYPE, WidgetConstants.QUERY_TABLE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.ENTITYLIST_CONTENT_TYPE, WidgetConstants.ENTITYLIST_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.SHINYSITE_CONTENT_TYPE, WidgetConstants.SHINYSITE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE, WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

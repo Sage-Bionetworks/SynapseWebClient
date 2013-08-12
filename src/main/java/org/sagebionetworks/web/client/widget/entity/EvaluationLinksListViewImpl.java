@@ -54,7 +54,7 @@ public class EvaluationLinksListViewImpl extends LayoutContainer implements Eval
 			}
 			
 			LayoutContainer border = new LayoutContainer();
-		    border.addStyleName("span-7 notopmargin");
+		    border.addStyleName("notopmargin");
 		    border.setBorders(true);
 		    border.add(linkContainer);
 			

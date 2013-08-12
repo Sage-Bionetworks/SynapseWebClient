@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.factory;
 
+import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
@@ -22,6 +23,7 @@ public interface RendererFactory {
 
 	////// Renderers
 	public YouTubeWidget getYouTubeRenderer();
+	public TutorialWizard getTutorialWidgetRenderer();
 	public ProvenanceWidget getProvenanceRenderer();
 	public OldImageWidget getOldImageRenderer();
 	public ImageWidget getImageRenderer();

@@ -11,11 +11,14 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityTab;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -41,11 +44,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private IconsImageBundle iconsImageBundle;
 	private WidgetRegistrar widgetRegistrar;
 	private EntityUpdatedHandler entityUpdateHandler;
+	private GlobalApplicationState globalApplicationState;
 	private EntityBundle bundle;
 	private String entityTypeDisplay;
 	private EventBus bus;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Long versionNumber;
+	private Synapse.EntityTab area;
+	private String areaToken;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -56,6 +62,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle,
 			WidgetRegistrar widgetRegistrar,
+			GlobalApplicationState globalApplicationState,
 			EventBus bus, JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -67,6 +74,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.widgetRegistrar = widgetRegistrar;
 		this.bus = bus;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 	}
 
@@ -76,9 +84,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      *
      * @param bundle
      */
-    public void setBundle(EntityBundle bundle, Long versionNumber) {
+    public void setBundle(EntityBundle bundle, Long versionNumber, Synapse.EntityTab area, String areaToken) {
     	this.bundle = bundle;
     	this.versionNumber = versionNumber;
+    	this.area = area;
+    	this.areaToken = areaToken;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -103,9 +113,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void refresh() {
-		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit());
+		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit(), area, areaToken);
 	}
-
+	
+	@Override
+	public void refreshTab(Synapse.EntityTab area, String areaToken) {
+		globalApplicationState.getPlaceChanger().goTo(new Synapse(bundle.getEntity().getId(), null, area, areaToken));
+	}
+	
 	@Override
 	public void fireEntityUpdatedEvent() {
 		EntityUpdatedEvent event = new EntityUpdatedEvent();
@@ -166,10 +181,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	/*
 	 * Private Methods
 	 */
-	private void sendDetailsToView(boolean isAdmin, boolean canEdit) {
+	private void sendDetailsToView(boolean isAdmin, boolean canEdit, Synapse.EntityTab area, String areaToken) {
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber);
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber, area, areaToken);
 	}
 	
 	private UserProfile getUserProfile() {

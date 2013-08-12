@@ -15,6 +15,8 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.activity.shared.ActivityMapper;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -23,6 +25,7 @@ public class GlobalApplicationStateImplTest {
 	CookieProvider mockCookieProvider;
 	PlaceController mockPlaceController;
 	ActivityMapper mockMapper;
+	EventBus mockEventBus;
 	GlobalApplicationStateImpl globalApplicationState;
 	
 	@Before
@@ -30,7 +33,8 @@ public class GlobalApplicationStateImplTest {
 		mockCookieProvider = Mockito.mock(CookieProvider.class);
 		mockPlaceController = Mockito.mock(PlaceController.class);
 		mockMapper = Mockito.mock(ActivityMapper.class);
-		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider);
+		mockEventBus = Mockito.mock(EventBus.class);
+		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider, mockEventBus);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setActivityMapper(mockMapper);
 	}
@@ -62,8 +66,8 @@ public class GlobalApplicationStateImplTest {
 		PlaceChanger changer = globalApplicationState.getPlaceChanger();
 		assertNotNull(changer);
 		changer.goTo(currenPlace);
-		// Since we are already there then just reload the page by calling getAtiviity.
-		verify(mockMapper).getActivity(currenPlace);
+		// Since we are already there then just reload the page by firing an event
+		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
 		
 	}
 
