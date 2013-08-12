@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.registration;
 
 
 public class WidgetConstants {
+	public static final String BACKTICK_CONTENT_TYPE = "backtick";
+	public static final String BACKTICK_FRIENDLY_NAME = "Backtick";
+	
 	public static final String BOOKMARK_CONTENT_TYPE = "bookmark";
 	public static final String BOOKMARK_FRIENDLY_NAME = "Bookmark";
 	public static final String BOOKMARK_TARGET_CONTENT_TYPE = "bookmarktarget";
@@ -40,6 +43,9 @@ public class WidgetConstants {
 	public static final String SHINYSITE_CONTENT_TYPE = "iframe";
 	public static final String SHINYSITE_FRIENDLY_NAME ="Shiny Site";
 	
+	public static final String UNDERSCORE_CONTENT_TYPE = "underscore";
+	public static final String UNDERSCORE_FRIENDLY_NAME = "Underscore";
+	
 	public static final String USERBADGE_CONTENT_TYPE = "userbadge";
 	public static final String USERBADGE_FRIENDLY_NAME ="User Badge";
 	
@@ -52,6 +58,7 @@ public class WidgetConstants {
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
+	public static final String WIDGET_END_MARKDOWN_ESCAPED = "\\}";
 	
 	public static final String TOC_CONTENT_TYPE = "toc";
 	public static final String WIKI_SUBPAGES_CONTENT_TYPE = "wikipages";
