@@ -418,4 +418,6 @@ public class ServerMarkdownUtils {
 	public static String getUrlHtml(String url){
 		return "<a target=\"_blank\" class=\"link\" href=\"" + url.trim() + "\">" + url+ "</a>";
 	}
+
+	public static final String DEFAULT_CODE_CSS_CLASS = "no-highlight";
 }
