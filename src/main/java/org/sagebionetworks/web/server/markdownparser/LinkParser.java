@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WebConstants;
 
 public class LinkParser extends BasicMarkdownElementParser  {
 	Pattern p1= Pattern.compile(MarkdownRegExConstants.LINK_REGEX, Pattern.DOTALL);
@@ -27,6 +28,11 @@ public class LinkParser extends BasicMarkdownElementParser  {
 				url.substring(bookmarkTarget.length()) + WidgetConstants.WIDGET_END_MARKDOWN;			
 
 			} else {
+				//Check for incomplete url
+				if(url.startsWith(WebConstants.URL_WWW_PREFIX)) {
+					url = WebConstants.URL_PROTOCOL + url;
+				}
+				//Create link
 				updated = "<a class=\"link\" target=\"_blank\" href=\"" + url + "\">" + text + "</a>";
 			}
 			
