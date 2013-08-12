@@ -15,6 +15,12 @@ public class MarkdownRegExConstants {
 	public static final String PREFIX_GROUP = "(^[> \t\n\f\r]*)";
 	
 	/**
+	 * Recognizes example input:
+	 * \`
+	 */
+	public static final String BACKTICK_ESCAPED_REGEX = "\\\\`";
+	
+	/**
 	 * Recognized example input:
 	 * > This is in
 	 * > a blockquote.
@@ -167,6 +173,12 @@ public class MarkdownRegExConstants {
 	 * ^sup^ is a superscript
 	 */
 	public static final String SUPERSCRIPT_REGEX = "(\\^)(?=\\S*)(.+?)(?<=\\S*)(\\^)";
+	
+	/**
+	 * Recognizes example input:
+	 * \_
+	 */
+	public static final String UNDERSCORE_ESCAPED_REGEX = "\\\\_";
 	
 	/**
 	 * Recognized example input:
