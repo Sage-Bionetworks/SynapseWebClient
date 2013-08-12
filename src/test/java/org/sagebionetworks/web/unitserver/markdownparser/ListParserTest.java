@@ -139,7 +139,7 @@ public class ListParserTest {
 		parser.processLine(elements);
 		result.append(elements.getHtml());
 		System.out.println("RESULT: " + result.toString());
-		assertTrue(result.toString().contains("<ul><li><p>First item</p><pre><code class=\"\">sudo apt-get install git"));
+		assertTrue(result.toString().contains("<ul><li><p>First item</p><pre><code class=\""+ServerMarkdownUtils.DEFAULT_CODE_CSS_CLASS+"\">sudo apt-get install git"));
 		assertTrue(result.toString().contains("sudo apt-get install curl"));
 		assertTrue(result.toString().contains("sudo apt-get install python python-setuptools python-pip"));
 		assertTrue(result.toString().contains("sudo pip install python-magic</code></pre></li></ul>"));
