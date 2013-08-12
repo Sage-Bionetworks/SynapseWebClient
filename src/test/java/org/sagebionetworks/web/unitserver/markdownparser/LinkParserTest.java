@@ -26,6 +26,22 @@ public class LinkParserTest {
 		assertTrue(result.contains("<a"));
 		assertTrue(result.contains("href=\"" + href));
 		assertTrue(result.contains(text));
+		
+		String text2 = "Synapse";
+		String href2 = "#!Synapse:syn12345";
+		String line2 = "[" + text2 + "](" + href2 +")";
+		MarkdownElements elements2 = new MarkdownElements(line2);
+		parser.processLine(elements2);
+		String result2 = elements2.getHtml();
+		assertTrue(result2.contains("href=\"#!Synapse:syn12345"));
+		
+		String text3 = "Synapse";
+		String href3 = "#Synapse:syn12345";
+		String line3 = "[" + text3 + "](" + href3 +")";
+		MarkdownElements elements3 = new MarkdownElements(line3);
+		parser.processLine(elements3);
+		String result3 = elements3.getHtml();
+		assertTrue(result3.contains("href=\"#Synapse:syn12345"));
 	}
 	
 	@Test

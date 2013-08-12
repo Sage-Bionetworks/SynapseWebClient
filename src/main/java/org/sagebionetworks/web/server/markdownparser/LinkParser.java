@@ -29,7 +29,8 @@ public class LinkParser extends BasicMarkdownElementParser  {
 
 			} else {
 				//Check for incomplete url
-				if(!url.toLowerCase().startsWith("http")) {
+				String testUrl = url.toLowerCase();
+				if(!testUrl.startsWith("http") && !testUrl.startsWith("#")) {
 					url = WebConstants.URL_PROTOCOL + url;
 				}
 				//Create link
