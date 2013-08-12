@@ -26,7 +26,7 @@ public class UnderscoreParserTest {
 		//Escape first, then use other parsers
 		parser.processLine(elements);
 		italicsParser.processLine(elements);
-		assertEquals(elements.getHtml(), "file${underscore?text=%5F&inlineWidget=true}number${underscore?text=%5F&inlineWidget=true}1");
+		assertEquals(elements.getHtml(), "file&#95;number&#95;1");
 		assertFalse(elements.getHtml().contains("<em>number</em>"));
 	}
 }

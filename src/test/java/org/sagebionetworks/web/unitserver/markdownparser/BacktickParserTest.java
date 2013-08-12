@@ -26,7 +26,7 @@ public class BacktickParserTest {
 		//Escape first, then use other parsers
 		parser.processLine(elements);
 		codeParser.processLine(elements);
-		assertEquals(elements.getHtml(), "${backtick?text=%60&inlineWidget=true}not code span${backtick?text=%60&inlineWidget=true}");
+		assertEquals(elements.getHtml(), "&#96;not code span&#96;");
 		assertFalse(elements.getHtml().contains("<code>not code span</code>"));
 	}
 }
