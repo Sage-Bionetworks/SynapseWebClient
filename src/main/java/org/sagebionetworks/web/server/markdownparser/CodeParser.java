@@ -26,8 +26,13 @@ public class CodeParser extends BasicMarkdownElementParser  {
 				isFirstCodeLine = true;
 				StringBuilder sb = new StringBuilder();
 				sb.append(ServerMarkdownUtils.START_PRE_CODE);
+				String codeCssClass = null;
 				if (m.groupCount() == 2)
-					sb.append(" class=\""+m.group(2).toLowerCase()+"\"");
+					codeCssClass = m.group(2).toLowerCase();
+				if (codeCssClass == null || codeCssClass.trim().length() == 0) {
+					codeCssClass = ServerMarkdownUtils.DEFAULT_CODE_CSS_CLASS;
+				}
+				sb.append(" class=\""+codeCssClass+"\"");
 				sb.append(">");
 				line.prependElement(sb.toString());
 			}
