@@ -29,6 +29,25 @@ public class LinkParserTest {
 	}
 	
 	@Test
+	public void testIncompleteLinks() {
+		String text = "Test";
+		String href = "www.example.com";
+		String line = "[" + text + "](" + href +")";
+		MarkdownElements elements = new MarkdownElements(line);
+		parser.processLine(elements);
+		String result = elements.getHtml();
+		assertTrue(result.contains("href=\"http://www.example.com"));
+		
+		String text2 = "Test";
+		String href2 = "example.com";
+		String line2 = "[" + text2 + "](" + href2 +")";
+		MarkdownElements elements2 = new MarkdownElements(line2);
+		parser.processLine(elements2);
+		String result2 = elements2.getHtml();
+		assertTrue(result2.contains("href=\"http://example.com"));
+	}
+	
+	@Test
 	public void testBookmarkAndLink() {
 		String line = "I want to refer to [this](#Bookmark:subject1). To see official page, go [here](http://example.com).";
 		MarkdownElements elements = new MarkdownElements(line);

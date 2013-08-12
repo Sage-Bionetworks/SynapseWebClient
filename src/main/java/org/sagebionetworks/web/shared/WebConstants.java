@@ -43,7 +43,6 @@ public class WebConstants {
 	public static final String VALID_BOOKMARK_ID_REGEX = "[_A-Za-z0-9-.[^\\s]]+";
 	
 	public static final String URL_PROTOCOL = "http://";
-	public static final String URL_WWW_PREFIX = "www";
 	
 	// OpenID related constants
 

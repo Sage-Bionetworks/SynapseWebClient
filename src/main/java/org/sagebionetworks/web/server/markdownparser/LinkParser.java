@@ -29,7 +29,7 @@ public class LinkParser extends BasicMarkdownElementParser  {
 
 			} else {
 				//Check for incomplete url
-				if(url.startsWith(WebConstants.URL_WWW_PREFIX)) {
+				if(!url.toLowerCase().startsWith("http")) {
 					url = WebConstants.URL_PROTOCOL + url;
 				}
 				//Create link
