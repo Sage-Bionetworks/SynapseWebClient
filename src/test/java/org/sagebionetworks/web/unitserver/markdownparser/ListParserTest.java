@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.server.markdownparser.CodeParser;
+import org.sagebionetworks.web.server.markdownparser.HeadingParser;
 import org.sagebionetworks.web.server.markdownparser.ListParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
@@ -18,6 +19,7 @@ public class ListParserTest {
 	
 	ListParser parser;
 	CodeParser codeParser;
+	HeadingParser headParser;
 	
 	@Before
 	public void setup(){
@@ -26,6 +28,9 @@ public class ListParserTest {
 		
 		codeParser = new CodeParser();
 		codeParser.reset();
+		
+		headParser = new HeadingParser();
+		headParser.reset();
 	}
 	
 	@Test
@@ -143,6 +148,27 @@ public class ListParserTest {
 		assertTrue(result.toString().contains("sudo apt-get install curl"));
 		assertTrue(result.toString().contains("sudo apt-get install python python-setuptools python-pip"));
 		assertTrue(result.toString().contains("sudo pip install python-magic</code></pre></li></ul>"));
+	}
+	
+	@Test
+	public void testWithHeader() {
+		String example = 
+			"1. #### Heading1\n" +
+			"    1. #### Heading2\n";
+		String[] lines = example.split("\n");
+		StringBuilder result = new StringBuilder();
+		for (int i = 0; i < lines.length; i++) {
+			MarkdownElements elements = new MarkdownElements(lines[i]);
+			parser.processLine(elements);
+			headParser.processLine(elements);
+			result.append(elements.getHtml());
+		}
+		//process a final empty line (just like the processor)
+		MarkdownElements elements = new MarkdownElements("");
+		parser.processLine(elements);
+		result.append(elements.getHtml());
+		System.out.println("RESULT: " + result.toString());
+		assertEquals("<ol><li><p><h4>Heading1</h4></p><ol><li><p><h4>Heading2</h4></p></li></ol></li></ol>", result.toString());
 	}
 	
 }
