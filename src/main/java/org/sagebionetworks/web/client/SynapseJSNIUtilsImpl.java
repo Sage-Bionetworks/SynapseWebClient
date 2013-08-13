@@ -13,6 +13,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
@@ -313,6 +314,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		newWin.setCallbackOnGSUploadError = function(savePath) {
 			alert('outer ERROR saving to GenomeSpace as ' + savePath);
 		}
+	}-*/;
+
+
+	@Override
+	public void processWithMathJax(Element element) {
+		_processWithMathJax(element);		
+	}
+
+	private final static native void _processWithMathJax(Element element) /*-{
+		$wnd.layoutMath(element);
 	}-*/;
 
 }

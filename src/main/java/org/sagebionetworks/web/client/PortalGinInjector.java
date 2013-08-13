@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEdito
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.MathJaxConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
@@ -50,6 +51,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.MathJaxWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
@@ -134,6 +136,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EntityListConfigEditor getEntityListConfigEditor();
 	public ShinySiteConfigEditor getShinySiteConfigEditor();
 	public ButtonLinkConfigEditor getButtonLinkConfigEditor();
+	public MathJaxConfigEditor getMathJaxConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -153,6 +156,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ShinySiteWidget getShinySiteRenderer();
 	public JoinWidget getJoinWidget();
 	public ButtonLinkWidget getButtonLinkWidget();
+	public MathJaxWidget getMathJaxWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
