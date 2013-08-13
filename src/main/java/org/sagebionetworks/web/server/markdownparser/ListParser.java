@@ -14,6 +14,7 @@ public class ListParser extends BasicMarkdownElementParser  {
 	Pattern p1= Pattern.compile(MarkdownRegExConstants.ORDERED_LIST_REGEX, Pattern.DOTALL);
 	Pattern p2 = Pattern.compile(MarkdownRegExConstants.UNORDERED_LIST_REGEX, Pattern.DOTALL);
 	Pattern p3 = Pattern.compile(MarkdownRegExConstants.INDENTED_REGEX, Pattern.DOTALL);
+	Pattern p4 = Pattern.compile(MarkdownRegExConstants.BLOCK_QUOTE_REGEX, Pattern.DOTALL);;
 	Stack<MarkdownList> stack;
 
 	@Override
@@ -26,15 +27,16 @@ public class ListParser extends BasicMarkdownElementParser  {
 		Matcher m1 = p1.matcher(line.getMarkdown());
 		Matcher m2 = p2.matcher(line.getMarkdown());
 		Matcher m3 = p3.matcher(line.getMarkdown());
-
+		Matcher m4 = p4.matcher(line.getMarkdown());
+	
 		boolean isOrderedList = m1.matches();
 		boolean isUnorderedList = m2.matches();
 
 		if (isOrderedList) {
-			getListItem(line, m1, true);
+			getListItem(line, m1, true, m4);
 		}
 		else if (isUnorderedList) {
-			getListItem(line, m2, false);
+			getListItem(line, m2, false, m4);
 		} 
 		else if (isInMarkdownElement()) {
 			//this is not a list item
@@ -43,10 +45,16 @@ public class ListParser extends BasicMarkdownElementParser  {
 			int depth = spaces.length();
 			String value = m3.group(2);
 			
+			boolean isInBlockQuote = m4.matches();
+			if(isInBlockQuote) {
+	        	depth--;						//Account for leading ">" blockquote character
+	        	value = m4.group(2) + value; 	//Prepend original prefix again for blockquote parser
+	        }
+			
 			checkForGreaterDepth(line, depth);
 	        if (!stack.isEmpty()) {
 	        	MarkdownList list = stack.peek();
-	        	if(depth != 0) {
+	        	if(depth > list.getDepth()) {
 	        		//this is an element under a list item, add it as a child to the item
 	        		list.addExtraElementHtml(line,  value);
 	        	} else {
@@ -60,15 +68,17 @@ public class ListParser extends BasicMarkdownElementParser  {
 		}
 	}
 	
-	public void getListItem(MarkdownElements line, Matcher m, boolean isOrderedList) {
+	public void getListItem(MarkdownElements line, Matcher m, boolean isOrderedList, Matcher blockquoteMatcher) {
 		//looks like a list item
-		//String prefixGroup = m.group(1);
 		String spaces = m.group(1);
         int depth = spaces.length();
-        //TODO: use listMarker to test order value (if ordered list)
-        String listMarker = m.group(2);
         String value = m.group(3);
         
+        boolean isInBlockQuote = blockquoteMatcher.matches();
+        if(isInBlockQuote) {
+        	depth--;										//Account for leading ">" blockquote character
+        	value = blockquoteMatcher.group(2) + value; 	//Prepend original prefix again for blockquote parser
+        }
         checkForGreaterDepth(line, depth);
         if (!stack.isEmpty()) {
         	MarkdownList list = stack.peek();
