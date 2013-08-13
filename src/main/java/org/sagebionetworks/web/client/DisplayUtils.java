@@ -118,6 +118,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -1613,5 +1614,33 @@ public class DisplayUtils {
 			version = ((Versionable) entity).getVersionNumber();
 		return version;
 	}
+
+	public static void initializeAutoselectLabel(final SynapseJSNIUtils synapseJSNIUtils, final Label label) {
+		label.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				synapseJSNIUtils.selectText(label.getElement());
+			}
+		});
+	}
+	
+	public static void showMd5Dialog(final SynapseJSNIUtils synapseJSNIUtils, String md5) {
+		final Dialog window = new Dialog();
+		window.setSize(220, 85);
+		window.setPlain(true);
+		window.setModal(true);
+		window.setHeading("md5");
 		
+		final Label md5Label = new Label(md5);
+		md5Label.addStyleName("inline-block margin-left-10 margin-top-5");
+		initializeAutoselectLabel(synapseJSNIUtils, md5Label);
+		window.add(md5Label);
+		
+	    window.setButtons(Dialog.OK);
+	    window.setButtonAlign(HorizontalAlignment.CENTER);
+	    window.setHideOnButtonClick(true);
+		window.setResizable(false);
+		window.show();
+	}
 }

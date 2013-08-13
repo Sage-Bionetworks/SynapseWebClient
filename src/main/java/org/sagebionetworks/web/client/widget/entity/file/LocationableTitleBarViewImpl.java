@@ -42,6 +42,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -76,7 +77,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	@UiField
 	SimplePanel uploadButtonContainer;
 	@UiField
-	SpanElement entityId;
+	Label entityId;
 	@UiField
 	Image entityIcon;
 	@UiField
@@ -123,6 +124,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
+		DisplayUtils.initializeAutoselectLabel(synapseJSNIUtils, entityId);
 	}
 	public static String getLocationablePath(EntityBundle bundle) {
 		String locationPath = null;
@@ -166,7 +168,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			if (isDataPossiblyWithinLocationable) {
 				//add an anchor with the file name, that redirects to the download button for functionality
 				entityLink.setText(entity.getName());
-				entityId.setInnerText(entity.getId());
+				entityId.setText(entity.getId());
 				AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
 				synapseIconForEntity.applyTo(entityIcon);
 				
@@ -193,7 +195,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 						md5Link.addClickHandler(new ClickHandler() {
 							@Override
 							public void onClick(ClickEvent event) {
-								showMd5Dialog(md5);
+								DisplayUtils.showMd5Dialog(synapseJSNIUtils, md5);
 							}
 						});
 						DisplayUtils.addTooltip(synapseJSNIUtils, md5Link, md5, TOOLTIP_POSITION.BOTTOM);
@@ -272,24 +274,5 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 
 	@Override
 	public void clear() {
-	}
-	
-	private void showMd5Dialog(String md5) {
-		final Dialog window = new Dialog();
-		window.setSize(220, 85);
-		window.setPlain(true);
-		window.setModal(true);
-		window.setHeading("md5");
-		
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<span style=\"margin-left: 10px;\">"+md5+"</span>");
-		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-		window.add(htmlPanel);
-		
-	    window.setButtons(Dialog.OK);
-	    window.setButtonAlign(HorizontalAlignment.CENTER);
-	    window.setHideOnButtonClick(true);
-		window.setResizable(false);
-		window.show();
 	}
 }

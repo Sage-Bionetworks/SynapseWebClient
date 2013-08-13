@@ -47,6 +47,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.extjs.gxt.ui.client.widget.ProgressBar;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class ProvUtilsTest {
@@ -336,6 +337,11 @@ public class ProvUtilsTest {
 			
 			@Override
 			public void getFileMd5(String fileFieldId, MD5Callback callback) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void selectText(Element textElement) {
 				// TODO Auto-generated method stub
 				
 			}
