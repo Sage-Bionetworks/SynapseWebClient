@@ -16,6 +16,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	boolean isTableStart;		//Is this the opening fence of the table
 	boolean isTableEnd;			//Is this the closing end of the table
 	boolean readFirstRow;		//Have we read the first row/should we check if this is a header row
+	boolean hasHandledHeader;
 	int tableCount;				//Table ID
 	ArrayList<String> rowData;	//Stores row/cells data
 	
@@ -26,6 +27,7 @@ public class TableParser extends BasicMarkdownElementParser {
 		isTableStart = false;
 		isTableEnd = false;
 		readFirstRow = false;
+		hasHandledHeader = false;
 		tableCount = 0;
 		rowData = new ArrayList<String>();
 	}
@@ -51,16 +53,12 @@ public class TableParser extends BasicMarkdownElementParser {
 				builder.append(" " + styles + "\">");
 			}
 		} else if(isTableEnd) {
-			//Add last row to the table if it's not a header row border
-			String rowDataString = createRowDataString();
-			if(!isHeaderBorder(rowDataString)) {
-				createTableRow(builder);
-			}
 			builder.append("</tbody></table>");
 			//Reset to false for future tables
 			isInTable = false;
 			hasTags = false;
 			readFirstRow = false;
+			hasHandledHeader = false;
 			rowData.clear();
 		} else {
 			//If we are not in a fenced table, check if this is a normal table
@@ -80,45 +78,41 @@ public class TableParser extends BasicMarkdownElementParser {
 						storeRowData(markdown);
 						readFirstRow = true;
 						tableCount++;
-					} else {
-						//We have stored data from reading the previous row
-						//Create a row for this data unless it is the header row's border
-						String rowDataString = createRowDataString();
-						if(!isHeaderBorder(rowDataString)) {
-							createTableRow(builder);
-						}
 					}
 				} else {
-					//We've read the first row and need to check if it's a header row
-					if(isHeaderBorder(markdown)) {
-						//If this line is a header row border, make the header with the stored data
-						builder.append("<thead>");
-						builder.append("<tr>");
-						for (int j = 0; j < rowData.size(); j++) {
-							builder.append("<th>");
-							builder.append(rowData.get(j));
-							builder.append("</th>");
+					if(!hasHandledHeader) {
+						//We've read the first row and need to check if it's a header row
+						if(isHeaderBorder(markdown)) {
+							//If this line is a header row border, make the header with the stored data
+							builder.append("<thead>");
+							builder.append("<tr>");
+							for (int j = 0; j < rowData.size(); j++) {
+								builder.append("<th>");
+								builder.append(rowData.get(j));
+								builder.append("</th>");
+							}
+							builder.append("</tr>");
+							builder.append("</thead>");
+							builder.append("<tbody>");
+						} else {
+							//Create a normal row with the stored data
+							builder.append("<tbody>");
+							createTableRow(builder);
 						}
-						builder.append("</tr>");
-						builder.append("</thead>");
-						builder.append("<tbody>");
-						rowData.clear();
+						hasHandledHeader = true;
 					} else {
-						//Create a normal row with the stored data
-						builder.append("<tbody>");
+						//Create a normal row for every row after the first
+						storeRowData(markdown);
 						createTableRow(builder);
 					}
-					readFirstRow = false;
 				}
-				
-				//Store this row's data 
-				storeRowData(markdown);
 			} else {
 				//Not a table line
 				if(!rowData.isEmpty()) {
-					//If we are creating a table, add the last row of it's not a header row border
-					String rowDataString = createRowDataString();
-					if(!isHeaderBorder(rowDataString)) {
+					//We were creating a table; finish the table
+					
+					if(!hasHandledHeader) {
+						//The first row must not be a header because no border syntax was found before the end of the table
 						line.prependElement("<tr>");
 						for (int j = 0; j < rowData.size(); j++) {
 							line.prependElement("<td>");
@@ -126,13 +120,14 @@ public class TableParser extends BasicMarkdownElementParser {
 							line.prependElement("</td>");
 						}
 						line.prependElement("</tr>\n");
-						line.prependElement("</tbody></table>");
-						builder.append(line.getMarkdown());
 					}
+					line.prependElement("</tbody></table>");
+					builder.append(line.getMarkdown());
 					
 					//Reset to false for future tables
 					isInTable = false;
 					readFirstRow = false;
+					hasHandledHeader = false;
 					rowData.clear();
 				} else {
 					//We are not in a table at all, just append the original markdown
@@ -143,15 +138,6 @@ public class TableParser extends BasicMarkdownElementParser {
 		line.updateMarkdown(builder.toString());
 	}
 
-	private String createRowDataString() {
-		StringBuilder rowDataString = new StringBuilder();
-		for(int i = 0; i < rowData.size() - 1; i++) {
-			rowDataString.append(rowData.get(i) + "|");
-		}
-		rowDataString.append(rowData.get(rowData.size()-1));
-		return rowDataString.toString();
-	}
-	
 	private void storeRowData(String markdown) {
 		rowData.clear();
 		String[] cells = markdown.split("\\|");
