@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Map;
+
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -33,6 +35,8 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -64,6 +68,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private HTML descriptionFormatInfo;
 	private WikiPageKey wikiKey;
 	private boolean isWikiEditor;
+	private Image editWidgetButton;
+	private boolean isWidgetEditable;
+	private int widgetStartIndex, widgetEndIndex;
+	private String innerText;
+	private WidgetDescriptorUpdatedHandler callback;
 	
 	public interface CloseHandler{
 		public void saveClicked();
@@ -101,12 +110,23 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.markdownTextArea = markdownTextArea;
 		this.wikiKey = wikiKey;
 		this.isWikiEditor = isWikiEditor;
+		this.callback = callback;
+		
 		String formattingTipsHtml = DisplayUtils.isInTestWebsite(cookies) ? WebConstants.SYNAPSE_MARKDOWN_FORMATTING_TIPS_HTML : WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML;
 		descriptionFormatInfo = new HTML(formattingTipsHtml);
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
 		mdCommands.setVerticalAlign(VerticalAlignment.MIDDLE);
 		mdCommands.addStyleName("view header-inner-commands-container");
+
+		editWidgetButton = getNewCommand("Edit Widget", iconsImageBundle.editGrey16(),new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleEditWidgetCommand();
+			}
+		}); 
+		mdCommands.add(editWidgetButton);
+		
 		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.addSquareGrey16()));
 		insertButton.setWidth(55);
 		insertButton.setMenu(createWidgetMenu(callback));
@@ -117,6 +137,21 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		FormData mdCommandFormData = new FormData();
 		mdCommandFormData.setMargins(new Margins(0,-15,0,10));
 		formPanel.add(mdCommands,mdCommandFormData);
+		
+		markdownTextArea.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				updateEditWidget();
+			}
+		});
+		
+		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
+			
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				updateEditWidget();
+			}
+		});
 		
 		// followed by description.
 		SimplePanel descriptionWrapper= new SimplePanel();
@@ -244,7 +279,66 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			}
 		}); 
 		mdCommands.add(link);
-				
+		
+	}
+	
+	public void handleEditWidgetCommand() {
+		if (isWidgetEditable) {
+			markdownTextArea.setSelectionRange(widgetStartIndex, innerText.length());
+			String contentTypeKey = widgetRegistrar.getWidgetContentType(innerText);
+			Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
+			BaseEditWidgetDescriptorPresenter.editExistingWidget(widgetDescriptorEditor, wikiKey, contentTypeKey, widgetDescriptor, new WidgetDescriptorUpdatedHandler() {
+				@Override
+			public void onUpdate(WidgetDescriptorUpdatedEvent event) {
+					//replace old widget text
+					String text = markdownTextArea.getText();
+					markdownTextArea.setText(text.substring(0, widgetStartIndex) + text.substring(widgetEndIndex));
+					markdownTextArea.setCursorPos(widgetStartIndex);
+					if (event.getInsertValue()!=null) {
+						insertMarkdown(event.getInsertValue());
+					}
+					if (callback != null)
+						callback.onUpdate(event);
+				}
+			}, isWikiEditor);	
+		}
+	}
+	
+	public void updateEditWidget(){
+		isWidgetEditable = false;
+		editWidgetButton.setResource(iconsImageBundle.editGrey16());
+		int cursorPos = markdownTextArea.getCursorPos();
+		if (cursorPos > -1) {
+			final String text = markdownTextArea.getText();
+			//move back until I find a whitespace or the beginning
+			int startWord = cursorPos-1;
+			while(startWord > -1 && !Character.isSpace(text.charAt(startWord))) {
+				startWord--;
+			}
+			startWord++;
+			String possibleWidget = text.substring(startWord);
+			if (possibleWidget.startsWith(WidgetConstants.WIDGET_START_MARKDOWN)) {
+				//find the end
+				int endWord = cursorPos;
+				while(endWord < text.length() && !WidgetConstants.WIDGET_END_MARKDOWN.equals(String.valueOf(text.charAt(endWord)))) {
+					endWord++;
+				}
+				//invalid widget specification if we went all the way to the end of the markdown
+				if (endWord != text.length()) {
+					//it's a widget
+					//parse the type and descriptor
+					endWord++;
+					possibleWidget = text.substring(startWord, endWord);
+					//set editable
+					isWidgetEditable = true;
+					editWidgetButton.setResource(iconsImageBundle.edit16());
+					innerText = possibleWidget.substring(WidgetConstants.WIDGET_START_MARKDOWN.length(), possibleWidget.length() - WidgetConstants.WIDGET_END_MARKDOWN.length());
+					widgetStartIndex = startWord;
+					widgetEndIndex = endWord;
+					
+				}
+			}
+		}
 	}
 	
 	public void showPreview(String descriptionMarkdown, final boolean isWiki) {

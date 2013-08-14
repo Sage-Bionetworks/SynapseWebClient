@@ -44,7 +44,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 		 * @param widgetType
 		 */
 		public void editNew(WikiPageKey wikiKey, String widgetType, boolean isWiki);
-		
+		public void editExisting(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> descriptor, boolean isWiki);
 		/**
 		 * 
 		 * @param handler
