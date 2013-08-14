@@ -129,6 +129,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.MathJaxConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.MathJaxConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
@@ -165,6 +167,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.MathJaxWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.MathJaxWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
@@ -523,6 +527,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityListConfigView.class).to(EntityListConfigViewImpl.class);
 		bind(ShinySiteConfigView.class).to(ShinySiteConfigViewImpl.class);
 		bind(ButtonLinkConfigView.class).to(ButtonLinkConfigViewImpl.class);
+		bind(MathJaxConfigView.class).to(MathJaxConfigViewImpl.class);
 		
 		// UI Widget Renderers
 		bind(BookmarkWidgetView.class).to(BookmarkWidgetViewImpl.class);
@@ -539,6 +544,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(JoinWidgetView.class).to(JoinWidgetViewImpl.class);
 		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
 		bind(ButtonLinkWidgetView.class).to(ButtonLinkWidgetViewImpl.class);
+		bind(MathJaxWidgetView.class).to(MathJaxWidgetViewImpl.class);
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);

@@ -148,6 +148,8 @@ public class WebConstants {
 
 	public static final String ENTITY_VERSION_STRING = "/version/";
 	
+	public static final String MATHJAX_PREFIX = "\\[";
+	public static final String MATHJAX_SUFFIX = "\\]";
 	
 	
 	//Synapse Properties
