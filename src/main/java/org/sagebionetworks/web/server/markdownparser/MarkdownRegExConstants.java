@@ -27,7 +27,7 @@ public class MarkdownRegExConstants {
 	 * 
 	 * Beginning of the line, optional whitespace, blockquote character '>', whitespace, then the text
 	 */
-	public static final String BLOCK_QUOTE_REGEX = "(^\\s*>\\s?(.*))";
+	public static final String BLOCK_QUOTE_REGEX = "(^\\s*(>(\\s?))(.*))";
 	
 	/**
 	 * Recognizes example input:
@@ -148,7 +148,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * 1. First Item
 	 */
-	public static final String ORDERED_LIST_REGEX = "(\\s*)(?:\\d+[.])(\\s+)(.+)";
+	public static final String ORDERED_LIST_REGEX = PREFIX_GROUP + "(?:\\d+[.])(\\s+)(.+)";
 	
 	/**
 	 * Recognized example input:
@@ -184,7 +184,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * * First Item
 	 */
-	public static final String UNORDERED_LIST_REGEX = "(\\s*)(?:[-+*])(\\s+)(.+)";
+	public static final String UNORDERED_LIST_REGEX = PREFIX_GROUP + "(?:[-+*])(\\s+)(.+)";
 	
 	
 	public static final String NEWLINE_REGEX = "([\n])";

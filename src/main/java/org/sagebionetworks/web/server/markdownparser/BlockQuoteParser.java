@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 public class BlockQuoteParser extends BasicMarkdownElementParser {
 	Pattern p1 = Pattern.compile(MarkdownRegExConstants.BLOCK_QUOTE_REGEX, Pattern.DOTALL);;
+	Pattern p2 = Pattern.compile(MarkdownRegExConstants.FENCE_CODE_BLOCK_REGEX, Pattern.DOTALL);
 	boolean inBlockQuote;
 	
 	@Override
@@ -15,15 +16,21 @@ public class BlockQuoteParser extends BasicMarkdownElementParser {
 	@Override
 	public void processLine(MarkdownElements line) {
 		Matcher m = p1.matcher(line.getMarkdown());
-		
+		Matcher codeMatcher = p2.matcher(line.getMarkdown());
 		if (m.matches()) {
 			if (!inBlockQuote) {
 				//starting block quote
 				inBlockQuote = true;
 				line.prependElement("<blockquote>");
 			}
-			//modify the markdown
-			line.updateMarkdown(m.group(2));
+			//modify the markdown and preserve leading space to determine depth of list items
+			//do not preserve any space following ">" if this is a code block fence
+			StringBuilder sb = new StringBuilder();
+			if(!codeMatcher.matches()) {
+				sb.append(m.group(3));
+			}
+			sb.append(m.group(4));
+			line.updateMarkdown(sb.toString());
 		}
 		else {
 			if (inBlockQuote){
