@@ -71,6 +71,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -124,7 +125,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SpanElement entityName;
 	@UiField
-	SpanElement entityId;
+	Label entityId;
 	@UiField
 	SimplePanel favoritePanel;
 
@@ -171,7 +172,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget, DoiWidget doiWidget, PortalGinInjector ginInjector) {
+			final SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget, DoiWidget doiWidget, PortalGinInjector ginInjector) {
 		this.icons = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
@@ -249,6 +250,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		doiPanel.setWidget(doiWidget.asWidget());
 		
 		previousVersions.setLayout(new FlowLayout(GRID_MARGIN));
+		DisplayUtils.initializeAutoselectLabel(synapseJSNIUtils, entityId);
 	}
 
 	@Override
@@ -333,7 +335,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	public void setEntityId(String text) {
-		entityId.setInnerText(text);
+		entityId.setText(text);
 	}
 
 

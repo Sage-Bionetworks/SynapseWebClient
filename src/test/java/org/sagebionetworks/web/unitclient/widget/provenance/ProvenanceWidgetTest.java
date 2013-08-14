@@ -69,6 +69,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTestImpl;
 
 import com.google.gwt.dev.util.collect.HashSet;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -457,6 +458,11 @@ public class ProvenanceWidgetTest {
 			
 			@Override
 			public void getFileMd5(String fileFieldId, MD5Callback callback) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void selectText(Element textElement) {
 				// TODO Auto-generated method stub
 				
 			}

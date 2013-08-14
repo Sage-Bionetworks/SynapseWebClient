@@ -13,6 +13,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
@@ -315,4 +316,27 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 
+	
+	@Override
+	public void selectText(Element textElement) {
+		_selectText(textElement);
+	}
+	
+	/**
+	 * Tested in IE9, Firefox 23, and Chrome 28
+	 * @param elem
+	 */
+	private final static native void _selectText(Element elem) /*-{
+		if ($doc.createRange && $wnd.getSelection) {
+			var range = $doc.createRange();
+			range.selectNodeContents(elem);
+			var selection = $wnd.getSelection();
+			selection.removeAllRanges();
+			selection.addRange(range);
+		} else if ($doc.selection && $doc.selection.createRange) {
+			var range = $doc.selection.createRange();
+			range.moveToElementText(elem);
+			range.select();
+		}
+	}-*/;
 }
