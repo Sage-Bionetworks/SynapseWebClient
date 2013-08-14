@@ -148,7 +148,9 @@ public class WebConstants {
 
 	public static final String ENTITY_VERSION_STRING = "/version/";
 	
-	public static final String DEFAULT_MATHJAX_VALUE = "\\[sqrt(2)\\]";
+	public static final String MATHJAX_PREFIX = "\\[";
+	public static final String MATHJAX_SUFFIX = "\\]";
+	
 	
 	//Synapse Properties
 	public static final String CHALLENGE_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_synapse_id";

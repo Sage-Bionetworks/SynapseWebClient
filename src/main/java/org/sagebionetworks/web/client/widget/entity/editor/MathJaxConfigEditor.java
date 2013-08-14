@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -22,7 +23,8 @@ public class MathJaxConfigEditor implements MathJaxConfigView.Presenter, WidgetE
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
-		view.configure(wikiKey, widgetDescriptor);
+		String equation = descriptor.get(WidgetConstants.MATHJAX_WIDGET_EQUATION_KEY);
+		view.setEquation(equation);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -39,7 +41,13 @@ public class MathJaxConfigEditor implements MathJaxConfigView.Presenter, WidgetE
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
-		descriptor.put(WidgetConstants.MATHJAX_WIDGET_EQUATION_KEY, view.getEquation());
+		String equation = view.getEquation();
+		if (!equation.startsWith(WebConstants.MATHJAX_PREFIX))
+			equation = WebConstants.MATHJAX_PREFIX + equation;
+		if (!equation.endsWith(WebConstants.MATHJAX_SUFFIX))
+			equation = equation + WebConstants.MATHJAX_SUFFIX;
+		
+		descriptor.put(WidgetConstants.MATHJAX_WIDGET_EQUATION_KEY, equation);
 	}
 	
 	@Override

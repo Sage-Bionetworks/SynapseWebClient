@@ -5,7 +5,6 @@ import java.util.Map;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
@@ -40,15 +39,6 @@ public class MathJaxConfigViewImpl extends LayoutContainer implements MathJaxCon
 		add(hp);
 	}
 	
-	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor) {
-		String text = descriptor.get(WidgetConstants.MATHJAX_WIDGET_EQUATION_KEY);
-		if (text != null)
-			field.setValue(text);
-		else
-			field.setValue(WebConstants.DEFAULT_MATHJAX_VALUE);
-	}
-
 	@Override
 	public void checkParams() throws IllegalArgumentException {
 		if (!field.isValid())
@@ -100,7 +90,10 @@ public class MathJaxConfigViewImpl extends LayoutContainer implements MathJaxCon
 	
 	@Override
 	public void setEquation(String equation) {
-		field.setValue(equation);
+		if (equation != null)
+			field.setValue(equation);
+		else
+			field.setValue("");
 	}
 	/*
 	 * Private Methods
