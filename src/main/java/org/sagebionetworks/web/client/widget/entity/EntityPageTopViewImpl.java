@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -122,6 +123,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
 	private PreviewWidget previewWidget;
+	private CookieProvider cookies;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -138,7 +140,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			FilesBrowser filesBrowser, 
 			MarkdownWidget markdownWidget, 
 			WikiPageWidget wikiPageWidget, 
-			PreviewWidget previewWidget) {
+			PreviewWidget previewWidget, CookieProvider cookies) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -156,6 +158,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.previewWidget = previewWidget;
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
+		this.cookies = cookies;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 		initProjectLayout();
@@ -216,7 +219,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Custom layouts for certain entities
 		boolean isFolderLike = bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis;
 		boolean isProject = bundle.getEntity() instanceof Project;
-		isTabShowing = isProject;
+		isTabShowing = isProject && DisplayUtils.isInTestWebsite(cookies);
 		String wikiPageId = null;
 		if (Synapse.EntityTab.WIKI == area)
 			wikiPageId = areaToken;
@@ -384,18 +387,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderProjectEntity(final EntityBundle bundle,
 			String entityTypeDisplay, boolean isAdmin, final boolean canEdit, Synapse.EntityTab area, String wikiPageId,
 			MarginData widgetMargin) {
-		// Entity Metadata
-		navtabContainer.removeClassName("hide");
-		entityMetadata.setEntityBundle(bundle, versionNumber);
-		topFullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
-		// Description
-		topFullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
-		
-		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24);
-		
-		// Child File Browser
-		filesTabContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
-
+		entityMetadata.setEntityBundle(bundle, versionNumber); 
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
 		// Annotation widget
@@ -409,23 +401,44 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		attachContainer.addStyleName("span-7 notopmargin");
 		threeCol.add(attachContainer);
 		threeCol.add(createSpacer());
-		
-		// ************************************************************************************************
-		filesTabContainer.add(threeCol, widgetMargin);
-		adminTabContainer.add(createEvaluationAdminList(bundle, new CallbackP<Boolean>() {
-			@Override
-			public void invoke(Boolean isVisible) {
-				if (isVisible)
-					adminListItem.removeClassName("hide");
+
+		if (isTabShowing) {
+			navtabContainer.removeClassName("hide");
+			topFullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
+			// Description
+			topFullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
+			
+			addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24);
+			
+			// Child File Browser
+			filesTabContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
+	
+			// ************************************************************************************************
+			filesTabContainer.add(threeCol, widgetMargin);
+			adminTabContainer.add(createEvaluationAdminList(bundle, new CallbackP<Boolean>() {
+				@Override
+				public void invoke(Boolean isVisible) {
+					if (isVisible)
+						adminListItem.removeClassName("hide");
+				}
+			}));
+			fullWidthContainer.add(currentTabContainer);
+			Synapse.EntityTab tab = area;
+			if (tab == null) {
+				//default is the wiki tab
+				tab = Synapse.EntityTab.WIKI;
 			}
-		}));
-		fullWidthContainer.add(currentTabContainer);
-		Synapse.EntityTab tab = area;
-		if (tab == null) {
-			//default is the wiki tab
-			tab = Synapse.EntityTab.WIKI;
+			setTabSelected(tab);
+		} else {
+			//old layout with no tabs
+			fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin); 
+			fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin); 
+			addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
+			fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true, canEdit));
+			threeCol.add(createEvaluationAdminList(bundle, null));
+			threeCol.add(createSpacer());
+			fullWidthContainer.add(threeCol, widgetMargin);
 		}
-		setTabSelected(tab);
 	}
 
 	private void setTabSelected(Synapse.EntityTab targetTab) {
@@ -465,7 +478,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, String wikiPageId, int spanWidth) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
-			final boolean isProject = bundle.getEntity() instanceof Project; 
 			// Child Page Browser
 			container.add(wikiPageWidget.asWidget());
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, new WikiPageWidget.Callback() {
@@ -475,8 +487,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				}
 				@Override
 				public void noWikiFound() {
-					if (isProject) {
-						//no wiki found for this project.  show Files instead
+					if (isTabShowing) {
+						//no wiki found, show Files tab instead
 						setTabSelected(Synapse.EntityTab.FILES);
 					}
 					
