@@ -11,6 +11,13 @@ public interface ResourceLoader {
 	 * @param resources
 	 * @param loadedCallback
 	 */
+	void requires(WebResource resource, AsyncCallback<Void> loadedCallback);
+
+	/**
+	 * Require certain web resources 
+	 * @param resources
+	 * @param loadedCallback
+	 */
 	void requires(List<WebResource> resources, AsyncCallback<Void> loadedCallback);
 		
 	boolean isLoaded(WebResource resource);
