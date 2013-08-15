@@ -71,7 +71,7 @@ public class TableParser extends BasicMarkdownElementParser {
 							builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable\">");
 						}
 						//Store the first row's cells
-						getRowData(markdown);
+						firstRowData = getRowData(markdown);
 						readFirstRow = true;
 						tableCount++;
 					}
@@ -148,12 +148,13 @@ public class TableParser extends BasicMarkdownElementParser {
 		firstRowData.clear();
 	}
 
-	private void getRowData(String markdown) {
-		firstRowData.clear();
+	private ArrayList<String> getRowData(String markdown) {
+		ArrayList<String> rowData = new ArrayList<String>();
 		String[] cells = markdown.split("\\|");
 		for (int j = 0; j < cells.length; j++) {
-			firstRowData.add(cells[j]);
+			rowData.add(cells[j]);
 		}
+		return rowData;
 	}
 	
 	private void createTableRow(StringBuilder builder, String markdown) {
