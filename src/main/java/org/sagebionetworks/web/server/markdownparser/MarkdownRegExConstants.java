@@ -145,10 +145,16 @@ public class MarkdownRegExConstants {
 	
 	/**
 	 * Recognized example input:
+	 * http: or ftp: or file:
+	 */
+	public static final String LINK_URL_PROTOCOL = "(https?|ftp|file):";
+	
+	/**
+	 * from http://stackoverflow.com/questions/163360/regular-expresion-to-match-urls-java 
+	 * Recognized example input:
 	 * http://www.example.com/
 	 */
-	//from http://stackoverflow.com/questions/163360/regular-expresion-to-match-urls-java 
-	public static final String LINK_URL = "(?<=[\\W&&[^\"]]|^)((https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
+	public static final String LINK_URL = "(?<=[\\W&&[^\"]]|^)(" + LINK_URL_PROTOCOL + "//[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
 	
 	/**
 	 * Recognized example input:

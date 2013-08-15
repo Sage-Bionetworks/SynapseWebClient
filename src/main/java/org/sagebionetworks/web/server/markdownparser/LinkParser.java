@@ -8,6 +8,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 public class LinkParser extends BasicMarkdownElementParser  {
 	Pattern p1= Pattern.compile(MarkdownRegExConstants.LINK_REGEX, Pattern.DOTALL);
+	Pattern protocol = Pattern.compile(MarkdownRegExConstants.LINK_URL_PROTOCOL, Pattern.DOTALL);
 
 	@Override
 	public void processLine(MarkdownElements line) {
@@ -28,9 +29,10 @@ public class LinkParser extends BasicMarkdownElementParser  {
 				url.substring(bookmarkTarget.length()) + WidgetConstants.WIDGET_END_MARKDOWN;			
 
 			} else {
-				//Check for incomplete url
+				//Check for incomplete urls (i.e. urls starting without http/ftp/file/#)
 				String testUrl = url.toLowerCase();
-				if(!testUrl.startsWith("http") && !testUrl.startsWith("#")) {
+				Matcher protocolMatcher = protocol.matcher(testUrl);
+				if(!protocolMatcher.find() && !testUrl.startsWith("#")) {
 					url = WebConstants.URL_PROTOCOL + url;
 				}
 				//Create link
