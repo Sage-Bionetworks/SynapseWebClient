@@ -54,6 +54,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -1613,5 +1614,38 @@ public class DisplayUtils {
 			version = ((Versionable) entity).getVersionNumber();
 		return version;
 	}
+	
+	public static WidgetSelectionState getWidgetSelectionState(String text, int cursorPos) {
+		WidgetSelectionState state = new WidgetSelectionState(text);
+		if (cursorPos > -1) {
+			//move back until I find a whitespace or the beginning
+			int startWord = cursorPos-1;
+			while(startWord > -1 && !Character.isSpace(text.charAt(startWord))) {
+				startWord--;
+			}
+			startWord++;
+			String possibleWidget = text.substring(startWord);
+			if (possibleWidget.startsWith(WidgetConstants.WIDGET_START_MARKDOWN)) {
+				//find the end
+				int endWord = cursorPos;
+				while(endWord < text.length() && !WidgetConstants.WIDGET_END_MARKDOWN.equals(String.valueOf(text.charAt(endWord)))) {
+					endWord++;
+				}
+				//invalid widget specification if we went all the way to the end of the markdown
+				if (endWord != text.length()) {
+					//it's a widget
+					//parse the type and descriptor
+					endWord++;
+					possibleWidget = text.substring(startWord, endWord);
+					//set editable
+					state.setWidgetSelected(true);
+					state.setInnerWidgetText(possibleWidget.substring(WidgetConstants.WIDGET_START_MARKDOWN.length(), possibleWidget.length() - WidgetConstants.WIDGET_END_MARKDOWN.length()));
+					state.setWidgetStartIndex(startWord);
+					state.setWidgetEndIndex(endWord);
+				}
+			}
+		}
 		
+		return state;
+	}
 }

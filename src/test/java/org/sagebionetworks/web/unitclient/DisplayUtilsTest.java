@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +9,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 public class DisplayUtilsTest {
 	
@@ -109,4 +111,81 @@ public class DisplayUtilsTest {
 		
 	}
 	
+	@Test
+	public void testWidgetNotSelectedState() {
+		String markdownText = "This contains no synapse widget";
+		for (int i = 0; i < markdownText.length(); i++) {
+			WidgetSelectionState state = DisplayUtils.getWidgetSelectionState(markdownText, i);
+			assertFalse(state.isWidgetSelected());	
+		}
+		
+		String synapseWidgetInnerText = "widget?param1=123&param2=456";
+		String fullSynapseWidgetText = WidgetConstants.WIDGET_START_MARKDOWN + synapseWidgetInnerText + WidgetConstants.WIDGET_END_MARKDOWN;
+		
+		//verify that when selecting outside of the widget text, it will report that widget is not selected
+		WidgetSelectionState state = DisplayUtils.getWidgetSelectionState(fullSynapseWidgetText + markdownText, fullSynapseWidgetText.length() + 1);
+		assertFalse(state.isWidgetSelected());
+		
+		state = DisplayUtils.getWidgetSelectionState(markdownText + fullSynapseWidgetText, 5);
+		assertFalse(state.isWidgetSelected());
+	}
+	
+	@Test
+	public void testWidgetSelectedState() {
+		String synapseWidgetInnerText = "widget?param1=123&param2=456";
+		String fullSynapseWidgetText = WidgetConstants.WIDGET_START_MARKDOWN + synapseWidgetInnerText + WidgetConstants.WIDGET_END_MARKDOWN;
+		String markdownText = " this contains a synapse widget somewhere ";
+		
+		//if the widget is at the beginning we should be able to find it when selecting inside, or the first character
+		String testMarkdown = fullSynapseWidgetText + markdownText;
+		WidgetSelectionState state = DisplayUtils.getWidgetSelectionState(testMarkdown, 0);
+		assertTrue(state.isWidgetSelected());
+		assertEquals(synapseWidgetInnerText, state.getInnerWidgetText());
+		assertEquals(0, state.getWidgetStartIndex());
+		assertEquals(fullSynapseWidgetText.length(), state.getWidgetEndIndex());
+		
+		state = DisplayUtils.getWidgetSelectionState(testMarkdown, 5);
+		assertTrue(state.isWidgetSelected());
+		assertEquals(synapseWidgetInnerText, state.getInnerWidgetText());
+		assertEquals(0, state.getWidgetStartIndex());
+		assertEquals(fullSynapseWidgetText.length(), state.getWidgetEndIndex());
+		
+		
+		//if the widget is at the end we should be able to find it when selecting inside, or the last character
+		testMarkdown = markdownText + fullSynapseWidgetText;
+		state = DisplayUtils.getWidgetSelectionState(testMarkdown, testMarkdown.length()-1);
+		assertTrue(state.isWidgetSelected());
+		assertEquals(synapseWidgetInnerText, state.getInnerWidgetText());
+		assertEquals(testMarkdown.length()-fullSynapseWidgetText.length(), state.getWidgetStartIndex());
+		assertEquals(testMarkdown.length(), state.getWidgetEndIndex());
+		
+		//select inside, but this time let's add spaces inside one of the parameters (and continue to verify that it finds the entire widget text)
+		synapseWidgetInnerText += "&param3=7 8 9";
+		fullSynapseWidgetText = WidgetConstants.WIDGET_START_MARKDOWN + synapseWidgetInnerText + WidgetConstants.WIDGET_END_MARKDOWN;
+		testMarkdown = markdownText + fullSynapseWidgetText;
+		state = DisplayUtils.getWidgetSelectionState(testMarkdown, testMarkdown.length()-fullSynapseWidgetText.length() + 4);
+		assertTrue(state.isWidgetSelected());
+		assertEquals(synapseWidgetInnerText, state.getInnerWidgetText());
+		assertEquals(testMarkdown.length()-fullSynapseWidgetText.length(), state.getWidgetStartIndex());
+		assertEquals(testMarkdown.length(), state.getWidgetEndIndex());
+		
+		//if the widget is in the middle we should be able to find it when selecting inside
+		int insertPoint = 6;
+		
+		testMarkdown = markdownText.substring(0, insertPoint) + fullSynapseWidgetText + markdownText.substring(insertPoint);
+		state = DisplayUtils.getWidgetSelectionState(testMarkdown, insertPoint + 2);
+		assertTrue(state.isWidgetSelected());
+		assertEquals(synapseWidgetInnerText, state.getInnerWidgetText());
+		assertEquals(insertPoint, state.getWidgetStartIndex());
+		assertEquals(insertPoint + fullSynapseWidgetText.length(), state.getWidgetEndIndex());
+	}
+	
+	@Test
+	public void testInvalidWidget() {
+		String markdownText = WidgetConstants.WIDGET_START_MARKDOWN + "onlyinvalid?because=it&does=not&end so \nwill the entire thing be overwritten?";
+		
+		//verify that when selecting outside of the widget text, it will report that widget is not selected
+		WidgetSelectionState state = DisplayUtils.getWidgetSelectionState(markdownText, 2);
+		assertFalse(state.isWidgetSelected());
+	}
 }

@@ -69,10 +69,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private WikiPageKey wikiKey;
 	private boolean isWikiEditor;
 	private Image editWidgetButton;
-	private boolean isWidgetEditable;
-	private int widgetStartIndex, widgetEndIndex;
-	private String innerText;
 	private WidgetDescriptorUpdatedHandler callback;
+	private WidgetSelectionState widgetSelectionState;
 	
 	public interface CloseHandler{
 		public void saveClicked();
@@ -83,7 +81,6 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		public void attachmentsClicked();
 		public void deleteClicked();
 	}
-	
 	
 	
 	@Inject
@@ -283,7 +280,10 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	}
 	
 	public void handleEditWidgetCommand() {
-		if (isWidgetEditable) {
+		if (widgetSelectionState != null && widgetSelectionState.isWidgetSelected()) {
+			final int widgetStartIndex = widgetSelectionState.getWidgetStartIndex();
+			final int widgetEndIndex = widgetSelectionState.getWidgetEndIndex();
+			String innerText = widgetSelectionState.getInnerWidgetText();
 			markdownTextArea.setSelectionRange(widgetStartIndex, innerText.length());
 			String contentTypeKey = widgetRegistrar.getWidgetContentType(innerText);
 			Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
@@ -305,39 +305,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	}
 	
 	public void updateEditWidget(){
-		isWidgetEditable = false;
 		editWidgetButton.setResource(iconsImageBundle.editGrey16());
-		int cursorPos = markdownTextArea.getCursorPos();
-		if (cursorPos > -1) {
-			final String text = markdownTextArea.getText();
-			//move back until I find a whitespace or the beginning
-			int startWord = cursorPos-1;
-			while(startWord > -1 && !Character.isSpace(text.charAt(startWord))) {
-				startWord--;
-			}
-			startWord++;
-			String possibleWidget = text.substring(startWord);
-			if (possibleWidget.startsWith(WidgetConstants.WIDGET_START_MARKDOWN)) {
-				//find the end
-				int endWord = cursorPos;
-				while(endWord < text.length() && !WidgetConstants.WIDGET_END_MARKDOWN.equals(String.valueOf(text.charAt(endWord)))) {
-					endWord++;
-				}
-				//invalid widget specification if we went all the way to the end of the markdown
-				if (endWord != text.length()) {
-					//it's a widget
-					//parse the type and descriptor
-					endWord++;
-					possibleWidget = text.substring(startWord, endWord);
-					//set editable
-					isWidgetEditable = true;
-					editWidgetButton.setResource(iconsImageBundle.edit16());
-					innerText = possibleWidget.substring(WidgetConstants.WIDGET_START_MARKDOWN.length(), possibleWidget.length() - WidgetConstants.WIDGET_END_MARKDOWN.length());
-					widgetStartIndex = startWord;
-					widgetEndIndex = endWord;
-					
-				}
-			}
+		widgetSelectionState = DisplayUtils.getWidgetSelectionState(markdownTextArea.getText(), markdownTextArea.getCursorPos());
+		 
+		if (widgetSelectionState.isWidgetSelected()) {
+			editWidgetButton.setResource(iconsImageBundle.edit16());
 		}
 	}
 	
