@@ -88,9 +88,9 @@ public class MarkdownRegExConstants {
 
 	/**
 	 * Recognized example input:
-	 * - , --, --- etc.
+	 * - , --, ---, -:, :-. -:- etc.
 	 */
-	public static final String TABLE_HEADER_BORDER_REGEX = "[-]+";
+	public static final String TABLE_HEADER_BORDER_REGEX = "[-:]+";
 	
 	/**
 	 * Recognized example input:
