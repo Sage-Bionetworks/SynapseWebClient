@@ -56,7 +56,5 @@ public interface SynapseJSNIUtils {
 
 	public void uploadUrlToGenomeSpace(String url);	
 	public void uploadUrlToGenomeSpace(String url, String filename);
-
-	public void requireJs(String url, CompletedCallback callback);
 	
 }

@@ -318,14 +318,4 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 
-	@Override
-	public void requireJs(String url, CompletedCallback callback) {
-		_requireJs(url, callback);
-	}
-
-	private final static native void _requireJs(String url, CompletedCallback callback) /*-{		
-		$wnd.head.js(url, function() {
-			callback.@org.sagebionetworks.web.client.callback.CompletedCallback::complete()();	
-		});
-	}-*/;
 }
