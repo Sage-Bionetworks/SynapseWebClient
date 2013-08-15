@@ -206,6 +206,6 @@ class TocItem extends BaseTreeModel implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "<a href=\"\"> " + getText() + "</a>";
+		return "<span> " + getText() + "</span>";
 	}
 }
