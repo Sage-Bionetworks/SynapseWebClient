@@ -98,6 +98,8 @@ public class TableParser extends BasicMarkdownElementParser {
 							//Create a normal row with the stored data
 							builder.append("<tbody>");
 							createTableRow(builder);
+							storeRowData(markdown);
+							createTableRow(builder);
 						}
 						hasHandledHeader = true;
 					} else {
