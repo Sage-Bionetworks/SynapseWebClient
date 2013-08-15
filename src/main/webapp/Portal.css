@@ -853,7 +853,7 @@ ol.lowerroman {
 	overflow: hidden !important;	
 }
 
-.pagesTree a{
+.pagesTree span{
 	font-family: Verdana,Arial,sans-serif;
 	font-size: 13px;
 }
