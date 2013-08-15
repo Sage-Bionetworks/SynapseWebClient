@@ -52,6 +52,7 @@ SynapseWidgetPresenter {
 	private int spanWidth;
 	private WikiPageWidgetView view; 
 	AuthenticationController authenticationController;
+	private String originalMarkdown;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -86,6 +87,7 @@ SynapseWidgetPresenter {
 	}
 	
 	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage, final int spanWidth) {
+		originalMarkdown = null;
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
@@ -113,6 +115,7 @@ SynapseWidgetPresenter {
 						try {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
+							originalMarkdown = currentPage.getMarkdown();
 							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isEmbeddedInOwnerPage, spanWidth);
 						} catch (JSONObjectAdapterException e) {
 							onFailure(e);
@@ -153,6 +156,11 @@ SynapseWidgetPresenter {
 			public void onSuccess(String result) {
 				try {
 					currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
+					if (originalMarkdown != null && !originalMarkdown.equals(currentPage.getMarkdown())) {
+						//markdown changed by another process.  please refresh to see the most current version of the wiki
+						view.showErrorMessage(DisplayConstants.ERROR_WIKI_MODIFIED);
+						return;
+					}
 					//update with the most current markdown and title
 					currentPage.setMarkdown(updatedMarkdown);
 					if (updatedTitle != null && updatedTitle.length() > 0)
