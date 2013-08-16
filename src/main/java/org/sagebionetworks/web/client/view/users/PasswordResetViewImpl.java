@@ -62,6 +62,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		this.iconsImageBundle = iconsImageBundle;
 		this.headerWidget = headerWidget;
 		
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		

@@ -62,6 +62,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		
 		this.provenanceWidget = provenanceWidget;
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
 				
@@ -74,6 +75,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		((LayoutContainer)provenanceWidget.asWidget()).setAutoHeight(true);
 		
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

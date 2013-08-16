@@ -65,6 +65,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 
@@ -74,6 +75,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

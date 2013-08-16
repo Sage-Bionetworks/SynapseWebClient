@@ -7,19 +7,17 @@
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	<g:HTMLPanel>
 
-		<div class="span-24 notopmargin">
-			<div class="span-13 logo">
+		<div ui:field="headerDiv" class="span-24 notopmargin small-header">		    
+			<div class="display-inline margin-top-3">
 				<a href="#">
-					<g:Image resource="{sageImages.sageLogoAndTitle}" />
-				</a>
+					<g:Image ui:field="logoLarge" resource="{sageImages.headerLarge}" styleName="margin-top-4" />					
+					<g:Image ui:field="logoSmall" resource="{sageImages.logoSmall}" styleName="margin-top-4" />
+				</a>				
+				<g:HorizontalPanel styleName="display-inline last margin-top-4" ui:field="commandBar" />
 				<g:SimplePanel ui:field="testSiteHeading" />
 			</div>
-			<g:HorizontalPanel ui:field="commandBar" />
-			<div class="span-24 notopmargin">
-				<div class="push-16 span-8 last notopmargin" style="text-align: right;">
-					<g:SimplePanel ui:field="searchBoxPanel" />
-				</div>
-			</div>
+			
+					
 		</div>
 
 	</g:HTMLPanel>

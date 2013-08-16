@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.search.SearchBox;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -49,15 +50,20 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
 
+	private static final String HEADER_LARGE_STYLE = "largeHeader";
+	private static final String HEADER_SMALL_STYLE = "smallHeader";
+
 	private UserSessionData cachedUserSessionData = null;
 	@UiField
-	HorizontalPanel commandBar;
-	
+	HorizontalPanel commandBar;	
 	@UiField
-	SimplePanel searchBoxPanel;
-	
+	SimplePanel testSiteHeading;	
 	@UiField
-	SimplePanel testSiteHeading;
+	Image logoSmall;
+	@UiField
+	Image logoLarge;
+	@UiField
+	DivElement headerDiv;
 	
 	private Presenter presenter;
 	private Map<MenuItems, Element> itemToElement;
@@ -77,6 +83,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private HorizontalPanel userNameWrapper;
 	private CookieProvider cookies;
+	SageImageBundle sageImageBundle;
+	boolean showLargeLogo;
 	
 	@Inject
 	public HeaderViewImpl(Binder binder,
@@ -91,16 +99,19 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.searchBox = searchBox;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookies = cookies;
-		// add search panel
-		searchBoxPanel.clear();		
-		searchBoxPanel.add(searchBox.asWidget());
-		searchBoxPanel.setVisible(false);
+		this.sageImageBundle = sageImageBundle;
+		// add search panel first
+		searchBox.setVisible(false);
+		commandBar.add(searchBox.asWidget());		
+		
+		showLargeLogo = false; // default
 		
 		testSiteHeading.clear();
 		testSiteHeading.add(getTestPanel());
 		testSiteHeading.setVisible(false);
 		refreshTestSiteHeader();
 		commandBar.addStyleName("last sf-j-menu");
+		
 	}
 	
 	private FlowPanel getTestPanel() {
@@ -143,6 +154,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	@Override
 	public void refresh() {
+		setLogo();
 		refreshTestSiteHeader();
 		UserSessionData userSessionData = presenter.getUser();
 		if (cachedUserSessionData == null || !cachedUserSessionData.equals(userSessionData)){
@@ -153,7 +165,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void setSearchVisible(boolean searchVisible) {
-		searchBoxPanel.setVisible(searchVisible);
+		searchBox.setVisible(searchVisible);
 	}
 	
 	
@@ -162,6 +174,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 */
 	
 	private void setUser(UserSessionData userData) {
+				
 		//initialize buttons
 		if(userAnchor == null) {
 			userAnchor = new Anchor();
@@ -299,4 +312,23 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			}
 		}
 	}
+
+	@Override
+	public void setLargeLogo(boolean isLarge) {
+		this.showLargeLogo = isLarge;
 	}
+	
+	private void setLogo() {
+		if(showLargeLogo) {
+			logoLarge.setVisible(true);
+			logoSmall.setVisible(false);
+			headerDiv.removeClassName(HEADER_SMALL_STYLE);
+			headerDiv.addClassName(HEADER_LARGE_STYLE);
+		} else {						
+			logoLarge.setVisible(false);
+			logoSmall.setVisible(true);
+			headerDiv.removeClassName(HEADER_LARGE_STYLE);
+			headerDiv.addClassName(HEADER_SMALL_STYLE);
+		}
+	}
+}

@@ -28,5 +28,7 @@ public interface SearchBoxView extends IsWidget, SynapseView {
 		
 	}
 
+	public void setVisible(boolean isVisible);
+
 
 }
