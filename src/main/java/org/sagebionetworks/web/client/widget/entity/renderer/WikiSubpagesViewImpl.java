@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
+import com.extjs.gxt.ui.client.widget.treepanel.TreePanel.TreeNode;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,7 +57,6 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 			//Remove folder icons
 			tree.getStyle().setNodeCloseIcon(null);
 			tree.getStyle().setNodeOpenIcon(null);
-			
 			//Set the text for the tree
 			tree.setLabelProvider(new ModelStringProvider<ModelData>() {
 				@Override
@@ -80,8 +80,10 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 			
 			tree.addListener(Events.OnClick, new Listener<TreePanelEvent<TocItem>>() {
 	            public void handleEvent(TreePanelEvent<TocItem> event) {
-	            	//go to the target place
-	            	globalAppState.getPlaceChanger().goTo(event.getItem().getTargetPlace());
+	            	String tagName = event.getTarget().getTagName();
+	            	//go to the target place (unless the target is an img, which it is when clicking the expand/collapse arrows)
+	            	if (!tagName.toUpperCase().equals("IMG"))
+	            		globalAppState.getPlaceChanger().goTo(event.getItem().getTargetPlace());
 	            };
 	        });
 			treePanel.add(tree);
