@@ -22,7 +22,6 @@ public class ImagePrototypeSingleton {
 	@Inject
 	ImagePrototypeSingleton(SageImageBundle bundle){
 		// Fill in all of the fields
-		upArrowIconHtml = AbstractImagePrototype.create(bundle.iconUpArrow()).getHTML();
 		downArrowIconHtml = AbstractImagePrototype.create(bundle.iconDownArrow()).getHTML();
 		iconTransparent16Html = AbstractImagePrototype.create(bundle.iconTransparent16()).getHTML();
 		iconGeneExpression16 = AbstractImagePrototype.create(bundle.iconGeneExpression16()).getHTML();
