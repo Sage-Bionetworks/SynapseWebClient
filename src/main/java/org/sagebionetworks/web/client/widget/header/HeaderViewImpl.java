@@ -314,7 +314,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 
 	@Override
-	public void showLargeLogo(boolean isLarge) {
+	public void setLargeLogo(boolean isLarge) {
 		this.showLargeLogo = isLarge;
 	}
 	

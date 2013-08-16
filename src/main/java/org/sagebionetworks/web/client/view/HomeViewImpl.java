@@ -128,7 +128,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.myEvaluationsList = myEvaluationsList;
 		this.iconsImageBundle = icons;
 		
-		headerWidget.configure(false);
+		headerWidget.configure(true);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
