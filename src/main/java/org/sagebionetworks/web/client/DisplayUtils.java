@@ -1,15 +1,29 @@
 package org.sagebionetworks.web.client;
 
 
+import static org.sagebionetworks.web.client.ClientProperties.ALERT_CONTAINER_ID;
+import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
+import static org.sagebionetworks.web.client.ClientProperties.ERROR_OBJ_REASON_KEY;
+import static org.sagebionetworks.web.client.ClientProperties.ESCAPE_CHARACTERS_SET;
+import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_PAGE_HEIGHT;
+import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_PAGE_WIDTH;
+import static org.sagebionetworks.web.client.ClientProperties.GB;
+import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
+import static org.sagebionetworks.web.client.ClientProperties.KB;
+import static org.sagebionetworks.web.client.ClientProperties.MB;
+import static org.sagebionetworks.web.client.ClientProperties.REGEX_CLEAN_ANNOTATION_KEY;
+import static org.sagebionetworks.web.client.ClientProperties.REGEX_CLEAN_ENTITY_NAME;
+import static org.sagebionetworks.web.client.ClientProperties.STYLE_DISPLAY_INLINE;
+import static org.sagebionetworks.web.client.ClientProperties.TB;
+import static org.sagebionetworks.web.client.ClientProperties.WHITE_SPACE;
+import static org.sagebionetworks.web.client.ClientProperties.WIKI_URL;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import static org.sagebionetworks.web.client.ClientProperties.*;
 
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.repo.model.Analysis;
@@ -48,7 +62,6 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityTab;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
@@ -90,16 +103,15 @@ import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
@@ -1615,8 +1627,12 @@ public class DisplayUtils {
 		return version;
 	}
 	
-	public static WidgetSelectionState getWidgetSelectionState(String text, int cursorPos) {
-		WidgetSelectionState state = new WidgetSelectionState(text);
+	public static void updateWidgetSelectionState(WidgetSelectionState state, String text, int cursorPos) {
+		state.setWidgetSelected(false);
+		state.setWidgetStartIndex(-1);
+		state.setWidgetEndIndex(-1);
+		state.setInnerWidgetText(null);
+		
 		if (cursorPos > -1) {
 			//move back until I find a whitespace or the beginning
 			int startWord = cursorPos-1;
@@ -1632,7 +1648,7 @@ public class DisplayUtils {
 					endWord++;
 				}
 				//invalid widget specification if we went all the way to the end of the markdown
-				if (endWord != text.length()) {
+				if (endWord < text.length()) {
 					//it's a widget
 					//parse the type and descriptor
 					endWord++;
@@ -1645,7 +1661,5 @@ public class DisplayUtils {
 				}
 			}
 		}
-		
-		return state;
 	}
 }

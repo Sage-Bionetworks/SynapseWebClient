@@ -92,6 +92,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.iconsImageBundle = iconsImageBundle;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.cookies = cookies;
+		widgetSelectionState = new WidgetSelectionState();
 	}
 	
 	/**
@@ -306,7 +307,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	
 	public void updateEditWidget(){
 		editWidgetButton.setResource(iconsImageBundle.editGrey16());
-		widgetSelectionState = DisplayUtils.getWidgetSelectionState(markdownTextArea.getText(), markdownTextArea.getCursorPos());
+		DisplayUtils.updateWidgetSelectionState(widgetSelectionState, markdownTextArea.getText(), markdownTextArea.getCursorPos());
 		 
 		if (widgetSelectionState.isWidgetSelected()) {
 			editWidgetButton.setResource(iconsImageBundle.edit16());

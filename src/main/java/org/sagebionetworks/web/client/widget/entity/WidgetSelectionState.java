@@ -3,11 +3,9 @@ package org.sagebionetworks.web.client.widget.entity;
 public class WidgetSelectionState {
 	private boolean isWidgetSelected = false;
 	private String innerWidgetText = null;
-	private String fullMarkdownText = null;
 	private int widgetStartIndex = -1, widgetEndIndex = -1;
 	
-	public WidgetSelectionState(String fullMarkdownText) {
-		this.fullMarkdownText = fullMarkdownText;
+	public WidgetSelectionState() {
 	}
 
 	public boolean isWidgetSelected() {
@@ -24,14 +22,6 @@ public class WidgetSelectionState {
 
 	public void setInnerWidgetText(String innerWidgetText) {
 		this.innerWidgetText = innerWidgetText;
-	}
-
-	public String getFullMarkdownText() {
-		return fullMarkdownText;
-	}
-
-	public void setFullMarkdownText(String fullMarkdownText) {
-		this.fullMarkdownText = fullMarkdownText;
 	}
 
 	public int getWidgetStartIndex() {
