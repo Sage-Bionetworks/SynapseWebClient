@@ -23,7 +23,7 @@
         <div class="clear"></div>
     	<div class="container"> 		
 			<g:SimplePanel ui:field="header" />
-				<div class="span-24 separator"></div>
+				<div class="span-24 separator margin-top-10-imp"></div>
 	        	<div class="span-24 notopmargin">	
 	<!-- end header -->
 					<div class="span-24 notopmargin" style="margin-top: 5px !important">

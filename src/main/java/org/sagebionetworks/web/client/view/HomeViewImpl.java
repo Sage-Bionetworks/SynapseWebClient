@@ -128,6 +128,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.myEvaluationsList = myEvaluationsList;
 		this.iconsImageBundle = icons;
 		
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
@@ -216,11 +217,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void refresh() {
 		header.clear();
+		headerWidget.configure(true);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
-		headerWidget.setSearchVisible(false);			
 
 		boolean isLoggedIn = presenter.showLoggedInDetails();
 		

@@ -37,5 +37,7 @@ public interface HeaderView extends IsWidget {
 		void getSupportHRef(AsyncCallback<String> callback);
 	}
 
+	public void showLargeLogo(boolean isHome);
+
 
 }

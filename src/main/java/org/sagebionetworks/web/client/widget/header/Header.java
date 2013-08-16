@@ -38,6 +38,10 @@ public class Header implements HeaderView.Presenter {
 	public void removeMenuItemActive(MenuItems menuItem) {
 		view.removeMenuItemActive(menuItem);
 	}
+	
+	public void configure(boolean isHome) {
+		view.showLargeLogo(isHome);
+	}
 
 	public Widget asWidget() {
 		view.setPresenter(this);

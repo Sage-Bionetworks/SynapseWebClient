@@ -81,6 +81,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
@@ -91,6 +92,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

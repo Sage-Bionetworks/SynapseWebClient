@@ -54,6 +54,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 		this.entityPageTop = entityPageTop;
 		this.sageImageBundle = sageImageBundle;
 		
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		// TODO : need to dynamically set the header widget
@@ -71,6 +72,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 		};
 		entityPageTop.setEntityUpdatedHandler(handler);
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
