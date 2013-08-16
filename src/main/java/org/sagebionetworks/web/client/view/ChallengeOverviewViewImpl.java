@@ -44,6 +44,7 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.wikiPage = wikiPage;
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -54,6 +55,7 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

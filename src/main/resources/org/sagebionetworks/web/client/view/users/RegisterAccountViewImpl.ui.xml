@@ -16,7 +16,7 @@
 		<div class="container">
 			<g:SimplePanel ui:field="header" />
 			<div class="span-24 notopmargin">
-				<div class="span-24 separator"></div>
+				<div class="span-24 separator margin-top-10-imp"></div>
 				<!-- end header -->
 				<div class="span-7"></div>
 				<div class="span-10 inner-6 view">

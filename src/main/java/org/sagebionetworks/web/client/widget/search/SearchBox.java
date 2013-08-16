@@ -76,6 +76,10 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 		this.searchAll = searchAll;
 	}
 
+	public void setVisible(boolean isVisible) {
+		view.setVisible(isVisible);
+	}
+
 	
 	/*
 	 * Private Methods
