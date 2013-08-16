@@ -412,11 +412,6 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.LINK_CONTENT_TYPE, callback);
 	    	};
 		}));
-	    menu.add(getNewCommand(WidgetConstants.MATHJAX_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
-	    	public void componentSelected(ComponentEvent ce) {
-	    		handleInsertWidgetCommand(WidgetConstants.MATHJAX_CONTENT_TYPE, callback);
-	    	};
-		}));
 
 	    menu.add(getNewCommand(WidgetConstants.PROVENANCE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
