@@ -61,6 +61,15 @@ public class LinkParserTest {
 		parser.processLine(elements2);
 		String result2 = elements2.getHtml();
 		assertTrue(result2.contains("href=\"http://example.com"));
+		
+		String text3 = "Test";
+		String href3 = "ftp://ftp.example";
+		String line3 = "[" + text3 + "](" + href3 +")";
+		MarkdownElements elements3 = new MarkdownElements(line3);
+		parser.processLine(elements3);
+		String result3 = elements3.getHtml();
+		assertTrue(result3.contains("href=\"ftp://ftp.example"));
+		
 	}
 	
 	@Test
