@@ -362,7 +362,7 @@ public class DisplayConstants {
 	public static final String IMAGE_CONFIG_ALT_TEXT = "Alternate Text:";
 	public static final String IMAGE_FAILED_TO_LOAD = "Image failed to load: ";
 	public static final String URL_LABEL = "URL:";
-	public static final String EQUATION_LABEL = "Math:";
+	public static final String EQUATION_LABEL = "TeX:";
 	public static final String LINK_TEXT_LABEL = "Link Text:";
 	public static final String TABLE_LABEL = "Tab Delimitted Table Contents:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";

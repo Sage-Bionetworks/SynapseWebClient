@@ -30,8 +30,8 @@ public class MathJaxConfigViewImpl extends LayoutContainer implements MathJaxCon
 		field = new TextField<String>();
 		field.setAllowBlank(false);
 		Label urlLabel = new Label(DisplayConstants.EQUATION_LABEL);
-		urlLabel.setWidth(60);
-		field.setWidth(270);
+		urlLabel.setWidth(30);
+		field.setWidth(300);
 		hp.add(urlLabel);
 		hp.add(field);
 		hp.addStyleName("margin-top-left-10");
