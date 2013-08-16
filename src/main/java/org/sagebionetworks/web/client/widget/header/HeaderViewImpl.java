@@ -316,6 +316,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@Override
 	public void setLargeLogo(boolean isLarge) {
 		this.showLargeLogo = isLarge;
+		if(!DisplayUtils.isInTestWebsite(cookies)) {
+			this.showLargeLogo = true;
+		}
 	}
 	
 	private void setLogo() {
