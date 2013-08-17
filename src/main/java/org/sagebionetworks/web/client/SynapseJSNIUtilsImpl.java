@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
@@ -267,12 +268,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
             else {
                console.log("finished loading file (to calculate md5)");
                // Call instance method setMD5() on md5Callback with the final md5
-    			md5Callback.@org.sagebionetworks.web.client.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
+    			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
             }
         };
         $wnd.frOnerror = function () {
         	console.warn("unable to calculate md5");
-            md5Callback.@org.sagebionetworks.web.client.MD5Callback::setMD5(Ljava/lang/String;)(null);
+            md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
         };
         
         $wnd.loadNext = function() { 
