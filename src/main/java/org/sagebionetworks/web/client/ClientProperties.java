@@ -3,6 +3,9 @@ package org.sagebionetworks.web.client;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.sagebionetworks.web.client.resources.WebResource;
+import org.sagebionetworks.web.client.resources.WebResource.ResourceType;
+
 public class ClientProperties {
 
 	public static final String HELP_EMAIL_ADDRESS = "synapseInfo@sagebase.org";
@@ -105,5 +108,12 @@ public class ClientProperties {
 	public static final String CLIENT_CL_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/synapsePythonClient/tree/master/examples/provenance";
 	public static final String CLIENT_JAVA_API_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";
 	public static final String CLIENT_JAVA_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";	
+
+	/*
+	 * JavaScript WebResources
+	 */
+	public static final WebResource CYTOSCAPE_JS = new WebResource("js/cytoscape-2.0.2.min.js", ResourceType.JAVASCRIPT);
+	public static final WebResource JQUERY_JS = new WebResource("https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js", ResourceType.JAVASCRIPT);
 	
 }
+

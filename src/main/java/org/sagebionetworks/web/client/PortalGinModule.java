@@ -14,6 +14,8 @@ import org.sagebionetworks.web.client.factory.RendererFactory;
 import org.sagebionetworks.web.client.factory.RendererFactoryImpl;
 import org.sagebionetworks.web.client.factory.TableColumnRendererFactory;
 import org.sagebionetworks.web.client.factory.TableColumnRendererFactoryImpl;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
+import org.sagebionetworks.web.client.resources.ResourceLoaderImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -195,6 +197,8 @@ import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowView;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowViewImpl;
+import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetView;
+import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
@@ -238,6 +242,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// GlobalApplicationState
 		bind(GlobalApplicationStateImpl.class).in(Singleton.class);
 		bind(GlobalApplicationState.class).to(GlobalApplicationStateImpl.class);
+		
+		bind(ResourceLoaderImpl.class).in(Singleton.class);
+		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
 		
 		// Header & Footer
 		bind(HeaderViewImpl.class).in(Singleton.class);
@@ -565,6 +572,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
 		
 		bind(TutorialWizardView.class).to(TutorialWizardViewImpl.class);
+		
+		bind(CytoscapeWidgetView.class).to(CytoscapeWidgetViewImpl.class);
+
 	}
 
 }
