@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import java.util.Date;
-import java.util.List;
 
-import org.sagebionetworks.web.client.callback.CompletedCallback;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
@@ -12,7 +10,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
