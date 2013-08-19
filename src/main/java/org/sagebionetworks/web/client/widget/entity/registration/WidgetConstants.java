@@ -13,10 +13,6 @@ public class WidgetConstants {
 	public static final String TUTORIAL_WIZARD_CONTENT_TYPE = "tutorial";
 	public static final String TUTORIAL_WIZARD_FRIENDLY_NAME = "Tutorial Wizard";
 	
-	public static final String MATHJAX_CONTENT_TYPE = "mathjax";
-	public static final String MATHJAX_FRIENDLY_NAME = "MathJax";
-	
-	
 	public static final String PROVENANCE_CONTENT_TYPE = "provenance";
 	public static final String PROVENANCE_FRIENDLY_NAME = "Provenance Graph";
 	
@@ -93,7 +89,6 @@ public class WidgetConstants {
 	public static final String PROV_WIDGET_DISPLAY_HEIGHT_KEY = "displayHeightPx";
 	public static final int PROV_WIDGET_HEIGHT_DEFAULT = 275;
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
-	public static final String MATHJAX_WIDGET_EQUATION_KEY = "equation";
 	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
 	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";
 	public static final String API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY = "showRowNumber";

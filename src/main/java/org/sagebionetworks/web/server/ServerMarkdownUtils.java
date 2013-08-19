@@ -32,6 +32,10 @@ public class ServerMarkdownUtils {
 	
 	public static final String START_PRE_CODE = "<pre><code";
 	public static final String END_PRE_CODE = "</code></pre>";
+	
+	public static final String START_MATH = "<div class=\"inline-block\" id=\""+WebConstants.DIV_ID_MATHJAX_PREFIX;
+	public static final String END_MATH = "</div>";
+	
 	public static final String HTML_LINE_BREAK = "<br />\n";
 	public static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
 	public static final String TEMP_SPACE_DELIMITER = "%^&2_9d";

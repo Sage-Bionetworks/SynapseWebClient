@@ -28,6 +28,7 @@ import org.sagebionetworks.web.server.markdownparser.ListParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 import org.sagebionetworks.web.server.markdownparser.MarkdownRegExConstants;
+import org.sagebionetworks.web.server.markdownparser.MathParser;
 import org.sagebionetworks.web.server.markdownparser.ReferenceParser;
 import org.sagebionetworks.web.server.markdownparser.StrikeoutParser;
 import org.sagebionetworks.web.server.markdownparser.SubscriptParser;
@@ -47,6 +48,7 @@ public class SynapseMarkdownProcessor {
 	private Map<Pattern, String> restorers = new HashMap<Pattern, String>();
 	
 	private CodeParser codeParser;
+	private MathParser mathParser;
 	public static SynapseMarkdownProcessor getInstance() {
 		if (singleton == null) {
 			singleton = new SynapseMarkdownProcessor();
@@ -69,6 +71,8 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new BookmarkTargetParser());
 		codeParser = new CodeParser();
 		allElementParsers.add(codeParser);
+		mathParser = new MathParser();
+		allElementParsers.add(mathParser);
 		allElementParsers.add(new CodeSpanParser());
 		allElementParsers.add(new DoiAutoLinkParser());
 		allElementParsers.add(new HeadingParser());
@@ -180,8 +184,8 @@ public class SynapseMarkdownProcessor {
 				parser.processLine(elements);
 			}
 			
-			//only give the option to start new multiline element (complex parser) or process simple elements if we're not in a code block
-			if (!codeParser.isInMarkdownElement()){
+			//only give the option to start new multiline element (complex parser) or process simple elements if we're not in a code block (or a math block)
+			if (!codeParser.isInMarkdownElement() && !mathParser.isInMarkdownElement()){
 				//then the inactive multiline parsers
 				for (MarkdownElementParser parser : inactiveComplexParsers) {
 					parser.processLine(elements);
