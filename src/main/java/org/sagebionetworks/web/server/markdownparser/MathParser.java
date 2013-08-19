@@ -69,22 +69,25 @@ public class MathParser extends BasicMarkdownElementParser  {
 			else {
 				//not currently in a math block, and this is not the start/end of a math block
 				//check for math span
-				m = p2.matcher(line.getMarkdown());
-				StringBuffer sb = new StringBuffer();
-				while(m.find()) {
-					//leave containers to filled in on completeParse()
-					String containerElement = getNewMathElementStart() + ServerMarkdownUtils.END_MATH;
-					div2equation.put(getCurrentDivID(), m.group(2));
-					m.appendReplacement(sb, containerElement);
-				}
-				m.appendTail(sb);
-				line.updateMarkdown(sb.toString());		
+				processMathSpan(line);		
 			}
 			if (isFirstMathLine)
 				isFirstMathLine = false;
 		}		
 	}
 
+	private void processMathSpan(MarkdownElements line) {
+		Matcher m = p2.matcher(line.getMarkdown());
+		StringBuffer sb = new StringBuffer();
+		while(m.find()) {
+			//leave containers to filled in on completeParse()
+			String containerElement = getNewMathElementStart() + ServerMarkdownUtils.END_MATH;
+			div2equation.put(getCurrentDivID(), m.group(2));
+			m.appendReplacement(sb, containerElement);
+		}
+		m.appendTail(sb);
+		line.updateMarkdown(sb.toString());
+	}
 	
 	/**
 	 * Fill in the stored equations into the containers that we made during parse
@@ -93,7 +96,9 @@ public class MathParser extends BasicMarkdownElementParser  {
 	public void completeParse(Document doc) {
 		for (String key : div2equation.keySet()) {
 			Element el = doc.getElementById(key);
-			el.appendText(div2equation.get(key));
+			//should never be null, but just to be safe
+			if (el != null)
+				el.appendText(div2equation.get(key));
 		}
 	}
 
