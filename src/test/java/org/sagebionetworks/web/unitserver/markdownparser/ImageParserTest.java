@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.server.markdownparser.ImageParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 
@@ -22,9 +23,8 @@ public class ImageParserTest {
 		String line = "![" + altText+ "](" + url + ")";
 		MarkdownElements elements = new MarkdownElements(line);
 		parser.processLine(elements);
-		String result = elements.getHtml();
-		assertTrue(result.contains("<img"));
-		assertTrue(result.contains("src=\"" + url));
-		assertTrue(result.contains("alt=\"" + altText));
+		String result = elements.getMarkdown();
+		String encodedUrl = WidgetEncodingUtil.encodeValue(url);
+		assertTrue(result.contains("${image?alt=An Image&fileName=" + encodedUrl + "&fromWeb=true}"));
 	}
 }

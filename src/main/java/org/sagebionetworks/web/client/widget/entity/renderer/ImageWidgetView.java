@@ -12,7 +12,7 @@ public interface ImageWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(WikiPageKey wikiKey, String fileName, String scale, String alignment, String synapseId, boolean isLoggedIn);
+	public void configure(WikiPageKey wikiKey, String fileName, String scale, String alignment, String synapseId, String altText, boolean isLoggedIn, boolean fromWeb);
 	
 	/**
 	 * Presenter interface
