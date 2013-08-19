@@ -52,6 +52,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	private static final String HEADER_LARGE_STYLE = "largeHeader";
 	private static final String HEADER_SMALL_STYLE = "smallHeader";
+	private static final String MARGIN_BOTTOM_STYLE = "margin-bottom-20";
+	private static final String NO_TOP_MARGIN_STYLE = "notopmargin";
 
 	private UserSessionData cachedUserSessionData = null;
 	@UiField
@@ -63,7 +65,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Image logoLarge;
 	@UiField
+	Image logoBeta;
+	@UiField
 	DivElement headerDiv;
+	@UiField
+	DivElement headerImageDiv;
+	
 	
 	private Presenter presenter;
 	private Map<MenuItems, Element> itemToElement;
@@ -165,7 +172,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void setSearchVisible(boolean searchVisible) {
-		searchBox.setVisible(searchVisible);
+		//TODO: remove this if for Synapse 1.0 release (to show search box) 
+		if (DisplayUtils.isInTestWebsite(cookies))
+			searchBox.setVisible(searchVisible);
 	}
 	
 	
@@ -316,22 +325,35 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@Override
 	public void setLargeLogo(boolean isLarge) {
 		this.showLargeLogo = isLarge;
-		if(!DisplayUtils.isInTestWebsite(cookies)) {
-			this.showLargeLogo = true;
-		}
 	}
 	
 	private void setLogo() {
-		if(showLargeLogo) {
-			logoLarge.setVisible(true);
+		//TODO: remove this first section for Synapse 1.0 release to show updated header 
+		if (!DisplayUtils.isInTestWebsite(cookies)) {
+			logoBeta.setVisible(true);
+			logoLarge.setVisible(false);
 			logoSmall.setVisible(false);
 			headerDiv.removeClassName(HEADER_SMALL_STYLE);
 			headerDiv.addClassName(HEADER_LARGE_STYLE);
+			headerDiv.addClassName(MARGIN_BOTTOM_STYLE);
+			headerImageDiv.removeClassName(NO_TOP_MARGIN_STYLE);
+		}
+		else if(showLargeLogo) {
+			logoBeta.setVisible(false);
+			logoLarge.setVisible(true);
+			logoSmall.setVisible(false);
+			headerDiv.removeClassName(MARGIN_BOTTOM_STYLE);
+			headerDiv.removeClassName(HEADER_SMALL_STYLE);
+			headerDiv.addClassName(HEADER_LARGE_STYLE);
+			headerImageDiv.addClassName(NO_TOP_MARGIN_STYLE);
 		} else {						
+			logoBeta.setVisible(false);
 			logoLarge.setVisible(false);
 			logoSmall.setVisible(true);
+			headerDiv.removeClassName(MARGIN_BOTTOM_STYLE);
 			headerDiv.removeClassName(HEADER_LARGE_STYLE);
 			headerDiv.addClassName(HEADER_SMALL_STYLE);
+			headerImageDiv.addClassName(NO_TOP_MARGIN_STYLE);
 		}
 	}
 }

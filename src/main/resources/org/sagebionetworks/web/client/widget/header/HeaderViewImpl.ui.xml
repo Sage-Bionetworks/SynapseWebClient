@@ -9,12 +9,17 @@
 
 		<div ui:field="headerDiv" class="span-24 notopmargin small-header">		    
 			<div class="display-inline margin-top-3">
-				<a href="#">
-					<g:Image ui:field="logoLarge" resource="{sageImages.headerLarge}" styleName="margin-top-4" />					
-					<g:Image ui:field="logoSmall" resource="{sageImages.logoSmall}" styleName="margin-top-4" />
-				</a>				
+			    <div ui:field="headerImageDiv" class="span-12 logo">
+			        <a href="#"> 
+				    	<g:Image ui:field="logoBeta" resource="{sageImages.sageLogoAndTitle}" />
+				    	<g:Image ui:field="logoLarge" resource="{sageImages.headerLarge}" styleName="margin-top-4" />					
+						<g:Image ui:field="logoSmall" resource="{sageImages.logoSmall}" styleName="margin-top-4" />
+					</a>
+					<g:SimplePanel ui:field="testSiteHeading" />
+			    </div>
+								
 				<g:HorizontalPanel styleName="display-inline last margin-top-4" ui:field="commandBar" />
-				<g:SimplePanel ui:field="testSiteHeading" />
+				
 			</div>
 			
 					
