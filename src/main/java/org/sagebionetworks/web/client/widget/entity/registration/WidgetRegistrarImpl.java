@@ -99,7 +99,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
-		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
+		if(contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
+			presenter = ginInjector.getLinkRenderer();
+		} else if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
 			presenter = ginInjector.getBookmarkRenderer();
 		} else if(contentTypeKey.equals(WidgetConstants.REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceRenderer();

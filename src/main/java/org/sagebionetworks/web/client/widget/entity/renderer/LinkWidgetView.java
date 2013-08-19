@@ -1,18 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface ImageWidgetView extends IsWidget {
-
+public interface LinkWidgetView extends IsWidget {
 	/**
 	 * Set the presenter.
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(WikiPageKey wikiKey, String fileName, String scale, String alignment, String synapseId, String altText, boolean isLoggedIn, boolean fromWeb);
+	public void configure(String linkText, String linkUrl);
 	
 	/**
 	 * Presenter interface

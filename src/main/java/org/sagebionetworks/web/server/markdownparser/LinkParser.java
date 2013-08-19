@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class LinkParser extends BasicMarkdownElementParser  {
@@ -35,8 +36,14 @@ public class LinkParser extends BasicMarkdownElementParser  {
 				if(!protocolMatcher.find() && !testUrl.startsWith("#")) {
 					url = WebConstants.URL_PROTOCOL + url;
 				}
-				//Create link
-				updated = "<a class=\"link\" target=\"_blank\" href=\"" + url + "\">" + text + "</a>";
+				
+				//Create link by preparing widget syntax for the renderer
+				String encodedUrl = WidgetEncodingUtil.encodeValue(url);
+				
+				//${link?text=text&url=url&inlineWidget=true}
+				updated = WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.LINK_CONTENT_TYPE + "?" + 
+				WidgetConstants.TEXT_KEY + "=" + text + "&" + WidgetConstants.LINK_URL_KEY + "=" + encodedUrl + "&" + 
+				WidgetConstants.INLINE_WIDGET_KEY + "=true" + WidgetConstants.WIDGET_END_MARKDOWN;
 			}
 			
 			//Escape the replacement string for appendReplacement
