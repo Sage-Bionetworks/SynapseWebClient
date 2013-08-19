@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -28,7 +29,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 	}
 
 	private String getCurrentDivID() {
-		return WebConstants.DIV_ID_MATHJAX_PREFIX + mathElementCount + ServerMarkdownUtils.getPreviewSuffix(isPreview);
+		return WebConstants.DIV_ID_MATHJAX_PREFIX + mathElementCount + SharedMarkdownUtils.getPreviewSuffix(isPreview);
 	}
 	
 	private String getNewMathElementStart() {
