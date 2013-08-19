@@ -1,13 +1,20 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 public class MathParser extends BasicMarkdownElementParser  {
 	Pattern p1 = Pattern.compile(MarkdownRegExConstants.FENCE_MATH_BLOCK_REGEX);
 	Pattern p2 = Pattern.compile(MarkdownRegExConstants.MATH_SPAN_REGEX);
+	
+	Map<String, String> div2equation;
 	
 	boolean isInMathBlock, isFirstMathLine;
 	int mathElementCount;
@@ -17,13 +24,17 @@ public class MathParser extends BasicMarkdownElementParser  {
 		isInMathBlock = false;
 		isFirstMathLine = false;
 		mathElementCount = -1;
+		div2equation = new HashMap<String, String>();
 	}
 
+	private String getCurrentDivID() {
+		return WebConstants.DIV_ID_MATHJAX_PREFIX + mathElementCount + ServerMarkdownUtils.getPreviewSuffix(isPreview);
+	}
+	
 	private String getNewMathElementStart() {
 		mathElementCount++;
 		StringBuilder sb = new StringBuilder();
-		sb.append(ServerMarkdownUtils.START_MATH);
-		sb.append(mathElementCount);
+		sb.append(ServerMarkdownUtils.START_MATH + getCurrentDivID());
 		sb.append("\">");
 		return sb.toString();
 	}
@@ -54,24 +65,35 @@ public class MathParser extends BasicMarkdownElementParser  {
 					line.prependElement("\n");	
 				}
 			}
-			//TODO: fix inline math spans. Need a way to protect equation. 
-			//One idea is to store the equation text (group 2) in a map that links div-id2equation, 
-			//then in the completeParse construct the html doc find the target divs, and set the child node text to the (protected) equation.
-//			else {
-//				//not currently in a math block, and this is not the start/end of a math block
-//				//check for math span
-//				m = p2.matcher(line.getMarkdown());
-//				StringBuffer sb = new StringBuffer();
-//				while(m.find()) {
-//					String updated = getNewMathElementStart() + m.group(2) + ServerMarkdownUtils.END_MATH;
-//					m.appendReplacement(sb, updated);
-//				}
-//				m.appendTail(sb);
-//				line.updateMarkdown(sb.toString());		
-//			}
+			else {
+				//not currently in a math block, and this is not the start/end of a math block
+				//check for math span
+				m = p2.matcher(line.getMarkdown());
+				StringBuffer sb = new StringBuffer();
+				while(m.find()) {
+					//leave containers to filled in on completeParse()
+					String containerElement = getNewMathElementStart() + ServerMarkdownUtils.END_MATH;
+					div2equation.put(getCurrentDivID(), m.group(2));
+					m.appendReplacement(sb, containerElement);
+				}
+				m.appendTail(sb);
+				line.updateMarkdown(sb.toString());		
+			}
 			if (isFirstMathLine)
 				isFirstMathLine = false;
 		}		
+	}
+
+	
+	/**
+	 * Fill in the stored equations into the containers that we made during parse
+	 */
+	@Override
+	public void completeParse(Document doc) {
+		for (String key : div2equation.keySet()) {
+			Element el = doc.getElementById(key);
+			el.appendText(div2equation.get(key));
+		}
 	}
 
 	@Override
