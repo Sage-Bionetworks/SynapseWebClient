@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -139,7 +140,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	 * @throws JSONObjectAdapterException 
 	 */
 	public static void loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, boolean isWiki, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, IconsImageBundle iconsImageBundle, Boolean isPreview) throws JSONObjectAdapterException {
-		final String suffix = isPreview ? WebConstants.DIV_ID_PREVIEW_SUFFIX : "";
+		final String suffix = ServerMarkdownUtils.getPreviewSuffix(isPreview);
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = WebConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
@@ -177,7 +178,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	 * @throws JSONObjectAdapterException 
 	 */
 	public static void loadMath(final HTMLPanel panel, final SynapseJSNIUtils synapseJSNIUtils, Boolean isPreview) throws JSONObjectAdapterException {
-		final String suffix = isPreview ? WebConstants.DIV_ID_PREVIEW_SUFFIX : "";
+		final String suffix = ServerMarkdownUtils.getPreviewSuffix(isPreview);
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = WebConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
