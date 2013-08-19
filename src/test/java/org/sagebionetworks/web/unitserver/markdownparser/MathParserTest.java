@@ -3,6 +3,8 @@ package org.sagebionetworks.web.unitserver.markdownparser;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
@@ -51,6 +53,25 @@ public class MathParserTest {
 		assertFalse(result.contains(ServerMarkdownUtils.START_MATH));
 		assertTrue(result.contains(ServerMarkdownUtils.END_MATH));
 		assertFalse(parser.isInMarkdownElement());
+	}
+	
+	@Test
+	public void testMathSpan(){
+		String equation = "\\[\\left( \\sum_{k=1}^n a_k b_k \\right)^2 \\leq \\left( \\sum_{k=1}^n a_k^2 \\right) \\left( \\sum_{k=1}^n b_k^2 \\right)\\]";
+		String line = "Contains this inline math $"+equation+"$ equation";
+		MarkdownElements elements = new MarkdownElements(line);
+		parser.processLine(elements);
+		String result = elements.getHtml();
+		//should contain both start and end.  It will not contain the equation (protected from other parsers)
+		assertTrue(result.contains(ServerMarkdownUtils.START_MATH));
+		assertTrue(result.contains(ServerMarkdownUtils.END_MATH));
+		assertFalse(parser.isInMarkdownElement());
+		assertFalse(result.contains(equation));
+		
+		//verify that equation is in the final output
+		Document doc = Jsoup.parse(result);
+		parser.completeParse(doc);
+		assertTrue(doc.html().contains(equation));
 	}
 
 }

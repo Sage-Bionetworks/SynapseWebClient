@@ -14,7 +14,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 	Pattern p1 = Pattern.compile(MarkdownRegExConstants.FENCE_MATH_BLOCK_REGEX);
 	Pattern p2 = Pattern.compile(MarkdownRegExConstants.MATH_SPAN_REGEX);
 	
-	Map<String, String> div2equation;
+	Map<String, String> div2equation = new HashMap<String, String>();
 	
 	boolean isInMathBlock, isFirstMathLine;
 	int mathElementCount;
@@ -24,7 +24,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 		isInMathBlock = false;
 		isFirstMathLine = false;
 		mathElementCount = -1;
-		div2equation = new HashMap<String, String>();
+		div2equation.clear();
 	}
 
 	private String getCurrentDivID() {
