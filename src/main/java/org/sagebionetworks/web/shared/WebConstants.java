@@ -102,6 +102,8 @@ public class WebConstants {
 
 	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
 	
+	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
+	
 	public static final String FOOTNOTE_ID_WIDGET_PREFIX = "wikiFootnote";
 	
 	public static final String REFERENCE_ID_WIDGET_PREFIX = "wikiReference";
