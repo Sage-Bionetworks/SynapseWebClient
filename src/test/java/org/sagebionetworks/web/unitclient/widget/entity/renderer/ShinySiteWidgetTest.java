@@ -28,6 +28,7 @@ public class ShinySiteWidgetTest {
 	AuthenticationController mockAuthenticationController;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
+	String validSiteUrl2 = "https://shiny.synapse.org/rstudio/faithful/";
 
 	String invalidSiteUrl = "http://google.com";
 	
@@ -52,6 +53,10 @@ public class ShinySiteWidgetTest {
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
 		widget.configure(wikiKey, descriptor);
 		verify(mockView).configure(eq(validSiteUrl), anyInt());
+		
+		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl2);
+		widget.configure(wikiKey, descriptor);
+		verify(mockView).configure(eq(validSiteUrl2), anyInt());
 	}
 	
 	@Test
