@@ -324,7 +324,7 @@ public class ServerMarkdownUtils {
 
 	
 	public static int appendNewTableHtml(StringBuilder builder, String regEx, String[] lines, int tableCount, int i) {
-		builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
+		builder.append("<div class=\"span-24 overflow-auto\"><table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
 		//header
 		builder.append("<thead>");
 		builder.append("<tr>");
@@ -350,7 +350,7 @@ public class ServerMarkdownUtils {
 			i++;
 		}
 		builder.append("</tbody>");
-		builder.append("</table>");
+		builder.append("</table></div>");
 		
 		return i;
 	}
