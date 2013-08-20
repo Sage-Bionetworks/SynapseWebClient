@@ -76,8 +76,6 @@ public class SynapseMarkdownProcessorTest {
 			"> ```";
 		String actualResult = processor.markdown2Html(testString, false);
 		String expectedResult = "<blockquote>\n   <ul>\n    <li><p>Item 1</p></li>\n    <li><p> Item 2</p>\n     <ol>\n      <li><p> </p><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li>\n      <li><p> SubItem 2b</p></li>\n     </ol></li>\n   </ul>\n   <pre><code class=\"r\"> Then a code block! </code></pre>\n   <br /> \n  </blockquote>";
-		System.out.println("Expected:\n" + expectedResult);
-		System.out.println("Result:\n" + actualResult);
 		assertTrue(actualResult.contains(expectedResult));
 	}
 	
