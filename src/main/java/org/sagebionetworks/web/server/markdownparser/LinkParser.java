@@ -1,15 +1,29 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.shared.WebConstants;
+
+import com.google.gwt.dev.util.collect.HashMap;
 
 public class LinkParser extends BasicMarkdownElementParser  {
 	Pattern p1= Pattern.compile(MarkdownRegExConstants.LINK_REGEX, Pattern.DOTALL);
 	Pattern protocol = Pattern.compile(MarkdownRegExConstants.LINK_URL_PROTOCOL, Pattern.DOTALL);
+	Map<String, String> div2Link = new HashMap<String, String>();
+	int linkCount;
+
+	@Override
+	public void reset() {
+		linkCount = -1;
+		div2Link.clear();
+	}
+	
+	private String getCurrentDivID() {
+		return WebConstants.DIV_ID_LINK_PREFIX + linkCount;
+	}
 
 	@Override
 	public void processLine(MarkdownElements line) {
@@ -30,6 +44,7 @@ public class LinkParser extends BasicMarkdownElementParser  {
 				url.substring(bookmarkTarget.length()) + WidgetConstants.WIDGET_END_MARKDOWN;			
 
 			} else {
+				linkCount++;
 				//Check for incomplete urls (i.e. urls starting without http/ftp/file/#)
 				String testUrl = url.toLowerCase();
 				Matcher protocolMatcher = protocol.matcher(testUrl);
@@ -37,20 +52,27 @@ public class LinkParser extends BasicMarkdownElementParser  {
 					url = WebConstants.URL_PROTOCOL + url;
 				}
 				
-				//Create link by preparing widget syntax for the renderer
-				String encodedUrl = WidgetEncodingUtil.encodeValue(url);
-				
-				//${link?text=text&url=url&inlineWidget=true}
-				updated = WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.LINK_CONTENT_TYPE + "?" + 
-				WidgetConstants.TEXT_KEY + "=" + text + "&" + WidgetConstants.LINK_URL_KEY + "=" + encodedUrl + "&" + 
-				WidgetConstants.INLINE_WIDGET_KEY + "=true" + WidgetConstants.WIDGET_END_MARKDOWN;
+				updated = "<div class=\"inline-block\" id=\"" + getCurrentDivID() + "\"></div>";
+				StringBuilder html = new StringBuilder();
+				html.append("<a class=\"link\" target=\"_blank\" href=\"");
+				html.append(url + "\">");
+				html.append(text + "</a>");
+				div2Link.put(getCurrentDivID(), html.toString());
+
 			}
-			
-			//Escape the replacement string for appendReplacement
-			updated = Matcher.quoteReplacement(updated);
 			m.appendReplacement(sb, updated);
 		}
 		m.appendTail(sb);
 		line.updateMarkdown(sb.toString());
 	}
+	
+	/*
+	@Override
+	public void completeParse(Document doc) {
+		for(String key: div2Link.keySet()) {
+			Element el = doc.getElementById(key);
+			el.appendText(div2Link.get(key));
+		}
+	}
+	*/
 }

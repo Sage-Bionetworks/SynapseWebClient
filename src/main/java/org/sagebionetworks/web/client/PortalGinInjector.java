@@ -51,7 +51,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.LinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.MathJaxWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
@@ -140,7 +139,6 @@ public interface PortalGinInjector extends Ginjector {
 	public MathJaxConfigEditor getMathJaxConfigEditor();
 	
 	////// Renderers
-	public LinkWidget getLinkRenderer();
 	public BookmarkWidget getBookmarkRenderer();
 	public ReferenceWidget getReferenceRenderer();
 	public YouTubeWidget getYouTubeRenderer();

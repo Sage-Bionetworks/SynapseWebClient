@@ -27,20 +27,14 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor) {
 		this.descriptor = widgetDescriptor;
-		if(descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FROM_WEB_KEY)) {
-			String fileName = descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY);
-			String altText = descriptor.get(WidgetConstants.IMAGE_WIDGET_ALT_KEY);
-			view.configure(null, fileName, null, null, null, altText, false, true);
-		} else {
-			String synapseId = descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY);
-			view.configure(wikiKey,
-					descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
-					descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
-					descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
-					synapseId, null, authenticationController.isLoggedIn(), false);
-			//set up view based on descriptor parameters
-			descriptor = widgetDescriptor;
-		}
+		String synapseId = descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY);
+		view.configure(wikiKey,
+				descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
+				descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
+				descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
+				synapseId, authenticationController.isLoggedIn());
+		//set up view based on descriptor parameters
+		descriptor = widgetDescriptor;
 	}
 	
 	@SuppressWarnings("unchecked")

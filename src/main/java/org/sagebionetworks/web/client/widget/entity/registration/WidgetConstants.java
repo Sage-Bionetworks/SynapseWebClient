@@ -75,8 +75,6 @@ public class WidgetConstants {
 	public static final String IMAGE_WIDGET_SCALE_KEY = "scale";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
 	public static final String IMAGE_WIDGET_SYNAPSE_ID_KEY = "synapseId";
-	public static final String IMAGE_WIDGET_ALT_KEY = "alt";
-	public static final String IMAGE_WIDGET_FROM_WEB_KEY = "fromWeb";
 	public static final String JOIN_WIDGET_EVALUATION_ID_KEY = "evaluationId";
 	public static final String JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY = "subchallengeIdList";
 	public static final String JOIN_WIDGET_SUBCHALLENGE_ID_LIST_DELIMETER = ",";

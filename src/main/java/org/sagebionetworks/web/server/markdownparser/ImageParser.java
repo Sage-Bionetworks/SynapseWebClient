@@ -1,32 +1,56 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
+import org.sagebionetworks.web.shared.WebConstants;
+
+import com.google.gwt.dev.util.collect.HashMap;
 
 public class ImageParser extends BasicMarkdownElementParser {
 	Pattern p1 = Pattern.compile(MarkdownRegExConstants.IMAGE_REGEX);;
+	Map<String, String> div2Image = new HashMap<String, String>();
+	int imageCount;
+
+	@Override
+	public void reset() {
+		imageCount = -1;
+		div2Image.clear();
+	}
+	
+	private String getCurrentDivID() {
+		return WebConstants.DIV_ID_IMAGE_PREFIX + imageCount;
+	}
 	
 	@Override
 	public void processLine(MarkdownElements line) {
 		Matcher m = p1.matcher(line.getMarkdown());
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
-			//Create link by preparing widget syntax for the renderer
-			String encodedUrl = WidgetEncodingUtil.encodeValue(m.group(2));
+			imageCount++;
+			String updated = "<div class=\"inline-block\" id=\"" + getCurrentDivID() + "\"></div>";
 			
-			//${image?alt=text&fileName=src&fromWeb=true}
-			String updated = WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.IMAGE_CONTENT_TYPE + "?" + 
-			WidgetConstants.IMAGE_WIDGET_ALT_KEY + "=" + m.group(1) + "&" + WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY + "=" + encodedUrl + 
-			"&" + WidgetConstants.IMAGE_WIDGET_FROM_WEB_KEY + "=true" + WidgetConstants.WIDGET_END_MARKDOWN;
-			
-			//Escape the replacement string for appendReplacement
-			updated = Matcher.quoteReplacement(updated);
+			String src = m.group(2);
+			String alt = m.group(1);
+			StringBuilder html = new StringBuilder();
+			html.append("<img src=\"");
+			html.append(src + "\" alt=\"");
+			html.append(alt + "\" />");
+			div2Image.put(getCurrentDivID(), html.toString());
 			m.appendReplacement(sb, updated);
 		}
 		m.appendTail(sb);
 		line.updateMarkdown(sb.toString());
 	}
+	
+	/*
+	@Override
+	public void completeParse(Document doc) {
+		for(String key: div2Image.keySet()) {
+			Element el = doc.getElementById(key);
+			el.appendText(div2Image.get(key));
+		}
+	}
+	*/
 }
