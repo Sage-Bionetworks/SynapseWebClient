@@ -32,6 +32,10 @@ public class ServerMarkdownUtils {
 	
 	public static final String START_PRE_CODE = "<pre><code";
 	public static final String END_PRE_CODE = "</code></pre>";
+	
+	public static final String START_MATH = "<div class=\"inline-block\" id=\"";
+	public static final String END_MATH = "</div>";
+	
 	public static final String HTML_LINE_BREAK = "<br />\n";
 	public static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
 	public static final String TEMP_SPACE_DELIMITER = "%^&2_9d";
@@ -356,7 +360,7 @@ public class ServerMarkdownUtils {
 	}
 	
 	public static void addWidgets(Document doc, Boolean isPreview) {
-		String suffix = isPreview ? WebConstants.DIV_ID_PREVIEW_SUFFIX : "";
+		String suffix = SharedMarkdownUtils.getPreviewSuffix(isPreview);
 		// using a regular expression to find our special widget notation, replace with a div with the widget name
 		String regEx = "\\W*?("+WidgetConstants.WIDGET_START_MARKDOWN_ESCAPED+"([^\\}]*)\\})\\W*?"; //reluctant qualification so that it finds multiple per line
 		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive

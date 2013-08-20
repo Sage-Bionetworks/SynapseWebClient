@@ -3,6 +3,7 @@ package org.sagebionetworks.web.server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.server.markdownparser.ListParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 import org.sagebionetworks.web.server.markdownparser.MarkdownRegExConstants;
+import org.sagebionetworks.web.server.markdownparser.MathParser;
 import org.sagebionetworks.web.server.markdownparser.ReferenceParser;
 import org.sagebionetworks.web.server.markdownparser.StrikeoutParser;
 import org.sagebionetworks.web.server.markdownparser.SubscriptParser;
@@ -47,6 +49,7 @@ public class SynapseMarkdownProcessor {
 	private Map<Pattern, String> restorers = new HashMap<Pattern, String>();
 	
 	private CodeParser codeParser;
+	private MathParser mathParser;
 	public static SynapseMarkdownProcessor getInstance() {
 		if (singleton == null) {
 			singleton = new SynapseMarkdownProcessor();
@@ -74,6 +77,8 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new BookmarkTargetParser());
 		codeParser = new CodeParser();
 		allElementParsers.add(codeParser);
+		mathParser = new MathParser();
+		allElementParsers.add(mathParser);
 		allElementParsers.add(new CodeSpanParser());
 		allElementParsers.add(new DoiAutoLinkParser());
 		allElementParsers.add(new HeadingParser());
@@ -136,7 +141,7 @@ public class SynapseMarkdownProcessor {
 		
 		//now make the main single pass to identify markdown elements and create the output
 		markdown = StringUtils.replace(markdown, ServerMarkdownUtils.R_MESSED_UP_ASSIGNMENT, ServerMarkdownUtils.R_ASSIGNMENT);
-		String html = processMarkdown(markdown, allElementParsers);
+		String html = processMarkdown(markdown, allElementParsers, isPreview);
 		if (html == null) {
 			//if the markdown processor fails to convert the md to html (will return null in this case), return the raw markdown instead. (as ugly as it might be, it's better than no information).
 			return originalMarkdown; 
@@ -146,10 +151,11 @@ public class SynapseMarkdownProcessor {
 		return html;
 	}
 	
-	public String processMarkdown(String markdown, List<MarkdownElementParser> parsers) {
+	public String processMarkdown(String markdown, List<MarkdownElementParser> parsers, boolean isPreview) {
 		//first, reset all of the parsers
 		for (MarkdownElementParser parser : parsers) {
 			parser.reset();
+			parser.setIsPreview(isPreview);
 		}
 		//go through the document once, and apply all markdown parsers to it
 		StringBuilder output = new StringBuilder();
@@ -182,8 +188,8 @@ public class SynapseMarkdownProcessor {
 				parser.processLine(elements);
 			}
 			
-			//only give the option to start new multiline element (complex parser) or process simple elements if we're not in a code block
-			if (!codeParser.isInMarkdownElement()){
+			//only give the option to start new multiline element (complex parser) or process simple elements if we're not in a code block (or a math block)
+			if (!codeParser.isInMarkdownElement() && !mathParser.isInMarkdownElement()){
 				//then the inactive multiline parsers
 				for (MarkdownElementParser parser : inactiveComplexParsers) {
 					parser.processLine(elements);
@@ -245,6 +251,9 @@ public class SynapseMarkdownProcessor {
 	public String postProcessHtml(String html, boolean isPreview) {
 		//using jsoup, since it's already in this project!
 		Document doc = Jsoup.parse(html);
+		for (MarkdownElementParser parser : allElementParsers) {
+			parser.completeParse(doc);
+		}
 		ServerMarkdownUtils.assignIdsToHeadings(doc);
 		
 		ServerMarkdownUtils.addWidgets(doc, isPreview);

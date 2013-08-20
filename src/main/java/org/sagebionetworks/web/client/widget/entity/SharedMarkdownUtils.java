@@ -42,4 +42,8 @@ public class SharedMarkdownUtils {
 		return getWidgetHTML(0, "", WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE);
 	}
 
+	public static String getPreviewSuffix(Boolean isPreview) {
+		return isPreview ? WebConstants.DIV_ID_PREVIEW_SUFFIX : "";
+	}
+
 }

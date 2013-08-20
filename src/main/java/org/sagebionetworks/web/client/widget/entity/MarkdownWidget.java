@@ -111,6 +111,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 					layout();
 					synapseJSNIUtils.highlightCodeBlocks();
 					DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
+					MarkdownWidget.loadMath(panel, synapseJSNIUtils, isPreview);
 					//asynchronously load the widgets
 					loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview);
 				} catch (JSONObjectAdapterException e) {
@@ -138,7 +139,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	 * @throws JSONObjectAdapterException 
 	 */
 	public static void loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, boolean isWiki, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, IconsImageBundle iconsImageBundle, Boolean isPreview) throws JSONObjectAdapterException {
-		final String suffix = isPreview ? WebConstants.DIV_ID_PREVIEW_SUFFIX : "";
+		final String suffix = SharedMarkdownUtils.getPreviewSuffix(isPreview);
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = WebConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
@@ -166,6 +167,25 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 			
 			i++;
 			currentWidgetDiv = WebConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+			el = panel.getElementById(currentWidgetDiv);
+		}
+	}
+	
+	
+	/**
+	 * Shared method for loading the math elements returned by the Synapse Markdown parser
+	 * @throws JSONObjectAdapterException 
+	 */
+	public static void loadMath(final HTMLPanel panel, final SynapseJSNIUtils synapseJSNIUtils, Boolean isPreview) throws JSONObjectAdapterException {
+		final String suffix = SharedMarkdownUtils.getPreviewSuffix(isPreview);
+		//look for every element that has the right format
+		int i = 0;
+		String currentWidgetDiv = WebConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
+		Element el = panel.getElementById(currentWidgetDiv);
+		while (el != null) {
+			synapseJSNIUtils.processWithMathJax(el);
+			i++;
+			currentWidgetDiv = WebConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
 			el = panel.getElementById(currentWidgetDiv);
 		}
 	}
