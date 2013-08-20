@@ -4,23 +4,23 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
+import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.WebConstants;
-
-import com.google.gwt.dev.util.collect.HashMap;
 
 public class UrlAutoLinkParser extends BasicMarkdownElementParser {
 	Pattern p = Pattern.compile(MarkdownRegExConstants.LINK_URL);
-	Map<String, String> div2Autolink = new HashMap<String, String>();
-	int autolinkCount;
+	MarkdownExtractor extractor;
 
 	@Override
 	public void reset() {
-		autolinkCount = -1;
-		div2Autolink.clear();
+		extractor = new MarkdownExtractor();
 	}
 	
 	private String getCurrentDivID() {
-		return WebConstants.DIV_ID_AUTOLINK_PREFIX + autolinkCount;
+		return WebConstants.DIV_ID_AUTOLINK_PREFIX + extractor.getCurrentContainerId() + SharedMarkdownUtils.getPreviewSuffix(isPreview);
 	}
 	
 	@Override
@@ -28,27 +28,31 @@ public class UrlAutoLinkParser extends BasicMarkdownElementParser {
 		Matcher m = p.matcher(line.getMarkdown());
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
-			autolinkCount++;
 			String url = m.group(1).trim();
-			String updated = "<div class=\"inline-block\" id=\"" + getCurrentDivID() + "\"></div>";
+			
+			StringBuilder updated = new StringBuilder();
+			updated.append(extractor.getContainerElementStart() + getCurrentDivID());
+			updated.append("\">" + extractor.getContainerElementEnd());
+			m.appendReplacement(sb, updated.toString());
+			
 			StringBuilder html = new StringBuilder();
-			html.append("<a class=\"link\" target=\"_blank\" href=\"");
+			html.append(ServerMarkdownUtils.START_LINK);
 			html.append(url + "\">");
-			html.append(url + "</a>");
-			div2Autolink.put(getCurrentDivID(), html.toString());
-			m.appendReplacement(sb, updated);
+			html.append(url + ServerMarkdownUtils.END_LINK);
+			extractor.putContainerIdToContent(getCurrentDivID(), html.toString());
 		}
 		m.appendTail(sb);
 		line.updateMarkdown(sb.toString());
 	}
-	
-	/*
+
 	@Override
 	public void completeParse(Document doc) {
-		for(String key: div2Autolink.keySet()) {
+		for(String key: extractor.getContainerIds()) {
 			Element el = doc.getElementById(key);
-			el.appendText(div2Autolink.get(key));
+			if(el != null) {
+				el.prepend(extractor.getContent(key));	
+			}
 		}
 	}
-	*/
+	
 }

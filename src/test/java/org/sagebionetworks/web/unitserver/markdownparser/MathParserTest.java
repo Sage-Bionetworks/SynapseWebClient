@@ -29,8 +29,8 @@ public class MathParserTest {
 		MarkdownElements elements = new MarkdownElements(line);
 		parser.processLine(elements);
 		String result = elements.getHtml();
-		assertTrue(result.contains(ServerMarkdownUtils.START_MATH));
-		assertFalse(result.contains(ServerMarkdownUtils.END_MATH));
+		assertTrue(result.contains(ServerMarkdownUtils.START_CONTAINER));
+		assertFalse(result.contains(ServerMarkdownUtils.END_CONTAINER));
 		
 		assertTrue(parser.isInMarkdownElement());
 		
@@ -39,9 +39,9 @@ public class MathParserTest {
 			elements = new MarkdownElements(l);
 			parser.processLine(elements);
 			result = elements.getHtml();
-			assertFalse(result.contains(ServerMarkdownUtils.START_MATH));
+			assertFalse(result.contains(ServerMarkdownUtils.START_CONTAINER));
 			assertTrue(result.contains(l));
-			assertFalse(result.contains(ServerMarkdownUtils.END_MATH));
+			assertFalse(result.contains(ServerMarkdownUtils.END_CONTAINER));
 			assertTrue(parser.isInMarkdownElement());
 		}
 		
@@ -50,8 +50,8 @@ public class MathParserTest {
 		elements = new MarkdownElements(line);
 		parser.processLine(elements);
 		result = elements.getHtml();
-		assertFalse(result.contains(ServerMarkdownUtils.START_MATH));
-		assertTrue(result.contains(ServerMarkdownUtils.END_MATH));
+		assertFalse(result.contains(ServerMarkdownUtils.START_CONTAINER));
+		assertTrue(result.contains(ServerMarkdownUtils.END_CONTAINER));
 		assertFalse(parser.isInMarkdownElement());
 	}
 	
@@ -63,8 +63,8 @@ public class MathParserTest {
 		parser.processLine(elements);
 		String result = elements.getHtml();
 		//should contain both start and end.  It will not contain the equation (protected from other parsers)
-		assertTrue(result.contains(ServerMarkdownUtils.START_MATH));
-		assertTrue(result.contains(ServerMarkdownUtils.END_MATH));
+		assertTrue(result.contains(ServerMarkdownUtils.START_CONTAINER));
+		assertTrue(result.contains(ServerMarkdownUtils.END_CONTAINER));
 		assertFalse(parser.isInMarkdownElement());
 		assertFalse(result.contains(equation));
 		

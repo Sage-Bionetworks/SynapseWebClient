@@ -35,7 +35,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 	private String getNewMathElementStart() {
 		mathElementCount++;
 		StringBuilder sb = new StringBuilder();
-		sb.append(ServerMarkdownUtils.START_MATH + getCurrentDivID());
+		sb.append(ServerMarkdownUtils.START_CONTAINER + getCurrentDivID());
 		sb.append("\">");
 		return sb.toString();
 	}
@@ -54,7 +54,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 			}
 			else {
 				//ending math block
-				line.appendElement(ServerMarkdownUtils.END_MATH);
+				line.appendElement(ServerMarkdownUtils.END_CONTAINER);
 				isInMathBlock = false;
 			}
 			//remove all fenced blocks from the markdown, just set to the prefix group
@@ -81,7 +81,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
 			//leave containers to filled in on completeParse()
-			String containerElement = getNewMathElementStart() + ServerMarkdownUtils.END_MATH;
+			String containerElement = getNewMathElementStart() + ServerMarkdownUtils.END_CONTAINER;
 			div2equation.put(getCurrentDivID(), m.group(2));
 			m.appendReplacement(sb, containerElement);
 		}
