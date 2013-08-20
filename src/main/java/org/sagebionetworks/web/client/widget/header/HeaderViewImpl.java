@@ -338,7 +338,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			headerDiv.addClassName(MARGIN_BOTTOM_STYLE);
 			headerImageDiv.removeClassName(NO_TOP_MARGIN_STYLE);
 		}
-		else if(showLargeLogo) {
+		else {
+			//always show large label if in alpha mode (until we're ready to unveil)
 			logoBeta.setVisible(false);
 			logoLarge.setVisible(true);
 			logoSmall.setVisible(false);
@@ -346,14 +347,16 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			headerDiv.removeClassName(HEADER_SMALL_STYLE);
 			headerDiv.addClassName(HEADER_LARGE_STYLE);
 			headerImageDiv.addClassName(NO_TOP_MARGIN_STYLE);
-		} else {						
-			logoBeta.setVisible(false);
-			logoLarge.setVisible(false);
-			logoSmall.setVisible(true);
-			headerDiv.removeClassName(MARGIN_BOTTOM_STYLE);
-			headerDiv.removeClassName(HEADER_LARGE_STYLE);
-			headerDiv.addClassName(HEADER_SMALL_STYLE);
-			headerImageDiv.addClassName(NO_TOP_MARGIN_STYLE);
 		}
+//		} else {		
+			//show small logo
+//			logoBeta.setVisible(false);
+//			logoLarge.setVisible(false);
+//			logoSmall.setVisible(true);
+//			headerDiv.removeClassName(MARGIN_BOTTOM_STYLE);
+//			headerDiv.removeClassName(HEADER_LARGE_STYLE);
+//			headerDiv.addClassName(HEADER_SMALL_STYLE);
+//			headerImageDiv.addClassName(NO_TOP_MARGIN_STYLE);
+//		}
 	}
 }
