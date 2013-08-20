@@ -32,7 +32,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.globalApplicationState = globalApplicationState;
 	}
-	
+
 	@Override
 	public void configure(WikiPageKey wikiKey, final String fileName,
 			final String scale, String alignment, final String synapseId, final boolean isLoggedIn) {
@@ -53,7 +53,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 				}
 			});
 		}
-		
+
 		if (alignment != null) {
 			String trimmedAlignment = alignment.trim();
 			if (WidgetConstants.FLOAT_LEFT.equalsIgnoreCase(trimmedAlignment)) {
@@ -79,7 +79,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 					else 
 						showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + "Unable to view image " + synapseId);
 				}
-					
+
 				else if (fileName != null)
 					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + fileName);
 				else
@@ -120,7 +120,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + e.getMessage());
 				}
 			}
-			
+
 			private void setImageToMaxSize(float imageWidth, float imageHeight) {
 				image.setWidth(MAX_IMAGE_WIDTH + "px");	
 				image.setHeight(imageHeight * MAX_IMAGE_WIDTH / imageWidth + "px");
@@ -131,12 +131,12 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 		image.setUrl(url);
 		this.layout(true);
 	}
-	
+
 	public void showError(String error) {
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));
 		layout(true);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return this;
@@ -146,8 +146,8 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-		
-	
+
+
 	/*
 	 * Private Methods
 	 */

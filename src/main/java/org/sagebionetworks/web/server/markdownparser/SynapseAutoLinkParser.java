@@ -11,7 +11,7 @@ public class SynapseAutoLinkParser extends BasicMarkdownElementParser {
 		Matcher m = p.matcher(line.getMarkdown());
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
-			String updated = "<a class=\"link\" href=\"#!Synapse:" + m.group(1) +"\">" + m.group(1) + "</a>";
+			String updated = "<a class=\"link\" target=\"_blank\" href=\"#!Synapse:" + m.group(1) +"\">" + m.group(1) + "</a>";
 			m.appendReplacement(sb, updated);
 		}
 		m.appendTail(sb);

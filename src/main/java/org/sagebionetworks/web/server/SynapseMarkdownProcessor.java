@@ -66,6 +66,13 @@ public class SynapseMarkdownProcessor {
 		//first initialize parsers that handle escaping
 		allElementParsers.add(new UnderscoreParser());
 		allElementParsers.add(new BacktickParser());
+		//other parsers should not affect code spans
+		allElementParsers.add(new CodeSpanParser());
+		//parsers handling urls go before other simple parsers
+		allElementParsers.add(new ImageParser());
+		allElementParsers.add(new LinkParser());
+		allElementParsers.add(new UrlAutoLinkParser());
+		
 		//initialize all markdown element parsers
 		allElementParsers.add(new BlockQuoteParser());
 		allElementParsers.add(new BoldParser());	
@@ -74,13 +81,10 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(codeParser);
 		mathParser = new MathParser();
 		allElementParsers.add(mathParser);
-		allElementParsers.add(new CodeSpanParser());
 		allElementParsers.add(new DoiAutoLinkParser());
 		allElementParsers.add(new HeadingParser());
 		allElementParsers.add(new HorizontalLineParser());
-		allElementParsers.add(new ImageParser());
 		allElementParsers.add(new ItalicsParser());
-		allElementParsers.add(new LinkParser());
 		allElementParsers.add(new ListParser());
 		allElementParsers.add(new ReferenceParser());
 		allElementParsers.add(new StrikeoutParser());
@@ -88,7 +92,6 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new SuperscriptParser());
 		allElementParsers.add(new SynapseAutoLinkParser());
 		allElementParsers.add(new TableParser());
-		allElementParsers.add(new UrlAutoLinkParser());
 		allElementParsers.add(new WikiSubpageParser());
 		
 		//preservers
