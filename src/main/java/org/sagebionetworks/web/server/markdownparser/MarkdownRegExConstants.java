@@ -48,6 +48,21 @@ public class MarkdownRegExConstants {
 	 * ```
 	 */
 	public static final String FENCE_CODE_BLOCK_REGEX = PREFIX_GROUP + "[`]{3}\\s*([a-zA-Z_0-9-]*)\\s*$";
+	
+	/**
+	 * Recognized example input:
+	 * $$
+	 * This is a math block
+	 * $$
+	 */
+	public static final String FENCE_MATH_BLOCK_REGEX = PREFIX_GROUP + "[$]{2}\\s*$";
+	
+	/**
+	 * Recognized example input:
+	 * A math span look like $this$
+	 */
+	public static final String MATH_SPAN_REGEX = "(?<!\\\\)(\\$+)([^{].+?)(?<!\\$)\\1(?!\\$)";
+	
 
 	/**
 	 * Recognized example input:

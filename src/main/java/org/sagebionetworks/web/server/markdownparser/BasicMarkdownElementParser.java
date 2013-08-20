@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.server.markdownparser;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 public abstract class BasicMarkdownElementParser implements MarkdownElementParser {
 
+	protected boolean isPreview;
+	
 	/**
 	 * Can leave alone if element parser has no state 
 	 */
@@ -42,5 +45,18 @@ public abstract class BasicMarkdownElementParser implements MarkdownElementParse
 	protected String getLineWithoutHTML(String line) {
 		return Jsoup.parse(line).text();
 	}
+	
+	/**
+	 * Can leave along if parser does not need to operate on the entire html document after processing is complete (most don't).
+	 */
+	@Override
+	public void completeParse(Document doc) {
+	}
 
+	@Override
+	public void setIsPreview(boolean isPreview) {
+		this.isPreview= isPreview;
+	}
+	
+	
 }

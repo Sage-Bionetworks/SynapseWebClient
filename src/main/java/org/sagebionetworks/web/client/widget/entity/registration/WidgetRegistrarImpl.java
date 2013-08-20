@@ -76,8 +76,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getShinySiteConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.BUTTON_LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getButtonLinkConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.MATHJAX_CONTENT_TYPE)) {
-			presenter = ginInjector.getMathJaxConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -134,8 +132,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getButtonLinkWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE)) {
 			presenter = ginInjector.getTutorialWidgetRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.MATHJAX_CONTENT_TYPE)) {
-			presenter = ginInjector.getMathJaxWidget();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)

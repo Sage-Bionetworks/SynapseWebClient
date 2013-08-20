@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import org.jsoup.nodes.Document;
+
 /**
  * Class used to detect markdown elements (processing markdown to html).
  * If using a regular expression to detect, it's pattern should be compiled in init().
@@ -28,6 +30,12 @@ public interface MarkdownElementParser {
 	void completeParse(StringBuilder html);
 	
 	/**
+	 * If there are any final modifications to the output html that the parser needs to make, it should perform it here (efficiently)
+	 * @param html
+	 */
+	void completeParse(Document doc);
+	
+	/**
 	 * Return true if this parser is still open (has not yet received the signal to close)
 	 * @return
 	 */
@@ -44,4 +52,6 @@ public interface MarkdownElementParser {
 	 * @return
 	 */
 	boolean isInputSingleLine();
+	
+	void setIsPreview(boolean isPreview);
 }
