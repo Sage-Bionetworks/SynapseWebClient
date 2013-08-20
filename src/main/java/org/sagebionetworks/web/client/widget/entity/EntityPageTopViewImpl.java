@@ -315,6 +315,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		
+		colLeftContainer.add(createPropertyWidget(bundle), widgetMargin);
+		
 		// ** RIGHT **
 		// Programmatic Clients
 		colRightContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
@@ -331,8 +333,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Provenance Widget for anything other than projects of folders
 		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) 
 			fullWidthContainer.add(createProvenanceWidget(bundle), widgetMargin);
-		// Annotation Editor widget
-		fullWidthContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
 		fullWidthContainer.add(createAttachmentsWidget(bundle, canEdit, false), widgetMargin);
 		
@@ -354,7 +354,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			MarginData widgetMargin) {
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fullWidthContainer.add(entityMetadata.asWidget(), new MarginData(0));
-		
 		// ** RIGHT **
 		// none
 
@@ -362,6 +361,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		//SWC-668: render (from top to bottom) description, wiki, then file browser, to make consistent with Project view.
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
+		
+		//Annotations
+		fullWidthContainer.add(createPropertyWidget(bundle), new MarginData(0));
 
 		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 
@@ -370,12 +372,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
-		// Annotation widget
-		LayoutContainer annotContainer = createPropertyWidget(bundle);
-		annotContainer.addStyleName("span-7 notopmargin");
-		threeCol.add(annotContainer, widgetMargin);		
-		threeCol.add(createSpacer(), widgetMargin);
-
+		
 		//main use case appear to be Project level challenges
 //		threeCol.add(createEvaluationAdminList(bundle, null), widgetMargin);		
 //		threeCol.add(createSpacer(), widgetMargin);
@@ -391,10 +388,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		LayoutContainer threeCol = new LayoutContainer();
 		threeCol.addStyleName("span-24 notopmargin");
 		// Annotation widget
-		LayoutContainer annotContainer = createPropertyWidget(bundle);
-		annotContainer.addStyleName("span-7 notopmargin");
-		threeCol.add(annotContainer);		
-		threeCol.add(createSpacer());
 		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************		
 		// Attachments
 		Widget attachContainer = createAttachmentsWidget(bundle, canEdit, false);
@@ -407,7 +400,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			topFullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
 			// Description
 			topFullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
-			
+			topFullWidthContainer.add(createPropertyWidget(bundle), widgetMargin);
 			addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24);
 			
 			// Child File Browser
@@ -432,7 +425,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		} else {
 			//old layout with no tabs
 			fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin); 
-			fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin); 
+			fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
+			fullWidthContainer.add(createPropertyWidget(bundle), widgetMargin);
 			addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 			fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true, canEdit));
 			threeCol.add(createEvaluationAdminList(bundle, null));
@@ -514,10 +508,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
 		// Description
 		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
+		// Annotation Editor widget
+		colLeftContainer.add(createPropertyWidget(bundle), widgetMargin);
 		
 		// ** RIGHT **
-		// Annotation Editor widget
-		colRightContainer.add(createPropertyWidget(bundle), widgetMargin);
 		// Attachments
 		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, false), widgetMargin);
 
@@ -637,8 +631,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 		if (!propertyWidget.isEmpty()) {
-			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.ANNOTATIONS + "</h4>")));
-		    // Create the property body
+			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<span class=\"boldText\">" + DisplayConstants.ANNOTATIONS + ":</span>")));
+		    //TODO: create the Add Tag button
+			// Create the property body
 		    // the headers for properties.
 		    lc.add(propertyWidget.asWidget());
 		}
