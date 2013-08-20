@@ -16,6 +16,7 @@ import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.server.markdownparser.MarkdownExtractor;
 import org.sagebionetworks.web.server.markdownparser.MarkdownRegExConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -118,7 +119,24 @@ public class ServerMarkdownUtils {
 		return markdown.replace(TEMP_NEWLINE_DELIMITER, "\n").replace(TEMP_SPACE_DELIMITER, " ");
 	}
 	
-
+	/**
+	 * Retrieves each container specified by saved ids and inserts the associated contents into the container
+	 * @param extractor
+	 * @param doc
+	 */
+	public static void insertExtractedContentToMarkdown(MarkdownExtractor extractor, Document doc, boolean hasHtml) {
+		for(String key: extractor.getContainerIds()) {
+			Element el = doc.getElementById(key);
+			if(el != null) {
+				if(hasHtml) {
+					el.prepend(extractor.getContent(key));
+				} else {
+					el.appendText(extractor.getContent(key));
+				}
+			}
+		}
+	}
+	
 	/**
 	 * adds a reference to the subpages wiki widget at the top of the page if it isn't already in the markdown
 	 * @param markdown

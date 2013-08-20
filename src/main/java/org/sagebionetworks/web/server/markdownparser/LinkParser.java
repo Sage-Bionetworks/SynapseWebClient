@@ -73,13 +73,7 @@ public class LinkParser extends BasicMarkdownElementParser  {
 	
 	@Override
 	public void completeParse(Document doc) {
-		for(String key: extractor.getContainerIds()) {
-			Element el = doc.getElementById(key);
-			if(el != null) {
-				el.prepend(extractor.getContent(key));
-				
-			}
-		}
+		ServerMarkdownUtils.insertExtractedContentToMarkdown(extractor, doc, true);
 	}
 	
 }

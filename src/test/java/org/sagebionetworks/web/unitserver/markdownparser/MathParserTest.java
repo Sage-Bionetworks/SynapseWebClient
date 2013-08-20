@@ -21,6 +21,7 @@ public class MathParserTest {
 	@Before
 	public void setup(){
 		parser = new MathParser();
+		parser.reset();
 	}
 	
 	@Test

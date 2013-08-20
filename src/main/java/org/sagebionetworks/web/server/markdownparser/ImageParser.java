@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
+import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class ImageParser extends BasicMarkdownElementParser {
@@ -20,6 +21,13 @@ public class ImageParser extends BasicMarkdownElementParser {
 		return WebConstants.DIV_ID_IMAGE_PREFIX + extractor.getCurrentContainerId() + SharedMarkdownUtils.getPreviewSuffix(isPreview);
 	}
 	
+	private String getNewElementStart() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(extractor.getContainerElementStart() + getCurrentDivID());
+		sb.append("\">");
+		return sb.toString();
+	}
+	
 	@Override
 	public void processLine(MarkdownElements line) {
 		Matcher m = p1.matcher(line.getMarkdown());
@@ -28,10 +36,8 @@ public class ImageParser extends BasicMarkdownElementParser {
 			String src = m.group(2);
 			String alt = m.group(1);
 
-			StringBuilder updated = new StringBuilder();
-			updated.append(extractor.getContainerElementStart() + getCurrentDivID());
-			updated.append("\">" + extractor.getContainerElementEnd());
-			m.appendReplacement(sb, updated.toString());
+			String containerElement = getNewElementStart() + extractor.getContainerElementEnd();
+			m.appendReplacement(sb, containerElement);
 			
 			StringBuilder html = new StringBuilder();
 			html.append("<img src=\"");
@@ -45,11 +51,6 @@ public class ImageParser extends BasicMarkdownElementParser {
 
 	@Override
 	public void completeParse(Document doc) {
-		for(String key: extractor.getContainerIds()) {
-			Element el = doc.getElementById(key);
-			if(el != null) {
-				el.prepend(extractor.getContent(key));
-			}
-		}
+		ServerMarkdownUtils.insertExtractedContentToMarkdown(extractor, doc, true);
 	}
 }

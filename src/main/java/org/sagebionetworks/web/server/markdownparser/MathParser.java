@@ -15,27 +15,23 @@ public class MathParser extends BasicMarkdownElementParser  {
 	Pattern p1 = Pattern.compile(MarkdownRegExConstants.FENCE_MATH_BLOCK_REGEX);
 	Pattern p2 = Pattern.compile(MarkdownRegExConstants.MATH_SPAN_REGEX);
 	
-	Map<String, String> div2equation = new HashMap<String, String>();
-	
+	MarkdownExtractor extractor;
 	boolean isInMathBlock, isFirstMathLine;
-	int mathElementCount;
 	
 	@Override
 	public void reset() {
 		isInMathBlock = false;
 		isFirstMathLine = false;
-		mathElementCount = -1;
-		div2equation.clear();
+		extractor = new MarkdownExtractor();
 	}
 
 	private String getCurrentDivID() {
-		return WebConstants.DIV_ID_MATHJAX_PREFIX + mathElementCount + SharedMarkdownUtils.getPreviewSuffix(isPreview);
+		return WebConstants.DIV_ID_MATHJAX_PREFIX + extractor.getCurrentContainerId() + SharedMarkdownUtils.getPreviewSuffix(isPreview);
 	}
 	
 	private String getNewMathElementStart() {
-		mathElementCount++;
 		StringBuilder sb = new StringBuilder();
-		sb.append(ServerMarkdownUtils.START_CONTAINER + getCurrentDivID());
+		sb.append(extractor.getContainerElementStart() + getCurrentDivID());
 		sb.append("\">");
 		return sb.toString();
 	}
@@ -54,7 +50,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 			}
 			else {
 				//ending math block
-				line.appendElement(ServerMarkdownUtils.END_CONTAINER);
+				line.appendElement(extractor.getContainerElementEnd());
 				isInMathBlock = false;
 			}
 			//remove all fenced blocks from the markdown, just set to the prefix group
@@ -81,8 +77,8 @@ public class MathParser extends BasicMarkdownElementParser  {
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
 			//leave containers to filled in on completeParse()
-			String containerElement = getNewMathElementStart() + ServerMarkdownUtils.END_CONTAINER;
-			div2equation.put(getCurrentDivID(), m.group(2));
+			String containerElement = getNewMathElementStart() + extractor.getContainerElementEnd();
+			extractor.putContainerIdToContent(getCurrentDivID(), m.group(2));
 			m.appendReplacement(sb, containerElement);
 		}
 		m.appendTail(sb);
@@ -94,12 +90,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 	 */
 	@Override
 	public void completeParse(Document doc) {
-		for (String key : div2equation.keySet()) {
-			Element el = doc.getElementById(key);
-			//should never be null, but just to be safe
-			if (el != null)
-				el.appendText(div2equation.get(key));
-		}
+		ServerMarkdownUtils.insertExtractedContentToMarkdown(extractor, doc, false);
 	}
 
 	@Override
