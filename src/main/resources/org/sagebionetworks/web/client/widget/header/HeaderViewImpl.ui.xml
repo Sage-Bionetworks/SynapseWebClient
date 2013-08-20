@@ -8,13 +8,18 @@
 	<g:HTMLPanel>
 
 		<div ui:field="headerDiv" class="span-24 notopmargin small-header">		    
-			<div class="display-inline margin-top-3">
-				<a href="#">
-					<g:Image ui:field="logoLarge" resource="{sageImages.headerLarge}" styleName="margin-top-4" />					
-					<g:Image ui:field="logoSmall" resource="{sageImages.logoSmall}" styleName="margin-top-4" />
-				</a>				
-				<g:HorizontalPanel styleName="display-inline last margin-top-4" ui:field="commandBar" />
-				<g:SimplePanel ui:field="testSiteHeading" />
+			<div class="display-inline span-24 last notopmargin margin-top-3">
+			    <div ui:field="headerImageDiv" class="span-10 logo last">
+			        <a href="#"> 
+				    	<g:Image ui:field="logoBeta" resource="{sageImages.sageLogoAndTitle}" />
+				    	<g:Image ui:field="logoLarge" resource="{sageImages.headerLarge}" styleName="margin-top-4" />					
+						<g:Image ui:field="logoSmall" resource="{sageImages.logoSmall}" styleName="margin-top-4" />
+					</a>
+					
+			    </div>
+				<g:SimplePanel ui:field="testSiteHeading" styleName="span-2 last" />				
+				<g:HorizontalPanel styleName="display-inline max-width-460 last margin-top-4" ui:field="commandBar" />
+				
 			</div>
 			
 					
