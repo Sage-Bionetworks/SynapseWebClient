@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.markdownparser.MarkdownRegExConstants;
+import org.sagebionetworks.web.server.markdownparser.TableParser;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import eu.henkelmann.actuarius.ActuariusTransformer;
@@ -324,7 +325,7 @@ public class ServerMarkdownUtils {
 
 	
 	public static int appendNewTableHtml(StringBuilder builder, String regEx, String[] lines, int tableCount, int i) {
-		builder.append("<div class=\"span-24 overflow-auto\"><table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
+		builder.append(TableParser.TABLE_START_HTML+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
 		//header
 		builder.append("<thead>");
 		builder.append("<tr>");
@@ -349,8 +350,7 @@ public class ServerMarkdownUtils {
 			builder.append("</tr>");
 			i++;
 		}
-		builder.append("</tbody>");
-		builder.append("</table></div>");
+		builder.append(TableParser.TABLE_END_HTML);
 		
 		return i;
 	}

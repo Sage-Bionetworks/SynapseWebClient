@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 public class TableParser extends BasicMarkdownElementParser {
-	private static final String TABLE_END_HTML = "</tbody></table></div>";
-	private static final String TABLE_START_HTML = "<div class=\"span-24 overflow-auto\"><table id=\"";
+	public static final String TABLE_END_HTML = "</tbody></table></div>";
+	public static final String TABLE_START_HTML = "<div class=\"span-24 notopmargin last overflow-auto\"><table id=\"";
 	Pattern start = Pattern.compile(MarkdownRegExConstants.TABLE_START_REGEX);
 	Pattern p = Pattern.compile(MarkdownRegExConstants.TABLE_REGEX, Pattern.DOTALL);;
 	Pattern end = Pattern.compile(MarkdownRegExConstants.TABLE_END_REGEX);
