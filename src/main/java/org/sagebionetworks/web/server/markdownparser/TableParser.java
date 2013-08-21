@@ -12,6 +12,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	Pattern end = Pattern.compile(MarkdownRegExConstants.TABLE_END_REGEX);
 	Pattern headerBorder = Pattern.compile(MarkdownRegExConstants.TABLE_HEADER_BORDER_REGEX);
 	boolean hasTags; 			//Are we creating a fenced table versus a table with just column separated by pipes
+	boolean shortStyle;			//Does this table need to limit its height
 	boolean isInTable;			//Have we started/are we in the middle of creating a table
 	boolean isTableStart;		//Is this the opening fence of the table
 	boolean isTableEnd;			//Is this the closing end of the table
@@ -23,6 +24,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	@Override
 	public void reset() {
 		hasTags = false;
+		shortStyle = false;
 		isInTable = false;
 		isTableStart = false;
 		isTableEnd = false;
@@ -46,6 +48,11 @@ public class TableParser extends BasicMarkdownElementParser {
 			isInTable = true;
 			//Get class styles and start table
 			String styles = startMatcher.group(2);
+			if(styles != null && styles.contains("short")) {
+				//Wrap table in a container that will limit height and maintain good format
+				builder.append("<div class=\"markdowntableWrap\">");
+				shortStyle = true;
+			}
 			builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable");
 			if(styles == null) {
 				builder.append("\">");
@@ -55,6 +62,9 @@ public class TableParser extends BasicMarkdownElementParser {
 		} else if(isTableEnd) {
 			//End table and reset state for future tables
 			builder.append("</tbody></table>");
+			if(shortStyle) {
+				builder.append("</div>");
+			}
 			resetTableState();
 		} else {
 			//If we are not in a fenced table, check if this is a normal table
@@ -101,6 +111,9 @@ public class TableParser extends BasicMarkdownElementParser {
 					}
 					//End table and reset state for future tables
 					line.prependElement("</tbody></table>");
+					if(shortStyle) {
+						line.prependElement("</div>");
+					}
 					builder.append(line.getMarkdown());
 					resetTableState();
 				} else {
@@ -143,6 +156,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	private void resetTableState() {
 		isInTable = false;
 		hasTags = false;
+		shortStyle = false;
 		readFirstRow = false;
 		hasHandledFirstRow = false;
 		firstRowData.clear();

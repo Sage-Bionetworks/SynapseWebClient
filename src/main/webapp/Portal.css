@@ -749,6 +749,13 @@ h1, h2, h3, h4, h5, h6 {
     border: 2px solid #dddddd;
 }
 
+/* Wrap styles will apply to short tables */
+.markdowntableWrap {
+    width:100%;
+    height:400px;
+    overflow:auto;
+}
+
 .markdowntable caption + thead tr:first-child th,
 .markdowntable caption + tbody tr:first-child th,
 .markdowntable caption + tbody tr:first-child td,
