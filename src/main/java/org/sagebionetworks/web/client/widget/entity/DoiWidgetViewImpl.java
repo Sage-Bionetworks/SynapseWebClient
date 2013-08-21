@@ -6,9 +6,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -22,7 +19,7 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	AuthenticationController authenticationController;
 	
 	FlowPanel container;
-	Button createDoiButton;
+	
 	@Inject
 	public DoiWidgetViewImpl(GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController) {
@@ -31,21 +28,8 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 
 		container = new FlowPanel();
 		initWidget(container);
-		createDoiButton = new Button("Create DOI");
-		createDoiButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				presenter.createDoi();
-			}
-		});
 	}
 
-	@Override
-	public void showCreateDoi() {
-		container.clear();
-		container.add(createDoiButton);
-	}
-	
 	@Override
 	public void showDoi(final DoiStatus doi) {
 		container.clear();
@@ -53,7 +37,6 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 		if (doi == DoiStatus.ERROR) {
 			//show error UI
 			container.add(new HTMLPanel(DisplayUtils.getWarningHtml("Error creating DOI", "")));
-			container.add(createDoiButton);
 		} else if (doi == DoiStatus.IN_PROCESS) {
 			//show in process UI
 			container.add(new HTMLPanel("<span class=\"margin-left-5\">DOI processing...</span>"));

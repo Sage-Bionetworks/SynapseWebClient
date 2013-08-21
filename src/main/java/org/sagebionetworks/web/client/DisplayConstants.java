@@ -200,6 +200,7 @@ public class DisplayConstants {
 	public static final String LABEL_RENAME = "Rename";
 	public static final String LABEL_CREATE = "Create";
 	public static final String LABEL_MOVE = "Move";
+	public static final String LABEL_CREATE_DOI = "Create DOI";
 	public static final String SELECT_NEW_PARENT = "Select New Parent for this";
 	public static final String LABEL_ARE_YOU_SURE = "Are you sure?";
 	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. Please try again.";

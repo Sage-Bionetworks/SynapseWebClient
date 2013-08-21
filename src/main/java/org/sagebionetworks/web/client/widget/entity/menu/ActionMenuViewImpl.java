@@ -68,6 +68,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private Button deleteButton;
 	private boolean isInTestMode;
 	private EntityBundle entityBundle;
+	private MenuItem doiItem;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
@@ -176,6 +177,11 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		DisplayUtils.showInfo(title, message);
 	}
 
+	@Override
+	public void enableDoiCreation(boolean enable) {
+		doiItem.setEnabled(enable);
+	}
+	
 	@Override
 	public void clear() {
 		if(editButton != null) editButton.removeAllListeners();
@@ -299,6 +305,10 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 
 		if(entity instanceof Locationable || entity instanceof FileEntity) {
 			addUploadToGenomeSpace(menu, entityBundle);
+		}
+		
+		if (canEdit) {
+			addCreateDoiItem(menu, entity, entityType);
 		}
 		
 		toolsButton.setMenu(menu);
@@ -450,6 +460,26 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		menu.add(itemMove);
 	}
 
+	/**
+	 * 'Create DOI' item
+	 * @param menu
+	 * @param entity 
+	 * @param entityType 
+	 */
+	private void addCreateDoiItem(Menu menu, final Entity entity, EntityType entityType) {
+		if (doiItem == null) {
+			doiItem = new MenuItem(DisplayConstants.LABEL_CREATE_DOI);
+			doiItem.addSelectionListener(new SelectionListener<MenuEvent>() {
+				@Override
+				public void componentSelected(MenuEvent ce) {				
+					presenter.createDoi();		
+				}
+			});
+		}
+		menu.add(doiItem);
+		doiItem.setEnabled(false);
+	}
+	
 	private void addUploadToGenomeSpace(final Menu menu, final EntityBundle bundle) {
 		MenuItem item = new MenuItem("Upload to " + AbstractImagePrototype.create(sageImageBundle.genomeSpaceLogoTitle16()).getHTML());		
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {

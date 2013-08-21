@@ -84,7 +84,7 @@ public class DoiWidgetTest {
 	public void testConfigureNotFound() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		doiWidget.configure(entityId, true, null);
-		verify(mockView).showCreateDoi();
+		verify(mockView).clear();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -92,7 +92,7 @@ public class DoiWidgetTest {
 	public void testConfigureNotFoundNonEditable() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		doiWidget.configure(entityId, false, null);
-		verify(mockView, Mockito.times(0)).showCreateDoi();
+		verify(mockView, Mockito.times(0)).clear();
 	}
 
 	

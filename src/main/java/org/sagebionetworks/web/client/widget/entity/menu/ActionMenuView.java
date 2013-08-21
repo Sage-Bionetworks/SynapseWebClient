@@ -37,6 +37,7 @@ public interface ActionMenuView extends IsWidget, SynapseView {
 			Long versionNumber, 
 			boolean isInTestMode);
 	
+	void enableDoiCreation(boolean enable);
 	/**
 	 * Presenter interface
 	 */
@@ -65,6 +66,8 @@ public interface ActionMenuView extends IsWidget, SynapseView {
 		void uploadToGenomespace();
 		
 		void showAvailableEvaluations();
+		
+		void createDoi();
 	}
 
 }
