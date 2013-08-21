@@ -19,12 +19,12 @@ public interface PropertyWidgetView extends IsWidget{
 		 * Set the entity bundle on this widget
 		 * @param bundle
 		 */
-		 public void setEntityBundle(EntityBundle bundle);
+		 public void configure(EntityBundle bundle, boolean canEdit);
 	}
 
 	/**
 	 * Set the rows to be displayed in the view
 	 * @param rows
 	 */
-	void setRows(List<EntityRow<?>> rows);
+	void configure(List<EntityRow<?>> rows, boolean canEdit);
 }

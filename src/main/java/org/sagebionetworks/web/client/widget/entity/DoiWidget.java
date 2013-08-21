@@ -122,8 +122,10 @@ public class DoiWidget implements Presenter {
 				html = getDoiLink(fullDoi, doiName);
 			else
 				html = getDoiSpan(fullDoi);
+			//prepend field key
+			html = "<span class=\"boldText\" style=\"margin-right: 5px;\">DOI:</span> " + html;
 		}
-		return html;
+		return  html;
 	}
 	
 	public static String getDoiLink(String fullDoi, String doiName){

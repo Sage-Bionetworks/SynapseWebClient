@@ -76,8 +76,6 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	@UiField
 	SimplePanel uploadButtonContainer;
 	@UiField
-	SpanElement entityId;
-	@UiField
 	Image entityIcon;
 	@UiField
 	SpanElement fileName;
@@ -166,7 +164,6 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			if (isDataPossiblyWithinLocationable) {
 				//add an anchor with the file name, that redirects to the download button for functionality
 				entityLink.setText(entity.getName());
-				entityId.setInnerText(entity.getId());
 				AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
 				synapseIconForEntity.applyTo(entityIcon);
 				

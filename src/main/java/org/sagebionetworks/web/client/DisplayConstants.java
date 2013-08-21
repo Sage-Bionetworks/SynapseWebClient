@@ -441,6 +441,9 @@ public class DisplayConstants {
 	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2 = "\" target=\"_blank\" class=\"link\">here</a>.";
 	public static final String BUTTON_TEXT_FLAG_DATA = "Flag Data";
 	public static final String BUTTON_TEXT_RESTRICT_DATA = "Add Restrictions";
+	public static final String TEXT_ADD_ANNOTATION = "Add Annotation";
+	public static final String TEXT_DELETE_ANNOTATION = "Delete Annotation";
+	public static final String TEXT_EDIT_ANNOTATION = "Edit Annotation";
 	public static final String BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT = "Request Access";
 	public static final String BUTTON_TEXT_ACCEPT_TERMS_OF_USE = "Accept Terms of Use";
 	public static final String BUTTON_TEXT_LOGIN = "Login";

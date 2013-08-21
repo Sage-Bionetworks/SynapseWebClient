@@ -19,15 +19,13 @@
   </ui:style>
 
 	<g:HTMLPanel>
-		<h2 style="margin-bottom: 3px;">	
+		<h2 style="margin-bottom: 0px;">	
 			<g:HTMLPanel ui:field="entityNamePanel">			
-				 <g:Image ui:field="entityIcon" />&nbsp;<span ui:field="entityName"></span>&nbsp;(<span ui:field="entityId"></span>) <g:SimplePanel ui:field="favoritePanel"/>			
+				 <g:Image ui:field="entityIcon" />&nbsp;<span ui:field="entityName"></span>&nbsp;<g:SimplePanel ui:field="favoritePanel"/>			
 			</g:HTMLPanel>
 		</h2>
 		<g:HTMLPanel ui:field="detailedMetadata">
-			<div class="span-17 notopmargin">
-				<g:HTMLPanel ui:field="dataUseContainer" ></g:HTMLPanel>
-			</div>			
+		    <span class="boldText margin-right-5">Synapse ID:</span><span ui:field="entityId"></span>
 			<div class="span-17 notopmargin">
 				<g:HTMLPanel ui:field="versions">
 					<span class="boldText">File History</span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
@@ -37,6 +35,9 @@
 			<div class="span-17 notopmargin">
 				<gxt:LayoutContainer ui:field="previousVersions" styleName="{style.limitedHeight}" visible="false" autoHeight="true" />
 			</div>
+			<div class="span-17 notopmargin">
+				<g:HTMLPanel ui:field="dataUseContainer" ></g:HTMLPanel>
+			</div>			
 			<div class="span-17 notopmargin">
 				<g:HTMLPanel ui:field="sharingContainer" ></g:HTMLPanel>
 			</div>

@@ -50,12 +50,12 @@ public class PropertyWidget implements PropertyWidgetView.Presenter, IsWidget {
 	
 	
 	@Override
-	public void setEntityBundle(EntityBundle bundle) {
+	public void configure(EntityBundle bundle, boolean canEdit) {
 		// Create an adapter
 		try {
 			rows = getRows(bundle.getEntity(), bundle.getAnnotations(), factory, cache);
 			// Pass the rows to the two views
-			propertyView.setRows(rows);
+			propertyView.configure(rows, canEdit);
 		} catch (JSONObjectAdapterException e) {
 			throw new RuntimeException(e);
 		}

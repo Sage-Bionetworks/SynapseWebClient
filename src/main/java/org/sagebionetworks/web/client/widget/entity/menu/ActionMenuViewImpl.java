@@ -303,12 +303,12 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			addMoveItem(menu, entity, entityType);
 		}
 
-		if(entity instanceof Locationable || entity instanceof FileEntity) {
-			addUploadToGenomeSpace(menu, entityBundle);
-		}
-		
 		if (canEdit) {
 			addCreateDoiItem(menu, entity, entityType);
+		}
+		
+		if(entity instanceof Locationable || entity instanceof FileEntity) {
+			addUploadToGenomeSpace(menu, entityBundle);
 		}
 		
 		toolsButton.setMenu(menu);
