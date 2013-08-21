@@ -14,6 +14,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	Pattern end = Pattern.compile(MarkdownRegExConstants.TABLE_END_REGEX);
 	Pattern headerBorder = Pattern.compile(MarkdownRegExConstants.TABLE_HEADER_BORDER_REGEX);
 	boolean hasTags; 			//Are we creating a fenced table versus a table with just column separated by pipes
+	boolean shortStyle;			//Does this table need to limit its height
 	boolean isInTable;			//Have we started/are we in the middle of creating a table
 	boolean isTableStart;		//Is this the opening fence of the table
 	boolean isTableEnd;			//Is this the closing end of the table
@@ -25,6 +26,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	@Override
 	public void reset() {
 		hasTags = false;
+		shortStyle = false;
 		isInTable = false;
 		isTableStart = false;
 		isTableEnd = false;
@@ -48,6 +50,11 @@ public class TableParser extends BasicMarkdownElementParser {
 			isInTable = true;
 			//Get class styles and start table
 			String styles = startMatcher.group(2);
+			if(styles != null && styles.contains("short")) {
+				//Wrap table in a container that will limit height and maintain good format
+				builder.append("<div class=\"markdowntableWrap\">");
+				shortStyle = true;
+			}
 			builder.append(TABLE_START_HTML+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable");
 			if(styles == null) {
 				builder.append("\">");
@@ -55,9 +62,7 @@ public class TableParser extends BasicMarkdownElementParser {
 				builder.append(" " + styles + "\">");
 			}
 		} else if(isTableEnd) {
-			//End table and reset state for future tables
-			builder.append(TABLE_END_HTML);
-			resetTableState();
+			writeEndTable(line, builder);
 		} else {
 			//If we are not in a fenced table, check if this is a normal table
 			if(!hasTags) { 
@@ -91,20 +96,9 @@ public class TableParser extends BasicMarkdownElementParser {
 				//Not a table line
 				if(!firstRowData.isEmpty()) {
 					//We were creating a table; finish the table		
-					if(!hasHandledFirstRow) {
-						//The first row must not be a header because no border syntax was found before the end of the table
-						line.prependElement("<tr>");
-						for (int j = 0; j < firstRowData.size(); j++) {
-							line.prependElement("<td>");
-							line.prependElement(firstRowData.get(j));
-							line.prependElement("</td>");
-						}
-						line.prependElement("</tr>\n");
-					}
-					//End table and reset state for future tables
-					line.prependElement(TABLE_END_HTML);
+					writeEndTable(line, builder);
+					//Reinsert the original markdown
 					builder.append(line.getMarkdown());
-					resetTableState();
 				} else {
 					//We are not in a table at all, just append the original markdown
 					builder.append(line.getMarkdown());
@@ -112,6 +106,25 @@ public class TableParser extends BasicMarkdownElementParser {
 			}
 		}
 		line.updateMarkdown(builder.toString());
+	}
+	
+	private void writeEndTable(MarkdownElements line, StringBuilder builder) {
+		if(!hasHandledFirstRow) {
+			//The first row must not be a header because no border syntax was found before the end of the table
+			line.prependElement("<tr>");
+			for (int j = 0; j < firstRowData.size(); j++) {
+				line.prependElement("<td>");
+				line.prependElement(firstRowData.get(j));
+				line.prependElement("</td>");
+			}
+			line.prependElement("</tr>\n");
+		}
+		//End table and reset state for future tables
+		line.prependElement(TABLE_END_HTML);
+		if(shortStyle) {
+			line.prependElement("</div>");
+		}
+		resetTableState();
 	}
 	
 	private void createFirstRow(String markdown, StringBuilder builder) {
@@ -145,6 +158,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	private void resetTableState() {
 		isInTable = false;
 		hasTags = false;
+		shortStyle = false;
 		readFirstRow = false;
 		hasHandledFirstRow = false;
 		firstRowData.clear();
