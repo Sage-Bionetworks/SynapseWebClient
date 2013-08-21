@@ -722,6 +722,7 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+  width: auto !important;
 }
 
 .markdowntable td {
@@ -816,6 +817,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 .image{
 	max-width: 940px;
+}
+
+.max-width-460 {
+	max-width: 460px;
 }
 
 .max-height-200 {
@@ -965,6 +970,10 @@ ol.lowerroman {
 .widgetContainer {
 	overflow-x: auto;
 	display: inline;
+}
+
+.overflow-auto {
+	overflow: auto;
 }
 
 .inlineWidgetContainer {

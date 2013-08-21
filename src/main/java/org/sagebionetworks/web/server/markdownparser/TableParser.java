@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 public class TableParser extends BasicMarkdownElementParser {
+	public static final String TABLE_END_HTML = "</tbody></table></div>";
+	public static final String TABLE_START_HTML = "<div class=\"span-24 notopmargin last overflow-auto\"><table id=\"";
 	Pattern start = Pattern.compile(MarkdownRegExConstants.TABLE_START_REGEX);
 	Pattern p = Pattern.compile(MarkdownRegExConstants.TABLE_REGEX, Pattern.DOTALL);;
 	Pattern end = Pattern.compile(MarkdownRegExConstants.TABLE_END_REGEX);
@@ -53,7 +55,7 @@ public class TableParser extends BasicMarkdownElementParser {
 				builder.append("<div class=\"markdowntableWrap\">");
 				shortStyle = true;
 			}
-			builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable");
+			builder.append(TABLE_START_HTML+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable");
 			if(styles == null) {
 				builder.append("\">");
 			} else {
@@ -73,7 +75,7 @@ public class TableParser extends BasicMarkdownElementParser {
 						//This is the first time you've entered the table
 						if(!hasTags) {
 							//Create table if not already done when tags were found
-							builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable\">");
+							builder.append(TABLE_START_HTML+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter markdowntable\">");
 						}
 						//Store the first row's cells
 						firstRowData = getRowData(markdown);
@@ -118,7 +120,7 @@ public class TableParser extends BasicMarkdownElementParser {
 			line.prependElement("</tr>\n");
 		}
 		//End table and reset state for future tables
-		line.prependElement("</tbody></table>");
+		line.prependElement(TABLE_END_HTML);
 		if(shortStyle) {
 			line.prependElement("</div>");
 		}
