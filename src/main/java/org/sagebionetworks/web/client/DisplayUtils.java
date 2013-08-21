@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.repo.model.Analysis;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
@@ -69,6 +70,7 @@ import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
@@ -1662,4 +1664,20 @@ public class DisplayUtils {
 			}
 		}
 	}
+	
+	public static void addAnnotation(Annotations annos, String name, ANNOTATION_TYPE type) {
+		// Add a new annotation
+		if(ANNOTATION_TYPE.STRING == type){
+			annos.addAnnotation(name, "");
+		}else if(ANNOTATION_TYPE.DOUBLE == type){
+			annos.addAnnotation(name, 0.0);
+		}else if(ANNOTATION_TYPE.LONG == type){
+			annos.addAnnotation(name, 0l);
+		}else if(ANNOTATION_TYPE.DATE == type){
+			annos.addAnnotation(name, new Date());
+		}else{
+			throw new IllegalArgumentException("Unknown type: "+type);
+		}
+	}
+	
 }

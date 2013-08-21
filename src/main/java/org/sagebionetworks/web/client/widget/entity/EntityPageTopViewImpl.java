@@ -214,7 +214,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator,
 				canEdit, versionNumber));
 		
-		MarginData widgetMargin = new MarginData(0, 0, 20, 0);
+		MarginData widgetMargin = new MarginData(0, 0, 0, 0);
 
 		// Custom layouts for certain entities
 		boolean isFolderLike = bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis;
@@ -272,6 +272,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		filesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
 		entityMetadata.setEntityUpdatedHandler(handler);
+		propertyWidget.setEntityUpdatedHandler(handler);
 	}
 
 	@Override

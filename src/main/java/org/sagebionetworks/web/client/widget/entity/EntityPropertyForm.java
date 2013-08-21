@@ -23,9 +23,9 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog.TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog.Callback;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
@@ -127,19 +127,8 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 		AddAnnotationDialog.showAddAnnotation(new AddAnnotationDialog.Callback(){
 
 			@Override
-			public void addAnnotation(String name, TYPE type) {
-				// Add a new annotation
-				if(TYPE.STRING == type){
-					annos.addAnnotation(name, "");
-				}else if(TYPE.DOUBLE == type){
-					annos.addAnnotation(name, 0.0);
-				}else if(TYPE.LONG == type){
-					annos.addAnnotation(name, 0l);
-				}else if(TYPE.DATE == type){
-					annos.addAnnotation(name, new Date());
-				}else{
-					throw new IllegalArgumentException("Unknown type: "+type);
-				}
+			public void addAnnotation(String name, ANNOTATION_TYPE type) {
+				DisplayUtils.addAnnotation(annos, name, type);
 				// Rebuild the models
 				rebuildModel();
 			}

@@ -908,6 +908,10 @@ ol.lowerroman {
 	color: #000000;
 }
 
+.blackText-imp {
+	color: #000000 !important;
+}
+
 .pagesTree {
 	overflow: hidden !important;	
 }

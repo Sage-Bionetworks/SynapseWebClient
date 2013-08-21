@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -12,7 +14,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author John
  *
  */
-public interface PropertyWidgetView extends IsWidget{
+public interface PropertyWidgetView extends IsWidget, SynapseView{
 	
 	public interface Presenter {
 		/**
@@ -20,6 +22,9 @@ public interface PropertyWidgetView extends IsWidget{
 		 * @param bundle
 		 */
 		 public void configure(EntityBundle bundle, boolean canEdit);
+		 public void deleteAnnotation(EntityRow row);
+		 public void updateAnnotation(EntityRow row);
+		 public void addAnnotation(String name, ANNOTATION_TYPE type);
 	}
 
 	/**
@@ -27,4 +32,5 @@ public interface PropertyWidgetView extends IsWidget{
 	 * @param rows
 	 */
 	void configure(List<EntityRow<?>> rows, boolean canEdit);
+	void setPresenter(Presenter presenter);
 }
