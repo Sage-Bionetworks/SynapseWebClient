@@ -60,12 +60,7 @@ public class TableParser extends BasicMarkdownElementParser {
 				builder.append(" " + styles + "\">");
 			}
 		} else if(isTableEnd) {
-			//End table and reset state for future tables
-			builder.append("</tbody></table>");
-			if(shortStyle) {
-				builder.append("</div>");
-			}
-			resetTableState();
+			writeEndTable(line, builder);
 		} else {
 			//If we are not in a fenced table, check if this is a normal table
 			if(!hasTags) { 
@@ -99,23 +94,9 @@ public class TableParser extends BasicMarkdownElementParser {
 				//Not a table line
 				if(!firstRowData.isEmpty()) {
 					//We were creating a table; finish the table		
-					if(!hasHandledFirstRow) {
-						//The first row must not be a header because no border syntax was found before the end of the table
-						line.prependElement("<tr>");
-						for (int j = 0; j < firstRowData.size(); j++) {
-							line.prependElement("<td>");
-							line.prependElement(firstRowData.get(j));
-							line.prependElement("</td>");
-						}
-						line.prependElement("</tr>\n");
-					}
-					//End table and reset state for future tables
-					line.prependElement("</tbody></table>");
-					if(shortStyle) {
-						line.prependElement("</div>");
-					}
+					writeEndTable(line, builder);
+					//Reinsert the original markdown
 					builder.append(line.getMarkdown());
-					resetTableState();
 				} else {
 					//We are not in a table at all, just append the original markdown
 					builder.append(line.getMarkdown());
@@ -123,6 +104,25 @@ public class TableParser extends BasicMarkdownElementParser {
 			}
 		}
 		line.updateMarkdown(builder.toString());
+	}
+	
+	private void writeEndTable(MarkdownElements line, StringBuilder builder) {
+		if(!hasHandledFirstRow) {
+			//The first row must not be a header because no border syntax was found before the end of the table
+			line.prependElement("<tr>");
+			for (int j = 0; j < firstRowData.size(); j++) {
+				line.prependElement("<td>");
+				line.prependElement(firstRowData.get(j));
+				line.prependElement("</td>");
+			}
+			line.prependElement("</tr>\n");
+		}
+		//End table and reset state for future tables
+		line.prependElement("</tbody></table>");
+		if(shortStyle) {
+			line.prependElement("</div>");
+		}
+		resetTableState();
 	}
 	
 	private void createFirstRow(String markdown, StringBuilder builder) {
