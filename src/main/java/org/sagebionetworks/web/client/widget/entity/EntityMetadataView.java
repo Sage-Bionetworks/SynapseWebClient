@@ -15,7 +15,7 @@ public interface EntityMetadataView extends IsWidget, SynapseView {
 
 	public void setPresenter(Presenter p);
 
-	public void setEntityBundle(EntityBundle bundle, boolean canEdit, boolean autoShowFileHistory);
+	public void setEntityBundle(EntityBundle bundle, boolean canAdmin, boolean canEdit, boolean autoShowFileHistory);
 
 	public void showInfo(String string, String message);
 	

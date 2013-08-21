@@ -11,11 +11,13 @@ import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.Text;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -63,27 +65,24 @@ public class EntityViewUtils {
 			final IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
 		
-		final SimplePanel div = new SimplePanel();
+		
 		ImageResource shieldIcon = getShieldIcon(restrictionLevel, iconsImageBundle);
 		String description = restrictionDescriptor(restrictionLevel);
 		String tooltip = DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP;
 		
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\" class=\"boldText\">"+DisplayConstants.DATA_ACCESS_RESTRICTIONS_TEXT+"</span>" + DisplayUtils.getIconHtml(shieldIcon) + "</div>");
-		shb.appendHtmlConstant("<span style=\"margin-right: 10px; margin-left: 3px;\">"+description+"</span>");
+		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\" class=\"boldText\">"+DisplayConstants.DATA_ACCESS_RESTRICTIONS_TEXT+"</span>" + DisplayUtils.getIconHtml(shieldIcon));
+		shb.appendHtmlConstant("<span style=\"margin-left: 3px;\">"+description+"</span>");
 		
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
 		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
-		div.add(htmlPanel);
 		
-		LayoutContainer lc = new HorizontalPanel();
-		lc.setAutoWidth(true);
-		lc.setAutoHeight(true);
+		FlowPanel lc = new FlowPanel();
 		
-		lc.add(div);
-		shb = new SafeHtmlBuilder();
+		lc.add(htmlPanel);
+		
 		String infoHyperlinkText = DisplayConstants.INFO;
 		if (restrictionLevel==RESTRICTION_LEVEL.OPEN) { // OPEN data
 			if (hasAdministrativeAccess) {
@@ -96,9 +95,15 @@ public class EntityViewUtils {
 				infoHyperlinkText = DisplayConstants.GAIN_ACCESS; // note, this applies to 'anonymous' too.  the path leads the user to logging in.
 			}
 		}
-		shb.appendHtmlConstant("<span style=\"padding-right:30px;\"> (<a class=\"link\">"+infoHyperlinkText+"</a>)</span>");
-		Anchor aboutLink = new Anchor(shb.toSafeHtml());
+		Text t = new Text("(");
+		t.addStyleName("margin-left-5 inline-block");
+		lc.add(t);
+		Anchor aboutLink = new Anchor(infoHyperlinkText);
+		aboutLink.addStyleName("link");
 		lc.add(aboutLink);
+		t = new Text(")");
+		t.addStyleName("margin-right-10 inline-block");
+		lc.add(t);
 		aboutLink.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -132,9 +137,7 @@ public class EntityViewUtils {
 		});		
 		lc.add(flagLink);
 		DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, DisplayConstants.FLAG_TOOL_TIP, TOOLTIP_POSITION.BOTTOM);
-	    
-	    lc.layout();
-		return lc;
+	    return lc;
 	}
 
 	

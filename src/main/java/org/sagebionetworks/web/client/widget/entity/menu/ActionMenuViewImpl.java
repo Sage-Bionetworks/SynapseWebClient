@@ -27,9 +27,7 @@ import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
-import org.sagebionetworks.web.shared.EntityWrapper;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
@@ -39,12 +37,10 @@ import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -63,7 +59,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	
 	private Long versionNumber;
 	private Button editButton;
-	private Button shareButton;
+	
 	private Button toolsButton;
 	private Button deleteButton;
 	private boolean isInTestMode;
@@ -116,16 +112,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
 		
-		// share button
-		if(shareButton == null) { 
-			shareButton = new Button(DisplayConstants.BUTTON_SHARE, AbstractImagePrototype.create(iconsImageBundle.mailGrey16()));
-			shareButton.setId(DisplayConstants.ID_BTN_SHARE);
-			shareButton.setHeight(25);
-			shareButton.addStyleName("floatright margin-left-5");
-			this.add(shareButton);
-			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
-		}
-
 		// edit button
 		if(editButton == null) {			
 			editButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
@@ -139,11 +125,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		if (canEdit) editButton.enable();
 		else editButton.disable();
 		configureEditButton(entity, entityType);	
-		
-		if (isAdministrator) shareButton.enable();
-		else shareButton.disable();
-		configureShareButton(entity);		
-		
 		
 		if (isAdministrator)
 			deleteButton.enable();
@@ -185,7 +166,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	@Override
 	public void clear() {
 		if(editButton != null) editButton.removeAllListeners();
-		if(shareButton != null) shareButton.removeAllListeners();	
 	}
 	
 	/*
@@ -212,66 +192,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 				handleDeleteClick(typeDisplay);
 			}
 		});
-	}
-	private void configureShareButton(Entity entity) {		
-		accessControlListEditor.setResource(entity);
-		shareButton.removeAllListeners();		
-		shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				final Dialog window = new Dialog();
-				
-				// configure layout
-				window.setSize(560, 465);
-				window.setPlain(true);
-				window.setModal(true);
-				window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
-				window.setLayout(new FitLayout());
-				window.add(accessControlListEditor.asWidget(), new FitData(4));			    
-			    
-				// configure buttons
-				window.okText = "Save";
-				window.cancelText = "Cancel";
-			    window.setButtons(Dialog.OKCANCEL);
-			    window.setButtonAlign(HorizontalAlignment.RIGHT);
-			    window.setHideOnButtonClick(false);
-				window.setResizable(false);
-				
-				// "Apply" button
-				// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
-				Button applyButton = window.getButtonById(Dialog.OK);
-				applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						// confirm close action if there are unsaved changes
-						if (accessControlListEditor.hasUnsavedChanges()) {
-							accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
-								@Override
-								public void onSuccess(EntityWrapper result) {
-									presenter.fireEntityUpdatedEvent();
-								}
-								@Override
-								public void onFailure(Throwable caught) {
-									//failure notification is handled by the acl editor view.
-								}
-							});
-						}
-						window.hide();
-					}
-			    });
-				
-				// "Close" button				
-				Button closeButton = window.getButtonById(Dialog.CANCEL);
-			    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						window.hide();
-					}
-			    });
-				
-				window.show();
-			}
-		});		
 	}
 	
 	private void configureToolsMenu(EntityBundle entityBundle, EntityType entityType, boolean isAdministrator, boolean canEdit) {
