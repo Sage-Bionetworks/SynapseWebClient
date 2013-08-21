@@ -627,7 +627,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    // the headers for properties.
 	    propertyWidget.setEntityBundle(bundle);
 	    LayoutContainer lc = new LayoutContainer();
-	    lc.addStyleName("span-7");
+	    lc.addStyleName("span-24 last");
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 		if (!propertyWidget.isEmpty()) {

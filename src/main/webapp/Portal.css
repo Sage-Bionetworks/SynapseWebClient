@@ -39,6 +39,13 @@
 	padding: 2px 4px 2px 3px;
 }
 
+.light-border {
+	border: solid #ccc;
+	border-width:0.1em;
+	border-radius:0.4em;
+	padding: 2px 4px 2px 3px;
+}
+
 .sendButton {
 	display: block;
 	font-size: 16pt;

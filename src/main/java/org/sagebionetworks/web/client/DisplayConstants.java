@@ -482,7 +482,7 @@ public class DisplayConstants {
 	public static final String ACCESS_TO_DATA = "Access to these data is";
 	public static final String PAGE_NOT_FOUND = "Page not found";
 	public static final String PAGE_NOT_FOUND_DESC = "The page you requested was not found, that's all we know.";
-	public static final String ANNOTATIONS = "Tags";
+	public static final String ANNOTATIONS = "Annotations";
 	public static final String TO_LOAD_VERSION_1 = "To load this version";
 	public static final String TO_LOAD_AN_ENTITY = "To load an entity";
 	public static final String PROGRAMMATIC_ACCESS = "Programmatic Access";
