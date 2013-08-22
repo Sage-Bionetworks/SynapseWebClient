@@ -3,6 +3,8 @@ package org.sagebionetworks.web.server.markdownparser;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.sagebionetworks.web.server.ServerMarkdownUtils;
 /**
  * One of the more complicated parsers.  Needs to have a stack to support nested lists.
  * needs to remember the level (how deep is the nested list), the list type (ordered or unordered), and (if ordered) the current number)
@@ -96,7 +98,7 @@ public class ListParser extends BasicMarkdownElementParser  {
         	
         	//Account for leading ">" blockquote character
         	depth--;
-        } else if(line.getHtml().contains("<blockquote>")) {
+        } else if(line.hasElement(ServerMarkdownUtils.START_BLOCKQUOTE_TAG)) {
         	//This list item starts the blockquote/the blockquote has already been made
         	hasSeenBlockQuote = true;
         } 
@@ -123,7 +125,8 @@ public class ListParser extends BasicMarkdownElementParser  {
         	MarkdownList newList = getNewList(depth, isOrderedList);
         	if(preserveForBlockQuoteParser) {
         		//Preserve the ">" character for the blockquote parser to prepend the blockquote element
-        		line.updateMarkdown(prefix + newList.getStartListHtml() + "<li><p>" + value + "</p>");	
+        		line.updateMarkdown(prefix);
+        		line.appendElement(newList.getStartListHtml() + "<li><p>" + value + "</p>");	
         	} else {
         		//Start a normal list
         		line.prependElement(newList.getStartListHtml());

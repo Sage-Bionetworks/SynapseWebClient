@@ -47,4 +47,18 @@ public class MarkdownElements {
 		}
 		return sb.toString();
 	}
+	
+	public boolean hasElement(String elementName) {
+		for (String element : before) {
+			if(element.equals(elementName)) {
+				return true;
+			}
+		}
+		for (String element : after) {
+			if(element.equals(elementName)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

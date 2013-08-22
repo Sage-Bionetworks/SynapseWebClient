@@ -3,6 +3,8 @@ package org.sagebionetworks.web.server.markdownparser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.sagebionetworks.web.server.ServerMarkdownUtils;
+
 public class BlockQuoteParser extends BasicMarkdownElementParser {
 	Pattern p1 = Pattern.compile(MarkdownRegExConstants.BLOCK_QUOTE_REGEX, Pattern.DOTALL);;
 	Pattern p2 = Pattern.compile(MarkdownRegExConstants.FENCE_CODE_BLOCK_REGEX, Pattern.DOTALL);
@@ -21,7 +23,7 @@ public class BlockQuoteParser extends BasicMarkdownElementParser {
 			if (!inBlockQuote) {
 				//starting block quote
 				inBlockQuote = true;
-				line.prependElement("<blockquote>");
+				line.prependElement(ServerMarkdownUtils.START_BLOCKQUOTE_TAG);
 			}
 			//modify the markdown and preserve leading space to determine depth of list items
 			//do not preserve any space following ">" if this is a code block fence
