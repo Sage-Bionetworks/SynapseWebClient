@@ -50,6 +50,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
 
+	private static final int MAX_DISPLAY_NAME_CHARACTER_COUNT = 40;
 	private static final String HEADER_LARGE_STYLE = "largeHeader";
 	private static final String HEADER_SMALL_STYLE = "smallHeader";
 	private static final String MARGIN_BOTTOM_STYLE = "margin-bottom-20";
@@ -279,7 +280,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		if(userData != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 			UserProfile profile = userData.getProfile();
-			userAnchor.setText(profile.getDisplayName());
+			String displayName = profile.getDisplayName();
+			if (displayName.length() > MAX_DISPLAY_NAME_CHARACTER_COUNT) { 
+				displayName = displayName.substring(0, MAX_DISPLAY_NAME_CHARACTER_COUNT - 1) + "...";
+			}
+			userAnchor.setText(displayName);
 			userNameWrapper.clear();
 			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
 				Image profilePicture = new Image();
