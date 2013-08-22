@@ -86,6 +86,9 @@ import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView;
@@ -270,6 +273,12 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(PropertyWidget.class).in(Singleton.class);
 		bind(PropertyWidgetViewImpl.class).in(Singleton.class);
 		bind(PropertyWidgetView.class).to(PropertyWidgetViewImpl.class);
+		
+		
+		//file history
+		bind(FileHistoryWidget.class).in(Singleton.class);
+		bind(FileHistoryWidgetViewImpl.class).in(Singleton.class);
+		bind(FileHistoryWidgetView.class).to(FileHistoryWidgetViewImpl.class);
 		
 		// the logger
 		bind(ClientLoggerImpl.class).in(Singleton.class);

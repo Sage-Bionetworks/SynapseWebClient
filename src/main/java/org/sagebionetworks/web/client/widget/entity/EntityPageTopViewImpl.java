@@ -115,6 +115,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private LayoutContainer topFullWidthContainer, currentTabContainer, wikiTabContainer, filesTabContainer, adminTabContainer;
 	private Attachments attachmentsPanel;
 	private SnapshotWidget snapshotWidget;
+	private FileHistoryWidget fileHistoryWidget;
 	private Long versionNumber;
 	private boolean isTabShowing;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -135,7 +136,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			EntityTreeBrowser entityTreeBrowser, Breadcrumb breadcrumb,
 			PropertyWidget propertyWidget,
 			Attachments attachmentsPanel, SnapshotWidget snapshotWidget,
-			EntityMetadata entityMetadata, SynapseJSNIUtils synapseJSNIUtils,
+			EntityMetadata entityMetadata, FileHistoryWidget fileHistoryWidget, SynapseJSNIUtils synapseJSNIUtils,
 			PortalGinInjector ginInjector, 
 			FilesBrowser filesBrowser, 
 			MarkdownWidget markdownWidget, 
@@ -156,6 +157,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.ginInjector = ginInjector;
 		this.filesBrowser = filesBrowser;
 		this.previewWidget = previewWidget;
+		this.fileHistoryWidget = fileHistoryWidget;
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
 		this.cookies = cookies;
@@ -273,6 +275,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
 		entityMetadata.setEntityUpdatedHandler(handler);
 		propertyWidget.setEntityUpdatedHandler(handler);
+		fileHistoryWidget.setEntityUpdatedHandler(handler);
 	}
 
 	@Override
@@ -314,9 +317,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		else
 			colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
 		entityMetadata.setEntityBundle(bundle, versionNumber);
+		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
-		
-		colLeftContainer.add(createPropertyWidget(bundle, canEdit), new MarginData(0));
 		
 		// ** RIGHT **
 		// Programmatic Clients
@@ -324,6 +326,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// ** FULL WIDTH
 		// Description
+		fullWidthContainer.add(fileHistoryWidget.asWidget(), widgetMargin);
+		fullWidthContainer.add(createPropertyWidget(bundle, canEdit), new MarginData(0));
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 		// Wiki
 		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
@@ -360,12 +364,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// ** FULL WIDTH **
 		//SWC-668: render (from top to bottom) description, wiki, then file browser, to make consistent with Project view.
-		// Description
-		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 		
 		//Annotations
 		fullWidthContainer.add(createPropertyWidget(bundle, canEdit), new MarginData(0));
 
+		// Description
+		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
+		
+		
 		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 
 		// Child Browser
@@ -399,9 +405,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if (isTabShowing) {
 			navtabContainer.removeClassName("hide");
 			topFullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
+			topFullWidthContainer.add(createPropertyWidget(bundle, canEdit), new MarginData(0));
 			// Description
 			topFullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
-			topFullWidthContainer.add(createPropertyWidget(bundle, canEdit), new MarginData(0));
+			
 			addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24);
 			
 			// Child File Browser
@@ -426,8 +433,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		} else {
 			//old layout with no tabs
 			fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin); 
-			fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 			fullWidthContainer.add(createPropertyWidget(bundle, canEdit), new MarginData(0));
+			fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 			addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 			fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true, canEdit));
 			threeCol.add(createEvaluationAdminList(bundle, null));
@@ -507,11 +514,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		colLeftContainer.add(entityMetadata.asWidget(), widgetMargin);
-		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
+		//File History
+		colLeftContainer.add(fileHistoryWidget.asWidget(), new MarginData(0));
 		// Annotation Editor widget
 		colLeftContainer.add(createPropertyWidget(bundle, canEdit), new MarginData(0));
-		
+		// Description
+		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
+				
 		// ** RIGHT **
 		// Attachments
 		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, false), widgetMargin);
