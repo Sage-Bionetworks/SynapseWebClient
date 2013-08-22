@@ -27,7 +27,7 @@
 
 
 .header-inner-commands-container td {
-	padding: 3px 0px 3px 7px;
+	padding: 3px 7px 3px 7px;
 }
 
 .header-username-picture-container {
@@ -95,7 +95,7 @@
 .downloadLink,.downloadLink:hover,.downloadLink:visited { text-decoration:underline; margin-left:5px;}
 
 /* header links. transition from grey to black on hover, don't underline */
-.headerLink { font-weight: bold; color: #6e6e6e; padding: 0px 2px 0px 4px;
+.headerLink { line-height: 25px; font-weight: bold; color: #6e6e6e; padding: 0px 2px 0px 4px;
   -o-transition:.2s;
   -ms-transition:.2s;
   -moz-transition:.2s;
@@ -1090,7 +1090,7 @@ ol.lowerroman {
 }
 
 .margin-top-4 {
-	margin-top: 4px;
+	margin-top: 4px !important;
 }
 
 .margin-top-8 {
