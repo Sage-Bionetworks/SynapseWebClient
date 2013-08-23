@@ -90,7 +90,6 @@ public class SynapseMarkdownProcessorTest {
 			"> Then a code block!\n" +
 			"> ```";
 		String actualResult2 = processor.markdown2Html(testString2, false);
-		System.out.println(actualResult2);
 		String expectedResult2 = "<ol>\n   <li><p>First</p></li>\n   <li><p>Second</p></li>\n  </ol>\n  <br /> \n";
 		assertTrue(actualResult2.contains(expectedResult2));
 		
