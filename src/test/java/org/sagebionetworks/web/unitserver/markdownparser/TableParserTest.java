@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.SynapseMarkdownProcessor;
+import org.sagebionetworks.web.server.markdownparser.BoldParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
@@ -19,12 +20,17 @@ import org.sagebionetworks.web.server.markdownparser.UnderscoreParser;
 public class TableParserTest {
 	SynapseMarkdownProcessor processor;
 	TableParser parser;
+	
+	List<MarkdownElementParser> simpleParsers;
+	
 	@Before
 	public void setup(){
 		parser = new TableParser();
 		parser.reset();
 		
-		processor = SynapseMarkdownProcessor.getInstance();
+		simpleParsers = new ArrayList<MarkdownElementParser>();
+		simpleParsers.add(new BoldParser());
+		simpleParsers.add(new UnderscoreParser());
 	}
 	
 	@Test
@@ -86,8 +92,16 @@ public class TableParserTest {
 	@Test
 	public void testTableWithOneLine() throws IOException {
 		String exampleLine1 = "**Row 1 Content Cell 1** | Row\\_Content\\_2  | Row 1 Content Cell 3";
-		String result = processor.markdown2Html(exampleLine1, false);
-		assertTrue(result.contains("<td><strong>Row 1 Content Cell 1</strong> </td>"));
-		assertTrue(result.contains("Row_Content_2"));
+		StringBuilder tableOutput = new StringBuilder();
+		MarkdownElements elements = new MarkdownElements(exampleLine1);
+		parser.processLine(elements, simpleParsers);
+		tableOutput.append(elements.getHtml());
+		
+		elements = new MarkdownElements("");
+		parser.processLine(elements, simpleParsers);
+		tableOutput.append(elements.getHtml());
+		String html = tableOutput.toString();
+		assertTrue(html.contains("<td><strong>Row 1 Content Cell 1</strong> </td>"));
+		assertTrue(html.contains("Row&#95;Content&#95;2"));
 	}
 }

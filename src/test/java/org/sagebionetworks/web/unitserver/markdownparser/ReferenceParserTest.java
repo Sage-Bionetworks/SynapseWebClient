@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.SynapseMarkdownProcessor;
+import org.sagebionetworks.web.server.markdownparser.LinkParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.ReferenceParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
@@ -27,6 +28,7 @@ public class ReferenceParserTest {
 		
 		processor = SynapseMarkdownProcessor.getInstance();
 		simpleParsers = new ArrayList<MarkdownElementParser>();
+		simpleParsers.add(new LinkParser());
 	}
 	
 	@Test
