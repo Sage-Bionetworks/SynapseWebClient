@@ -76,7 +76,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		final Dialog window = new Dialog();
 		window.setMaximizable(false);
 		boolean isWikiEntityEditor = DisplayUtils.isWikiSupportedType(presenter.getEntity());
-		int height = isWikiEntityEditor ? 220 : 660;
+		int height = isWikiEntityEditor ? 180 : 660;
 		window.setSize(DIALOG_WIDTH, height);
 	    window.setPlain(true);  
 	    window.setModal(true);  
