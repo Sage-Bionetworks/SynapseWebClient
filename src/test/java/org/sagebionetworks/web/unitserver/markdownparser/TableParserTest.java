@@ -3,27 +3,28 @@ package org.sagebionetworks.web.unitserver.markdownparser;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.server.SynapseMarkdownProcessor;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
 import org.sagebionetworks.web.server.markdownparser.UnderscoreParser;
 
 public class TableParserTest {
+	SynapseMarkdownProcessor processor;
 	TableParser parser;
-	UnderscoreParser underscoreParser;
 	@Before
 	public void setup(){
 		parser = new TableParser();
 		parser.reset();
 		
-		underscoreParser = new UnderscoreParser();
-		underscoreParser.reset();
+		processor = SynapseMarkdownProcessor.getInstance();
 	}
 	
 	@Test
@@ -83,21 +84,10 @@ public class TableParserTest {
 	}
 	
 	@Test
-	public void testTableWithOneLine() {
-		String exampleLine1 = "Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3";
-		StringBuilder tableOutput = new StringBuilder();
-		MarkdownElements elements = new MarkdownElements(exampleLine1);
-		List<MarkdownElementParser> simple = new ArrayList<MarkdownElementParser>();
-		parser.processLine(elements, simple);
-		underscoreParser.processLine(elements, null);
-		tableOutput.append(elements.getHtml());
-
-		elements = new MarkdownElements("");
-		parser.processLine(elements, simple);
-		underscoreParser.processLine(elements, null);
-		tableOutput.append(elements.getHtml());
-		//check for a few items
-		String html = tableOutput.toString();
-		assertTrue(html.contains("<tr><td>Row 1 Content Cell 1 </td>"));
+	public void testTableWithOneLine() throws IOException {
+		String exampleLine1 = "**Row 1 Content Cell 1** | Row\\_Content\\_2  | Row 1 Content Cell 3";
+		String result = processor.markdown2Html(exampleLine1, false);
+		assertTrue(result.contains("<td><strong>Row 1 Content Cell 1</strong> </td>"));
+		assertTrue(result.contains("Row_Content_2"));
 	}
 }
