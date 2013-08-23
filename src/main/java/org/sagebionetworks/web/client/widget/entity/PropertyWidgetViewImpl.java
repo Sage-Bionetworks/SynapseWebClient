@@ -110,9 +110,9 @@ public class PropertyWidgetViewImpl extends FlowPanel implements PropertyWidgetV
 			String label = row.getLabel();
 			String delimiter = label != null && label.trim().length() > 0 && value != null && value.trim().length() > 0 ? ":" : "";
 			Label l1 = new Label(label + delimiter);
-			l1.addStyleName("inline-block margin-right-5");
+			l1.addStyleName("inline-block greyText-imp margin-right-5");
 			HTML l2 = new HTML(value);
-			l2.addStyleName("inline-block");
+			l2.addStyleName("inline-block blackText-imp");
 			DisplayUtils.addTooltip(synapseJSNIUtils, l2, row.getToolTipsBody(), TOOLTIP_POSITION.BOTTOM);
 			
 			container.add(l1);
@@ -126,8 +126,10 @@ public class PropertyWidgetViewImpl extends FlowPanel implements PropertyWidgetV
 						handleEditClick(row);
 					};
 				};
-				l2.addStyleName("link blackText-imp");
+				l2.addStyleName("link");
 				l2.addClickHandler(editHandler);
+				l1.addStyleName("link");
+				l1.addClickHandler(editHandler);
 				//container.add(getNewButton(iconsImageBundle.editGrey16(), editHandler, DisplayConstants.BUTTON_EDIT));
 				
 				//delete annotation handler

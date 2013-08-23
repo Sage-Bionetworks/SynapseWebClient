@@ -72,6 +72,7 @@ public class AddAnnotationDialog {
 		combo.setEditable(false);
 		combo.setTriggerAction(TriggerAction.ALL);
 		combo.setAllowBlank(false);
+		combo.setValue(new ComboValue(ANNOTATION_TYPE.STRING.getDisplayText()));
 		// Add them to the form
 		FormData basicFormData = new FormData("-20");
 		Margins margins = new Margins(10, 10, 0, 0);

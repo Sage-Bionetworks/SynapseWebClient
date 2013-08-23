@@ -912,6 +912,11 @@ ol.lowerroman {
 	color: #000000 !important;
 }
 
+.greyText-imp {
+    color: #717171 !important;
+}
+
+
 .pagesTree {
 	overflow: hidden !important;	
 }
