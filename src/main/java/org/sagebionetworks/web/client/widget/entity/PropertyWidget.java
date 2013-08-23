@@ -54,8 +54,8 @@ public class PropertyWidget implements PropertyWidgetView.Presenter, IsWidget {
 	 * @param propertyView
 	 */
 	@Inject
-	public PropertyWidget(AdapterFactory factory, EntitySchemaCache cache,
-			PropertyWidgetView propertyView, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
+	public PropertyWidget(PropertyWidgetView propertyView, AdapterFactory factory, EntitySchemaCache cache,
+			 SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
 		super();
 		this.factory = factory;
 		this.cache = cache;
