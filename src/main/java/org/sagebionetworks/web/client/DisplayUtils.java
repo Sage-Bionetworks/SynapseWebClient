@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.repo.model.Analysis;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
@@ -69,6 +70,7 @@ import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.EntityType;
@@ -96,6 +98,7 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
@@ -126,11 +129,13 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -1662,4 +1667,33 @@ public class DisplayUtils {
 			}
 		}
 	}
+	
+	public static void addAnnotation(Annotations annos, String name, ANNOTATION_TYPE type) {
+		// Add a new annotation
+		if(ANNOTATION_TYPE.STRING == type){
+			annos.addAnnotation(name, "");
+		}else if(ANNOTATION_TYPE.DOUBLE == type){
+			annos.addAnnotation(name, 0.0);
+		}else if(ANNOTATION_TYPE.LONG == type){
+			annos.addAnnotation(name, 0l);
+		}else if(ANNOTATION_TYPE.DATE == type){
+			annos.addAnnotation(name, new Date());
+		}else{
+			throw new IllegalArgumentException("Unknown type: "+type);
+		}
+	}
+	
+	public static void surroundWidgetWithParens(Panel container, Widget widget) {
+		Text paren = new Text("(");
+		paren.addStyleName("inline-block margin-left-5");
+		container.add(paren);
+
+		widget.addStyleName("inline-block");
+		container.add(widget);
+
+		paren = new Text(")");
+		paren.addStyleName("inline-block margin-right-10");
+		container.add(paren);
+	}
+	
 }

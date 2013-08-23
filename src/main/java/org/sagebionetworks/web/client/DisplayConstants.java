@@ -200,6 +200,7 @@ public class DisplayConstants {
 	public static final String LABEL_RENAME = "Rename";
 	public static final String LABEL_CREATE = "Create";
 	public static final String LABEL_MOVE = "Move";
+	public static final String LABEL_CREATE_DOI = "Create DOI";
 	public static final String SELECT_NEW_PARENT = "Select New Parent for this";
 	public static final String LABEL_ARE_YOU_SURE = "Are you sure?";
 	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. Please try again.";
@@ -440,6 +441,9 @@ public class DisplayConstants {
 	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2 = "\" target=\"_blank\" class=\"link\">here</a>.";
 	public static final String BUTTON_TEXT_FLAG_DATA = "Flag Data";
 	public static final String BUTTON_TEXT_RESTRICT_DATA = "Add Restrictions";
+	public static final String TEXT_ADD_ANNOTATION = "Add Annotation";
+	public static final String TEXT_DELETE_ANNOTATION = "Delete Annotation";
+	public static final String TEXT_EDIT_ANNOTATION = "Edit Annotation";
 	public static final String BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT = "Request Access";
 	public static final String BUTTON_TEXT_ACCEPT_TERMS_OF_USE = "Accept Terms of Use";
 	public static final String BUTTON_TEXT_LOGIN = "Login";
@@ -483,6 +487,7 @@ public class DisplayConstants {
 	public static final String PAGE_NOT_FOUND = "Page not found";
 	public static final String PAGE_NOT_FOUND_DESC = "The page you requested was not found, that's all we know.";
 	public static final String ANNOTATIONS = "Annotations";
+	public static final String DOI = "DOI";
 	public static final String TO_LOAD_VERSION_1 = "To load this version";
 	public static final String TO_LOAD_AN_ENTITY = "To load an entity";
 	public static final String PROGRAMMATIC_ACCESS = "Programmatic Access";
