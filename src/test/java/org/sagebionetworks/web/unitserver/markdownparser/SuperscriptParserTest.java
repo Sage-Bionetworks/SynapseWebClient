@@ -19,7 +19,7 @@ public class SuperscriptParserTest {
 	public void testSuperscript(){
 		String text = "10 in 2^10^ should be a superscript as should (x * 2) in 2^(x * 2)^.";
 		MarkdownElements elements = new MarkdownElements(text);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		assertTrue(elements.getHtml().contains("<sup>10</sup>"));
 		assertTrue(elements.getHtml().contains("<sup>(x * 2)</sup>"));
 	}

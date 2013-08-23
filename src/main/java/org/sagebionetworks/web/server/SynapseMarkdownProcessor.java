@@ -186,19 +186,19 @@ public class SynapseMarkdownProcessor {
 			MarkdownElements elements = new MarkdownElements(line);
 			//do parsers we're currently in the middle of
 			for (MarkdownElementParser parser : activeComplexParsers) {
-				parser.processLine(elements);
+				parser.processLine(elements, simpleParsers);
 			}
 			
 			//only give the option to start new multiline element (complex parser) or process simple elements if we're not in a code block (or a math block)
 			if (!codeParser.isInMarkdownElement() && !mathParser.isInMarkdownElement()){
 				//then the inactive multiline parsers
 				for (MarkdownElementParser parser : inactiveComplexParsers) {
-					parser.processLine(elements);
+					parser.processLine(elements, simpleParsers);
 				}
 				
 				//process the simple processors after complex parsers (the complex parsers clean up the markdown)
 				for (MarkdownElementParser parser : simpleParsers) {
-					parser.processLine(elements);
+					parser.processLine(elements, simpleParsers);
 				}
 			}
 				

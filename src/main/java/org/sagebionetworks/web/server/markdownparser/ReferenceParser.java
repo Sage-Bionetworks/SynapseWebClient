@@ -29,7 +29,7 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 	}
 
 	@Override
-	public void processLine(MarkdownElements line) {
+	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
 		String input = line.getMarkdown();
 		Matcher m = p1.matcher(input);
 		StringBuffer sb = new StringBuffer();
@@ -87,7 +87,7 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 		//No new lines; process over constructed footnote markdown
 		MarkdownElements elements = new MarkdownElements(footnoteMarkdown.toString());
 		for (MarkdownElementParser parser : parsersOnCompletion) {
-			parser.processLine(elements);
+			parser.processLine(elements, null);
 		}
 		output.append(elements.getHtml());
 		html.append(output);

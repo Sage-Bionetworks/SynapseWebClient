@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.server.markdownparser;
 
 import org.jsoup.nodes.Document;
+import java.util.List;
 
 /**
  * Class used to detect markdown elements (processing markdown to html).
@@ -19,9 +20,10 @@ public interface MarkdownElementParser {
 	/**
 	 * Called on every line of the markdown document.
 	 * @param line
+	 * @param simpleParsers TODO
 	 * @return
 	 */
-	void processLine(MarkdownElements line);
+	void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers);
 	
 	/**
 	 * If there are any final modifications to the output html that the parser needs to make, it should perform it here (efficiently)

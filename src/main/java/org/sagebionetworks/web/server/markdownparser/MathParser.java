@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.server.markdownparser;
-
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -37,7 +37,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 	}
 	
 	@Override
-	public void processLine(MarkdownElements line) {
+	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
 		Matcher m;
 		//math block
 		m = p1.matcher(line.getMarkdown());

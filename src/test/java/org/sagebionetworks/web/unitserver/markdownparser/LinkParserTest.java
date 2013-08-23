@@ -27,7 +27,7 @@ public class LinkParserTest {
 		String href = "http://example.com";
 		String line = "[" + text + "](" + href +")";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml();
 		assertTrue(!result.contains("http://example.com"));
 		assertTrue(result.contains(ServerMarkdownUtils.START_CONTAINER));
@@ -46,7 +46,7 @@ public class LinkParserTest {
 		String href = "example.com";
 		String line = "[" + text + "](" + href +")";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml();
 		Document doc = Jsoup.parse(result);
 		parser.completeParse(doc);
@@ -56,7 +56,7 @@ public class LinkParserTest {
 		String href2 = "ftp://ftp.example";
 		String line2 = "[" + text2 + "](" + href2 +")";
 		MarkdownElements elements2 = new MarkdownElements(line2);
-		parser.processLine(elements2);
+		parser.processLine(elements2, null);
 		String result2 = elements2.getHtml();
 		Document doc2 = Jsoup.parse(result2);
 		parser.completeParse(doc2);
@@ -68,7 +68,7 @@ public class LinkParserTest {
 	public void testBookmarkAndLink() {
 		String line = "I want to refer to [this](#Bookmark:subject1). To see official page, go [here](http://example.com).";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getMarkdown();
 		assertTrue(result.contains("${bookmark?text=this&inlineWidget=true&bookmarkID=subject1}"));
 		assertTrue(!result.contains("http://example.com"));

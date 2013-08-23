@@ -23,12 +23,12 @@ public class ReferenceParserTest {
 		String text = "The statement was from here ${reference?inlineWidget=true&text=Smith John%2E Cooking book%2E August 2 2013}.";
 		MarkdownElements elements = new MarkdownElements(text);
 		parser.reset();
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		assertTrue(elements.getHtml().contains("${reference?inlineWidget=true&text=Smith John%2E Cooking book%2E August 2 2013&footnoteId=1}."));
 		
 		String text2 = "The statement was from here ${reference?text=Smith John%2E Cooking book%2E August 2 2013&inlineWidget=true}.";
 		MarkdownElements elements2 = new MarkdownElements(text2);
-		parser.processLine(elements2);
+		parser.processLine(elements2, null);
 		assertTrue(elements2.getHtml().contains("${reference?text=Smith John%2E Cooking book%2E August 2 2013&inlineWidget=true&footnoteId=2}."));
 		
 		StringBuilder html = new StringBuilder("This is the last sentence.");
@@ -43,7 +43,7 @@ public class ReferenceParserTest {
 		String text = "The statement was from here ${reference?text=So et al%2E %5BYahoo%5D%28http%3A%2F%2Fwww%2Eyahoo%2Ecom%29%2E July 2013&inlineWidget=true}.";
 		MarkdownElements elements = new MarkdownElements(text);
 		parser.reset();
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		StringBuilder html = new StringBuilder("This is the last sentence.");
 		parser.completeParse(html);
 		String result = html.toString();

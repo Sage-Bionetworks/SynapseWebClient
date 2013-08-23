@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.server.markdownparser;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +38,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	}
 
 	@Override
-	public void processLine(MarkdownElements line) {
+	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
 		String markdown = line.getMarkdown();
 		
 		Matcher startMatcher = start.matcher(markdown);
@@ -62,7 +63,7 @@ public class TableParser extends BasicMarkdownElementParser {
 				builder.append(" " + styles + "\">");
 			}
 		} else if(isTableEnd) {
-			writeEndTable(line, builder);
+			writeEndTable(line, builder, simpleParsers);
 		} else {
 			//If we are not in a fenced table, check if this is a normal table
 			if(!hasTags) { 
@@ -96,7 +97,7 @@ public class TableParser extends BasicMarkdownElementParser {
 				//Not a table line
 				if(!firstRowData.isEmpty()) {
 					//We were creating a table; finish the table		
-					writeEndTable(line, builder);
+					writeEndTable(line, builder, simpleParsers);
 					//Reinsert the original markdown
 					builder.append(line.getMarkdown());
 				} else {
@@ -108,27 +109,24 @@ public class TableParser extends BasicMarkdownElementParser {
 		line.updateMarkdown(builder.toString());
 	}
 	
-	private void writeEndTable(MarkdownElements line, StringBuilder builder) {		
+	private void writeEndTable(MarkdownElements line, StringBuilder builder, List<MarkdownElementParser> simpleParsers) {	
 		if(!hasHandledFirstRow) {
 			//The first row must not be a header because no border syntax was found before the end of the table
-			//Insert this row into markdown for further parsing
-			builder.append("<tr>");
+			//Parse the row and prepend
+			StringBuilder sb = new StringBuilder();
+			sb.append("<tr>");
 			for (int j = 0; j < firstRowData.size(); j++) {
-				builder.append("<td>");
-				builder.append(firstRowData.get(j));
-				builder.append("</td>");
+				sb.append("<td>");
+				sb.append(firstRowData.get(j));
+				sb.append("</td>");
 			}
-			builder.append("</tr>\n");
-			builder.append(TABLE_END_HTML);
-			if(shortStyle) {
-				builder.append("</div>");
-			}
-		} else {
-			//Nothing to insert into markdown for parsing, so prepend the end of the table
-			line.prependElement(TABLE_END_HTML);
-			if(shortStyle) {
-				line.prependElement("</div>");
-			}
+			sb.append("</tr>\n");
+			String parsedLine = runSimpleParsers(sb.toString(), simpleParsers);
+			line.prependElement(parsedLine);
+		}
+		line.prependElement(TABLE_END_HTML);
+		if(shortStyle) {
+			line.prependElement("</div>");
 		}
 		resetTableState();
 		

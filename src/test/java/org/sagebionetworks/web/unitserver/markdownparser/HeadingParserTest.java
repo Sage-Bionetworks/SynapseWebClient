@@ -20,7 +20,7 @@ public class HeadingParserTest {
 		String text = "Basic Heading";
 		String line = "### " + text;
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml();
 		assertTrue(result.contains("<h3>"));
 		assertTrue(result.contains(text));
@@ -32,7 +32,7 @@ public class HeadingParserTest {
 		String text = "Basic Heading";
 		String line = "> ### " + text;
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml();
 		assertTrue(result.contains("<h3>"));
 		assertTrue(result.contains(text));

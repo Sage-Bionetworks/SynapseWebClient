@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import java.util.List;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 public abstract class BasicMarkdownElementParser implements MarkdownElementParser {
-
 	protected boolean isPreview;
 	
 	/**
@@ -13,7 +14,7 @@ public abstract class BasicMarkdownElementParser implements MarkdownElementParse
 	@Override
 	public void reset() {
 	}
-
+	
 	/**
 	 * Can leave along if parser does not need to operate on the entire html document after processing is complete (most don't).
 	 */
@@ -58,5 +59,11 @@ public abstract class BasicMarkdownElementParser implements MarkdownElementParse
 		this.isPreview= isPreview;
 	}
 	
-	
+	public String runSimpleParsers(String line, List<MarkdownElementParser> simpleParsers) {
+		MarkdownElements elements = new MarkdownElements(line);
+		for (MarkdownElementParser parser : simpleParsers) {
+			parser.processLine(elements, simpleParsers);
+		}
+		return elements.getHtml();
+	}
 }
