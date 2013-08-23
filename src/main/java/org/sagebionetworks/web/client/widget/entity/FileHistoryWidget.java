@@ -31,7 +31,6 @@ import com.google.inject.Inject;
  */
 public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWidget {
 	
-	private AdapterFactory factory;
 	private FileHistoryWidgetView view;
 	private EntityBundle bundle;
 	private EntityUpdatedHandler entityUpdatedHandler;
@@ -44,10 +43,9 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private Long currentVersion;
 		
 	@Inject
-	public FileHistoryWidget(AdapterFactory factory, NodeModelCreator nodeModelCreator,
-			FileHistoryWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
+	public FileHistoryWidget(FileHistoryWidgetView view, NodeModelCreator nodeModelCreator,
+			 SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
 		super();
-		this.factory = factory;
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;

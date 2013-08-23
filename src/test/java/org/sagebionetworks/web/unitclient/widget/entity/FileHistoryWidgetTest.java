@@ -39,10 +39,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
-import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -50,19 +48,19 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class EntityMetadataTest {
+public class FileHistoryWidgetTest {
 
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
-	EntityMetadataView mockView;
+	FileHistoryWidgetView mockView;
 	EntitySchemaCache mockSchemaCache;
 	JSONObjectAdapter jsonObjectAdapter;
 	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	JiraURLHelper mockJiraURLHelper;
-	EntityMetadata entityMetadata;
+	FileHistoryWidget fileHistoryWidget;
 	Versionable vb;
 	String entityId = "syn123";
 	EntityBundle bundle;
@@ -75,7 +73,7 @@ public class EntityMetadataTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockView = mock(EntityMetadataView.class);
+		mockView = mock(FileHistoryWidgetView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		mockEntityTypeProvider = mock(EntityTypeProvider.class);
@@ -91,7 +89,7 @@ public class EntityMetadataTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 
-		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, jsonObjectAdapter, mockGlobalApplicationState, mockEntityTypeProvider, mockJiraURLHelper);
+		fileHistoryWidget = new FileHistoryWidget(mockView, mockNodeModelCreator, mockSynapseClient, jsonObjectAdapter, mockGlobalApplicationState, mockAuthenticationController);
 
 		vb = new Data();
 		vb.setId(entityId);
@@ -110,39 +108,75 @@ public class EntityMetadataTest {
 		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
 		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
 				
-		entityMetadata.setEntityBundle(bundle, 1l);
+		fileHistoryWidget.setEntityBundle(bundle, 1l);
 
 	}
-	
+
 	@Test
-	public void testGetJiraFlagUrl() {
-		String flagURLString = "flagURLString";
-		when(mockJiraURLHelper.createFlagIssue(any(String.class),any(String.class),any(String.class))).thenReturn(flagURLString);
-		assertEquals(flagURLString, entityMetadata.getJiraFlagUrl());
+	public void testLoadVersions() throws Exception {
+		AsyncMockStubber
+				.callSuccessWith("")
+				.when(mockSynapseClient)
+				.getEntityVersions(anyString(), anyInt(), anyInt(),
+						any(AsyncCallback.class));
+		AsyncCallback<PaginatedResults<VersionInfo>> callback = new AsyncCallback<PaginatedResults<VersionInfo>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				fail("unexpected failure in test: " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(PaginatedResults<VersionInfo> result) {
+				assertEquals(null, result);
+			}
+		};
+
+		fileHistoryWidget.loadVersions("synEMPTY", 0, 1, callback);
 	}
-	
+
 	@Test
-	public void testGetJiraRestrictionUrl() {
-		String restrictionURLString = "restrictionURLString";
-		when(mockJiraURLHelper.createAccessRestrictionIssue(any(String.class),any(String.class),any(String.class))).thenReturn(restrictionURLString);
-		assertEquals(restrictionURLString, entityMetadata.getJiraRestrictionUrl());
+	public void testLoadVersionsFail() throws Exception {
+		AsyncMockStubber
+				.callFailureWith(new IllegalArgumentException())
+				.when(mockSynapseClient)
+				.getEntityVersions(anyString(), anyInt(), anyInt(),
+						any(AsyncCallback.class));
+		AsyncCallback<PaginatedResults<VersionInfo>> callback = new AsyncCallback<PaginatedResults<VersionInfo>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				assertTrue(caught instanceof IllegalArgumentException);
+			}
+
+			@Override
+			public void onSuccess(PaginatedResults<VersionInfo> result) {
+				fail("Called onSuccess on a failure");
+			}
+		};
+
+		fileHistoryWidget.loadVersions("synEMPTY", 0, 1, callback);
 	}
-	
+
 	@Test
-	public void testGetJiraRequestAccessUrl() {
-		String requestAccessURLString = "requestAccessURLString";
-		when(mockJiraURLHelper.createRequestAccessIssue(any(String.class),any(String.class),any(String.class),any(String.class),any(String.class))).thenReturn(requestAccessURLString);
-		assertEquals(requestAccessURLString, entityMetadata.getJiraRequestAccessUrl());
+	public void testUpdateVersionInfo() throws Exception {
+
+		String testComment = "testComment";
+		String testLabel = "testLabel";
+
+		fileHistoryWidget.editCurrentVersionInfo(vb.getId(), testLabel, testComment);
+		ArgumentCaptor<String> json = ArgumentCaptor.forClass(String.class);
+		verify(mockSynapseClient).updateEntity(json.capture(), (AsyncCallback<EntityWrapper>) any());
+		JSONObjectAdapter joa = new JSONObjectAdapterImpl();
+		joa = joa.createNew(json.getValue());
+		Versionable out = new Data();
+		out.initializeFromJSONObject(joa);
+		assertEquals(new Long(1), out.getVersionNumber());
+		assertEquals(testLabel, out.getVersionLabel());
+		assertEquals(testComment, out.getVersionComment());
 	}
-	
+
 	@Test
-	public void testGetRestrictionLevel() {
-		assertEquals(RESTRICTION_LEVEL.RESTRICTED, entityMetadata.getRestrictionLevel());
+	public void testDeleteVersion() throws Exception {
+		fileHistoryWidget.deleteVersion(vb.getId(), vb.getVersionNumber());
+		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
 	}
-	
-	@Test
-	public void testGetApprovalType() {
-		assertEquals(APPROVAL_TYPE.USER_AGREEMENT, entityMetadata.getApprovalType());
-	}
-	
 }
