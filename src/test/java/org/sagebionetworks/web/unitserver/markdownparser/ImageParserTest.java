@@ -26,7 +26,7 @@ public class ImageParserTest {
 		String altText = "An Image";
 		String line = "![" + altText+ "](" + url + ")";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml();
 		assertTrue(!result.contains("http://test.com/a.png"));
 		assertTrue(result.contains(ServerMarkdownUtils.START_CONTAINER));

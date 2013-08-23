@@ -19,7 +19,7 @@ public class SubscriptParserTest {
 	public void testSubscript(){
 		String text = "2 in H~2~0 should be a subscript as should x / 2 in log~x / 2~.";
 		MarkdownElements elements = new MarkdownElements(text);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		assertTrue(elements.getHtml().contains("<sub>2</sub>"));
 		assertTrue(elements.getHtml().contains("<sub>x / 2</sub>"));
 	}

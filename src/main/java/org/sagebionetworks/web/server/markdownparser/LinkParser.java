@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.server.markdownparser;
-
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +28,7 @@ public class LinkParser extends BasicMarkdownElementParser  {
 	}
 
 	@Override
-	public void processLine(MarkdownElements line) {
+	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
 		String input = line.getMarkdown();
 		String bookmarkTarget = WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":";
 		Matcher m = p1.matcher(input);

@@ -26,7 +26,7 @@ public class BlockQuoteParserTest {
 		String text = "first line text";
 		String line = "> " + text;
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result =elements.getHtml().toLowerCase();
 		assertTrue(result.contains("<blockquote"));
 		assertTrue(result.contains(text));
@@ -38,7 +38,7 @@ public class BlockQuoteParserTest {
 		text = "second line text";
 		line = " \t> " + text;
 		elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		result =elements.getHtml().toLowerCase();
 		
 		assertFalse(result.contains("<blockquote"));
@@ -51,7 +51,7 @@ public class BlockQuoteParserTest {
 		text = "third line not in blockquote";
 		line =  text;
 		elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		result = elements.getHtml().toLowerCase();
 		assertFalse(result.contains("<blockquote"));
 		assertTrue(result.contains(text));

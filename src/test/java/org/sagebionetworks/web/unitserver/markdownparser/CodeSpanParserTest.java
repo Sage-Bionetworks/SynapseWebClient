@@ -23,7 +23,7 @@ public class CodeSpanParserTest {
 	public void testCodeSpan(){
 		String text = "a basic `code span` test";
 		MarkdownElements elements = new MarkdownElements(text);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml();
 		assertTrue(!result.contains("<code>code span</code>"));
 		assertTrue(result.contains(ServerMarkdownUtils.START_CONTAINER));

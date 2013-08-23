@@ -18,18 +18,13 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 	@Override
 	public void reset() {
 		footnotes = new ArrayList<String>();
-		parsersOnCompletion = new ArrayList<MarkdownElementParser>();
-		parsersOnCompletion.add(new BoldParser());
-		parsersOnCompletion.add(new DoiAutoLinkParser());
-		parsersOnCompletion.add(new ItalicsParser());
-		parsersOnCompletion.add(new LinkParser());
-		parsersOnCompletion.add(new SynapseAutoLinkParser());
-		parsersOnCompletion.add(new UrlAutoLinkParser());
 		footnoteNumber = 1;
 	}
 
 	@Override
-	public void processLine(MarkdownElements line) {
+	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
+		parsersOnCompletion = simpleParsers;
+	
 		String input = line.getMarkdown();
 		Matcher m = p1.matcher(input);
 		StringBuffer sb = new StringBuffer();
@@ -76,20 +71,7 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 			footnoteMarkdown.append("<p id=\"" + footnoteId + "\" class=\"inlineWidgetContainer\">" + footnoteText + "</p>");
 			footnoteMarkdown.append("<br>");
 		}
-		
-		StringBuilder output = new StringBuilder();
-		
-		//Run needed parsers over footnotes
-		for (MarkdownElementParser parser : parsersOnCompletion) {
-			parser.reset();
-		}
-		
-		//No new lines; process over constructed footnote markdown
-		MarkdownElements elements = new MarkdownElements(footnoteMarkdown.toString());
-		for (MarkdownElementParser parser : parsersOnCompletion) {
-			parser.processLine(elements);
-		}
-		output.append(elements.getHtml());
-		html.append(output);
+		String parsedFootnotes = runSimpleParsers(footnoteMarkdown.toString(), parsersOnCompletion);
+		html.append(parsedFootnotes);
 	}
 }

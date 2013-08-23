@@ -23,7 +23,7 @@ public class UrlAutoLinkParserTest {
 	public void testAutoLink() {
 		String line = "Go to this link http://www.example.com";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml();
 		assertTrue(!result.contains("http://www.example.com"));
 		assertTrue(result.contains(ServerMarkdownUtils.START_CONTAINER));

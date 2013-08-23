@@ -24,8 +24,8 @@ public class BacktickParserTest {
 		String text = "\\`not code span\\`";
 		MarkdownElements elements = new MarkdownElements(text);
 		//Escape first, then use other parsers
-		parser.processLine(elements);
-		codeParser.processLine(elements);
+		parser.processLine(elements, null);
+		codeParser.processLine(elements, null);
 		assertEquals(elements.getHtml(), "&#96;not code span&#96;");
 		assertFalse(elements.getHtml().contains("<code>not code span</code>"));
 	}

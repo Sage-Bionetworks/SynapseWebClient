@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.server.markdownparser;
-
+import java.util.List;
 import java.util.regex.Pattern;
 
 
@@ -8,7 +8,7 @@ public class HorizontalLineParser extends BasicMarkdownElementParser  {
 	Pattern p2 = Pattern.compile(MarkdownRegExConstants.HR_REGEX2);
 
 	@Override
-	public void processLine(MarkdownElements line) {
+	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
 		String testLine = line.getMarkdown().replaceAll(" ", "");
 		boolean isHr = p1.matcher(testLine).matches() || p2.matcher(testLine).matches();
 		if (isHr) {

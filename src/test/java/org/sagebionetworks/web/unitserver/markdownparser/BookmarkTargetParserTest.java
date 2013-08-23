@@ -19,7 +19,7 @@ public class BookmarkTargetParserTest {
 	public void testBookmarkTarget() {
 		String text = "${bookmarktarget?bookmarkID=head2} Heading 2";
 		MarkdownElements elements = new MarkdownElements(text);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		assertTrue(elements.getHtml().contains("<p class=\"inlineWidgetContainer\" id=\"head2\"></p>"));
 	}
 }

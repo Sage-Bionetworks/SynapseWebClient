@@ -20,7 +20,7 @@ public class CodeParserTest {
 		String language = "ruby";
 		String line = "``` " + language;
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml().toLowerCase();
 		assertTrue(result.contains("<pre"));
 		assertTrue(result.contains("<code"));
@@ -33,7 +33,7 @@ public class CodeParserTest {
 		//second line
 		line = "some code";
 		elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		result = elements.getHtml().toLowerCase();
 		assertFalse(result.contains("<pre"));
 		assertFalse(result.contains("<code"));
@@ -47,14 +47,14 @@ public class CodeParserTest {
 		//third line
 		line = "third line";
 		elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		result = elements.getHtml().toLowerCase();
 		assertTrue(result.startsWith("\n"));
 		
 		//forth line
 		line =  "```";
 		elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		result = elements.getHtml().toLowerCase();
 		assertFalse(result.contains("<pre"));
 		assertFalse(result.contains("<code"));
