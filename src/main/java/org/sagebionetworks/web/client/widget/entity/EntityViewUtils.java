@@ -95,15 +95,13 @@ public class EntityViewUtils {
 				infoHyperlinkText = DisplayConstants.GAIN_ACCESS; // note, this applies to 'anonymous' too.  the path leads the user to logging in.
 			}
 		}
-		Text t = new Text("(");
-		t.addStyleName("margin-left-5 inline-block");
-		lc.add(t);
+		
+		
 		Anchor aboutLink = new Anchor(infoHyperlinkText);
 		aboutLink.addStyleName("link");
-		lc.add(aboutLink);
-		t = new Text(")");
-		t.addStyleName("margin-right-10 inline-block");
-		lc.add(t);
+		
+		DisplayUtils.surroundWidgetWithParens(lc, aboutLink);
+		
 		aboutLink.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {

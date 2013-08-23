@@ -114,15 +114,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		sharingContainer.clear();
 		sharingContainer.add(DisplayUtils.getShareSettingsDisplay("<span style=\"margin-right: 5px;\" class=\"boldText\">Sharing:</span>", bundle.getPermissions().getCanPublicRead(), synapseJSNIUtils));
 		if (canAdmin) {
-			Text paren = new Text("(");
-			paren.addStyleName("inline-block margin-left-5");
-			sharingContainer.add(paren);
 			Anchor shareSettings = new Anchor(DisplayConstants.MODIFY);
 			shareSettings.addStyleName("inline-block link");
-			sharingContainer.add(shareSettings);
-			paren = new Text(")");
-			paren.addStyleName("inline-block");
-			sharingContainer.add(paren);
+			
+			DisplayUtils.surroundWidgetWithParens(sharingContainer, shareSettings);
 			configureShareSettings(shareSettings, bundle.getEntity());
 		}
 			

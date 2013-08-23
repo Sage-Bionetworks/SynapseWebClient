@@ -98,6 +98,7 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
@@ -128,11 +129,13 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -1678,6 +1681,19 @@ public class DisplayUtils {
 		}else{
 			throw new IllegalArgumentException("Unknown type: "+type);
 		}
+	}
+	
+	public static void surroundWidgetWithParens(Panel container, Widget widget) {
+		Text paren = new Text("(");
+		paren.addStyleName("inline-block margin-left-5");
+		container.add(paren);
+
+		widget.addStyleName("inline-block");
+		container.add(widget);
+
+		paren = new Text(")");
+		paren.addStyleName("inline-block margin-right-10");
+		container.add(paren);
 	}
 	
 }

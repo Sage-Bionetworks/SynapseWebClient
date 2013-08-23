@@ -10,7 +10,9 @@ public interface DoiWidgetView extends IsWidget, SynapseView {
 
 	void setPresenter(Presenter presenter);
 	void showDoi(DoiStatus doi);
+	void showCreateDoi(); 
 	public interface Presenter {
+		public void createDoi();
 		public void getDoiPrefix(AsyncCallback<String> callback);
 		public String getDoiHtml(String prefix, boolean isReady);
 	}

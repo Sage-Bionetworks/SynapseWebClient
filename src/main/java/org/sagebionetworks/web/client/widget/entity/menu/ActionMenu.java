@@ -10,8 +10,6 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.doi.Doi;
-import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
@@ -39,10 +37,8 @@ import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -115,27 +111,9 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
 		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, versionNumber, DisplayUtils.isInTestWebsite(cookieProvider));
-		
-		//if user can edit entity, then check for a DOI (if none are found, then enable the Create DOI menu item
-		if (canEdit)
-			checkForDoi();
 		return view.asWidget();
 	}
 	
-	private void checkForDoi() {
-		synapseClient.getEntityDoi(entityBundle.getEntity().getId(), versionNumber, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if (caught instanceof NotFoundException) {
-					view.enableDoiCreation(true);
-				}
-			}
-		});
-	}
-		
 	public void clearState() {
 		view.clear();
 		// remove handlers
@@ -160,22 +138,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
 		entityEditor.setEntityUpdatedHandler(handler);
-	}
-	
-	@Override
-	public void createDoi() {
-		synapseClient.createDoi(entityBundle.getEntity().getId(), versionNumber, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void v) {
-				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
-				view.enableDoiCreation(false);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-			}
-		});
 	}
 	
 	@Override

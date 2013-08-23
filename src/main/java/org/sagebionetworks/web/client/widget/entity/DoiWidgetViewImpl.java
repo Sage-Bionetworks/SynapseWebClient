@@ -1,15 +1,25 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.doi.DoiStatus;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 
+import com.extjs.gxt.ui.client.widget.Text;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
@@ -19,6 +29,7 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	AuthenticationController authenticationController;
 	
 	FlowPanel container;
+	Anchor createDoiLink;
 	
 	@Inject
 	public DoiWidgetViewImpl(GlobalApplicationState globalApplicationState,
@@ -28,7 +39,22 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 
 		container = new FlowPanel();
 		initWidget(container);
+		createDoiLink = new Anchor("create DOI");
+		createDoiLink.addStyleName("link");
+		createDoiLink.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.createDoi();
+			}
+		});
 	}
+	
+	@Override
+	public void showCreateDoi() {
+	  container.clear();
+	  addWidgetToContainer(createDoiLink);
+	} 
 
 	@Override
 	public void showDoi(final DoiStatus doi) {
@@ -36,10 +62,11 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 		
 		if (doi == DoiStatus.ERROR) {
 			//show error UI
+			addWidgetToContainer(createDoiLink);
 			container.add(new HTMLPanel(DisplayUtils.getWarningHtml("Error creating DOI", "")));
 		} else if (doi == DoiStatus.IN_PROCESS) {
 			//show in process UI
-			container.add(new HTMLPanel("<span class=\"margin-left-5\">DOI processing...</span>"));
+			addWidgetToContainer(new Text("DOI processing"));
 		} else if (doi == DoiStatus.CREATED || doi == DoiStatus.READY) {
 			//ask for the doi prefix from the presenter, and show a link to that!
 			//first clear old handler, if there is one
@@ -47,7 +74,7 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 			presenter.getDoiPrefix(new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String prefix) {
-					container.add(new HTMLPanel(presenter.getDoiHtml(prefix, doi == DoiStatus.READY)));
+					addWidgetToContainer(new HTMLPanel(presenter.getDoiHtml(prefix, doi == DoiStatus.READY)));
 				}
 				
 				@Override
@@ -56,9 +83,18 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 						showErrorMessage(caught.getMessage());
 				}
 			});
-			
 		}
-			
+	}
+	
+	private void addWidgetToContainer(Widget widget) {
+		//we are showing something in the DOI area
+		Label title = new Label(DisplayConstants.DOI + ":");
+		title.addStyleName("inline-block boldText");
+		container.add(title);
+		
+		DisplayUtils.surroundWidgetWithParens(container, widget);
+		
+		container.add(new HTML());
 	}
 	
 	@Override
