@@ -258,6 +258,7 @@ public class SynapseMarkdownProcessor {
 		ServerMarkdownUtils.assignIdsToHeadings(doc);
 		
 		ServerMarkdownUtils.addWidgets(doc, isPreview);
+		doc.outputSettings().prettyPrint(false);
 		return doc.html();
 	}
 }
