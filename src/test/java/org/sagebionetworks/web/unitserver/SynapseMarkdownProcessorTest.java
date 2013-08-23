@@ -104,7 +104,7 @@ public class SynapseMarkdownProcessorTest {
 		String testString = "Tau | MAPT | MCF7,BT20\nVASP | VASP | MCF7,BT20\nXIAP | XIAP | MCF7,BT20\n--------------------------------\n## Additional Data Details";
 		String actualResult = processor.markdown2Html(testString, false);
 		assertTrue(actualResult.contains("<hr"));
-		assertFalse(actualResult.contains("<del"));
+		assertFalse(actualResult.contains("<del")); //This will fail with single-row tables
 	}
 	
 	@Test

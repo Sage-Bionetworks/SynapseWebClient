@@ -108,23 +108,30 @@ public class TableParser extends BasicMarkdownElementParser {
 		line.updateMarkdown(builder.toString());
 	}
 	
-	private void writeEndTable(MarkdownElements line, StringBuilder builder) {
+	private void writeEndTable(MarkdownElements line, StringBuilder builder) {		
 		if(!hasHandledFirstRow) {
 			//The first row must not be a header because no border syntax was found before the end of the table
-			line.prependElement("<tr>");
+			//Insert this row into markdown for further parsing
+			builder.append("<tr>");
 			for (int j = 0; j < firstRowData.size(); j++) {
-				line.prependElement("<td>");
-				line.prependElement(firstRowData.get(j));
-				line.prependElement("</td>");
+				builder.append("<td>");
+				builder.append(firstRowData.get(j));
+				builder.append("</td>");
 			}
-			line.prependElement("</tr>\n");
-		}
-		//End table and reset state for future tables
-		line.prependElement(TABLE_END_HTML);
-		if(shortStyle) {
-			line.prependElement("</div>");
+			builder.append("</tr>\n");
+			builder.append(TABLE_END_HTML);
+			if(shortStyle) {
+				builder.append("</div>");
+			}
+		} else {
+			//Nothing to insert into markdown for parsing, so prepend the end of the table
+			line.prependElement(TABLE_END_HTML);
+			if(shortStyle) {
+				line.prependElement("</div>");
+			}
 		}
 		resetTableState();
+		
 	}
 	
 	private void createFirstRow(String markdown, StringBuilder builder) {
