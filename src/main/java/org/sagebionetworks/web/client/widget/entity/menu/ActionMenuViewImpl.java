@@ -121,13 +121,10 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
 		}	
 		
-		if (canEdit) editButton.enable();
-		else editButton.disable();
+		editButton.setVisible(canEdit);
 		configureEditButton(entity, entityType);	
 		
-		if (isAdministrator)
-			deleteButton.enable();
-		else deleteButton.disable();
+		deleteButton.setVisible(isAdministrator);
 		configureDeleteButton(entityType);
 		
 		configureToolsMenu(entityBundle, entityType, isAdministrator, canEdit);
@@ -189,8 +186,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	}
 	
 	private void configureToolsMenu(EntityBundle entityBundle, EntityType entityType, boolean isAdministrator, boolean canEdit) {
-		toolsButton.enable();
-		
 		boolean authenticated = presenter.isUserLoggedIn();
 		// disable edit/admin items if in read-only mode
 		
@@ -222,9 +217,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		}
 		
 		toolsButton.setMenu(menu);
-		if(menu.getItemCount() == 0) {
-			toolsButton.disable();
-		}
+		toolsButton.setVisible(menu.getItemCount() > 0);
 	}
 
 	/**

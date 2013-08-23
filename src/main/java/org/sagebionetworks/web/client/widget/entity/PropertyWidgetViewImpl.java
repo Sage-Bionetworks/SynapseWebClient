@@ -104,51 +104,51 @@ public class PropertyWidgetViewImpl extends FlowPanel implements PropertyWidgetV
 			
 		//now add a button for every row
 		for (final EntityRow<?> row : rows) {
-			FlowPanel container = new FlowPanel();
-			container.addStyleName("inline-block light-border margin-right-5 margin-top-5");
-			String value = SafeHtmlUtils.htmlEscapeAllowEntities(row.getDislplayValue());
-			String label = row.getLabel();
-			String delimiter = label != null && label.trim().length() > 0 && value != null && value.trim().length() > 0 ? ":" : "";
-			Label l1 = new Label(label + delimiter);
-			l1.addStyleName("inline-block greyText-imp margin-right-5");
-			HTML l2 = new HTML(value);
-			l2.addStyleName("inline-block blackText-imp");
-			DisplayUtils.addTooltip(synapseJSNIUtils, l2, row.getToolTipsBody(), TOOLTIP_POSITION.BOTTOM);
-			
-			container.add(l1);
-			container.add(l2);
-			
-			//if user can edit values, then make it clickable
-			if (canEdit) {
-				//edit annotation handler
-				ClickHandler editHandler = new ClickHandler() {
-					public void onClick(ClickEvent event) {
-						handleEditClick(row);
-					};
-				};
-				l2.addStyleName("link");
-				l2.addClickHandler(editHandler);
-				l1.addStyleName("link");
-				l1.addClickHandler(editHandler);
-				//container.add(getNewButton(iconsImageBundle.editGrey16(), editHandler, DisplayConstants.BUTTON_EDIT));
+			if (row != null && row.getDislplayValue() != null) {
+				FlowPanel container = new FlowPanel();
+				container.addStyleName("inline-block light-border margin-right-5 margin-top-5");
+				String value = SafeHtmlUtils.htmlEscapeAllowEntities(row.getDislplayValue());
+				String label = row.getLabel();
+				String delimiter = label != null && label.trim().length() > 0 && value != null && value.trim().length() > 0 ? ":" : "";
+				Label l1 = new Label(label + delimiter);
+				l1.addStyleName("inline-block greyText-imp margin-right-5");
+				HTML l2 = new HTML(value);
+				l2.addStyleName("inline-block blackText-imp");
+				DisplayUtils.addTooltip(synapseJSNIUtils, l2, row.getToolTipsBody(), TOOLTIP_POSITION.BOTTOM);
 				
-				//delete annotation handler
-				ClickHandler deleteHandler = new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						//delete this row
-						handleDeleteClick(row);
-					}
-				};
-				container.add(getNewButton(iconsImageBundle.deleteButtonGrey16(), deleteHandler, DisplayConstants.LABEL_DELETE));
+				container.add(l1);
+				container.add(l2);
+				
+				//if user can edit values, then make it clickable
+				if (canEdit) {
+					//edit annotation handler
+					ClickHandler editHandler = new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							handleEditClick(row);
+						};
+					};
+					l2.addStyleName("link");
+					l2.addClickHandler(editHandler);
+					l1.addStyleName("link");
+					l1.addClickHandler(editHandler);
+					//container.add(getNewButton(iconsImageBundle.editGrey16(), editHandler, DisplayConstants.BUTTON_EDIT));
+					
+					//delete annotation handler
+					ClickHandler deleteHandler = new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							//delete this row
+							handleDeleteClick(row);
+						}
+					};
+					container.add(getNewButton(iconsImageBundle.deleteButtonGrey16(), deleteHandler, DisplayConstants.LABEL_DELETE));
+				}
+				else {
+					l2.addStyleName("blackText");
+				}
+				
+				this.add(container);
 			}
-			else {
-				l2.addStyleName("blackText");
-			}
-			
-			
-			this.add(container);
-			
 		}
 	}
 	

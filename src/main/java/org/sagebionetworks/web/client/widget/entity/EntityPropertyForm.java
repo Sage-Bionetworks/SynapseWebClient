@@ -2,9 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.Annotations;
@@ -22,10 +19,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
-import org.sagebionetworks.web.client.widget.entity.dialog.DeleteAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog.Callback;
-import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
@@ -101,38 +95,6 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 	@Override
 	public void saveButtonClicked() {
 		callback.saveEntity(adapter, annos);	
-	}
-
-	@Override
-	public void removeAnnotation() {
-		// Show a form for adding an Annotations
-		List<String> keys = new ArrayList<String>();
-		keys.addAll(annos.keySet());
-		DeleteAnnotationDialog.showDeleteAnnotationsDialog(keys, new DeleteAnnotationDialog.Callback() {
-			@Override
-			public void deletAnnotations(List<String> keysToDelete) {
-				// Delete all of the selected annotations.
-				for(String key: keysToDelete){
-					annos.deleteAnnotation(key);
-				}
-				// Rebuild the models
-				rebuildModel();
-			}
-		});
-	}
-	
-	@Override
-	public void addAnnotation() {
-		// Show a form for adding an Annotations
-		AddAnnotationDialog.showAddAnnotation(new AddAnnotationDialog.Callback(){
-
-			@Override
-			public void addAnnotation(String name, ANNOTATION_TYPE type) {
-				DisplayUtils.addAnnotation(annos, name, type);
-				// Rebuild the models
-				rebuildModel();
-			}
-		});
 	}
 	
 	public void refreshEntityAttachments(Entity newEntity) throws JSONObjectAdapterException {
