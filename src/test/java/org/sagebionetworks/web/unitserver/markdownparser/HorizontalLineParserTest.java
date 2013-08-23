@@ -20,14 +20,14 @@ public class HorizontalLineParserTest {
 	public void testHR1(){
 		String line = "---";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml();
 		assertTrue(result.toLowerCase().contains("<hr>"));
 		
 		//or more than 3
 		line = "-----";
 		elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		result = elements.getHtml();
 		assertTrue(result.toLowerCase().contains("<hr>"));
 	}
@@ -36,14 +36,14 @@ public class HorizontalLineParserTest {
 	public void testHR2(){
 		String line = "***";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml();
 		assertTrue(result.toLowerCase().contains("<hr>"));
 		
 		//or more than 3
 		line = "*******";
 		elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		result = elements.getHtml();
 		assertTrue(result.toLowerCase().contains("<hr>"));
 	}
@@ -52,7 +52,7 @@ public class HorizontalLineParserTest {
 	public void testNotHRs(){
 		String line = "dashes or asterisks *** in the line ---";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		String result = elements.getHtml();
 		assertFalse(result.toLowerCase().contains("<hr>"));
 	}

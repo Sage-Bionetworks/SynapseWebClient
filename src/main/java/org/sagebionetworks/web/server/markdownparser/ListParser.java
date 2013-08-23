@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.server.markdownparser;
-
+import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +29,7 @@ public class ListParser extends BasicMarkdownElementParser  {
 	}
 
 	@Override
-	public void processLine(MarkdownElements line) {
+	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
 		Matcher m1 = p1.matcher(line.getMarkdown());
 		Matcher m2 = p2.matcher(line.getMarkdown());
 		Matcher m3 = p3.matcher(line.getMarkdown());

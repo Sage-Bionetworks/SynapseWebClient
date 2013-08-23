@@ -3,23 +3,34 @@ package org.sagebionetworks.web.unitserver.markdownparser;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.server.SynapseMarkdownProcessor;
+import org.sagebionetworks.web.server.markdownparser.BoldParser;
+import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
 import org.sagebionetworks.web.server.markdownparser.UnderscoreParser;
 
 public class TableParserTest {
+	SynapseMarkdownProcessor processor;
 	TableParser parser;
-	UnderscoreParser underscoreParser;
+	
+	List<MarkdownElementParser> simpleParsers;
+	
 	@Before
 	public void setup(){
 		parser = new TableParser();
 		parser.reset();
 		
-		underscoreParser = new UnderscoreParser();
-		underscoreParser.reset();
+		simpleParsers = new ArrayList<MarkdownElementParser>();
+		simpleParsers.add(new BoldParser());
+		simpleParsers.add(new UnderscoreParser());
 	}
 	
 	@Test
@@ -30,27 +41,26 @@ public class TableParserTest {
 		String end = "|}";
 		StringBuilder tableOutput = new StringBuilder();
 		MarkdownElements elements = new MarkdownElements(start);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements(exampleLine1);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements(exampleLine2);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements(end);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements("");
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		tableOutput.append(elements.getHtml());
 		//check for a few items
 		String html = tableOutput.toString();
-		System.out.println("HTML: " + html);
 		assertTrue(html.contains("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+"0"));
 		assertTrue(html.contains("class=\"tablesorter markdowntable border\""));
 		assertTrue(html.contains("<tr><td>Row 1 Content Cell 1 </td>"));
@@ -63,39 +73,35 @@ public class TableParserTest {
 		String exampleLine2 = "--: | -- | :--";
 		StringBuilder tableOutput = new StringBuilder();
 		MarkdownElements elements = new MarkdownElements(exampleLine1);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements(exampleLine2);
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements("");
-		parser.processLine(elements);
+		parser.processLine(elements, null);
 		tableOutput.append(elements.getHtml());
 		//check for a few items
 		String html = tableOutput.toString();
-		System.out.println("HTML: " + html);
 		assertTrue(html.contains("<tr><th>Row 1 Content Cell 1 </th>"));
 		assertFalse(html.contains("--"));
 	}
 	
 	@Test
-	public void testTableWithOneLine() {
-		String exampleLine1 = "Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3";
+	public void testTableWithOneLine() throws IOException {
+		String exampleLine1 = "**Row 1 Content Cell 1** | Row\\_Content\\_2  | Row 1 Content Cell 3";
 		StringBuilder tableOutput = new StringBuilder();
 		MarkdownElements elements = new MarkdownElements(exampleLine1);
-		parser.processLine(elements);
-		underscoreParser.processLine(elements);
+		parser.processLine(elements, simpleParsers);
 		tableOutput.append(elements.getHtml());
-
+		
 		elements = new MarkdownElements("");
-		parser.processLine(elements);
-		underscoreParser.processLine(elements);
+		parser.processLine(elements, simpleParsers);
 		tableOutput.append(elements.getHtml());
-		//check for a few items
 		String html = tableOutput.toString();
-		System.out.println("HTML: " + html);
-		assertTrue(html.contains("<tr><td>Row 1 Content Cell 1 </td>"));
+		assertTrue(html.contains("<td><strong>Row 1 Content Cell 1</strong> </td>"));
+		assertTrue(html.contains("Row&#95;Content&#95;2"));
 	}
 }

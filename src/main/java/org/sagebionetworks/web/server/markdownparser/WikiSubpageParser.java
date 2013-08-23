@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.server.markdownparser;
-
+import java.util.List;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 
 public class WikiSubpageParser extends BasicMarkdownElementParser  {
@@ -13,7 +13,7 @@ public class WikiSubpageParser extends BasicMarkdownElementParser  {
 	}
 
 	@Override
-	public void processLine(MarkdownElements line) {
+	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
 		if (!seenWikiSubpagesWidget) {
 			if (line.getMarkdown().contains(subpagesWidgetMarkdown))
 				seenWikiSubpagesWidget = true;

@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.server.markdownparser;
 
-import java.util.Map;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -31,7 +30,7 @@ public class UrlAutoLinkParser extends BasicMarkdownElementParser {
 	}
 	
 	@Override
-	public void processLine(MarkdownElements line) {
+	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
 		Matcher m = p.matcher(line.getMarkdown());
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {

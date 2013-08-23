@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.server.markdownparser;
-
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,7 +8,7 @@ public class HeadingParser extends BasicMarkdownElementParser  {
 	boolean matchedLine;
 	
 	@Override
-	public void processLine(MarkdownElements line) {
+	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
 		Matcher m = p1.matcher(line.getMarkdown());
 		matchedLine = m.matches();
 		if (matchedLine) {
