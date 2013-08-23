@@ -60,7 +60,7 @@ public class TableParserTest {
 	@Test
 	public void testTableWithHeader() {
 		String exampleLine1 = "Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3";
-		String exampleLine2 = "--|--|--";
+		String exampleLine2 = "--: | -- | :--";
 		StringBuilder tableOutput = new StringBuilder();
 		MarkdownElements elements = new MarkdownElements(exampleLine1);
 		parser.processLine(elements);
