@@ -3,6 +3,8 @@ package org.sagebionetworks.web.server.markdownparser;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.sagebionetworks.web.server.ServerMarkdownUtils;
 /**
  * One of the more complicated parsers.  Needs to have a stack to support nested lists.
  * needs to remember the level (how deep is the nested list), the list type (ordered or unordered), and (if ordered) the current number)
@@ -16,10 +18,14 @@ public class ListParser extends BasicMarkdownElementParser  {
 	Pattern p3 = Pattern.compile(MarkdownRegExConstants.INDENTED_REGEX, Pattern.DOTALL);
 	Pattern p4 = Pattern.compile(MarkdownRegExConstants.BLOCK_QUOTE_REGEX, Pattern.DOTALL);;
 	Stack<MarkdownList> stack;
-
+	boolean hasSeenBlockQuote;
+	boolean preserveForBlockQuoteParser;
+	
 	@Override
 	public void reset() {
 		stack = new Stack<MarkdownList>();
+		hasSeenBlockQuote = false;
+		preserveForBlockQuoteParser = false;
 	}
 
 	@Override
@@ -62,7 +68,9 @@ public class ListParser extends BasicMarkdownElementParser  {
 	    	        while(!stack.isEmpty()){
 	    	        	list.closeOpenListItems(line);
 	    				line.prependElement(stack.pop().getEndListHtml());
-	    			}	    			
+	    			}
+	    	        hasSeenBlockQuote = false;
+	    			preserveForBlockQuoteParser = false;
 	        	}	        	
 	        }        
 		}
@@ -70,15 +78,32 @@ public class ListParser extends BasicMarkdownElementParser  {
 	
 	public void getListItem(MarkdownElements line, Matcher m, boolean isOrderedList, Matcher blockquoteMatcher) {
 		//looks like a list item
-		String spaces = m.group(1);
-        int depth = spaces.length();
+		String prefix = m.group(1);
+        int depth = prefix.length();
         String value = m.group(3);
-        
+
         boolean isInBlockQuote = blockquoteMatcher.matches();
-        if(isInBlockQuote) {
-        	depth--;										//Account for leading ">" blockquote character
-        	value = blockquoteMatcher.group(2) + value; 	//Prepend original prefix again for blockquote parser
-        }
+        if(isInBlockQuote) {    
+        	if(hasSeenBlockQuote) {
+        		//We're in the middle of a blockquote, so preserve
+        		//the ">" character for blockquote parser
+        		value = blockquoteMatcher.group(2) + value;
+        		preserveForBlockQuoteParser = false;
+        	} else {
+        		//The blockquote tag has not been made/this list item is starting the blockquote
+        		//We need to encompass the list with the blockquote element 
+        		preserveForBlockQuoteParser = true;
+        		hasSeenBlockQuote = true;
+        	}
+        	
+        	//Account for leading ">" blockquote character
+        	depth--;
+        } else if(line.hasElement(ServerMarkdownUtils.START_BLOCKQUOTE_TAG)) {
+        	//This list item starts the blockquote/the blockquote has already been made
+        	hasSeenBlockQuote = true;
+        } 
+        //else, create a list item with normal value
+
         checkForGreaterDepth(line, depth);
         if (!stack.isEmpty()) {
         	MarkdownList list = stack.peek();
@@ -98,8 +123,15 @@ public class ListParser extends BasicMarkdownElementParser  {
         	//no list in the stack
         	//create a new list
         	MarkdownList newList = getNewList(depth, isOrderedList);
-    		line.prependElement(newList.getStartListHtml());
-    		newList.addListItemHtml(line, value);
+        	if(preserveForBlockQuoteParser) {
+        		//Preserve the ">" character for the blockquote parser to prepend the blockquote element
+        		line.updateMarkdown(prefix);
+        		line.appendElement(newList.getStartListHtml() + "<li><p>" + value + "</p>");	
+        	} else {
+        		//Start a normal list
+        		line.prependElement(newList.getStartListHtml());
+        		newList.addListItemHtml(line, value);
+        	}
         }
 	}
 	

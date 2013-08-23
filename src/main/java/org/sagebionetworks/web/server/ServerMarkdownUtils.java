@@ -41,6 +41,7 @@ public class ServerMarkdownUtils {
 	public static final String START_LINK = "<a class=\"link\" target=\"_blank\" href=\"";
 	public static final String END_LINK = "</a>";
 	
+	public static final String START_BLOCKQUOTE_TAG = "<blockquote>";
 	public static final String HTML_LINE_BREAK = "<br />\n";
 	public static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
 	public static final String TEMP_SPACE_DELIMITER = "%^&2_9d";
