@@ -11,6 +11,7 @@ import java.util.Set;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -187,10 +187,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		return value;
 	}
 	
-	private String getPagedURI() {
+	public String getPagedURI() {
 		String uri = tableConfig.getUri();
 		//special case for query service
-		if (uri.startsWith(WebConstants.QUERY_SERVICE_PREFIX)) {
+		if (uri.startsWith(ClientProperties.QUERY_SERVICE_PREFIX)) {
 			return tableConfig.getUri() + "+limit+"+tableConfig.getPageSize()+"+offset+"+(tableConfig.getOffset()+1);
 		} else {
 			String firstCharacter = tableConfig.getUri().contains("?") ? "&" : "?";

@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -21,6 +23,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -40,6 +43,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class APITableWidgetTest {
 		
+	private static final String TESTSERVICE_PATH = "/testservice";
 	APITableWidget widget;
 	APITableWidgetView mockView;
 	SynapseClientAsync mockSynapseClient;
@@ -85,7 +89,7 @@ public class APITableWidgetTest {
 		AsyncMockStubber.callSuccessWith(testJSON).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
 		widget = new APITableWidget(mockView, mockSynapseClient, mockJSONObjectAdapter, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController);
 		descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, "/testservice");
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, TESTSERVICE_PATH);
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "true");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, "10");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, "true");
@@ -181,5 +185,22 @@ public class APITableWidgetTest {
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
+	
+	@Test
+	public void testPagingURI() throws JSONObjectAdapterException {
+		widget.configure(testWikiKey, descriptor);
+		String pagedURI = widget.getPagedURI();
+		assertEquals(TESTSERVICE_PATH + "?limit=10&offset=0", pagedURI.toLowerCase());
+	}
+	
+	@Test
+	public void testQueryServicePagingURI() throws JSONObjectAdapterException {
+		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, testServiceCall);
+		widget.configure(testWikiKey, descriptor);
+		String pagedURI = widget.getPagedURI();
+		assertEquals(testServiceCall + "+limit+10+offset+1", pagedURI.toLowerCase());
+	}
+
 	
 }
