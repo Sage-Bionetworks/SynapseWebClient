@@ -20,9 +20,8 @@ public class SynapseMarkdownProcessorTest {
 	@Test
 	public void testMarkdown2HtmlEscapeControlCharacters() throws IOException{
 		String testString = "& ==> &amp;\" ==> &quot;> ==> &gt;< ==> &lt;' =";
-		
 		String actualResult = processor.markdown2Html(testString, false);
-		assertTrue(actualResult.contains("&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt; &lt; ==&gt; &lt;' ="));
+		assertTrue(actualResult.contains("&amp; ==&gt; &amp;&quot; ==&gt; &quot;&gt; ==&gt; &gt; &lt;  ==&gt; &lt;' ="));
 	}
 	
 	@Test
@@ -75,8 +74,14 @@ public class SynapseMarkdownProcessorTest {
 			"> Then a code block!\n" +
 			"> ```";
 		String actualResult = processor.markdown2Html(testString, false);
-		String expectedResult = "<blockquote>\n   <ul>\n    <li><p>Item 1</p></li>\n    <li><p> Item 2</p>\n     <ol>\n      <li><p> </p><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li>\n      <li><p> SubItem 2b</p></li>\n     </ol></li>\n   </ul>\n   <pre><code class=\"r\"> Then a code block! </code></pre>\n   <br /> \n  </blockquote>";
+		String expectedResult = "<blockquote><ul><li><p>Item 1</p></li>";
+		String expectedResult2 = "<li><p> Item 2</p><ol><li><p> </p><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li><li><p> SubItem 2b</p></li></ol></li></ul>";
+		String expectedResult3 = "<pre><code class=\"r\"> Then a code block! </code></pre>";
+		String expectedResult4 = "</blockquote>"; 
 		assertTrue(actualResult.contains(expectedResult));
+		assertTrue(actualResult.contains(expectedResult2));
+		assertTrue(actualResult.contains(expectedResult3));
+		assertTrue(actualResult.contains(expectedResult4));
 		
 		String testString2 =
 			"1. First\n" +
@@ -89,12 +94,19 @@ public class SynapseMarkdownProcessorTest {
 			"> ``` r\n" +
 			"> Then a code block!\n" +
 			"> ```";
-		String actualResult2 = processor.markdown2Html(testString2, false);
-		String expectedResult2 = "<ol>\n   <li><p>First</p></li>\n   <li><p>Second</p></li>\n  </ol>\n  <br /> \n";
-		assertTrue(actualResult2.contains(expectedResult2));
+
+		String expectedResult5 = "<ol><li><p>First</p></li><li><p>Second</p></li></ol><br />";
+		String expectedResult6 = "<blockquote> <ul><li><p>Item 1</p></li>";
+		String expectedResult7 = "<li><p>Item 2</p><ol><li><p></p><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li><li><p>SubItem 2b</p></li></ol></li></ul>";
+		String expectedResult8 = "<pre><code class=\"r\"> Then a code block! </code></pre><br />";
+		String expectedResult9 = "</blockquote>";
 		
-		String expectedResult2b = "<blockquote>\n   <ul>\n    <li><p>Item 1</p></li>\n    <li><p> Item 2</p>\n     <ol>\n      <li><p> </p><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li>\n      <li><p> SubItem 2b</p></li>\n     </ol></li>\n   </ul>\n   <pre><code class=\"r\"> Then a code block! </code></pre>\n   <br /> \n  </blockquote>";
-		assertTrue(actualResult.contains(expectedResult2b));
+		String actualResult2 = processor.markdown2Html(testString2, false);
+		assertTrue(actualResult2.contains(expectedResult5));
+		assertTrue(actualResult2.contains(expectedResult6));
+		assertTrue(actualResult2.contains(expectedResult7));
+		assertTrue(actualResult2.contains(expectedResult8));
+		assertTrue(actualResult2.contains(expectedResult9));
 	}
 	
 	@Test
@@ -124,5 +136,13 @@ public class SynapseMarkdownProcessorTest {
 		assertTrue(actualResult.contains("&lt;"));
 		assertTrue(actualResult.contains("&gt;"));
 		
+	}
+	
+	@Test
+	public void testSpaces() throws IOException{
+		String testString = "The hi in t**hi**s is bold. No spaces in H~2~O.";
+		String result = processor.markdown2Html(testString, false);
+		assertTrue(result.contains("The hi in t<strong>hi</strong>s is bold."));
+		assertTrue(result.contains("No spaces in H<sub>2</sub>O."));
 	}
 }
