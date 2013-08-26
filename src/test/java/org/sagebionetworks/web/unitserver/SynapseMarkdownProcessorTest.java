@@ -70,13 +70,13 @@ public class SynapseMarkdownProcessorTest {
 			"> * Item 2\n" +
 			">   1. #### SubItem 2a\n" +
 			">   2. SubItem 2b\n" +
-			"> ```\n" +
+			"> ``` r\n" +
 			"> Then a code block!\n" +
 			"> ```";
 		String actualResult = processor.markdown2Html(testString, false);
 		String expectedResult = "<blockquote><ul><li><p>Item 1</p></li>";
 		String expectedResult2 = "<li><p> Item 2</p><ol><li><p> </p><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li><li><p> SubItem 2b</p></li></ol></li></ul>";
-		String expectedResult3 = "<pre><code class=\"no-highlight\"> Then a code block! </code></pre>";
+		String expectedResult3 = "<pre><code class=\"r\"> Then a code block! </code></pre>";
 		String expectedResult4 = "</blockquote>"; 
 		assertTrue(actualResult.contains(expectedResult));
 		assertTrue(actualResult.contains(expectedResult2));
