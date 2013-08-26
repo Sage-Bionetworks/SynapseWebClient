@@ -15,6 +15,7 @@ public interface QueryTableConfigView extends IsWidget, WidgetEditorView {
 	public void setPresenter(Presenter presenter);
 	public String getQueryString();
 	
+	public Boolean isPaging();
 	public Boolean isShowRowNumbers();
 	public String getRowNumberColumnName();
 	public List<APITableColumnConfig> getConfigs();
