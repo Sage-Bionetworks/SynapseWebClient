@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.http.client.URL;
@@ -15,6 +16,7 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	
 	private QueryTableConfigView view;
 	private Map<String, String> descriptor;
+	private static final String DEFAULT_PAGE_SIZE = "100";
 	
 	@Inject
 	public QueryTableConfigEditor(QueryTableConfigView view) {
@@ -27,6 +29,12 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
 		APITableConfig tableConfig = new APITableConfig(widgetDescriptor);
+		String uri = tableConfig.getUri();
+		if (uri != null && uri.startsWith(WebConstants.QUERY_SERVICE_PREFIX)) {
+			//strip off prefix and decode query string
+			uri = URL.decodeQueryString(uri.substring(WebConstants.QUERY_SERVICE_PREFIX.length()));
+			tableConfig.setUri(uri);
+		}
 		view.configure(tableConfig);
 	}
 	
@@ -44,8 +52,9 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, "/query?query=" + URL.encodeQueryString(view.getQueryString()));
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, Boolean.FALSE.toString());
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, WebConstants.QUERY_SERVICE_PREFIX + URL.encodeQueryString(view.getQueryString()));
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, view.isPaging().toString());
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, DEFAULT_PAGE_SIZE);
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, view.isShowRowNumbers().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, view.getRowNumberColumnName());
 		List<APITableColumnConfig> configs = view.getConfigs();

@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -187,8 +188,14 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	}
 	
 	private String getPagedURI() {
-		String firstCharacter = tableConfig.getUri().contains("?") ? "&" : "?";
-		return tableConfig.getUri() + firstCharacter + "limit="+tableConfig.getPageSize()+"&offset="+tableConfig.getOffset();
+		String uri = tableConfig.getUri();
+		//special case for query service
+		if (uri.startsWith(WebConstants.QUERY_SERVICE_PREFIX)) {
+			return tableConfig.getUri() + "+limit+"+tableConfig.getPageSize()+"+offset+"+(tableConfig.getOffset()+1);
+		} else {
+			String firstCharacter = tableConfig.getUri().contains("?") ? "&" : "?";
+			return tableConfig.getUri() + firstCharacter + "limit="+tableConfig.getPageSize()+"&offset="+tableConfig.getOffset();	
+		}
 	}
 	
 	/**
