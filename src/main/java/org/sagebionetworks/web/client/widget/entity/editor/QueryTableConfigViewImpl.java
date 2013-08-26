@@ -15,6 +15,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -22,7 +23,7 @@ public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTa
 
 	private Presenter presenter;
 	private TextField<String> queryField, rowNumbersColumnNameField;
-	private CheckBox isRowVisibleField;
+	private CheckBox isPagingField, isRowVisibleField;
 	private APITableColumnManager columnsManager;
 	
 	@Inject
@@ -39,13 +40,20 @@ public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTa
 		queryField = new TextField<String>();
 		isRowVisibleField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL);
 		isRowVisibleField.addStyleName("apitable");
+
+		isPagingField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_PAGING);
+		isPagingField.addStyleName("apitable");
+
 		rowNumbersColumnNameField = new TextField<String>();
+		
 		
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_QUERY_LABEL, queryField, flowpanel);
 		queryField.setAllowBlank(false);
-
-		flowpanel.add(isRowVisibleField);
-		initNewField(DisplayConstants.SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME, rowNumbersColumnNameField, flowpanel);
+		
+		flowpanel.add(new SimplePanel(isPagingField));
+		
+		flowpanel.add(new SimplePanel(isRowVisibleField));
+		//initNewField(DisplayConstants.SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME, rowNumbersColumnNameField, flowpanel);
 		
 		flowpanel.add(columnsManager.asWidget());
 		
@@ -76,6 +84,7 @@ public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTa
 		queryField.setValue(tableConfig.getUri());
 		isRowVisibleField.setValue(tableConfig.isShowRowNumber());
 		rowNumbersColumnNameField.setValue(tableConfig.getRowNumberColName());
+		isPagingField.setValue(tableConfig.isPaging());
 	}
 	
 	@Override
@@ -110,6 +119,11 @@ public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTa
 	@Override
 	public String getRowNumberColumnName() {
 		return rowNumbersColumnNameField.getValue();
+	}
+	
+	@Override
+	public Boolean isPaging() {
+		return isPagingField.getValue();
 	}
 	
 	@Override

@@ -11,6 +11,7 @@ import java.util.Set;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -186,9 +187,15 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		return value;
 	}
 	
-	private String getPagedURI() {
-		String firstCharacter = tableConfig.getUri().contains("?") ? "&" : "?";
-		return tableConfig.getUri() + firstCharacter + "limit="+tableConfig.getPageSize()+"&offset="+tableConfig.getOffset();
+	public String getPagedURI() {
+		String uri = tableConfig.getUri();
+		//special case for query service
+		if (uri.startsWith(ClientProperties.QUERY_SERVICE_PREFIX)) {
+			return tableConfig.getUri() + "+limit+"+tableConfig.getPageSize()+"+offset+"+(tableConfig.getOffset()+1);
+		} else {
+			String firstCharacter = tableConfig.getUri().contains("?") ? "&" : "?";
+			return tableConfig.getUri() + firstCharacter + "limit="+tableConfig.getPageSize()+"&offset="+tableConfig.getOffset();	
+		}
 	}
 	
 	/**

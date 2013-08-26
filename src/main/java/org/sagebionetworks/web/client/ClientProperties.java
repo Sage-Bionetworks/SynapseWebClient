@@ -114,6 +114,7 @@ public class ClientProperties {
 	 */
 	public static final WebResource CYTOSCAPE_JS = new WebResource("js/cytoscape-2.0.2.min.js", ResourceType.JAVASCRIPT);
 	public static final WebResource JQUERY_JS = new WebResource("https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js", ResourceType.JAVASCRIPT);
+	public static final String QUERY_SERVICE_PREFIX = "/query?query=";
 	
 }
 
