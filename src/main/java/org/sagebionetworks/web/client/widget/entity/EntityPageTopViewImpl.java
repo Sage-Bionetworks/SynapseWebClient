@@ -648,7 +648,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    lc.addStyleName("span-7");
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
-		if (!annotationsWidget.isEmpty()) {
+		if (canEdit || !annotationsWidget.isEmpty()) {
 			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.ANNOTATIONS + "</h4>")));
 			// Create the property body
 			// the headers for properties.
