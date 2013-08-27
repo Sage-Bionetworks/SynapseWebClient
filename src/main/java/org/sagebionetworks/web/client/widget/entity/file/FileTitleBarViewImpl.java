@@ -74,8 +74,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	SimplePanel uploadButtonContainer;
 	@UiField
-	SpanElement entityId;
-	@UiField
 	Image entityIcon;
 	@UiField
 	SpanElement fileName;
@@ -150,7 +148,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		if (isDataWithin) {
 			//add an anchor with the file name, that redirects to the download button for functionality
 			entityLink.setText(entity.getName());
-			entityId.setInnerText(entity.getId());
 			AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
 			synapseIconForEntity.applyTo(entityIcon);
 			//fileHandle is null if user can't access the filehandle associated with this fileentity

@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,8 @@ public class StringValueUtilsTest {
 	public void testTooLongStringValueToString(){
 		String value = "This is just a string and should remain so but is so long that it will be truncated";
 		String result = StringValueUtils.valueToString(value);
-		assertEquals(value.substring(0, StringValueUtils.MAX_CHARS_IN_LIST-1), result);
+		assertTrue(result.length() < value.length());
+		assertEquals(value.substring(0, StringValueUtils.MAX_CHARS_IN_LIST-1), result.substring(0, StringValueUtils.MAX_CHARS_IN_LIST-1));
 	}
 	
 	@Test
