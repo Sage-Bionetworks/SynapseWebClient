@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class SharedMarkdownUtils {
+	public static final int SYNAPSE_MARKDOWN_WIDGET_PARSER_INDEX = 3;
 
 	public static String getWikiSubpagesMarkdown() {
 		return WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN;
@@ -12,8 +13,8 @@ public class SharedMarkdownUtils {
 	public static String getNoAutoWikiSubpagesMarkdown() {
 		return WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.NO_AUTO_WIKI_SUBPAGES + WidgetConstants.WIDGET_END_MARKDOWN;
 	}
-	
-	public static String getWidgetHTML(int widgetIndex, String suffix, String widgetProperties){
+
+	public static String getWidgetHTML(String id, String widgetProperties){
 		boolean inlineWidget = false;
 		StringBuilder sb = new StringBuilder();
 		if(widgetProperties.contains(WidgetConstants.INLINE_WIDGET_KEY + "=true")) {
@@ -22,8 +23,7 @@ public class SharedMarkdownUtils {
 	
 		sb.append("<div id=\"");
 		sb.append(WebConstants.DIV_ID_WIDGET_PREFIX);
-		sb.append(widgetIndex);
-		sb.append(suffix);
+		sb.append(id);
 		
 		//Some widgets will be inline
 		if(inlineWidget) {
@@ -39,7 +39,7 @@ public class SharedMarkdownUtils {
 	}
 
 	public static String getDefaultWikiMarkdown() {
-		return getWidgetHTML(0, "", WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE);
+		return getWidgetHTML(0 + "", WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE);
 	}
 
 	public static String getPreviewSuffix(Boolean isPreview) {
