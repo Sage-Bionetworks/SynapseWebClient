@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.EvaluationList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -59,6 +60,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	
 	private Long versionNumber;
 	private Button editButton;
+	private Button shareButton;
 	
 	private Button toolsButton;
 	private Button deleteButton;
@@ -111,6 +113,15 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
 		
+		if(shareButton == null) { 
+			shareButton = new Button(DisplayConstants.BUTTON_SHARE, AbstractImagePrototype.create(iconsImageBundle.mailGrey16()));
+			shareButton.setId(DisplayConstants.ID_BTN_SHARE);
+			shareButton.setHeight(25);
+			shareButton.addStyleName("floatright margin-left-5");
+			this.add(shareButton);
+			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
+		} 
+		
 		// edit button
 		if(editButton == null) {			
 			editButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
@@ -123,6 +134,9 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		
 		editButton.setVisible(canEdit);
 		configureEditButton(entity, entityType);	
+		
+		shareButton.setVisible(isAdministrator);
+		configureShareButton(entity);
 		
 		deleteButton.setVisible(isAdministrator);
 		configureDeleteButton(entityType);
@@ -157,6 +171,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	@Override
 	public void clear() {
 		if(editButton != null) editButton.removeAllListeners();
+		if(shareButton != null) shareButton.removeAllListeners(); 
 	}
 	
 	/*
@@ -181,6 +196,22 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				handleDeleteClick(typeDisplay);
+			}
+		});
+	}
+	
+	private void configureShareButton(Entity entity) { 
+		accessControlListEditor.setResource(entity);
+		shareButton.removeAllListeners();  
+		shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				DisplayUtils.showSharingDialog(accessControlListEditor, new Callback() {
+					@Override
+					public void invoke() {
+						presenter.fireEntityUpdatedEvent();
+					}
+				});
 			}
 		});
 	}

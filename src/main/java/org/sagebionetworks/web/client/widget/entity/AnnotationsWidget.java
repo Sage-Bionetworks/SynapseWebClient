@@ -35,12 +35,12 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class PropertyWidget implements PropertyWidgetView.Presenter, IsWidget {
+public class AnnotationsWidget implements AnnotationsWidgetView.Presenter, IsWidget {
 	
 	private AdapterFactory factory;
 	private EntitySchemaCache cache;
 	private List<EntityRow<?>> rows;
-	private PropertyWidgetView propertyView;
+	private AnnotationsWidgetView propertyView;
 	private EntityBundle bundle;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
@@ -54,7 +54,7 @@ public class PropertyWidget implements PropertyWidgetView.Presenter, IsWidget {
 	 * @param propertyView
 	 */
 	@Inject
-	public PropertyWidget(PropertyWidgetView propertyView, AdapterFactory factory, EntitySchemaCache cache,
+	public AnnotationsWidget(AnnotationsWidgetView propertyView, AdapterFactory factory, EntitySchemaCache cache,
 			 SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
 		super();
 		this.factory = factory;

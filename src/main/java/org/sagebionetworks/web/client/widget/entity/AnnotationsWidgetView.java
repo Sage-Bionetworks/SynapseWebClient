@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author John
  *
  */
-public interface PropertyWidgetView extends IsWidget, SynapseView{
+public interface AnnotationsWidgetView extends IsWidget, SynapseView{
 	
 	public interface Presenter {
 		/**

@@ -73,7 +73,9 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -126,6 +128,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -1694,6 +1697,59 @@ public class DisplayUtils {
 		paren = new Text(")");
 		paren.addStyleName("inline-block margin-right-10");
 		container.add(paren);
+	}
+
+	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, final Callback callback) {
+		final Dialog window = new Dialog();
+		// configure layout
+		window.setSize(560, 465);
+		window.setPlain(true);
+		window.setModal(true);
+		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
+		window.setLayout(new FitLayout());
+		window.add(accessControlListEditor.asWidget(), new FitData(4));			    
+	    
+		// configure buttons
+		window.okText = "Save";
+		window.cancelText = "Cancel";
+	    window.setButtons(Dialog.OKCANCEL);
+	    window.setButtonAlign(HorizontalAlignment.RIGHT);
+	    window.setHideOnButtonClick(false);
+		window.setResizable(false);
+		
+		// "Apply" button
+		// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
+		Button applyButton = window.getButtonById(Dialog.OK);
+		applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				// confirm close action if there are unsaved changes
+				if (accessControlListEditor.hasUnsavedChanges()) {
+					accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
+						@Override
+						public void onSuccess(EntityWrapper result) {
+							callback.invoke();
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							//failure notification is handled by the acl editor view.
+						}
+					});
+				}
+				window.hide();
+			}
+	    });
+		
+		// "Close" button				
+		Button closeButton = window.getButtonById(Dialog.CANCEL);
+	    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+	    });
+		
+		window.show();
 	}
 	
 }

@@ -122,7 +122,8 @@ public class FormFieldFactory {
 		field.setShadow(false);
 		field.setFireChangeEventOnSetValue(true);
 		field.setFieldLabel(row.getLabel());
-		field.setToolTip(row.getDescription());
+		if (row.getDescription() != null && row.getDescription().length() > 0)
+			field.setToolTip(row.getDescription());
 		return field;
 	}
 

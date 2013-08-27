@@ -95,9 +95,9 @@ import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
-import org.sagebionetworks.web.client.widget.entity.PropertyWidgetView;
-import org.sagebionetworks.web.client.widget.entity.PropertyWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
+import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetView;
+import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardView;
@@ -266,9 +266,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntitySchemaCacheImpl.class).in(Singleton.class);
 		bind(EntitySchemaCache.class).to(EntitySchemaCacheImpl.class);
 		
-		bind(PropertyWidget.class).in(Singleton.class);
-		bind(PropertyWidgetViewImpl.class).in(Singleton.class);
-		bind(PropertyWidgetView.class).to(PropertyWidgetViewImpl.class);
+		bind(AnnotationsWidget.class).in(Singleton.class);
+		bind(AnnotationsWidgetViewImpl.class).in(Singleton.class);
+		bind(AnnotationsWidgetView.class).to(AnnotationsWidgetViewImpl.class);
 		
 		
 		//file history

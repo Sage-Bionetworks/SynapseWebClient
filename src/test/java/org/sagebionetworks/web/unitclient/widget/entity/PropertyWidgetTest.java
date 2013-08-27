@@ -30,8 +30,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
-import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
-import org.sagebionetworks.web.client.widget.entity.PropertyWidgetView;
+import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
+import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -44,13 +44,13 @@ public class PropertyWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
-	PropertyWidgetView mockView;
+	AnnotationsWidgetView mockView;
 	
 	JSONObjectAdapter jsonObjectAdapter;
 	static AdapterFactoryImpl adapterFactory = new AdapterFactoryImpl();
 	static EntitySchemaCache schemaCache = new EntitySchemaCacheImpl(adapterFactory);
 	
-	PropertyWidget propertyWidget;
+	AnnotationsWidget propertyWidget;
 	EntityBundle testBundle;
 	Annotations annotations;
 	EntityUpdatedHandler mockEntityUpdatedHandler;
@@ -60,10 +60,10 @@ public class PropertyWidgetTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockView = mock(PropertyWidgetView.class);
+		mockView = mock(AnnotationsWidgetView.class);
 		mockEntityUpdatedHandler = mock(EntityUpdatedHandler.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
-		propertyWidget = new PropertyWidget(mockView, adapterFactory, schemaCache, mockSynapseClient, jsonObjectAdapter, mockGlobalApplicationState, mockAuthenticationController);
+		propertyWidget = new AnnotationsWidget(mockView, adapterFactory, schemaCache, mockSynapseClient, jsonObjectAdapter, mockGlobalApplicationState, mockAuthenticationController);
 		
 		testBundle = mock(EntityBundle.class);
 		FileEntity file = new FileEntity();

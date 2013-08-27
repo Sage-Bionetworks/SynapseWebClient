@@ -11,16 +11,7 @@ import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
-import org.sagebionetworks.web.shared.EntityWrapper;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.Text;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FitData;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,7 +19,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -150,58 +140,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		link.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				
-				final Dialog window = new Dialog();
-				
-				// configure layout
-				window.setSize(560, 465);
-				window.setPlain(true);
-				window.setModal(true);
-				window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
-				window.setLayout(new FitLayout());
-				window.add(accessControlListEditor.asWidget(), new FitData(4));			    
-			    
-				// configure buttons
-				window.okText = "Save";
-				window.cancelText = "Cancel";
-			    window.setButtons(Dialog.OKCANCEL);
-			    window.setButtonAlign(HorizontalAlignment.RIGHT);
-			    window.setHideOnButtonClick(false);
-				window.setResizable(false);
-				
-				// "Apply" button
-				// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
-				Button applyButton = window.getButtonById(Dialog.OK);
-				applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				DisplayUtils.showSharingDialog(accessControlListEditor, new Callback() {
 					@Override
-					public void componentSelected(ButtonEvent ce) {
-						// confirm close action if there are unsaved changes
-						if (accessControlListEditor.hasUnsavedChanges()) {
-							accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
-								@Override
-								public void onSuccess(EntityWrapper result) {
-									presenter.fireEntityUpdatedEvent();
-								}
-								@Override
-								public void onFailure(Throwable caught) {
-									//failure notification is handled by the acl editor view.
-								}
-							});
-						}
-						window.hide();
+					public void invoke() {
+						presenter.fireEntityUpdatedEvent();
 					}
-			    });
-				
-				// "Close" button				
-				Button closeButton = window.getButtonById(Dialog.CANCEL);
-			    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						window.hide();
-					}
-			    });
-				
-				window.show();
+				});
 			}
 		});
 				

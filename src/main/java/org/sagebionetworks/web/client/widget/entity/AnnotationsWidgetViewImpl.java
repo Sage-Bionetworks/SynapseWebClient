@@ -28,8 +28,11 @@ import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -42,7 +45,7 @@ import com.google.inject.Inject;
  * @author jmhill
  *
  */
-public class PropertyWidgetViewImpl extends FlowPanel implements PropertyWidgetView, IsWidget {
+public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsWidgetView, IsWidget {
 	
 	private IconsImageBundle iconsImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -50,8 +53,7 @@ public class PropertyWidgetViewImpl extends FlowPanel implements PropertyWidgetV
 	private FormFieldFactory formFieldFactory;
 	
 	@Inject
-	public PropertyWidgetViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, FormFieldFactory formFieldFactory) {
-		this.addStyleName("span-24 notopmargin last");
+	public AnnotationsWidgetViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, FormFieldFactory formFieldFactory) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.formFieldFactory = formFieldFactory;
@@ -78,46 +80,23 @@ public class PropertyWidgetViewImpl extends FlowPanel implements PropertyWidgetV
 	@Override
 	public void configure(List<EntityRow<?>> rows, boolean canEdit) {
 		this.clear();
-		if (!rows.isEmpty() || canEdit) {
-			Label title = new Label(DisplayConstants.ANNOTATIONS + ":");
-			title.addStyleName("inline-block boldText");
-			add(title);
-			//include Add Annotation button if user can edit
-			if (canEdit) {
-				ClickHandler handler = new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						// Show a form for adding an Annotations
-						AddAnnotationDialog.showAddAnnotation(new AddAnnotationDialog.Callback(){
-
-							@Override
-							public void addAnnotation(String name, ANNOTATION_TYPE type) {
-								presenter.addAnnotation(name, type);
-							}
-						});
-					}
-				};
-				add(getNewButton(iconsImageBundle.addSquareGrey16(), handler, DisplayConstants.TEXT_ADD_ANNOTATION));
-			}
-			add(new HTML());
-		}
 			
 		//now add a button for every row
+		Grid g = new Grid(rows.size(), 3);
+		g.addStyleName("table nobottommargin");
+		int i = -1;
 		for (final EntityRow<?> row : rows) {
+			i++;
 			if (row != null && row.getDislplayValue() != null) {
-				FlowPanel container = new FlowPanel();
-				container.addStyleName("inline-block light-border margin-right-5 margin-top-5");
 				String value = SafeHtmlUtils.htmlEscapeAllowEntities(row.getDislplayValue());
 				String label = row.getLabel();
-				String delimiter = label != null && label.trim().length() > 0 && value != null && value.trim().length() > 0 ? ":" : "";
-				Label l1 = new Label(label + delimiter);
-				l1.addStyleName("inline-block greyText-imp margin-right-5");
+				Label l1 = new Label(label);
+				l1.addStyleName("inline-block greyText-imp");
 				HTML l2 = new HTML(value);
 				l2.addStyleName("inline-block blackText-imp");
 				DisplayUtils.addTooltip(synapseJSNIUtils, l2, row.getToolTipsBody(), TOOLTIP_POSITION.BOTTOM);
-				
-				container.add(l1);
-				container.add(l2);
+				g.setWidget(i, 0, l1);
+				g.setWidget(i, 1, l2);
 				
 				//if user can edit values, then make it clickable
 				if (canEdit) {
@@ -141,14 +120,34 @@ public class PropertyWidgetViewImpl extends FlowPanel implements PropertyWidgetV
 							handleDeleteClick(row);
 						}
 					};
-					container.add(getNewButton(iconsImageBundle.deleteButtonGrey16(), deleteHandler, DisplayConstants.LABEL_DELETE));
+					g.setWidget(i, 2, getNewButton(iconsImageBundle.deleteButtonGrey16(), deleteHandler, DisplayConstants.LABEL_DELETE));
 				}
 				else {
 					l2.addStyleName("blackText");
 				}
-				
-				this.add(container);
 			}
+		}
+		this.add(g);
+		if (!rows.isEmpty() || canEdit) {
+			//include Add Annotation button if user can edit
+			if (canEdit) {
+				SelectionListener<ButtonEvent> listener = new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						// Show a form for adding an Annotations
+						AddAnnotationDialog.showAddAnnotation(new AddAnnotationDialog.Callback(){
+
+							@Override
+							public void addAnnotation(String name, ANNOTATION_TYPE type) {
+								presenter.addAnnotation(name, type);
+							}
+						});
+					}
+				}; 
+				
+				add(new Button(DisplayConstants.TEXT_ADD_ANNOTATION, AbstractImagePrototype.create(iconsImageBundle.addSquareGrey16()), listener));
+			}
+			add(new HTML());
 		}
 	}
 	

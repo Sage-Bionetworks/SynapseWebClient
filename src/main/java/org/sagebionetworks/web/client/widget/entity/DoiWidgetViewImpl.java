@@ -6,10 +6,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 
-import com.extjs.gxt.ui.client.widget.Text;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -66,7 +63,7 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 			container.add(new HTMLPanel(DisplayUtils.getWarningHtml("Error creating DOI", "")));
 		} else if (doi == DoiStatus.IN_PROCESS) {
 			//show in process UI
-			addWidgetToContainer(new Text("DOI processing"));
+			addWidgetToContainer(new Label("DOI processing"));
 		} else if (doi == DoiStatus.CREATED || doi == DoiStatus.READY) {
 			//ask for the doi prefix from the presenter, and show a link to that!
 			//first clear old handler, if there is one
