@@ -461,8 +461,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				PermissionsTableEntry entry = store.getAt(rowIndex);
 				UserGroupHeader principal = entry.getAclEntry().getPrincipal();
 				String principalHtml;
-				boolean isThePublicGroup = principal != null && principal.getOwnerId().equals(publicPrincipalId.toString());
-				boolean isTheAuthenticatedUsersGroup = principal != null && principal.getOwnerId().equals(authenticatedPrincipalId.toString());
+				boolean isThePublicGroup = principal != null && publicPrincipalId != null && principal.getOwnerId().equals(publicPrincipalId.toString());
+				boolean isTheAuthenticatedUsersGroup = principal != null && authenticatedPrincipalId != null && principal.getOwnerId().equals(authenticatedPrincipalId.toString());
 				
 				if (isThePublicGroup)
 					principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.PUBLIC_ACL_TITLE, DisplayConstants.PUBLIC_ACL_DESCRIPTION);
@@ -481,7 +481,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 							null
 					);
 					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
-				} else if (principal.getOwnerId().equals(publicPrincipalId.toString())){
+				} else if (publicPrincipalId != null && principal.getOwnerId().equals(publicPrincipalId.toString())){
 					ImageResource icon = iconsImageBundle.globe32();
 					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
 				} else {

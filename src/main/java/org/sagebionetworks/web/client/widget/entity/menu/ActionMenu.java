@@ -113,7 +113,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, versionNumber, DisplayUtils.isInTestWebsite(cookieProvider));
 		return view.asWidget();
 	}
-		
+	
 	public void clearState() {
 		view.clear();
 		// remove handlers
@@ -139,7 +139,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.entityUpdatedHandler = handler;
 		entityEditor.setEntityUpdatedHandler(handler);
 	}
-
+	
 	@Override
 	public void moveEntity(String newParentId) {
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());

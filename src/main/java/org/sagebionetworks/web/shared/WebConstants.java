@@ -41,7 +41,7 @@ public class WebConstants {
 	public static final String VALID_ENTITY_ID_REGEX = "^[Ss]{1}[Yy]{1}[Nn]{1}\\d+";
 	public static final String VALID_POSITIVE_NUMBER_REGEX = "^[0-9]+";
 	public static final String VALID_BOOKMARK_ID_REGEX = "[_A-Za-z0-9-.[^\\s]]+";
-	
+	public static final String HTML_ELLIPSIS = "&hellip;";
 	public static final String URL_PROTOCOL = "http://";
 	
 	// OpenID related constants
