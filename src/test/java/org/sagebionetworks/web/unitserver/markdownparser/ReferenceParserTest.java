@@ -10,14 +10,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.SynapseMarkdownProcessor;
+import org.sagebionetworks.web.server.markdownparser.BookmarkTargetParser;
 import org.sagebionetworks.web.server.markdownparser.LinkParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.ReferenceParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
+import org.sagebionetworks.web.server.markdownparser.SynapseMarkdownWidgetParser;
+import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class ReferenceParserTest {
-	SynapseMarkdownProcessor processor; 
 	ReferenceParser parser;
 	List<MarkdownElementParser> simpleParsers;
 	
@@ -25,11 +27,15 @@ public class ReferenceParserTest {
 	public void setup(){
 		parser = new ReferenceParser();
 		parser.reset();
-		
+		SynapseMarkdownWidgetParser widgetParser = new SynapseMarkdownWidgetParser();
+		widgetParser.reset();
 		LinkParser linkParser = new LinkParser();
 		linkParser.reset();
-		processor = SynapseMarkdownProcessor.getInstance();
 		simpleParsers = new ArrayList<MarkdownElementParser>();
+		simpleParsers.add(linkParser);
+		simpleParsers.add(linkParser);
+		simpleParsers.add(linkParser);
+		simpleParsers.add(widgetParser);
 		simpleParsers.add(linkParser);
 	}
 	
