@@ -15,7 +15,6 @@ import com.google.gwt.dev.util.collect.HashMap;
 public class LinkParser extends BasicMarkdownElementParser  {
 	Pattern p1= Pattern.compile(MarkdownRegExConstants.LINK_REGEX, Pattern.DOTALL);
 	Pattern protocol = Pattern.compile(MarkdownRegExConstants.LINK_URL_PROTOCOL, Pattern.DOTALL);
-
 	MarkdownExtractor extractor;
 
 	@Override
@@ -68,6 +67,8 @@ public class LinkParser extends BasicMarkdownElementParser  {
 		}
 		m.appendTail(sb);
 		line.updateMarkdown(sb.toString());
+		//Check for new bookmark widget
+		simpleParsers.get(SharedMarkdownUtils.SYNAPSE_MARKDOWN_WIDGET_PARSER_INDEX).processLine(line, simpleParsers);
 	}
 	
 	
