@@ -34,6 +34,7 @@ import org.sagebionetworks.web.server.RestTemplateProviderImpl;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -222,8 +223,10 @@ public class UserAccountServiceImplTest {
 		results.setResults(allGroups);
 		
 		when(mockSynapse.getGroups(anyInt(),anyInt())).thenReturn(results);
-		String actualResult =UserAccountServiceImpl.getPublicAndAuthenticatedPrincipalIds(mockSynapse);
-		String expectedResult = publicGroupId + "," + authGroupId;
+		PublicPrincipalIds actualResult = UserAccountServiceImpl.getPublicAndAuthenticatedPrincipalIds(mockSynapse);
+		PublicPrincipalIds expectedResult = new PublicPrincipalIds();
+		expectedResult.setPublicAclPrincipalId(Long.parseLong(publicGroupId));
+		expectedResult.setAuthenticatedAclPrincipalId(Long.parseLong(authGroupId));
 		Assert.assertEquals(expectedResult, actualResult);
 	}
 	

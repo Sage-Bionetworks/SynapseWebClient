@@ -108,6 +108,14 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(callback);
 	}
 	
+	public AccessControlList getAcl() {
+		return acl;
+	}
+	
+	public PublicPrincipalIds getPublicPrincipalIds() {
+		return publicPrincipalIds;
+	}
+	
 	public Widget asWidget() {
 		view.setPresenter(this);			
 		return view.asWidget();

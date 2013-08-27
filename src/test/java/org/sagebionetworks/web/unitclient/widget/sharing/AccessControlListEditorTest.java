@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.unitclient.presenter;
+package org.sagebionetworks.web.unitclient.widget.sharing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -51,6 +51,7 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -112,7 +113,7 @@ public class AccessControlListEditorTest {
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(AccessControlListEditorView.class);
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
-		AsyncMockStubber.callSuccessWith(TEST_PUBLIC_PRINCIPAL_ID +","+ TEST_AUTHENTICATED_PRINCIPAL_ID).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
