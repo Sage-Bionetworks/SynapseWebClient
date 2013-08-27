@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -135,16 +136,13 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 		if (this.evaluation.getId() == null) throw new IllegalStateException(NULL_EVALUATION_MESSAGE);
 		view.showLoading();
 		if (publicAclPrincipalId == null){
-			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<String>() {
+			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<PublicPrincipalIds>() {
 				@Override
-				public void onSuccess(String result) {
-					if (result != null && result.length() > 0) {
-						String[] principalIds = result.split(",");
-						if (principalIds.length ==2){
-							publicAclPrincipalId = Long.parseLong(principalIds[0]);
-							authenticatedAclPrincipalId = Long.parseLong(principalIds[1]);
-							initViewPrincipalIds();
-						}
+				public void onSuccess(PublicPrincipalIds result) {
+					if (result != null) {
+						publicAclPrincipalId = result.getPublicAclPrincipalId();
+						authenticatedAclPrincipalId = result.getAuthenticatedAclPrincipalId();
+						initViewPrincipalIds();
 					}
 				}
 				@Override

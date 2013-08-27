@@ -281,9 +281,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				public void componentSelected(ButtonEvent ce) {
 					//add the ability for PUBLIC to see this entity
 					if (isPubliclyVisible) {
-						if (publicPrincipalId != null){
-							presenter.removeAccess(publicPrincipalId);
-						}
+						presenter.makePrivate();
 					}
 					else {
 						if (publicPrincipalId != null) {

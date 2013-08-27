@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -58,9 +59,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private boolean unsavedChanges;
 	private boolean unsavedViewChanges;
 	private boolean hasLocalACL_inRepo;
-	private Long publicAclPrincipalId = null;
-	private Long authenticatedAclPrincipalId = null;
 	GlobalApplicationState globalApplicationState;
+	PublicPrincipalIds publicPrincipalIds;
 	
 	// Entity components
 	private Entity entity;
@@ -130,8 +130,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		return view.asWidget();
 	}
 	private void initViewPrincipalIds(){
-		view.setPublicPrincipalId(publicAclPrincipalId);
-		view.setAuthenticatedPrincipalId(authenticatedAclPrincipalId);
+		if (publicPrincipalIds != null) {
+			view.setPublicPrincipalId(publicPrincipalIds.getPublicAclPrincipalId());
+			view.setAuthenticatedPrincipalId(publicPrincipalIds.getAuthenticatedAclPrincipalId());	
+		}
 	}
 	
 	/**
@@ -140,18 +142,12 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private void refresh(final AsyncCallback<Void> callback) {
 		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
 		view.showLoading();
-		if (publicAclPrincipalId == null){
-			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<String>() {
+		if (publicPrincipalIds == null){
+			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<PublicPrincipalIds>() {
 				@Override
-				public void onSuccess(String result) {
-					if (result != null && result.length() > 0) {
-						String[] principalIds = result.split(",");
-						if (principalIds.length ==2){
-							publicAclPrincipalId = Long.parseLong(principalIds[0]);
-							authenticatedAclPrincipalId = Long.parseLong(principalIds[1]);
-							initViewPrincipalIds();
-						}
-					}
+				public void onSuccess(PublicPrincipalIds result) {
+					publicPrincipalIds = result;
+					initViewPrincipalIds();
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -209,7 +205,23 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 
 	private void updateIsPublicAccess(){
-		view.setIsPubliclyVisible(uep.getCanPublicRead());	
+		view.setIsPubliclyVisible(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));	
+	}
+	
+	@Override
+	public void makePrivate() {
+		//try to remove the public principal ids from the acl
+		List<Long> toRemove = new ArrayList<Long>();
+		for (ResourceAccess ra : acl.getResourceAccess()) {
+			if (publicPrincipalIds.getAuthenticatedAclPrincipalId().equals(ra.getPrincipalId())){
+				toRemove.add(publicPrincipalIds.getAuthenticatedAclPrincipalId());
+			} else if (publicPrincipalIds.getPublicAclPrincipalId().equals(ra.getPrincipalId())) {
+				toRemove.add(publicPrincipalIds.getPublicAclPrincipalId());
+			}
+		}
+		for (Long id : toRemove) {
+			removeAccess(id);	
+		}
 	}
 	
 	private void populateAclEntries() {
@@ -258,7 +270,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
 			return;
 		}
-		if (principalId.equals(publicAclPrincipalId))
+		if (principalId.equals(publicPrincipalIds.getPublicAclPrincipalId()))
 			uep.setCanPublicRead(true);
 		
 		ResourceAccess toSet = null;
@@ -305,7 +317,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
 			return;
 		}
-		if (principalIdToRemove.equals(publicAclPrincipalId))
+		if (principalIdToRemove.equals(publicPrincipalIds.getPublicAclPrincipalId()))
 			uep.setCanPublicRead(false);
 		boolean foundUser = false;;
 		Set<ResourceAccess> newRAs = new HashSet<ResourceAccess>();

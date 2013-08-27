@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
@@ -596,15 +597,14 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public String getPublicAndAuthenticatedGroupPrincipalIds() {
+	public PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds() {
 		validateService();
 		Synapse synapseClient = createSynapseClient();
 		return getPublicAndAuthenticatedPrincipalIds(synapseClient);		
 	}
 	
-	public static String getPublicAndAuthenticatedPrincipalIds(Synapse synapseClient) {
-		String publicPrincipalId = "";
-		String authenticatedPrincipalId = "";
+	public static PublicPrincipalIds getPublicAndAuthenticatedPrincipalIds(Synapse synapseClient) {
+		PublicPrincipalIds returnValue = new PublicPrincipalIds();
 		try {
 			PaginatedResults<UserGroup> allGroups = synapseClient.getGroups(0, Integer.MAX_VALUE);
 			
@@ -612,15 +612,15 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 				UserGroup userGroup = (UserGroup) iterator.next();
 				if (userGroup.getName() != null){
 					if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.PUBLIC.name()))
-						publicPrincipalId = userGroup.getId();
+						returnValue.setPublicAclPrincipalId(Long.parseLong(userGroup.getId()));
 					else if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.AUTHENTICATED_USERS.name()))
-						authenticatedPrincipalId = userGroup.getId();
+						returnValue.setAuthenticatedAclPrincipalId(Long.parseLong(userGroup.getId()));
 				}
 			}
 		} catch (Exception e) {
 			throw new RestClientException(e.getMessage());
 		}
-		return publicPrincipalId + "," + authenticatedPrincipalId;	
+		return returnValue;	
 	}
 	
 	/**

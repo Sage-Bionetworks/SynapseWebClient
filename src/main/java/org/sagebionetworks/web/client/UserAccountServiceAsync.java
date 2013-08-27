@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 
@@ -41,7 +42,7 @@ public interface UserAccountServiceAsync {
 	
 	void getFastPassSupportUrl(AsyncCallback<String> callback) throws RestServiceException;
 	
-	void getPublicAndAuthenticatedGroupPrincipalIds(AsyncCallback<String> callback);
+	void getPublicAndAuthenticatedGroupPrincipalIds(AsyncCallback<PublicPrincipalIds> callback);
 	
 	/**
 	 * This needs to be replaced with a Synapse Java Client call

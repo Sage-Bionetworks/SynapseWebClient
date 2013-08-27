@@ -100,5 +100,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 		 * @param unsavedChanges
 		 */
 		public void setUnsavedViewChanges(boolean unsavedChanges);
+		
+		void makePrivate();
 	}
 }
