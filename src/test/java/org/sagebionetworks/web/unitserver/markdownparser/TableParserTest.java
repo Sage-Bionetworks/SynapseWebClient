@@ -90,6 +90,29 @@ public class TableParserTest {
 	}
 	
 	@Test
+	public void testTableWithDifferentHeader() {
+		String exampleLine1 = "| Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3 |";
+		String exampleLine2 = "| --: | -- | :-- |";
+		StringBuilder tableOutput = new StringBuilder();
+		MarkdownElements elements = new MarkdownElements(exampleLine1);
+		parser.processLine(elements, null);
+		tableOutput.append(elements.getHtml());
+		
+		elements = new MarkdownElements(exampleLine2);
+		parser.processLine(elements, null);
+		tableOutput.append(elements.getHtml());
+		
+		elements = new MarkdownElements("");
+		parser.processLine(elements, null);
+		tableOutput.append(elements.getHtml());
+		//check for a few items
+		String html = tableOutput.toString();
+		System.out.println(html);
+		assertTrue(html.contains("<tr><th>Row 1 Content Cell 1 </th>"));
+		assertFalse(html.contains("--"));
+	}
+	
+	@Test
 	public void testTableWithOneLine() throws IOException {
 		String exampleLine1 = "**Row 1 Content Cell 1** | Row\\_Content\\_2  | Row 1 Content Cell 3";
 		StringBuilder tableOutput = new StringBuilder();

@@ -190,15 +190,8 @@ public class TableParser extends BasicMarkdownElementParser {
 	}
 	
 	private boolean isHeaderBorder(String markdown) {
-		Matcher m;
-		String[] cells = markdown.split("\\|");
-		for (int j = 0; j < cells.length; j++) {
-			m = headerBorder.matcher(cells[j]);
-			if(!m.matches()) {
-				return false;
-			}
-		}
-		return true;
+		Matcher m = headerBorder.matcher(markdown);
+		return m.matches();
 	}
 	
 	@Override
