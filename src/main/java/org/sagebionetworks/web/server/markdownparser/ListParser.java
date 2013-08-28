@@ -22,14 +22,14 @@ public class ListParser extends BasicMarkdownElementParser  {
 	boolean preserveForBlockQuoteParser;
 	
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		stack = new Stack<MarkdownList>();
 		hasSeenBlockQuote = false;
 		preserveForBlockQuoteParser = false;
 	}
 
 	@Override
-	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
+	public void processLine(MarkdownElements line) {
 		Matcher m1 = p1.matcher(line.getMarkdown());
 		Matcher m2 = p2.matcher(line.getMarkdown());
 		Matcher m3 = p3.matcher(line.getMarkdown());

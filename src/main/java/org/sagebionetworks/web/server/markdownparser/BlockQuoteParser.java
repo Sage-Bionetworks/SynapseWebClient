@@ -11,12 +11,12 @@ public class BlockQuoteParser extends BasicMarkdownElementParser {
 	boolean inBlockQuote;
 	
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		inBlockQuote = false;
 	}
 
 	@Override
-	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
+	public void processLine(MarkdownElements line) {
 		Matcher m = p1.matcher(line.getMarkdown());
 		Matcher codeMatcher = p2.matcher(line.getMarkdown());
 		if (m.matches()) {

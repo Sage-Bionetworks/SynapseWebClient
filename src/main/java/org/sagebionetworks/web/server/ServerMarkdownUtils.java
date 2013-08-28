@@ -405,7 +405,7 @@ public class ServerMarkdownUtils {
 						childFound = true;
 						if (matcher.groupCount() == 2) {
 							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
-							sb.append(SharedMarkdownUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
+							sb.append(SharedMarkdownUtils.getWidgetHTML(widgetsFound + suffix, matcher.group(2)));
 							if(matcher.group(2).contains(WidgetConstants.INLINE_WIDGET_KEY)) {
 								inlineWidget = true;
 							}

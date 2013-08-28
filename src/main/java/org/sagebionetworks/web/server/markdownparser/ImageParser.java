@@ -13,37 +13,30 @@ public class ImageParser extends BasicMarkdownElementParser {
 	MarkdownExtractor extractor;
 
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		extractor = new MarkdownExtractor();
 	}
 	
 	private String getCurrentDivID() {
 		return WebConstants.DIV_ID_IMAGE_PREFIX + extractor.getCurrentContainerId() + SharedMarkdownUtils.getPreviewSuffix(isPreview);
 	}
-	
-	private String getNewElementStart() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(extractor.getContainerElementStart() + getCurrentDivID());
-		sb.append("\">");
-		return sb.toString();
-	}
-	
+
 	@Override
-	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
+	public void processLine(MarkdownElements line) {
 		Matcher m = p1.matcher(line.getMarkdown());
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
 			String src = m.group(2);
 			String alt = m.group(1);
-
-			String containerElement = getNewElementStart() + extractor.getContainerElementEnd();
-			m.appendReplacement(sb, containerElement);
 			
 			StringBuilder html = new StringBuilder();
 			html.append("<img src=\"");
 			html.append(src + "\" alt=\"");
 			html.append(alt + "\" />");
 			extractor.putContainerIdToContent(getCurrentDivID(), html.toString());
+			
+			String containerElement = extractor.getNewElementStart(getCurrentDivID()) + extractor.getContainerElementEnd();
+			m.appendReplacement(sb, containerElement);
 		}
 		m.appendTail(sb);
 		line.updateMarkdown(sb.toString());

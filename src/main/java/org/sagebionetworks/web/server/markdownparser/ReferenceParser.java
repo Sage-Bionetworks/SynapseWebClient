@@ -16,15 +16,14 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 	int footnoteNumber;
 	
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		footnotes = new ArrayList<String>();
 		footnoteNumber = 1;
+		parsersOnCompletion = simpleParsers;
 	}
 
 	@Override
-	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
-		parsersOnCompletion = simpleParsers;
-	
+	public void processLine(MarkdownElements line) {
 		String input = line.getMarkdown();
 		Matcher m = p1.matcher(input);
 		StringBuffer sb = new StringBuffer();
@@ -65,7 +64,7 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 			String footnoteId = WebConstants.FOOTNOTE_ID_WIDGET_PREFIX + (i + 1);
 			
 			//Insert the special bookmark-link syntax to link back to the reference
-			footnoteMarkdown.append("[[" + (i + 1) + "]](" + WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":" + targetReferenceId + ")");
+			footnoteMarkdown.append("[[" + (i + 1) + "]](" + WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":" + targetReferenceId + ") ");
 
 			//Assign id to the element so that the reference can link to this footnote
 			footnoteMarkdown.append("<p id=\"" + footnoteId + "\" class=\"inlineWidgetContainer\">" + footnoteText + "</p>");

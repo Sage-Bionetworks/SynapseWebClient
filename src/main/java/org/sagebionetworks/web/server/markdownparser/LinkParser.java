@@ -15,12 +15,19 @@ import com.google.gwt.dev.util.collect.HashMap;
 public class LinkParser extends BasicMarkdownElementParser  {
 	Pattern p1= Pattern.compile(MarkdownRegExConstants.LINK_REGEX, Pattern.DOTALL);
 	Pattern protocol = Pattern.compile(MarkdownRegExConstants.LINK_URL_PROTOCOL, Pattern.DOTALL);
-
 	MarkdownExtractor extractor;
+	MarkdownElementParser widgetParser;
 
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		extractor = new MarkdownExtractor();
+		for(int i = 0; i < simpleParsers.size(); i++) {
+			MarkdownElementParser parser = simpleParsers.get(i);
+			if(parser instanceof SynapseMarkdownWidgetParser) {
+				widgetParser = parser;
+				break;
+			} 
+		}
 	}
 	
 	private String getCurrentDivID() {
@@ -28,7 +35,7 @@ public class LinkParser extends BasicMarkdownElementParser  {
 	}
 
 	@Override
-	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
+	public void processLine(MarkdownElements line) {
 		String input = line.getMarkdown();
 		String bookmarkTarget = WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":";
 		Matcher m = p1.matcher(input);
@@ -54,20 +61,22 @@ public class LinkParser extends BasicMarkdownElementParser  {
 					url = WebConstants.URL_PROTOCOL + url;
 				}
 				
-				updated.append(extractor.getContainerElementStart() + getCurrentDivID());
-				updated.append("\">" + extractor.getContainerElementEnd());
-				
 				StringBuilder html = new StringBuilder();
 				html.append(ServerMarkdownUtils.START_LINK);
 				html.append(url + "\">");
 				html.append(text + ServerMarkdownUtils.END_LINK);
 				extractor.putContainerIdToContent(getCurrentDivID(), html.toString());
+				
+				updated.append(extractor.getContainerElementStart() + getCurrentDivID());
+				updated.append("\">" + extractor.getContainerElementEnd());
 			}
 			//Escape the replacement string for bookmarks' widget syntax
 			m.appendReplacement(sb, Matcher.quoteReplacement(updated.toString()));
 		}
 		m.appendTail(sb);
 		line.updateMarkdown(sb.toString());
+		//Check for new bookmark widget
+		widgetParser.processLine(line);
 	}
 	
 	
