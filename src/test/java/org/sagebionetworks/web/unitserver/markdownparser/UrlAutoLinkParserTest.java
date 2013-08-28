@@ -16,14 +16,14 @@ public class UrlAutoLinkParserTest {
 	@Before
 	public void setup() {
 		parser = new UrlAutoLinkParser();
-		parser.reset();
+		parser.reset(null);
 	}
 	
 	@Test
 	public void testAutoLink() {
 		String line = "Go to this link http://www.example.com";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		String result = elements.getHtml();
 		assertTrue(!result.contains("http://www.example.com"));
 		assertTrue(result.contains(ServerMarkdownUtils.START_CONTAINER));
@@ -31,7 +31,6 @@ public class UrlAutoLinkParserTest {
 
 		Document doc = Jsoup.parse(result);
 		parser.completeParse(doc);
-		System.out.println("Doc: " + doc.html());
 		assertTrue(doc.html().contains("http://www.example.com"));
 		assertTrue(doc.html().contains("<a"));
 		assertTrue(doc.html().contains("</a>"));

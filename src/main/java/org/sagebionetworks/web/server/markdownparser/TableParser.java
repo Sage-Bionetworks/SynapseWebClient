@@ -23,9 +23,10 @@ public class TableParser extends BasicMarkdownElementParser {
 	boolean hasHandledFirstRow;
 	int tableCount;				//Table ID
 	ArrayList<String> firstRowData;	//Stores row/cells data
+	List<MarkdownElementParser> simpleParsers;
 	
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		hasTags = false;
 		shortStyle = false;
 		isInTable = false;
@@ -35,10 +36,11 @@ public class TableParser extends BasicMarkdownElementParser {
 		hasHandledFirstRow = false;
 		tableCount = 0;
 		firstRowData = new ArrayList<String>();
+		this.simpleParsers = simpleParsers;
 	}
 
 	@Override
-	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
+	public void processLine(MarkdownElements line) {
 		String markdown = line.getMarkdown();
 		
 		Matcher startMatcher = start.matcher(markdown);
@@ -63,7 +65,7 @@ public class TableParser extends BasicMarkdownElementParser {
 				builder.append(" " + styles + "\">");
 			}
 		} else if(isTableEnd) {
-			writeEndTable(line, builder, simpleParsers);
+			writeEndTable(line, builder);
 		} else {
 			//If we are not in a fenced table, check if this is a normal table
 			if(!hasTags) { 
@@ -97,7 +99,7 @@ public class TableParser extends BasicMarkdownElementParser {
 				//Not a table line
 				if(!firstRowData.isEmpty()) {
 					//We were creating a table; finish the table		
-					writeEndTable(line, builder, simpleParsers);
+					writeEndTable(line, builder);
 					//Reinsert the original markdown
 					builder.append(line.getMarkdown());
 				} else {
@@ -109,7 +111,7 @@ public class TableParser extends BasicMarkdownElementParser {
 		line.updateMarkdown(builder.toString());
 	}
 	
-	private void writeEndTable(MarkdownElements line, StringBuilder builder, List<MarkdownElementParser> simpleParsers) {	
+	private void writeEndTable(MarkdownElements line, StringBuilder builder) {	
 		if(!hasHandledFirstRow) {
 			//The first row must not be a header because no border syntax was found before the end of the table
 			//Parse the row and prepend

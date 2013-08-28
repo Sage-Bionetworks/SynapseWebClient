@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 
 /**
@@ -200,6 +201,12 @@ public class MarkdownRegExConstants {
 	 * ^sup^ is a superscript
 	 */
 	public static final String SUPERSCRIPT_REGEX = "(\\^)(?=\\S*)(.+?)(?<=\\S*)(\\^)";
+	
+	/**
+	 * Recognizes example input:
+	 * ${contentType?widgetParams=values}
+	 */
+	public static final String SYNAPSE_MARKDOWN_WIDGET_REGEX = "(" + WidgetConstants.WIDGET_START_MARKDOWN_ESCAPED + "([^\\}]*)" + WidgetConstants.WIDGET_END_MARKDOWN_ESCAPED + ")"; 
 	
 	/**
 	 * Recognizes example input:

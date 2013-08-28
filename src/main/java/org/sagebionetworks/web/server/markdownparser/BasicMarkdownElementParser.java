@@ -12,7 +12,7 @@ public abstract class BasicMarkdownElementParser implements MarkdownElementParse
 	 * Can leave alone if element parser has no state 
 	 */
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 	}
 	
 	/**
@@ -42,7 +42,7 @@ public abstract class BasicMarkdownElementParser implements MarkdownElementParse
 	public boolean isInputSingleLine() {
 		return true;
 	}
-	
+
 	protected String getLineWithoutHTML(String line) {
 		return Jsoup.parse(line).text();
 	}
@@ -62,7 +62,7 @@ public abstract class BasicMarkdownElementParser implements MarkdownElementParse
 	public String runSimpleParsers(String line, List<MarkdownElementParser> simpleParsers) {
 		MarkdownElements elements = new MarkdownElements(line);
 		for (MarkdownElementParser parser : simpleParsers) {
-			parser.processLine(elements, simpleParsers);
+			parser.processLine(elements);
 		}
 		return elements.getHtml();
 	}

@@ -21,14 +21,14 @@ public class MathParserTest {
 	@Before
 	public void setup(){
 		parser = new MathParser();
-		parser.reset();
+		parser.reset(null);
 	}
 	
 	@Test
 	public void testMathBlock(){
 		String line = "$$";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		String result = elements.getHtml();
 		assertTrue(result.contains(ServerMarkdownUtils.START_CONTAINER));
 		assertFalse(result.contains(ServerMarkdownUtils.END_CONTAINER));
@@ -38,7 +38,7 @@ public class MathParserTest {
 		//feed test equation
 		for (String l : testEquation.split("\n")) {
 			elements = new MarkdownElements(l);
-			parser.processLine(elements, null);
+			parser.processLine(elements);
 			result = elements.getHtml();
 			assertFalse(result.contains(ServerMarkdownUtils.START_CONTAINER));
 			assertTrue(result.contains(l));
@@ -49,7 +49,7 @@ public class MathParserTest {
 		//last line
 		line =  "$$";
 		elements = new MarkdownElements(line);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		result = elements.getHtml();
 		assertFalse(result.contains(ServerMarkdownUtils.START_CONTAINER));
 		assertTrue(result.contains(ServerMarkdownUtils.END_CONTAINER));
@@ -61,7 +61,7 @@ public class MathParserTest {
 		String equation = "\\[\\left( \\sum_{k=1}^n a_k b_k \\right)^2 \\leq \\left( \\sum_{k=1}^n a_k^2 \\right) \\left( \\sum_{k=1}^n b_k^2 \\right)\\]";
 		String line = "Contains this inline math $"+equation+"$ equation";
 		MarkdownElements elements = new MarkdownElements(line);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		String result = elements.getHtml();
 		//should contain both start and end.  It will not contain the equation (protected from other parsers)
 		assertTrue(result.contains(ServerMarkdownUtils.START_CONTAINER));

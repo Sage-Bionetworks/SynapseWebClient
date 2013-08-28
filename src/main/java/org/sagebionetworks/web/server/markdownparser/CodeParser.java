@@ -11,13 +11,13 @@ public class CodeParser extends BasicMarkdownElementParser  {
 	
 	
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		isInCodeBlock = false;
 		isFirstCodeLine = false;
 	}
 
 	@Override
-	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
+	public void processLine(MarkdownElements line) {
 		Matcher m = p.matcher(line.getMarkdown());
 		if (m.matches()) {
 			if (!isInCodeBlock) {

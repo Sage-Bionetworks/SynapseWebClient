@@ -8,29 +8,28 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.server.SynapseMarkdownProcessor;
+
 import org.sagebionetworks.web.server.markdownparser.LinkParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.ReferenceParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
-import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.server.markdownparser.SynapseMarkdownWidgetParser;
 
 public class ReferenceParserTest {
-	SynapseMarkdownProcessor processor; 
 	ReferenceParser parser;
 	List<MarkdownElementParser> simpleParsers;
 	
 	@Before
 	public void setup(){
-		parser = new ReferenceParser();
-		parser.reset();
-		
-		LinkParser linkParser = new LinkParser();
-		linkParser.reset();
-		processor = SynapseMarkdownProcessor.getInstance();
+		SynapseMarkdownWidgetParser widgetParser = new SynapseMarkdownWidgetParser();
+		widgetParser.reset(null);
 		simpleParsers = new ArrayList<MarkdownElementParser>();
-		simpleParsers.add(linkParser);
+		simpleParsers.add(widgetParser);		
+		LinkParser linkParser = new LinkParser();
+		linkParser.reset(simpleParsers);
+		simpleParsers.add(linkParser);	
+		parser = new ReferenceParser();
+		parser.reset(simpleParsers);
 	}
 	
 	@Test
@@ -41,9 +40,9 @@ public class ReferenceParserTest {
 		MarkdownElements elements = new MarkdownElements(text);
 		MarkdownElements elements2 = new MarkdownElements(text2);
 		StringBuilder output = new StringBuilder();
-		parser.processLine(elements, simpleParsers);
+		parser.processLine(elements);
 		output.append(elements.getHtml());
-		parser.processLine(elements2, simpleParsers);
+		parser.processLine(elements2);
 		output.append(elements2.getHtml());
 		String result = output.toString();
 		assertTrue(result.contains("${reference?inlineWidget=true&text=Smith John%2E Cooking book%2E August 2 2013&footnoteId=1}."));
@@ -60,11 +59,11 @@ public class ReferenceParserTest {
 		String text = "The statement was from here ${reference?text=So et al%2E %5BYahoo%5D%28http%3A%2F%2Fwww%2Eyahoo%2Ecom%29%2E July 2013&inlineWidget=true}.";
 		MarkdownElements elements = new MarkdownElements(text);
 		StringBuilder output = new StringBuilder();
-		parser.processLine(elements, simpleParsers);
+		parser.processLine(elements);
 		output.append(elements.getHtml());
 		
 		elements = new MarkdownElements("");
-		parser.processLine(elements, simpleParsers);
+		parser.processLine(elements);
 		output.append(elements.getHtml());
 		parser.completeParse(output);
 		
