@@ -100,13 +100,13 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * Column 1 | Column 2 | Column 3
 	 */
-	public static final String TABLE_REGEX = ".*[|]{1}.+[|]{1}.*";
+	public static final String TABLE_REGEX = "(.+[|]{1}.*)+";
 
 	/**
 	 * Recognized example input:
 	 * - , --, ---, -:, :-. -:- etc.
 	 */
-	public static final String TABLE_HEADER_BORDER_REGEX = "[\\s-:|]*[|]{1}[\\s-:|]+[|]{1}[\\s-:|]*";
+	public static final String TABLE_HEADER_BORDER_REGEX = "([\\s-:|]+[|]{1}[\\s-:|]*)+";
 
 	/**
 	 * Recognized example input:
