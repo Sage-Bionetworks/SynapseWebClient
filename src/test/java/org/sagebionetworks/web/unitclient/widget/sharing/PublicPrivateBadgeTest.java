@@ -39,6 +39,7 @@ public class PublicPrivateBadgeTest {
 	
 	private static final Long TEST_PUBLIC_PRINCIPAL_ID = 789l;
 	private static final Long TEST_AUTHENTICATED_PRINCIPAL_ID = 123l;
+	private static final Long TEST_ANONYMOUS_PRINCIPAL_ID = 422l;
 
 	PublicPrivateBadge publicPrivateBadge;
 	PublicPrivateBadgeView mockView;
@@ -67,7 +68,7 @@ public class PublicPrivateBadgeTest {
 		acl.setResourceAccess(resourceAccessSet);
 		testEntity = new FileEntity();
 		testEntity.setId("syn12345");
-		publicPrincipalIds=new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID);
+		publicPrincipalIds=new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(AccessControlList.class))).thenReturn(acl);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(new EntityBundleTransport()).when(mockSynapseClient).getEntityBundle(anyString(),  anyInt(),  any(AsyncCallback.class));
@@ -117,12 +118,25 @@ public class PublicPrivateBadgeTest {
 		resourceAccessSet.add(ra);
 		assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
 		
+		ra = new ResourceAccess();
+		ra.setPrincipalId(TEST_ANONYMOUS_PRINCIPAL_ID);
+		resourceAccessSet.add(ra);
+		assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+		
 		//add only the other public group, and verify public
 		resourceAccessSet.clear();
 		ra = new ResourceAccess();
 		ra.setPrincipalId(TEST_PUBLIC_PRINCIPAL_ID);
 		resourceAccessSet.add(ra);
 		assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+		
+		//add only the other public group, and verify public
+		resourceAccessSet.clear();
+		ra = new ResourceAccess();
+		ra.setPrincipalId(TEST_ANONYMOUS_PRINCIPAL_ID);
+		resourceAccessSet.add(ra);
+		assertTrue(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
+
 	}
 	
 	

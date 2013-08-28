@@ -2,7 +2,6 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 import net.oauth.OAuthException;
@@ -16,6 +15,8 @@ import org.sagebionetworks.client.exceptions.SynapseTermsOfUseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
@@ -48,7 +49,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	public static final long serialVersionUID = 498269726L;
 
 	private static Logger logger = Logger.getLogger(UserAccountServiceImpl.class.getName());
-			
+	private static PublicPrincipalIds publicPrincipalIds = null;
 	/**
 	 * The template is injected with Gin
 	 */
@@ -598,29 +599,41 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	
 	@Override
 	public PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds() {
-		validateService();
-		Synapse synapseClient = createSynapseClient();
-		return getPublicAndAuthenticatedPrincipalIds(synapseClient);		
+		if (publicPrincipalIds == null) {
+			try {
+				validateService();
+				Synapse synapseClient = createSynapseClient();
+				Synapse anonymousClient = createAnonymousSynapseClient();
+				UserProfile anonymousProfile = anonymousClient.getMyProfile();
+				String anonymousPrincipalId = anonymousProfile.getOwnerId();
+				initPublicAndAuthenticatedPrincipalIds(synapseClient, anonymousPrincipalId);
+			} catch (Exception e) {
+				throw new RestClientException(e.getMessage());
+			}
+		}
+		return publicPrincipalIds;
 	}
 	
-	public static PublicPrincipalIds getPublicAndAuthenticatedPrincipalIds(Synapse synapseClient) {
-		PublicPrincipalIds returnValue = new PublicPrincipalIds();
+	public static void initPublicAndAuthenticatedPrincipalIds(Synapse synapseClient, String anonymousPrincipalId) {
 		try {
+			//TODO:  change to synapseClient.getUserGroupHeadersByPrefix() after exposure?
+			PublicPrincipalIds results = new PublicPrincipalIds();
+			results.setAnonymousUserId(Long.parseLong(anonymousPrincipalId));
 			PaginatedResults<UserGroup> allGroups = synapseClient.getGroups(0, Integer.MAX_VALUE);
 			
-			for (Iterator iterator = allGroups.getResults().iterator(); iterator.hasNext();) {
-				UserGroup userGroup = (UserGroup) iterator.next();
+			for (UserGroup userGroup : allGroups.getResults()) {
 				if (userGroup.getName() != null){
 					if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.PUBLIC.name()))
-						returnValue.setPublicAclPrincipalId(Long.parseLong(userGroup.getId()));
+						results.setPublicAclPrincipalId(Long.parseLong(userGroup.getId()));
 					else if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.AUTHENTICATED_USERS.name()))
-						returnValue.setAuthenticatedAclPrincipalId(Long.parseLong(userGroup.getId()));
+						results.setAuthenticatedAclPrincipalId(Long.parseLong(userGroup.getId()));
 				}
 			}
+			
+			publicPrincipalIds = results;
 		} catch (Exception e) {
 			throw new RestClientException(e.getMessage());
 		}
-		return returnValue;	
 	}
 	
 	/**
@@ -638,6 +651,14 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			sessionToken = tokenProvider.getSessionToken();
 		}
 		synapseClient.setSessionToken(sessionToken);
+		synapseClient.setRepositoryEndpoint(urlProvider
+				.getRepositoryServiceUrl());
+		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
+		return synapseClient;
+	}
+	
+	private Synapse createAnonymousSynapseClient() {
+		Synapse synapseClient = synapseProvider.createNewClient();
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -33,8 +34,8 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	public void addAclEntry(AclEntry entry);
 	
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
-	public void setPublicPrincipalId(Long id);
-	public void setAuthenticatedPrincipalId(Long id);
+	public void setPublicPrincipalIds(PublicPrincipalIds publicPrincipalIds);
+	
 	
 	/**
 	 * Set the view to a loading state while async loads

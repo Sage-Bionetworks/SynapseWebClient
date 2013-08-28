@@ -131,8 +131,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	private void initViewPrincipalIds(){
 		if (publicPrincipalIds != null) {
-			view.setPublicPrincipalId(publicPrincipalIds.getPublicAclPrincipalId());
-			view.setAuthenticatedPrincipalId(publicPrincipalIds.getAuthenticatedAclPrincipalId());	
+			view.setPublicPrincipalIds(publicPrincipalIds);
 		}
 	}
 	
@@ -217,6 +216,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				toRemove.add(publicPrincipalIds.getAuthenticatedAclPrincipalId());
 			} else if (publicPrincipalIds.getPublicAclPrincipalId().equals(ra.getPrincipalId())) {
 				toRemove.add(publicPrincipalIds.getPublicAclPrincipalId());
+			} else if (publicPrincipalIds.getAnonymousUserPrincipalId().equals(ra.getPrincipalId())) {
+				toRemove.add(publicPrincipalIds.getAnonymousUserPrincipalId());
 			}
 		}
 		for (Long id : toRemove) {

@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -84,7 +85,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private ListStore<PermissionsTableEntry> permissionsStore;
 	private ColumnModel columnModel;
-	private Long publicPrincipalId, authenticatedPrincipalId;
+	private PublicPrincipalIds publicPrincipalIds;
 	private Boolean isPubliclyVisible;
 	private Button publicButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
@@ -137,13 +138,10 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 	
 	@Override
-	public void setPublicPrincipalId(Long id) {
-		publicPrincipalId = id;
+	public void setPublicPrincipalIds(PublicPrincipalIds publicPrincipalIds) {
+		this.publicPrincipalIds = publicPrincipalIds;
 	}
-	@Override
-	public void setAuthenticatedPrincipalId(Long id) {
-		authenticatedPrincipalId = id;
-	}
+	
 	@Override
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible) {
 		this.isPubliclyVisible = isPubliclyVisible;
@@ -171,7 +169,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		permissionsStore = new ListStore<PermissionsTableEntry>();
 		permissionsGrid = AccessControlListEditorViewImpl.createPermissionsGrid(
 				permissionsStore, 
-				AccessControlListEditorViewImpl.createPeopleRenderer(publicPrincipalId, authenticatedPrincipalId, synapseJSNIUtils, iconsImageBundle), 
+				AccessControlListEditorViewImpl.createPeopleRenderer(publicPrincipalIds, synapseJSNIUtils, iconsImageBundle), 
 				createButtonRenderer(), 
 				AccessControlListEditorViewImpl.createRemoveRenderer(iconsImageBundle, new CallbackP<Long>() {
 					@Override
@@ -228,7 +226,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			fieldSet.setWidth(FIELD_WIDTH);
 			
 			// user/group combobox
-			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalId, authenticatedPrincipalId);
+			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalIds);
 			peopleCombo.setEmptyText("Enter a user or group name...");
 			peopleCombo.setFieldLabel("User/Group");
 			peopleCombo.setForceSelection(true);
@@ -284,8 +282,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 						presenter.makePrivate();
 					}
 					else {
-						if (publicPrincipalId != null) {
-							presenter.setAccess(publicPrincipalId, PermissionLevel.CAN_VIEW);
+						if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
+							presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
 						}
 					}
 					
@@ -446,8 +444,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 
 	public static GridCellRenderer<PermissionsTableEntry> createPeopleRenderer(
-			final Long publicPrincipalId, 
-			final Long authenticatedPrincipalId, 
+			final PublicPrincipalIds publicPrincipalIds, 
 			final SynapseJSNIUtils synapseJSNIUtils,
 			final IconsImageBundle iconsImageBundle) {
 		GridCellRenderer<PermissionsTableEntry> personRenderer = new GridCellRenderer<PermissionsTableEntry>() {
@@ -458,16 +455,24 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					Grid<PermissionsTableEntry> grid) {
 				PermissionsTableEntry entry = store.getAt(rowIndex);
 				UserGroupHeader principal = entry.getAclEntry().getPrincipal();
-				String principalHtml;
-				boolean isThePublicGroup = principal != null && publicPrincipalId != null && principal.getOwnerId().equals(publicPrincipalId.toString());
-				boolean isTheAuthenticatedUsersGroup = principal != null && authenticatedPrincipalId != null && principal.getOwnerId().equals(authenticatedPrincipalId.toString());
+				String principalHtml = "";
+				Long publicPrincipalId = publicPrincipalIds.getPublicAclPrincipalId();
+				Long authenticatedPrincipalId = publicPrincipalIds.getAuthenticatedAclPrincipalId();
+				Long anonymousUserPrincipalId = publicPrincipalIds.getAnonymousUserPrincipalId();
 				
-				if (isThePublicGroup)
-					principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.PUBLIC_ACL_TITLE, DisplayConstants.PUBLIC_ACL_DESCRIPTION);
-				else if (isTheAuthenticatedUsersGroup)
-					principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.AUTHENTICATED_USERS_ACL_TITLE, DisplayConstants.AUTHENTICATED_USERS_ACL_DESCRIPTION);
-				else
-					principalHtml = DisplayUtils.getUserNameEmailHtml(principal);
+				if (principal != null) {
+					if (publicPrincipalId != null && principal.getOwnerId().equals(publicPrincipalId.toString())) {
+						//is public group
+						principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.PUBLIC_ACL_TITLE, DisplayConstants.PUBLIC_ACL_DESCRIPTION);
+					} else if (authenticatedPrincipalId != null && principal.getOwnerId().equals(authenticatedPrincipalId.toString())) {
+						//is authenticated group
+						principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.AUTHENTICATED_USERS_ACL_TITLE, DisplayConstants.AUTHENTICATED_USERS_ACL_DESCRIPTION);	
+					} else if (anonymousUserPrincipalId != null && principal.getOwnerId().equals(anonymousUserPrincipalId.toString())) {
+						//is anonymous user
+						principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.PUBLIC_USER_ACL_TITLE, DisplayConstants.PUBLIC_USER_ACL_DESCRIPTION);
+					} else
+						principalHtml = DisplayUtils.getUserNameEmailHtml(principal);
+				}
 				
 				String iconHtml = "";
 				if (principal.getPic() != null) {

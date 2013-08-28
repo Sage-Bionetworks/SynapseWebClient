@@ -77,11 +77,8 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	public static boolean isPublic(AccessControlList acl, PublicPrincipalIds publicPrincipalIds) {
 		for (final ResourceAccess ra : acl.getResourceAccess()) {
 			Long pricipalIdLong = ra.getPrincipalId();
-			//if the acl contains public or authenticated, then return true
-			if (pricipalIdLong != null && 
-				(pricipalIdLong.equals(publicPrincipalIds.getPublicAclPrincipalId()) || pricipalIdLong.equals(publicPrincipalIds.getAuthenticatedAclPrincipalId()))) {
+			if (publicPrincipalIds.isPublic(pricipalIdLong))
 				return true;
-			}
 		}
 		return false;
 	}

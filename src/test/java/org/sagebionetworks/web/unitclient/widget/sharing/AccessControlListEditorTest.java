@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -83,6 +82,7 @@ public class AccessControlListEditorTest {
 	private static final long USER2_ID = 4L;
 	private static final Long TEST_PUBLIC_PRINCIPAL_ID = 789l;
 	private static final Long TEST_AUTHENTICATED_PRINCIPAL_ID = 123l;
+	private static final Long TEST_ANONYMOUS_USER_PRINCIPAL_ID = 422l;
 	private static final String OWNER_NAME = "Owner";
 	private static final String ENTITY_ID = "syn101";
 	private static final String INHERITED_ACL_ID = "syn202";
@@ -113,7 +113,7 @@ public class AccessControlListEditorTest {
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(AccessControlListEditorView.class);
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
-		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID,TEST_ANONYMOUS_USER_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
@@ -253,7 +253,7 @@ public class AccessControlListEditorTest {
 		assertEquals("Created ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
-		verify(mockACLEView).setPublicPrincipalId(anyLong());
+		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -296,7 +296,7 @@ public class AccessControlListEditorTest {
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(5)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
-		verify(mockACLEView).setPublicPrincipalId(anyLong());
+		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
 	}
 	
 	@SuppressWarnings("unchecked")

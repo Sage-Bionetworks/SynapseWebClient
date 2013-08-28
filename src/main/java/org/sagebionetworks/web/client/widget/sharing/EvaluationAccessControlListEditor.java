@@ -53,8 +53,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 	private AuthenticationController authenticationController;
 	private boolean unsavedChanges;
 	private boolean unsavedViewChanges;
-	private Long publicAclPrincipalId = null;
-	private Long authenticatedAclPrincipalId = null;
+	private PublicPrincipalIds publicPrincipalIds = null;
 	GlobalApplicationState globalApplicationState;
 	
 	// Entity components
@@ -125,8 +124,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 		return view.asWidget();
 	}
 	private void initViewPrincipalIds(){
-		view.setPublicPrincipalId(publicAclPrincipalId);
-		view.setAuthenticatedPrincipalId(authenticatedAclPrincipalId);
+		view.setPublicPrincipalIds(publicPrincipalIds);
 	}
 	
 	/**
@@ -135,13 +133,12 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 	private void refresh(final AsyncCallback<Void> callback) {
 		if (this.evaluation.getId() == null) throw new IllegalStateException(NULL_EVALUATION_MESSAGE);
 		view.showLoading();
-		if (publicAclPrincipalId == null){
+		if (publicPrincipalIds == null){
 			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<PublicPrincipalIds>() {
 				@Override
 				public void onSuccess(PublicPrincipalIds result) {
 					if (result != null) {
-						publicAclPrincipalId = result.getPublicAclPrincipalId();
-						authenticatedAclPrincipalId = result.getAuthenticatedAclPrincipalId();
+						publicPrincipalIds = result;
 						initViewPrincipalIds();
 					}
 				}
@@ -235,7 +232,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 			boolean isOwner = (ra.getPrincipalId().equals(uep.getOwnerPrincipalId()));
 			if (header != null) {
 				view.addAclEntry(new AclEntry(header, ra.getAccessType(), isOwner));
-				if (pricipalIdLong.equals(authenticatedAclPrincipalId)) {
+				if (pricipalIdLong.equals(publicPrincipalIds.getAuthenticatedAclPrincipalId())) {
 					PermissionLevel level = AclUtils.getPermissionLevel(ra.getAccessType());
 					view.setIsOpenParticipation(PermissionLevel.CAN_PARTICIPATE_EVALUATION.equals(level));
 				}
@@ -279,7 +276,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
 			return;
 		}
-		if (principalId.equals(publicAclPrincipalId))
+		if (principalId.equals(publicPrincipalIds.getPublicAclPrincipalId()))
 			uep.setCanPublicRead(true);
 		
 		ResourceAccess toSet = null;
@@ -311,7 +308,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
 			return;
 		}
-		if (principalIdToRemove.equals(publicAclPrincipalId))
+		if (principalIdToRemove.equals(publicPrincipalIds.getPublicAclPrincipalId()))
 			uep.setCanPublicRead(false);
 		boolean foundUser = false;;
 		Set<ResourceAccess> newRAs = new HashSet<ResourceAccess>();
