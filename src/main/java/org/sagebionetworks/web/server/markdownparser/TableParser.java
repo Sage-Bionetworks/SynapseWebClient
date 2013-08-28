@@ -171,7 +171,7 @@ public class TableParser extends BasicMarkdownElementParser {
 
 	private ArrayList<String> getRowData(String markdown) {
 		ArrayList<String> rowData = new ArrayList<String>();
-		String[] cells = markdown.split("\\|");
+		String[] cells = splitRow(markdown);
 		for (int j = 0; j < cells.length; j++) {
 			rowData.add(cells[j]);
 		}
@@ -179,7 +179,7 @@ public class TableParser extends BasicMarkdownElementParser {
 	}
 	
 	private void createTableRow(StringBuilder builder, String markdown) {
-		String[] cells = markdown.split("\\|");
+		String[] cells = splitRow(markdown);
 		builder.append("<tr>");
 		for (int j = 0; j < cells.length; j++) {
 			builder.append("<td>");
@@ -187,6 +187,11 @@ public class TableParser extends BasicMarkdownElementParser {
 			builder.append("</td>");
 		}
 		builder.append("</tr>\n");
+	}
+	
+	private String[] splitRow(String row) {
+		//remove any leading pipe and split
+		return row.replaceFirst("^\\|", "").split("\\|");
 	}
 	
 	private boolean isHeaderBorder(String markdown) {
