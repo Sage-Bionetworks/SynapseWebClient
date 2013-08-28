@@ -223,10 +223,13 @@ public class UserAccountServiceImplTest {
 		results.setResults(allGroups);
 		
 		when(mockSynapse.getGroups(anyInt(),anyInt())).thenReturn(results);
-		PublicPrincipalIds actualResult = UserAccountServiceImpl.getPublicAndAuthenticatedPrincipalIds(mockSynapse);
+		String anonymousUserId = "987";
+		UserAccountServiceImpl.initPublicAndAuthenticatedPrincipalIds(mockSynapse, anonymousUserId);
+		PublicPrincipalIds actualResult = UserAccountServiceImpl.publicPrincipalIds;
 		PublicPrincipalIds expectedResult = new PublicPrincipalIds();
 		expectedResult.setPublicAclPrincipalId(Long.parseLong(publicGroupId));
 		expectedResult.setAuthenticatedAclPrincipalId(Long.parseLong(authGroupId));
+		expectedResult.setAnonymousUserId(Long.parseLong(anonymousUserId));
 		Assert.assertEquals(expectedResult, actualResult);
 	}
 	

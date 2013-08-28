@@ -49,7 +49,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	public static final long serialVersionUID = 498269726L;
 
 	private static Logger logger = Logger.getLogger(UserAccountServiceImpl.class.getName());
-	private static PublicPrincipalIds publicPrincipalIds = null;
+	public static PublicPrincipalIds publicPrincipalIds = null;
 	/**
 	 * The template is injected with Gin
 	 */
