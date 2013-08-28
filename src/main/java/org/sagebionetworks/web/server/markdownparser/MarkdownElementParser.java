@@ -55,11 +55,5 @@ public interface MarkdownElementParser {
 	 */
 	boolean isInputSingleLine();
 	
-	/**
-	 * True if it is the special parser that protects widget syntax
-	 * @return
-	 */
-	boolean isSynapseMarkdownWidgetParser();
-	
 	void setIsPreview(boolean isPreview);
 }

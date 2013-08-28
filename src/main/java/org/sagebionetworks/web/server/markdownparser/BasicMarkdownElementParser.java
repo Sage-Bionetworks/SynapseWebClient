@@ -42,12 +42,7 @@ public abstract class BasicMarkdownElementParser implements MarkdownElementParse
 	public boolean isInputSingleLine() {
 		return true;
 	}
-	
-	@Override
-	public boolean isSynapseMarkdownWidgetParser() {
-		return false;
-	}
-	
+
 	protected String getLineWithoutHTML(String line) {
 		return Jsoup.parse(line).text();
 	}

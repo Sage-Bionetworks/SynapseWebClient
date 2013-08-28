@@ -102,10 +102,5 @@ public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
 			}	
 		}
 	}
-	
-	@Override
-	public boolean isSynapseMarkdownWidgetParser() {
-		return true;
-	}
 
 }

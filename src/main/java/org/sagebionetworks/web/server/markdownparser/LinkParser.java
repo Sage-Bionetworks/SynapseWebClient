@@ -22,8 +22,9 @@ public class LinkParser extends BasicMarkdownElementParser  {
 	public void reset(List<MarkdownElementParser> simpleParsers) {
 		extractor = new MarkdownExtractor();
 		for(int i = 0; i < simpleParsers.size(); i++) {
-			if(simpleParsers.get(i).isSynapseMarkdownWidgetParser()) {
-				widgetParser = simpleParsers.get(i);
+			MarkdownElementParser parser = simpleParsers.get(i);
+			if(parser instanceof SynapseMarkdownWidgetParser) {
+				widgetParser = parser;
 				break;
 			} 
 		}
