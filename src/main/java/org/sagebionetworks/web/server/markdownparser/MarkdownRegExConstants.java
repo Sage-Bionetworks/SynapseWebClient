@@ -106,8 +106,8 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * - , --, ---, -:, :-. -:- etc.
 	 */
-	public static final String TABLE_HEADER_BORDER_REGEX = "[\\s-:]+";
-	
+	public static final String TABLE_HEADER_BORDER_REGEX = "[\\s-:|]*[|]{1}[\\s-:|]+[|]{1}[\\s-:|]*";
+
 	/**
 	 * Recognized example input:
 	 * {| class="border"
