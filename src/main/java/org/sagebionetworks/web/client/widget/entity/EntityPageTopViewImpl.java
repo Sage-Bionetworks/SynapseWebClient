@@ -444,7 +444,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
 			addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 			fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true, canEdit));
-			threeCol.add(createEvaluationAdminList(bundle, null));
+			Widget evalAdminPanel = createEvaluationAdminList(bundle, null);
+			evalAdminPanel.addStyleName("span-7 notopmargin");
+			threeCol.add(evalAdminPanel);
 			threeCol.add(createSpacer());
 			fullWidthContainer.add(threeCol, widgetMargin);
 		}
