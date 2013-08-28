@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
+import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
@@ -22,8 +23,10 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -47,7 +50,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	HTMLPanel dataUseContainer;
 	@UiField
-	HTMLPanel sharingContainer;
+	FlowPanel sharingContainer;
 
 	@UiField
 	Image entityIcon;
@@ -69,16 +72,17 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private AccessControlListEditor accessControlListEditor;
+	private PublicPrivateBadge publicPrivateBadge;
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget, DoiWidget doiWidget, AccessControlListEditor accessControlListEditor) {
+			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget, DoiWidget doiWidget, AccessControlListEditor accessControlListEditor, PublicPrivateBadge publicPrivateBadge) {
 		this.icons = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
 		this.doiWidget = doiWidget;
 		this.accessControlListEditor = accessControlListEditor;
-		
+		this.publicPrivateBadge = publicPrivateBadge;
 		initWidget(uiBinder.createAndBindUi(this));
 
 				
@@ -94,7 +98,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		clearmeta();
 		
 		Entity e = bundle.getEntity();
-
+		
 		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
 		synapseIconForEntity.applyTo(entityIcon);
 		
@@ -102,7 +106,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setEntityId(e.getId());
 		
 		sharingContainer.clear();
-		sharingContainer.add(DisplayUtils.getShareSettingsDisplay("<span style=\"margin-right: 5px;\" class=\"boldText\">Sharing:</span>", bundle.getPermissions().getCanPublicRead(), synapseJSNIUtils));
+		Label sharingLabel = new Label("Sharing:");
+		sharingLabel.addStyleName("boldText margin-right-5 inline-block");
+		sharingContainer.add(sharingLabel);
+		sharingContainer.add(publicPrivateBadge.asWidget());
+		publicPrivateBadge.configure(e);
 		if (canAdmin) {
 			Anchor shareSettings = new Anchor(DisplayConstants.MODIFY);
 			shareSettings.addStyleName("inline-block link");

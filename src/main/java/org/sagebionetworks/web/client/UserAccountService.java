@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.security.AuthenticationException;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 
@@ -31,7 +32,7 @@ public interface UserAccountService extends RemoteService {
 	public String getPublicAuthServiceUrl();
 	
 	public String getFastPassSupportUrl() throws RestServiceException;
-	public String getPublicAndAuthenticatedGroupPrincipalIds();
+	public PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds();
 
 	public String getTermsOfUse();
 	

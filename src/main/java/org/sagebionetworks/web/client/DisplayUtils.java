@@ -1607,8 +1607,7 @@ public class DisplayUtils {
 		}
 	}
 
-	public static Widget getShareSettingsDisplay(String prefix, boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
-		if(prefix == null) prefix = "";
+	public static Widget getShareSettingsDisplay(boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
 		final SimplePanel lc = new SimplePanel();
 		lc.addStyleName(STYLE_DISPLAY_INLINE);
 		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
@@ -1616,7 +1615,7 @@ public class DisplayUtils {
 		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
 
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(prefix + "<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
+		shb.appendHtmlConstant("<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
 		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
 
 		//form the html
