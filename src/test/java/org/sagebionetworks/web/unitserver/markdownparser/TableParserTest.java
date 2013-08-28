@@ -98,20 +98,19 @@ public class TableParserTest {
 		String exampleLine2 = "| --: | -- | :-- |";
 		StringBuilder tableOutput = new StringBuilder();
 		MarkdownElements elements = new MarkdownElements(exampleLine1);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements(exampleLine2);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements("");
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		//check for a few items
 		String html = tableOutput.toString();
-		System.out.println(html);
-		assertTrue(html.contains("<tr><th>Row 1 Content Cell 1 </th>"));
+		assertTrue(html.contains("<tr><th> Row 1 Content Cell 1 </th>"));
 		assertFalse(html.contains("--"));
 	}
 	
