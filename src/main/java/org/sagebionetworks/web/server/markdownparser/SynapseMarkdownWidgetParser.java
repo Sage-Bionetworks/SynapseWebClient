@@ -10,7 +10,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
@@ -18,34 +17,41 @@ public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
 	String suffix = SharedMarkdownUtils.getPreviewSuffix(isPreview);
 	MarkdownExtractor extractor;
 	
+	String subpagesWidgetMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
+	String noSubpagesMarkdown = SharedMarkdownUtils.getNoAutoWikiSubpagesMarkdown();
+	boolean seenWikiSubpagesWidget;
+	
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		extractor = new MarkdownExtractor();
+		seenWikiSubpagesWidget = false;
 	}
 	
 	private String getCurrentDivID() {
 		return WebConstants.DIV_ID_WIDGET_SYNTAX_PREFIX + extractor.getCurrentContainerId() + suffix;
 	}
-	
-	private String getNewElementStart() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(extractor.getContainerElementStart() + getCurrentDivID());
-		sb.append("\">");
-		return sb.toString();
-	}
-	
+
 	@Override
-	public void processLine(MarkdownElements line,
-			List<MarkdownElementParser> simpleParsers) {
-		Matcher m = p.matcher(line.getMarkdown());
+	public void processLine(MarkdownElements line) {
+		String markdown = line.getMarkdown();
+		if (!seenWikiSubpagesWidget) {
+			if (markdown.contains(subpagesWidgetMarkdown))
+				seenWikiSubpagesWidget = true;
+			if (markdown.contains(noSubpagesMarkdown)) {
+				seenWikiSubpagesWidget = true;
+				markdown.replace(noSubpagesMarkdown, "");
+			}
+		}
+		
+		Matcher m = p.matcher(markdown);
 		StringBuffer sb = new StringBuffer();
-		while(m.find()) {	
-			String containerElement = getNewElementStart() + extractor.getContainerElementEnd();
-			m.appendReplacement(sb, containerElement);
-			
+		while(m.find()) {				
 			StringBuilder html = new StringBuilder();
 			html.append(m.group(2));
 			extractor.putContainerIdToContent(getCurrentDivID(), html.toString());
+			
+			String containerElement = extractor.getNewElementStart(getCurrentDivID()) + extractor.getContainerElementEnd();
+			m.appendReplacement(sb, containerElement);
 		}
 		m.appendTail(sb);
 		line.updateMarkdown(sb.toString());
@@ -53,16 +59,15 @@ public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
 	
 	@Override
 	public void completeParse(StringBuilder html) {
-		String subpagesWidgetMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
-		//If the wikipages was inserted on completeParse, we need to add it to the map of widgets
-		if(html.substring(0, subpagesWidgetMarkdown.length()).equals(subpagesWidgetMarkdown)) {
-			String containerElement = getNewElementStart() + extractor.getContainerElementEnd();
-			html.replace(0, subpagesWidgetMarkdown.length(), "");
-			html.insert(0, containerElement);
-			
+		if (!seenWikiSubpagesWidget) {	
+			//If wikipages/nowikipages widget is not seen, automatically insert it at the top of the markdown
+			//First add this widget to the map of widgets
 			StringBuilder content = new StringBuilder();
 			content.append(WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE);
 			extractor.putContainerIdToContent(getCurrentDivID(), content.toString());
+			
+			String containerElement = extractor.getNewElementStart(getCurrentDivID()) + extractor.getContainerElementEnd();
+			html.insert(0, containerElement);
 		}
 	}
 	
@@ -94,9 +99,13 @@ public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
 				//Surround with widget holder and appropriate container
 				childNode.wrap(outerContainer.toString()).wrap(widgetHtml);
 				childNode.remove();
-			}
-			
+			}	
 		}
+	}
+	
+	@Override
+	public boolean isSynapseMarkdownWidgetParser() {
+		return true;
 	}
 
 }

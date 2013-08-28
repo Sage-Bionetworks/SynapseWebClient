@@ -24,8 +24,8 @@ public class UnderscoreParserTest {
 		String text = "file\\_number\\_1";
 		MarkdownElements elements = new MarkdownElements(text);
 		//Escape first, then use other parsers
-		parser.processLine(elements, null);
-		italicsParser.processLine(elements, null);
+		parser.processLine(elements);
+		italicsParser.processLine(elements);
 		assertEquals(elements.getHtml(), "file&#95;number&#95;1");
 		assertFalse(elements.getHtml().contains("<em>number</em>"));
 	}

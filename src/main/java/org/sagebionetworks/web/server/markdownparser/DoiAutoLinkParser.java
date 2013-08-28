@@ -1,5 +1,4 @@
 package org.sagebionetworks.web.server.markdownparser;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -7,7 +6,7 @@ public class DoiAutoLinkParser extends BasicMarkdownElementParser {
 	Pattern p = Pattern.compile(MarkdownRegExConstants.LINK_DOI);
 	
 	@Override
-	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
+	public void processLine(MarkdownElements line) {
 		Matcher m = p.matcher(line.getMarkdown());
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {

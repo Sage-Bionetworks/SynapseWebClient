@@ -19,7 +19,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 	boolean isInMathBlock, isFirstMathLine;
 	
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		isInMathBlock = false;
 		isFirstMathLine = false;
 		extractor = new MarkdownExtractor();
@@ -29,15 +29,8 @@ public class MathParser extends BasicMarkdownElementParser  {
 		return WebConstants.DIV_ID_MATHJAX_PREFIX + extractor.getCurrentContainerId() + SharedMarkdownUtils.getPreviewSuffix(isPreview);
 	}
 	
-	private String getNewMathElementStart() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(extractor.getContainerElementStart() + getCurrentDivID());
-		sb.append("\">");
-		return sb.toString();
-	}
-	
 	@Override
-	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
+	public void processLine(MarkdownElements line) {
 		Matcher m;
 		//math block
 		m = p1.matcher(line.getMarkdown());
@@ -46,7 +39,7 @@ public class MathParser extends BasicMarkdownElementParser  {
 				//starting math block
 				isInMathBlock = true;
 				isFirstMathLine = true;
-				line.prependElement(getNewMathElementStart());
+				line.prependElement(extractor.getNewElementStart(getCurrentDivID()));
 			}
 			else {
 				//ending math block
@@ -77,8 +70,9 @@ public class MathParser extends BasicMarkdownElementParser  {
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {
 			//leave containers to filled in on completeParse()
-			String containerElement = getNewMathElementStart() + extractor.getContainerElementEnd();
 			extractor.putContainerIdToContent(getCurrentDivID(), m.group(2));
+			
+			String containerElement = extractor.getNewElementStart(getCurrentDivID()) + extractor.getContainerElementEnd();
 			m.appendReplacement(sb, containerElement);
 		}
 		m.appendTail(sb);

@@ -4,7 +4,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class SharedMarkdownUtils {
-	public static final int SYNAPSE_MARKDOWN_WIDGET_PARSER_INDEX = 3;
 
 	public static String getWikiSubpagesMarkdown() {
 		return WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN;

@@ -14,6 +14,7 @@ import org.sagebionetworks.web.server.SynapseMarkdownProcessor;
 import org.sagebionetworks.web.server.markdownparser.BoldParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
+import org.sagebionetworks.web.server.markdownparser.SynapseMarkdownWidgetParser;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
 import org.sagebionetworks.web.server.markdownparser.UnderscoreParser;
 
@@ -26,11 +27,13 @@ public class TableParserTest {
 	@Before
 	public void setup(){
 		parser = new TableParser();
-		parser.reset();
 		
 		simpleParsers = new ArrayList<MarkdownElementParser>();
 		simpleParsers.add(new BoldParser());
 		simpleParsers.add(new UnderscoreParser());
+		simpleParsers.add(new SynapseMarkdownWidgetParser());
+		
+		parser.reset(simpleParsers);
 	}
 	
 	@Test
@@ -41,23 +44,23 @@ public class TableParserTest {
 		String end = "|}";
 		StringBuilder tableOutput = new StringBuilder();
 		MarkdownElements elements = new MarkdownElements(start);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements(exampleLine1);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements(exampleLine2);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements(end);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements("");
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		//check for a few items
 		String html = tableOutput.toString();
@@ -73,15 +76,15 @@ public class TableParserTest {
 		String exampleLine2 = "--: | -- | :--";
 		StringBuilder tableOutput = new StringBuilder();
 		MarkdownElements elements = new MarkdownElements(exampleLine1);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements(exampleLine2);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements("");
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		//check for a few items
 		String html = tableOutput.toString();
@@ -94,11 +97,11 @@ public class TableParserTest {
 		String exampleLine1 = "**Row 1 Content Cell 1** | Row\\_Content\\_2  | Row 1 Content Cell 3";
 		StringBuilder tableOutput = new StringBuilder();
 		MarkdownElements elements = new MarkdownElements(exampleLine1);
-		parser.processLine(elements, simpleParsers);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		
 		elements = new MarkdownElements("");
-		parser.processLine(elements, simpleParsers);
+		parser.processLine(elements);
 		tableOutput.append(elements.getHtml());
 		String html = tableOutput.toString();
 		assertTrue(html.contains("<td><strong>Row 1 Content Cell 1</strong> </td>"));

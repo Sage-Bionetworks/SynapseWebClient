@@ -39,7 +39,6 @@ import org.sagebionetworks.web.server.markdownparser.SynapseMarkdownWidgetParser
 import org.sagebionetworks.web.server.markdownparser.TableParser;
 import org.sagebionetworks.web.server.markdownparser.UnderscoreParser;
 import org.sagebionetworks.web.server.markdownparser.UrlAutoLinkParser;
-import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 
 public class SynapseMarkdownProcessor {
 	private static SynapseMarkdownProcessor singleton = null;
@@ -65,7 +64,6 @@ public class SynapseMarkdownProcessor {
 	
 	private void init() {
 		//protect widget syntax
-		allElementParsers.add(new WikiSubpageParser());
 		allElementParsers.add(new ReferenceParser());
 		allElementParsers.add(new BookmarkTargetParser());
 		allElementParsers.add(new SynapseMarkdownWidgetParser());
@@ -156,11 +154,6 @@ public class SynapseMarkdownProcessor {
 	}
 	
 	public String processMarkdown(String markdown, List<MarkdownElementParser> parsers, boolean isPreview) {
-		//first, reset all of the parsers
-		for (MarkdownElementParser parser : parsers) {
-			parser.reset();
-			parser.setIsPreview(isPreview);
-		}
 		//go through the document once, and apply all markdown parsers to it
 		StringBuilder output = new StringBuilder();
 		
@@ -180,6 +173,12 @@ public class SynapseMarkdownProcessor {
 				inactiveComplexParsers.add(parser);
 		}
 		
+		//reset all of the parsers
+		for (MarkdownElementParser parser : parsers) {
+			parser.reset(simpleParsers);
+			parser.setIsPreview(isPreview);
+		}
+		
 		List<String> allLines = new ArrayList<String>();
 		for (String line : markdown.split("\n")) {
 			allLines.add(line);
@@ -189,19 +188,19 @@ public class SynapseMarkdownProcessor {
 			MarkdownElements elements = new MarkdownElements(line);
 			//do parsers we're currently in the middle of
 			for (MarkdownElementParser parser : activeComplexParsers) {
-				parser.processLine(elements, simpleParsers);
+				parser.processLine(elements);
 			}
 			
 			//only give the option to start new multiline element (complex parser) or process simple elements if we're not in a code block (or a math block)
 			if (!codeParser.isInMarkdownElement() && !mathParser.isInMarkdownElement()){
 				//then the inactive multiline parsers
 				for (MarkdownElementParser parser : inactiveComplexParsers) {
-					parser.processLine(elements, simpleParsers);
+					parser.processLine(elements);
 				}
 				
 				//process the simple processors after complex parsers (the complex parsers clean up the markdown)
 				for (MarkdownElementParser parser : simpleParsers) {
-					parser.processLine(elements, simpleParsers);
+					parser.processLine(elements);
 				}
 			}
 				

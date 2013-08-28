@@ -24,13 +24,13 @@ public class ListParserTest {
 	@Before
 	public void setup(){
 		parser = new ListParser();
-		parser.reset();
+		parser.reset(null);
 		
 		codeParser = new CodeParser();
-		codeParser.reset();
+		codeParser.reset(null);
 		
 		headParser = new HeadingParser();
-		headParser.reset();
+		headParser.reset(null);
 	}
 	
 	@Test
@@ -42,12 +42,12 @@ public class ListParserTest {
 		StringBuilder result = new StringBuilder();
 		for (int i = 0; i < lines.length; i++) {
 			MarkdownElements elements = new MarkdownElements(lines[i]);
-			parser.processLine(elements, null);
+			parser.processLine(elements);
 			result.append(elements.getHtml());
 		}
 		//process a final empty line (just like the processor)
 		MarkdownElements elements = new MarkdownElements("");
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		result.append(elements.getHtml());
 		System.out.println("RESULT: " + result.toString());
 		assertEquals("<ol><li><p>First item</p></li><li><p>Second item</p></li></ol>", result.toString());
@@ -61,12 +61,12 @@ public class ListParserTest {
 		StringBuilder result2 = new StringBuilder();
 		for (int i = 0; i < lines2.length; i++) {
 			MarkdownElements elements2 = new MarkdownElements(lines2[i]);
-			parser.processLine(elements2, null);
+			parser.processLine(elements2);
 			result2.append(elements2.getHtml());
 		}
 		//process a final empty line (just like the processor)
 		MarkdownElements extraLine = new MarkdownElements("");
-		parser.processLine(extraLine, null);
+		parser.processLine(extraLine);
 		result2.append(extraLine.getHtml());
 		System.out.println("RESULT: " + result2.toString());
 		assertEquals("<ol><li><p>List item one</p><ol><li><p>bunk</p></li><li><p>bupkis</p></li></ol></li><li><p>Second one</p></li></ol>", result2.toString());
@@ -87,12 +87,12 @@ public class ListParserTest {
 		StringBuilder result = new StringBuilder();
 		for (int i = 0; i < lines.length; i++) {
 			MarkdownElements elements = new MarkdownElements(lines[i]);
-			parser.processLine(elements, null);
+			parser.processLine(elements);
 			result.append(elements.getHtml());
 		}
 		//process a final empty line (just like the processor)
 		MarkdownElements elements = new MarkdownElements("");
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		result.append(elements.getHtml());
 		System.out.println("RESULT: " + result.toString());
 		assertEquals("<ul><li><p>Abacus</p><ul><li><p>answer</p></li></ul></li><li><p>Bubbles</p><ol><li><p>bunk</p></li><li><p>bupkis</p><ul><li><p>BELITTLER</p></li></ul></li><li><p>burper</p></li></ol></li><li><p>Cunning</p></li></ul>", result.toString());
@@ -108,13 +108,13 @@ public class ListParserTest {
 		StringBuilder result = new StringBuilder();
 		for (int i = 0; i < lines.length; i++) {
 			MarkdownElements elements = new MarkdownElements(lines[i]);
-			codeParser.processLine(elements, null);
-			parser.processLine(elements, null);
+			codeParser.processLine(elements);
+			parser.processLine(elements);
 			result.append(elements.getHtml());
 		}
 		//process a final empty line (just like the processor)
 		MarkdownElements elements = new MarkdownElements("");
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		result.append(elements.getHtml());
 		System.out.println("RESULT: " + result.toString());
 		assertEquals("<ul><li><p>First item</p><p>This is another paragraph</p><p>This is another paragraph</p></li></ul>", result.toString());
@@ -134,14 +134,14 @@ public class ListParserTest {
 		StringBuilder result = new StringBuilder();
 		for (int i = 0; i < lines.length; i++) {
 			MarkdownElements elements = new MarkdownElements(lines[i]);
-			parser.processLine(elements, null);
-			codeParser.processLine(elements, null);
+			parser.processLine(elements);
+			codeParser.processLine(elements);
 			result.append(elements.getHtml());
 
 		}
 		//process a final empty line (just like the processor)
 		MarkdownElements elements = new MarkdownElements("");
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		result.append(elements.getHtml());
 		System.out.println("RESULT: " + result.toString());
 		assertTrue(result.toString().contains("<ul><li><p>First item</p><pre><code class=\""+ServerMarkdownUtils.DEFAULT_CODE_CSS_CLASS+"\">sudo apt-get install git"));
@@ -159,13 +159,13 @@ public class ListParserTest {
 		StringBuilder result = new StringBuilder();
 		for (int i = 0; i < lines.length; i++) {
 			MarkdownElements elements = new MarkdownElements(lines[i]);
-			parser.processLine(elements, null);
-			headParser.processLine(elements, null);
+			parser.processLine(elements);
+			headParser.processLine(elements);
 			result.append(elements.getHtml());
 		}
 		//process a final empty line (just like the processor)
 		MarkdownElements elements = new MarkdownElements("");
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		result.append(elements.getHtml());
 		System.out.println("RESULT: " + result.toString());
 		assertEquals("<ol><li><p><h4>Heading1</h4></p><ol><li><p><h4>Heading2</h4></p></li></ol></li></ol>", result.toString());

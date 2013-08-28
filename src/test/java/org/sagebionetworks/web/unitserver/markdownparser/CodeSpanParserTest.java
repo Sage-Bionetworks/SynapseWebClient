@@ -16,14 +16,14 @@ public class CodeSpanParserTest {
 	@Before
 	public void setup(){
 		parser = new CodeSpanParser();
-		parser.reset();
+		parser.reset(null);
 	}
 	
 	@Test
 	public void testCodeSpan(){
 		String text = "a basic `code span` test";
 		MarkdownElements elements = new MarkdownElements(text);
-		parser.processLine(elements, null);
+		parser.processLine(elements);
 		String result = elements.getHtml();
 		assertTrue(!result.contains("<code>code span</code>"));
 		assertTrue(result.contains(ServerMarkdownUtils.START_CONTAINER));

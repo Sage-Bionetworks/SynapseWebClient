@@ -16,15 +16,14 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 	int footnoteNumber;
 	
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		footnotes = new ArrayList<String>();
 		footnoteNumber = 1;
+		parsersOnCompletion = simpleParsers;
 	}
 
 	@Override
-	public void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers) {
-		parsersOnCompletion = simpleParsers;
-	
+	public void processLine(MarkdownElements line) {
 		String input = line.getMarkdown();
 		Matcher m = p1.matcher(input);
 		StringBuffer sb = new StringBuffer();

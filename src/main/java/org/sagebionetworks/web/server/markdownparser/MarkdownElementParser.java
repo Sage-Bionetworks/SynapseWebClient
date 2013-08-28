@@ -14,16 +14,16 @@ public interface MarkdownElementParser {
 	
 	/**
 	 * Called before document processing begins.  State should be cleared.
+	 * @param simpleParsers TODO
 	 */
-	void reset();
+	void reset(List<MarkdownElementParser> simpleParsers);
 
 	/**
 	 * Called on every line of the markdown document.
 	 * @param line
-	 * @param simpleParsers TODO
 	 * @return
 	 */
-	void processLine(MarkdownElements line, List<MarkdownElementParser> simpleParsers);
+	void processLine(MarkdownElements line);
 	
 	/**
 	 * If there are any final modifications to the output html that the parser needs to make, it should perform it here (efficiently)
@@ -54,6 +54,12 @@ public interface MarkdownElementParser {
 	 * @return
 	 */
 	boolean isInputSingleLine();
+	
+	/**
+	 * True if it is the special parser that protects widget syntax
+	 * @return
+	 */
+	boolean isSynapseMarkdownWidgetParser();
 	
 	void setIsPreview(boolean isPreview);
 }
