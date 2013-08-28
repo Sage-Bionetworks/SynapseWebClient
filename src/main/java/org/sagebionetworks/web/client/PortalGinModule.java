@@ -66,6 +66,9 @@ import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListViewImpl;
+import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
+import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetView;
+import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
@@ -95,9 +98,6 @@ import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
-import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetView;
-import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardView;
@@ -210,6 +210,8 @@ import org.sagebionetworks.web.client.widget.sharing.AccessMenuButtonView;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButtonViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorViewImpl;
+import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
+import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
@@ -577,6 +579,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TutorialWizardView.class).to(TutorialWizardViewImpl.class);
 		
 		bind(CytoscapeWidgetView.class).to(CytoscapeWidgetViewImpl.class);
+		
+		bind(PublicPrivateBadgeView.class).to(PublicPrivateBadgeViewImpl.class);
 
 	}
 

@@ -18,7 +18,7 @@
 				<g:HTMLPanel ui:field="dataUseContainer" ></g:HTMLPanel>
 			</div>			
 			<div class="span-17 notopmargin">
-				<g:HTMLPanel ui:field="sharingContainer" ></g:HTMLPanel>
+				<g:FlowPanel ui:field="sharingContainer" ></g:FlowPanel>
 			</div>
 			<div class="span-17 notopmargin">
 				<g:SimplePanel ui:field="doiPanel"/>

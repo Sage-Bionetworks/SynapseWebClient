@@ -82,7 +82,9 @@ public class DisplayConstants {
 	public static final String BUTTON_REVOKE_OPEN_PARTICIPATION_TOOLTIP = "Click to restrict participation to only those people you select above";
 	
 	public static final String PUBLIC_ACL_TITLE = "Public on the web";
-	public static final String PUBLIC_ACL_DESCRIPTION = "Anyone on the internet can access, no login required";
+	public static final String PUBLIC_USER_ACL_TITLE = "Public user on the web";
+	public static final String PUBLIC_ACL_DESCRIPTION = "Anyone on the internet can access";
+	public static final String PUBLIC_USER_ACL_DESCRIPTION = "Any anonymous user on the internet can access";
 	public static final String PUBLIC_ACL_ENTITY_PAGE = "Public";
 	public static final String PRIVATE_ACL_ENTITY_PAGE = "Private";
 	public static final String PRIVATE_ACL_DESCRIPTION = "Restricted to those people selected in the Share Settings window";
