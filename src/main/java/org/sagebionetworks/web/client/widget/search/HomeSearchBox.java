@@ -10,10 +10,15 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -22,17 +27,17 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 	private HomeSearchBoxView view;
 	private GlobalApplicationState globalApplicationState;
 	private JSONObjectAdapter jsonObjectAdapter;
-	
+	private SynapseClientAsync synapseClient;
 	private boolean searchAll = false;
 	
 	@Inject
 	public HomeSearchBox(HomeSearchBoxView view, 
 			GlobalApplicationState globalApplicationState,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter, SynapseClientAsync synapseClient) {
 		this.view = view;		
 		this.globalApplicationState = globalApplicationState;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		
+		this.synapseClient = synapseClient;
 		view.setPresenter(this);
 	}	
 	
@@ -58,7 +63,32 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 				// if fail, fall back on regular search
 			}
 		}
-		globalApplicationState.getPlaceChanger().goTo(new Search(value));
+		searchForTerm(value, globalApplicationState, synapseClient);
+	}
+	
+	public static void searchForTerm(String queryTerm, final GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient) {
+		final Synapse synapsePlace = SearchUtil.willRedirect(queryTerm);
+		final Search searchPlace = new Search(queryTerm);
+		if (synapsePlace == null) {
+			//no potential redirect, go directly to search!
+			globalApplicationState.getPlaceChanger().goTo(searchPlace);	
+		} else {
+			//looks like a redirect.  let's validate before going there.
+			synapseClient.getEntity(queryTerm, new AsyncCallback<EntityWrapper>() {
+				
+				@Override
+				public void onSuccess(EntityWrapper result) {
+					//any success then go to entity page
+					globalApplicationState.getPlaceChanger().goTo(synapsePlace);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					//any failure then go to search
+					globalApplicationState.getPlaceChanger().goTo(searchPlace);
+				}
+			});
+		}
 	}
 
 	@Override
