@@ -6,8 +6,10 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -28,6 +30,7 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 	private Entity entity;
 	private EntityTypeProvider entityTypeProvider;
 	private AdapterFactory adapterFactory;
+	private SynapseClientAsync synapseClient;
 	private boolean searchAll = false;
 	
 	@Inject
@@ -36,13 +39,15 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			GlobalApplicationState globalApplicationState,
-			AdapterFactory adapterFactory) {
+			AdapterFactory adapterFactory,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
 		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;
+		this.synapseClient = synapseClient;
 		view.setPresenter(this);
 	}	
 	
@@ -68,7 +73,7 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 				// if fail, fall back on regular search
 			}
 		}
-		globalApplicationState.getPlaceChanger().goTo(new Search(value));
+		DisplayUtils.searchForTerm(value, globalApplicationState, synapseClient);
 	}
 
 	@Override

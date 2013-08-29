@@ -64,6 +64,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
@@ -1749,6 +1750,31 @@ public class DisplayUtils {
 	    });
 		
 		window.show();
+	}
+
+	public static void searchForTerm(String queryTerm, final GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient) {
+		final Synapse synapsePlace = SearchUtil.willRedirect(queryTerm);
+		final Search searchPlace = new Search(queryTerm);
+		if (synapsePlace == null) {
+			//no potential redirect, go directly to search!
+			globalApplicationState.getPlaceChanger().goTo(searchPlace);	
+		} else {
+			//looks like a redirect.  let's validate before going there.
+			synapseClient.getEntity(queryTerm, new AsyncCallback<EntityWrapper>() {
+				
+				@Override
+				public void onSuccess(EntityWrapper result) {
+					//any success then go to entity page
+					globalApplicationState.getPlaceChanger().goTo(synapsePlace);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					//any failure then go to search
+					globalApplicationState.getPlaceChanger().goTo(searchPlace);
+				}
+			});
+		}
 	}
 	
 }

@@ -111,13 +111,6 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Search) {
 					// search results page
-					Search searchPlace = (Search) place;
-					Synapse redirect = SearchUtil.willRedirect(searchPlace);
-					if(redirect != null){
-						place = redirect;
-						onSuccess();						
-						return;
-					}
 					SearchPresenter presenter = ginjector.getSearchPresenter();
 					presenter.setPlace((Search)place);
 					presenter.start(panel, eventBus);
