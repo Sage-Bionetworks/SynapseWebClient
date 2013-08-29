@@ -256,8 +256,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				final TextArea mdField = new TextArea();
 				mdField.setValue(currentPage.getMarkdown());
 				mdField.addStyleName("span-"+spanWidth);
+				mdField.addStyleName("markdownEditor");
 				mdField.setHeight("400px");
-
+				
 				LayoutContainer form = new LayoutContainer();
 				form.addStyleName("span-" + spanWidth);
 				final TextBox titleField = new TextBox();
