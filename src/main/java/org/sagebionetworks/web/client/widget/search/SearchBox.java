@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -72,7 +73,7 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 				// if fail, fall back on regular search
 			}
 		}
-		HomeSearchBox.searchForTerm(value, globalApplicationState, synapseClient);
+		SearchUtil.searchForTerm(value, globalApplicationState, synapseClient);
 	}
 
 	@Override

@@ -1,22 +1,24 @@
 package org.sagebionetworks.web.unitclient.widget.search;
 
-import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
+import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class HomeSearchBoxTest {
+public class SearchUtilTest {
 
 	private GlobalApplicationState mockGlobalAppState;
 	private PlaceChanger mockPlaceChanger;
@@ -34,14 +36,14 @@ public class HomeSearchBoxTest {
 	@Test
 	public void testSearchForTerm() {
 		//search for something that does not look like a Synapse ID
-		HomeSearchBox.searchForTerm("not_an_id", mockGlobalAppState, mockSynapseClient);
+		SearchUtil.searchForTerm("not_an_id", mockGlobalAppState, mockSynapseClient);
 		verify(mockPlaceChanger).goTo(any(Search.class));
 	}
 	
 	@Test
 	public void testSearchForSynId() {
 		//mocking successful verification of the syn id, should change to Synapse entity place
-		HomeSearchBox.searchForTerm("syn123", mockGlobalAppState, mockSynapseClient);
+		SearchUtil.searchForTerm("syn123", mockGlobalAppState, mockSynapseClient);
 		verify(mockPlaceChanger).goTo(any(Synapse.class));
 	}
 	
@@ -49,7 +51,7 @@ public class HomeSearchBoxTest {
 	public void testSearchForInvalidSynId() {
 		//mocking failed verification of the syn id, should change to Search place
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
-		HomeSearchBox.searchForTerm("syn123", mockGlobalAppState, mockSynapseClient);
+		SearchUtil.searchForTerm("syn123", mockGlobalAppState, mockSynapseClient);
 		verify(mockPlaceChanger).goTo(any(Search.class));
 	}
 }
