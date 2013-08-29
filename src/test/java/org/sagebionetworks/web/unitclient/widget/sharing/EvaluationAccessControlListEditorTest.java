@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.unitclient.presenter;
+package org.sagebionetworks.web.unitclient.widget.sharing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -46,6 +46,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorView;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -77,6 +78,7 @@ public class EvaluationAccessControlListEditorTest {
 	private static final long USER2_ID = 4L;
 	private static final Long TEST_PUBLIC_PRINCIPAL_ID = 789l;
 	private static final Long TEST_AUTHENTICATED_PRINCIPAL_ID = 123l;
+	private static final Long TEST_ANONYMOUS_PRINCIPAL_ID = 422l;
 	private static final String OWNER_NAME = "Owner";
 	private static final String EVALUATION_ID = "101";
 	private static final String CONTENT_SOURCE = "syn102";
@@ -106,7 +108,8 @@ public class EvaluationAccessControlListEditorTest {
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(EvaluationAccessControlListEditorView.class);
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
-		AsyncMockStubber.callSuccessWith(TEST_PUBLIC_PRINCIPAL_ID +","+ TEST_AUTHENTICATED_PRINCIPAL_ID).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		
 		AsyncMockStubber.callSuccessWith(acl.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockSynapseClient).getEvaluationAcl(anyString(), any(AsyncCallback.class));
@@ -235,7 +238,7 @@ public class EvaluationAccessControlListEditorTest {
 		assertEquals("Updated ACL is invalid", acl, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(5)).buildWindow(anyBoolean());
-		verify(mockACLEView).setPublicPrincipalId(anyLong());
+		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -74,7 +75,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private ListStore<PermissionsTableEntry> permissionsStore;
 	private ColumnModel columnModel;
-	private Long publicPrincipalId, authenticatedPrincipalId;
+	private PublicPrincipalIds publicPrincipalIds;
 	private Boolean isOpenParticipation;
 	private Button openParticipationButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
@@ -126,13 +127,10 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	}
 	
 	@Override
-	public void setPublicPrincipalId(Long id) {
-		publicPrincipalId = id;
+	public void setPublicPrincipalIds(PublicPrincipalIds publicPrincipalIds) {
+		this.publicPrincipalIds = publicPrincipalIds;
 	}
-	@Override
-	public void setAuthenticatedPrincipalId(Long id) {
-		authenticatedPrincipalId = id;
-	}
+
 	@Override
 	public void setIsOpenParticipation(Boolean isOpenParticipation) {
 		this.isOpenParticipation = isOpenParticipation;
@@ -160,7 +158,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 		permissionsStore = new ListStore<PermissionsTableEntry>();
 		permissionsGrid = AccessControlListEditorViewImpl.createPermissionsGrid(
 				permissionsStore, 
-				AccessControlListEditorViewImpl.createPeopleRenderer(publicPrincipalId, authenticatedPrincipalId, synapseJSNIUtils, iconsImageBundle), 
+				AccessControlListEditorViewImpl.createPeopleRenderer(publicPrincipalIds, synapseJSNIUtils, iconsImageBundle), 
 				createButtonRenderer(),
 				AccessControlListEditorViewImpl.createRemoveRenderer(iconsImageBundle, new CallbackP<Long>() {
 					@Override
@@ -200,7 +198,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 		fieldSet.setWidth(FIELD_WIDTH);
 		
 		// user/group combobox
-		peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalId, authenticatedPrincipalId);
+		peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalIds);
 		peopleCombo.setEmptyText("Enter a user or group name...");
 		peopleCombo.setFieldLabel("User/Group");
 		peopleCombo.setForceSelection(true);
@@ -252,13 +250,13 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 			public void componentSelected(ButtonEvent ce) {
 				//add the ability for authenticated users to participate
 				if (isOpenParticipation) {
-					if (authenticatedPrincipalId != null){
-						presenter.removeAccess(authenticatedPrincipalId);
+					if (publicPrincipalIds.getAuthenticatedAclPrincipalId() != null){
+						presenter.removeAccess(publicPrincipalIds.getAuthenticatedAclPrincipalId());
 					}
 				}
 				else {
-					if (authenticatedPrincipalId != null) {
-						presenter.setAccess(authenticatedPrincipalId, PermissionLevel.CAN_PARTICIPATE_EVALUATION);
+					if (publicPrincipalIds.getAuthenticatedAclPrincipalId() != null) {
+						presenter.setAccess(publicPrincipalIds.getAuthenticatedAclPrincipalId(), PermissionLevel.CAN_PARTICIPATE_EVALUATION);
 					}
 				}
 				
