@@ -231,7 +231,7 @@ public class UploaderTest {
 		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyString(), anyInt(), anyInt(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep3(false, null);
+		uploader.directUploadStep3(false, null, 1);
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		verify(synapseClient).completeUpload(anyString(),  anyString(),  anyString(),  anyBoolean(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
@@ -264,7 +264,7 @@ public class UploaderTest {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		uploader.handleUpload("newFile.txt");
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep3(false, null);
+		uploader.directUploadStep3(false, null, 1);
 		verifyUploadError();
 	}
 	
@@ -274,10 +274,24 @@ public class UploaderTest {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).completeUpload(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		uploader.handleUpload("newFile.txt");
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep3(false, null);
+		uploader.directUploadStep3(false, null,1);
 		verifyUploadError();
 	}
 
+	@Test
+	public void testDirectUploadStep3Retry() throws Exception {
+		//returned a failed status every time, and verify that we will eventually see an upload error (once the MAX_RETRY limit has been surpassed)
+		UploadDaemonStatus status = new UploadDaemonStatus();
+		status.setState(State.FAILED);
+		status.setFileHandleId("fake handle");
+		String failedUploadDaemonStatusJson = status.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		AsyncMockStubber.callSuccessWith(failedUploadDaemonStatusJson).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
+		
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		uploader.handleUpload("newFile.txt");
+		uploader.directUploadStep3(false, null,1);
+		verifyUploadError();
+	}
 	
 	@Test
 	public void testByteRange() {

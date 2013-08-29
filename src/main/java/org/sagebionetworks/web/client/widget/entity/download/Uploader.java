@@ -327,7 +327,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		//are there more chunks to upload?
 		requestList.add(requestJson);
 		if (currentChunkNumber >= totalChunkCount)
-			directUploadStep3(view.isNewlyRestricted(), requestList);
+			directUploadStep3(view.isNewlyRestricted(), requestList, 1);
 		else
 			directUploadStep2(contentType, currentChunkNumber+1, 1, totalChunkCount, fileSize, requestList);
 	}
@@ -370,7 +370,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return new ByteRange(startByte, endByte);
 	}
 	
-	public void directUploadStep3(final boolean isNewlyRestricted, List<String> requestList){
+	public void directUploadStep3(final boolean isNewlyRestricted, final List<String> requestList, final int currentAttempt){
 		//complete the file upload, and refresh
 		try {
 			final String entityId = entity==null ? null : entity.getId();
@@ -382,7 +382,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					try {
 						UploadDaemonStatus status = nodeModelCreator.createJSONEntity(result, UploadDaemonStatus.class);
 						//if it's already done, then finish.  Otherwise keep checking back until it's complete.
-						processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+						processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted, requestList, currentAttempt);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -397,7 +397,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	public void processDaemonStatus(UploadDaemonStatus status, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted){
+	public void processDaemonStatus(UploadDaemonStatus status, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted, List<String> requestList, int currentAttempt){
 		State state = status.getState();
 		if (State.COMPLETED == state) {
 			view.updateProgress(.99d, "99%");
@@ -408,14 +408,21 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			double currentProgress = ((status.getPercentComplete()*.01d) * COMBINING_TOTAL_PERCENT) + UPLOADING_TOTAL_PERCENT;
 			String progressText = percentFormat.format(currentProgress*100.0) + "%";
 			view.updateProgress(currentProgress, progressText);
-			checkStatusAgainLater(status.getDaemonId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+			checkStatusAgainLater(status.getDaemonId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted, requestList, currentAttempt);
 		}
 		else if (State.FAILED == state) {
-			uploadError(status.getErrorMessage());
+			combineChunksUploadFailure(isNewlyRestricted, requestList, currentAttempt, status.getErrorMessage());
 		}
 	}
 	
-	public void checkStatusAgainLater(final String daemonId, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted) {
+	public void combineChunksUploadFailure(boolean isNewlyRestricted, List<String> requestList, int currentAttempt, String errorMessage) {
+		if (currentAttempt >= MAX_RETRY)
+			uploadError("Exceeded the maximum number of attempts to combine all of the parts. " + errorMessage);
+		else //retry
+			directUploadStep3(isNewlyRestricted, requestList, currentAttempt+1);
+	}
+	
+	public void checkStatusAgainLater(final String daemonId, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted, final List<String> requestList, final int currentAttempt) {
 		//in one second, do a web service call to check the status again
 		Timer t = new Timer() {
 		      public void run() {
@@ -426,7 +433,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							try {
 								UploadDaemonStatus status = nodeModelCreator.createJSONEntity(result, UploadDaemonStatus.class);
 								// if it's already done, then finish. Otherwise keep checking back until it's complete.
-								processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+								processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted, requestList, currentAttempt);
 							} catch (JSONObjectAdapterException e) {
 								onFailure(e);
 							}
