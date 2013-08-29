@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -72,7 +73,7 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 				// if fail, fall back on regular search
 			}
 		}
-		HomeSearchBox.searchForTerm(value, globalApplicationState, synapseClient);
+		DisplayUtils.searchForTerm(value, globalApplicationState, synapseClient);
 	}
 
 	@Override
