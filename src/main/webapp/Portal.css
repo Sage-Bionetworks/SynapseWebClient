@@ -595,6 +595,9 @@ a.shortBtn {
     border-radius: 4px 0 4px 0;
 }
 
+.markdownEditor {
+    font-family: Lucidatypewriter, monospace !important;
+}
 
 .markdown {
 	word-wrap:break-word;
