@@ -597,6 +597,7 @@ a.shortBtn {
 
 .markdownEditor {
     font-family: Lucida Console, monospace !important;
+    font-size: 13px;
 }
 
 .markdown {
