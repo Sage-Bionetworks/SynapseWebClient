@@ -50,7 +50,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
 
-	private static final int MAX_DISPLAY_NAME_CHARACTER_COUNT = 40;
+	private static final int MAX_DISPLAY_NAME_CHARACTER_COUNT = 35;
 	private static final String HEADER_LARGE_STYLE = "largeHeader";
 	private static final String HEADER_SMALL_STYLE = "smallHeader";
 	private static final String MARGIN_BOTTOM_STYLE = "margin-bottom-20";
