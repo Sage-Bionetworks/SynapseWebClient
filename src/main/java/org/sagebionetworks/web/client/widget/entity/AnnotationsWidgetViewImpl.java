@@ -81,13 +81,18 @@ public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsW
 	public void configure(List<EntityRow<?>> rows, boolean canEdit) {
 		this.clear();
 			
-		//now add a button for every row
-		Grid g = new Grid(rows.size(), 3);
+		//now add a row for each annotation
+		int rowCount = 0;
+		for (final EntityRow<?> row : rows) {
+			if (row != null && row.getDislplayValue() != null)
+				rowCount++;
+		}
+		Grid g = new Grid(rowCount, 3);
 		g.addStyleName("table nobottommargin");
 		int i = -1;
 		for (final EntityRow<?> row : rows) {
-			i++;
 			if (row != null && row.getDislplayValue() != null) {
+				i++;
 				String value = SafeHtmlUtils.htmlEscapeAllowEntities(row.getDislplayValue());
 				String label = row.getLabel();
 				Label l1 = new Label(label);

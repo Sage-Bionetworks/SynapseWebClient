@@ -80,9 +80,10 @@ public class EntityListUtil {
 			public void onFailure(Throwable caught) {
 				EntityGroupRecordDisplay errorDisplay = getEmptyDisplay();
 				errorDisplay.setEntityId(ref.getTargetId());
-				errorDisplay.setVersion(SafeHtmlUtils.fromSafeConstant(ref.getTargetVersionNumber().toString()));
+				String versionNumber = ref.getTargetVersionNumber() == null ? "" : ref.getTargetVersionNumber().toString();
+				errorDisplay.setVersion(SafeHtmlUtils.fromSafeConstant(versionNumber));
 				String msg = ref.getTargetId();
-				if(ref.getTargetVersionNumber() != null) msg += ", Version " + ref.getTargetVersionNumber();
+				if(ref.getTargetVersionNumber() != null) msg += ", Version " + versionNumber;
 				if(caught instanceof UnauthorizedException || caught instanceof ForbiddenException) {
 					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.TITLE_UNAUTHORIZED + ": " + msg));
 				} else if (caught instanceof NotFoundException) {
