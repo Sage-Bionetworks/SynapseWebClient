@@ -58,19 +58,17 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	private UserSessionData cachedUserSessionData = null;
 	@UiField
-	FlowPanel commandBar;	
-	FlowPanel testSitePanel;
+	FlowPanel commandBar;		
 	@UiField
 	Image logoSmall;
 	@UiField
 	Image logoLarge;
 	@UiField
-	Image logoBeta;
-	@UiField
 	DivElement headerDiv;
 	@UiField
 	DivElement headerImageDiv;
 	
+	FlowPanel testSitePanel;
 	
 	private Presenter presenter;
 	private Map<MenuItems, Element> itemToElement;
@@ -109,8 +107,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.cookies = cookies;
 		this.sageImageBundle = sageImageBundle;
 		// add search panel first
-		searchBox.setVisible(false);
-		addToCommandBar(searchBox.asWidget());
+		searchBox.setVisible(true);
 		
 		showLargeLogo = false; // default
 		
@@ -170,9 +167,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void setSearchVisible(boolean searchVisible) {
-		//TODO: remove this if for Synapse 1.0 release (to show search box) 
-		if (DisplayUtils.isInTestWebsite(cookies))
-			searchBox.setVisible(searchVisible);
+		searchBox.setVisible(searchVisible);
 	}
 	
 	
@@ -182,7 +177,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	private void setUser(UserSessionData userData) {
 		commandBar.clear();
-		
+				
 		//initialize buttons
 		if(userAnchor == null) {
 			userAnchor = new Anchor();
@@ -230,7 +225,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				}
 			});
 			DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
-		 	
+		 			
 			userCommands.add(userGuide);
 		 	userCommands.add(settings);
 		 	userCommands.add(logout);
@@ -318,50 +313,37 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 		addToCommandBar(supportLinkContainer);
 		
+		// add search	
+		addToCommandBar(searchBox.asWidget());
+
 		addToCommandBar(testSitePanel);
-		
 	}
 
 	private void addToCommandBar(Widget widget) {
-		widget.addStyleName("floatright vertical-align-middle inline-block margin-right-10");
+		widget.addStyleName("right vertical-align-middle inline-block margin-right-10");
 		commandBar.add(widget);
 	}
 	
 	@Override
 	public void setLargeLogo(boolean isLarge) {
 		this.showLargeLogo = isLarge;
+		if(!DisplayUtils.isInTestWebsite(cookies)) {
+			this.showLargeLogo = true;
+		}
 	}
 	
 	private void setLogo() {
-		//TODO: remove this first section for Synapse 1.0 release to show updated header 
-		if (!DisplayUtils.isInTestWebsite(cookies)) {
-			logoBeta.setVisible(true);
-			logoLarge.setVisible(false);
-			logoSmall.setVisible(false);
-			headerDiv.removeClassName(HEADER_SMALL_STYLE);
-			headerDiv.addClassName(HEADER_LARGE_STYLE);
-			headerDiv.addClassName(MARGIN_BOTTOM_STYLE);
-			headerImageDiv.removeClassName(NO_TOP_MARGIN_STYLE);
-		}
-		else {
-			//always show large label if in alpha mode (until we're ready to unveil)
-			logoBeta.setVisible(false);
+		if(showLargeLogo) {
 			logoLarge.setVisible(true);
 			logoSmall.setVisible(false);
-			headerDiv.removeClassName(MARGIN_BOTTOM_STYLE);
 			headerDiv.removeClassName(HEADER_SMALL_STYLE);
 			headerDiv.addClassName(HEADER_LARGE_STYLE);
-			headerImageDiv.addClassName(NO_TOP_MARGIN_STYLE);
+		} else {						
+			logoLarge.setVisible(false);
+			logoSmall.setVisible(true);
+			headerDiv.removeClassName(HEADER_LARGE_STYLE);
+			headerDiv.addClassName(HEADER_SMALL_STYLE);
 		}
-//		} else {		
-			//show small logo
-//			logoBeta.setVisible(false);
-//			logoLarge.setVisible(false);
-//			logoSmall.setVisible(true);
-//			headerDiv.removeClassName(MARGIN_BOTTOM_STYLE);
-//			headerDiv.removeClassName(HEADER_LARGE_STYLE);
-//			headerDiv.addClassName(HEADER_SMALL_STYLE);
-//			headerImageDiv.addClassName(NO_TOP_MARGIN_STYLE);
-//		}
 	}
+	
 }

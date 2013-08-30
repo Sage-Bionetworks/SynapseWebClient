@@ -60,6 +60,7 @@ public class SearchBoxViewImpl extends Composite implements SearchBoxView {
 				@Override
 				public void onKeyDown(KeyDownEvent event) {
 					if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+						searchField.setValue("");
 						presenter.search(searchField.getValue());
 		            }					
 				}
