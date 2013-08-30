@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -89,45 +88,68 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	
 
 	@Override
-	public void editCurrentVersionInfo(String entityId, String version, String comment) {
-		Entity entity = bundle.getEntity();
-		if (entity.getId().equals(entityId) && entity instanceof Versionable) {
+	public void editCurrentVersionInfo(String entityId, final String version, final String comment) {
+		//SWC-771. The current bundle may be pointing to an old version (not the current version).  
+		//First ask for the current version of the entity
+		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				try {
+					Entity entity = nodeModelCreator.createEntity(result);
+					editCurrentVersionInfo(entity, version, comment);
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				}
+
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (!DisplayUtils.handleServiceException(caught,
+						globalApplicationState.getPlaceChanger(),
+						authenticationController.isLoggedIn(), view)) {
+					view.showErrorMessage(DisplayConstants.ERROR_UPDATE_FAILED + "\n" + caught.getMessage());
+				}
+
+			}
+		});
+	}
+
+	private void editCurrentVersionInfo(Entity entity, String version, String comment) throws JSONObjectAdapterException {
+		if (entity instanceof Versionable) {
 			final Versionable vb = (Versionable)entity;
 			if (version != null && version.equals(vb.getVersionLabel()) &&
 				comment != null && comment.equals(vb.getVersionComment())) {
 				view.showInfo("Version Info Unchanged", "You didn't change anything about the version info.");
 				return;
 			}
+			String versionLabel = version;
 			if (version == null || version.equals(""))
-				version = null; // Null out the version field if empty so it defaults to number
-			vb.setVersionLabel(version);
+				versionLabel = null; // Null out the version field if empty so it defaults to number
+			vb.setVersionLabel(versionLabel);
 			vb.setVersionComment(comment);
 			JSONObjectAdapter joa = jsonObjectAdapter.createNew();
-			try {
-				vb.writeToJSONObject(joa);
-				synapseClient.updateEntity(joa.toJSONString(),
-						new AsyncCallback<EntityWrapper>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								if (!DisplayUtils.handleServiceException(
-										caught, globalApplicationState.getPlaceChanger(),
-										authenticationController.isLoggedIn(), view)) {
-									view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE
-											+ "\n" + caught.getMessage());
-								}
+			
+			vb.writeToJSONObject(joa);
+			synapseClient.updateEntity(joa.toJSONString(),
+					new AsyncCallback<EntityWrapper>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							if (!DisplayUtils.handleServiceException(
+									caught, globalApplicationState.getPlaceChanger(),
+									authenticationController.isLoggedIn(), view)) {
+								view.showErrorMessage(DisplayConstants.ERROR_UPDATE_FAILED
+										+ "\n" + caught.getMessage());
 							}
-							@Override
-							public void onSuccess(EntityWrapper result) {
-								view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
-								fireEntityUpdatedEvent();
-							}
-						});
-			} catch (JSONObjectAdapterException e) {
-				view.showErrorMessage(DisplayConstants.ERROR_INVALID_VERSION_FORMAT);
-			}
+						}
+						@Override
+						public void onSuccess(EntityWrapper result) {
+							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
+							fireEntityUpdatedEvent();
+						}
+					});
 		}
 	}
-
+	
 	@Override
 	public void deleteVersion(final String entityId, final Long versionNumber) {
 		synapseClient.deleteEntityVersionById(entityId, versionNumber, new AsyncCallback<Void>() {

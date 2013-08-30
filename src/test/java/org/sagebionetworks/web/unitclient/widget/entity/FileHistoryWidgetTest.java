@@ -109,6 +109,7 @@ public class FileHistoryWidgetTest {
 		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
 				
 		fileHistoryWidget.setEntityBundle(bundle, 1l);
+		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 
 	}
 
@@ -161,7 +162,7 @@ public class FileHistoryWidgetTest {
 
 		String testComment = "testComment";
 		String testLabel = "testLabel";
-
+		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(vb);
 		fileHistoryWidget.editCurrentVersionInfo(vb.getId(), testLabel, testComment);
 		ArgumentCaptor<String> json = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).updateEntity(json.capture(), (AsyncCallback<EntityWrapper>) any());
