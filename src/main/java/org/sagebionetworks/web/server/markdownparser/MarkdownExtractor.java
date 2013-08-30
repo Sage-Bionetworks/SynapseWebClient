@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.server.markdownparser;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
-
-import com.google.gwt.dev.util.collect.HashMap;
 
 public class MarkdownExtractor {
 	private Map<String, String> containerToContents;
