@@ -198,9 +198,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		container.setLayout(new FlowLayout());
 		this.add(container);
 				
-		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"><h4 class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\">" + DisplayConstants.ACCESS_WILL_BE + ":&nbsp;</h4>" 
-				+ "<div class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\" style=\"top:-3px; position: relative;\">" + DisplayUtils.getShareSettingsDisplay(false, synapseJSNIUtils) + "</div>"				
-				+ "</div>"));
+		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
 		
 		TabPanel tabPanel = new TabPanel();		
 		tabPanel.setPlain(true);
