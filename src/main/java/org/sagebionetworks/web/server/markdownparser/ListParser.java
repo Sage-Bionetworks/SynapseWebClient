@@ -156,12 +156,8 @@ public class ListParser extends BasicMarkdownElementParser  {
 	 * the new list and include the item.
 	 * @return
 	 */
-	public MarkdownList getNewList(int depth, boolean isOrderedList, String startSymbol) {
-		if(isOrderedList) {
-			//Trim off the period
-			startSymbol = startSymbol.substring(0, startSymbol.length()-1);
-		}
-		MarkdownList newList = isOrderedList ? new OrderedMarkdownList(depth, startSymbol) : new UnorderedMarkdownList(depth, startSymbol);
+	public MarkdownList getNewList(int depth, boolean isOrderedList, String symbol) {
+		MarkdownList newList = isOrderedList ? new OrderedMarkdownList(depth, symbol) : new UnorderedMarkdownList(depth);
 		stack.push(newList);
 		return newList;
 	}

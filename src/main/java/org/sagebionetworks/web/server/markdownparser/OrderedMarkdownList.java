@@ -2,10 +2,15 @@ package org.sagebionetworks.web.server.markdownparser;
 
 public class OrderedMarkdownList extends MarkdownList {
 	private int orderValue;
+	private String startSymbol;
 
 	public OrderedMarkdownList(int depth, String startSymbol) {
-		super(depth, startSymbol);
+		super(depth);
 		this.orderValue = 1;
+		if(startSymbol.endsWith(".")) {
+			startSymbol = startSymbol.substring(0, startSymbol.length()-1);
+		}
+		this.startSymbol = startSymbol;
 	}
 	
 	/**
@@ -17,7 +22,7 @@ public class OrderedMarkdownList extends MarkdownList {
 	}
 	@Override
 	public String getStartListHtml() {
-		return "<ol start=\"" + getStartSymbol() + "\">";
+		return "<ol start=\"" + startSymbol + "\">";
 	}
 	@Override
 	public String getEndListHtml() {

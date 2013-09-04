@@ -5,15 +5,13 @@ import java.util.regex.Pattern;
 
 public abstract class MarkdownList {
 	private int depth;
-	private String startSymbol;
 	private boolean firstItemCreated;
 	private boolean inCodeBlock;
 	private Pattern p;
 	
-	public MarkdownList(int depth, String startSymbol) {
+	public MarkdownList(int depth) {
 		super();
 		this.depth = depth;
-		this.startSymbol = startSymbol;
 		this.firstItemCreated = false;
 		this.inCodeBlock = false;
 		this.p = Pattern.compile(MarkdownRegExConstants.HTML_FENCE_CODE_BLOCK_REGEX, Pattern.DOTALL);
@@ -24,10 +22,6 @@ public abstract class MarkdownList {
 		return depth;
 	}
 	
-	public String getStartSymbol() {
-		return startSymbol;
-	}
-
 	public abstract String getStartListHtml();
 	public void addListItemHtml(MarkdownElements line, String item) {
 		//Close the previous list item if it exists
