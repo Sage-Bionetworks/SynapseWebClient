@@ -14,6 +14,7 @@ public interface AttachmentConfigView extends IsWidget, WidgetEditorView {
 	public void setPresenter(Presenter presenter);
 	
 	public String getUploadedFileHandleName();
+	public void setUploadedFileHandleName(String fileHandleName);
 	
 	public void configure(WikiPageKey wikiKey);
 	

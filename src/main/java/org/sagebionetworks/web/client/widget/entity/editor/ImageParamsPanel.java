@@ -75,5 +75,15 @@ public class ImageParamsPanel extends FormPanel{
 			return Integer.toString(scaleSlider.getValue());
 		return null;
 	}
+	
+	public void setAlignment(String alignmentValue) {
+		if(alignmentCombo != null && alignmentCombo.getValue() != null)
+			alignmentCombo.getValue().setValue(alignmentValue);			
+	}
+
+	public void setScale(String scale) {
+		if (scaleSlider != null)
+			scaleSlider.setValue(Integer.parseInt(scale));
+	}
 }
 

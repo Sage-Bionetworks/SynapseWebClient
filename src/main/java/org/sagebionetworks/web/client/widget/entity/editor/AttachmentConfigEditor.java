@@ -25,6 +25,10 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
 		descriptor = widgetDescriptor;
 		view.configure(wikiKey);
+		try {
+			//try to set the image widget file name
+			view.setUploadedFileHandleName(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+		} catch (Exception e) {}
 	}
 	
 	@SuppressWarnings("unchecked")

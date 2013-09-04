@@ -153,6 +153,13 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	public String getUploadedFileHandleName() {
 		return uploadedFileHandleName;
 	}
+	
+	@Override
+	public void setUploadedFileHandleName(String uploadedFileHandleName) {
+		this.uploadedFileHandleName = uploadedFileHandleName;
+		uploadPanel.getFileUploadField().setValue(uploadedFileHandleName);
+	}
+	
 	@Override
 	public String getAlignment() {
 		if (isSynapseEntity())
@@ -168,7 +175,24 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		else
 			return uploadParamsPanel.getScale();
 	}
-
+	
+	@Override
+	public void setAlignment(String alignment) {
+		if (isSynapseEntity())
+			synapseParamsPanel.setAlignment(alignment);
+		else
+			uploadParamsPanel.setAlignment(alignment);
+		
+	}
+	
+	@Override
+	public void setScale(String scale) {
+		if (isSynapseEntity())
+			synapseParamsPanel.setScale(scale);
+		else
+			uploadParamsPanel.setScale(scale);
+	}
+	
 	private HorizontalPanel getExternalLinkPanel() {
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
@@ -327,9 +351,16 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	}
 	
 	@Override
+	public void setSynapseId(String synapseId) {
+		entityField.setValue(synapseId);
+		tabPanel.setSelection(synapseTab);
+	}
+	
+	@Override
 	public boolean isExternal() {
 		return externalTab.equals(tabPanel.getSelectedItem());
 	}
+	
 	
 	@Override
 	public boolean isSynapseEntity() {

@@ -293,13 +293,15 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 					//replace old widget text
 					String text = markdownTextArea.getText();
-					markdownTextArea.setText(text.substring(0, widgetStartIndex) + text.substring(widgetEndIndex));
-					markdownTextArea.setCursorPos(widgetStartIndex);
-					if (event.getInsertValue()!=null) {
-						insertMarkdown(event.getInsertValue());
+					if (widgetStartIndex > -1 && widgetEndIndex > -1) {
+						markdownTextArea.setText(text.substring(0, widgetStartIndex) + text.substring(widgetEndIndex));
+						markdownTextArea.setCursorPos(widgetStartIndex);
+						if (event.getInsertValue()!=null) {
+							insertMarkdown(event.getInsertValue());
+						}
+						if (callback != null)
+							callback.onUpdate(event);
 					}
-					if (callback != null)
-						callback.onUpdate(event);
 				}
 			}, isWikiEditor);	
 		}
