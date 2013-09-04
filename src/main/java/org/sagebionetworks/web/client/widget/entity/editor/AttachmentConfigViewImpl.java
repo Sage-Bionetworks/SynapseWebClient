@@ -48,6 +48,12 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	public String getUploadedFileHandleName() {
 		return uploadedFileHandleName;
 	}
+	
+	@Override
+	public void setUploadedFileHandleName(String fileHandleName) {
+		this.uploadedFileHandleName = fileHandleName;
+		uploadPanel.getFileUploadField().setValue(fileHandleName);
+	}
 
 	@Override
 	public void configure(WikiPageKey wikiKey) {
