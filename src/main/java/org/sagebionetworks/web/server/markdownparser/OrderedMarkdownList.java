@@ -7,9 +7,6 @@ public class OrderedMarkdownList extends MarkdownList {
 	public OrderedMarkdownList(int depth, String startSymbol) {
 		super(depth);
 		this.orderValue = 1;
-		if(startSymbol.endsWith(".")) {
-			startSymbol = startSymbol.substring(0, startSymbol.length()-1);
-		}
 		this.startSymbol = startSymbol;
 	}
 	

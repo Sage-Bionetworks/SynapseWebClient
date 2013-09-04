@@ -176,7 +176,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * 1. First Item
 	 */
-	public static final String ORDERED_LIST_REGEX = PREFIX_GROUP + "(\\d+[.])(\\s+)(.+)";
+	public static final String ORDERED_LIST_REGEX = PREFIX_GROUP + "(\\d+)[.](\\s+)(.+)";
 	
 	/**
 	 * Recognized example input:
