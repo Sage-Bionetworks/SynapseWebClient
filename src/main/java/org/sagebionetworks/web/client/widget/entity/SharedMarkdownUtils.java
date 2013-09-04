@@ -20,7 +20,7 @@ public class SharedMarkdownUtils {
 			inlineWidget = true;
 		}
 	
-		sb.append("<div id=\"");
+		sb.append("<span id=\"");
 		sb.append(WebConstants.DIV_ID_WIDGET_PREFIX);
 		sb.append(id);
 		
@@ -33,7 +33,7 @@ public class SharedMarkdownUtils {
 		
 		sb.append(widgetProperties);
 		sb.append("\">");
-		sb.append("</div>");
+		sb.append("</span>");
 	    return sb.toString();
 	}
 

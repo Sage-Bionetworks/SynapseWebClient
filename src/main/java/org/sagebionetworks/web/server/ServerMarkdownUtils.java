@@ -35,8 +35,8 @@ public class ServerMarkdownUtils {
 	public static final String START_PRE_CODE = "<pre><code";
 	public static final String END_PRE_CODE = "</code></pre>";
 	
-	public static final String START_CONTAINER = "<div class=\"inline-block\" id=\"";
-	public static final String END_CONTAINER = "</div>";
+	public static final String START_CONTAINER = "<span id=\"";
+	public static final String END_CONTAINER = "</span>";
 	
 	public static final String START_LINK = "<a class=\"link\" target=\"_blank\" href=\"";
 	public static final String END_LINK = "</a>";
