@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.server.markdownparser;
 
 public class UnorderedMarkdownList extends MarkdownList {
-	public UnorderedMarkdownList(int depth) {
-		super(depth);
+	public UnorderedMarkdownList(int depth, String startSymbol) {
+		super(depth, startSymbol);
 	}
 	@Override
 	public String getStartListHtml() {

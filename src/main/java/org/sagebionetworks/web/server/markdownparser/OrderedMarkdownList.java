@@ -3,8 +3,8 @@ package org.sagebionetworks.web.server.markdownparser;
 public class OrderedMarkdownList extends MarkdownList {
 	private int orderValue;
 
-	public OrderedMarkdownList(int depth) {
-		super(depth);
+	public OrderedMarkdownList(int depth, String startSymbol) {
+		super(depth, startSymbol);
 		this.orderValue = 1;
 	}
 	
@@ -17,7 +17,7 @@ public class OrderedMarkdownList extends MarkdownList {
 	}
 	@Override
 	public String getStartListHtml() {
-		return "<ol>";
+		return "<ol start=\"" + getStartSymbol() + "\">";
 	}
 	@Override
 	public String getEndListHtml() {
