@@ -80,7 +80,8 @@ public class ListParser extends BasicMarkdownElementParser  {
 		//looks like a list item
 		String prefix = m.group(1);
         int depth = prefix.length();
-        String value = m.group(3);
+        String symbol = m.group(2);
+        String value = m.group(4);
 
         boolean isInBlockQuote = blockquoteMatcher.matches();
         if(isInBlockQuote) {    
@@ -114,7 +115,7 @@ public class ListParser extends BasicMarkdownElementParser  {
         	} else {
         		//list depth is less than the current depth
         		//create a new list
-        		MarkdownList newList = getNewList(depth, isOrderedList);
+        		MarkdownList newList = getNewList(depth, isOrderedList, symbol);
         		line.prependElement(newList.getStartListHtml());
         		newList.addListItemHtml(line, value);
         	}
@@ -122,7 +123,7 @@ public class ListParser extends BasicMarkdownElementParser  {
         else {
         	//no list in the stack
         	//create a new list
-        	MarkdownList newList = getNewList(depth, isOrderedList);
+        	MarkdownList newList = getNewList(depth, isOrderedList, symbol);
         	if(preserveForBlockQuoteParser) {
         		//Preserve the ">" character for the blockquote parser to prepend the blockquote element
         		line.updateMarkdown(prefix);
@@ -155,8 +156,8 @@ public class ListParser extends BasicMarkdownElementParser  {
 	 * the new list and include the item.
 	 * @return
 	 */
-	public MarkdownList getNewList(int depth, boolean isOrderedList) {
-		MarkdownList newList = isOrderedList ? new OrderedMarkdownList(depth) : new UnorderedMarkdownList(depth);
+	public MarkdownList getNewList(int depth, boolean isOrderedList, String symbol) {
+		MarkdownList newList = isOrderedList ? new OrderedMarkdownList(depth, symbol) : new UnorderedMarkdownList(depth);
 		stack.push(newList);
 		return newList;
 	}
