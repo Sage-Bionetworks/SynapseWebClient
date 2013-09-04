@@ -48,9 +48,9 @@ public class ReferenceParserTest {
 		assertTrue(result.contains("${reference?inlineWidget=true&text=Smith John%2E Cooking book%2E August 2 2013&footnoteId=1}."));
 		assertTrue(result.contains("${reference?text=Smith John%2E Cooking book%2E August 2 2013&inlineWidget=true&footnoteId=2}."));
 		//Check for footnotes at end of document
-		assertTrue(result.contains("<p class=\"inlineWidgetContainer\" id=\"wikiReference1\"></p>"));
+		assertTrue(result.contains("<span id=\"wikiReference1\"></span>"));
 		assertTrue(result.contains("${reference?inlineWidget=true&text=Smith John%2E Cooking book%2E August 2 2013&footnoteId=1}"));
-		assertTrue(result.contains("<p class=\"inlineWidgetContainer\" id=\"wikiReference2\"></p>"));
+		assertTrue(result.contains("<span id=\"wikiReference2\"></span>"));
 		assertTrue(result.contains("${reference?text=Smith John%2E Cooking book%2E August 2 2013&inlineWidget=true&footnoteId=2}"));
 	}
 	
@@ -71,7 +71,7 @@ public class ReferenceParserTest {
 		//After complete parse, this is footnote section
 		assertTrue(result.contains("<hr>")); 
 		//See if link regex is detected. Check for container of link.
-		assertTrue(result.contains("<div class=\"inline-block\" id=\"link-0\"></div>"));
+		assertTrue(result.contains("<span id=\"link-0\"></span>"));
 		
 	}
 	

@@ -32,7 +32,7 @@ public class SynapseMarkdownWidgetParserTest {
 		StringBuilder sb = new StringBuilder();
 		String result = elements.getHtml();
 		sb.append(result);
-		assertTrue(result.contains("<div"));
+		assertTrue(result.contains("<span"));
 		assertFalse(result.contains("${provenance?entityList=syn1234567&depth=1&showExpand=true}"));
 		
 		parser.completeParse(sb);
@@ -49,6 +49,6 @@ public class SynapseMarkdownWidgetParserTest {
 		refParser.processLine(elements);
 		parser.processLine(elements);
 		String result = elements.getHtml();
-		assertTrue(result.contains("<div"));
+		assertTrue(result.contains("<span"));
 	}
 }
