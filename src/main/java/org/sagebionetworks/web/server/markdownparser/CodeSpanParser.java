@@ -18,7 +18,7 @@ public class CodeSpanParser extends BasicMarkdownElementParser {
 	}
 	
 	private String getCurrentDivID() {
-		return WebConstants.DIV_ID_LINK_PREFIX + extractor.getCurrentContainerId() + SharedMarkdownUtils.getPreviewSuffix(isPreview);
+		return WebConstants.DIV_ID_CODE_SPAN_PREFIX + extractor.getCurrentContainerId() + SharedMarkdownUtils.getPreviewSuffix(isPreview);
 	}
 	
 	@Override
