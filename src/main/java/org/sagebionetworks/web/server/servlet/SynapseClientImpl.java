@@ -110,6 +110,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
+	// This will be appened to the User-Agent header.
+	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"+PortalVersionHolder.getVersionInfo();
 	static {//kick off initialization (like pattern compilation) by referencing it
 			SynapseMarkdownProcessor.getInstance();
 		}
@@ -389,6 +391,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
 		synapseClient.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
+		// Append the portal's version information to the user agent.
+		synapseClient.appendUserAgent(PORTAL_USER_AGENT);
 		return synapseClient;
 	}
 

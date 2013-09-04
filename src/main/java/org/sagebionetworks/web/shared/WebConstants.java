@@ -41,6 +41,8 @@ public class WebConstants {
 	public static final String VALID_ENTITY_ID_REGEX = "^[Ss]{1}[Yy]{1}[Nn]{1}\\d+";
 	public static final String VALID_POSITIVE_NUMBER_REGEX = "^[0-9]+";
 	public static final String VALID_BOOKMARK_ID_REGEX = "[_A-Za-z0-9-.[^\\s]]+";
+	public static final String HTML_ELLIPSIS = "&hellip;";
+	public static final String URL_PROTOCOL = "http://";
 	
 	// OpenID related constants
 
@@ -76,8 +78,10 @@ public class WebConstants {
 			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br>--strike out--<br></code></pre><br>" +
 			"<h3>Subscript/Superscript</h3><pre><code>~subscript~  ^superscript^<br></code></pre><br>" +
 			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>Custom Synapse ID link text:<br>[my text](#Synapse:syn12345)</code></pre></pre><pre><code>Bookmarks within page<br>To create bookmark target: ${bookmarktarget?bookmarkID=myid}<br>To link to bookmark: [my text](#Bookmark:myid)</code></pre><br>" +
-			"<h3>Tables</h3><pre><code>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>Row 2 Content Cell 1  | Row 2 Content Cell 2  | Row 2 Content Cell 3</code><br>" +
+			"<h3>Tables</h3><pre><code>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>Row 2 Content Cell 1  | Row 2 Content Cell 2  | Row 2 Content Cell 3</code></pre><pre><code>Table styles:<br>short (for tables with significant number of rows)<br>text-align-center<br>text-align-right<br>border</pre></code><pre><code>To apply styles:<br>{| class=\"border text-align-center\"<br>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>|}</pre></code><br>" +
 			"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
+			"<h3>Inline LaTeX</h3><pre><code>$\\[x^2\\]$<br></code></pre><br>" +
+			"<h3>LaTeX Blocks</h3><p>Wrap your math blocks in $$<pre><code>$$<br>\\begin{aligned}<br>x^2<br>\\end{aligned}<br>$$<br></code></pre></p><br>" +
 			"<h3>Headers</h3><p><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre></p><p>Exclude a header from the table of contents:<pre><code>#! Header 1 <br>##! Header 2<br>######! Header 6</code></pre></p><br>" +
 			"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
 			"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
@@ -100,6 +104,11 @@ public class WebConstants {
 
 	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
 	
+	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
+    public static final String DIV_ID_LINK_PREFIX = "link-";
+	public static final String DIV_ID_AUTOLINK_PREFIX = "autolink-";
+	public static final String DIV_ID_IMAGE_PREFIX = "image-";
+	public static final String DIV_ID_WIDGET_SYNTAX_PREFIX = "widgetsyntax-";
 	public static final String FOOTNOTE_ID_WIDGET_PREFIX = "wikiFootnote";
 	
 	public static final String REFERENCE_ID_WIDGET_PREFIX = "wikiReference";
@@ -146,10 +155,14 @@ public class WebConstants {
 
 	public static final String ENTITY_VERSION_STRING = "/version/";
 	
+	public static final String MATHJAX_PREFIX = "\\[";
+	public static final String MATHJAX_SUFFIX = "\\]";
 	
 	
 	//Synapse Properties
 	public static final String CHALLENGE_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_synapse_id";
+	public static final String CHALLENGE_WRITE_UP_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_writeup_synapse_id";
+	
 
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
 	

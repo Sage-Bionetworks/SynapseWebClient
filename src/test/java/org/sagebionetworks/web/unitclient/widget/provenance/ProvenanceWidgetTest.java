@@ -41,10 +41,10 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.MD5Callback;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.JsoProvider;
@@ -69,6 +69,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTestImpl;
 
 import com.google.gwt.dev.util.collect.HashSet;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -457,6 +458,11 @@ public class ProvenanceWidgetTest {
 			
 			@Override
 			public void getFileMd5(String fileFieldId, MD5Callback callback) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void processWithMathJax(Element element) {
 				// TODO Auto-generated method stub
 				
 			}

@@ -16,16 +16,10 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 	int footnoteNumber;
 	
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		footnotes = new ArrayList<String>();
-		parsersOnCompletion = new ArrayList<MarkdownElementParser>();
-		parsersOnCompletion.add(new BoldParser());
-		parsersOnCompletion.add(new DoiAutoLinkParser());
-		parsersOnCompletion.add(new ItalicsParser());
-		parsersOnCompletion.add(new LinkParser());
-		parsersOnCompletion.add(new SynapseAutoLinkParser());
-		parsersOnCompletion.add(new UrlAutoLinkParser());
 		footnoteNumber = 1;
+		parsersOnCompletion = simpleParsers;
 	}
 
 	@Override
@@ -70,26 +64,13 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 			String footnoteId = WebConstants.FOOTNOTE_ID_WIDGET_PREFIX + (i + 1);
 			
 			//Insert the special bookmark-link syntax to link back to the reference
-			footnoteMarkdown.append("[[" + (i + 1) + "]](" + WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":" + targetReferenceId + ")");
+			footnoteMarkdown.append("[[" + (i + 1) + "]](" + WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":" + targetReferenceId + ") ");
 
 			//Assign id to the element so that the reference can link to this footnote
 			footnoteMarkdown.append("<p id=\"" + footnoteId + "\" class=\"inlineWidgetContainer\">" + footnoteText + "</p>");
 			footnoteMarkdown.append("<br>");
 		}
-		
-		StringBuilder output = new StringBuilder();
-		
-		//Run needed parsers over footnotes
-		for (MarkdownElementParser parser : parsersOnCompletion) {
-			parser.reset();
-		}
-		
-		//No new lines; process over constructed footnote markdown
-		MarkdownElements elements = new MarkdownElements(footnoteMarkdown.toString());
-		for (MarkdownElementParser parser : parsersOnCompletion) {
-			parser.processLine(elements);
-		}
-		output.append(elements.getHtml());
-		html.append(output);
+		String parsedFootnotes = runSimpleParsers(footnoteMarkdown.toString(), parsersOnCompletion);
+		html.append(parsedFootnotes);
 	}
 }

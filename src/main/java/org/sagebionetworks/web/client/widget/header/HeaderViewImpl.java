@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.search.SearchBox;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -49,15 +50,25 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
 
+	private static final int MAX_DISPLAY_NAME_CHARACTER_COUNT = 35;
+	private static final String HEADER_LARGE_STYLE = "largeHeader";
+	private static final String HEADER_SMALL_STYLE = "smallHeader";
+	private static final String MARGIN_BOTTOM_STYLE = "margin-bottom-20";
+	private static final String NO_TOP_MARGIN_STYLE = "notopmargin";
+
 	private UserSessionData cachedUserSessionData = null;
 	@UiField
-	HorizontalPanel commandBar;
-	
+	FlowPanel commandBar;		
 	@UiField
-	SimplePanel searchBoxPanel;
-	
+	Image logoSmall;
 	@UiField
-	SimplePanel testSiteHeading;
+	Image logoLarge;
+	@UiField
+	DivElement headerDiv;
+	@UiField
+	DivElement headerImageDiv;
+	
+	FlowPanel testSitePanel;
 	
 	private Presenter presenter;
 	private Map<MenuItems, Element> itemToElement;
@@ -72,11 +83,14 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private Anchor loginButton;
 	private Anchor registerButton;
 	private Anchor supportLink;
+	private SimplePanel supportLinkContainer;
 	private HorizontalPanel userCommands;
 	private FlowPanel userNameContainer;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private HorizontalPanel userNameWrapper;
 	private CookieProvider cookies;
+	SageImageBundle sageImageBundle;
+	boolean showLargeLogo;
 	
 	@Inject
 	public HeaderViewImpl(Binder binder,
@@ -91,16 +105,15 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.searchBox = searchBox;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookies = cookies;
-		// add search panel
-		searchBoxPanel.clear();		
-		searchBoxPanel.add(searchBox.asWidget());
-		searchBoxPanel.setVisible(false);
+		this.sageImageBundle = sageImageBundle;
+		// add search panel first
+		searchBox.setVisible(true);
 		
-		testSiteHeading.clear();
-		testSiteHeading.add(getTestPanel());
-		testSiteHeading.setVisible(false);
+		showLargeLogo = false; // default
+		
+		testSitePanel = getTestPanel();
+		testSitePanel.setVisible(false);
 		refreshTestSiteHeader();
-		commandBar.addStyleName("last sf-j-menu");
 	}
 	
 	private FlowPanel getTestPanel() {
@@ -138,11 +151,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 
 	private void refreshTestSiteHeader() {
-		testSiteHeading.setVisible(DisplayUtils.isInTestWebsite(cookies));
+		testSitePanel.setVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
 	
 	@Override
 	public void refresh() {
+		setLogo();
 		refreshTestSiteHeader();
 		UserSessionData userSessionData = presenter.getUser();
 		if (cachedUserSessionData == null || !cachedUserSessionData.equals(userSessionData)){
@@ -153,7 +167,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void setSearchVisible(boolean searchVisible) {
-		searchBoxPanel.setVisible(searchVisible);
+		searchBox.setVisible(searchVisible);
 	}
 	
 	
@@ -162,6 +176,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 */
 	
 	private void setUser(UserSessionData userData) {
+		commandBar.clear();
+				
 		//initialize buttons
 		if(userAnchor == null) {
 			userAnchor = new Anchor();
@@ -176,7 +192,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 		if (userCommands == null){
 			userCommands = new HorizontalPanel();
-        	userCommands.addStyleName("span-3 inner-2 view header-inner-commands-container");
+        	userCommands.addStyleName("view header-inner-commands-container");
 
         	Image userGuide = new Image(iconsImageBundle.bookOpen16());
         	userGuide.addStyleName("imageButton");
@@ -209,7 +225,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				}
 			});
 			DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
-		 	
+		 			
 			userCommands.add(userGuide);
 		 	userCommands.add(settings);
 		 	userCommands.add(logout);
@@ -243,11 +259,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				}
 			});
 		}
-		if (supportLink == null) {
-			supportLink = new Anchor(DisplayConstants.LINK_COMMUNITY_FORUM, "http://support.sagebase.org", "_blank");
-			supportLink.addStyleName("headerLink");
-			commandBar.add(supportLink);
-		}
 //		presenter.getSupportHRef(new AsyncCallback<String>() {
 //			
 //			@Override
@@ -264,9 +275,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		if(userData != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 			UserProfile profile = userData.getProfile();
-			userAnchor.setText(profile.getDisplayName());
-			commandBar.remove(loginButton);
-			commandBar.remove(registerButton);
+			String displayName = profile.getDisplayName();
+			if (displayName.length() > MAX_DISPLAY_NAME_CHARACTER_COUNT) { 
+				displayName = displayName.substring(0, MAX_DISPLAY_NAME_CHARACTER_COUNT - 1) + "...";
+			}
+			userAnchor.setText(displayName);
 			userNameWrapper.clear();
 			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
 				Image profilePicture = new Image();
@@ -284,19 +297,53 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				userNameWrapper.add(profilePicture);
 			}
 			userNameWrapper.add(userAnchor);
-			if (commandBar.getWidgetIndex(userNameContainer) == -1){
-				commandBar.add(userNameContainer);
-				commandBar.add(userCommands);
-			}
+			addToCommandBar(userCommands);
+			addToCommandBar(userNameContainer);
 		} else {
 			//no user data, add register and login
-			commandBar.remove(userNameContainer);
-			commandBar.remove(userCommands);
-			if (commandBar.getWidgetIndex(registerButton) == -1)
-			{
-				commandBar.add(registerButton);			
-				commandBar.add(loginButton);
-			}
+			addToCommandBar(loginButton);
+			addToCommandBar(registerButton);
+		}
+
+		if (supportLink == null) {
+			supportLink = new Anchor(DisplayConstants.LINK_COMMUNITY_FORUM, "http://support.sagebase.org", "_blank");
+			supportLink.addStyleName("headerLink");
+			supportLinkContainer = new SimplePanel();
+			supportLinkContainer.add(supportLink);
+		}
+		addToCommandBar(supportLinkContainer);
+		
+		// add search	
+		addToCommandBar(searchBox.asWidget());
+
+		addToCommandBar(testSitePanel);
+	}
+
+	private void addToCommandBar(Widget widget) {
+		widget.addStyleName("right vertical-align-middle inline-block margin-right-10");
+		commandBar.add(widget);
+	}
+	
+	@Override
+	public void setLargeLogo(boolean isLarge) {
+		this.showLargeLogo = isLarge;
+		if(!DisplayUtils.isInTestWebsite(cookies)) {
+			this.showLargeLogo = true;
 		}
 	}
+	
+	private void setLogo() {
+		if(showLargeLogo) {
+			logoLarge.setVisible(true);
+			logoSmall.setVisible(false);
+			headerDiv.removeClassName(HEADER_SMALL_STYLE);
+			headerDiv.addClassName(HEADER_LARGE_STYLE);
+		} else {						
+			logoLarge.setVisible(false);
+			logoSmall.setVisible(true);
+			headerDiv.removeClassName(HEADER_LARGE_STYLE);
+			headerDiv.addClassName(HEADER_SMALL_STYLE);
+		}
 	}
+	
+}

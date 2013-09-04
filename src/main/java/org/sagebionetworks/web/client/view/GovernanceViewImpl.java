@@ -38,6 +38,7 @@ public class GovernanceViewImpl extends Composite implements GovernanceView {
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 				
@@ -49,6 +50,7 @@ public class GovernanceViewImpl extends Composite implements GovernanceView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

@@ -82,7 +82,9 @@ public class DisplayConstants {
 	public static final String BUTTON_REVOKE_OPEN_PARTICIPATION_TOOLTIP = "Click to restrict participation to only those people you select above";
 	
 	public static final String PUBLIC_ACL_TITLE = "Public on the web";
-	public static final String PUBLIC_ACL_DESCRIPTION = "Anyone on the internet can access, no login required";
+	public static final String PUBLIC_USER_ACL_TITLE = "Public user on the web";
+	public static final String PUBLIC_ACL_DESCRIPTION = "Anyone on the internet can access";
+	public static final String PUBLIC_USER_ACL_DESCRIPTION = "Any anonymous user on the internet can access";
 	public static final String PUBLIC_ACL_ENTITY_PAGE = "Public";
 	public static final String PRIVATE_ACL_ENTITY_PAGE = "Private";
 	public static final String PRIVATE_ACL_DESCRIPTION = "Restricted to those people selected in the Share Settings window";
@@ -200,6 +202,7 @@ public class DisplayConstants {
 	public static final String LABEL_RENAME = "Rename";
 	public static final String LABEL_CREATE = "Create";
 	public static final String LABEL_MOVE = "Move";
+	public static final String LABEL_CREATE_DOI = "Create DOI";
 	public static final String SELECT_NEW_PARENT = "Select New Parent for this";
 	public static final String LABEL_ARE_YOU_SURE = "Are you sure?";
 	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. Please try again.";
@@ -279,6 +282,7 @@ public class DisplayConstants {
 	public static final String ERROR_LOADING_DESCRIPTION_FAILED = "Failed to load the description: ";
 	public static final String ERROR_LOADING_MARKDOWN_FAILED = "Failed to load the markdown: ";
 	public static final String ERROR_LOADING_WIKI_FAILED = "Failed to load the wiki page: ";
+	public static final String ERROR_WIKI_MODIFIED = "Sorry, another process has made changes to this wiki while you were editing.  Please reload the page, merge in your changes, and try saving again.";
 	public static final String ERRROR_ATTACHMENT_FAILED = "Failed to upload attachment: ";
 	public static final String ERROR_PROFILE_PICTURE_FAILED = "Failed to upload photo: ";
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
@@ -361,6 +365,7 @@ public class DisplayConstants {
 	public static final String IMAGE_CONFIG_ALT_TEXT = "Alternate Text:";
 	public static final String IMAGE_FAILED_TO_LOAD = "Image failed to load: ";
 	public static final String URL_LABEL = "URL:";
+	public static final String EQUATION_LABEL = "TeX:";
 	public static final String LINK_TEXT_LABEL = "Link Text:";
 	public static final String TABLE_LABEL = "Tab Delimitted Table Contents:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
@@ -372,7 +377,7 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_RENDERERS_LABEL = "Renderer Names:";
 	public static final String SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL = "Show Row Numbers?";
 	public static final String SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME = "Row Numbers Col Name:";
-	public static final String SYNAPSE_API_CALL_IS_PAGING = "Support Paging?";
+	public static final String SYNAPSE_API_CALL_IS_PAGING = "Support Pagination?";
 	public static final String SYNAPSE_API_CALL_PAGE_SIZE = "Page Size:";
 	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
 	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
@@ -438,6 +443,9 @@ public class DisplayConstants {
 	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2 = "\" target=\"_blank\" class=\"link\">here</a>.";
 	public static final String BUTTON_TEXT_FLAG_DATA = "Flag Data";
 	public static final String BUTTON_TEXT_RESTRICT_DATA = "Add Restrictions";
+	public static final String TEXT_ADD_ANNOTATION = "Add Annotation";
+	public static final String TEXT_DELETE_ANNOTATION = "Delete Annotation";
+	public static final String TEXT_EDIT_ANNOTATION = "Edit Annotation";
 	public static final String BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT = "Request Access";
 	public static final String BUTTON_TEXT_ACCEPT_TERMS_OF_USE = "Accept Terms of Use";
 	public static final String BUTTON_TEXT_LOGIN = "Login";
@@ -481,6 +489,7 @@ public class DisplayConstants {
 	public static final String PAGE_NOT_FOUND = "Page not found";
 	public static final String PAGE_NOT_FOUND_DESC = "The page you requested was not found, that's all we know.";
 	public static final String ANNOTATIONS = "Annotations";
+	public static final String DOI = "DOI";
 	public static final String TO_LOAD_VERSION_1 = "To load this version";
 	public static final String TO_LOAD_AN_ENTITY = "To load an entity";
 	public static final String PROGRAMMATIC_ACCESS = "Programmatic Access";
@@ -491,13 +500,14 @@ public class DisplayConstants {
 	public static final String ADD_FOLDER = "Add Folder";
 	public static final String ADD_FILE = "Add File";
 	public static final String FILES = "Files";
+	public static final String CHALLENGE_ADMIN = "Challenge Admin";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
 	public static final String ERROR_FILE_CREATION_FAILED = "File creation failed. Please try again";
 	public static final String PAGES = "Pages";
 	public static final String ADD_PAGE = "Add a new Page";
 	public static final String CREATE_WIKI = "Insert Wiki";
 	public static final String DEFAULT_ROOT_WIKI_NAME = "Root";
-	public static final String PROJECT_WIKI_NAME = "Wiki";
+	public static final String WIKI = "Wiki";
 	public static final String ERROR_PAGE_CREATION_FAILED = "Page creation failed. Please try again";
 	public static final String UNAUTHORIZED = "Unauthorized";
 	public static final String UNAUTHORIZED_DESC = "You are not authorized to access the page requested.";
@@ -588,6 +598,7 @@ public class DisplayConstants {
 	public static final String EXAMPLE_CODE = "Example Code";
 	public static final String MORE_DETAILS_SYNAPSE = "Read more about Synapse";
 	public static final String REST_API_DOCUMENTATION = "REST API documentation";
+	public static final String ERROR_LOADING_CYTOSCAPE = "An error occurred loading the Cytoscape Graph";
 	
 }
 

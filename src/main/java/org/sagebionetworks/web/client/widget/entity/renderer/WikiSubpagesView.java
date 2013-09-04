@@ -19,8 +19,6 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 */
 	public void configure(TocItem root);
 	
-	public String getHTML(String href, String title, boolean isCurrentPage);
-	
 	/**
 	 * Presenter interface
 	 */

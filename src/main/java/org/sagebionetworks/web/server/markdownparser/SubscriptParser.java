@@ -1,5 +1,4 @@
 package org.sagebionetworks.web.server.markdownparser;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

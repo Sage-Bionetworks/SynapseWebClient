@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Map;
+
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -33,6 +35,8 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -64,6 +68,9 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private HTML descriptionFormatInfo;
 	private WikiPageKey wikiKey;
 	private boolean isWikiEditor;
+	private Image editWidgetButton;
+	private WidgetDescriptorUpdatedHandler callback;
+	private WidgetSelectionState widgetSelectionState;
 	
 	public interface CloseHandler{
 		public void saveClicked();
@@ -76,7 +83,6 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	}
 	
 	
-	
 	@Inject
 	public MarkdownEditorWidget(SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor, CookieProvider cookies) {
 		super();
@@ -86,6 +92,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.iconsImageBundle = iconsImageBundle;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.cookies = cookies;
+		widgetSelectionState = new WidgetSelectionState();
 	}
 	
 	/**
@@ -101,12 +108,23 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.markdownTextArea = markdownTextArea;
 		this.wikiKey = wikiKey;
 		this.isWikiEditor = isWikiEditor;
+		this.callback = callback;
+		
 		String formattingTipsHtml = DisplayUtils.isInTestWebsite(cookies) ? WebConstants.SYNAPSE_MARKDOWN_FORMATTING_TIPS_HTML : WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML;
 		descriptionFormatInfo = new HTML(formattingTipsHtml);
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
 		mdCommands.setVerticalAlign(VerticalAlignment.MIDDLE);
 		mdCommands.addStyleName("view header-inner-commands-container");
+
+		editWidgetButton = getNewCommand("Edit Widget", iconsImageBundle.editGrey16(),new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleEditWidgetCommand();
+			}
+		}); 
+		mdCommands.add(editWidgetButton);
+		
 		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.addSquareGrey16()));
 		insertButton.setWidth(55);
 		insertButton.setMenu(createWidgetMenu(callback));
@@ -117,6 +135,21 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		FormData mdCommandFormData = new FormData();
 		mdCommandFormData.setMargins(new Margins(0,-15,0,10));
 		formPanel.add(mdCommands,mdCommandFormData);
+		
+		markdownTextArea.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				updateEditWidget();
+			}
+		});
+		
+		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
+			
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				updateEditWidget();
+			}
+		});
 		
 		// followed by description.
 		SimplePanel descriptionWrapper= new SimplePanel();
@@ -244,7 +277,41 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			}
 		}); 
 		mdCommands.add(link);
-				
+		
+	}
+	
+	public void handleEditWidgetCommand() {
+		if (widgetSelectionState != null && widgetSelectionState.isWidgetSelected()) {
+			final int widgetStartIndex = widgetSelectionState.getWidgetStartIndex();
+			final int widgetEndIndex = widgetSelectionState.getWidgetEndIndex();
+			String innerText = widgetSelectionState.getInnerWidgetText();
+			markdownTextArea.setSelectionRange(widgetStartIndex, innerText.length());
+			String contentTypeKey = widgetRegistrar.getWidgetContentType(innerText);
+			Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
+			BaseEditWidgetDescriptorPresenter.editExistingWidget(widgetDescriptorEditor, wikiKey, contentTypeKey, widgetDescriptor, new WidgetDescriptorUpdatedHandler() {
+				@Override
+			public void onUpdate(WidgetDescriptorUpdatedEvent event) {
+					//replace old widget text
+					String text = markdownTextArea.getText();
+					markdownTextArea.setText(text.substring(0, widgetStartIndex) + text.substring(widgetEndIndex));
+					markdownTextArea.setCursorPos(widgetStartIndex);
+					if (event.getInsertValue()!=null) {
+						insertMarkdown(event.getInsertValue());
+					}
+					if (callback != null)
+						callback.onUpdate(event);
+				}
+			}, isWikiEditor);	
+		}
+	}
+	
+	public void updateEditWidget(){
+		editWidgetButton.setResource(iconsImageBundle.editGrey16());
+		DisplayUtils.updateWidgetSelectionState(widgetSelectionState, markdownTextArea.getText(), markdownTextArea.getCursorPos());
+		 
+		if (widgetSelectionState.isWidgetSelected()) {
+			editWidgetButton.setResource(iconsImageBundle.edit16());
+		}
 	}
 	
 	public void showPreview(String descriptionMarkdown, final boolean isWiki) {
@@ -285,6 +352,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			panel = new HTMLPanel(result);
 		}
 		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
+		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true);
 		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
@@ -345,6 +413,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.LINK_CONTENT_TYPE, callback);
 	    	};
 		}));
+
 	    menu.add(getNewCommand(WidgetConstants.PROVENANCE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.PROVENANCE_CONTENT_TYPE, callback);
@@ -415,6 +484,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY+"=evalId1,evalId2" + WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
+	    	menu.add(getNewCommand(WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE + "?"+WidgetConstants.WIDGET_ENTITY_ID_KEY+"=syn123&" +WidgetConstants.TEXT_KEY + "=Tutorial"+ WidgetConstants.WIDGET_END_MARKDOWN);
+		    	};
+			}));
+
 	    	
 	    }
 

@@ -27,10 +27,10 @@ import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.MD5Callback;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -47,6 +47,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.extjs.gxt.ui.client.widget.ProgressBar;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class ProvUtilsTest {
@@ -336,6 +337,12 @@ public class ProvUtilsTest {
 			
 			@Override
 			public void getFileMd5(String fileFieldId, MD5Callback callback) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void processWithMathJax(Element element) {
 				// TODO Auto-generated method stub
 				
 			}

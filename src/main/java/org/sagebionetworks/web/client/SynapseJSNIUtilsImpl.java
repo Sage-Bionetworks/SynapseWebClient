@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
@@ -13,6 +14,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window.Location;
@@ -236,7 +238,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	private final static native double _getFileSize(String fileFieldId) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		return fileToUploadElement.files[0].size;
+		var fileSize = ('files' in fileToUploadElement) ? fileToUploadElement.files[0].size : 0;
+		return fileSize;
 	}-*/;
 	
 	/**
@@ -265,12 +268,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
             else {
                console.log("finished loading file (to calculate md5)");
                // Call instance method setMD5() on md5Callback with the final md5
-    			md5Callback.@org.sagebionetworks.web.client.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
+    			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
             }
         };
         $wnd.frOnerror = function () {
         	console.warn("unable to calculate md5");
-            md5Callback.@org.sagebionetworks.web.client.MD5Callback::setMD5(Ljava/lang/String;)(null);
+            md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
         };
         
         $wnd.loadNext = function() { 
@@ -312,6 +315,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		newWin.setCallbackOnGSUploadError = function(savePath) {
 			alert('outer ERROR saving to GenomeSpace as ' + savePath);
 		}
+	}-*/;
+
+
+	@Override
+	public void processWithMathJax(Element element) {
+		_processWithMathJax(element);		
+	}
+
+	private final static native void _processWithMathJax(Element element) /*-{
+		$wnd.layoutMath(element);
 	}-*/;
 
 }

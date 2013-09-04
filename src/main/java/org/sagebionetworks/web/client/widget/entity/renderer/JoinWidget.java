@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.place.shared.Place;
@@ -89,7 +90,10 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showError(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
+					//if the user can't read the evaluation, then don't show the join button.  if there was some other error, then report it...
+					if (!(caught instanceof ForbiddenException)) {
+						view.showError(DisplayConstants.EVALUATION_USER_STATE_ERROR + caught.getMessage());
+					}
 				}
 			});
 		} catch (RestServiceException e) {
@@ -258,42 +262,17 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 	
 	@Override
 	public void submitToChallengeClicked() {
-		//has this user ever submitted to a challenge before?
-		try {
-			synapseClient.hasSubmitted(new AsyncCallback<Boolean>() {
-				@Override
-				public void onSuccess(Boolean hasSubmitted) {
-					if(hasSubmitted) {
-						//pop up the submission dialog that has an Entity Finder
-						showSubmissionDialog();
-					} else {
-						showSubmissionGuide(new TutorialWizard.Callback() {
-							
-							@Override
-							public void tutorialSkipped() {
-								submissionUserGuideSkipped();
-							}
-							
-							@Override
-							public void tutorialFinished() {
-								//do nothing
-							}
-						});
-					}
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
-				}
-			});
-		} catch (RestServiceException e) {
-			view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
-		}
+		showSubmissionDialog();
 	}
 	
 	public void getTutorialSynapseId(AsyncCallback<String> callback) {
 		synapseClient.getSynapseProperty(WebConstants.CHALLENGE_TUTORIAL_PROPERTY, callback);
 	}
+	
+	public void getWriteUpGuideSynapseId(AsyncCallback<String> callback) {
+		synapseClient.getSynapseProperty(WebConstants.CHALLENGE_WRITE_UP_TUTORIAL_PROPERTY, callback);
+	}
+
 	
 	@Override
 	public void submissionUserGuideSkipped() {
@@ -309,6 +288,19 @@ public class JoinWidget implements JoinWidgetView.Presenter, WidgetRendererPrese
 			};
 			public void onSuccess(String tutorialEntityId) {
 				view.showSubmissionUserGuide(tutorialEntityId, callback);
+			};
+		});
+	}
+	
+	@Override
+	public void showWriteupGuide() {
+		//no submissions found.  walk through the steps of uploading to Synapse
+		getWriteUpGuideSynapseId(new AsyncCallback<String>() {
+			public void onFailure(Throwable caught) {
+				onFailure(new IllegalArgumentException(DisplayConstants.PROPERTY_ERROR + WebConstants.CHALLENGE_WRITE_UP_TUTORIAL_PROPERTY));
+			};
+			public void onSuccess(String tutorialEntityId) {
+				view.showSubmissionUserGuide(tutorialEntityId, null);
 			};
 		});
 	}

@@ -198,9 +198,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		container.setLayout(new FlowLayout());
 		this.add(container);
 				
-		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"><h4 class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\">" + DisplayConstants.ACCESS_WILL_BE + ":&nbsp;</h4>" 
-				+ "<div class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\" style=\"top:-3px; position: relative;\">" + DisplayUtils.getShareSettingsDisplay(null, false, synapseJSNIUtils) + "</div>"				
-				+ "</div>"));
+		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
 		
 		TabPanel tabPanel = new TabPanel();		
 		tabPanel.setPlain(true);
@@ -243,7 +241,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		container.add(new HTML("<h3>"+ DisplayConstants.DATA_USE_BANNER +"</h3>"), new MarginData(25, 10, 5, 10));
 		container.add(new HTML("<div class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\"> <span style=\"font-size: 12pt; display: inline; color: #000;\">"
 				+ DisplayConstants.DATA_USE_BANNER_SUB1  + "</span>" 				
-				+ DisplayUtils.getShareSettingsDisplay(null, true, synapseJSNIUtils) 				
+				+ DisplayUtils.getShareSettingsDisplay(true, synapseJSNIUtils) 				
 				+ "<span style=\"font-size: 12pt; display: inline; color: #000;\">" + DisplayConstants.DATA_USE_BANNER_SUB2 + "</span>" 				
 				+"</div>"), new MarginData(0, 10, 0, 10));		
 		container.add(new HTML(DisplayConstants.DATA_USE_NOTE), new MarginData(3, 10, 10, 10));

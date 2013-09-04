@@ -26,11 +26,23 @@
 					<div class="span-8 notopmargin">
 						<h3>What is Synapse?</h3>
 						<ul class="list check-list">
-						    
-							<li class="whatIsSynapseText">A <span style="font-weight: bold;">private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">public</span> <g:Image resource='{icons.globe16}' /> workspace that allows you to <span style="font-weight: bold;">aggregate</span>, <span style="font-weight: bold;">describe</span>, and <span style="font-weight: bold;">share</span> your research.</li>
-							<li class="whatIsSynapseText">A tool to improve reproducibility of data intensive science, <span style="font-weight: bold;">recording your progress as you work</span> with tools such as <span style="font-weight: bold;">R</span> and <span style="font-weight: bold;">Python</span>.</li>
-							<li class="whatIsSynapseText">A collection of <span style="font-weight: bold;">living research projects</span> enabling you to contribute to <span style="font-weight: bold;">large-scale collaborative solutions</span> to difficult scientific problems.</li>
-							<li class="whatIsSynapseText"><g:Anchor ui:field="aboutSynapseLink"/></li>
+
+							<li class="whatIsSynapseText">
+								A <span style="font-weight: bold;">private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">public</span> <g:Image resource='{icons.globe16}' />
+								workspace that allows you to <span style="font-weight: bold;">aggregate</span>, <span style="font-weight: bold;">describe</span>, and <span style="font-weight: bold;">share</span>
+								your research.
+							</li>
+							<li class="whatIsSynapseText">
+								A tool to improve reproducibility of data intensive science, <span style="font-weight: bold;">recording progress as you work</span>
+								with tools such as <span style="font-weight: bold;">R</span> and <span style="font-weight: bold;">Python</span>.
+							</li>
+							<li class="whatIsSynapseText">
+								A set of <span style="font-weight: bold;">living research projects</span> enabling contribution to
+								<span style="font-weight: bold;">large-scale collaborative solutions</span> to scientific problems.
+							</li>
+							<li class="whatIsSynapseText">
+								<g:Anchor ui:field="aboutSynapseLink" />
+							</li>
 						</ul>
 					</div>
 				</g:HTMLPanel>
@@ -65,11 +77,11 @@
 					<div class="span-8 notopmargin last">
 						<h3>Get Started</h3>
 						Synapse is free to use as a Beta service.<br/><br/> 
-						<g:SimplePanel ui:field="loginBtnPanel"/>
+						<g:SimplePanel styleName="margin-top-8" ui:field="loginBtnPanel"/>
 						<br/>
-						<g:SimplePanel ui:field="registerBtnPanel"/>
+						<g:SimplePanel styleName="margin-top-8" ui:field="registerBtnPanel"/>
 						<br/>
-						<g:SimplePanel ui:field="dream8BtnPanel"/>
+						<g:SimplePanel styleName="margin-top-8" ui:field="dream8BtnPanel"/>
 					</div>
 				</g:HTMLPanel>
 

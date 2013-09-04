@@ -3,6 +3,7 @@ package org.sagebionetworks.web.server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -12,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
+import org.sagebionetworks.web.server.markdownparser.BacktickParser;
 import org.sagebionetworks.web.server.markdownparser.BlockQuoteParser;
 import org.sagebionetworks.web.server.markdownparser.BoldParser;
 import org.sagebionetworks.web.server.markdownparser.BookmarkTargetParser;
@@ -27,14 +29,16 @@ import org.sagebionetworks.web.server.markdownparser.ListParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
 import org.sagebionetworks.web.server.markdownparser.MarkdownRegExConstants;
+import org.sagebionetworks.web.server.markdownparser.MathParser;
 import org.sagebionetworks.web.server.markdownparser.ReferenceParser;
 import org.sagebionetworks.web.server.markdownparser.StrikeoutParser;
 import org.sagebionetworks.web.server.markdownparser.SubscriptParser;
 import org.sagebionetworks.web.server.markdownparser.SuperscriptParser;
 import org.sagebionetworks.web.server.markdownparser.SynapseAutoLinkParser;
+import org.sagebionetworks.web.server.markdownparser.SynapseMarkdownWidgetParser;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
+import org.sagebionetworks.web.server.markdownparser.UnderscoreParser;
 import org.sagebionetworks.web.server.markdownparser.UrlAutoLinkParser;
-import org.sagebionetworks.web.server.markdownparser.WikiSubpageParser;
 
 public class SynapseMarkdownProcessor {
 	private static SynapseMarkdownProcessor singleton = null;
@@ -45,6 +49,7 @@ public class SynapseMarkdownProcessor {
 	private Map<Pattern, String> restorers = new HashMap<Pattern, String>();
 	
 	private CodeParser codeParser;
+	private MathParser mathParser;
 	public static SynapseMarkdownProcessor getInstance() {
 		if (singleton == null) {
 			singleton = new SynapseMarkdownProcessor();
@@ -58,28 +63,38 @@ public class SynapseMarkdownProcessor {
 	}
 	
 	private void init() {
-		//initialize all markdown element parsers
+		//protect widget syntax
+		allElementParsers.add(new ReferenceParser());
+		allElementParsers.add(new BookmarkTargetParser());
+		allElementParsers.add(new SynapseMarkdownWidgetParser());
+		
+		//parsers that handle escaping
+		allElementParsers.add(new UnderscoreParser());
+		allElementParsers.add(new BacktickParser());
+		//other parsers should not affect code spans
+		allElementParsers.add(new CodeSpanParser());
+		//parsers protecting urls go before other simple parsers
+		allElementParsers.add(new ImageParser());
+		allElementParsers.add(new LinkParser());
+		allElementParsers.add(new UrlAutoLinkParser());
+		
+		//initialize other markdown element parsers
 		allElementParsers.add(new BlockQuoteParser());
 		allElementParsers.add(new BoldParser());	
-		allElementParsers.add(new BookmarkTargetParser());
 		codeParser = new CodeParser();
 		allElementParsers.add(codeParser);
-		allElementParsers.add(new CodeSpanParser());
+		mathParser = new MathParser();
+		allElementParsers.add(mathParser);
 		allElementParsers.add(new DoiAutoLinkParser());
 		allElementParsers.add(new HeadingParser());
 		allElementParsers.add(new HorizontalLineParser());
-		allElementParsers.add(new ImageParser());
 		allElementParsers.add(new ItalicsParser());
-		allElementParsers.add(new LinkParser());
 		allElementParsers.add(new ListParser());
-		allElementParsers.add(new ReferenceParser());
 		allElementParsers.add(new StrikeoutParser());
 		allElementParsers.add(new SubscriptParser());
 		allElementParsers.add(new SuperscriptParser());
 		allElementParsers.add(new SynapseAutoLinkParser());
 		allElementParsers.add(new TableParser());
-		allElementParsers.add(new UrlAutoLinkParser());
-		allElementParsers.add(new WikiSubpageParser());
 		
 		//preservers
 		preservers.put(Pattern.compile(MarkdownRegExConstants.NEWLINE_REGEX), ServerMarkdownUtils.TEMP_NEWLINE_DELIMITER);
@@ -126,10 +141,9 @@ public class SynapseMarkdownProcessor {
 		//and this method has been the least destructive (compared to clean() with various WhiteLists, or using java HTMLEditorKit to do it).
 		markdown = Jsoup.parse(markdown).text();
 		markdown = applyPatternReplacements(markdown, restorers);
-		
 		//now make the main single pass to identify markdown elements and create the output
 		markdown = StringUtils.replace(markdown, ServerMarkdownUtils.R_MESSED_UP_ASSIGNMENT, ServerMarkdownUtils.R_ASSIGNMENT);
-		String html = processMarkdown(markdown, allElementParsers);
+		String html = processMarkdown(markdown, allElementParsers, isPreview);
 		if (html == null) {
 			//if the markdown processor fails to convert the md to html (will return null in this case), return the raw markdown instead. (as ugly as it might be, it's better than no information).
 			return originalMarkdown; 
@@ -139,11 +153,7 @@ public class SynapseMarkdownProcessor {
 		return html;
 	}
 	
-	public String processMarkdown(String markdown, List<MarkdownElementParser> parsers) {
-		//first, reset all of the parsers
-		for (MarkdownElementParser parser : parsers) {
-			parser.reset();
-		}
+	public String processMarkdown(String markdown, List<MarkdownElementParser> parsers, boolean isPreview) {
 		//go through the document once, and apply all markdown parsers to it
 		StringBuilder output = new StringBuilder();
 		
@@ -163,6 +173,12 @@ public class SynapseMarkdownProcessor {
 				inactiveComplexParsers.add(parser);
 		}
 		
+		//reset all of the parsers
+		for (MarkdownElementParser parser : parsers) {
+			parser.reset(simpleParsers);
+			parser.setIsPreview(isPreview);
+		}
+		
 		List<String> allLines = new ArrayList<String>();
 		for (String line : markdown.split("\n")) {
 			allLines.add(line);
@@ -175,8 +191,8 @@ public class SynapseMarkdownProcessor {
 				parser.processLine(elements);
 			}
 			
-			//only give the option to start new multiline element (complex parser) or process simple elements if we're not in a code block
-			if (!codeParser.isInMarkdownElement()){
+			//only give the option to start new multiline element (complex parser) or process simple elements if we're not in a code block (or a math block)
+			if (!codeParser.isInMarkdownElement() && !mathParser.isInMarkdownElement()){
 				//then the inactive multiline parsers
 				for (MarkdownElementParser parser : inactiveComplexParsers) {
 					parser.processLine(elements);
@@ -238,9 +254,11 @@ public class SynapseMarkdownProcessor {
 	public String postProcessHtml(String html, boolean isPreview) {
 		//using jsoup, since it's already in this project!
 		Document doc = Jsoup.parse(html);
+		for (MarkdownElementParser parser : allElementParsers) {
+			parser.completeParse(doc);
+		}
 		ServerMarkdownUtils.assignIdsToHeadings(doc);
-		
-		ServerMarkdownUtils.addWidgets(doc, isPreview);
+		doc.outputSettings().prettyPrint(false);
 		return doc.html();
 	}
 }

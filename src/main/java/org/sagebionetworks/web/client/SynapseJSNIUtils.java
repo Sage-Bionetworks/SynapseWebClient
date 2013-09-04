@@ -2,10 +2,12 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 
+import com.google.gwt.user.client.Element;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public interface SynapseJSNIUtils {
@@ -54,4 +56,5 @@ public interface SynapseJSNIUtils {
 	public void uploadUrlToGenomeSpace(String url);	
 	public void uploadUrlToGenomeSpace(String url, String filename);
 	
+	public void processWithMathJax(Element element);
 }

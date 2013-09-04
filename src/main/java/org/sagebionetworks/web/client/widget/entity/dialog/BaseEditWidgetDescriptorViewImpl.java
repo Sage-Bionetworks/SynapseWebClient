@@ -94,9 +94,14 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	
 	@Override
 	public void show(String windowTitle) {
-		window = getNewDialog();
-		window.setHeading(windowTitle);
-		window.show();
+		if (widgetDescriptorPresenter != null) {
+			window = getNewDialog();
+			window.setHeading(windowTitle);
+			window.show();
+		} else {
+			//widget editor presenter not found for this content type
+			DisplayUtils.showErrorMessage("No editor was found for the selected widget.");
+		}
 	}
 
 	@Override

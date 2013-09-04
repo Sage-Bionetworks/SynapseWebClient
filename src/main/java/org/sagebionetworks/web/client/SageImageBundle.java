@@ -64,6 +64,18 @@ public interface SageImageBundle extends ClientBundle {
 	
 	@Source("images/genomeSpace-logo-title-16.gif")
 	ImageResource genomeSpaceLogoTitle16();
-
+	
+	@Source("images/SynapseHeader.png")
+	ImageResource synaspseHeader();
+	
+	@Source("images/SynapseTextHeader.png")
+	ImageResource synapseTextHeader();
+	
+	@Source("images/LogoHeader.png")
+	ImageResource logoHeader();
+	
+	@Source("images/SynapseLogo-small.png")
+	ImageResource synapseLogoSmall();
+	
 	
 }

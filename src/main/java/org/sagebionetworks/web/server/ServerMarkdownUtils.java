@@ -16,7 +16,9 @@ import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.server.markdownparser.MarkdownExtractor;
 import org.sagebionetworks.web.server.markdownparser.MarkdownRegExConstants;
+import org.sagebionetworks.web.server.markdownparser.TableParser;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import eu.henkelmann.actuarius.ActuariusTransformer;
@@ -32,6 +34,14 @@ public class ServerMarkdownUtils {
 	
 	public static final String START_PRE_CODE = "<pre><code";
 	public static final String END_PRE_CODE = "</code></pre>";
+	
+	public static final String START_CONTAINER = "<div class=\"inline-block\" id=\"";
+	public static final String END_CONTAINER = "</div>";
+	
+	public static final String START_LINK = "<a class=\"link\" target=\"_blank\" href=\"";
+	public static final String END_LINK = "</a>";
+	
+	public static final String START_BLOCKQUOTE_TAG = "<blockquote>";
 	public static final String HTML_LINE_BREAK = "<br />\n";
 	public static final String TEMP_NEWLINE_DELIMITER = "%^&1_9d";
 	public static final String TEMP_SPACE_DELIMITER = "%^&2_9d";
@@ -111,7 +121,24 @@ public class ServerMarkdownUtils {
 		return markdown.replace(TEMP_NEWLINE_DELIMITER, "\n").replace(TEMP_SPACE_DELIMITER, " ");
 	}
 	
-
+	/**
+	 * Retrieves each container specified by saved ids and inserts the associated contents into the container
+	 * @param extractor
+	 * @param doc
+	 */
+	public static void insertExtractedContentToMarkdown(MarkdownExtractor extractor, Document doc, boolean hasHtml) {
+		for(String key: extractor.getContainerIds()) {
+			Element el = doc.getElementById(key);
+			if(el != null) {
+				if(hasHtml) {
+					el.prepend(extractor.getContent(key));
+				} else {
+					el.appendText(extractor.getContent(key));
+				}
+			}
+		}
+	}
+	
 	/**
 	 * adds a reference to the subpages wiki widget at the top of the page if it isn't already in the markdown
 	 * @param markdown
@@ -324,7 +351,7 @@ public class ServerMarkdownUtils {
 
 	
 	public static int appendNewTableHtml(StringBuilder builder, String regEx, String[] lines, int tableCount, int i) {
-		builder.append("<table id=\""+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
+		builder.append(TableParser.TABLE_START_HTML+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
 		//header
 		builder.append("<thead>");
 		builder.append("<tr>");
@@ -349,14 +376,13 @@ public class ServerMarkdownUtils {
 			builder.append("</tr>");
 			i++;
 		}
-		builder.append("</tbody>");
-		builder.append("</table>");
+		builder.append(TableParser.TABLE_END_HTML);
 		
 		return i;
 	}
 	
 	public static void addWidgets(Document doc, Boolean isPreview) {
-		String suffix = isPreview ? WebConstants.DIV_ID_PREVIEW_SUFFIX : "";
+		String suffix = SharedMarkdownUtils.getPreviewSuffix(isPreview);
 		// using a regular expression to find our special widget notation, replace with a div with the widget name
 		String regEx = "\\W*?("+WidgetConstants.WIDGET_START_MARKDOWN_ESCAPED+"([^\\}]*)\\})\\W*?"; //reluctant qualification so that it finds multiple per line
 		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
@@ -379,8 +405,8 @@ public class ServerMarkdownUtils {
 						childFound = true;
 						if (matcher.groupCount() == 2) {
 							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
-							sb.append(SharedMarkdownUtils.getWidgetHTML(widgetsFound, suffix, matcher.group(2)));
-							if(matcher.group(2).contains("inlineWidget")) {
+							sb.append(SharedMarkdownUtils.getWidgetHTML(widgetsFound + suffix, matcher.group(2)));
+							if(matcher.group(2).contains(WidgetConstants.INLINE_WIDGET_KEY)) {
 								inlineWidget = true;
 							}
 							widgetsFound++;
@@ -418,4 +444,6 @@ public class ServerMarkdownUtils {
 	public static String getUrlHtml(String url){
 		return "<a target=\"_blank\" class=\"link\" href=\"" + url.trim() + "\">" + url+ "</a>";
 	}
+
+	public static final String DEFAULT_CODE_CSS_CLASS = "no-highlight";
 }

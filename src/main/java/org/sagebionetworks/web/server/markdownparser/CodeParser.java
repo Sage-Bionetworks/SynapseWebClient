@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.server.markdownparser;
-
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,7 +11,7 @@ public class CodeParser extends BasicMarkdownElementParser  {
 	
 	
 	@Override
-	public void reset() {
+	public void reset(List<MarkdownElementParser> simpleParsers) {
 		isInCodeBlock = false;
 		isFirstCodeLine = false;
 	}
@@ -26,8 +26,13 @@ public class CodeParser extends BasicMarkdownElementParser  {
 				isFirstCodeLine = true;
 				StringBuilder sb = new StringBuilder();
 				sb.append(ServerMarkdownUtils.START_PRE_CODE);
+				String codeCssClass = null;
 				if (m.groupCount() == 2)
-					sb.append(" class=\""+m.group(2).toLowerCase()+"\"");
+					codeCssClass = m.group(2).toLowerCase();
+				if (codeCssClass == null || codeCssClass.trim().length() == 0) {
+					codeCssClass = ServerMarkdownUtils.DEFAULT_CODE_CSS_CLASS;
+				}
+				sb.append(" class=\""+codeCssClass+"\"");
 				sb.append(">");
 				line.prependElement(sb.toString());
 			}

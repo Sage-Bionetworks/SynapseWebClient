@@ -25,7 +25,7 @@
 			<g:SimplePanel ui:field="header" />
 	        	<div class="span-24 notopmargin">	
 	<!-- end header -->
-					<div class="span-24 separator"></div>
+					<div class="span-24 separator margin-top-10-imp"></div>
 					<div class="span-24 notopmargin" style="white-space: normal;">
 						<g:SimplePanel ui:field="breadcrumbsPanel"/>
 					</div>

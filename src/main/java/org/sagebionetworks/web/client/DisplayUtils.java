@@ -1,18 +1,33 @@
 package org.sagebionetworks.web.client;
 
 
+import static org.sagebionetworks.web.client.ClientProperties.ALERT_CONTAINER_ID;
+import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
+import static org.sagebionetworks.web.client.ClientProperties.ERROR_OBJ_REASON_KEY;
+import static org.sagebionetworks.web.client.ClientProperties.ESCAPE_CHARACTERS_SET;
+import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_PAGE_HEIGHT;
+import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_PAGE_WIDTH;
+import static org.sagebionetworks.web.client.ClientProperties.GB;
+import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
+import static org.sagebionetworks.web.client.ClientProperties.KB;
+import static org.sagebionetworks.web.client.ClientProperties.MB;
+import static org.sagebionetworks.web.client.ClientProperties.REGEX_CLEAN_ANNOTATION_KEY;
+import static org.sagebionetworks.web.client.ClientProperties.REGEX_CLEAN_ENTITY_NAME;
+import static org.sagebionetworks.web.client.ClientProperties.STYLE_DISPLAY_INLINE;
+import static org.sagebionetworks.web.client.ClientProperties.TB;
+import static org.sagebionetworks.web.client.ClientProperties.WHITE_SPACE;
+import static org.sagebionetworks.web.client.ClientProperties.WIKI_URL;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import static org.sagebionetworks.web.client.ClientProperties.*;
 
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.repo.model.Analysis;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
@@ -53,10 +68,14 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -81,6 +100,7 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
@@ -88,16 +108,15 @@ import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
@@ -109,14 +128,17 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -608,7 +630,14 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
-		Synapse place = new Synapse(entityId, versionNumber);
+		return getSynapseHistoryTokenNoHash(entityId, versionNumber, null);
+	}
+	
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityTab area) {
+		return getSynapseHistoryTokenNoHash(entityId, versionNumber, area, null);
+	}
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityTab area, String areaToken) {
+		Synapse place = new Synapse(entityId, versionNumber, area, areaToken);
 		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
@@ -1578,8 +1607,7 @@ public class DisplayUtils {
 		}
 	}
 
-	public static Widget getShareSettingsDisplay(String prefix, boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
-		if(prefix == null) prefix = "";
+	public static Widget getShareSettingsDisplay(boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
 		final SimplePanel lc = new SimplePanel();
 		lc.addStyleName(STYLE_DISPLAY_INLINE);
 		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
@@ -1587,7 +1615,7 @@ public class DisplayUtils {
 		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
 
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(prefix + "<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
+		shb.appendHtmlConstant("<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
 		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
 
 		//form the html
@@ -1598,5 +1626,129 @@ public class DisplayUtils {
 
 		return lc;
 	}
+	
+	public static Long getVersion(Entity entity) {
+		Long version = null;
+		if (entity != null && entity instanceof Versionable)
+			version = ((Versionable) entity).getVersionNumber();
+		return version;
+	}
+	
+	public static void updateWidgetSelectionState(WidgetSelectionState state, String text, int cursorPos) {
+		state.setWidgetSelected(false);
+		state.setWidgetStartIndex(-1);
+		state.setWidgetEndIndex(-1);
+		state.setInnerWidgetText(null);
 		
+		if (cursorPos > -1) {
+			//move back until I find a whitespace or the beginning
+			int startWord = cursorPos-1;
+			while(startWord > -1 && !Character.isSpace(text.charAt(startWord))) {
+				startWord--;
+			}
+			startWord++;
+			String possibleWidget = text.substring(startWord);
+			if (possibleWidget.startsWith(WidgetConstants.WIDGET_START_MARKDOWN)) {
+				//find the end
+				int endWord = cursorPos;
+				while(endWord < text.length() && !WidgetConstants.WIDGET_END_MARKDOWN.equals(String.valueOf(text.charAt(endWord)))) {
+					endWord++;
+				}
+				//invalid widget specification if we went all the way to the end of the markdown
+				if (endWord < text.length()) {
+					//it's a widget
+					//parse the type and descriptor
+					endWord++;
+					possibleWidget = text.substring(startWord, endWord);
+					//set editable
+					state.setWidgetSelected(true);
+					state.setInnerWidgetText(possibleWidget.substring(WidgetConstants.WIDGET_START_MARKDOWN.length(), possibleWidget.length() - WidgetConstants.WIDGET_END_MARKDOWN.length()));
+					state.setWidgetStartIndex(startWord);
+					state.setWidgetEndIndex(endWord);
+				}
+			}
+		}
+	}
+	
+	public static void addAnnotation(Annotations annos, String name, ANNOTATION_TYPE type) {
+		// Add a new annotation
+		if(ANNOTATION_TYPE.STRING == type){
+			annos.addAnnotation(name, "");
+		}else if(ANNOTATION_TYPE.DOUBLE == type){
+			annos.addAnnotation(name, 0.0);
+		}else if(ANNOTATION_TYPE.LONG == type){
+			annos.addAnnotation(name, 0l);
+		}else if(ANNOTATION_TYPE.DATE == type){
+			annos.addAnnotation(name, new Date());
+		}else{
+			throw new IllegalArgumentException("Unknown type: "+type);
+		}
+	}
+	
+	public static void surroundWidgetWithParens(Panel container, Widget widget) {
+		Text paren = new Text("(");
+		paren.addStyleName("inline-block margin-left-5");
+		container.add(paren);
+
+		widget.addStyleName("inline-block");
+		container.add(widget);
+
+		paren = new Text(")");
+		paren.addStyleName("inline-block margin-right-10");
+		container.add(paren);
+	}
+
+	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, final Callback callback) {
+		final Dialog window = new Dialog();
+		// configure layout
+		window.setSize(560, 465);
+		window.setPlain(true);
+		window.setModal(true);
+		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
+		window.setLayout(new FitLayout());
+		window.add(accessControlListEditor.asWidget(), new FitData(4));			    
+	    
+		// configure buttons
+		window.okText = "Save";
+		window.cancelText = "Cancel";
+	    window.setButtons(Dialog.OKCANCEL);
+	    window.setButtonAlign(HorizontalAlignment.RIGHT);
+	    window.setHideOnButtonClick(false);
+		window.setResizable(false);
+		
+		// "Apply" button
+		// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
+		Button applyButton = window.getButtonById(Dialog.OK);
+		applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				// confirm close action if there are unsaved changes
+				if (accessControlListEditor.hasUnsavedChanges()) {
+					accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
+						@Override
+						public void onSuccess(EntityWrapper result) {
+							callback.invoke();
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							//failure notification is handled by the acl editor view.
+						}
+					});
+				}
+				window.hide();
+			}
+	    });
+		
+		// "Close" button				
+		Button closeButton = window.getButtonById(Dialog.CANCEL);
+	    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+	    });
+		
+		window.show();
+	}
+	
 }

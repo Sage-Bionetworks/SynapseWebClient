@@ -10,6 +10,9 @@ public class WidgetConstants {
 	public static final String YOUTUBE_CONTENT_TYPE = "youtube";
 	public static final String YOUTUBE_FRIENDLY_NAME = "YouTube";
 	
+	public static final String TUTORIAL_WIZARD_CONTENT_TYPE = "tutorial";
+	public static final String TUTORIAL_WIZARD_FRIENDLY_NAME = "Tutorial Wizard";
+	
 	public static final String PROVENANCE_CONTENT_TYPE = "provenance";
 	public static final String PROVENANCE_FRIENDLY_NAME = "Provenance Graph";
 	
@@ -39,7 +42,7 @@ public class WidgetConstants {
 	
 	public static final String SHINYSITE_CONTENT_TYPE = "iframe";
 	public static final String SHINYSITE_FRIENDLY_NAME ="Shiny Site";
-	
+
 	public static final String USERBADGE_CONTENT_TYPE = "userbadge";
 	public static final String USERBADGE_FRIENDLY_NAME ="User Badge";
 	
@@ -52,6 +55,7 @@ public class WidgetConstants {
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	public static final String WIDGET_START_MARKDOWN_ESCAPED = "\\$\\{";
+	public static final String WIDGET_END_MARKDOWN_ESCAPED = "\\}";
 	
 	public static final String TOC_CONTENT_TYPE = "toc";
 	public static final String WIKI_SUBPAGES_CONTENT_TYPE = "wikipages";
@@ -95,6 +99,7 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
 	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	public static final String USERBADGE_WIDGET_ID_KEY = "id";
+	public static final String WIDGET_ENTITY_ID_KEY = "entityId";
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	
 	public static final String SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY = "includePrincipalId";

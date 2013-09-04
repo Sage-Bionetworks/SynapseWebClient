@@ -47,14 +47,23 @@ public class AclUtilsTest {
 		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_VIEW, PermissionLevel.CAN_PARTICIPATE_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER, PermissionLevel.CAN_ADMINISTER_EVALUATION, PermissionLevel.OWNER })), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.READ));
 		
-		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_PARTICIPATE_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION })), 
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_PARTICIPATE_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION })), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.PARTICIPATE));
 		
-		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER, PermissionLevel.CAN_ADMINISTER_EVALUATION, PermissionLevel.OWNER })), 
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_PARTICIPATE_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION })), 
+				AclUtils.getPermisionLevels(ACCESS_TYPE.SUBMIT));
+		
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER, PermissionLevel.CAN_ADMINISTER_EVALUATION, PermissionLevel.OWNER })), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.UPDATE));
 		
 		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION })), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.READ_PRIVATE_SUBMISSION));
+		
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION })), 
+				AclUtils.getPermisionLevels(ACCESS_TYPE.UPDATE_SUBMISSION));
+		
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_ADMINISTER_EVALUATION })), 
+				AclUtils.getPermisionLevels(ACCESS_TYPE.DELETE_SUBMISSION));
 
 		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER, PermissionLevel.CAN_ADMINISTER_EVALUATION, PermissionLevel.OWNER })), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.CREATE));
@@ -83,15 +92,15 @@ public class AclUtilsTest {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.READ);
 		set.add(ACCESS_TYPE.PARTICIPATE);
+		set.add(ACCESS_TYPE.SUBMIT);
 		return set;
 	}
 	
 	private Set<ACCESS_TYPE> getScoreAccessTypeSet() {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.READ);
-		set.add(ACCESS_TYPE.PARTICIPATE);
-		set.add(ACCESS_TYPE.UPDATE);
 		set.add(ACCESS_TYPE.READ_PRIVATE_SUBMISSION);
+		set.add(ACCESS_TYPE.UPDATE_SUBMISSION);
 		return set;
 	}
 
@@ -128,8 +137,11 @@ public class AclUtilsTest {
 		set.add(ACCESS_TYPE.CREATE);
 		set.add(ACCESS_TYPE.READ);
 		set.add(ACCESS_TYPE.PARTICIPATE);
+		set.add(ACCESS_TYPE.SUBMIT);
 		set.add(ACCESS_TYPE.UPDATE);
 		set.add(ACCESS_TYPE.READ_PRIVATE_SUBMISSION);
+		set.add(ACCESS_TYPE.UPDATE_SUBMISSION);
+		set.add(ACCESS_TYPE.DELETE_SUBMISSION);
 		set.add(ACCESS_TYPE.DELETE);
 		set.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
 		return set;

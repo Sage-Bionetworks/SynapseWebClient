@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -90,7 +91,14 @@ public class EvaluationSubmitter implements Presenter {
 						view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
 					} 
 					else {
-						getAvailableEvaluationsSubmitterAliases(evaluations);
+						List<String> submitterAliases = new ArrayList<String>();
+						//add the default team name (if set in the profile and not already in the list)
+						UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
+						String teamName = sessionData.getProfile().getTeamName();
+						if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
+							submitterAliases.add(teamName);
+						}
+						view.popupSelector(submissionEntity == null, evaluations, submitterAliases);
 					}
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -105,39 +113,7 @@ public class EvaluationSubmitter implements Presenter {
 		};
 	}
 	
-	
-	public void getAvailableEvaluationsSubmitterAliases(final List<Evaluation> evaluations) {
-		try {
-			synapseClient.getAvailableEvaluationsSubmitterAliases(new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String jsonString) {
-					try {
-						RestResourceList results = nodeModelCreator.createJSONEntity(jsonString, RestResourceList.class);
-						List<String> submitterAliases = results.getList();
-						//add the default team name (if set in the profile and not already in the list)
-						UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-						String teamName = sessionData.getProfile().getTeamName();
-						if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
-							submitterAliases.add(teamName);
-						}
-						view.popupSelector(submissionEntity == null, evaluations, submitterAliases);	
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-				}
-			});
-		} catch (RestServiceException e) {
-			view.showErrorMessage(e.getMessage());
-		}
-	}
-
-	
+		
 	@Override
 	public void submitToEvaluations(final Reference selectedReference, final List<Evaluation> evaluations, final String submitterAlias) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag
@@ -156,90 +132,9 @@ public class EvaluationSubmitter implements Presenter {
 		final String id = entityId;
 		final Long ver = version;
 		
-		Callback onCheckSuccess = new Callback() {
-			@Override
-			public void invoke() {
-				//Requirements checked; move onto submitting
-				lookupEtag(id, ver, evaluations, submitterAlias);
-			}
-		};
-		
-		//Check access requirements with the entity id before moving on with submission
-		try {
-			checkSubmissionRequirements(id, onCheckSuccess);
-		} catch(RestServiceException e) {
-			view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
-		}
+		lookupEtag(id, ver, evaluations, submitterAlias); 
 	}
 	
-	/**
-	 * Check for unmet access restrictions. As long as more exist, it will not move onto submissions.
-	 * @throws RestServiceException
-	 */
-	public void checkSubmissionRequirements(final String entityId, final Callback onCheckSuccess) throws RestServiceException {
-		//Check for unmet access restrictions
-		synapseClient.getUnmetAccessRequirements(entityId, new AsyncCallback<AccessRequirementsTransport>() {
-			@Override
-			public void onSuccess(AccessRequirementsTransport result) {
-				try {
-					PaginatedResults<TermsOfUseAccessRequirement> ar = nodeModelCreator.createPaginatedResults(result.toString(), TermsOfUseAccessRequirement.class);
-					if (ar.getTotalNumberOfResults() > 0) {
-						//there are unmet access requirements.  user must accept all before joining the challenge
-						List<TermsOfUseAccessRequirement> unmetRequirements = ar.getResults();
-						final AccessRequirement firstUnmetAccessRequirement = unmetRequirements.get(0);
-						String text = GovernanceServiceHelper.getAccessRequirementText(firstUnmetAccessRequirement);
-						Callback termsOfUseCallback = new Callback() {
-							@Override
-							public void invoke() {
-								//agreed to terms of use.
-								setLicenseAccepted(firstUnmetAccessRequirement.getId(), entityId, onCheckSuccess);
-							}
-						};
-						//pop up the requirement
-						view.showAccessRequirement(text, termsOfUseCallback);
-					} else {
-						onCheckSuccess.invoke();
-					}
-				} catch(Throwable e) {
-					onFailure(e);
-				}
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
-			}
-		});
-	}
-	
-	public void setLicenseAccepted(Long arId, final String entityId, final Callback onCheckSuccess) {	
-		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
-			@Override
-			public void invoke(Throwable t) {
-				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + t.getMessage());
-			}
-		};
-		
-		Callback onSuccess = new Callback() {
-			@Override
-			public void invoke() {
-				//ToU signed, now try to submit (will check for other unmet access restrictions)
-				try {
-					checkSubmissionRequirements(entityId, onCheckSuccess);
-				} catch(RestServiceException e) {
-					onFailure.invoke(e);
-				}
-			}
-		};
-		
-		GovernanceServiceHelper.signTermsOfUse(
-				authenticationController.getCurrentUserPrincipalId(), 
-				arId, 
-				onSuccess, 
-				onFailure, 
-				synapseClient, 
-				jsonObjectAdapter);
-	}
 	
 	public void lookupEtag(final String id, final Long ver, final List<Evaluation> evaluations, final String submitterAlias) {
 		//look up entity for the current etag

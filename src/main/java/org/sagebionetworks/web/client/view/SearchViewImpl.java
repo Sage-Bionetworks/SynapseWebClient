@@ -123,6 +123,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		loadShowing = false;
@@ -135,6 +136,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

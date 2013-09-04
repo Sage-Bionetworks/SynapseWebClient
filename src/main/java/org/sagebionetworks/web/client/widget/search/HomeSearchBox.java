@@ -10,7 +10,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
@@ -22,17 +23,17 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 	private HomeSearchBoxView view;
 	private GlobalApplicationState globalApplicationState;
 	private JSONObjectAdapter jsonObjectAdapter;
-	
+	private SynapseClientAsync synapseClient;
 	private boolean searchAll = false;
 	
 	@Inject
 	public HomeSearchBox(HomeSearchBoxView view, 
 			GlobalApplicationState globalApplicationState,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter, SynapseClientAsync synapseClient) {
 		this.view = view;		
 		this.globalApplicationState = globalApplicationState;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		
+		this.synapseClient = synapseClient;
 		view.setPresenter(this);
 	}	
 	
@@ -58,9 +59,9 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 				// if fail, fall back on regular search
 			}
 		}
-		globalApplicationState.getPlaceChanger().goTo(new Search(value));
+		SearchUtil.searchForTerm(value, globalApplicationState, synapseClient);
 	}
-
+	
 	@Override
 	public String getSearchAllProjectsLink() {		
 		return DisplayUtils.getSearchHistoryToken(getSearchQueryForType("project"));	

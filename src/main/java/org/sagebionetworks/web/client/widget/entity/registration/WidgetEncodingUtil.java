@@ -9,7 +9,7 @@ public class WidgetEncodingUtil {
 	private static Map<String, Character> h2c = new HashMap<String, Character>();
 	
 	static {
-		//encodes { } - _ . ! ~ * ' ( ) [ ] : ; / ? & = + , # $ %
+		//encodes { } - _ . ! ~ * ' ( ) [ ] : ; / ? & = + , # $ % |
 		c2h.put('{',"%7B");
 		c2h.put('}', "%7D");
 		c2h.put('-', "%2D");
@@ -37,6 +37,8 @@ public class WidgetEncodingUtil {
 		c2h.put('#', "%23");
 		c2h.put('$', "%24");
 		c2h.put('%', "%25");
+		c2h.put('|', "%7C");
+		
 		
 		//reverse lookup for decode
 		for (Character v : c2h.keySet()) {

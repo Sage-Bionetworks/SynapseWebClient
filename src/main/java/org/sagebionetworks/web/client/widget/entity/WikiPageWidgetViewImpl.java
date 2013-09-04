@@ -133,7 +133,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.currentPage = newPage;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.spanWidth = spanWidth;
-		
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
 		showDefaultViewWithWiki();
@@ -147,8 +146,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private void showDefaultViewWithWiki() {
 		removeAll(true);
 		SimplePanel topBarWrapper = new SimplePanel();
-		String hrString = isEmbeddedInOwnerPage ? "separator" : "";
-		topBarWrapper.addStyleName("span-"+spanWidth + " margin-top-5 " + hrString);
+		topBarWrapper.addStyleName("span-"+spanWidth + " margin-top-5");
 		String titleString = isEmbeddedInOwnerPage ? "" : currentPage.getTitle();
 		topBarWrapper.add(new HTMLPanel("<h2 class=\"span-"+(spanWidth-5)+"\" style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
 		add(topBarWrapper);
@@ -212,7 +210,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		
 		if(addPageButton == null) {
 			addPageButton = getInsertPageButton(false);
-			commandBar.add(addPageButton);			
+			commandBar.add(addPageButton);
 		}
 		
 		commandBarWrapper.setVisible(canEdit);
@@ -258,8 +256,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				final TextArea mdField = new TextArea();
 				mdField.setValue(currentPage.getMarkdown());
 				mdField.addStyleName("span-"+spanWidth);
+				mdField.addStyleName("markdownEditor");
 				mdField.setHeight("400px");
-
+				
 				LayoutContainer form = new LayoutContainer();
 				form.addStyleName("span-" + spanWidth);
 				final TextBox titleField = new TextBox();

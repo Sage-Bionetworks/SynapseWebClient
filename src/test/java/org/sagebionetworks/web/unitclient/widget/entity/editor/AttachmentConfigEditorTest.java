@@ -24,7 +24,7 @@ public class AttachmentConfigEditorTest {
 	AttachmentConfigView mockView;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
-	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
+	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null, null);
 	
 	@Before
 	public void setup(){

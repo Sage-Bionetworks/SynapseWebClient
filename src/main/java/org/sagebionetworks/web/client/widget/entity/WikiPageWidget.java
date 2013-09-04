@@ -52,9 +52,11 @@ SynapseWidgetPresenter {
 	private int spanWidth;
 	private WikiPageWidgetView view; 
 	AuthenticationController authenticationController;
+	private String originalMarkdown;
 	
 	public interface Callback{
 		public void pageUpdated();
+		public void noWikiFound();
 	}
 	
 	public interface OwnerObjectNameCallback{
@@ -84,12 +86,12 @@ SynapseWidgetPresenter {
 		return view.asWidget();
 	}
 	
-	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, Callback callback, final boolean isEmbeddedInOwnerPage, final int spanWidth) {
+	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage, final int spanWidth) {
+		originalMarkdown = null;
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.spanWidth = spanWidth;
-		
 		//set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -97,6 +99,9 @@ SynapseWidgetPresenter {
 			this.callback = new Callback() {
 				@Override
 				public void pageUpdated() {
+				}
+				@Override
+				public void noWikiFound() {
 				}
 			};
 		
@@ -110,6 +115,7 @@ SynapseWidgetPresenter {
 						try {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
+							originalMarkdown = currentPage.getMarkdown();
 							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isEmbeddedInOwnerPage, spanWidth);
 						} catch (JSONObjectAdapterException e) {
 							onFailure(e);
@@ -124,6 +130,9 @@ SynapseWidgetPresenter {
 								view.showNoWikiAvailableUI();
 							else if (!isEmbeddedInOwnerPage) //otherwise, if it's not embedded in the owner page, show a 404
 								view.show404();
+							
+							if (callback != null)
+								callback.noWikiFound();
 						}
 						else if (caught instanceof ForbiddenException) {
 							if (!isEmbeddedInOwnerPage) //if it's not embedded in the owner page, show a 403
@@ -147,6 +156,11 @@ SynapseWidgetPresenter {
 			public void onSuccess(String result) {
 				try {
 					currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
+					if (originalMarkdown != null && !originalMarkdown.equals(currentPage.getMarkdown())) {
+						//markdown changed by another process.  please refresh to see the most current version of the wiki
+						view.showErrorMessage(DisplayConstants.ERROR_WIKI_MODIFIED);
+						return;
+					}
 					//update with the most current markdown and title
 					currentPage.setMarkdown(updatedMarkdown);
 					if (updatedTitle != null && updatedTitle.length() > 0)
@@ -236,6 +250,9 @@ SynapseWidgetPresenter {
 				} catch (JSONObjectAdapterException e) {
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 				}
+			}
+			@Override
+			public void noWikiFound() {
 			}
 		});
 	}

@@ -8,6 +8,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -33,7 +34,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	 * @param evaluations List of evaluations to display
 	 * @param evaluationCallback call back with the evaluation if it is selected
 	 */
-	public void configure(String entityId) {
+	public void configure(String entityId, final CallbackP<Boolean> isChallengeCallback) {
 		synapseClient.getSharableEvaluations(entityId, new AsyncCallback<ArrayList<String>>() {
 			
 			@Override
@@ -44,6 +45,8 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 						evaluations.add(new Evaluation(adapterFactory.createNew(eh)));
 					}
 					view.configure(evaluations);
+					if (isChallengeCallback != null)
+						isChallengeCallback.invoke(evaluations.size() > 0);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}

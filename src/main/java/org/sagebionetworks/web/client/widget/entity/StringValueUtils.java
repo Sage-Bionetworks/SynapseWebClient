@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.Date;
 import java.util.List;
 
+import org.sagebionetworks.web.shared.WebConstants;
+
 
 /**
  * Utilities for generating the display string for various object types.
@@ -24,7 +26,7 @@ public class StringValueUtils {
 		if(value instanceof String){
 			String stringValue =  (String) value;
 			if(stringValue.length() > MAX_CHARS_IN_LIST){
-				return stringValue.substring(0,MAX_CHARS_IN_LIST-1);
+				return stringValue.substring(0,MAX_CHARS_IN_LIST-1) + WebConstants.HTML_ELLIPSIS;
 			}else{
 				return stringValue;
 			}

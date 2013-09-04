@@ -20,7 +20,7 @@
         <div class="clear"></div>
     	<div class="container"> 
     		<div class="span-24 notopmargin"><g:SimplePanel ui:field="header" /></div>		
-			<div class="span-24 separator"></div>
+			<div class="span-24 separator margin-top-10-imp"></div>
 			<div class="span-24 notopmargin"><g:SimplePanel ui:field="entityPageTopPanel" /></div>
             <div class="clear"></div>
         </div> <!-- close class="container" -->

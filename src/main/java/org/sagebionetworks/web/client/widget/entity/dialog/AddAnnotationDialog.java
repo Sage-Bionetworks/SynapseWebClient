@@ -13,7 +13,6 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
@@ -27,43 +26,12 @@ import com.extjs.gxt.ui.client.widget.layout.FormData;
 public class AddAnnotationDialog {
 	
 	/**
-	 * The annotation types.
-	 * @author John
-	 *
-	 */
-	public enum TYPE {
-		STRING("Text"),
-		LONG("Integer"),
-		DOUBLE("Floating Point"),
-		DATE("Date");
-		
-		private String dispalyText;
-		TYPE(String dispalyText){
-			this.dispalyText = dispalyText;
-		}
-		
-		/**
-		 * This display text for this option.
-		 * @return
-		 */
-		public String getDispalyText(){
-			return dispalyText;
-		}
-		
-		public static TYPE getTypeForDisplay(String dispaly){
-			for(TYPE type: values()){
-				if(type.dispalyText.equals(dispaly)) return type;
-			}
-			throw new IllegalArgumentException("Cannot find type for display: "+dispaly);
-		}
-	}
-	/**
 	 * Callback called when the user adds an annotation.
 	 * @author John
 	 *
 	 */
 	public interface Callback{
-		public void addAnnotation(String name, TYPE type);
+		public void addAnnotation(String name, ANNOTATION_TYPE type);
 	}
 	
 	/**
@@ -92,8 +60,8 @@ public class AddAnnotationDialog {
 		nameField.setFieldLabel("Name");
 		ListStore<ComboValue> store = new ListStore<ComboValue>();
 		// Add each type
-		for(TYPE type: TYPE.values()){
-			ComboValue comboValue = new ComboValue(type.getDispalyText());
+		for(ANNOTATION_TYPE type: ANNOTATION_TYPE.values()){
+			ComboValue comboValue = new ComboValue(type.getDisplayText());
 			store.add(comboValue);
 		}
 		final ComboBox<ComboValue> combo = new ComboBox<ComboValue>();
@@ -104,6 +72,7 @@ public class AddAnnotationDialog {
 		combo.setEditable(false);
 		combo.setTriggerAction(TriggerAction.ALL);
 		combo.setAllowBlank(false);
+		combo.setValue(new ComboValue(ANNOTATION_TYPE.STRING.getDisplayText()));
 		// Add them to the form
 		FormData basicFormData = new FormData("-20");
 		Margins margins = new Margins(10, 10, 0, 0);
@@ -121,7 +90,7 @@ public class AddAnnotationDialog {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
 				// Let the caller know.
-				callback.addAnnotation(nameField.getValue(), TYPE.getTypeForDisplay(combo.getValue().getValue()) );
+				callback.addAnnotation(nameField.getValue(), ANNOTATION_TYPE.getTypeForDisplay(combo.getValue().getValue()) );
 			}
 	    });
 		
