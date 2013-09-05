@@ -46,10 +46,34 @@ public class WebConstants {
 	
 	// OpenID related constants
 
+	/**
+	 * name of a web request parameter indicating that the user accepts the terms of use.
+	 * Passed at the initiation of OpenID authentication.
+	 * 
+	 */
+	public static final String ACCEPTS_TERMS_OF_USE_PARAM = "acceptsTermsOfUse";
+
+	/**
+	 * A token built into the redirect URL by the authentication controller at the end of OpenID
+	 * authentication to indicate that the Synapse Terms of Use have not been signed.
+	 * 
+	 */
+	public static final String ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN = "TermsOfUseAcceptanceRequired";
+
+	/**
+	 * A token built into the redirect URL by the authentication controller at the end of OpenID
+	 * authentication to indicate that an error has occurred.
+	 * 
+	 */
+	public static final String OPEN_ID_ERROR_TOKEN = "OpenIDError";
+
+	
 	public static final String OPEN_ID_URI = "/Portal/openid";
 
 	public static final String OPEN_ID_PROVIDER = "OPEN_ID_PROVIDER";
 	// 		e.g. https://www.google.com/accounts/o8/id
+	
+	public static final String OPEN_ID_PROVIDER_GOOGLE_VALUE = "GOOGLE";
 	
 	// this is the parameter name for the value of the final redirect
 	public static final String RETURN_TO_URL_PARAM = "RETURN_TO_URL";
