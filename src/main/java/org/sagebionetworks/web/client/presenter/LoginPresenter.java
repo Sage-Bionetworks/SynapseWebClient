@@ -176,12 +176,12 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						} else {
 							view.showErrorMessage("An error occurred. Please try logging in again.");
 							view.showLogin(openIdActionUrl, openIdReturnUrl);
-							globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 						}
 					}
 				});
 			} 
 		} else if (WebConstants.OPEN_ID_ERROR_TOKEN.equals(token)) {
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 			view.showErrorMessage("An error occurred. Please try logging in again.");
 			view.showLogin(openIdActionUrl, openIdReturnUrl);
 		} else {
