@@ -101,6 +101,41 @@ public class OpenIDUtils {
 		
 		sampleConsumer.authRequest(openIdProvider, openIDCallbackURL, servlet, request, response);
 	}
+	
+	public static String createRedirectURL(
+			String returnToURL, 
+			String sessionToken,
+			boolean crowdAcceptsTermsOfUse,
+			boolean isGWTMode) throws URISyntaxException {
+		String redirectUrl = null;
+		if (isGWTMode) {
+			redirectUrl = returnToURL+":";
+			if (crowdAcceptsTermsOfUse) {
+				redirectUrl += sessionToken;
+			} else {
+				redirectUrl += WebConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN;
+			}
+		} else {
+			if (crowdAcceptsTermsOfUse) {
+				redirectUrl = addRequestParameter(returnToURL, "status=OK&sessionToken="+sessionToken);
+			} else {
+				redirectUrl = addRequestParameter(returnToURL, "status="+WebConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN);
+			}
+		}
+		return redirectUrl;
+	}
+
+	public static String createErrorRedirectURL(
+			String returnToURL, 
+			boolean isGWTMode) throws URISyntaxException {
+		String redirectUrl = null;
+		if (isGWTMode) {
+			redirectUrl = returnToURL+":"+WebConstants.OPEN_ID_ERROR_TOKEN;
+		} else {
+			redirectUrl = addRequestParameter(returnToURL, "status="+WebConstants.OPEN_ID_ERROR_TOKEN);
+		}
+		return redirectUrl;
+	}
 
 	public static void openIDCallback(
 			HttpServletRequest request,
@@ -168,24 +203,8 @@ public class OpenIDUtils {
 			CrowdAuthUtil.setUserAttributes(email, attrs);
 			
 			Session crowdSession = CrowdAuthUtil.authenticate(credentials, false);
-
-
 			boolean crowdAcceptsTermsOfUse = CrowdAuthUtil.acceptsTermsOfUse(email, acceptsTermsOfUse);
-			String redirectUrl = null;
-			if (isGWTMode) {
-				redirectUrl = returnToURL+":";
-				if (crowdAcceptsTermsOfUse) {
-					redirectUrl += crowdSession.getSessionToken();
-				} else {
-					redirectUrl += WebConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN;
-				}
-			} else {
-				if (crowdAcceptsTermsOfUse) {
-					redirectUrl = addRequestParameter(returnToURL, "status=OK&sessionToken="+crowdSession.getSessionToken());
-				} else {
-					redirectUrl = addRequestParameter(returnToURL, "status="+WebConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN);
-				}
-			}
+			String redirectUrl = createRedirectURL(returnToURL, crowdSession.getSessionToken(), crowdAcceptsTermsOfUse, isGWTMode);
 			String location = response.encodeRedirectURL(redirectUrl);
 			response.sendRedirect(location);
 		} catch (Exception e) {
@@ -195,15 +214,9 @@ public class OpenIDUtils {
 				if (e instanceof AuthenticationException) throw (AuthenticationException)e;
 				throw new AuthenticationException(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), e);
 			} else {
-				String redirectUrl = null;
-				if (isGWTMode) {
-					redirectUrl = returnToURL+":"+WebConstants.OPEN_ID_ERROR_TOKEN;
-				} else {
-					redirectUrl = addRequestParameter(returnToURL, "status="+WebConstants.OPEN_ID_ERROR_TOKEN);
-				}
+				String redirectUrl = createErrorRedirectURL(returnToURL, isGWTMode);
 				String location = response.encodeRedirectURL(redirectUrl);
 				response.sendRedirect(location);
-				
 			}
 		}
 	}
