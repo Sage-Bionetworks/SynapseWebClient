@@ -52,10 +52,10 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		// federated login button
 		SafeHtmlBuilder sb = new SafeHtmlBuilder()		
 		.appendHtmlConstant("<form accept-charset=\"UTF-8\" action=\""+ presenter.getOpenIdActionUrl() +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
-		.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_PROVIDER+"\" type=\"hidden\" value=\""+ DisplayConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>")
+		.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_PROVIDER+"\" type=\"hidden\" value=\""+ WebConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>")
 		.appendHtmlConstant("    <input name=\""+WebConstants.RETURN_TO_URL_PARAM+"\" type=\"hidden\" value=\""+  presenter.getOpenIdReturnUrl() +"\"/>");
 		if (userHasExplictlyAcceptedTermsOfUse) {
-			sb.appendHtmlConstant("    <input name=\""+ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
+			sb.appendHtmlConstant("    <input name=\""+WebConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
 		}
 		sb.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_MODE+"\" type=\"hidden\" value=\""+  WebConstants.OPEN_ID_MODE_GWT +"\"/>");
 		sb.appendHtmlConstant("    <button id=\"" + DisplayConstants.ID_BTN_LOGIN_GOOGLE + "\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"https://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")

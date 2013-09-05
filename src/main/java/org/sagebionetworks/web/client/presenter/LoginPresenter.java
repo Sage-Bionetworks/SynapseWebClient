@@ -123,7 +123,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				isSso = authenticationController.getCurrentUserIsSSO();
 			authenticationController.logoutUser();
 			view.showLogout(isSso);
-		} else if (token!=null && ServiceConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN.equals(token)) {
+		} else if (token!=null && WebConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN.equals(token)) {
 			userService.getTermsOfUse(new AsyncCallback<String>() {
 				public void onSuccess(String content) {
 					view.showTermsOfUse(content, 
@@ -180,6 +180,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					}
 				});
 			} 
+		} else if (WebConstants.OPEN_ID_ERROR_TOKEN.equals(token)) {
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
+			view.showErrorMessage("An error occurred. Please try logging in again.");
+			view.showLogin(openIdActionUrl, openIdReturnUrl);
 		} else {
 			// standard view
 			authenticationController.logoutUser();

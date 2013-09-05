@@ -121,8 +121,6 @@ public class DisplayConstants {
 	 */
 	public static final String SINGLE_SIGN_ON_USERID = "SSO";
 	public static final String OPEN_ID_SAGE_LOGIN_BUTTON_TEXT = "Sign in with a Google Account";
-	public static final String OPEN_ID_PROVIDER_GOOGLE_VALUE = "https://www.google.com/accounts/o8/id";
-	public static final String OPEN_ID_PROVIDER_SAGE_VALUE = "https://www.google.com/accounts/o8/site-xrds?hd=sagebase.org";
 
 	public static final String SERVICE_PARENT_ID_KEY = "parentId";
 	public static final String SERVICE_ETAG_KEY = "etag";
