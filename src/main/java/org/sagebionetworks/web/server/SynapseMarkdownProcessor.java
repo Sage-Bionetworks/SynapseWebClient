@@ -37,6 +37,7 @@ import org.sagebionetworks.web.server.markdownparser.SuperscriptParser;
 import org.sagebionetworks.web.server.markdownparser.SynapseAutoLinkParser;
 import org.sagebionetworks.web.server.markdownparser.SynapseMarkdownWidgetParser;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
+import org.sagebionetworks.web.server.markdownparser.TildeParser;
 import org.sagebionetworks.web.server.markdownparser.UnderscoreParser;
 import org.sagebionetworks.web.server.markdownparser.UrlAutoLinkParser;
 
@@ -69,6 +70,7 @@ public class SynapseMarkdownProcessor {
 		allElementParsers.add(new SynapseMarkdownWidgetParser());
 		
 		//parsers that handle escaping
+		allElementParsers.add(new TildeParser());
 		allElementParsers.add(new UnderscoreParser());
 		allElementParsers.add(new BacktickParser());
 		//other parsers should not affect code spans
