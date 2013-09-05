@@ -210,6 +210,12 @@ public class MarkdownRegExConstants {
 	
 	/**
 	 * Recognizes example input:
+	 * \~
+	 */
+	public static final String TILDE_ESCAPED_REGEX = "\\\\~";
+	
+	/**
+	 * Recognizes example input:
 	 * \_
 	 */
 	public static final String UNDERSCORE_ESCAPED_REGEX = "\\\\_";
