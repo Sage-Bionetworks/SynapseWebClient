@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -16,6 +17,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -115,13 +117,10 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 	
 	@Override
 	public void configurePager(int start, int end, int total) {
-		String label = start + "-" + end + " of " + total;
-		StringBuilder builder = new StringBuilder();
-		builder.append("<ul class=\"pager\">");
-		builder.append("<li><a id=\"prevButton\">Previous</a></li>");
-		builder.append(label);
-		builder.append("<li><a id=\"nextButton\">Next</a></li>");
-		builder.append("</ul>");
+		UnorderedListPanel panel = new UnorderedListPanel();
+		panel.setStyleName("pager");
+		Label label = new Label(start + "-" + end + " of " + total);
+		
 		Anchor prev = new Anchor();
 		prev.setHTML("Previous");
 		prev.addStyleName("link");
@@ -131,7 +130,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 				presenter.pageBack();
 			}
 		});
-		DisplayUtils.addTooltip(this.synapseJSNIUtils, prev, DisplayConstants.PAGE_BACK, TOOLTIP_POSITION.BOTTOM);
+		
 		Anchor next = new Anchor();
 		next.setHTML("Next");
 		next.addStyleName("link");
@@ -141,10 +140,20 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 				presenter.pageForward();
 			}
 		});
-		DisplayUtils.addTooltip(this.synapseJSNIUtils, next, DisplayConstants.PAGE_BACK, TOOLTIP_POSITION.BOTTOM);
-		HTMLPanel panel = new HTMLPanel(builder.toString());
-		panel.addAndReplaceElement(prev, "prevButton");
-		panel.addAndReplaceElement(next, "nextButton");
+		
+		if (start == 1) {
+			panel.add(prev, "disabled");
+		} else {
+			panel.add(prev);
+			DisplayUtils.addTooltip(this.synapseJSNIUtils, prev, DisplayConstants.PAGE_BACK, TOOLTIP_POSITION.BOTTOM);
+		}
+		panel.add(label, "pagerLabel");
+		if(end == total) {
+			panel.add(next, "disabled");
+		} else {
+			panel.add(next);
+			DisplayUtils.addTooltip(this.synapseJSNIUtils, next, DisplayConstants.PAGE_BACK, TOOLTIP_POSITION.BOTTOM);
+		}
 		add(panel);
 		layout(true);
 	}
