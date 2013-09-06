@@ -460,3 +460,7 @@ button.close{padding:0;cursor:pointer;background:transparent;border:0;-webkit-ap
 .visible-desktop{display:inherit !important;}
 @media (min-width:768px) and (max-width:979px){.hidden-desktop{display:inherit !important;} .visible-desktop{display:none !important ;} .visible-tablet{display:inherit !important;} .hidden-tablet{display:none !important;}}@media (max-width:767px){.hidden-desktop{display:inherit !important;} .visible-desktop{display:none !important;} .visible-phone{display:inherit !important;} .hidden-phone{display:none !important;}}.visible-print{display:none !important;}
 @media print{.visible-print{display:inherit !important;} .hidden-print{display:none !important;}}
+.pager {  margin: 20px 0;  text-align: center;  list-style: none;  *zoom: 1;}
+.pager li {  display: inline;}
+.pager li > a,.pager li > span {  display: inline-block;  margin: 5px; padding: 5px 14px;  background-color: #fff;  border: 1px solid #ddd;  -webkit-border-radius: 15px;     -moz-border-radius: 15px;          border-radius: 15px;}
+.pager li > a:hover,.pager li > a:focus {  text-decoration: none;  background-color: #f5f5f5;}
