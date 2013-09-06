@@ -14,10 +14,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -83,9 +81,17 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 						//column data (each renderer has a list of columns that it will output.  ask for each value
 						for (int j = 0; j < renderers.length; j++) {
 							List<String> rendererColumnNames = renderers[j].getColumnNames();
+							Map<String, List<String>> outputColumnData = renderers[j].getColumnData();
+		
 							for (Iterator<String> iterator = rendererColumnNames.iterator(); iterator.hasNext();) {
 								String columnName = iterator.next();
-								String value = renderers[j].getColumnData().get(columnName).get(i);
+								String value;
+								//Check that this renderer has initialized data for this column
+								if(outputColumnData.get(columnName) == null) {
+									value = "";
+								} else {
+									value = outputColumnData.get(columnName).get(i);
+								}
 								builder.append("<td>"+value+"</td>");
 							}
 						}
@@ -109,44 +115,37 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 	
 	@Override
 	public void configurePager(int start, int end, int total) {
-		FlowPanel hp = new FlowPanel();
-		hp.addStyleName("margin-bottom-40");
-		hp.addStyleName("margin-top-10");
-		Image pageBack = new Image(iconsImageBundle.NavigateLeft16());
-		pageBack.addStyleName("imageButton");
-		pageBack.addStyleName("left");
-		pageBack.addClickHandler(new ClickHandler() {
+		String label = start + "-" + end + " of " + total;
+		StringBuilder builder = new StringBuilder();
+		builder.append("<ul class=\"pager\">");
+		builder.append("<li><a id=\"prevButton\">Previous</a></li>");
+		builder.append(label);
+		builder.append("<li><a id=\"nextButton\">Next</a></li>");
+		builder.append("</ul>");
+		Anchor prev = new Anchor();
+		prev.setHTML("Previous");
+		prev.addStyleName("link");
+		prev.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.pageBack();
 			}
 		});
-		DisplayUtils.addTooltip(this.synapseJSNIUtils, pageBack, DisplayConstants.PAGE_BACK, TOOLTIP_POSITION.BOTTOM);
-	 	
-		Image pageForward = new Image(iconsImageBundle.NavigateRight16());
-		pageForward.addStyleName("imageButton");
-		pageForward.addStyleName("left");
-		pageForward.addStyleName("margin-left-5");
-		pageForward.addClickHandler(new ClickHandler() {
+		DisplayUtils.addTooltip(this.synapseJSNIUtils, prev, DisplayConstants.PAGE_BACK, TOOLTIP_POSITION.BOTTOM);
+		Anchor next = new Anchor();
+		next.setHTML("Next");
+		next.addStyleName("link");
+		next.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.pageForward();
 			}
 		});
-		DisplayUtils.addTooltip(this.synapseJSNIUtils, pageForward, DisplayConstants.PAGE_NEXT, TOOLTIP_POSITION.BOTTOM);
-	 	
-		Label label = new Label(start + "-" + end + " of " + total);
-		label.addStyleName("left");
-		label.addStyleName("margin-left-5");
-		
-		if (start != 1)
-			hp.add(pageBack);
-		hp.add(label);
-		if (end != total)
-			hp.add(pageForward);
-//		pageBack.setEnabled(start > 1);
-//		pageForward.setEnabled(end < total);
-		add(hp);
+		DisplayUtils.addTooltip(this.synapseJSNIUtils, next, DisplayConstants.PAGE_BACK, TOOLTIP_POSITION.BOTTOM);
+		HTMLPanel panel = new HTMLPanel(builder.toString());
+		panel.addAndReplaceElement(prev, "prevButton");
+		panel.addAndReplaceElement(next, "nextButton");
+		add(panel);
 		layout(true);
 	}
 	
