@@ -1035,9 +1035,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			long startTime = System.currentTimeMillis();
 			String html = null;
 			if (isAlphaMode)
-				html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview);
+				html = ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);
 			else
-				html = ServerMarkdownUtils.markdown2Html(markdown, isPreview, markdownProcessor);				
+				html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview);
 			
 			long endTime = System.currentTimeMillis();
 			float elapsedTime = endTime-startTime;
