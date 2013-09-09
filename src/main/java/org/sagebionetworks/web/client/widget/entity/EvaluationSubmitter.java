@@ -182,7 +182,7 @@ public class EvaluationSubmitter implements Presenter {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.EVALUATION_REGISTRATION_ERROR + caught.getMessage());
+				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR+ caught.getMessage());
 			}
 		});
 	}
@@ -191,7 +191,7 @@ public class EvaluationSubmitter implements Presenter {
 		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
 			@Override
 			public void invoke(Throwable t) {
-				view.showErrorMessage(DisplayConstants.EVALUATION_REGISTRATION_ERROR + t.getMessage());
+				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + t.getMessage());
 			}
 		};
 		
