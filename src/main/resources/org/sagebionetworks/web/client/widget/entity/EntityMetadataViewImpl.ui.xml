@@ -13,7 +13,7 @@
 			</g:HTMLPanel>
 		</h2>
 		<g:HTMLPanel ui:field="detailedMetadata">
-		    <div><span class="boldText margin-right-5">Synapse ID:</span><span ui:field="entityId"></span></div>
+		    <div><span class="boldText margin-right-5">Synapse ID: </span><span ui:field="entityId"></span></div>
 			<div class="span-17 notopmargin">
 				<g:HTMLPanel ui:field="dataUseContainer" ></g:HTMLPanel>
 			</div>			
