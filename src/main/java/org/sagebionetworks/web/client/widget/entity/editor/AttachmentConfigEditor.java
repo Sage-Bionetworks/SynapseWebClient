@@ -27,7 +27,9 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 		view.configure(wikiKey);
 		try {
 			//try to set the image widget file name
-			view.setUploadedFileHandleName(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
+				view.setUploadedFileHandleName(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+			}
 		} catch (Exception e) {}
 	}
 	
