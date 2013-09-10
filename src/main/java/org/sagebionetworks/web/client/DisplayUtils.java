@@ -573,6 +573,10 @@ public class DisplayUtils {
 		return getWarningHtml(DisplayConstants.MARKDOWN_WIDGET_WARNING, warningText);
 	}
 	
+	public static String getMarkdownAPITableWarningHtml(String warningText) {
+		return getWarningHtml(DisplayConstants.MARKDOWN_API_TABLE_WARNING, warningText);
+	}
+	
 	public static String getWarningHtml(String title, String warningText) {
 		return "<div class=\"alert alert-block\"><strong>"+ title + "</strong><br/> " + warningText + "</div>";
 	}
