@@ -552,6 +552,7 @@ public class DisplayConstants {
 	public static final String ADD_ENTITY = "Add Entity";
 	public static final String INVALID_SHINY_SITE = " is not a valid Shiny Site URL. Please " + ClientProperties.HELP_EMAIL_ADDRESS_LINK + " if you would like your Shiny Server added to our white list.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
+	public static final String MARKDOWN_API_TABLE_WARNING = "API Table Warning";
 	public static final String ACCESS_WILL_BE = "Access Will Be";
 	public static final String ANY_USE = "Any Use";
 	public static final String SELECT_DATA_USE = "Please select a Data Use Level";
