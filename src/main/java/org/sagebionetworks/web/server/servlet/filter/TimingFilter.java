@@ -10,9 +10,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Logs timing and error messages 
@@ -21,7 +20,7 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
  */
 public class TimingFilter implements Filter {
 	
-	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
+	static private Logger log = LogManager.getLogger(TimingFilter.class);
 
 	@Override
 	public void destroy() {
