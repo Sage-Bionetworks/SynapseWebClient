@@ -161,7 +161,9 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 	@Override
 	public void showError(String message) {
 		removeAll();
-		add(new HTMLPanel(DisplayUtils.getIconHtml(iconsImageBundle.error16()) + message));	
+		String errorMessage = DisplayUtils.getIconHtml(iconsImageBundle.error16()) + message;
+		add(new HTMLPanel(DisplayUtils.getMarkdownAPITableWarningHtml(errorMessage)));	
+		layout(true);
 	}
 	
 	@Override
