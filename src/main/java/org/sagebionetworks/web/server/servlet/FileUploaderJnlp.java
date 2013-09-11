@@ -11,6 +11,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
@@ -22,6 +26,7 @@ public class FileUploaderJnlp extends HttpServlet {
 
 	private static Logger logger = Logger.getLogger(FileUploaderJnlp.class.getName());
 	private static final long serialVersionUID = 1L;
+	private static String jarUrl;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 
@@ -86,6 +91,14 @@ public class FileUploaderJnlp extends HttpServlet {
 		String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 		Boolean isUpdate = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_UPLOADER_IS_UPDATE_PARAM));
 
+		if(jarUrl == null)
+			try {
+				setJarUrl();
+			} catch (Exception e) {
+				logger.warning(e.getMessage());
+				throw new ServletException(e);
+			}
+		
 		response.setContentType(WebConstants.CONTENT_TYPE_JNLP);
 		PrintWriter out = null;
 		try {
@@ -101,6 +114,16 @@ public class FileUploaderJnlp extends HttpServlet {
 	    }
 	}
 	
+	private void setJarUrl() throws SynapseException, JSONObjectAdapterException {
+		Synapse synapse = synapseProvider.createNewClient();
+		SynapseVersionInfo version = synapse.getVersionInfo();
+		jarUrl = "http://sagebionetworks.artifactoryonline.com/sagebionetworks/simple/libs-releases-local/org/sagebionetworks/fileUploadClient/"
+				+ version.getVersion()
+				+ "/fileUploadClient-"
+				+ version.getVersion()
+				+ "-jar-with-dependencies.jar";		
+	}
+
 	/**
 	 * Get the session token
 	 * @param request
@@ -129,7 +152,6 @@ public class FileUploaderJnlp extends HttpServlet {
 		">\n" +
 		"        <argument>--sessionToken="+ sessionToken +"</argument>\n" +
 		"        <argument>--entityId="+ entityId +"</argument>\n" +
-		"        <argument>--isUpdate="+ isUpdate +"</argument>\n" +
 		"     </application-desc>\n" +
 		"     <security><all-permissions/></security>\n" +
 		"</jnlp>";
