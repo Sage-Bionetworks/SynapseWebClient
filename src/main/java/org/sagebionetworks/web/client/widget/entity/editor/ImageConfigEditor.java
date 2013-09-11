@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Map;
+import com.extjs.gxt.ui.client.widget.Dialog;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -22,9 +23,9 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
-		view.configure(wikiKey);
+		view.configure(wikiKey, window);
 		//and try to prepopulate with values from the map.  if it fails, ignore
 		try {
 			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY) || descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
