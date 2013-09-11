@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.ArrayList;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
 		APITableConfig tableConfig = new APITableConfig(widgetDescriptor);
 		view.configure(tableConfig);
