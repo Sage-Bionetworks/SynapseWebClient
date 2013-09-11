@@ -93,11 +93,6 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 		window.setWidth(width);
 		window.setHeight(height);
 		window.setHeading(windowTitle);
-		
-		//The ok/submitting button will be enabled when attachments/images are uploaded
-		if(windowTitle.equals(WidgetConstants.ATTACHMENT_PREVIEW_FRIENDLY_NAME) || windowTitle.equals(WidgetConstants.IMAGE_FRIENDLY_NAME)) {
-			window.getButtonById(Dialog.OK).disable();
-		}
 	}
 	
 	@Override

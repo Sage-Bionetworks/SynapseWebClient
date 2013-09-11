@@ -244,6 +244,8 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + 
 				wikiIdParam;
 		
+		//The ok/submitting button will be enabled when images are uploaded
+		window.getButtonById(Dialog.OK).disable();
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, 25, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {

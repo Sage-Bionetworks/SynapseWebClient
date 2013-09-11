@@ -30,6 +30,7 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 			//try to set the image widget file name
 			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
 				view.setUploadedFileHandleName(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+				window.getButtonById(Dialog.OK).enable();
 			}
 		} catch (Exception e) {}
 	}

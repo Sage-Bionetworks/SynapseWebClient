@@ -39,7 +39,7 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	public void initView() {
 		setLayout(new FitLayout());
 		uploadedFileHandleName = null;
-				
+		
 		this.setHeight(150);
 		this.layout(true);
 	}
@@ -72,6 +72,8 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + 
 				wikiIdParam;
 		
+		//The ok/submitting button will be enabled when attachments are uploaded
+		window.getButtonById(Dialog.OK).disable();
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.IMAGE_CONFIG_UPLOAD, 25, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {

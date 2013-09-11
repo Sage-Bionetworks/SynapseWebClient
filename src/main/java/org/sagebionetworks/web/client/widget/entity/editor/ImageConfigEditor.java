@@ -33,6 +33,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 					view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
 				} else if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)){
 					view.setUploadedFileHandleName(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+					window.getButtonById(Dialog.OK).enable();
 				}
 				view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
 				view.setScale(descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY));
