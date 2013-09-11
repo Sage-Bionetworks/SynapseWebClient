@@ -8,7 +8,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
+import com.extjs.gxt.ui.client.widget.Dialog;
 public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, WidgetEditorPresenter {
 	private Map<String, String> descriptor;
 	private ReferenceConfigView view;
@@ -21,7 +21,7 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
 	}
 	

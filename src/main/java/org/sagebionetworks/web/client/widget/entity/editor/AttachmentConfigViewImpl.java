@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.repo.model.attachment.UploadResult;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -56,14 +57,14 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	}
 
 	@Override
-	public void configure(WikiPageKey wikiKey) {
+	public void configure(WikiPageKey wikiKey, Dialog window) {
 		//update the uploadPanel
-		initUploadPanel(wikiKey);
+		initUploadPanel(wikiKey, window);
 		
 		this.layout(true);
 	}
 	
-	private void initUploadPanel(WikiPageKey wikiKey) {
+	private void initUploadPanel(WikiPageKey wikiKey, final Dialog window) {
 		removeAll();
 		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
 		String baseURl = GWT.getModuleBaseURL()+"filehandle?" +
@@ -78,6 +79,8 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 					if(UploadStatus.SUCCESS == result.getUploadStatus()){
 						//save close this dialog with a save
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
+						//enable the ok button
+						window.getButtonById(Dialog.OK).enable();
 					}else{
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ result.getMessage()));
 					}

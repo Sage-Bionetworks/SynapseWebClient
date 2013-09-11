@@ -18,6 +18,7 @@ import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -226,16 +227,16 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey) {
+	public void configure(WikiPageKey wikiKey, Dialog window) {
 		uploadTab.removeAll();
 		//update the uploadPanel
-		initUploadPanel(wikiKey);
+		initUploadPanel(wikiKey, window);
 		
 		this.setHeight(DISPLAY_HEIGHT);
 		this.layout(true);
 	}
 	
-	private void initUploadPanel(WikiPageKey wikiKey) {
+	private void initUploadPanel(WikiPageKey wikiKey, final Dialog window) {
 		
 		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
 		String baseURl = GWT.getModuleBaseURL()+"filehandle?" +
@@ -252,6 +253,8 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 					if(UploadStatus.SUCCESS == result.getUploadStatus()){
 						//save close this dialog with a save
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
+						//enable the ok button
+						window.getButtonById(Dialog.OK).enable();
 					}else{
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ result.getMessage()));
 					}

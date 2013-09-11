@@ -41,14 +41,14 @@ public class ShinySiteConfigEditorTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
 		descriptor.put(WidgetConstants.SHINYSITE_HEIGHT_KEY, "500");
-		editor.configure(wikiKey, descriptor);
+		editor.configure(wikiKey, descriptor, null);
 		verify(mockView).configure(validSiteUrl, 500);		
 	}
 
 	@Test
 	public void testUpdateDescriptorFromView() {
 		Map<String, String> descriptor = new HashMap<String, String>();
-		editor.configure(wikiKey, descriptor);
+		editor.configure(wikiKey, descriptor, null);
 		
 		when(mockView.getSiteUrl()).thenReturn(validSiteUrl);
 		when(mockView.getSiteHeight()).thenReturn(500);
