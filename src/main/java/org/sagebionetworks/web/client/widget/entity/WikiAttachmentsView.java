@@ -22,7 +22,7 @@ public interface WikiAttachmentsView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void configure(WikiPageKey wikiKey, WikiPage wikiPage, Callback callback);
+		void configure(WikiPageKey wikiKey, WikiPage wikiPage, boolean supportDelete, Callback callback);
 		/**
 		 * Delete attachment
 		 */
@@ -31,7 +31,7 @@ public interface WikiAttachmentsView extends IsWidget, SynapseView {
 		void setAttachmentColumnWidth(int width);
 	}
 
-	public void configure(WikiPageKey wikiKey, List<FileHandle> list);
+	public void configure(WikiPageKey wikiKey, List<FileHandle> list, boolean supportDelete);
 	public void setAttachmentColumnWidth(int width);
 	public void attachmentDeleted(String fileHandleId);
 }

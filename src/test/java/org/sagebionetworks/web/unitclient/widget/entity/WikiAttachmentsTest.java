@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -74,20 +72,20 @@ public class WikiAttachmentsTest {
 
 	@Test
 	public void testConfigure() {
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
-		verify(mockView).configure(any(WikiPageKey.class), any(List.class));
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), true, null);
+		verify(mockView).configure(any(WikiPageKey.class), any(List.class), anyBoolean());
 	}
 	
 	@Test
 	public void testConfigureFail() {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), true, null);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testDelete(){
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), true, null);
 		presenter.deleteAttachment("a file");
 		verify(mockSynapseClient).updateWikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}

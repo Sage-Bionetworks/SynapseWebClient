@@ -36,6 +36,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	private WikiPageKey wikiKey;
 	private List<FileHandle> allFileHandles;
 	private Callback callback;
+	private boolean supportDelete;
 	
 	public interface Callback{
 		public void attachmentClicked(String fileName);
@@ -57,9 +58,10 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, WikiPage wikiPage, Callback callback) {
+	public void configure(final WikiPageKey wikiKey, WikiPage wikiPage, final boolean supportDelete, Callback callback) {
 		this.wikiPage = wikiPage;
 		this.wikiKey = wikiKey;
+		this.supportDelete = supportDelete;
 		if (callback == null) {
 			this.callback = new Callback() {
 				
@@ -87,7 +89,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 						}
 					}
 					
-					view.configure(wikiKey, workingSet);
+					view.configure(wikiKey, workingSet, supportDelete);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -129,7 +131,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				public void onSuccess(String result) {
 					try{
 						WikiPage updatedPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
-						configure(wikiKey, updatedPage, callback);
+						configure(wikiKey, updatedPage, supportDelete, callback);
 						callback.attachmentDeleted(fileName);
 					} catch (JSONObjectAdapterException e) {
 						view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);

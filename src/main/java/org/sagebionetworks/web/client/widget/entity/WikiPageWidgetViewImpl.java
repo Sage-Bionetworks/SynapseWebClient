@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
@@ -38,9 +39,12 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -74,6 +78,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private int spanWidth;
 	private WikiPageKey wikiKey;
 	private WidgetRegistrar widgetRegistrar;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	WikiPageWidgetView.Presenter presenter;
 	
 	public interface Callback{
@@ -90,7 +95,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Inject
-	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, WidgetRegistrar widgetRegistrar) {
+	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, WidgetRegistrar widgetRegistrar, SynapseJSNIUtils synapseJSNIUtils) {
 		super();
 		this.markdownWidget = markdownWidget;
 		this.markdownEditorWidget = markdownEditorWidget;
@@ -98,6 +103,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.breadcrumb = breadcrumb;
 		this.wikiAttachments = wikiAttachments;
 		this.widgetRegistrar = widgetRegistrar;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 	}
 	
 	@Override
@@ -158,6 +164,32 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "span-"+spanWidth + " margin-top-5"));
 		add(mainPanel);
 		
+		//show a link that pops up the wiki attachments
+		Anchor wikiAttachmentsLink = new Anchor("Wiki Attachments");
+		wikiAttachmentsLink.addStyleName("link");
+		
+		wikiAttachmentsLink.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				showAttachments(false, new WikiAttachments.Callback() {  
+					@Override
+					public void attachmentDeleted(String fileName) {
+						//not supported
+					}
+					
+					@Override
+					public void attachmentClicked(String fileName) {
+						//treat like a link, go to wiki attachment
+						DisplayUtils.newWindow(DisplayUtils.createWikiAttachmentUrl(synapseJSNIUtils.getBaseFileHandleUrl(), wikiKey, fileName,false), fileName, null);
+					}
+				});
+			}
+		});
+		SimplePanel wikiAttachmentsWrapper = new SimplePanel();
+		wikiAttachmentsWrapper.addStyleName("span-"+spanWidth + " notopmargin margin-bottom-10");
+		wikiAttachmentsWrapper.add(wikiAttachmentsLink);
+		add(wikiAttachmentsWrapper);
 		layout(true);
 	}
 	
@@ -289,7 +321,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		return new ManagementHandler() {
 			@Override
 			public void attachmentsClicked() {
-				wikiAttachments.configure(wikiKey, currentPage, new WikiAttachments.Callback() {
+				showAttachments(true, new WikiAttachments.Callback() {
 					@Override
 					public void attachmentDeleted(String fileName) {
 						//when an attachment is deleted from the wiki attachments dialog, let's delete references from the markdown editor
@@ -318,7 +350,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 						}						
 					}
 				});
-				showDialog(wikiAttachments);
 			}
 			@Override
 			public void deleteClicked() {
@@ -336,6 +367,11 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				});
 			}
 		};
+	}
+	
+	private void showAttachments(boolean supportDelete, WikiAttachments.Callback callback){
+		wikiAttachments.configure(wikiKey, currentPage, supportDelete, callback);
+		showDialog(wikiAttachments);
 	}
 	
 	private CloseHandler getCloseHandler(final TextBox titleField, final TextArea mdField) {
