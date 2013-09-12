@@ -44,7 +44,7 @@ public class ProvenanceConfigEditorTest {
 		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entityToGraph);
 		descriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, showExpand);
 		descriptor.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, displayHeight);
-		editor.configure(wikiKey, descriptor);
+		editor.configure(wikiKey, descriptor, null);
 		verify(mockView).setEntityList(eq(entityToGraph));
 		verify(mockView).setIsExpanded(eq(Boolean.valueOf(showExpand)));
 		verify(mockView).setDepth(eq(Long.parseLong(d)));

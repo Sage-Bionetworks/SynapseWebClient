@@ -131,10 +131,90 @@ public class EvaluationSubmitter implements Presenter {
 		
 		final String id = entityId;
 		final Long ver = version;
+		final String[] evaluationIds = new String[evaluations.size()];
+		for(int i = 0; i < evaluationIds.length; i++) {
+			evaluationIds[i] = evaluations.get(i).getId();
+		}
+		
+		 //Check access requirements for evaluations before moving on with submission
+		 try {
+			 checkForUnmetRequirements(0, evaluationIds);
+		 } catch(RestServiceException e) {
+			 view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
+		 }
 		
 		lookupEtag(id, ver, evaluations, submitterAlias); 
 	}
 	
+	/**
+	* Check for unmet access restrictions. As long as more exist, it will not move onto submissions.
+	* @throws RestServiceException
+	*/
+	public void checkForUnmetRequirements(final int evalIndex, final String[] evaluationIds) throws RestServiceException {
+		synapseClient.getUnmetEvaluationAccessRequirements(evaluationIds[evalIndex], new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				try {
+					PaginatedResults<TermsOfUseAccessRequirement> ar = nodeModelCreator.createPaginatedResults(result, TermsOfUseAccessRequirement.class);
+					if (ar.getTotalNumberOfResults() > 0) {
+						//there are unmet access requirements.  user must accept all
+						List<TermsOfUseAccessRequirement> unmetRequirements = ar.getResults();
+						final AccessRequirement firstUnmetAccessRequirement = unmetRequirements.get(0);
+						String text = GovernanceServiceHelper.getAccessRequirementText(firstUnmetAccessRequirement);
+						Callback termsOfUseCallback = new Callback() {
+							@Override
+							public void invoke() {
+								//agreed to terms of use.
+								setLicenseAccepted(firstUnmetAccessRequirement.getId(), evalIndex, evaluationIds);
+							}
+						};
+						//pop up the requirement
+						view.showAccessRequirement(text, termsOfUseCallback);
+					} else {
+						if (evalIndex != evaluationIds.length - 1) {
+							checkForUnmetRequirements(evalIndex+1, evaluationIds);
+						}
+					}
+				} catch(Throwable e) {
+					onFailure(e);
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR+ caught.getMessage());
+			}
+		});
+	}
+	
+	public void setLicenseAccepted(Long	arId, final int evalIndex, final String[] evaluationIds) {	
+		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
+			@Override
+			public void invoke(Throwable t) {
+				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + t.getMessage());
+			}
+		};
+		
+		Callback onSuccess = new Callback() {
+			@Override
+			public void invoke() {
+				//ToU signed, now try to submit evaluations (checks for other unmet access restrictions before submission)
+				try {
+					checkForUnmetRequirements(evalIndex, evaluationIds);
+				} catch (RestServiceException e) {
+					onFailure.invoke(e);
+				}
+			}
+		};
+		
+		GovernanceServiceHelper.signTermsOfUse(
+				authenticationController.getCurrentUserPrincipalId(), 
+				arId, 
+				onSuccess, 
+				onFailure, 
+				synapseClient, 
+				jsonObjectAdapter);
+	}
 	
 	public void lookupEtag(final String id, final Long ver, final List<Evaluation> evaluations, final String submitterAlias) {
 		//look up entity for the current etag

@@ -114,26 +114,20 @@ public class EvaluationSubmitterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(entity);
 		
-		requirements = new PaginatedResults<TermsOfUseAccessRequirement>();		
+		requirements = new PaginatedResults<TermsOfUseAccessRequirement>();
 		requirements.setTotalNumberOfResults(0);
-		art = new AccessRequirementsTransport();
-		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(AsyncCallback.class));
+		List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
+		requirements.setResults(ars);	
 	}
 	
 	@Test
 	public void testSubmitToEvaluations() throws RestServiceException, JSONObjectAdapterException{
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
-		
 		submitter.configure(entity, null);
-		submitter.submitToEvaluations(null, new ArrayList<Evaluation>(), submitterAlias);
-		verify(mockSynapseClient, times(0)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
-		
 		submitter.submitToEvaluations(null, evaluationList, submitterAlias);
 		//should invoke submission twice (once per evaluation), directly without terms of use
 		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
 		verify(mockSynapseClient, times(2)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 
-		
 		ArgumentCaptor<HashSet> captor = ArgumentCaptor.forClass(HashSet.class);
 		//submitted status shown
 		verify(mockView).showSubmissionAcceptedDialogs(captor.capture());
@@ -161,8 +155,7 @@ public class EvaluationSubmitterTest {
 		//submitted status shown
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
-	@Ignore
+
 	@Test
 	public void testSubmitToEvaluationsWithTermsOfUse() throws RestServiceException, JSONObjectAdapterException{	
 		requirements.setTotalNumberOfResults(1);
@@ -173,14 +166,14 @@ public class EvaluationSubmitterTest {
 		ars.add(requirement);
 		requirements.setResults(ars);
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
-		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUnmetEvaluationAccessRequirements(anyString(), any(AsyncCallback.class));
 		
 		submitter.configure(entity, null);
 		submitter.submitToEvaluations(null, evaluationList, submitterAlias);
 		
-		//should show terms of use for the requirement
-		verify(mockView).showAccessRequirement(anyString(), any(Callback.class));
-		
+		//should show terms of use for the requirement and then submit two evaluations
+		verify(mockView, times(1)).showAccessRequirement(anyString(), any(Callback.class));
+		verify(mockSynapseClient, times(2)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test

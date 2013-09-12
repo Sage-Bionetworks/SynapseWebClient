@@ -10,7 +10,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
+import com.extjs.gxt.ui.client.widget.Dialog;
 public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, WidgetEditorPresenter {
 	
 	private ShinySiteConfigView view;
@@ -22,7 +22,7 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 		view.initView();
 	}
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
 		String siteUrl = descriptor.get(WidgetConstants.SHINYSITE_SITE_KEY);
 		int height = ShinySiteWidget.getHeightFromDescriptor(descriptor);

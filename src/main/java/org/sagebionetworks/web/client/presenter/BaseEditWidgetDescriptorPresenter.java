@@ -122,9 +122,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		//initialize the view with a new widget descriptor definition of the correct type and show
 		widgetDescriptor = descriptor;
 		view.setWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, isWiki);
-		//prepopulate with a unique attachment name of the correct type
-		String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
-		view.show(friendlyName);
+		view.show();
 		view.setSaveButtonText(DisplayConstants.INSERT_BUTTON_LABEL);
 	}
 	

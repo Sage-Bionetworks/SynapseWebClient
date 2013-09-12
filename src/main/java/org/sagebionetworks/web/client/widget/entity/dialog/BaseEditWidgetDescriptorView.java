@@ -13,7 +13,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	/**
 	 * Show the popup
 	 */
-	public void show(String windowTitle);
+	public void show();
 	
 	/**
 	 * Hide the popup
