@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Map;
+import com.extjs.gxt.ui.client.widget.Dialog;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -20,7 +21,7 @@ public class ButtonLinkConfigEditor implements ButtonLinkConfigView.Presenter, W
 		view.initView();
 	}		
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
 		view.configure(wikiKey, widgetDescriptor);
 	}

@@ -8,7 +8,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
+import com.extjs.gxt.ui.client.widget.Dialog;
 public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, WidgetEditorPresenter {
 	
 	private ProvenanceConfigView view;
@@ -21,7 +21,7 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 	}		
 
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;		
 		if (descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY) != null)
 			view.setEntityList(descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY));

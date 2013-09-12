@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Map;
+import com.extjs.gxt.ui.client.widget.Dialog;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -18,7 +19,7 @@ public class LinkConfigEditor implements LinkConfigView.Presenter, WidgetEditorP
 		view.initView();
 	}		
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		//no way to edit an existing link
 	}
 	
