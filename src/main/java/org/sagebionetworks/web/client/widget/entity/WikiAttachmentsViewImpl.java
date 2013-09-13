@@ -56,7 +56,7 @@ public class WikiAttachmentsViewImpl extends LayoutContainer implements WikiAtta
 	private IconsImageBundle iconsImageBundle;
 	private int attachmentColumnWidth;
 	private SynapseJSNIUtils synapseJsniUtils;
-	
+	private boolean supportDelete;
 	@Inject
 	public WikiAttachmentsViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJsniUtils) {
 		this.iconsImageBundle = iconsImageBundle;
@@ -107,7 +107,8 @@ public class WikiAttachmentsViewImpl extends LayoutContainer implements WikiAtta
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, List<FileHandle> list) {		
+	public void configure(WikiPageKey wikiKey, List<FileHandle> list, boolean supportDelete) {		
+		this.supportDelete = supportDelete;
 		gridStore.removeAll();
 		if(list == null || list.size() == 0){
 			addNoAttachmentRow();
@@ -198,20 +199,22 @@ public class WikiAttachmentsViewImpl extends LayoutContainer implements WikiAtta
 					wrap.setToolTip(tooltip);
 				
 				panel.add(wrap);
-
-				AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle.deleteButtonGrey16());
-				Anchor button = DisplayUtils.createIconLink(img, new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						deleteAttachmentAt(rowIndex);
-					}
-				});
-
-				TableData td = new TableData();
-				td.setHorizontalAlign(HorizontalAlignment.RIGHT);
-				td.setVerticalAlign(VerticalAlignment.MIDDLE);
 				
-				panel.add(button, td);
+				if (supportDelete) {
+					AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle.deleteButtonGrey16());
+					Anchor button = DisplayUtils.createIconLink(img, new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							deleteAttachmentAt(rowIndex);
+						}
+					});
+	
+					TableData td = new TableData();
+					td.setHorizontalAlign(HorizontalAlignment.RIGHT);
+					td.setVerticalAlign(VerticalAlignment.MIDDLE);
+					
+					panel.add(button, td);
+				}
 				panel.setAutoWidth(true);
 				return panel;
 			}

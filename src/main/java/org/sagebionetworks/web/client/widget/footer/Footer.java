@@ -10,7 +10,7 @@ public class Footer implements FooterView.Presenter {
 
 	private FooterView view;
 	SynapseClientAsync synapseClient;
-	
+	private boolean isInitialized = false;
 	@Inject
 	public Footer(FooterView view, SynapseClientAsync synapseClient) {
 		this.view = view;
@@ -20,22 +20,25 @@ public class Footer implements FooterView.Presenter {
 
 	public Widget asWidget() {
 		view.setPresenter(this);
-		synapseClient.getSynapseVersions(new AsyncCallback<String>() {
-			
-			@Override
-			public void onSuccess(String result) {
-				String[] vals = result.split(",");
-				if(vals.length == 2)
-					view.setVersion(vals[0],vals[1]);
-				else 
-					onFailure(null);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setVersion("unknown", "unknown");
-			}
-		});
+		if (!isInitialized) {
+			isInitialized = true;
+			synapseClient.getSynapseVersions(new AsyncCallback<String>() {
+				
+				@Override
+				public void onSuccess(String result) {
+					String[] vals = result.split(",");
+					if(vals.length == 2)
+						view.setVersion(vals[0],vals[1]);
+					else 
+						onFailure(null);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setVersion("unknown", "unknown");
+				}
+			});
+		}
 		return view.asWidget();
 	}
 }
