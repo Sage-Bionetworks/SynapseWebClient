@@ -9,7 +9,7 @@ import net.oauth.OAuthException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseTermsOfUseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
@@ -327,7 +327,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		// First make sure the service is ready to go.
 		validateService();
 		
-		Synapse synapseClient = createSynapseClient();
+		SynapseClient synapseClient = createSynapseClient();
 		String userSessionJson = null;
 		try {
 			UserSessionData userData = synapseClient.login(username, password, explicitlyAcceptsTermsOfUse);
@@ -368,7 +368,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}	
 	
 	private UserSessionData getUserSessionData(String sessionToken) throws SynapseException{
-		Synapse synapseClient = createSynapseClient(sessionToken);
+		SynapseClient synapseClient = createSynapseClient(sessionToken);
 		return synapseClient.getUserSessionData();
 	}
 
@@ -602,8 +602,8 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		if (publicPrincipalIds == null) {
 			try {
 				validateService();
-				Synapse synapseClient = createSynapseClient();
-				Synapse anonymousClient = createAnonymousSynapseClient();
+				SynapseClient synapseClient = createSynapseClient();
+				SynapseClient anonymousClient = createAnonymousSynapseClient();
 				UserProfile anonymousProfile = anonymousClient.getMyProfile();
 				String anonymousPrincipalId = anonymousProfile.getOwnerId();
 				initPublicAndAuthenticatedPrincipalIds(synapseClient, anonymousPrincipalId);
@@ -614,7 +614,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		return publicPrincipalIds;
 	}
 	
-	public static void initPublicAndAuthenticatedPrincipalIds(Synapse synapseClient, String anonymousPrincipalId) {
+	public static void initPublicAndAuthenticatedPrincipalIds(SynapseClient synapseClient, String anonymousPrincipalId) {
 		try {
 			//TODO:  change to synapseClient.getUserGroupHeadersByPrefix() after exposure?
 			PublicPrincipalIds results = new PublicPrincipalIds();
@@ -640,13 +640,13 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	 * The synapse client is stateful so we must create a new one for each
 	 * request
 	 */
-	private Synapse createSynapseClient() {
+	private SynapseClient createSynapseClient() {
 		return createSynapseClient(null);
 	}
 
-	private Synapse createSynapseClient(String sessionToken) {
+	private SynapseClient createSynapseClient(String sessionToken) {
 		// Create a new syanpse
-		Synapse synapseClient = synapseProvider.createNewClient();
+		SynapseClient synapseClient = synapseProvider.createNewClient();
 		if(sessionToken == null) {
 			sessionToken = tokenProvider.getSessionToken();
 		}
@@ -657,8 +657,8 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		return synapseClient;
 	}
 	
-	private Synapse createAnonymousSynapseClient() {
-		Synapse synapseClient = synapseProvider.createNewClient();
+	private SynapseClient createAnonymousSynapseClient() {
+		SynapseClient synapseClient = synapseProvider.createNewClient();
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());

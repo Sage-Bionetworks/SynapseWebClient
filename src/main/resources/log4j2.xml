@@ -12,7 +12,7 @@
 			fileName="${org.sagebionetworks.local.logging.dir}/portal.log"
 			filePattern="${org.sagebionetworks.local.logging.dir}/portal.%d{yyyy-MM-dd-hh-mm}.log.gz">
 			<PatternLayout>
-				<pattern>%d{ISO8601}{GMT+0} %-5p [%15.15t] [%c] - %m%n</pattern>
+				<pattern>%d{ISO8601}{GMT+0} %X{sessionId} %-5p [%15.15t] [%c] - %m%n</pattern>
 			</PatternLayout>
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1" />
@@ -23,7 +23,7 @@
 			fileName="${org.sagebionetworks.local.logging.dir}/portal-http-out.log"
 			filePattern="${org.sagebionetworks.local.logging.dir}/portal-http-out.%d{yyyy-MM-dd-hh-mm}.log.gz">
 			<PatternLayout>
-				<pattern>%d{ISO8601}{GMT+0} %-5p [%15.15t] [%c] - %m%n</pattern>
+				<pattern>%d{ISO8601}{GMT+0} %X{sessionId} %-5p [%15.15t] [%c] - %m%n</pattern>
 			</PatternLayout>
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1" />
