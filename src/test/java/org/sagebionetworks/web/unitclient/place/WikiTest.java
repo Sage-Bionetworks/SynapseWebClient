@@ -3,7 +3,7 @@ package org.sagebionetworks.web.unitclient.place;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.place.Wiki;
 
 /**

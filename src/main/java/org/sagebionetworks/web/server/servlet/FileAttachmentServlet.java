@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
@@ -101,7 +101,7 @@ public class FileAttachmentServlet extends HttpServlet {
 		String token = getSessionToken(request);
 
 		// Now get the signed url
-		Synapse client = createNewClient(token);
+		SynapseClient client = createNewClient(token);
 		String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 		String tokenId = request.getParameter(WebConstants.TOKEN_ID_PARAM_KEY);
 		String waitString = request.getParameter(WebConstants.WAIT_FOR_URL);
@@ -150,7 +150,7 @@ public class FileAttachmentServlet extends HttpServlet {
 		try {
 			List<AttachmentData> list = new ArrayList<AttachmentData>();
 			// Connect to syanpse
-			Synapse client = createNewClient(token);
+			SynapseClient client = createNewClient(token);
 			// get Entity and store file in location
 			String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 			FileItemIterator iter = upload.getItemIterator(request);
@@ -240,8 +240,8 @@ public class FileAttachmentServlet extends HttpServlet {
 	 *
 	 * @return
 	 */
-	private Synapse createNewClient(String sessionToken) {
-		Synapse client = synapseProvider.createNewClient();
+	private SynapseClient createNewClient(String sessionToken) {
+		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
 		client.setSessionToken(sessionToken);

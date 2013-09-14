@@ -9,7 +9,9 @@ import java.util.logging.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.SynapseClientImpl;
+import org.sagebionetworks.client.SynapseProfileProxy;
 import org.sagebionetworks.web.shared.NodeType;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -102,16 +104,16 @@ public class ServiceUtils {
 	/**
 	 * The synapse client is stateful so we must create a new one for each request
 	 */
-	public static Synapse createSynapseClient(TokenProvider tokenProvider, ServiceUrlProvider urlProvider) {
-		Synapse synapseClient = new Synapse();
+	public static SynapseClient createSynapseClient(TokenProvider tokenProvider, ServiceUrlProvider urlProvider) {
+		SynapseClient synapseClient = SynapseProfileProxy.createProfileProxy(new SynapseClientImpl());
 		synapseClient.setSessionToken(tokenProvider.getSessionToken());
 		synapseClient.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
 		return synapseClient;
 	}	
 	
-	public static Synapse createSynapseClient(SynapseProvider synapseProvider, ServiceUrlProvider urlProvider, String sessionToken) {
-		Synapse client = synapseProvider.createNewClient();
+	public static SynapseClient createSynapseClient(SynapseProvider synapseProvider, ServiceUrlProvider urlProvider, String sessionToken) {
+		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
 		client.setSessionToken(sessionToken);

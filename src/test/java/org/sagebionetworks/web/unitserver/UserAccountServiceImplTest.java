@@ -23,7 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
@@ -194,7 +194,7 @@ public class UserAccountServiceImplTest {
 	
 	@Test
 	public void testPublicAuthGroupTest() throws Exception {
-		Synapse mockSynapse = Mockito.mock(Synapse.class);
+		SynapseClient mockSynapse = Mockito.mock(SynapseClient.class);
 		//create a few groups, including one that looks like a public group and authenticated group
 		List<UserGroup> allGroups = new ArrayList<UserGroup>();
 		
