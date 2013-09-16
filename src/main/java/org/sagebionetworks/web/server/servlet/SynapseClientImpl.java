@@ -1559,22 +1559,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		if (entityId == null || entityId.trim().length()==0 ) {
 			throw new BadRequestException("Entity ID must be given");
 		}
-		String lowerEntityId = entityId.toLowerCase();
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//look up the available evaluations
-			PaginatedResults<Evaluation> allEvaluations = synapseClient.getEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			PaginatedResults<Evaluation> allEvaluations = synapseClient.getEvaluationByContentSource(entityId, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
 			
 			ArrayList<String> mySharableEvalauations = new ArrayList<String>();
 			for (Evaluation eval : allEvaluations.getResults()) {
-				String contentSource = eval.getContentSource();
-				
-				if (contentSource != null && lowerEntityId.equals(contentSource.toLowerCase())) {
-					//evaluation is associated to entity id.  can I change permissions?
-					UserEvaluationPermissions uep = synapseClient.getUserEvaluationPermissions(eval.getId());
-					if (uep.getCanChangePermissions()) {
-						mySharableEvalauations.add(eval.writeToJSONObject(adapterFactory.createNew()).toJSONString());
-					}
+				//evaluation is associated to entity id.  can I change permissions?
+				UserEvaluationPermissions uep = synapseClient.getUserEvaluationPermissions(eval.getId());
+				if (uep.getCanChangePermissions()) {
+					mySharableEvalauations.add(eval.writeToJSONObject(adapterFactory.createNew()).toJSONString());
 				}
 			}
 			return mySharableEvalauations;
