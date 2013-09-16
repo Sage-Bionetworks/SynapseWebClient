@@ -12,21 +12,20 @@
 		<!-- MAIN CONTAINER -->
 		<!-- HEADER -->
 		<div class="color-line"></div>
-		<div class="clear"></div>
+
+		<g:SimplePanel ui:field="header" />
+
+		<div class="separator" style="margin-top: 20px; margin-bottom: 40px !important;"></div>
+		
+		<!-- TOP 3 COLUMNS -->		
 		<div class="container">
-
-			<g:SimplePanel ui:field="header" />
-
-			<!-- MAIN CONTENT -->
-			<div>				
-				<div class="span-24 separator" style="margin-top: 20px; margin-bottom: 18px !important;"></div>
-
+			<div class="row">
 				<!-- What is Synapse -->
 				<g:HTMLPanel ui:field="whatIsSynapseContainer">
-					<div class="span-8 notopmargin">
+					<div class="col-md-4 ">
 						<h3>What is Synapse?</h3>
 						<ul class="list check-list">
-
+	
 							<li class="whatIsSynapseText">
 								A <span style="font-weight: bold;">private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">public</span> <g:Image resource='{icons.globe16}' />
 								workspace that allows you to <span style="font-weight: bold;">aggregate</span>, <span style="font-weight: bold;">describe</span>, and <span style="font-weight: bold;">share</span>
@@ -46,10 +45,10 @@
 						</ul>
 					</div>
 				</g:HTMLPanel>
-
+	
 				<!-- How to Use Synapse -->
 				<g:HTMLPanel ui:field="howToUseSynapseContainer">
-					<div class="span-8 notopmargin">
+					<div class="col-md-4 ">
 						<h3>How to Use Synapse</h3>
 						<ul class="list arrow-list">
 							<li>
@@ -74,90 +73,114 @@
 		
 				<!-- Get Started -->
 				<g:HTMLPanel ui:field="getStartedContainer">
-					<div class="span-8 notopmargin last">
+					<div class="col-md-4 ">
 						<h3>Get Started</h3>
 						Synapse is free to use as a Beta service.<br/><br/> 
-						<g:SimplePanel styleName="margin-top-8" ui:field="loginBtnPanel"/>
+						<g:SimplePanel ui:field="loginBtnPanel"/>
 						<br/>
-						<g:SimplePanel styleName="margin-top-8" ui:field="registerBtnPanel"/>
+						<g:SimplePanel ui:field="registerBtnPanel"/>
 						<br/>
-						<g:SimplePanel styleName="margin-top-8" ui:field="dream8BtnPanel"/>
+						<g:SimplePanel ui:field="dream8BtnPanel"/>
 					</div>
 				</g:HTMLPanel>
-
+	
 				<!-- START PROJECT & MY PROJECTS -->
 				<g:SimplePanel ui:field="projectPanel" />
-			</div>			
+			</div> <!-- end row -->				
 
             <!-- SLIDER -->
-            <div class="span-24 notopmargin">
-            <div class="span-24 slider-area">
-            	<div class="theme-default">
-                    <div id="slider" class="nivoSlider">
-                        
-                        <a class="link" href="#!Challenges:DREAM8"><img src="images/spotlight/Dream8Banner.jpg" alt="" title="#dream8BannerCaption" /></a>
-                        <a href="#!Synapse:syn1720047"><img src="images/spotlight/HPN_Challenge.jpg" alt="" title="#hpnCaption" /></a>                        
-                        <a href="#!Synapse:syn1761567"><img src="images/spotlight/Toxicogenetics_Challenge.jpg" alt="" title="#toxicoCaption" /></a>
-                        <a href="#!Synapse:syn1876068"><img src="images/spotlight/WholeCell_Challenge.jpg" alt="" title="#wholecellCaption" /></a>
+			<div class="row separator-margin-top">
+			    <!-- Carousel
+			    ================================================== -->
+			    <div id="myCarousel" class="carousel slide">
+			      <!-- Indicators -->
+			      <ol class="carousel-indicators">
+			        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+			        <li data-target="#myCarousel" data-slide-to="1"></li>
+			        <li data-target="#myCarousel" data-slide-to="2"></li>
+			        <li data-target="#myCarousel" data-slide-to="3"></li>
+   			        <li data-target="#myCarousel" data-slide-to="4"></li>
+   			        <li data-target="#myCarousel" data-slide-to="5"></li>			        			        
+				  </ol>
+			      <div class="carousel-inner">
+			        <div class="item active">
+			          <a href="#!Challenges:DREAM8"><img src="images/spotlight/Dream8Banner.jpg" alt="First slide"/></a>
+			          <div class="container">
+			            <div class="carousel-caption">
+			              <p><a class="btn btn-large btn-primary" href="#!Challenges:DREAM8">Learn More</a></p>
+			            </div>
+			          </div>
+			        </div>
+			        <div class="item">
+			          <a href="#!Synapse:syn1720047"><img src="images/spotlight/HPN_Challenge.jpg" alt="First slide"/></a>
+			          <div class="container">
+			            <div class="carousel-caption">			              
+			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1720047">Challenge Details &amp; Registration</a></p>
+			            </div>
+			          </div>
+			        </div>
+			        <div class="item">
+			          <a href="#!Synapse:syn1761567"><img src="images/spotlight/Toxicogenetics_Challenge.jpg" alt="First slide"/></a>
+			          <div class="container">
+			            <div class="carousel-caption">
+			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1761567">Challenge Details &amp; Registration</a></p>
+			            </div>
+			          </div>
+			        </div>
+			        <div class="item">
+			          <a href="#!Synapse:syn1876068"><img src="images/spotlight/WholeCell_Challenge.jpg" alt="First slide"/></a>
+			          <div class="container">
+			            <div class="carousel-caption">
+			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1876068">Challenge Details &amp; Registration</a></p>
+			            </div>
+			          </div>
+			        </div>
+			        <div class="item">
+			          <a href="#!Synapse:syn1710250"><img src="images/spotlight/attractorMetagene.jpg" alt="First slide"/></a>
+			          <div class="container">
+			            <div class="carousel-caption">
+			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1710250">BCC Gateway Project</a></p>
+			            </div>
+			          </div>
+			        </div>
+			        <div class="item">
+			          <a href="#!Synapse:syn300013"><img src="images/spotlight/TcgaPancancer.jpg" alt="First slide"/></a>
+			          <div class="container">
+			            <div class="carousel-caption">
+			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn300013">TCGA Pancancer Project</a></p>
+			            </div>
+			          </div>
+			        </div>			        			       
+			      </div>
+			      <a class="left carousel-control-clean" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
+			      <a class="right carousel-control-clean" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
+			    </div><!-- /.carousel -->
+			</div> <!-- end row -->				
 
-                        <a href="#!Synapse:syn1710250"><img src="images/spotlight/attractorMetagene.jpg" alt="" title="#bccGatewayCaption" /></a>                        
-                        <a href="#!Synapse:syn300013"><img src="images/spotlight/TcgaPancancer.jpg" alt="" title="#tcgaPancanCaption" /></a>
-
-                        <!-- Uncomment this once the DREAM8 competitions are out of the Carousel 
-                        <a class="link" target="_blank" href="http://eepurl.com/Af4wH"><img src="images/spotlight/CompetitionUpdates.jpg" alt="" title="#challengeInfoCaption" /></a>
-                        -->
-                    </div>
-    
-                    <div id="dream8BannerCaption" class="nivo-html-caption" style="top: 120px !important;">
-                    	<a class="link" href="#!Challenges:DREAM8">Learn More</a>                    
-                    </div>                    
-                    <div id="hpnCaption" class="nivo-html-caption" style="top: 120px !important;">
-                        <a href="#!Synapse:syn1720047">Challenge Details &amp; Registration</a>
-                    </div>
-                    <div id="toxicoCaption" class="nivo-html-caption" style="top: 120px !important;">
-                        <a href="#!Synapse:syn1761567">Challenge Details &amp; Registration</a>
-                    </div>
-                    <div id="wholecellCaption" class="nivo-html-caption" style="top: 120px !important;">
-                        <a href="#!Synapse:syn1876068">Challenge Details &amp; Registration</a>
-                    </div>
-                    
-                    <div id="bccGatewayCaption" class="nivo-html-caption" style="top: 120px !important;">
-                        <a href="#!Synapse:syn1710250">BCC Gateway Project</a>
-                    </div>
-                    <div id="tcgaPancanCaption" class="nivo-html-caption" style="top: 120px !important;">
-                        <a href="#!Synapse:syn300013">TCGA Pancancer Project</a>
-                    </div>
-                    
-                    <!-- Uncomment this once the DREAM8 competitions are out of the Carousel
-                    <div id="challengeInfoCaption" class="nivo-html-caption" style="top: 120px !important;">
-                    	<a target="_blank" href="http://eepurl.com/Af4wH">Subscribe</a>                    
-                    </div>
-                     -->
-                </div>
-            </div>
-            </div>
-            <!-- END SLIDER -->
+			<div class="row">
+				<div class="separator separator-margin"></div>						
+			</div> <!-- end row -->				
 
 			<!-- SEARCH BOX -->
-			<div class="span-24">
+			<div class="row">
 				<h3>Search Synapse</h3>
-				<div class="span-23 inner-6 view notopmargin">
+				<div class="well" style="margin-bottom: 0px !important;">
 					<g:SimplePanel ui:field="bigSearchBox" />
 				</div>
-			</div>
-			<!-- END SEARCH BOX -->
+			</div> <!-- end row -->				
 
-
-			<div class="span-24 separator"></div>						
+			<div class="row">
+				<div class="separator separator-margin"></div>						
+			</div> <!-- end row -->				
 
 			<!-- PROGRAMMATIC CLIENTS -->
-			<div class="span-24">
+			<div class="row">				
 				<h3>Programmatic Clients</h3>
 				<p>Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
 				   interact with all of Synapse's functionality programmatically. Create projects, upload/download files, generate provenance, query, create wikis and more
 				   all from the comfort of your own code. Don't see your language of choice here? Check out our 
 				   full <g:Anchor ui:field="restApiLink"/>.</p>
-				<div class="span-7 notopmargin">
+				<div class="col-md-4">
 			    	<span style="position:relative; top:8px; padding-right: 5px;">
 			    	    <g:Image resource='{sageImageBundle.logoR45}' />
 			    	</span>
@@ -165,7 +188,7 @@
 			    	<g:SimplePanel ui:field="rClientInstallPanel" />
 			    	<h5 style="display:inline"><g:Anchor ui:field="rAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="rExampleCodeLink"/></h5>
 				</div>
-				<div class="span-6 notopmargin">
+				<div class="col-md-3">
 			    	<span style="position:relative; top:8px; padding-right: 5px;">
 			    	    <g:Image resource='{sageImageBundle.logoPython45}' />
 			    	</span>
@@ -173,7 +196,7 @@
 			    	<g:SimplePanel ui:field="pythonClientInstallPanel" />
 					<h5 style="display:inline"><g:Anchor ui:field="pythonAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="pythonExampleCodeLink"/></h5>
 				</div>
-				<div class="span-6 notopmargin">
+				<div class="col-md-3">
 			    	<span style="position:relative; top:8px; padding-right: 5px;">
 			    	    <g:Image resource='{sageImageBundle.logoCommandLine45}' />
 			    	</span>
@@ -181,7 +204,7 @@
 			    	<g:SimplePanel ui:field="clClientInstallPanel" />
 					<h5 style="display:inline"><g:Anchor ui:field="clAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="clExampleCodeLink"/></h5>
 				</div>												
-				<div class="span-5 notopmargin last">
+				<div class="col-md-2">
 			    	<span style="position:relative; top:8px; padding-right: 5px;">
 			    	    <g:Image resource='{sageImageBundle.logoJava45}' />
 			    	</span>
@@ -191,25 +214,24 @@
 						<h5 style="display:inline"><g:Anchor ui:field="javaAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="javaExampleCodeLink"/></h5>								
 			    	</span>
 				</div>
-			</div>
-	
-			<div class="span-24 separator"></div>						
-			
-			
-			<!-- NEWS -->						
-			<div class="span-24 notopmargin main-service">
-				<div class="span-18">
-					<h3>News</h3>
-					<g:SimplePanel ui:field="newsFeed" />
-				</div>
-				
-				<!-- DATA USE -->
-				<div class="span-6 notopmargin last">
-					<div class="span-6">
-						<h3>Data Use Conditions</h3>
+			</div> <!-- end row -->				
+
+			<div class="row">			
+				<div class="separator separator-margin"></div>						
+			</div> <!-- end row -->				
+
+			<div class="row">			
+				<!-- NEWS -->						
+				<div class="main-service">
+					<div class="col-md-9">
+						<h3>News</h3>						
+						<g:SimplePanel ui:field="newsFeed" styleName="row"/>
 					</div>
-					<div class="span-6 inner-6 view notopmargin">
-						<div class="span-5 notopmargin last">
+					
+					<!-- DATA USE -->
+					<div class="col-md-3">
+						<h3>Data Use Conditions</h3>
+						<div class="well">
 							<p>There are times where human data can only be shared with certain
 								restrictions. Learn what the rules are and how to apply and comply
 								with data privacy levels.</p>
@@ -224,17 +246,16 @@
 								<g:Image resource='{icons.shieldYellow16}' /><h5 style="display: inline; margin-left: 3px;">Restricted Use</h5><br/>
 								<g:Image resource='{icons.sheildGreen16}' /><h5 style="display: inline; margin-left: 3px;">Open Use</h5><br/>
 							</div>
-						</div>
-			
+						</div>				
 					</div>
+					<!-- END DATA USE -->				
 				</div>
-				<!-- END DATA USE -->				
-			</div>
-			
-								
+			</div> <!-- end row -->				
+		</div> <!-- close class="container" -->			
+									
 
-			<div class="clear"></div>
-		</div> <!-- close class="container" -->
+		<div class="clear"></div>
+
 		<g:SimplePanel ui:field="footer" />
 
 	</g:HTMLPanel>

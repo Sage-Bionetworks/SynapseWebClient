@@ -163,7 +163,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		//Preview
 		final com.google.gwt.user.client.ui.Button previewButton =  new com.google.gwt.user.client.ui.Button();
 		previewButton.setText(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT);
-		previewButton.addStyleName("btn");
+		previewButton.addStyleName("btn btn-default");
 		previewButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -182,7 +182,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		if (managementHandler != null) {
 			final com.google.gwt.user.client.ui.Button deleteButton =  new com.google.gwt.user.client.ui.Button();
 			deleteButton.setHTML(DisplayConstants.BUTTON_DELETE_WIKI);
-			deleteButton.addStyleName("btn");
+			deleteButton.addStyleName("btn btn-default");
 			deleteButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -193,7 +193,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			mdCommandsLower.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 			final com.google.gwt.user.client.ui.Button attachmentsButton =  new com.google.gwt.user.client.ui.Button();
 			attachmentsButton.setText(DisplayConstants.BUTTON_WIKI_ATTACHMENTS);
-			attachmentsButton.addStyleName("btn");
+			attachmentsButton.addStyleName("btn btn-default");
 			attachmentsButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -213,7 +213,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			//also add a save button to the lower command bar
 			final com.google.gwt.user.client.ui.Button saveButton =  new com.google.gwt.user.client.ui.Button();
 			saveButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
-			saveButton.addStyleName("btn");
+			saveButton.addStyleName("btn btn-default");
 			saveButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -226,7 +226,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			
 			final com.google.gwt.user.client.ui.Button cancelButton =  new com.google.gwt.user.client.ui.Button();
 			cancelButton.setText(DisplayConstants.BUTTON_CANCEL);
-			cancelButton.addStyleName("btn");
+			cancelButton.addStyleName("btn btn-default");
 			cancelButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {

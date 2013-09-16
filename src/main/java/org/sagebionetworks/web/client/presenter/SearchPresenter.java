@@ -223,11 +223,12 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 
 	@Override
 	public List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow) {
+		if(currentResult == null) return null;		
 		Long nResults = currentResult.getFound();
 		Long start = currentResult.getStart();
 		if(nResults == null || start == null)
 			return null;
-		return PaginationUtil.getPagination(nResults.intValue(), start.intValue(), nPerPage, nPagesToShow);
+		return PaginationUtil.getPagination(nResults.intValue(), start.intValue(), nPerPage, nPagesToShow);		
 	}
 
 	@Override

@@ -6,75 +6,67 @@
 	
 	<g:HTMLPanel>
 
-		<!-- FOOTER -->
+		<!-- FOOTER -->		
 		<div class="footer-line-top-wrapper">
             <div class="footer-container">
-                <div class="span-24 notopmargin footer-top-line">
+                <div class="footer-top-line">
             	</div>
         	</div>
             <div class="clear"></div>
     	</div>
         <div class="clear"></div>
         <div class="footer-wrapper">
-            <div class="footer-container" style="width: 960px">
-                <div class="span-24 notopmargin">
-                    <div class="span-24 footer notopmargin">
-                        <div class="span-5 notopmargin last">
-                            <h6>With Support From</h6>                            				                          
-                            <div class="flickr item left"><a href="http://www.lsdfa.org/" target="_new"><img src="images/LSDF_logo.jpg" style="padding: 5px;"/></a></div>                            
-                        </div>
-                        <div class="span-3 notopmargin" style="margin-right: 10px">
-                            <h6>&nbsp;</h6>
-                            <div class="flickr item left"><a href="http://www.cancer.gov/" target="_new"><img src="images/NCI_logo.jpg" style="padding: 5px;" /></a></div>                                                       
-                        </div>
-                        <div class="span-5 notopmargin" style="margin-right: 10px">
-                            <h6>&nbsp;</h6>
-                            <div class="flickr item left"><a href="http://www.bioontology.org/" target="_new"><img src="images/NCBO_logo.png" style="padding: 5px;" /></a></div>                                                       
-                        </div>
-                        <div class="span-6 notopmargin last">
-                            <h6>&nbsp;</h6>
-                            <div class="flickr item left"><a href="http://www.sloan.org/" target="_new"><img src="images/Sloan_logo.jpg" style="padding: 5px;" /></a></div>                                                       
-                        </div>
-                        <div class="span-3 notopmargin">
-                        	<h6>Follow Us On</h6>                            
-                            <div class="tweet-icon">
-                                <a href="https://twitter.com/sagebio" class='social' title='Twitter'><img src="images/1px.png" alt="" width="26px" height="26px" /></a>
-                            </div>
-                            <div class="facebook-icon">
-                                <a href="http://www.facebook.com/pages/Sage-Bionetworks/246302308981" class='social' title='Facebook'><img src="images/1px.png" alt="" width="26px" height="26px" /></a>
-                            </div>
-                        </div>
-                        <div class="span-3 notopmargin last">
-                            <h6>Contact info</h6>
-                            <p class="small">
-                            	<a href="http://www.sagebase.org">Sage Bionetworks</a><br/>
-                            	1100 Fairview Ave N<br/>
-                            	Seattle, WA 98109<br/>
-                            	<a href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a>                             	
-                           	</p>
-                        </div>
-                    </div>
-                 </div>
+            <div class="footer-container">
+	            <div class="footer container">
+					<div class="row">
+		                <div class="col-md-8">
+			                <h6>With Support From</h6>                            				                          				                    
+			                <div class="img-thumbnail"><a href="http://www.lsdfa.org/" target="_new"><img src="images/LSDF_logo.jpg" style="padding: 5px;"/></a></div>                            
+		                    <div class="img-thumbnail"><a href="http://www.cancer.gov/" target="_new"><img src="images/NCI_logo.jpg" style="padding: 5px;" /></a></div>                                                       
+		                    <div class="img-thumbnail"><a href="http://www.bioontology.org/" target="_new"><img src="images/NCBO_logo.png" style="padding: 5px;" /></a></div>                                                       
+		                    <div class="img-thumbnail"><a href="http://www.sloan.org/" target="_new"><img src="images/Sloan_logo.jpg" style="padding: 5px;" /></a></div>                                                       
+		                </div>
+		                <div class="col-md-2 col-sm-12">
+		                	<h6>Follow Us On</h6>                            
+		                    <div class="tweet-icon">
+		                        <a href="https://twitter.com/sagebio" class='social' title='Twitter'><img src="images/1px.png" alt="" width="26px" height="26px" /></a>
+		                    </div>
+		                    <div class="facebook-icon">
+		                        <a href="http://www.facebook.com/pages/Sage-Bionetworks/246302308981" class='social' title='Facebook'><img src="images/1px.png" alt="" width="26px" height="26px" /></a>
+		                    </div>
+		                </div>
+					    <div class="col-md-2 col-sm-12">
+		                    <h6>Contact info</h6>
+		                    <p class="small">
+		                    	<a href="http://www.sagebase.org">Sage Bionetworks</a><br/>
+		                    	1100 Fairview Ave N<br/>
+		                    	Seattle, WA 98109<br/>
+		                    	<a href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a>                             	
+		                   	</p>					        					        
+					    </div>
+					</div>
+	            </div>
             </div>
             <div class="clear"></div>
 		</div>
         <div class="footer-line-wrapper">
             <div class="footer-container">
-            	<div class="span-24 notopmargin footer-line">
-                    <div class="span-8 notopmargin">
-                        <p>Copyright <span ui:field="copyrightYear" /> <a href="http://www.sagebase.org">Sage Bionetworks</a><br/> 
-                        <span class="small">portal: <span ui:field="portalVersionSpan" />, repo: <span ui:field="repoVersionSpan" /></span></p>
-                    </div>
-                    <div class="span-16 notopmargin last">
-                    	<p class="right">
-	                    	<a href="#!Home:0">Home</a> / 
-							<a href="#!Governance:0">Governance</a> /
-							<a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a> / 
-							<g:FlowPanel ui:field="debugModePanel" />
-                    	</p>
+            	<div class="container footer-line">
+            	    <div class="row">
+	                    <div class="col-md-4">
+	                        <p>Copyright <span ui:field="copyrightYear" /> <a href="http://www.sagebase.org">Sage Bionetworks</a><br/> 
+	                        <span class="small">portal: <span ui:field="portalVersionSpan" />, repo: <span ui:field="repoVersionSpan" /></span></p>
+	                    </div>
+	                    <div class="col-md-8">
+	                    	<p class="right">
+		                    	<a href="#!Home:0">Home</a> / 
+								<a href="#!Governance:0">Governance</a> /
+								<a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a> / 
+								<g:FlowPanel ui:field="debugModePanel" />
+	                    	</p>
+	                	</div>
                 	</div>
             	</div>
-                <div class="clear"></div>
         	</div>
     	</div>
 

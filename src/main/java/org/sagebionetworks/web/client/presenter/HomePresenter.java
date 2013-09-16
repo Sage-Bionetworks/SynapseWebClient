@@ -111,7 +111,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			RSSEntry entry = feed.getEntries().get(i);
 			//every max, set as the last
 			String lastString = (i+1)%MAX_NEWS_ITEMS==0 ? "last" : "";
-			htmlResponse.append("<div class=\"span-6 serv notopmargin "+lastString+"\"><div class=\"icon-white-big left icon161-white\" style=\"background-color: rgb(122, 122, 122);\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
+			htmlResponse.append("<div class=\"col-md-4 serv "+lastString+"\"><div class=\"icon-white-big left icon161-white\" style=\"background-color: rgb(122, 122, 122);\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
             htmlResponse.append(entry.getLink());
             htmlResponse.append("\" class=\"service-tipsy north link\">");
             htmlResponse.append(entry.getTitle());
@@ -126,7 +126,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public String getSupportFeedHtml(String rssFeedJson) throws JSONObjectAdapterException {
 		RSSFeed feed = new RSSFeed(adapterFactory.createNew(rssFeedJson));
 		StringBuilder htmlResponse = new StringBuilder();
-		htmlResponse.append("<div class=\"span-12 last notopmargin\"> <ul class=\"list question-list\">");
+		htmlResponse.append("<div> <ul class=\"list question-list\">");
 		for (int i = 0; i < feed.getEntries().size(); i++) {
 			RSSEntry entry = feed.getEntries().get(i);
 			htmlResponse.append("<li style=\"padding-top: 0px; padding-bottom: 3px\"><h5 style=\"margin-bottom: 0px;\"><a href=\"");

@@ -1145,9 +1145,69 @@ ol.lowerroman {
 	vertical-align: middle;
 }
 
+.separator-margin {	margin-top: 40px; margin-bottom: 40px; }
+.separator-margin-top {	margin-top: 40px; }
 
 
+/*============================*/
+/* Custom Carousel Control */
+.carousel-control-clean {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 15%;
+  font-size: 20px;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
 
+.carousel-control-clean.left {
+}
+
+.carousel-control-clean.right {
+  right: 0;
+  left: auto;
+}
+
+.carousel-control-clean:hover,
+.carousel-control-clean:focus {
+  color: #ffffff;
+  text-decoration: none;
+  opacity: 0.9;
+  filter: alpha(opacity=90);
+}
+
+.carousel-control-clean .icon-prev,
+.carousel-control-clean .icon-next,
+.carousel-control-clean .glyphicon-chevron-left,
+.carousel-control-clean .glyphicon-chevron-right {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  display: inline-block;
+}
+
+.carousel-control-clean .icon-prev,
+.carousel-control-clean .icon-next {
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  font-family: serif;
+}
+
+.carousel-control-clean .icon-prev:before {
+  content: '\2039';
+}
+
+.carousel-control-clean .icon-next:before {
+  content: '\203a';
+}
 
 
 

@@ -1,86 +1,95 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
-<head>
-<meta name="description" content="" />
-<meta name="google-site-verification" content="KIO5H8Bg3i0oAEAzTEMK5qIlYJLbd2zogLs_-im4rI0" />
-<meta name="msvalidate.01" content="E37AC1589F823723B64275D4BC890B1A" />
-<!-- 
-adding the following meta tag should tell the crawler to try to crawl the ugly version of *this* URL, 
-but I only want it to find the production (want it to ignore staging, which may have the same data) 
-<meta name="fragment" content="!" />  
--->
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<head>
+		<meta name="description" content="" />
+		<meta name="google-site-verification" content="KIO5H8Bg3i0oAEAzTEMK5qIlYJLbd2zogLs_-im4rI0" />
+		<meta name="msvalidate.01" content="E37AC1589F823723B64275D4BC890B1A" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<!--                                                               -->
-		<!-- Consider inlining CSS to reduce the number of requested files -->
-		<!--                                                               -->
+	    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	    <!--[if lt IE 9]>
+	      <script src="bootstrap/assets/js/html5shiv.js"></script>
+	      <script src="bootstrap/assets/js/respond.min.js"></script>
+	    <![endif]-->		
+
+		<!-- 
+		adding the following meta tag should tell the crawler to try to crawl the ugly version of *this* URL, 
+		but I only want it to find the production (want it to ignore staging, which may have the same data) 
+		<meta name="fragment" content="!" />  
+		-->
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">	
 		<link rel="stylesheet" type="text/css" href="Portal/gwt/standard/standard.css" /> 
 		<link rel="stylesheet" type="text/css" href="jquery/themes/base/jquery.ui.all.css" />
 		<link rel="stylesheet" type="text/css" href="Portal.css" />		
 		<link rel="stylesheet" type="text/css" href="resources/css/gxt-all.css" />
 		<link rel="stylesheet" type="text/css" href="resources/css/gxt-gray.css" />
-		<link rel="stylesheet" type="text/css" href="jsPlumb/provenance.css" />
-		
-		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-		<link href="css/reset.css" rel="stylesheet" type="text/css" />
-		<link href="css/style.css" rel="stylesheet" type="text/css" />
+		<link rel="stylesheet" type="text/css" href="jsPlumb/provenance.css" />		
+		<link rel="stylesheet" href="css/code-highlighting.css" type="text/css" />
+
+<!-- 		<link href="css/style.css" rel="stylesheet" type="text/css" />
+ -->
+ 		<link href="css/Synapse-svarog.css" rel="stylesheet" type="text/css" />
+
+<!--
+ 		<link href="css/reset.css" rel="stylesheet" type="text/css" />
 		<link href="css/colorpicker.css" rel="stylesheet" type="text/css" />
 		<link rel="stylesheet" href="css/nivo-default.css" type="text/css" media="screen" />
 		<link rel="stylesheet" href="css/nivo-slider.css" type="text/css" media="screen" />
 		<link rel="stylesheet" href="css/prettyPhoto.css" type="text/css" media="screen" />
-		<link rel="stylesheet" href="css/code-highlighting.css" type="text/css" />
-		<!--GOOGLE FONTS-->
+ -->
+<!--
 		<link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css' />
 		<link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css' />
-		<!--/GOOGLE FONTS-->
+ -->
 		<!-- COLOR STYLE -->
 		<link href="style/color/SynapseColor.css" rel="stylesheet" type="text/css" />
-		
-		
+				
 		<!-- head.js -->
 		<script src="js/head.load.min.js"></script>
 		<script>
-        var start = new Date();
-	        head.js("https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js")
-	        .js("https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js")
-	        .js("js/custom.js")		
-	        .js("js/tabs.js")
-	        .js("js/slides.min.jquery.js")
-	        .js("js/spark-md5.min.js")
-	        .js("js/nivo-slider/jquery.nivo.slider.pack.js")
-	        .js("js/superfish-menu/hoverIntent.js")
-	        .js("js/superfish-menu/superfish.js")
-	        .js("js/scrolltop/scrolltopcontrol.js")
-	        .js("js/prettyPhoto/jquery.prettyPhoto.js")
-	        .js("js/jquery.featureList-1.0.0.js")
-	        .js("js/swfobject/swfobject.js")
-	        .js("js/easing/jquery.easing.1.3.js")
-	        .js("js/jquery.iconmenu.js")
-	        .js("js/kwicks/jquery.kwicks-1.5.1.pack.js")
-	        .js("js/mosaic/mosaic.1.0.1.js")
-	        .js("js/jquery.tipsy.js")
-	        .js("js/jquery.quicksand.js")
-	        .js("js/jquery.tablesorter.js")
-	        .js("js/jquery.mousewheel.js")
-	        .js("js/jquery.contentcarousel.js")
-	        .js("js/jquery.vaccordion.js")
-	        .js("js/highlight.pack.js")
-	        .js("https://c328740.ssl.cf1.rackcdn.com/mathjax/2.2-latest/MathJax.js?config=default")
-	        .js("js/mathjax-loader.js")
-            .js("jsPlumb/lib/jquery.ui.touch-punch.min.js")
-            .js("jsPlumb/lib/jsBezier-0.4-min.js")
-            .js("jsPlumb/jsPlumb-util-1.3.13-RC1.js")
-            .js("jsPlumb/jsPlumb-dom-adapter-1.3.13-RC1.js")
-            .js("jsPlumb/jsPlumb-1.3.13-RC1.js")
-            .js("jsPlumb/jsPlumb-defaults-1.3.13-RC1.js")
-            .js("jsPlumb/jsPlumb-connectors-statemachine-1.3.13-RC1.js")
-            .js("jsPlumb/jsPlumb-renderers-svg-1.3.13-RC1.js")
-            .js("jsPlumb/jsPlumb-renderers-canvas-1.3.13-RC1.js")
-            .js("jsPlumb/jsPlumb-renderers-vml-1.3.13-RC1.js")
-            .js("jsPlumb/jquery.jsPlumb-1.3.13-RC1.js")
-            .js("bootstrap/js/bootstrap.min.js");
-    	</script>    
-
+	        var start = new Date();
+		        head.js("https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js")
+		        .js("https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js")
+ 		        .js("js/custom.js")		
+		        .js("js/tabs.js")
+		        .js("js/slides.min.jquery.js")
+		        .js("js/spark-md5.min.js")
+		        .js("js/nivo-slider/jquery.nivo.slider.pack.js")
+		        .js("js/superfish-menu/hoverIntent.js")
+		        .js("js/superfish-menu/superfish.js")
+//		        .js("js/scrolltop/scrolltopcontrol.js")
+		        .js("js/prettyPhoto/jquery.prettyPhoto.js")
+		        .js("js/jquery.featureList-1.0.0.js")
+		        .js("js/swfobject/swfobject.js")
+		        .js("js/easing/jquery.easing.1.3.js")
+		        .js("js/jquery.iconmenu.js")
+		        .js("js/kwicks/jquery.kwicks-1.5.1.pack.js")
+		        .js("js/mosaic/mosaic.1.0.1.js")
+		        .js("js/jquery.tipsy.js")
+		        .js("js/jquery.quicksand.js")
+		        .js("js/jquery.tablesorter.js")
+		        .js("js/jquery.mousewheel.js")
+		        .js("js/jquery.contentcarousel.js")
+		        .js("js/jquery.vaccordion.js")
+		        .js("js/highlight.pack.js")
+		        .js("https://c328740.ssl.cf1.rackcdn.com/mathjax/2.2-latest/MathJax.js?config=default")
+		        .js("js/mathjax-loader.js")
+	            .js("jsPlumb/lib/jquery.ui.touch-punch.min.js")
+	            .js("jsPlumb/lib/jsBezier-0.4-min.js")
+	            .js("jsPlumb/jsPlumb-util-1.3.13-RC1.js")
+	            .js("jsPlumb/jsPlumb-dom-adapter-1.3.13-RC1.js")
+	            .js("jsPlumb/jsPlumb-1.3.13-RC1.js")
+	            .js("jsPlumb/jsPlumb-defaults-1.3.13-RC1.js")
+	            .js("jsPlumb/jsPlumb-connectors-statemachine-1.3.13-RC1.js")
+	            .js("jsPlumb/jsPlumb-renderers-svg-1.3.13-RC1.js")
+	            .js("jsPlumb/jsPlumb-renderers-canvas-1.3.13-RC1.js")
+	            .js("jsPlumb/jsPlumb-renderers-vml-1.3.13-RC1.js")
+	            .js("jsPlumb/jquery.jsPlumb-1.3.13-RC1.js")
+	            .js("bootstrap/js/bootstrap.min.js");
+	   	</script>    
+	
 		<title>Sage Synapse : Contribute to the Cure</title>
 		
 		<!--                                           -->
@@ -88,12 +97,12 @@ but I only want it to find the production (want it to ignore staging, which may 
 		<!-- If you add any GWT meta tags, they must   -->
 		<!-- be added before this line.                -->
 		<!--                                           -->
-
+	
 		<script type="text/javascript" language="javascript" src="js/goog/base.js"></script>
 		<script type="text/javascript" language="javascript" src="js/nchart.js"></script>
 		<script type="text/javascript" language="javascript" src="Portal/Portal.nocache.js"></script>
 		<script language='javascript' src='resources/flash/swfobject.js'></script>
-		
+			
 		<!-- Search autocomplete script. Temporary -->
 	
 		<!-- put this last -->
@@ -110,36 +119,30 @@ but I only want it to find the production (want it to ignore staging, which may 
 		  })();
 		
 		</script>
-	</head>	
-	<body onunload="jsPlumb.unload();" >
-		<!-- MAIN WRAPPER -->
-		<div style="margin:5px auto 0" class="main-wrapper">
-		
-		
-			<!-- OPTIONAL: include this if you want history support -->
-			<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1'
-				style="position: absolute; width: 0; height: 0; border: 0"></iframe>
-			
-			<!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+	</head>
+	<body onunload="jsPlumb.unload();">
+		<div>
+			<!-- GWT history support -->
+			<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position: absolute; width: 0; height: 0; border: 0"></iframe>
+	
 			<noscript>
-			<div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-			Your web browser must have JavaScript enabled in order for this
-			application to display correctly.<br />
-			If you are an automated web crawler from a search engine, follow this <a href="https://synapse.prod.sagebase.org/Portal.html#!Home:0">AJAX application crawl link</a>
-			</div>
-			
+				<div
+					style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+					Your web browser must have JavaScript enabled in order for this
+					application to display correctly.<br /> If you are an automated web
+					crawler from a search engine, follow this <a
+						href="https://synapse.prod.sagebase.org/Portal.html#!Home:0">AJAX
+						application crawl link</a>
+				</div>
 			</noscript>
-			
+	
 			<!-- This is the GWT-generated body -->
-			<div id="alertWrapper" >
-				<div id="alertContainer" >
-				</div> 
+			<div id="alertWrapper">
+				<div id="alertContainer"></div>
 			</div>
 			<div id="rootPanel"></div>
-								
-	    </div>
-		<!-- END MAIN CONTENT -->
-		<!-- END FOOTER -->
-	    <div class="clear"></div>
+	
+		</div>
+		<div class="clear"></div>
 	</body>
 </html>
