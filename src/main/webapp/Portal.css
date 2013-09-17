@@ -543,6 +543,9 @@ a.shortBtn {
 .margin-top-10 {
 	margin-top: 10px;
 }
+.margin-top-15 {
+	margin-top: 15px;
+}
 
 .margin-left-180 {
 	margin-left: 180px;
@@ -1012,7 +1015,7 @@ ol.lowerroman {
     display: inline-block;
     font: 11px arial,tahoma,helvetica,sans-serif;
     overflow: hidden;
-    padding: 0 0 5px 3px;
+    padding: 0 0 0px 3px;
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 270px;
@@ -1147,6 +1150,7 @@ ol.lowerroman {
 
 .separator-margin {	margin-top: 40px; margin-bottom: 40px; }
 .separator-margin-top {	margin-top: 40px; }
+.separator-header { margin-top: 20px; margin-bottom: 40px !important; }
 
 
 /*============================*/
@@ -1209,5 +1213,9 @@ ol.lowerroman {
   content: '\203a';
 }
 
-
+/*==================================*/
+/* GXT Overrides */
+.x-tree3-node-text {
+	top: 1px !important;
+}
 

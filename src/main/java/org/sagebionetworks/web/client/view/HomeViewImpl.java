@@ -261,30 +261,38 @@ public class HomeViewImpl extends Composite implements HomeView {
 	 */
 	private void injectProjectPanel() {
 		projectPanel.clear();
-		// Overall container
-		LayoutContainer container = new LayoutContainer();
-		container.setStyleName("col-md-8 notopmargin last");			
-		
+		LayoutContainer container = new LayoutContainer();		
+		// Evaluations and Projects
 		LayoutContainer evalsAndProjects = new LayoutContainer();
-		evalsAndProjects.setStyleName("col-md-4 notopmargin");
+		evalsAndProjects.setStyleName("col-md-4");
 		evalsAndProjects.add(getMyEvaluationsContainer());
 		evalsAndProjects.add(getMyProjectsContainer());
+		evalsAndProjects.add(createCreateProjectWidget()); 
 		container.add(evalsAndProjects);
+		// Favorites
 		container.add(getFavoritesContainer());
+
 		
-		// Create a project
+		projectPanel.add(container);		
+	}
+
+	private LayoutContainer createCreateProjectWidget() {
 		LayoutContainer createProjectContainer = new LayoutContainer();
-		createProjectContainer.addStyleName("col-md-8 last");		
+		createProjectContainer.setStyleName("row margin-top-15");
 		
+		LayoutContainer col1 = new LayoutContainer();
+		col1.addStyleName("col-md-7");
 		final TextBox input = new TextBox();
-		input.addStyleName("form-signinInput displayInline");
-		input.setWidth("200px");
+		input.addStyleName("form-control");
 		input.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
-		createProjectContainer.add(input, new MarginData(0, 10, 0, 0));		
+		col1.add(input);
+		createProjectContainer.add(col1);		
 		
-		Button createBtn = new Button(DisplayConstants.LABEL_CREATE);
+		LayoutContainer col2 = new LayoutContainer();
+		col2.addStyleName("col-md-5");
+		Button createBtn = new Button(DisplayConstants.CREATE_PROJECT);
 		createBtn.removeStyleName("gwt-Button");
-		createBtn.addStyleName("btn btn-default displayInline form-inputButton");
+		createBtn.addStyleName("btn btn-default btn-block");
 		createBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -296,8 +304,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 				presenter.createProject(input.getValue());
 			}
 		});
-		createProjectContainer.add(createBtn);		
+		col2.add(createBtn);
+		createProjectContainer.add(col2);		
 
+		LayoutContainer col3 = new LayoutContainer();
+		col3.addStyleName("col-md-12 right");		
 		Anchor whatProj = new Anchor(DisplayConstants.WHAT_IS_A_PROJECT);
 		whatProj.addClickHandler(new ClickHandler() {
 			@Override
@@ -305,16 +316,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new ProjectsHome(ClientProperties.DEFAULT_PLACE_TOKEN));
 			}
 		});
-		createProjectContainer.add(whatProj, new MarginData(0, 0, 0, 15));
-		
-		container.add(createProjectContainer);
-
-		projectPanel.add(container);		
+		col3.add(whatProj);
+		createProjectContainer.add(col3);
+		return createProjectContainer;
 	}
 	
 	private LayoutContainer getFavoritesContainer() {
 		LayoutContainer favoritesContainer = new LayoutContainer();
-		favoritesContainer.setStyleName("col-md-4 notopmargin last");
+		favoritesContainer.setStyleName("col-md-4");
 		favoritesContainer.add(
 				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
 		favoritesContainer.add(favoritesTreeBrowser.asWidget());
@@ -324,14 +333,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private LayoutContainer getMyEvaluationsContainer() {
 		//My Evaluations
 		LayoutContainer myEvaluations = new LayoutContainer();
-		myEvaluations.setStyleName("col-md-4 notopmargin");
 		myEvaluations.add(myEvaluationsList.asWidget());					
 		return myEvaluations;
 	}
 	
 	private LayoutContainer getMyProjectsContainer() {
 		LayoutContainer myProjContainer = new LayoutContainer();
-		myProjContainer.setStyleName("col-md-4 notopmargin");
 		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
 		myProjContainer.add(myProjectsTreeBrowser.asWidget());					
 		return myProjContainer;
