@@ -11,8 +11,8 @@
 	<g:HTMLPanel>
 		<!-- HEADER -->
 		<div class="color-line"></div>
-		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header"></div>
+		<g:SimplePanel ui:field="header" styleName="container"/>
+		<div class="separator separator-header-home"></div>
 		
 		<!-- TOP 3 COLUMNS -->		
 		<div class="container">

@@ -17,10 +17,8 @@
 		<!-- HEADER -->
 		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header"></div>
-		<div class="row">    
-			<g:SimplePanel ui:field="entityPageTopPanel" styleName="col-md-12"/>
-		</div>
+		<div class="separator separator-header-page"></div>
+		<g:SimplePanel ui:field="entityPageTopPanel"/>
         <div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
