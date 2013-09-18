@@ -250,18 +250,27 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		//The ok/submitting button will be enabled when required images are uploaded
 		//or when another tab (external or synapse) is viewed
 		window.getButtonById(Dialog.OK).disable();
-		externalTab.addListener(Events.Select, new Listener<TabPanelEvent>() {
+		
+		Listener uploadTabChangeListener = new Listener<TabPanelEvent>() {
+			@Override
+			public void handleEvent(TabPanelEvent be) {
+				if(uploadedFileHandleName != null) {
+					window.getButtonById(Dialog.OK).enable();
+				}
+			}
+		};
+		
+		Listener tabChangeListener = new Listener<TabPanelEvent>() {
 			@Override
 			public void handleEvent(TabPanelEvent be) {
 				window.getButtonById(Dialog.OK).enable();
 			}
-		});
-		synapseTab.addListener(Events.Select, new Listener<TabPanelEvent>() {
-			@Override
-			public void handleEvent(TabPanelEvent be) {
-				window.getButtonById(Dialog.OK).enable();
-			}
-		});
+		};
+		
+		uploadTab.addListener(Events.Select, uploadTabChangeListener);
+		externalTab.addListener(Events.Select, tabChangeListener);
+		synapseTab.addListener(Events.Select, tabChangeListener);
+		
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, 25, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
