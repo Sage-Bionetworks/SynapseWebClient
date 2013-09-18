@@ -12,8 +12,6 @@ import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.attachment.UploadResult;
-import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -32,14 +30,12 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.util.Margins;
@@ -333,7 +329,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Wiki
 		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 		
-		LayoutContainer row = createRowContainer();
+		LayoutContainer row = DisplayUtils.createRowContainer();
 		// Preview
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {			
 			row.add(getFilePreview(bundle));
@@ -344,7 +340,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.add(row);
 		
 		// Annotations
-		row = createRowContainer();		
+		row = DisplayUtils.createRowContainer();		
 		row.add(createAnnotationsWidget(bundle, canEdit), widgetMargin);
 		fullWidthContainer.add(row);
 		
@@ -355,13 +351,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		//these types should not have children to show (and don't show deprecated Preview child object)
 		
 		// ************************************************************************************************		
-	}
-
-	private LayoutContainer createRowContainer() {
-		LayoutContainer row;
-		row = new LayoutContainer();
-		row.setStyleName("row");
-		return row;
 	}
 	
 	private Widget getFilePreview(EntityBundle bundle) {
@@ -416,20 +405,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			String entityTypeDisplay, boolean isAdmin, final boolean canEdit, Synapse.EntityTab area, String wikiPageId,
 			MarginData widgetMargin) {
 		entityMetadata.setEntityBundle(bundle, versionNumber); 
-		LayoutContainer threeCol = new LayoutContainer();
-		threeCol.addStyleName("span-24 notopmargin");
+		
+		// Annotations
+		LayoutContainer projectExtrasRow = new LayoutContainer();
 		// Annotation widget
-		LayoutContainer annotContainer = createAnnotationsWidget(bundle, canEdit);
-		annotContainer.addStyleName("span-7 notopmargin");
-		threeCol.add(annotContainer);    
-		threeCol.add(createSpacer());
-		// ***** TODO : BOTH OF THESE SHOULD BE REPLACED BY THE NEW ATTACHMENT/MARKDOWN SYSTEM ************		
-		// Attachments
-		Widget attachContainer = createAttachmentsWidget(bundle, canEdit, false);
-		attachContainer.addStyleName("span-7 notopmargin");
-		threeCol.add(attachContainer);
-		threeCol.add(createSpacer());
+		LayoutContainer row = DisplayUtils.createRowContainer();		
+		row.add(createAnnotationsWidget(bundle, canEdit), widgetMargin);
+		projectExtrasRow.add(row);
 
+		// Attachments (TODO : this should eventually be removed)
+		row = DisplayUtils.createRowContainer();		
+		row.add(createAttachmentsWidget(bundle, canEdit, false), widgetMargin);
+		projectExtrasRow.add(row);		
+		
 		if (isTabShowing) {
 			navtabContainer.removeClassName("hide");
 			topFullWidthContainer.add(entityMetadata.asWidget(), widgetMargin);
@@ -439,17 +427,22 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24);
 			
 			// Child File Browser
-			filesTabContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
+			row = DisplayUtils.createRowContainer();		
+			row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
+			filesTabContainer.add(row);
 	
 			// ************************************************************************************************
-			filesTabContainer.add(threeCol, widgetMargin);
-			adminTabContainer.add(createEvaluationAdminList(bundle, new CallbackP<Boolean>() {
+			filesTabContainer.add(projectExtrasRow, widgetMargin);
+			
+			row = DisplayUtils.createRowContainer();
+			row.add(createEvaluationAdminList(bundle, new CallbackP<Boolean>() {
 				@Override
 				public void invoke(Boolean isVisible) {
 					if (isVisible)
 						adminListItem.removeClassName("hide");
 				}
 			}));
+			adminTabContainer.add(row);
 			fullWidthContainer.add(currentTabContainer);
 			Synapse.EntityTab tab = area;
 			if (tab == null) {
@@ -458,6 +451,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 			setTabSelected(tab);
 		} else {
+			// TODO : remove on switchover
 			//old layout with no tabs
 			fullWidthContainer.add(entityMetadata.asWidget(), widgetMargin); 
 			fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true), widgetMargin);
@@ -465,9 +459,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), true, canEdit));
 			Widget evalAdminPanel = createEvaluationAdminList(bundle, null);
 			evalAdminPanel.addStyleName("span-7 notopmargin");
-			threeCol.add(evalAdminPanel);
-			threeCol.add(createSpacer());
-			fullWidthContainer.add(threeCol, widgetMargin);
+			fullWidthContainer.add(evalAdminPanel, widgetMargin);
 		}
 	}
 
@@ -582,7 +574,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    final LayoutContainer border = new LayoutContainer();
 	    border.setTitle(DisplayConstants.PROVENANCE);
 	    border.addStyleName("highlight-box");
-	    //border.setHeight(WIDGET_HEIGHT_PX);
 	    border.setBorders(true);
 	    border.add(provViewWidget);
 		
@@ -684,31 +675,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         flex.setFlex(1);
 
         final String baseURl = GWT.getModuleBaseURL()+"attachment";
-        final String actionUrl =  baseURl+ "?" + WebConstants.ENTITY_PARAM_KEY + "=" + bundle.getEntity().getId() ;
 
-        if(canEdit) {
-	        Anchor addBtn = new Anchor();
-	        addBtn.setHTML(DisplayUtils.getIconHtml(iconsImageBundle.add16()));
-	        addBtn.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle,DisplayConstants.ATTACHMENT_DIALOG_WINDOW_TITLE, DisplayConstants.ATTACHMENT_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
-						@Override
-						public void onSaveAttachment(UploadResult result) {
-							if(result != null){
-								if(UploadStatus.SUCCESS == result.getUploadStatus()){
-									showInfo(DisplayConstants.TEXT_ATTACHMENT_SUCCESS, "");
-								}else{
-									showErrorMessage(DisplayConstants.ERRROR_ATTACHMENT_FAILED+result.getMessage());
-								}
-							}
-							presenter.fireEntityUpdatedEvent();
-						}
-					});
-				}
-			});
-	        c.add(addBtn, new HBoxLayoutData(new Margins(0)));
-        }
         lc.add(c);
 
         // We just create a new one each time.

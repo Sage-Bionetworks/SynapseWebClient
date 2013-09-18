@@ -99,6 +99,7 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
@@ -1754,5 +1755,12 @@ public class DisplayUtils {
 		
 		window.show();
 	}
-	
+
+	public static LayoutContainer createRowContainer() {
+		LayoutContainer row;
+		row = new LayoutContainer();
+		row.setStyleName("row");
+		return row;
+	}
+
 }

@@ -353,6 +353,41 @@ div.colborder {
 }
 .icon161-white {background-image:url('../images/icons-white.png'); background-position: 0px -128px;}
 
+.view {
+	background-color:#f1f2f1;
+	-moz-box-shadow:0px 1px 2px #aaa;
+	-webkit-box-shadow:0px 1px 2px #aaa;
+	box-shadow:0px 1px 2px #aaa;
+}
+.view .item a {
+	-moz-box-shadow: 0px 0px 0px;
+	-webkit-box-shadow: 0px 0px 0px;
+	box-shadow: 0px 0px 0px;
+	background-color:none;
+}
+.view:hover {
+	background-color:#e6e6e6;
+	background-image: url(../images/pattern/1w.png);
+	-moz-box-shadow:0px 1px 2px #aaa;
+	-webkit-box-shadow:0px 1px 2px #aaa;
+	box-shadow:0px 1px 2px #aaa;
+	-webkit-transition: background-color 0.4s ease-in-out;
+   -moz-transition: background-color 0.4s ease-in-out;
+   -o-transition: background-color 0.4s ease-in-out;
+   -ms-transition: background-color 0.4s ease-in-out;
+   transition: background-color 0.4s ease-in-out;
+}
+
+.view:hover .item a { background-color:none !important;}
+.view h5 .link {
+	padding-left:23px;
+	margin-bottom:50px;
+	text-transform:uppercase; 
+	background-image: url(../images/view.png);
+	background-repeat:no-repeat;
+	background-position:0px 5px;
+}
+
 /*-------------------------------------------------------*/
 /* ### Synapse Custom SVAROG ### */
 /*-------------------------------------------------------*/

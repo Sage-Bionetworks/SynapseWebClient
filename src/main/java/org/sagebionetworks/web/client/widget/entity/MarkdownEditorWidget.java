@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Map;
 
+import org.apache.logging.log4j.core.pattern.MDCPatternConverter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -84,7 +85,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	
 	
 	@Inject
-	public MarkdownEditorWidget(SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor, CookieProvider cookies) {
+	public MarkdownEditorWidget(SynapseClientAsync synapseClient,
+			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
+			IconsImageBundle iconsImageBundle,
+			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
+			CookieProvider cookies) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -104,7 +109,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	 * @param callback
 	 * @param saveHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
 	 */
-	public void configure(final WikiPageKey wikiKey, final TextArea markdownTextArea, LayoutContainer formPanel, boolean showFieldLabel, final boolean isWikiEditor, final WidgetDescriptorUpdatedHandler callback, final CloseHandler saveHandler, final ManagementHandler managementHandler, int spanWidth) {
+	public void configure(final WikiPageKey wikiKey,
+			final TextArea markdownTextArea, LayoutContainer formPanel,
+			boolean showFieldLabel, final boolean isWikiEditor,
+			final WidgetDescriptorUpdatedHandler callback,
+			final CloseHandler saveHandler,
+			final ManagementHandler managementHandler, int colWidth) {
 		this.markdownTextArea = markdownTextArea;
 		this.wikiKey = wikiKey;
 		this.isWikiEditor = isWikiEditor;
@@ -114,7 +124,6 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		descriptionFormatInfo = new HTML(formattingTipsHtml);
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
-		mdCommands.setVerticalAlign(VerticalAlignment.MIDDLE);
 		mdCommands.addStyleName("view header-inner-commands-container");
 
 		editWidgetButton = getNewCommand("Edit Widget", iconsImageBundle.editGrey16(),new ClickHandler() {
@@ -133,9 +142,9 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		if (showFieldLabel)
 			formPanel.add(new Label("Description:"),descriptionLabelFormData);
 		FormData mdCommandFormData = new FormData();
-		mdCommandFormData.setMargins(new Margins(0,-15,0,10));
 		formPanel.add(mdCommands,mdCommandFormData);
 		
+		markdownTextArea.addStyleName("col-xs-12 col-sm-12 col-md-12 col-lg-12");
 		markdownTextArea.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -156,12 +165,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		descriptionWrapper.add(markdownTextArea);
 		
 		FormData descriptionData = new FormData("-5");
-		//descriptionData.setHeight(310);
-		descriptionData.setMargins(new Margins(0, 10, 0, 10));
+		//descriptionData.setHeight(310);		
         formPanel.add(descriptionWrapper, descriptionData);
 		
 		//Preview
 		final com.google.gwt.user.client.ui.Button previewButton =  new com.google.gwt.user.client.ui.Button();
+		previewButton.removeStyleName("gwt-Button");
 		previewButton.setText(DisplayConstants.ENTITY_DESCRIPTION_PREVIEW_BUTTON_TEXT);
 		previewButton.addStyleName("btn btn-default");
 		previewButton.addClickHandler(new ClickHandler() {
@@ -172,26 +181,34 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		});
 		
 		FormData previewFormData = new FormData("-5");
-		previewFormData.setMargins(new Margins(10,10,0,10));
+		previewFormData.setMargins(new Margins(10,0,0,0));
 		
-		HorizontalPanel mdCommandsLower = new HorizontalPanel();
-		mdCommandsLower.setVerticalAlign(VerticalAlignment.MIDDLE);
-		formPanel.add(mdCommandsLower, previewFormData);
-		//mdCommandsLower.addStyleName("");
-		
+		LayoutContainer overallRow = DisplayUtils.createRowContainer();
+		LayoutContainer row = DisplayUtils.createRowContainer();		
+		HorizontalPanel mdCommandsLowerLeft = new HorizontalPanel();
+		mdCommandsLowerLeft.addStyleName("col-md-6");
+		mdCommandsLowerLeft.setVerticalAlign(VerticalAlignment.MIDDLE);
+		LayoutContainer mdCommandsLowerRight = new LayoutContainer();
+		mdCommandsLowerRight.addStyleName("col-md-6");		
+		row.add(mdCommandsLowerLeft);
+		row.add(mdCommandsLowerRight);
+		overallRow.add(row);
+		formPanel.add(overallRow, previewFormData);		
 		if (managementHandler != null) {
 			final com.google.gwt.user.client.ui.Button deleteButton =  new com.google.gwt.user.client.ui.Button();
+			deleteButton.removeStyleName("gwt-Button");
 			deleteButton.setHTML(DisplayConstants.BUTTON_DELETE_WIKI);
-			deleteButton.addStyleName("btn btn-default");
+			deleteButton.addStyleName("btn btn-danger");
 			deleteButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					managementHandler.deleteClicked();
 				}
 			});
-			mdCommandsLower.add(deleteButton);
-			mdCommandsLower.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
+			mdCommandsLowerLeft.add(deleteButton);
+			mdCommandsLowerLeft.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 			final com.google.gwt.user.client.ui.Button attachmentsButton =  new com.google.gwt.user.client.ui.Button();
+			attachmentsButton.removeStyleName("gwt-Button");
 			attachmentsButton.setText(DisplayConstants.BUTTON_WIKI_ATTACHMENTS);
 			attachmentsButton.addStyleName("btn btn-default");
 			attachmentsButton.addClickHandler(new ClickHandler() {
@@ -200,40 +217,41 @@ public class MarkdownEditorWidget extends LayoutContainer {
 					managementHandler.attachmentsClicked();
 				}
 			});
-			mdCommandsLower.add(attachmentsButton);
-			mdCommandsLower.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
+			mdCommandsLowerLeft.add(attachmentsButton);
+			mdCommandsLowerLeft.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
-		mdCommandsLower.add(previewButton);
-		formPanel.add(mdCommandsLower, previewFormData);
+		mdCommandsLowerLeft.add(previewButton);
+
 		if (saveHandler != null) {
 			SimplePanel space = new SimplePanel();
-			space.addStyleName("span-" + (spanWidth-12) + " margin-left-35");
-			mdCommandsLower.add(space);
+			space.addStyleName("margin-left-35");
+			mdCommandsLowerLeft.add(space);
 			
 			//also add a save button to the lower command bar
 			final com.google.gwt.user.client.ui.Button saveButton =  new com.google.gwt.user.client.ui.Button();
+			saveButton.removeStyleName("gwt-Button");
 			saveButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
-			saveButton.addStyleName("btn btn-default");
+			saveButton.addStyleName("btn btn-primary right margin-right-5");
 			saveButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					saveHandler.saveClicked();
 				}
 			});
-			mdCommandsLower.add(saveButton);
-			
-			mdCommandsLower.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
-			
+						
 			final com.google.gwt.user.client.ui.Button cancelButton =  new com.google.gwt.user.client.ui.Button();
+			cancelButton.removeStyleName("gwt-Button");
 			cancelButton.setText(DisplayConstants.BUTTON_CANCEL);
-			cancelButton.addStyleName("btn btn-default");
+			cancelButton.addStyleName("btn btn-default right");
 			cancelButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					saveHandler.cancelClicked();
 				}
 			});
-			mdCommandsLower.add(cancelButton);
+
+			mdCommandsLowerRight.add(cancelButton);
+			mdCommandsLowerRight.add(saveButton);
 		}
 		
 		

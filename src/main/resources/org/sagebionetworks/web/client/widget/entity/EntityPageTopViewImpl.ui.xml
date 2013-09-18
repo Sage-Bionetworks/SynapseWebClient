@@ -34,7 +34,7 @@
 					<div class="col-md-4" style="float:right; !important"><g:SimplePanel ui:field="colRightPanel" /></div>
 				</div>
 											
-				<div>
+				<div class="row">
 					<g:SimplePanel ui:field="fullWidthPanel" styleName="col-md-12"/>
 				</div>								
 	</g:HTMLPanel>
