@@ -249,13 +249,13 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		
 		//The ok/submitting button will be enabled when required images are uploaded
 		//or when another tab (external or synapse) is viewed
-		window.getButtonById(Dialog.OK).disable();
-		
 		Listener uploadTabChangeListener = new Listener<TabPanelEvent>() {
 			@Override
 			public void handleEvent(TabPanelEvent be) {
 				if(uploadedFileHandleName != null) {
 					window.getButtonById(Dialog.OK).enable();
+				} else {
+					window.getButtonById(Dialog.OK).disable();
 				}
 			}
 		};
