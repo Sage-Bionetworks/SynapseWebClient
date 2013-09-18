@@ -16,7 +16,10 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.TabPanelEvent;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -244,8 +247,30 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + 
 				wikiIdParam;
 		
-		//The ok/submitting button will be enabled when images are uploaded
-		window.getButtonById(Dialog.OK).disable();
+		//The ok/submitting button will be enabled when required images are uploaded
+		//or when another tab (external or synapse) is viewed
+		Listener uploadTabChangeListener = new Listener<TabPanelEvent>() {
+			@Override
+			public void handleEvent(TabPanelEvent be) {
+				if(uploadedFileHandleName != null) {
+					window.getButtonById(Dialog.OK).enable();
+				} else {
+					window.getButtonById(Dialog.OK).disable();
+				}
+			}
+		};
+		
+		Listener tabChangeListener = new Listener<TabPanelEvent>() {
+			@Override
+			public void handleEvent(TabPanelEvent be) {
+				window.getButtonById(Dialog.OK).enable();
+			}
+		};
+		
+		uploadTab.addListener(Events.Select, uploadTabChangeListener);
+		externalTab.addListener(Events.Select, tabChangeListener);
+		synapseTab.addListener(Events.Select, tabChangeListener);
+		
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, 25, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
