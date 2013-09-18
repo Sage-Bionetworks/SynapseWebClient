@@ -23,9 +23,9 @@
 				<div class="row" ui:field="navtabContainer">
 				    <ul class="nav nav-tabs margin-left-15 margin-right-15">
 				        <!-- remove span-8 after upgrade to Bootstrap 3.0, use nav-justified on parent ul instead -->
-					    <li class="span-8 active" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
-					    <li class="span-8" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>
-					    <li class="span-8" ui:field="adminListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink"/></li>
+					    <li class="span-4 active" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
+					    <li class="span-4" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>
+					    <li class="span-4" ui:field="adminListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink"/></li>
 				    </ul>
 				</div>
 				
@@ -34,7 +34,7 @@
 					<div class="col-md-4" style="float:right; !important"><g:SimplePanel ui:field="colRightPanel" /></div>
 				</div>
 											
-				<div class="row">
+				<div>
 					<g:SimplePanel ui:field="fullWidthPanel" styleName="col-md-12"/>
 				</div>								
 	</g:HTMLPanel>

@@ -580,7 +580,7 @@ a.shortBtn {
 .file-preview {
     position: relative;
     margin: 15px 0;
-    padding: 39px 19px 14px;
+    padding: 30px 3px 3px 3px;
     background-color: white;
     border: 1px solid #DDD;
     -webkit-border-radius: 4px;
@@ -596,7 +596,6 @@ a.shortBtn {
     left: -1px;
     padding: 3px 7px;
     font-size: 12px;
-    font-weight: bold;
     background-color: whiteSmoke;
     border: 1px solid #DDD;
     color: #9DA0A4;
@@ -1082,7 +1081,7 @@ ol.lowerroman {
 .highlight-box {
     position: relative;
     margin: 15px 0;
-    padding: 39px 19px 14px;
+    padding: 30px 3px 3px 3px;
     background-color: white;
     border: 1px solid #DDD;
     -webkit-border-radius: 4px;
@@ -1098,7 +1097,6 @@ ol.lowerroman {
     left: -1px;
     padding: 3px 7px;
     font-size: 12px;
-    font-weight: bold;
     background-color: whiteSmoke;
     border: 1px solid #DDD;
     color: #9DA0A4;

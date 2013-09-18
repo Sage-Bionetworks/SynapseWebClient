@@ -126,6 +126,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private PreviewWidget previewWidget;
 	private CookieProvider cookies;
 	
+	private static int WIDGET_HEIGHT_PX = 270;
+	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
@@ -330,14 +332,23 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false), widgetMargin);
 		// Wiki
 		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
+		
+		LayoutContainer row = createRowContainer();
 		// Preview
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
-			fullWidthContainer.add(getFilePreview(bundle));
+		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {			
+			row.add(getFilePreview(bundle));
 		}
 		// Provenance Widget for anything other than projects of folders
 		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) 
-			fullWidthContainer.add(createProvenanceWidget(bundle), widgetMargin);
-		fullWidthContainer.add(createAnnotationsWidget(bundle, canEdit), widgetMargin);
+			row.add(createProvenanceWidget(bundle), widgetMargin);
+		fullWidthContainer.add(row);
+		
+		// Annotations
+		row = createRowContainer();		
+		row.add(createAnnotationsWidget(bundle, canEdit), widgetMargin);
+		fullWidthContainer.add(row);
+		
+		
 		// Attachments
 		fullWidthContainer.add(createAttachmentsWidget(bundle, canEdit, false), widgetMargin);
 		
@@ -345,11 +356,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// ************************************************************************************************		
 	}
+
+	private LayoutContainer createRowContainer() {
+		LayoutContainer row;
+		row = new LayoutContainer();
+		row.setStyleName("row");
+		return row;
+	}
 	
 	private Widget getFilePreview(EntityBundle bundle) {
 		previewWidget.configure(bundle);
 		Widget preview = previewWidget.asWidget();
-		preview.addStyleName("span-17 notopmargin padding-top-15");		
+		preview.addStyleName("col-md-6 file-preview");
+		preview.setHeight(WIDGET_HEIGHT_PX + "px");
 		return preview;
 	}
 	
@@ -545,12 +564,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Widget createProvenanceWidget(EntityBundle bundle) {
 		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
-		lc.addStyleName("span-7 notopmargin right last");
-		LayoutContainer topbar = new LayoutContainer();
-		HTML html = new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.PROVENANCE + "</h4>"));
-		html.addStyleName("floatleft");
-		topbar.add(html);
-		lc.add(topbar);
+		lc.addStyleName("col-md-6");
 		
 	    // Create the property body
 	    // the headers for properties.
@@ -562,16 +576,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
+		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-61));
 	    provenanceWidget.configure(null, configMap);
 	    final Widget provViewWidget = provenanceWidget.asWidget(); 
 	    final LayoutContainer border = new LayoutContainer();
-	    border.addStyleName("span-7 notopmargin");
+	    border.setTitle(DisplayConstants.PROVENANCE);
+	    border.addStyleName("highlight-box");
+	    //border.setHeight(WIDGET_HEIGHT_PX);
 	    border.setBorders(true);
 	    border.add(provViewWidget);
-
-		LayoutContainer menu = new LayoutContainer();		
-		menu.addStyleName("floatleft");
-		topbar.add(menu, new MarginData(8,0,0,5));
 		
 	    lc.add(border);
 	    lc.layout();
@@ -647,16 +660,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    // the headers for properties.
 	    annotationsWidget.configure(bundle, canEdit);
 	    LayoutContainer lc = new LayoutContainer();
-	    lc.addStyleName("span-7");
-		lc.setAutoWidth(true);
-		lc.setAutoHeight(true);
+	    lc.setTitle(DisplayConstants.ANNOTATIONS);	    
 		if (canEdit || !annotationsWidget.isEmpty()) {
-			lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h4>" + DisplayConstants.ANNOTATIONS + "</h4>")));
-			// Create the property body
-			// the headers for properties.
+			lc.setStyleName("highlight-box col-md-12");
 			lc.add(annotationsWidget.asWidget());
 		} 
-
 		lc.layout();
 		return lc;
 	}
