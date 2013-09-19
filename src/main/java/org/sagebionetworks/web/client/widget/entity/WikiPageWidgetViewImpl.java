@@ -275,7 +275,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 						presenter.refreshWikiAttachments(titleField.getValue(), mdField.getValue(), null);
 					}
 				}, getCloseHandler(titleField, mdField), getManagementHandler(), colWidth);
-				form.addStyleName("margin-bottom-40");
+				form.addStyleName("margin-bottom-40 margin-top-10");
 				add(form);
 				layout(true);
 			}

@@ -609,8 +609,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		else 
 			filesBrowser.configure(entity.getId());
 		LayoutContainer lc = new LayoutContainer();
-		lc.addStyleName("left");
-		lc.setStyleAttribute("margin", "0px 0px 20px 0px");
+		lc.addStyleName("col-md-12 margin-top-10");
 		lc.add(filesBrowser.asWidget());
 		return lc;
 	}
