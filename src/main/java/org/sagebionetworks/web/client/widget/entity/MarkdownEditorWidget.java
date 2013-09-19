@@ -392,7 +392,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    	};
 			}));
 	    }
-
+	    
 	    menu.add(getNewCommand(WidgetConstants.BUTTON_LINK_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.BUTTON_LINK_CONTENT_TYPE, callback);
@@ -428,6 +428,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    	};
 		}));
 
+	    menu.add(getNewCommand(WidgetConstants.REFERENCE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.REFERENCE_CONTENT_TYPE, callback);
+	    	};
+	    }));
+
 	    menu.add(getNewCommand(WidgetConstants.TABBED_TABLE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, callback);
@@ -455,17 +461,13 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	     */
 	    if (DisplayUtils.isInTestWebsite(cookies)) {
 	    	menu.add(new SeparatorMenuItem());
+
 	    	menu.add(getNewCommand(WidgetConstants.BOOKMARK_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    		public void componentSelected(ComponentEvent ce) {
 	    			handleInsertWidgetCommand(WidgetConstants.BOOKMARK_CONTENT_TYPE, callback);
 	    		}
 	    	}));
-	    	menu.add(getNewCommand(WidgetConstants.REFERENCE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
-		    	public void componentSelected(ComponentEvent ce) {
-		    		handleInsertWidgetCommand(WidgetConstants.REFERENCE_CONTENT_TYPE, callback);
-		    	};
-		    }));
-	    	
+
 	    	menu.add(getNewCommand(WidgetConstants.SHINYSITE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
 		    		handleInsertWidgetCommand(WidgetConstants.SHINYSITE_CONTENT_TYPE, callback);
