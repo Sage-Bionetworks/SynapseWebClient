@@ -1763,4 +1763,18 @@ public class DisplayUtils {
 		return row;
 	}
 
+	public static enum ButtonType { DEFAULT, PRIMARY, SUCCESS, INFO, WARNING, DANGER, LINK }
+	
+	public static com.google.gwt.user.client.ui.Button createButton(String title, ButtonType type) {
+		return createIconButton(title, type, null);
+	}
+		
+	public static com.google.gwt.user.client.ui.Button createIconButton(String title, ButtonType type, String iconClass) {
+		String style = iconClass == null ? "" : " class=\"glyphicon " + iconClass+ "\"" ;
+		com.google.gwt.user.client.ui.Button btn = new com.google.gwt.user.client.ui.Button(SafeHtmlUtils.fromSafeConstant("<span" + style +"></span> " + title));
+		btn.removeStyleName("gwt-Button");
+		btn.addStyleName("btn btn-" + type.toString().toLowerCase());
+		return btn;
+	}
+
 }

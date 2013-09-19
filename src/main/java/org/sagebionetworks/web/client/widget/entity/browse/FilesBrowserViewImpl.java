@@ -79,7 +79,8 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			Button upload = getUploadButton(entityId);
 			upload.addStyleName("margin-right-5");
 			// AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16())
-			Button addFolder = new Button(SafeHtmlUtils.fromSafeConstant("<span class=\"glyphicon glyphicon-plus\"></span> " + DisplayConstants.ADD_FOLDER), new ClickHandler() {				
+			Button addFolder = DisplayUtils.createIconButton(DisplayConstants.ADD_FOLDER, DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
+			addFolder.addClickHandler(new ClickHandler() {				
 				@Override
 				public void onClick(ClickEvent event) {
 					NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
@@ -90,8 +91,6 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 					});
 				}
 			});
-			addFolder.removeStyleName("gwt-Button");
-			addFolder.addStyleName("btn btn-default");
 		
 			topbar.add(upload);
 			topbar.add(addFolder, new MarginData(0, 3, 0, 0));
@@ -157,9 +156,8 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			}
 		};
 		// AbstractImagePrototype.create(iconsImageBundle.NavigateUp16())
-		Button uploadButton = new Button(SafeHtmlUtils.fromSafeConstant("<span class=\"glyphicon glyphicon-arrow-up\"></span> " + DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK));
-		uploadButton.removeStyleName("gwt-Button");
-		uploadButton.addStyleName("btn btn-default left display-inline");
+		Button uploadButton = DisplayUtils.createIconButton(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayUtils.ButtonType.DEFAULT, "glyphicon-arrow-up");
+		uploadButton.addStyleName("left display-inline");
 		final Window window = new Window();
 		uploader.clearHandlers();
 		// add user defined handler

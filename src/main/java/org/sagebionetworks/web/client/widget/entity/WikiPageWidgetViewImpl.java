@@ -197,10 +197,8 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		}
 			
 		if(editButton == null) {			
-			editButton = new Button(DisplayConstants.BUTTON_EDIT_WIKI);
-			//, AbstractImagePrototype.create(iconsImageBundle.editGrey16())
-			editButton.removeStyleName("gwt-Button");
-			editButton.addStyleName("btn btn-default left display-inline");			
+			editButton = DisplayUtils.createIconButton(DisplayConstants.BUTTON_EDIT_WIKI, DisplayUtils.ButtonType.DEFAULT, "glyphicon-pencil");			
+			editButton.addStyleName("left display-inline");			
 			editButton.getElement().setId(DisplayConstants.ID_BTN_EDIT);			
 			commandBar.add(editButton, new MarginData(0, 5, 0, 0));			
 		}
@@ -219,10 +217,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	private Button getInsertPageButton(final boolean isFirstPage) {
 		String buttonText = isFirstPage ? DisplayConstants.CREATE_WIKI : DisplayConstants.ADD_PAGE;
-		Button insertButton = new Button(buttonText);
-		//AbstractImagePrototype.create(iconsImageBundle.addSquareGrey16())
-		insertButton.removeStyleName("gwt-Button");
-		insertButton.addStyleName("btn btn-default");			
+		Button insertButton = DisplayUtils.createIconButton(buttonText, DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
 		if(addButtonHandlerRegistration != null) addButtonHandlerRegistration.removeHandler();
 		addButtonHandlerRegistration = insertButton.addClickHandler(new ClickHandler() {
 			@Override
