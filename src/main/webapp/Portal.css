@@ -577,6 +577,10 @@ a.shortBtn {
 	margin-left: 725px;
 }
 
+.margin-left-0-important {
+	margin-left: 0px !important;
+}
+
 .file-preview {
     position: relative;
     margin: 15px 0;

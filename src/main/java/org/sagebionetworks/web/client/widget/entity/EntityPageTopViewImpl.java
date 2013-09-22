@@ -305,49 +305,51 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 */
 	// Render the File entity	
 	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber, String wikiPageId) {
-		// ** LEFT **
-		// Entity Metadata
-		if (bundle.getEntity() instanceof FileEntity)
+		// ** LEFT/RIGHT
+		// File Title Bar
+		if (bundle.getEntity() instanceof FileEntity) {
 			colLeftContainer.add(fileTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
-		else
+		} else {
 			colLeftContainer.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
+		}
+		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
-		colLeftContainer.add(entityMetadata.asWidget());
-		
-		// ** RIGHT **
+		colLeftContainer.add(entityMetadata.asWidget());		
 		// Programmatic Clients
 		colRightContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
 
 		// ** FULL WIDTH
-		// Description
+		// File History
+		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
 		fullWidthContainer.add(fileHistoryWidget.asWidget());
+		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
-		// Wiki
-		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 		
+		// Preview & Provenance Row
 		LayoutContainer row = DisplayUtils.createRowContainer();
-		// Preview
+		row.addStyleName("margin-left-0-important");
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {			
 			row.add(getFilePreview(bundle));
 		}
-		// Provenance Widget for anything other than projects of folders
-		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) 
+		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) { 
+			// Provenance Widget (for anything other than projects of folders)
 			row.add(createProvenanceWidget(bundle));
+		}
 		fullWidthContainer.add(row);
 		
 		// Annotations
 		row = DisplayUtils.createRowContainer();		
-		row.add(createAnnotationsWidget(bundle, canEdit));
-		fullWidthContainer.add(row);
-		
-		
+		//row.add(createAnnotationsWidget(bundle, canEdit));
+		LayoutContainer annots = new LayoutContainer();
+		annots.addStyleName("col-md-12 highlight-box");
+		annots.setTitle("Annotations");
+		annots.add(new HTML("fjdslkfjdklasjfklasjflkdjsaklfjdsakl"));
+		row.add(annots);
+		fullWidthContainer.add(row);		
 		// Attachments
-		fullWidthContainer.add(createAttachmentsWidget(bundle, canEdit, false));
-		
-		//these types should not have children to show (and don't show deprecated Preview child object)
-		
-		// ************************************************************************************************		
+		fullWidthContainer.add(createAttachmentsWidget(bundle, canEdit, false));		
+		// Wiki
+		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 	}
 	
 	private Widget getFilePreview(EntityBundle bundle) {
@@ -361,38 +363,26 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	// Render the Folder entity
 	private void renderFolderEntity(EntityBundle bundle,
 			String entityTypeDisplay, boolean isAdmin, boolean canEdit, String wikiPageId) {
+		LayoutContainer row;
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		fullWidthContainer.add(entityMetadata.asWidget(), new MarginData(0));
-		// ** RIGHT **
-		// none
-
-		// ** FULL WIDTH **
-		//SWC-668: render (from top to bottom) description, wiki, then file browser, to make consistent with Project view.
-		
+		Widget ebW = entityMetadata.asWidget();
+		row = DisplayUtils.createRowContainer();
+		ebW.addStyleName("col-md-12");
+		row.add(ebW);
+		fullWidthContainer.add(row);		
 		// Description
 		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
-		
-		
-		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 
 		// Child Browser
-		fullWidthContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
-
-		LayoutContainer threeCol = new LayoutContainer();
-		threeCol.addStyleName("span-24 notopmargin");
+		row = DisplayUtils.createRowContainer();
+		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
+		fullWidthContainer.add(row);
 		
 		//Annotations
+		fullWidthContainer.add(createAnnotationsWidget(bundle, canEdit));
 		
-		// Annotation widget
-		Widget annotContainer = createAnnotationsWidget(bundle, canEdit);		
-		threeCol.add(annotContainer);    
-		threeCol.add(createSpacer()); 
-		
-		//main use case appear to be Project level challenges
-//		threeCol.add(createEvaluationAdminList(bundle, null));		
-//		threeCol.add(createSpacer());
-		
-		fullWidthContainer.add(threeCol);
+		// Wiki
+		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
 	}
 
 	// Render the Project entity
@@ -472,7 +462,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
-			container.add(wikiPageWidget.asWidget());
+			Widget wikiW = wikiPageWidget.asWidget();
+			wikiW.addStyleName("margin-top-15");
+			container.add(wikiW);
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, new WikiPageWidget.Callback() {
 				@Override
 				public void pageUpdated() {
@@ -526,7 +518,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Widget createProvenanceWidget(EntityBundle bundle) {
 		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
-		lc.addStyleName("col-md-6");
+		lc.addStyleName("col-md-6 highlight-box");
+		lc.setTitle(DisplayConstants.PROVENANCE);
 		
 	    // Create the property body
 	    // the headers for properties.
@@ -542,9 +535,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    provenanceWidget.configure(null, configMap);
 	    final Widget provViewWidget = provenanceWidget.asWidget(); 
 	    final LayoutContainer border = new LayoutContainer();
-	    border.setTitle(DisplayConstants.PROVENANCE);
-	    border.addStyleName("highlight-box");
-	    border.setBorders(true);
 	    border.add(provViewWidget);
 		
 	    lc.add(border);
@@ -562,8 +552,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private Widget createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {		
-		LayoutContainer lc = new LayoutContainer();
-		lc.addStyleName("span-7 notopmargin");
+		LayoutContainer lc = new LayoutContainer();		
 		lc.setAutoHeight(true);
 		LayoutContainer pcc = ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), versionNumber, synapseJSNIUtils, sageImageBundle);
 		pcc.addStyleName("right");
