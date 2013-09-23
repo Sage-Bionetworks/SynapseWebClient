@@ -120,7 +120,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.isWikiEditor = isWikiEditor;
 		this.callback = callback;
 		
-		String formattingTipsHtml = DisplayUtils.isInTestWebsite(cookies) ?  WebConstants.SYNAPSE_MARKDOWN_FORMATTING_TIPS_HTML : WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML;
+		String formattingTipsHtml = DisplayUtils.isInTestWebsite(cookies) ? WebConstants.ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML : WebConstants.SYNAPSE_MARKDOWN_FORMATTING_TIPS_HTML;
 		descriptionFormatInfo = new HTML(formattingTipsHtml);
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
@@ -410,7 +410,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    	};
 			}));
 	    }
-
+	    
 	    menu.add(getNewCommand(WidgetConstants.BUTTON_LINK_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.BUTTON_LINK_CONTENT_TYPE, callback);
@@ -446,6 +446,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    	};
 		}));
 
+	    menu.add(getNewCommand(WidgetConstants.REFERENCE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.REFERENCE_CONTENT_TYPE, callback);
+	    	};
+	    }));
+
 	    menu.add(getNewCommand(WidgetConstants.TABBED_TABLE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, callback);
@@ -473,17 +479,13 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	     */
 	    if (DisplayUtils.isInTestWebsite(cookies)) {
 	    	menu.add(new SeparatorMenuItem());
+
 	    	menu.add(getNewCommand(WidgetConstants.BOOKMARK_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    		public void componentSelected(ComponentEvent ce) {
 	    			handleInsertWidgetCommand(WidgetConstants.BOOKMARK_CONTENT_TYPE, callback);
 	    		}
 	    	}));
-	    	menu.add(getNewCommand(WidgetConstants.REFERENCE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
-		    	public void componentSelected(ComponentEvent ce) {
-		    		handleInsertWidgetCommand(WidgetConstants.REFERENCE_CONTENT_TYPE, callback);
-		    	};
-		    }));
-	    	
+
 	    	menu.add(getNewCommand(WidgetConstants.SHINYSITE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
 		    		handleInsertWidgetCommand(WidgetConstants.SHINYSITE_CONTENT_TYPE, callback);

@@ -80,7 +80,7 @@ public class EntityListConfigEditorTest {
 		editor = new EntityListConfigEditor(mockView, mockSynapseClient,
 				mockNodeModelCreator, mockSynapseJSNIUtils, mockAuthenticationController);
 		
-		editor.configure(null, descriptor);
+		editor.configure(null, descriptor, null);
 	}
 	
 	@Test
@@ -97,7 +97,7 @@ public class EntityListConfigEditorTest {
 		String encoded = EntityListUtil.recordsToString(records);
 		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, encoded);
 				
-		editor.configure(null, descriptor);
+		editor.configure(null, descriptor, null);
 		
 		verify(mockView).configure();	
 		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));

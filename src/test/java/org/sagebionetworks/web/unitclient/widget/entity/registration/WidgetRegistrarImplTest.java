@@ -45,13 +45,13 @@ public class WidgetRegistrarImplTest {
 	}
 	@Test
 	public void testCreateWidgetEditors() {
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, true);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, true, null);
 		verify(mockGinInjector).getYouTubeConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, false);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, false, null);
 		verify(mockGinInjector).getOldImageConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, true);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, true, null);
 		verify(mockGinInjector).getImageConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, true);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, true, null);
 		verify(mockGinInjector).getProvenanceConfigEditor();
 	}
 	

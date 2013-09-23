@@ -1,26 +1,19 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.logging.Logger;
-
-import net.oauth.OAuthException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseTermsOfUseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;
@@ -42,7 +35,6 @@ import org.springframework.web.client.RestClientException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.gwt.user.server.rpc.UnexpectedException;
 import com.google.inject.Inject;
-import com.gsfn.FastPass;
 
 public class UserAccountServiceImpl extends RemoteServiceServlet implements UserAccountService, TokenProvider {
 	
@@ -327,7 +319,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		// First make sure the service is ready to go.
 		validateService();
 		
-		Synapse synapseClient = createSynapseClient();
+		SynapseClient synapseClient = createSynapseClient();
 		String userSessionJson = null;
 		try {
 			UserSessionData userData = synapseClient.login(username, password, explicitlyAcceptsTermsOfUse);
@@ -368,7 +360,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}	
 	
 	private UserSessionData getUserSessionData(String sessionToken) throws SynapseException{
-		Synapse synapseClient = createSynapseClient(sessionToken);
+		SynapseClient synapseClient = createSynapseClient(sessionToken);
 		return synapseClient.getUserSessionData();
 	}
 
@@ -571,39 +563,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public String getFastPassSupportUrl() throws RestServiceException {
-		validateService();
-		String fastPassUrl = "";
-		//get the user
-		try {
-			String sessionToken = getSessionToken();
-			if (sessionToken != null){
-				UserSessionData userData = getUserSessionData(sessionToken);
-				String email = userData.getProfile().getUserName();
-				String displayName = userData.getProfile().getDisplayName();
-				String principleId = userData.getProfile().getOwnerId();
-				fastPassUrl = getFastPassSupportUrl(email, displayName, principleId);
-			}
-		} catch (SynapseTermsOfUseException e) {
-			throw new TermsOfUseException(e.getMessage());
-		} catch (Exception e) {
-			throw new RestServiceException(e.getMessage());
-		}
-		return fastPassUrl;		
-	}
-	
-	public String getFastPassSupportUrl(String email, String displayName, String principleId) throws OAuthException, IOException, URISyntaxException {
-		FastPass.setDomain(ClientProperties.SUPPORT_URL);
-		return FastPass.url(StackConfiguration.getPortalGetSatisfactionKey(), StackConfiguration.getPortalGetSatisfactionSecret(), email, displayName, principleId, false);
-	}
-	
-	@Override
 	public PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds() {
 		if (publicPrincipalIds == null) {
 			try {
 				validateService();
-				Synapse synapseClient = createSynapseClient();
-				Synapse anonymousClient = createAnonymousSynapseClient();
+				SynapseClient synapseClient = createSynapseClient();
+				SynapseClient anonymousClient = createAnonymousSynapseClient();
 				UserProfile anonymousProfile = anonymousClient.getMyProfile();
 				String anonymousPrincipalId = anonymousProfile.getOwnerId();
 				initPublicAndAuthenticatedPrincipalIds(synapseClient, anonymousPrincipalId);
@@ -614,7 +579,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		return publicPrincipalIds;
 	}
 	
-	public static void initPublicAndAuthenticatedPrincipalIds(Synapse synapseClient, String anonymousPrincipalId) {
+	public static void initPublicAndAuthenticatedPrincipalIds(SynapseClient synapseClient, String anonymousPrincipalId) {
 		try {
 			//TODO:  change to synapseClient.getUserGroupHeadersByPrefix() after exposure?
 			PublicPrincipalIds results = new PublicPrincipalIds();
@@ -640,13 +605,13 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	 * The synapse client is stateful so we must create a new one for each
 	 * request
 	 */
-	private Synapse createSynapseClient() {
+	private SynapseClient createSynapseClient() {
 		return createSynapseClient(null);
 	}
 
-	private Synapse createSynapseClient(String sessionToken) {
+	private SynapseClient createSynapseClient(String sessionToken) {
 		// Create a new syanpse
-		Synapse synapseClient = synapseProvider.createNewClient();
+		SynapseClient synapseClient = synapseProvider.createNewClient();
 		if(sessionToken == null) {
 			sessionToken = tokenProvider.getSessionToken();
 		}
@@ -657,8 +622,8 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		return synapseClient;
 	}
 	
-	private Synapse createAnonymousSynapseClient() {
-		Synapse synapseClient = synapseProvider.createNewClient();
+	private SynapseClient createAnonymousSynapseClient() {
+		SynapseClient synapseClient = synapseProvider.createNewClient();
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());

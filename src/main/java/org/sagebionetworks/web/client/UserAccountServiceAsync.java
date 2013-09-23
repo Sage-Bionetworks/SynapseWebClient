@@ -40,8 +40,6 @@ public interface UserAccountServiceAsync {
 
 	void getPublicAuthServiceUrl(AsyncCallback<String> callback);
 	
-	void getFastPassSupportUrl(AsyncCallback<String> callback) throws RestServiceException;
-	
 	void getPublicAndAuthenticatedGroupPrincipalIds(AsyncCallback<PublicPrincipalIds> callback);
 	
 	/**

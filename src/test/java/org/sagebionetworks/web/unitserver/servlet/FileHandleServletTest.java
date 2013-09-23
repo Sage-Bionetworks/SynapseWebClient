@@ -20,11 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
@@ -41,7 +41,7 @@ public class FileHandleServletTest {
 	ServiceUrlProvider mockUrlProvider;
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
-	Synapse mockSynapse;
+	SynapseClient mockSynapse;
 	ServletOutputStream responseOutputStream;
 	FileHandleServlet servlet;
 
@@ -51,7 +51,7 @@ public class FileHandleServletTest {
 
 		// Mock synapse and provider so we don't need to worry about
 		// unintentionally testing those classes
-		mockSynapse = mock(Synapse.class);
+		mockSynapse = mock(SynapseClient.class);
 		mockSynapseProvider = mock(SynapseProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 

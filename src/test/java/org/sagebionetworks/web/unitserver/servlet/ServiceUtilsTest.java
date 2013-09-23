@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.ServiceUtils;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
@@ -43,7 +43,7 @@ public class ServiceUtilsTest {
 				SESSION_TOKEN);
 		ServiceUrlProvider serviceUrlProvider = new ServiceUrlProvider();
 
-		Synapse client = ServiceUtils.createSynapseClient(mockTokenProvider,
+		SynapseClient client = ServiceUtils.createSynapseClient(mockTokenProvider,
 				serviceUrlProvider);
 
 		Mockito.verify(mockTokenProvider).getSessionToken();

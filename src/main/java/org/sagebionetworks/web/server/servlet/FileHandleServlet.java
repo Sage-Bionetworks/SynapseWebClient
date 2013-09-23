@@ -24,7 +24,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.HttpClientProviderImpl;
-import org.sagebionetworks.client.Synapse;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -35,11 +34,12 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.web.client.SynapseClient;
+import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.common.io.Files;
@@ -117,7 +117,7 @@ public class FileHandleServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String token = getSessionToken(request);
-		Synapse client = createNewClient(token);
+		SynapseClient client = createNewClient(token);
 		boolean isProxy = false;
 		String proxy = request.getParameter(WebConstants.PROXY_PARAM_KEY);
 		if (proxy != null)
@@ -195,7 +195,7 @@ public class FileHandleServlet extends HttpServlet {
 
 		try {
 			// Connect to synapse
-			Synapse client = createNewClient(token);
+			SynapseClient client = createNewClient(token);
 			FileItemIterator iter = upload.getItemIterator(request);
 			String entityId = null;
 			while (iter.hasNext()) {
@@ -213,9 +213,9 @@ public class FileHandleServlet extends HttpServlet {
 				try{
 					// Now upload the file
 					String contentType = item.getContentType();
-					if (Synapse.APPLICATION_OCTET_STREAM.equals(contentType.toLowerCase())){
+					if (SynapseClientImpl.APPLICATION_OCTET_STREAM.equals(contentType.toLowerCase())){
 						//see if we can make a better guess based on the file stream
-						contentType = Synapse.guessContentTypeFromStream(temp);
+						contentType = SynapseClientImpl.guessContentTypeFromStream(temp);
 						//some source code files still register as application/octet-stream, but the preview manager in the backend should recognize those specific file extensions
 					}
 					client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
@@ -296,7 +296,7 @@ public class FileHandleServlet extends HttpServlet {
 		}
 	}
 	
-	public static FileEntity getNewFileEntity(String parentEntityId, String fileHandleId, Synapse client) throws SynapseException {
+	public static FileEntity getNewFileEntity(String parentEntityId, String fileHandleId, SynapseClient client) throws SynapseException {
 		FileEntity fileEntity = new FileEntity();
 		fileEntity.setParentId(parentEntityId);
 		fileEntity.setEntityType(FileEntity.class.getName());
@@ -305,7 +305,7 @@ public class FileHandleServlet extends HttpServlet {
 		fileEntity = client.createEntity(fileEntity);
 		return fileEntity;
 	}
-	public static void fixNameAndLockDown(FileEntity fileEntity, FileHandle newFileHandle, boolean isRestricted, Synapse client) throws SynapseException {
+	public static void fixNameAndLockDown(FileEntity fileEntity, FileHandle newFileHandle, boolean isRestricted, SynapseClient client) throws SynapseException {
 		String originalFileEntityName = fileEntity.getName();
 		try{
 			//and try to set the name to the filename
@@ -357,8 +357,8 @@ public class FileHandleServlet extends HttpServlet {
 	 *
 	 * @return
 	 */
-	private Synapse createNewClient(String sessionToken) {
-		Synapse client = synapseProvider.createNewClient();
+	private SynapseClient createNewClient(String sessionToken) {
+		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
 		if (sessionToken != null)

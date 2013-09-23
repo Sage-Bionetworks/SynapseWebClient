@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityGroupRecord;
@@ -45,7 +46,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		view.initView();
 	}
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		if (widgetDescriptor == null) throw new IllegalArgumentException("Descriptor can not be null");
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;

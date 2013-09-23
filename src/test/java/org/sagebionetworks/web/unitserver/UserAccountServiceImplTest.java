@@ -25,7 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
@@ -195,7 +195,7 @@ public class UserAccountServiceImplTest {
 	
 	@Test
 	public void testPublicAuthGroupTest() throws Exception {
-		Synapse mockSynapse = Mockito.mock(Synapse.class);
+		SynapseClient mockSynapse = Mockito.mock(SynapseClient.class);
 		//create a few groups, including one that looks like a public group and authenticated group
 		List<UserGroup> allGroups = new ArrayList<UserGroup>();
 		
@@ -295,24 +295,4 @@ public class UserAccountServiceImplTest {
 			fail("The Auth Service URL returned was not valid.");
 		}
 	}
-	
-	@Test
-	public void testGetFastPassUrl() throws OAuthException, IOException, URISyntaxException {
-		try {
-			//anonymous user test
-			String fastPassUrl = service.getFastPassSupportUrl();
-			assertEquals(fastPassUrl, "");
-			
-			//This tests the FastPass library, it makes a call to getsatisfaction.com to form the authenticated SSO url string.
-			fastPassUrl = service.getFastPassSupportUrl("myemail@foo.com", "Mr. Bar", "x1169");
-			//the fastpass url contains all of the right pieces
-			Assert.assertTrue(fastPassUrl.indexOf("uid=x1169") > -1);
-			Assert.assertTrue(fastPassUrl.indexOf("email=myemail%40foo.com") > -1);
-			Assert.assertTrue(fastPassUrl.indexOf("name=Mr.%20Bar") > -1);
-		} catch (RestServiceException e) {
-			fail("The fastpass URL returned was not valid.");
-		}
-	}
-	
-	
 }

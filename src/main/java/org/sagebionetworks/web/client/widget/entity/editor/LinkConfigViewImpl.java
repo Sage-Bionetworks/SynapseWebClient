@@ -37,6 +37,7 @@ public class LinkConfigViewImpl extends LayoutContainer implements LinkConfigVie
 		hp.add(urlLabel);
 		hp.add(urlField);
 		hp.addStyleName("margin-top-left-10");
+		
 		vp.add(hp);
 		
 		hp = new HorizontalPanel();

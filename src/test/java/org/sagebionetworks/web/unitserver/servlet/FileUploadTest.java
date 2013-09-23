@@ -22,7 +22,7 @@ import org.hamcrest.BaseMatcher;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Locationable;
@@ -59,7 +59,7 @@ public class FileUploadTest {
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
 	PresignedUrl mockUrl;
-	Synapse mockSynapse;
+	SynapseClient mockSynapse;
 	ServletOutputStream responseOutputStream;
 	FileUpload servlet;
 	boolean hasNext = true;
@@ -71,7 +71,7 @@ public class FileUploadTest {
 
 		// Mock synapse and provider so we don't need to worry about
 		// unintentionally testing those classes
-		mockSynapse = mock(Synapse.class);
+		mockSynapse = mock(SynapseClient.class);
 		mockSynapseProvider = mock(SynapseProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 

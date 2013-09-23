@@ -65,29 +65,4 @@ public class LoginPresenterTest {
 		loginPresenter.setPlace(place);
 		Assert.assertEquals("/Portal.html?foo=bar#!LoginPlace", loginPresenter.getOpenIdReturnUrl());
 	}
-	
-	@Test
-	public void testFastpassValidSession() throws Exception {
-		LoginPlace loginPlace = new LoginPlace(LoginPlace.FASTPASS_TOKEN);
-		UserSessionData myTestUserSessionData = new UserSessionData();
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith("my user").when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("myfastpassurl").when(mockUserAccountServiceAsync).getFastPassSupportUrl(any(AsyncCallback.class));	
-		loginPresenter.showView(loginPlace);
-		verify(mockUserAccountServiceAsync).getFastPassSupportUrl(any(AsyncCallback.class));
-		verify(mockGwtWrapper).replaceThisWindowWith(any(String.class));
-	}
-	
-	@Test
-	public void testFastpassInvalidSession() throws Exception {
-		LoginPlace loginPlace = new LoginPlace(LoginPlace.FASTPASS_TOKEN);
-		UserSessionData myTestUserSessionData = new UserSessionData();
-		//return the test user the first time (as if logged in), then null the second time (simulate logging out)		
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(myTestUserSessionData);
-		when(mockNodeModelCreator.createJSONEntity(myTestUserSessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString(), UserSessionData.class)).thenReturn(myTestUserSessionData);
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));		
-		loginPresenter.showView(loginPlace);
-		verify(mockAuthenticationController, new AtLeast(1)).logoutUser();
-		verify(mockCookieProvier).setCookie(ClientProperties.FASTPASS_LOGIN_COOKIE_VALUE, Boolean.TRUE.toString());
-	}
 }

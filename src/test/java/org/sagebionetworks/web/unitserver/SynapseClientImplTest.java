@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -80,7 +80,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -118,7 +118,7 @@ public class SynapseClientImplTest {
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
 	ServiceUrlProvider mockUrlProvider;
-	Synapse mockSynapse;
+	SynapseClient mockSynapse;
 	SynapseClientImpl synapseClient;
 	
 	String entityId = "123";
@@ -146,7 +146,7 @@ public class SynapseClientImplTest {
 
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException{
-		mockSynapse = Mockito.mock(Synapse.class);
+		mockSynapse = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
@@ -874,6 +874,20 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
 	}
 	
+	public void setupGetEvaluationsForEntity(String sharedEntityId) throws SynapseException {
+		PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
+		when(mockSynapse.getEvaluationByContentSource(anyString(),anyInt(),anyInt())).thenReturn(getEmptyPaginatedResults());
+		when(mockSynapse.getEvaluationByContentSource(eq(sharedEntityId),anyInt(),anyInt())).thenReturn(testResults);
+	}
+	
+	private PaginatedResults<Evaluation> getEmptyPaginatedResults() {
+		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
+		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
+		testResults.setTotalNumberOfResults(0);
+		testResults.setResults(evaluationList);
+		return testResults;
+	}
+	
 	private PaginatedResults<Evaluation> getTestEvaluations(String sharedEntityId) {
 		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
@@ -1002,7 +1016,7 @@ public class SynapseClientImplTest {
 	public void testGetSharableEvaluations() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String myEntityId = "syn123";
 		//set up 2 available evaluations associated to this entity id
-		setupGetAllEvaluations(myEntityId);
+		setupGetEvaluationsForEntity(myEntityId);
 		
 		//"Before" junit test setup configured so this user to have the ability to change permissions on eval 2, but not on eval 1
 		ArrayList<String> sharableEvaluations = synapseClient.getSharableEvaluations(myEntityId);

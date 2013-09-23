@@ -11,13 +11,13 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigView;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
+import com.extjs.gxt.ui.client.widget.Dialog;
 public class AttachmentConfigEditorTest {
 		
 	AttachmentConfigEditor editor;
@@ -43,8 +43,8 @@ public class AttachmentConfigEditorTest {
 	@Test
 	public void testConfigure() {
 		Map<String,String> descriptor = new HashMap<String, String>();
-		editor.configure(wikiKey, descriptor);
-		verify(mockView).configure(any(WikiPageKey.class));
+		editor.configure(wikiKey, descriptor, null);
+		verify(mockView).configure(any(WikiPageKey.class), any(Dialog.class));
 		when(mockView.getUploadedFileHandleName()).thenReturn("a test file name");
 		
 		editor.updateDescriptorFromView();
