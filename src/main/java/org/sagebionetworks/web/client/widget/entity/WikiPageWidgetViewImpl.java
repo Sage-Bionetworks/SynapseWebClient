@@ -68,7 +68,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private Boolean canEdit;
 	private WikiPage currentPage;
 	private Breadcrumb breadcrumb;
-	private boolean isEmbeddedInOwnerPage;
+	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
 	private WikiAttachments wikiAttachments;
 	private int spanWidth;
@@ -126,12 +126,12 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void configure(WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth) {
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int spanWidth) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.ownerObjectName = ownerObjectName;
 		this.currentPage = newPage;
-		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		this.isRootWiki = isRootWiki;
 		this.spanWidth = spanWidth;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
@@ -145,15 +145,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	private void showDefaultViewWithWiki() {
 		removeAll(true);
-		SimplePanel topBarWrapper = new SimplePanel();
-		topBarWrapper.addStyleName("span-"+spanWidth + " margin-top-5");
-		String titleString = isEmbeddedInOwnerPage ? "" : currentPage.getTitle();
-		topBarWrapper.add(new HTMLPanel("<h2 class=\"span-"+(spanWidth-5)+"\" style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
-		add(topBarWrapper);
 		
 		FlowPanel mainPanel = new FlowPanel();
 		mainPanel.addStyleName("span-"+spanWidth + " notopmargin");
-		mainPanel.add(getBreadCrumbs(spanWidth));
 		mainPanel.add(getCommands(canEdit));
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "span-"+spanWidth + " margin-top-5"));
 		add(mainPanel);
@@ -166,27 +160,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		widgetWrapper.addStyleName(styleNames);
 		widgetWrapper.add(widget);
 		return widgetWrapper;
-	}
-	
-	private Widget getBreadCrumbs(int spanWidth) {
-		final SimplePanel breadcrumbsWrapper = new SimplePanel();
-		breadcrumbsWrapper.addStyleName("span-"+spanWidth+" notopmargin");
-		if (!isEmbeddedInOwnerPage) {
-			List<LinkData> links = new ArrayList<LinkData>();
-			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
-				//point to Home
-				links.add(new LinkData("Home", new Home(ClientProperties.DEFAULT_PLACE_TOKEN)));
-				breadcrumbsWrapper.add(breadcrumb.asWidget(links, null));
-			} else {
-				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
-				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
-				breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
-			}
-			
-			layout(true);
-			//TODO: support other object types.  
-		}
-		return breadcrumbsWrapper;
 	}
 		
 	private SimplePanel getCommands(Boolean canEdit) {
@@ -262,10 +235,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				LayoutContainer form = new LayoutContainer();
 				form.addStyleName("span-" + spanWidth);
 				final TextBox titleField = new TextBox();
-				if (!isEmbeddedInOwnerPage) {
+				if (!isRootWiki) {
 					titleField.setValue(currentPage.getTitle());
-					titleField.addStyleName("font-size-32 margin-left-10 margin-bottom-10 span-"+spanWidth);
-					titleField.setHeight("35px");
+					titleField.addStyleName("margin-left-10 margin-bottom-10 span-"+spanWidth);
 					
 					form.add(titleField);
 				}
