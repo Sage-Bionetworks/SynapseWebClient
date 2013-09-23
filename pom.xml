@@ -449,12 +449,6 @@
 			<version>1.0</version>
 		</dependency>
 
-		<!-- Get Satisfaction SSO support (Java FastPass Library) -->
-		<dependency>
-		    <groupId>com.getsatisfaction</groupId>
-		    <artifactId>fastpass</artifactId>
-		    <version>1.0</version>
-		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
