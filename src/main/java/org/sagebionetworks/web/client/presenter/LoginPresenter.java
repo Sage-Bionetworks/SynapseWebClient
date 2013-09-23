@@ -83,40 +83,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	@SuppressWarnings("deprecation")
 	public void showView(final LoginPlace place) {
 		String token = place.toToken();
-		if (LoginPlace.FASTPASS_TOKEN.equals(token)) {
-			//fastpass!
-			
-			//is the user already logged in?  			
-			if(authenticationController.isLoggedIn()){
-				//the user might be logged in.  verify the session token
-				authenticationController.loginUser(authenticationController.getCurrentUserSessionToken(), new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String result) {
-						//success, go to support the support site
-						gotoSupport();
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) {
-							//not really logged in. 
-							authenticationController.logoutUser();
-							return;
-						}
-						//not really logged in. 
-						authenticationController.logoutUser();
-						showView(place);
-					}
-				});
-				return;
-			}
-			else { 
-				//not logged in. do normal login, but after all is done, redirect back to the support site
-				cookies.setCookie(ClientProperties.FASTPASS_LOGIN_COOKIE_VALUE, Boolean.TRUE.toString());
-				token = ClientProperties.DEFAULT_PLACE_TOKEN;
-			}
-			
-		}
-		
 		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {			
 			boolean isSso = false;
 			if(authenticationController.isLoggedIn())
@@ -208,48 +174,14 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	 * Private Methods
 	 */
 	private void forwardToPlaceAfterLogin(Place forwardPlace) {
-		String isFastPassLogin = cookies.getCookie(ClientProperties.FASTPASS_LOGIN_COOKIE_VALUE);
-		if (isFastPassLogin != null && Boolean.valueOf(isFastPassLogin)){
-			cookies.removeCookie(ClientProperties.FASTPASS_LOGIN_COOKIE_VALUE);
-			gotoSupport();
+		if(forwardPlace == null) {
+			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 		}
-		else {
-			if(forwardPlace == null) {
-				forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
-			}
-			bus.fireEvent(new PlaceChangeEvent(forwardPlace));	
-		}
+		bus.fireEvent(new PlaceChangeEvent(forwardPlace));	
 	}
 
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
-
-	public void gotoSupport() {
-		try {
-			userService.getFastPassSupportUrl(new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					if (result != null && result.length()>0)
-						//send user to "http://support.sagebase.org/fastpass/finish_signover?company=sagebase&fastpass="+URL.encodeQueryString(result)
-						gwtWrapper.replaceThisWindowWith(ClientProperties.FASTPASS_SIGNOVER_URL + gwtWrapper.encodeQueryString(result));
-					else
-						//can't go on, just fail
-						view.showErrorMessage(DisplayConstants.ERROR_NO_FASTPASS);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) return;
-					view.showErrorMessage(DisplayConstants.ERROR_NO_FASTPASS + caught.getMessage());
-				}
-			});
-		} catch (RestServiceException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_NO_FASTPASS + e.getMessage());
-
-		}
-	}
-
-
 }
