@@ -1,23 +1,20 @@
 package org.sagebionetworks.web.server.markdownparser;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.shared.WebConstants;
-
-import com.google.gwt.dev.util.collect.HashMap;
 
 public class LinkParser extends BasicMarkdownElementParser  {
 	Pattern p1= Pattern.compile(MarkdownRegExConstants.LINK_REGEX, Pattern.DOTALL);
 	Pattern protocol = Pattern.compile(MarkdownRegExConstants.LINK_URL_PROTOCOL, Pattern.DOTALL);
 	MarkdownExtractor extractor;
 	MarkdownElementParser widgetParser;
-
+	
 	@Override
 	public void reset(List<MarkdownElementParser> simpleParsers) {
 		extractor = new MarkdownExtractor();
@@ -25,7 +22,7 @@ public class LinkParser extends BasicMarkdownElementParser  {
 			MarkdownElementParser parser = simpleParsers.get(i);
 			if(parser instanceof SynapseMarkdownWidgetParser) {
 				widgetParser = parser;
-				break;
+				 break;
 			} 
 		}
 	}
@@ -83,6 +80,7 @@ public class LinkParser extends BasicMarkdownElementParser  {
 	@Override
 	public void completeParse(Document doc) {
 		ServerMarkdownUtils.insertExtractedContentToMarkdown(extractor, doc, true);
+		//and extract any widgets that may have been in the link text
+		widgetParser.completeParse(doc);
 	}
-	
 }
