@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,6 +14,7 @@ import org.sagebionetworks.web.server.DoiAutoLinkDetector;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
 import org.sagebionetworks.web.server.SynapseAutoLinkDetector;
 import org.sagebionetworks.web.server.UrlAutoLinkDetector;
+import org.sagebionetworks.web.server.markdownparser.MarkdownExtractor;
 
 import eu.henkelmann.actuarius.ActuariusTransformer;
 
@@ -166,5 +169,39 @@ public class ServerMarkdownUtilsTest {
 		ServerMarkdownUtils.assignIdsToHeadings(htmlDoc);
 		String actualResult = htmlDoc.html();
 		assertEquals(expectedResult, actualResult);
+	}
+	
+	@Test
+	public void testInsertExtractedContent(){
+		String containerId1="containerId1";
+		String containerId2="containerId2";
+		String containerId2Content="These are the droids we are looking for.";
+		MarkdownExtractor extractor = new MarkdownExtractor();
+		extractor.putContainerIdToContent(containerId1, "<span id=\""+containerId2+"\"></span>");
+		String testString = "<p>Line of widgets: <span id=\""+containerId1+"\"></span></p>";
+		Document htmlDoc = Jsoup.parse(testString);
+		ServerMarkdownUtils.insertExtractedContentToMarkdown(extractor, htmlDoc, true);
+		
+		//containerId1 content should have been extracted
+		assertTrue(extractor.getContainerIds().isEmpty());
+		
+		extractor.putContainerIdToContent(containerId2, containerId2Content);
+		
+		ServerMarkdownUtils.insertExtractedContentToMarkdown(extractor, htmlDoc, true);
+		//html should now contain the container Id 2 content
+		assertTrue(extractor.getContainerIds().isEmpty());
+		assertTrue(htmlDoc.html().contains(containerId2Content));
+		
+		//can run more than once. showing with a container id element that is not present in the html
+		String containerIdElementNotFound="containerIdElementNotFound";
+		extractor.putContainerIdToContent(containerIdElementNotFound, "<h1>Html never inserted</h1>");
+		String beforeHtml = htmlDoc.html();
+		Set beforeSet = new HashSet();
+		beforeSet.addAll(extractor.getContainerIds());
+		ServerMarkdownUtils.insertExtractedContentToMarkdown(extractor, htmlDoc, true);
+		ServerMarkdownUtils.insertExtractedContentToMarkdown(extractor, htmlDoc, true);
+		
+		assertEquals(beforeHtml, htmlDoc.html());
+		assertEquals(beforeSet, extractor.getContainerIds());
 	}
 }
