@@ -52,4 +52,10 @@ public class MarkdownExtractor {
 		return containerToContents;
 	}
 	
+	public void removeContainerIds(Set<String> containerIds) {
+		for (String containerId : containerIds) {
+			containerToContents.remove(containerId);	
+		}
+	}
+	
 }
