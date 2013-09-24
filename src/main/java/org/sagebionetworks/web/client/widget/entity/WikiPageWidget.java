@@ -116,7 +116,8 @@ SynapseWidgetPresenter {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
 							originalMarkdown = currentPage.getMarkdown();
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isEmbeddedInOwnerPage, spanWidth);
+							boolean isRootWiki = currentPage.getParentWikiId() == null;
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth);
 						} catch (JSONObjectAdapterException e) {
 							onFailure(e);
 						}
