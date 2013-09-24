@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitserver.markdownparser;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -11,8 +10,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.server.ServerMarkdownUtils;
+import org.sagebionetworks.web.server.markdownparser.ItalicsParser;
 import org.sagebionetworks.web.server.markdownparser.LinkParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElementParser;
 import org.sagebionetworks.web.server.markdownparser.MarkdownElements;
@@ -27,8 +26,11 @@ public class LinkParserTest {
 		SynapseMarkdownWidgetParser widgetParser = new SynapseMarkdownWidgetParser();
 		widgetParser.reset(null);
 	
+		ItalicsParser italicsParser = new ItalicsParser();
+		
 		simpleParsers = new ArrayList<MarkdownElementParser>();
 		simpleParsers.add(widgetParser);
+		simpleParsers.add(italicsParser);
 		
 		parser = new LinkParser();
 		parser.reset(simpleParsers);
@@ -36,7 +38,8 @@ public class LinkParserTest {
 	
 	@Test
 	public void testLink(){
-		String text = "This Is A Test";
+		//text, with italicized "Is"
+		String text = "This *Is* A Test";
 		String href = "http://example.com";
 		String line = "[" + text + "](" + href +")";
 		MarkdownElements elements = new MarkdownElements(line);
@@ -48,9 +51,13 @@ public class LinkParserTest {
 		
 		Document doc = Jsoup.parse(result);
 		parser.completeParse(doc);
-		assertTrue(doc.html().contains("http://example.com"));
-		assertTrue(doc.html().contains("<a"));
-		assertTrue(doc.html().contains("</a>"));
+		String html = doc.html();
+		assertTrue(html.contains("http://example.com"));
+		assertTrue(html.contains("<a"));
+		assertTrue(html.contains("</a>"));
+		//simpleparsers has a the italics parser, so it should result in italicized text
+		assertTrue(html.contains("<em"));
+		assertTrue(html.contains("</em>"));
 	}
 	
 	@Test
