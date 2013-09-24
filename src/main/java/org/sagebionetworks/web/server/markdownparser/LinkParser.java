@@ -14,6 +14,7 @@ public class LinkParser extends BasicMarkdownElementParser  {
 	Pattern protocol = Pattern.compile(MarkdownRegExConstants.LINK_URL_PROTOCOL, Pattern.DOTALL);
 	MarkdownExtractor extractor;
 	MarkdownElementParser widgetParser;
+	private List<MarkdownElementParser> simpleParsers;
 	
 	@Override
 	public void reset(List<MarkdownElementParser> simpleParsers) {
@@ -25,6 +26,7 @@ public class LinkParser extends BasicMarkdownElementParser  {
 				 break;
 			} 
 		}
+		this.simpleParsers = simpleParsers;
 	}
 	
 	private String getCurrentDivID() {
@@ -61,7 +63,8 @@ public class LinkParser extends BasicMarkdownElementParser  {
 				StringBuilder html = new StringBuilder();
 				html.append(ServerMarkdownUtils.START_LINK);
 				html.append(url + "\">");
-				html.append(text + ServerMarkdownUtils.END_LINK);
+				String processedText = runSimpleParsers(text, simpleParsers);
+				html.append(processedText + ServerMarkdownUtils.END_LINK);
 				extractor.putContainerIdToContent(getCurrentDivID(), html.toString());
 				
 				updated.append(extractor.getContainerElementStart() + getCurrentDivID());
