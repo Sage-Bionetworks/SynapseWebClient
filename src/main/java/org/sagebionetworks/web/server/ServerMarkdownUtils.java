@@ -2,8 +2,10 @@ package org.sagebionetworks.web.server;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,6 +129,7 @@ public class ServerMarkdownUtils {
 	 * @param doc
 	 */
 	public static void insertExtractedContentToMarkdown(MarkdownExtractor extractor, Document doc, boolean hasHtml) {
+		Set<String> foundKeys = new HashSet<String>();
 		for(String key: extractor.getContainerIds()) {
 			Element el = doc.getElementById(key);
 			if(el != null) {
@@ -135,8 +138,11 @@ public class ServerMarkdownUtils {
 				} else {
 					el.appendText(extractor.getContent(key));
 				}
+				foundKeys.add(key);
 			}
 		}
+		//clean up the container Ids that we resolved
+		extractor.removeContainerIds(foundKeys);
 	}
 	
 	/**
