@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -196,8 +197,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean isAdministrator, boolean canEdit,
-			Long versionNumber, Synapse.EntityArea area, String areaToken) {
-		this.versionNumber = versionNumber;
+			Long versionNumber, Synapse.EntityArea area, String areaToken, String projectId) {
+		this.versionNumber = versionNumber;		
 		colLeftContainer = initContainerAndPanel(colLeftContainer, colLeftPanel);
 		colRightContainer = initContainerAndPanel(colRightContainer, colRightPanel);
 		fullWidthContainer = initContainerAndPanel(fullWidthContainer, fullWidthPanel);
@@ -232,12 +233,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			renderProjectEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, area, wikiPageId);
 		} else if (isFolderLike) {
 			//render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
-			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, wikiPageId);
+			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, wikiPageId, projectId);
 		} else if (bundle.getEntity() instanceof Summary) {
 		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber);
 		} else {
 			// default entity view
-			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, wikiPageId);
+			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, wikiPageId, projectId);
 		}
 		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
@@ -312,7 +313,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * Private Methods
 	 */
 	// Render the File entity	
-	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber, String wikiPageId) {
+	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber, String wikiPageId, String projectId) {
 		// ** LEFT/RIGHT
 		// File Title Bar
 		if (bundle.getEntity() instanceof FileEntity) {
@@ -370,27 +371,34 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 	// Render the Folder entity
 	private void renderFolderEntity(EntityBundle bundle,
-			String entityTypeDisplay, boolean isAdmin, boolean canEdit, String wikiPageId) {
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit, String wikiPageId, String projectId) {		
+		topFullWidthContainer.add(new HTML("Project: " + projectId)); // TODO: make into project header widget 
+		fullWidthContainer.add(currentTabContainer);		
+		
 		LayoutContainer row;
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		Widget ebW = entityMetadata.asWidget();
 		row = DisplayUtils.createRowContainer();
 		ebW.addStyleName("col-md-12");
 		row.add(ebW);
-		fullWidthContainer.add(row);		
+		filesTabContainer.add(row);		
 		// Description
-		fullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
+		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
 
 		// Child Browser
 		row = DisplayUtils.createRowContainer();
 		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
-		fullWidthContainer.add(row);
+		filesTabContainer.add(row);
 		
 		//Annotations
-		fullWidthContainer.add(createAnnotationsWidget(bundle, canEdit));
+		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));
+		filesTabContainer.layout(true);
 		
 		// Wiki
-		addWikiPageWidget(fullWidthContainer, bundle, canEdit, wikiPageId, 24);
+		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24);
+		
+		// select files tab for folder
+		setTabSelected(EntityArea.FILES, false);
 	}
 
 	// Render the Project entity
