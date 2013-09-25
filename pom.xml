@@ -465,12 +465,6 @@
 			<version>20100527</version>
 		</dependency>
 
-		<!-- Markdown -->
-		<dependency>
-			<groupId>eu.henkelmann</groupId>
-			<artifactId>actuarius_2.9.2</artifactId>
-			<version>0.2.4</version>
-		</dependency>
 		<!-- Test only dependencies -->
 		<dependency>
 			<groupId>com.sun.grizzly</groupId>
