@@ -431,6 +431,7 @@ a.shortBtn {
 	width: 100%;
 	top: 5px;
 	left: 0;
+	z-index: 100;
 }
 
 #alertContainer {

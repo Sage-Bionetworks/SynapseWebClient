@@ -1,13 +1,19 @@
 package org.sagebionetworks.web.unitclient;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -190,4 +196,23 @@ public class DisplayUtilsTest {
 		DisplayUtils.updateWidgetSelectionState(state, markdownText, 2);
 		assertFalse(state.isWidgetSelected());
 	}
+	
+	@Test 
+	public void testGetProjectId() {
+		String projectId = "syn123";
+		EntityPath path = new EntityPath();
+		EntityHeader root = new EntityHeader();
+		EntityHeader project = new EntityHeader();
+		project.setId(projectId);
+		project.setType(Project.class.getName());
+		EntityHeader file = new EntityHeader();
+		path.setPath(Arrays.asList(new EntityHeader[] { root, project, file }));
+		assertEquals(projectId, DisplayUtils.getProjectId(path));
+	}
 }
+
+
+
+
+
+

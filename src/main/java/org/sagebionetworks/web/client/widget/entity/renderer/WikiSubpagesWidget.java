@@ -73,7 +73,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							if (headers.getTotalNumberOfResults() == 1) {
 								EntityHeader theHeader = headers.getResults().get(0);
 								ownerObjectName = theHeader.getName();
-								ownerObjectLink = new Synapse(theHeader.getId(), wikiKey.getVersion(), Synapse.EntityTab.WIKI, null);
+								ownerObjectLink = new Synapse(theHeader.getId(), wikiKey.getVersion(), Synapse.EntityArea.WIKI, null);
 								refreshTableOfContents();
 							}	
 						} catch (JSONObjectAdapterException e) {
@@ -121,7 +121,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							title = ownerObjectName;
 						}
 						else {
-							targetPlace = new Synapse(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), Synapse.EntityTab.WIKI, header.getId());
+							targetPlace = new Synapse(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), Synapse.EntityArea.WIKI, header.getId());
 							title = header.getTitle();
 						}
 						

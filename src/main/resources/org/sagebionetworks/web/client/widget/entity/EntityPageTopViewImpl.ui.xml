@@ -20,7 +20,7 @@
 				    <g:SimplePanel ui:field="topFullWidthPanel" styleName="col-md-12"/>
 			    </div>
 				    
-				<div class="row" ui:field="navtabContainer" styleName="margin-top-15">
+				<div class="row margin-top-15" ui:field="navtabContainer">
 				    <ul class="nav nav-tabs margin-left-15 margin-right-15">
 				        <!-- remove span-8 after upgrade to Bootstrap 3.0, use nav-justified on parent ul instead -->
 					    <li class="span-4 active" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>

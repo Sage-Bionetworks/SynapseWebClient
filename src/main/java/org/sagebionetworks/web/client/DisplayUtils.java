@@ -31,6 +31,8 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -133,7 +135,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -638,10 +639,10 @@ public class DisplayUtils {
 		return getSynapseHistoryTokenNoHash(entityId, versionNumber, null);
 	}
 	
-	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityTab area) {
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityArea area) {
 		return getSynapseHistoryTokenNoHash(entityId, versionNumber, area, null);
 	}
-	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityTab area, String areaToken) {
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityArea area, String areaToken) {
 		Synapse place = new Synapse(entityId, versionNumber, area, areaToken);
 		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
@@ -1775,6 +1776,16 @@ public class DisplayUtils {
 		btn.removeStyleName("gwt-Button");
 		btn.addStyleName("btn btn-" + type.toString().toLowerCase());
 		return btn;
+	}
+
+	public static String getProjectId(EntityPath entityPath) {
+		if(entityPath == null) return null;
+		for(EntityHeader eh : entityPath.getPath()) {
+			if(Project.class.getName().equals(eh.getType())) {
+				return eh.getId();
+			}
+		}
+		return null;
 	}
 
 }

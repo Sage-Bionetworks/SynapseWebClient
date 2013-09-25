@@ -30,7 +30,7 @@ public class SynapsePlaceTest {
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertNull(place.getVersionNumber());
 		Assert.assertNull(place.getAreaToken());
-		Assert.assertNull(place.getEntityArea());
+		Assert.assertNull(place.getArea());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
 	
@@ -42,7 +42,7 @@ public class SynapsePlaceTest {
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertEquals(testVersionNumber, place.getVersionNumber());
 		Assert.assertNull(place.getAreaToken());
-		Assert.assertNull(place.getEntityArea());
+		Assert.assertNull(place.getArea());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
 	
@@ -53,7 +53,7 @@ public class SynapsePlaceTest {
 		
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertEquals(testVersionNumber, place.getVersionNumber());
-		Assert.assertEquals(Synapse.EntityTab.FILES, place.getEntityArea());
+		Assert.assertEquals(Synapse.EntityArea.FILES, place.getArea());
 		Assert.assertNull(place.getAreaToken());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
@@ -65,7 +65,7 @@ public class SynapsePlaceTest {
 		
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertEquals(testVersionNumber, place.getVersionNumber());
-		Assert.assertEquals(Synapse.EntityTab.ADMIN, place.getEntityArea());
+		Assert.assertEquals(Synapse.EntityArea.ADMIN, place.getArea());
 		Assert.assertNull(place.getAreaToken());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
@@ -77,7 +77,7 @@ public class SynapsePlaceTest {
 		
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertEquals(testVersionNumber, place.getVersionNumber());
-		Assert.assertEquals(Synapse.EntityTab.WIKI, place.getEntityArea());
+		Assert.assertEquals(Synapse.EntityArea.WIKI, place.getArea());
 		Assert.assertEquals(testAreaToken, place.getAreaToken());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
@@ -89,7 +89,7 @@ public class SynapsePlaceTest {
 		
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertNull(place.getVersionNumber());
-		Assert.assertEquals(Synapse.EntityTab.FILES, place.getEntityArea());
+		Assert.assertEquals(Synapse.EntityArea.FILES, place.getArea());
 		Assert.assertNull(place.getAreaToken());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
@@ -101,7 +101,7 @@ public class SynapsePlaceTest {
 		
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertNull(place.getVersionNumber());
-		Assert.assertEquals(Synapse.EntityTab.ADMIN, place.getEntityArea());
+		Assert.assertEquals(Synapse.EntityArea.ADMIN, place.getArea());
 		Assert.assertNull(place.getAreaToken());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
@@ -113,7 +113,7 @@ public class SynapsePlaceTest {
 		
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertNull(place.getVersionNumber());
-		Assert.assertEquals(Synapse.EntityTab.WIKI, place.getEntityArea());
+		Assert.assertEquals(Synapse.EntityArea.WIKI, place.getArea());
 		Assert.assertEquals(testAreaToken, place.getAreaToken());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
