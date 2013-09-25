@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitshared.users;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,8 +10,6 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-
-import scala.actors.threadpool.Arrays;
 
 public class AclUtilsTest {
 
