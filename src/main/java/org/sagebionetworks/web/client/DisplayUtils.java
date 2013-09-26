@@ -147,7 +147,6 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
-
 	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
@@ -1778,11 +1777,11 @@ public class DisplayUtils {
 		return btn;
 	}
 
-	public static String getProjectId(EntityPath entityPath) {
+	public static EntityHeader getProjectId(EntityPath entityPath) {
 		if(entityPath == null) return null;
 		for(EntityHeader eh : entityPath.getPath()) {
 			if(Project.class.getName().equals(eh.getType())) {
-				return eh.getId();
+				return eh;
 			}
 		}
 		return null;

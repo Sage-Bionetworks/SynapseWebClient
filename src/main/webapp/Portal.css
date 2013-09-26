@@ -573,6 +573,9 @@ a.shortBtn {
 .margin-bottom-10 {
 	margin-bottom: 10px;
 }
+.margin-bottom-15 {
+	margin-bottom: 15px;
+}
 
 .margin-left-725 {
 	margin-left: 725px;
@@ -580,6 +583,18 @@ a.shortBtn {
 
 .margin-left-0-important {
 	margin-left: 0px !important;
+}
+
+.margin-left-neg-15 {
+	margin-left: -15px;
+}
+
+.margin-right-neg-15 {
+	margin-right: -15px;
+}
+
+.tab-background {
+	background-color: #f9f9f9;
 }
 
 .file-preview {
@@ -595,7 +610,7 @@ a.shortBtn {
 }
  
 .file-preview::after {
-    content: "Preview";
+    content: attr(title);
     position: absolute;
     top: -1px;
     left: -1px;
@@ -1086,7 +1101,7 @@ ol.lowerroman {
 .highlight-box {
     position: relative;
     margin-top: 15px;
-    padding: 30px 3px 3px 3px;
+    padding: 47px 3px 6px 11px;
     background-color: white;
     border: 1px solid #DDD;
     -webkit-border-radius: 4px;
@@ -1098,16 +1113,15 @@ ol.lowerroman {
 .highlight-box::after {
     content: attr(title);
     position: absolute;
-    top: -1px;
-    left: -1px;
+    top: 6px;
+    left: 6px;
+	color: #333333;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 21px;
+    font-weight: 200;
+    line-height: 1.4;
     padding: 3px 7px;
-    font-size: 12px;
-    background-color: whiteSmoke;
-    border: 1px solid #DDD;
-    color: #9DA0A4;
-    -webkit-border-radius: 4px 0 4px 0;
-    -moz-border-radius: 4px 0 4px 0;
-    border-radius: 4px 0 4px 0;
+    position: absolute;    
 }
 
 .highlight-line {

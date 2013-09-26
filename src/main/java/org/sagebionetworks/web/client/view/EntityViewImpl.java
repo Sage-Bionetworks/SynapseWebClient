@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -89,9 +90,9 @@ public class EntityViewImpl extends Composite implements EntityView {
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber, String projectId, Synapse.EntityArea area, String areaToken) {
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
 		entityPageTop.clearState();
-		entityPageTop.configure(bundle, versionNumber, projectId, area, areaToken);
+		entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
 		entityPageTopPanel.setWidget(entityPageTop.asWidget());
 		entityPageTop.refresh();
 	}

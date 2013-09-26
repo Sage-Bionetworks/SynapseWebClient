@@ -18,7 +18,7 @@
 			</g:HTMLPanel>
 		</g:HTMLPanel>
 		<g:HTMLPanel ui:field="noFileFoundContainer">
-			<div class="span-17 bordered-form notopmargin">
+			<div class="well">
 				<div>
 					<h3><span style="margin-right: 10px;">No File Found</span><g:SimplePanel ui:field="uploadButtonContainer"/></h3>
 				</div>

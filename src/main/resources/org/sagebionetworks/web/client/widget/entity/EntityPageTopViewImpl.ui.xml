@@ -21,7 +21,7 @@
 			    </div>
 				    
 				<div class="row margin-top-15" ui:field="navtabContainer">
-				    <ul class="nav nav-tabs margin-left-15 margin-right-15">
+				    <ul class="nav nav-tabs">
 				        <!-- remove span-8 after upgrade to Bootstrap 3.0, use nav-justified on parent ul instead -->
 					    <li class="span-4 active" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
 					    <li class="span-4" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>

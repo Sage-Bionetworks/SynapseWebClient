@@ -23,7 +23,7 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean isAdmin, boolean canEdit,
 			Long versionNumber, Synapse.EntityArea area, String areaToken,
-			String projectId);
+			EntityHeader projectHeader);
 
 	/**
 	 * Presenter interface

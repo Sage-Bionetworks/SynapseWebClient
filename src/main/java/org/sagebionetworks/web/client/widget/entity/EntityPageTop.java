@@ -53,7 +53,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private Long versionNumber;
 	private Synapse.EntityArea area;
 	private String areaToken;
-	private String projectId;
+	private EntityHeader projectHeader;
 	private AreaChangeHandler areaChangedHandler;
 	
 	@Inject
@@ -87,10 +87,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      *
      * @param bundle
      */
-    public void configure(EntityBundle bundle, Long versionNumber, String projectId, Synapse.EntityArea area, String areaToken) {
+    public void configure(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
     	this.bundle = bundle;
     	this.versionNumber = versionNumber;
-    	this.projectId = projectId;
+    	this.projectHeader = projectHeader;
     	this.area = area;
     	this.areaToken = areaToken;
 	}
@@ -113,7 +113,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void refresh() {
-		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit(), area, areaToken, projectId);
+		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit(), area, areaToken, projectHeader);
 	}
 		
 	@Override
@@ -191,17 +191,17 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void gotoProjectArea(EntityArea area) {
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(projectId, null, area, null));
+		globalApplicationState.getPlaceChanger().goTo(new Synapse(projectHeader.getId(), null, area, null));
 	}
 
 	
 	/*
 	 * Private Methods
 	 */
-	private void sendDetailsToView(boolean isAdmin, boolean canEdit, Synapse.EntityArea area, String areaToken, String projectId) {		
+	private void sendDetailsToView(boolean isAdmin, boolean canEdit, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {		
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber, area, areaToken, projectId);
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber, area, areaToken, projectHeader);
 	}
 	
 	private UserProfile getUserProfile() {
